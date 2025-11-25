@@ -1,0 +1,99 @@
+# Example configuration file for ccpm-config.yaml
+# Copy this to .claude/ccpm-config.yaml and customize for your project
+
+project:
+  name: "Your Project Name"
+  type: "mobile-react-native"  # Options: mobile-react-native, web-vuejs, web-reactjs, web-nextjs, backend-laravel
+  description: "Brief description of your project"
+  repository: "https://github.com/your-org/your-project"
+
+team:
+  reviewers:
+    # Add team member emails or names for each region/role
+    default: "reviewer@example.com"
+    # For multi-region projects (like FWD Cube):
+    # ph: "philippines-reviewer@example.com"
+    # my: "malaysia-reviewer@example.com"
+    # id: "indonesia-reviewer@example.com"
+
+integrations:
+  jira:
+    enabled: false
+    # url: "https://your-domain.atlassian.net"
+    # project_key: "PROJ"
+    # Authentication via environment variables:
+    # JIRA_EMAIL and JIRA_API_TOKEN
+  
+  confluence:
+    enabled: false
+    # url: "https://your-domain.atlassian.net/wiki"
+    # space_key: "DOCS"
+    # Authentication via environment variables:
+    # CONFLUENCE_EMAIL and CONFLUENCE_API_TOKEN
+  
+  slack:
+    enabled: false
+    # Authentication via environment variable:
+    # SLACK_WEBHOOK_URL
+    # channels:
+    #   dev: "dev-notifications"
+    #   qa: "qa-reports"
+    #   design: "design-reviews"
+
+workflow:
+  # Default test coverage threshold (percentage)
+  default_test_coverage: 80
+  
+  # Require human approval at each phase gate
+  require_approval: true
+  
+  # Enforce TDD workflow (tests before code)
+  tdd_enforcement: true
+  
+  # Auto-generate documentation after completion
+  auto_generate_docs: true
+  
+  # Create Confluence pages automatically
+  create_confluence_pages: false
+  
+  # Send Slack notifications
+  send_slack_notifications: false
+
+quality:
+  # Maximum ESLint warnings allowed (0 = no warnings)
+  eslint_max_warnings: 0
+  
+  # Use TypeScript strict mode
+  typescript_strict: true
+  
+  # Auto-format with Prettier
+  prettier_auto_format: true
+
+conventions:
+  # File naming conventions
+  file_naming:
+    components: "PascalCase.{phone|tablet}.tsx"
+    hooks: "useCamelCase.tsx"
+    features: "kebab-case/{region}/{phone|tablet}/"
+  
+  # Branch naming pattern
+  branch_naming:
+    pattern: "feature/<TICKET>-<description>"
+    example: "feature/PROJ-123-add-feature"
+  
+  # Code style preferences
+  code_style:
+    component_type: "functional"  # Options: functional, class
+    state_management: "zustand"   # Options: zustand, redux, context
+    api_layer: "react-query"      # Options: react-query, rtk-query, axios
+
+# Custom agents (optional)
+# Add project-specific agents in .claude/agents/
+# They automatically get +25 priority bonus
+
+# Custom rules (optional)
+# Add project-specific rules in .claude/rules/
+
+# Custom skills (optional)
+# Add project-specific skills in .claude/skills/
+

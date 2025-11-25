@@ -1,0 +1,271 @@
+#!/bin/bash
+
+# CCPM Team Agents Installation Script
+# Copies .claude directory to your project and sets up environment configuration
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script directory (where this script is located)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_SOURCE="$SCRIPT_DIR/.claude"
+
+echo -e "${BLUE}🚀 CCPM Team Agents Installation${NC}"
+echo "======================================"
+echo ""
+
+# Check if .claude directory exists
+if [ ! -d "$CLAUDE_SOURCE" ]; then
+    echo -e "${RED}❌ Error: .claude directory not found in $SCRIPT_DIR${NC}"
+    echo "Please run this script from the ccpm-team-agents repository root."
+    exit 1
+fi
+
+# Get target project path
+if [ -z "$1" ]; then
+    read -p "Enter your project path (absolute or relative): " TARGET_PROJECT
+else
+    TARGET_PROJECT="$1"
+fi
+
+# Convert to absolute path
+if [[ ! "$TARGET_PROJECT" = /* ]]; then
+    TARGET_PROJECT="$(cd "$TARGET_PROJECT" && pwd)"
+fi
+
+# Check if target directory exists
+if [ ! -d "$TARGET_PROJECT" ]; then
+    echo -e "${RED}❌ Error: Target directory does not exist: $TARGET_PROJECT${NC}"
+    exit 1
+fi
+
+TARGET_CLAUDE="$TARGET_PROJECT/.claude"
+
+echo -e "${BLUE}Target project:${NC} $TARGET_PROJECT"
+echo -e "${BLUE}Target .claude:${NC} $TARGET_CLAUDE"
+echo ""
+
+# Check if .claude already exists in target
+if [ -d "$TARGET_CLAUDE" ]; then
+    echo -e "${YELLOW}⚠️  Warning: .claude directory already exists in target project${NC}"
+    read -p "Overwrite? (yes/no): " OVERWRITE
+    if [ "$OVERWRITE" != "yes" ]; then
+        echo "Installation cancelled."
+        exit 0
+    fi
+    echo "Removing existing .claude directory..."
+    rm -rf "$TARGET_CLAUDE"
+fi
+
+# Copy .claude directory
+echo -e "${BLUE}Copying .claude directory...${NC}"
+cp -r "$CLAUDE_SOURCE" "$TARGET_CLAUDE"
+echo -e "${GREEN}✅ .claude directory copied${NC}"
+echo ""
+
+# Read .envrc.template to get environment variable keys
+ENVRC_TEMPLATE="$TARGET_CLAUDE/.envrc.template"
+
+if [ ! -f "$ENVRC_TEMPLATE" ]; then
+    echo -e "${RED}❌ Error: .envrc.template not found${NC}"
+    exit 1
+fi
+
+# Extract environment variable names from template
+echo -e "${BLUE}📝 Environment Configuration${NC}"
+echo "======================================"
+echo "Please provide values for environment variables."
+echo "Press Enter to skip optional variables (empty values)."
+echo "You can configure integrations later by editing .claude/.envrc"
+echo ""
+
+# Initialize variables
+declare -A ENV_VARS
+
+# Function to prompt for env var
+prompt_env_var() {
+    local var_name=$1
+    local description=$2
+    local is_secret=${3:-false}
+    local default_value=${4:-}
+    
+    local prompt_text="$description"
+    if [ -n "$default_value" ]; then
+        prompt_text="$prompt_text [$default_value]"
+    fi
+    
+    if [ "$is_secret" = true ]; then
+        read -sp "$prompt_text: " value
+        echo ""
+    else
+        read -p "$prompt_text: " value
+    fi
+    
+    # Use default if empty
+    if [ -z "$value" ] && [ -n "$default_value" ]; then
+        value="$default_value"
+    fi
+    
+    ENV_VARS["$var_name"]="$value"
+}
+
+# Prompt for key environment variables
+echo -e "${YELLOW}Project Configuration:${NC}"
+prompt_env_var "PROJECT_NAME" "Project Name" false ""
+prompt_env_var "PROJECT_ENV" "Project Environment" false "development"
+
+echo ""
+echo -e "${YELLOW}Jira Integration (optional - press Enter to skip):${NC}"
+prompt_env_var "JIRA_URL" "Jira URL (e.g., https://company.atlassian.net)" false ""
+prompt_env_var "JIRA_EMAIL" "Jira Email" false ""
+prompt_env_var "JIRA_API_TOKEN" "Jira API Token" true ""
+prompt_env_var "JIRA_PROJECT_KEY" "Jira Project Key" false ""
+
+echo ""
+echo -e "${YELLOW}Confluence Integration (optional - press Enter to skip):${NC}"
+prompt_env_var "CONFLUENCE_URL" "Confluence URL" false ""
+prompt_env_var "CONFLUENCE_EMAIL" "Confluence Email" false ""
+prompt_env_var "CONFLUENCE_API_TOKEN" "Confluence API Token" true ""
+prompt_env_var "CONFLUENCE_SPACE_KEY" "Confluence Space Key" false ""
+
+echo ""
+echo -e "${YELLOW}Slack Integration (optional - press Enter to skip):${NC}"
+prompt_env_var "SLACK_BOT_TOKEN" "Slack Bot Token (xoxb-...)" true ""
+prompt_env_var "SLACK_CHANNEL_ID" "Slack Channel ID" false ""
+prompt_env_var "SLACK_WEBHOOK_URL" "Slack Webhook URL" false ""
+
+echo ""
+echo -e "${YELLOW}Figma Integration (optional - press Enter to skip):${NC}"
+prompt_env_var "FIGMA_ACCESS_TOKEN" "Figma Access Token (figd_...)" true ""
+prompt_env_var "FIGMA_FILE_KEY" "Figma File Key" false ""
+
+echo ""
+echo -e "${YELLOW}Git Configuration (optional):${NC}"
+prompt_env_var "GIT_AUTHOR_NAME" "Git Author Name" false ""
+prompt_env_var "GIT_AUTHOR_EMAIL" "Git Author Email" false ""
+
+# Create .envrc file
+ENVRC_FILE="$TARGET_CLAUDE/.envrc"
+echo ""
+echo -e "${BLUE}Creating .envrc file...${NC}"
+
+# Generate .envrc from template
+cat > "$ENVRC_FILE" << 'EOF'
+# .claude/.envrc - CCPM Integration Configuration
+# Auto-generated by install.sh
+# Date: 
+# DO NOT COMMIT THIS FILE
+
+EOF
+
+# Replace date
+sed -i.bak "s/Date: /Date: $(date +%Y-%m-%d)/" "$ENVRC_FILE" 2>/dev/null || \
+sed -i "s/Date: /Date: $(date +%Y-%m-%d)/" "$ENVRC_FILE"
+rm -f "$ENVRC_FILE.bak" 2>/dev/null || true
+
+# Append environment variables
+cat >> "$ENVRC_FILE" << EOF
+
+# ============================================
+# Project Configuration
+# ============================================
+export PROJECT_NAME="${ENV_VARS[PROJECT_NAME]}"
+export PROJECT_ENV="${ENV_VARS[PROJECT_ENV]:-development}"
+
+# ============================================
+# Jira Integration
+# ============================================
+export JIRA_URL="${ENV_VARS[JIRA_URL]}"
+export JIRA_EMAIL="${ENV_VARS[JIRA_EMAIL]}"
+export JIRA_API_TOKEN="${ENV_VARS[JIRA_API_TOKEN]}"
+export JIRA_PROJECT_KEY="${ENV_VARS[JIRA_PROJECT_KEY]}"
+export JIRA_DEFAULT_ASSIGNEE="${ENV_VARS[JIRA_DEFAULT_ASSIGNEE]}"
+export JIRA_DEFAULT_PRIORITY="${ENV_VARS[JIRA_DEFAULT_PRIORITY]:-Medium}"
+export JIRA_BOARD_ID="${ENV_VARS[JIRA_BOARD_ID]}"
+
+# ============================================
+# Confluence Integration
+# ============================================
+export CONFLUENCE_URL="${ENV_VARS[CONFLUENCE_URL]}"
+export CONFLUENCE_EMAIL="${ENV_VARS[CONFLUENCE_EMAIL]}"
+export CONFLUENCE_API_TOKEN="${ENV_VARS[CONFLUENCE_API_TOKEN]}"
+export CONFLUENCE_SPACE_KEY="${ENV_VARS[CONFLUENCE_SPACE_KEY]}"
+export CONFLUENCE_PARENT_PAGE_ID="${ENV_VARS[CONFLUENCE_PARENT_PAGE_ID]}"
+export CONFLUENCE_DEFAULT_LABELS="${ENV_VARS[CONFLUENCE_DEFAULT_LABELS]:-ccpm,generated,documentation}"
+
+# ============================================
+# Slack Integration
+# ============================================
+export SLACK_BOT_TOKEN="${ENV_VARS[SLACK_BOT_TOKEN]}"
+export SLACK_CHANNEL_ID="${ENV_VARS[SLACK_CHANNEL_ID]}"
+export SLACK_WEBHOOK_URL="${ENV_VARS[SLACK_WEBHOOK_URL]}"
+export SLACK_MENTION_DEV="${ENV_VARS[SLACK_MENTION_DEV]:-@developer-team}"
+export SLACK_MENTION_QA="${ENV_VARS[SLACK_MENTION_QA]:-@qa-team}"
+export SLACK_MENTION_PM="${ENV_VARS[SLACK_MENTION_PM]:-@pm-team}"
+
+# ============================================
+# Figma Integration
+# ============================================
+export FIGMA_ACCESS_TOKEN="${ENV_VARS[FIGMA_ACCESS_TOKEN]}"
+export FIGMA_FILE_KEY="${ENV_VARS[FIGMA_FILE_KEY]}"
+export FIGMA_TEAM_ID="${ENV_VARS[FIGMA_TEAM_ID]}"
+export FIGMA_MCP_ENABLED="${ENV_VARS[FIGMA_MCP_ENABLED]:-true}"
+
+# ============================================
+# CCPM Configuration
+# ============================================
+export CCPM_AUTO_APPROVE="${ENV_VARS[CCPM_AUTO_APPROVE]:-true}"
+export CCPM_DEFAULT_COVERAGE="${ENV_VARS[CCPM_DEFAULT_COVERAGE]:-80}"
+export CCPM_TDD_ENFORCE="${ENV_VARS[CCPM_TDD_ENFORCE]:-true}"
+export CCPM_AUTO_NOTIFY="${ENV_VARS[CCPM_AUTO_NOTIFY]:-true}"
+export CCPM_TOKEN_WARNING="${ENV_VARS[CCPM_TOKEN_WARNING]:-150000}"
+
+# ============================================
+# Optional: Git Configuration
+# ============================================
+export GIT_AUTHOR_NAME="${ENV_VARS[GIT_AUTHOR_NAME]}"
+export GIT_AUTHOR_EMAIL="${ENV_VARS[GIT_AUTHOR_EMAIL]}"
+EOF
+
+echo -e "${GREEN}✅ .envrc file created${NC}"
+echo ""
+
+# Create settings.local.json from settings.example.json
+SETTINGS_EXAMPLE="$TARGET_CLAUDE/settings.example.json"
+SETTINGS_LOCAL="$TARGET_CLAUDE/settings.local.json"
+
+if [ -f "$SETTINGS_EXAMPLE" ]; then
+    echo -e "${BLUE}Creating settings.local.json...${NC}"
+    cp "$SETTINGS_EXAMPLE" "$SETTINGS_LOCAL"
+    echo -e "${GREEN}✅ settings.local.json created${NC}"
+    echo ""
+else
+    echo -e "${YELLOW}⚠️  Warning: settings.example.json not found${NC}"
+fi
+
+# Summary
+echo -e "${GREEN}======================================"
+echo "✅ Installation Complete!"
+echo "======================================${NC}"
+echo ""
+echo "CCPM Team Agents has been installed to:"
+echo -e "  ${BLUE}$TARGET_CLAUDE${NC}"
+echo ""
+echo "Configuration files created:"
+echo -e "  ✅ ${BLUE}$ENVRC_FILE${NC} (environment variables - git-ignored)"
+echo -e "  ✅ ${BLUE}$SETTINGS_LOCAL${NC} (local settings - git-ignored)"
+echo ""
+echo "Next steps:"
+echo "  1. Review and edit $ENVRC_FILE if needed"
+echo "  2. Review and edit $SETTINGS_LOCAL if needed"
+echo "  3. Start using CCPM: ${BLUE}workflow:start \"Your task\"${NC}"
+echo ""
+echo "📚 Documentation: $TARGET_CLAUDE/README.md"
+echo ""
+

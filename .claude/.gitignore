@@ -1,0 +1,35 @@
+# CCPM .gitignore
+# Ignore sensitive and temporary files
+
+# Environment files with secrets
+.envrc
+.envrc.local
+*.env
+
+# Workflow execution data
+logs/
+context/
+active-workflow.txt
+
+# Local settings
+settings.local.json
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+__MACOSX/
+**/__MACOSX/
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+

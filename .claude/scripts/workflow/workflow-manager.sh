@@ -1,0 +1,316 @@
+#!/usr/bin/env bash
+
+# Workflow Manager
+# Purpose: Manage multiple workflow states
+# Version: 1.0.0
+
+set -euo pipefail
+
+CLAUDE_DIR=".claude"
+LOGS_DIR="${CLAUDE_DIR}/logs"
+WORKFLOWS_DIR="${LOGS_DIR}/workflows"
+ACTIVE_WORKFLOW_FILE="${CLAUDE_DIR}/active-workflow.txt"
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Get active workflow ID
+get_active_workflow() {
+    if [[ -f "${ACTIVE_WORKFLOW_FILE}" ]]; then
+        cat "${ACTIVE_WORKFLOW_FILE}"
+    else
+        echo ""
+    fi
+}
+
+# Set active workflow
+set_active_workflow() {
+    local workflow_id="$1"
+    echo "$workflow_id" > "${ACTIVE_WORKFLOW_FILE}"
+}
+
+# Get workflow state file path
+get_workflow_state_file() {
+    local workflow_id="$1"
+    echo "${WORKFLOWS_DIR}/${workflow_id}/workflow-state.json"
+}
+
+# Load workflow state
+load_workflow_state() {
+    local workflow_id="${1:-$(get_active_workflow)}"
+    
+    if [[ -z "$workflow_id" ]]; then
+        echo -e "${RED}❌ No active workflow${NC}" >&2
+        return 1
+    fi
+    
+    local state_file=$(get_workflow_state_file "$workflow_id")
+    
+    if [[ ! -f "$state_file" ]]; then
+        echo -e "${RED}❌ Workflow state not found: $workflow_id${NC}" >&2
+        return 1
+    fi
+    
+    cat "$state_file"
+}
+
+# Save workflow state
+save_workflow_state() {
+    local workflow_id="$1"
+    local state_json="$2"
+    
+    local state_file=$(get_workflow_state_file "$workflow_id")
+    echo "$state_json" > "$state_file"
+}
+
+# List all workflows
+list_workflows() {
+    if [[ ! -d "${WORKFLOWS_DIR}" ]]; then
+        echo -e "${YELLOW}No workflows found${NC}"
+        return
+    fi
+    
+    local active_id=$(get_active_workflow)
+    
+    echo -e "${BLUE}📋 All Workflows:${NC}"
+    echo ""
+    
+    for workflow_dir in "${WORKFLOWS_DIR}"/*/ ; do
+        if [[ ! -d "$workflow_dir" ]]; then
+            continue
+        fi
+        
+        local workflow_id=$(basename "$workflow_dir")
+        local state_file="${workflow_dir}/workflow-state.json"
+        
+        if [[ ! -f "$state_file" ]]; then
+            continue
+        fi
+        
+        local workflow_name=$(jq -r '.workflow_name // .workflow_id' "$state_file" 2>/dev/null || echo "$workflow_id")
+        local status=$(jq -r '.status // "unknown"' "$state_file" 2>/dev/null || echo "unknown")
+        local current_phase=$(jq -r '.current_phase // 0' "$state_file" 2>/dev/null || echo "0")
+        local created_at=$(jq -r '.created_at // "unknown"' "$state_file" 2>/dev/null || echo "unknown")
+        
+        # Mark active workflow
+        local active_marker=""
+        if [[ "$workflow_id" == "$active_id" ]]; then
+            active_marker=" ${GREEN}[ACTIVE]${NC}"
+        fi
+        
+        # Status icon
+        local status_icon="⏸️"
+        if [[ "$status" == "completed" ]]; then
+            status_icon="✅"
+        elif [[ "$status" == "in_progress" ]]; then
+            status_icon="⏳"
+        elif [[ "$status" == "error" ]]; then
+            status_icon="❌"
+        fi
+        
+        echo -e "${status_icon} ${BLUE}${workflow_name}${NC}${active_marker}"
+        echo "   ID: ${workflow_id}"
+        echo "   Phase: ${current_phase}/9 | Status: ${status}"
+        echo "   Created: ${created_at}"
+        echo ""
+    done
+}
+
+# Switch to workflow
+switch_workflow() {
+    local workflow_id="$1"
+    
+    local state_file=$(get_workflow_state_file "$workflow_id")
+    
+    if [[ ! -f "$state_file" ]]; then
+        echo -e "${RED}❌ Workflow not found: $workflow_id${NC}"
+        return 1
+    fi
+    
+    set_active_workflow "$workflow_id"
+    
+    local workflow_name=$(jq -r '.workflow_name // .workflow_id' "$state_file")
+    echo -e "${GREEN}✅ Switched to workflow: ${workflow_name}${NC}"
+    echo "   ID: ${workflow_id}"
+}
+
+# Delete workflow
+delete_workflow() {
+    local workflow_id="$1"
+    local force="${2:-false}"
+    
+    local workflow_dir="${WORKFLOWS_DIR}/${workflow_id}"
+    local context_dir="${LOGS_DIR}/contexts/${workflow_id}"
+    
+    if [[ ! -d "$workflow_dir" ]]; then
+        echo -e "${RED}❌ Workflow not found: $workflow_id${NC}"
+        return 1
+    fi
+    
+    # Check if active
+    local active_id=$(get_active_workflow)
+    if [[ "$workflow_id" == "$active_id" ]] && [[ "$force" != "true" ]]; then
+        echo -e "${YELLOW}⚠️  Cannot delete active workflow${NC}"
+        echo "   Switch to another workflow first or use --force"
+        return 1
+    fi
+    
+    # Confirm deletion
+    if [[ "$force" != "true" ]]; then
+        echo -e "${YELLOW}⚠️  Delete workflow: $workflow_id?${NC}"
+        read -p "   This will delete all logs and deliverables. Continue? (y/N) " confirm
+        if [[ "$confirm" != "y" ]] && [[ "$confirm" != "Y" ]]; then
+            echo "Cancelled"
+            return 0
+        fi
+    fi
+    
+    # Delete
+    rm -rf "$workflow_dir"
+    if [[ -d "$context_dir" ]]; then
+        rm -rf "$context_dir"
+    fi
+    
+    # Clear active if this was active
+    if [[ "$workflow_id" == "$active_id" ]]; then
+        rm -f "${ACTIVE_WORKFLOW_FILE}"
+    fi
+    
+    echo -e "${GREEN}✅ Workflow deleted: $workflow_id${NC}"
+}
+
+# Archive workflow
+archive_workflow() {
+    local workflow_id="$1"
+    local archive_dir="${CLAUDE_DIR}/archive"
+    
+    mkdir -p "$archive_dir"
+    
+    local workflow_dir="${WORKFLOWS_DIR}/${workflow_id}"
+    local context_dir="${LOGS_DIR}/contexts/${workflow_id}"
+    local archive_file="${archive_dir}/${workflow_id}.tar.gz"
+    
+    if [[ ! -d "$workflow_dir" ]]; then
+        echo -e "${RED}❌ Workflow not found: $workflow_id${NC}"
+        return 1
+    fi
+    
+    echo -e "${BLUE}📦 Archiving workflow: $workflow_id${NC}"
+    
+    # Create archive
+    tar -czf "$archive_file" \
+        -C "${LOGS_DIR}" \
+        "workflows/${workflow_id}" \
+        "contexts/${workflow_id}" 2>/dev/null || true
+    
+    echo -e "${GREEN}✅ Archived to: $archive_file${NC}"
+    
+    # Ask to delete
+    read -p "   Delete original? (y/N) " confirm
+    if [[ "$confirm" == "y" ]] || [[ "$confirm" == "Y" ]]; then
+        delete_workflow "$workflow_id" "true"
+    fi
+}
+
+# Show usage
+show_usage() {
+    cat <<EOF
+Workflow Manager - Manage multiple CCPM workflows
+
+USAGE:
+    bash $0 <command> [arguments]
+
+COMMANDS:
+    list                    List all workflows
+    active                  Show active workflow
+    switch <workflow-id>    Switch to workflow
+    load <workflow-id>      Load workflow state
+    delete <workflow-id>    Delete workflow
+    archive <workflow-id>   Archive workflow
+    help                    Show this help
+
+EXAMPLES:
+    # List all workflows
+    bash $0 list
+    
+    # Switch workflow
+    bash $0 switch add-auth-20251124-120000
+    
+    # Load workflow state
+    bash $0 load add-auth-20251124-120000
+    
+    # Archive completed workflow
+    bash $0 archive add-auth-20251124-120000
+
+LOCATION:
+    Workflows: .claude/logs/workflows/
+    Contexts:  .claude/logs/contexts/
+    Active:    .claude/active-workflow.txt
+EOF
+}
+
+# Main
+main() {
+    local command="${1:-list}"
+    
+    case "$command" in
+        list)
+            list_workflows
+            ;;
+        active)
+            local active_id=$(get_active_workflow)
+            if [[ -z "$active_id" ]]; then
+                echo -e "${YELLOW}No active workflow${NC}"
+            else
+                echo -e "${GREEN}Active workflow: $active_id${NC}"
+            fi
+            ;;
+        switch)
+            if [[ -z "${2:-}" ]]; then
+                echo -e "${RED}Error: workflow-id required${NC}"
+                echo "Usage: $0 switch <workflow-id>"
+                exit 1
+            fi
+            switch_workflow "$2"
+            ;;
+        load)
+            if [[ -z "${2:-}" ]]; then
+                load_workflow_state
+            else
+                load_workflow_state "$2"
+            fi
+            ;;
+        delete)
+            if [[ -z "${2:-}" ]]; then
+                echo -e "${RED}Error: workflow-id required${NC}"
+                echo "Usage: $0 delete <workflow-id>"
+                exit 1
+            fi
+            delete_workflow "$2" "${3:-false}"
+            ;;
+        archive)
+            if [[ -z "${2:-}" ]]; then
+                echo -e "${RED}Error: workflow-id required${NC}"
+                echo "Usage: $0 archive <workflow-id>"
+                exit 1
+            fi
+            archive_workflow "$2"
+            ;;
+        help|--help|-h)
+            show_usage
+            ;;
+        *)
+            echo -e "${RED}Unknown command: $command${NC}"
+            echo ""
+            show_usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
+

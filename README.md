@@ -21,15 +21,54 @@ The system includes:
 
 ### Installation
 
+#### Option 1: Automated Installation (Recommended)
+
+Use the installation script to automatically copy `.claude` to your project and configure environment variables:
+
+```bash
+# Clone this repository
+git clone https://github.com/nguyenthienthanh/ccpm-team-agents.git
+cd ccpm-team-agents
+
+# Run installation script
+./install.sh /path/to/your/project
+
+# Or run interactively (script will prompt for project path)
+./install.sh
+```
+
+The script will:
+- ✅ Copy `.claude` directory to your project root
+- ✅ Prompt you for environment variables (Jira, Confluence, Slack, Figma)
+- ✅ Create `.claude/.envrc` with your configuration
+- ✅ Create `.claude/settings.local.json` from template
+
+**Note:** All sensitive files (`.envrc`, `settings.local.json`) are automatically git-ignored.
+
+#### Option 2: Manual Installation
+
 1. Clone this repository:
 ```bash
-git clone https://github.com/your-org/ccpm-team-agents.git
+git clone https://github.com/nguyenthienthanh/ccpm-team-agents.git
 cd ccpm-team-agents
 ```
 
-2. Copy the `.claude` directory to your project:
+2. Copy the `.claude` directory to your project root:
 ```bash
 cp -r .claude /path/to/your/project/
+```
+
+3. Configure environment variables:
+```bash
+cd /path/to/your/project
+cp .claude/.envrc.template .claude/.envrc
+# Edit .claude/.envrc and fill in your values
+```
+
+4. Create local settings:
+```bash
+cp .claude/settings.example.json .claude/settings.local.json
+# Edit .claude/settings.local.json if needed
 ```
 
 ### Usage

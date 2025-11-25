@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+**/.DS_Store
+__MACOSX/
+**/__MACOSX/
+
+# Local configuration files
+.claude/.env
+.claude/.envrc
+.claude/.envrc.local
+.claude/*.env
+.claude/settings.local.json
+.claude/ccpm-config.yaml
+.claude/active-workflow.txt
+
+# Workflow execution data
+.claude/logs/
+.claude/logs/**/*
+.claude/contexts/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+

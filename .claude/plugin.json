@@ -1,0 +1,318 @@
+{
+  "name": "ccpm-team-agents",
+  "version": "4.5.0",
+  "description": "Comprehensive Project Management with Multi-Agent Collaboration, TDD Enforcement, and Quality Gates",
+  "author": "Your Organization",
+  "license": "MIT",
+  "main": ".claude/CLAUDE.md",
+  "type": "workspace",
+  
+  "keywords": [
+    "project-management",
+    "tdd",
+    "team-agents",
+    "workflow",
+    "jira",
+    "confluence",
+    "slack",
+    "react-native",
+    "quality-gates"
+  ],
+  
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  
+  "files": [
+    ".claude/**/*",
+    "!.claude/context/**",
+    "!.claude/logs/**",
+    "!.claude/workflow-state.json",
+    "!.claude/.env"
+  ],
+  
+  "hooks": {
+    "UserPromptSubmit": {
+      "script": ".claude/hooks/smart-agent-selector.md",
+      "description": "Auto-activates relevant agents based on user prompt",
+      "priority": 100
+    }
+  },
+  
+  "commands": [
+    {
+      "name": "workflow:start",
+      "description": "Initialize workflow and execute Phase 1: Requirements Analysis",
+      "file": ".claude/commands/workflow/start.md",
+      "category": "Workflow"
+    },
+    {
+      "name": "workflow:status",
+      "description": "Show current workflow status and progress",
+      "file": ".claude/commands/workflow/status.md",
+      "category": "Workflow"
+    },
+    {
+      "name": "workflow:approve",
+      "description": "Approve current phase and proceed to next",
+      "file": ".claude/commands/workflow/approve.md",
+      "category": "Workflow"
+    },
+    {
+      "name": "workflow:reject",
+      "description": "Reject phase and restart with feedback",
+      "file": ".claude/commands/workflow/reject.md",
+      "category": "Workflow"
+    },
+    {
+      "name": "workflow:modify",
+      "description": "Modify deliverables without full restart",
+      "file": ".claude/commands/workflow/modify.md",
+      "category": "Workflow"
+    },
+    {
+      "name": "workflow:phase:2",
+      "description": "Execute Phase 2: Technical Planning",
+      "file": ".claude/commands/workflow/phase-2.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:3",
+      "description": "Execute Phase 3: Design Review",
+      "file": ".claude/commands/workflow/phase-3.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:4",
+      "description": "Execute Phase 4: Test Planning",
+      "file": ".claude/commands/workflow/phase-4.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:5a",
+      "description": "Execute Phase 5a: Write Tests (TDD RED)",
+      "file": ".claude/commands/workflow/phase-5a.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:5b",
+      "description": "Execute Phase 5b: Implementation (TDD GREEN)",
+      "file": ".claude/commands/workflow/phase-5b.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:5c",
+      "description": "Execute Phase 5c: Refactor (TDD REFACTOR)",
+      "file": ".claude/commands/workflow/phase-5c.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:6",
+      "description": "Execute Phase 6: Code Review",
+      "file": ".claude/commands/workflow/phase-6.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:7",
+      "description": "Execute Phase 7: QA Validation",
+      "file": ".claude/commands/workflow/phase-7.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:8",
+      "description": "Execute Phase 8: Documentation",
+      "file": ".claude/commands/workflow/phase-8.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "workflow:phase:9",
+      "description": "Execute Phase 9: Notification",
+      "file": ".claude/commands/workflow/phase-9.md",
+      "category": "Workflow Phases"
+    },
+    {
+      "name": "project:init",
+      "description": "Initialize CCPM for a new project or reconfigure",
+      "file": ".claude/commands/project/init.md",
+      "category": "Project"
+    },
+    {
+      "name": "agent:list",
+      "description": "List all available agents and their capabilities",
+      "file": ".claude/commands/agent:list.md",
+      "category": "Agent Management"
+    },
+    {
+      "name": "project:switch",
+      "description": "Switch between configured projects",
+      "file": ".claude/commands/project:switch.md",
+      "category": "Project Management"
+    },
+    {
+      "name": "help",
+      "description": "Show CCPM command reference and documentation",
+      "file": ".claude/commands/help.md",
+      "category": "Help"
+    }
+  ],
+  
+  "agents": [
+    {
+      "name": "mobile-react-native",
+      "description": "React Native + Expo mobile development expert",
+      "file": ".claude/agents/mobile-react-native.md",
+      "priority": 100,
+      "triggers": ["react-native", "expo", "mobile", "ios", "android"]
+    },
+    {
+      "name": "web-vuejs",
+      "description": "Vue.js 3 web development expert",
+      "file": ".claude/agents/web-vuejs.md",
+      "priority": 90,
+      "triggers": ["vue", "vuejs", "composition-api"]
+    },
+    {
+      "name": "web-reactjs",
+      "description": "React 18 web development expert",
+      "file": ".claude/agents/web-reactjs.md",
+      "priority": 90,
+      "triggers": ["react", "cra", "spa"]
+    },
+    {
+      "name": "web-nextjs",
+      "description": "Next.js web development expert",
+      "file": ".claude/agents/web-nextjs.md",
+      "priority": 90,
+      "triggers": ["nextjs", "next", "ssr", "ssg"]
+    },
+    {
+      "name": "backend-laravel",
+      "description": "Laravel PHP backend development expert",
+      "file": ".claude/agents/backend-laravel.md",
+      "priority": 90,
+      "triggers": ["laravel", "php", "api", "backend"]
+    },
+    {
+      "name": "qa-automation",
+      "description": "Testing and QA automation expert",
+      "file": ".claude/agents/qa-automation.md",
+      "priority": 85,
+      "triggers": ["test", "testing", "qa", "automation", "coverage"]
+    },
+    {
+      "name": "ui-designer",
+      "description": "UI/UX design analysis and component breakdown expert",
+      "file": ".claude/agents/ui-designer.md",
+      "priority": 85,
+      "triggers": ["design", "ui", "ux", "figma", "component"]
+    },
+    {
+      "name": "jira-operations",
+      "description": "JIRA integration and ticket management",
+      "file": ".claude/agents/jira-operations.md",
+      "priority": 80,
+      "triggers": ["jira", "ticket", "issue"]
+    },
+    {
+      "name": "confluence-operations",
+      "description": "Confluence documentation management",
+      "file": ".claude/agents/confluence-operations.md",
+      "priority": 80,
+      "triggers": ["confluence", "documentation", "wiki"]
+    },
+    {
+      "name": "slack-operations",
+      "description": "Slack notification and team communication",
+      "file": ".claude/agents/slack-operations.md",
+      "priority": 70,
+      "triggers": ["slack", "notify", "message"]
+    },
+    {
+      "name": "pm-operations-orchestrator",
+      "description": "Workflow coordination and phase management",
+      "file": ".claude/agents/pm-operations-orchestrator.md",
+      "priority": 95,
+      "triggers": ["workflow", "phase", "orchestrate"]
+    },
+    {
+      "name": "project-detector",
+      "description": "Project type and structure detection",
+      "file": ".claude/agents/project-detector.md",
+      "priority": 100,
+      "triggers": []
+    },
+    {
+      "name": "project-context-manager",
+      "description": "Context persistence and state management",
+      "file": ".claude/agents/project-context-manager.md",
+      "priority": 95,
+      "triggers": []
+    },
+    {
+      "name": "project-config-loader",
+      "description": "Configuration loading and validation",
+      "file": ".claude/agents/project-config-loader.md",
+      "priority": 95,
+      "triggers": []
+    }
+  ],
+  
+  "skills": [
+    {
+      "name": "requirement-analysis",
+      "description": "Analyze requirements and identify issues",
+      "file": ".claude/skills/requirement-analysis.md"
+    },
+    {
+      "name": "tdd-implementation",
+      "description": "Test-Driven Development workflow enforcement",
+      "file": ".claude/skills/tdd-implementation.md"
+    },
+    {
+      "name": "code-review",
+      "description": "Code quality review and feedback",
+      "file": ".claude/skills/code-review.md"
+    },
+    {
+      "name": "react-native-patterns",
+      "description": "React Native best practices and patterns",
+      "file": ".claude/skills/dev-expert/react-native-patterns.md"
+    },
+    {
+      "name": "stakeholder-management",
+      "description": "Stakeholder communication and management",
+      "file": ".claude/skills/pm-expert/stakeholder-management.md"
+    },
+    {
+      "name": "risk-management",
+      "description": "Project risk identification and mitigation",
+      "file": ".claude/skills/pm-expert/risk-management.md"
+    }
+  ],
+  
+  "config": {
+    "default": ".claude/ccpm-config.yaml",
+    "example": ".claude/ccpm-config.example.yaml"
+  },
+  
+  "documentation": {
+    "readme": ".claude/README.md",
+    "getting-started": ".claude/GET_STARTED.md",
+    "testing": ".claude/TESTING_GUIDE.md",
+    "architecture": ".claude/docs/architecture/overview.md",
+    "phases": ".claude/docs/phases/",
+    "guides": ".claude/docs/guides/"
+  },
+  
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/ccpm-team-agents.git"
+  },
+  
+  "bugs": {
+    "url": "https://github.com/your-org/ccpm-team-agents/issues"
+  },
+  
+  "homepage": "https://github.com/your-org/ccpm-team-agents#readme"
+}
+

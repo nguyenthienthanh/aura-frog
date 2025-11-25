@@ -1,0 +1,104 @@
+# Project Configuration
+
+project:
+  name: "Your Project Name"
+  type: "web-app"  # Options: web-app, mobile-app, backend-api, fullstack
+  description: "Brief description of your project"
+  
+tech_stack:
+  primary:
+    framework: "React"  # React, Vue, Next.js, React Native, Laravel, etc.
+    language: "TypeScript"
+    version: "18.x"
+  
+  state_management: "Redux Toolkit"  # Redux, Zustand, Pinia, MobX, Context API
+  styling: "Tailwind CSS"  # Tailwind, CSS Modules, Styled Components, BEM
+  testing: "Jest + RTL"  # Jest, Vitest, Cypress, Playwright
+  
+  additional:
+    - "React Query"
+    - "React Hook Form"
+    - "Axios"
+
+team:
+  lead: "tech-lead@example.com"
+  
+  reviewers:
+    frontend: ["frontend-reviewer@example.com"]
+    backend: ["backend-reviewer@example.com"]
+    qa: ["qa-lead@example.com"]
+    design: ["design-lead@example.com"]
+  
+  regions:  # Optional: for multi-region projects
+    - name: "Region A"
+      code: "ra"
+      lead: "lead-ra@example.com"
+    - name: "Region B"
+      code: "rb"
+      lead: "lead-rb@example.com"
+
+integrations:
+  jira:
+    url: ""  # https://yourcompany.atlassian.net
+    project_key: "PROJ"  # Your JIRA project key
+    # Add credentials via environment variables
+  
+  confluence:
+    url: ""  # https://yourcompany.atlassian.net/wiki
+    space_key: "DEV"  # Your Confluence space
+  
+  slack:
+    webhook_url: ""  # Add via environment variables
+    channels:
+      dev: "#dev-team"
+      qa: "#qa-team"
+      general: "#project-updates"
+
+workflow:
+  # Test coverage settings
+  test_coverage_target: 80  # Percentage
+  tdd_enforcement: "strict"  # Options: strict, recommended, optional
+  
+  # Review settings
+  require_design_review: true
+  require_qa_review: true
+  auto_assign_reviewers: true
+  
+  # Approval settings
+  approval_gates: true
+  require_explicit_approval: true
+  
+  # Phase settings
+  skip_phases: []  # Phases to skip (e.g., [3] to skip design review)
+
+conventions:
+  # Load from conventions.md
+  file_naming: "See conventions.md"
+  branch_naming: "See conventions.md"
+  commit_format: "See conventions.md"
+
+environments:
+  development:
+    api_url: "http://localhost:3000"
+    debug: true
+  
+  staging:
+    api_url: "https://staging.api.example.com"
+    debug: true
+  
+  production:
+    api_url: "https://api.example.com"
+    debug: false
+
+# Custom settings
+custom:
+  # Add any project-specific settings here
+  features:
+    - "authentication"
+    - "dashboard"
+    - "user-management"
+  
+  deployment:
+    platform: "Vercel"  # Vercel, AWS, GCP, Azure, etc.
+    ci_cd: "GitHub Actions"
+
