@@ -330,7 +330,7 @@ You:
 
 ---
 
-## 🤖 Available Agents (21 Total)
+## 🤖 Available Agents (23 Total)
 
 ### Development Agents (Priority 90-100)
 
@@ -399,6 +399,26 @@ You:
 - Triggers: `database`, `sql`, `postgres`, `mysql`, `mongodb`, `schema`, `migration`, `query`, `index`
 - **Commands:** `db:design`, `db:optimize`
 
+**mobile-flutter** (Priority: 95) - NEW! ⭐
+- Flutter mobile development (iOS/Android)
+- Dart language, widget tree
+- State management: Bloc, Provider, Riverpod, GetX
+- Material Design, Cupertino widgets
+- Responsive layouts, adaptive UI
+- Platform channels, native integration
+- Testing: Widget tests, integration tests
+- Triggers: `flutter`, `dart`, `bloc`, `provider`, `riverpod`, `mobile`
+
+**web-angular** (Priority: 90) - NEW! ⭐
+- Angular 17+ web development
+- TypeScript, standalone components
+- Signals (reactive state), control flow (@if, @for)
+- NgRx state management, RxJS
+- Reactive forms, HttpClient
+- Angular Router, lazy loading
+- Testing: Jasmine, Jest, Cypress
+- Triggers: `angular`, `typescript`, `ngrx`, `rxjs`, `signals`
+
 ### Quality, Security & Design (Priority 85-95)
 
 **security-expert** (Priority: 95) - NEW! ⭐
@@ -414,7 +434,10 @@ You:
 **qa-automation** (Priority: 85)
 - Testing & QA
 - Jest, Vitest, Playwright, Detox
-- Triggers: `test`, `qa`, `automation`, `coverage`
+- Code quality analysis, complexity metrics
+- Technical debt tracking
+- Triggers: `test`, `qa`, `automation`, `coverage`, `quality`
+- **Commands:** `quality:check`, `quality:debt`, `quality:complexity`
 
 **ui-designer** (Priority: 85)
 - UI/UX analysis
@@ -462,9 +485,10 @@ NOT:
 - CI/CD pipelines (GitHub Actions, GitLab CI, Azure, CircleCI)
 - Infrastructure as Code (Terraform, CloudFormation, Pulumi)
 - Cloud platforms (AWS, GCP, Azure)
-- Monitoring & logging (Prometheus, Grafana, ELK)
-- Triggers: `docker`, `kubernetes`, `k8s`, `ci/cd`, `terraform`, `deploy`
-- **Commands:** `docker:create`, `cicd:create`, `deploy:setup`
+- Monitoring & logging (Prometheus, Grafana, ELK, Sentry, New Relic)
+- Error tracking, log analysis, performance monitoring
+- Triggers: `docker`, `kubernetes`, `k8s`, `ci/cd`, `terraform`, `deploy`, `monitor`, `logs`
+- **Commands:** `docker:create`, `cicd:create`, `deploy:setup`, `monitor:setup`, `monitor:errors`, `logs:analyze`
 
 **jira-operations** (Priority: 80)
 - JIRA integration
