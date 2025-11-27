@@ -178,7 +178,7 @@ workflow:start "Add user authentication"
 
 # Creates:
 # - .claude/logs/workflows/add-user-auth-20251124-120000/
-# - .claude/logs/contexts/add-user-auth-20251124-120000/
+# - .claude/logs/workflows/add-user-auth-20251124-120000/
 # - Sets as active workflow
 ```
 
@@ -372,7 +372,7 @@ writeFile('active-workflow.txt', newWorkflowId);
     "project_root": "/path/to/project",
     "user": "developer",
     "logs_dir": ".claude/logs/workflows/add-user-authentication-20251124-120000",
-    "context_dir": ".claude/logs/contexts/add-user-authentication-20251124-120000"
+    "context_dir": ".claude/logs/workflows/add-user-authentication-20251124-120000"
   },
   
   "handoffs": [

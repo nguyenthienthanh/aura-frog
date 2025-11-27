@@ -317,7 +317,7 @@ Options:
 - Medium: [C]
 - Low: [D]
 
-**Review Report:** `.claude/logs/contexts/[workflow]/BUG_FIX_REVIEW.md`
+**Review Report:** `.claude/logs/workflows/[workflow]/BUG_FIX_REVIEW.md`
 
 Options:
 - "approve" → QA validation
@@ -412,7 +412,7 @@ Options:
 - ✅ Confluence page ready
 
 **Files:**
-- `.claude/logs/contexts/[workflow]/BUG_FIX_SUMMARY.md`
+- `.claude/logs/workflows/[workflow]/BUG_FIX_SUMMARY.md`
 - `documents/bugs/[bug-id].md`
 
 Options:
@@ -465,7 +465,7 @@ Options:
 3. QA verification
 4. Deploy to production
 
-**Workflow archived:** `.claude/logs/contexts/bugfix-[name]-[timestamp]/`
+**Workflow archived:** `.claude/logs/workflows/bugfix-[name]-[timestamp]/`
 ```
 
 ---

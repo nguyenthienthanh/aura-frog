@@ -212,7 +212,7 @@ ${context.activeAgents.join(', ')}
 function saveContext(context: WorkflowContext): void {
   const contextPath = path.join(
     process.cwd(),
-    '.claude/logs/contexts',
+    '.claude/logs/workflows',
     `${context.id}.json`
   );
   
@@ -226,7 +226,7 @@ function saveContext(context: WorkflowContext): void {
 function loadContext(contextId: string): WorkflowContext {
   const contextPath = path.join(
     process.cwd(),
-    '.claude/logs/contexts',
+    '.claude/logs/workflows',
     `${contextId}.json`
   );
   
@@ -284,7 +284,7 @@ function loadContext(contextId: string): WorkflowContext {
 - **Auto-save:** After every decision recorded
 - **Auto-save:** After every blocker added
 - **Format:** JSON for easy parsing
-- **Location:** `.claude/logs/contexts/`
+- **Location:** `.claude/logs/workflows/`
 
 ---
 

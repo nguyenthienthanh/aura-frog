@@ -193,12 +193,15 @@ Project Context > CCPM Rules > Generic Defaults
 │   ├── conventions.md           # Naming, structure, patterns
 │   ├── rules.md                 # Project-specific rules
 │   └── examples.md              # Code examples
-├── logs/                        # Workflow logs (git-ignored)
-│   ├── workflows/               # Phase deliverables
-│   ├── figma/                   # Figma data
-│   ├── jira/                    # JIRA data
-│   └── audio/                   # Voice narration
-└── context/                     # Active contexts (git-ignored)
+└── logs/                        # All logs (git-ignored)
+    ├── workflows/               # Workflow execution logs
+    │   └── {workflow-id}/       # Per-workflow directory
+    │       ├── workflow-state.json
+    │       ├── task-context.md
+    │       └── deliverables/
+    ├── figma/                   # Figma data
+    ├── jira/                    # JIRA data
+    └── audio/                   # Voice narration
 ```
 
 **Note:** No `.claude/CLAUDE.md` in projects - plugin CLAUDE.md is used globally

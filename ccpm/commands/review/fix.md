@@ -49,7 +49,7 @@ review:fix --dry-run
 ```typescript
 // Read Phase 6 deliverables
 const reviewReport = loadFile(
-  '.claude/logs/contexts/{workflow-id}/deliverables/PHASE_6_CODE_REVIEW_REPORT.md'
+  '.claude/logs/workflows/{workflow-id}/deliverables/PHASE_6_CODE_REVIEW_REPORT.md'
 );
 
 // Parse issues

@@ -31,7 +31,7 @@ workflow:resume add-user-authentication-20251124-120000
 ```typescript
 const workflowId = args[0];
 const statePath = `workflow-state.json`;
-const handoffPath = `.claude/logs/contexts/${workflowId}/HANDOFF_CONTEXT.md`;
+const handoffPath = `.claude/logs/workflows/${workflowId}/HANDOFF_CONTEXT.md`;
 
 // Load state
 const state = JSON.parse(readFile(statePath));
@@ -112,7 +112,7 @@ console.log(`📊 New session - Tokens available: ${200000 - newSessionTokens}`)
 - ✅ Test plan & cases
 
 **All files located in:**
-`.claude/logs/contexts/add-user-authentication-20251124-120000/deliverables/`
+`.claude/logs/workflows/add-user-authentication-20251124-120000/deliverables/`
 
 ---
 
@@ -321,7 +321,7 @@ const minimalContext = {
 Solution:
 1. Check workflow ID spelling
 2. List available workflows:
-   ls .claude/logs/contexts/
+   ls .claude/logs/workflows/
 3. Use correct ID from list
 ```
 

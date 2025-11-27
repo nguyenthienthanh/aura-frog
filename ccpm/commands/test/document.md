@@ -644,7 +644,7 @@ Options:
 4. Execute E2E tests
 5. Generate test report
 
-**Workflow archived:** `.claude/logs/contexts/test-document-[name]-[timestamp]/`
+**Workflow archived:** `.claude/logs/workflows/test-document-[name]-[timestamp]/`
 ```
 
 ---

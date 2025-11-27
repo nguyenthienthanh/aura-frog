@@ -111,8 +111,8 @@ bash scripts/workflow/migrate-workflows.sh
 ```
 
 **What it does:**
-1. ✅ Creates new `.claude/logs/workflows/` and `.claude/logs/contexts/` structure
-2. ✅ Moves deliverables → `.claude/logs/contexts/[workflow-id]/deliverables/`
+1. ✅ Creates new `.claude/logs/workflows/` and `.claude/logs/workflows/` structure
+2. ✅ Moves deliverables → `.claude/logs/workflows/[workflow-id]/deliverables/`
 3. ✅ Moves logs → `.claude/logs/workflows/[workflow-id]/`
 4. ✅ Converts `task-context.md` → `README.md`
 5. ✅ Creates execution logs
@@ -124,10 +124,10 @@ After verifying migration:
 
 ```bash
 # Remove old workflows
-rm -rf .claude/logs/contexts/*
+rm -rf .claude/logs/workflows/*
 
 # Or remove entire old context folder
-rm -rf .claude/logs/contexts/
+rm -rf .claude/logs/workflows/
 ```
 
 ---
@@ -204,7 +204,7 @@ done
 
 ```bash
 # Search in deliverables
-grep -r "authentication" .claude/logs/contexts/*/deliverables/
+grep -r "authentication" .claude/logs/workflows/*/deliverables/
 
 # Search in execution logs
 grep "ERROR" .claude/logs/workflows/*/execution.log
@@ -255,7 +255,7 @@ grep "ERROR" .claude/logs/workflows/*/execution.log
     "project_root": "/path/to/project",
     "user": "developer",
     "logs_dir": ".claude/logs/workflows/add-user-authentication-20251124-143530",
-    "context_dir": ".claude/logs/contexts/add-user-authentication-20251124-143530"
+    "context_dir": ".claude/logs/workflows/add-user-authentication-20251124-143530"
   }
 }
 ```
@@ -312,10 +312,10 @@ cat workflow-state.json | jq '.workflow_id, .status, .current_phase_name'
 
 ```bash
 # List all deliverables for a workflow
-ls .claude/logs/contexts/refactor-userprofile-20251124-143022/deliverables/
+ls .claude/logs/workflows/refactor-userprofile-20251124-143022/deliverables/
 
 # Read specific phase deliverable
-cat .claude/logs/contexts/[workflow-id]/deliverables/02-technical-planning/tech-spec.md
+cat .claude/logs/workflows/[workflow-id]/deliverables/02-technical-planning/tech-spec.md
 ```
 
 ### Viewing Logs

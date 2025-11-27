@@ -82,9 +82,9 @@ Progress: 2/9 phases complete (22%)
 ───────────────────────────────────────────────────────────
 
 📦 Total Deliverables: 3 files
-   - .claude/logs/contexts/.../PHASE_1_REQUIREMENTS_ANALYSIS.md
-   - .claude/logs/contexts/.../PHASE_2_TECH_SPEC.md
-   - .claude/logs/contexts/.../architecture-diagram.png
+   - .claude/logs/workflows/.../PHASE_1_REQUIREMENTS_ANALYSIS.md
+   - .claude/logs/workflows/.../PHASE_2_TECH_SPEC.md
+   - .claude/logs/workflows/.../architecture-diagram.png
 
 ⏱️  Time Tracking:
    - Total elapsed: 1h 15m
@@ -182,7 +182,7 @@ Failing Tests:
 - useSocialMarketingLogic.test.ts: State management
 
 Run tests: npm test
-View logs: .claude/logs/contexts/{workflow-id}/logs/
+View logs: .claude/logs/workflows/{workflow-id}/logs/
 ```
 
 ---

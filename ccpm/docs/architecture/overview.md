@@ -358,7 +358,7 @@ Workflow State:
     - Generated artifacts
 
 Agent Context:
-  Location: .claude/logs/contexts/{agent-name}.json
+  Location: .claude/logs/workflows/{agent-name}.json
   Contains:
     - Recent tasks
     - Decision history

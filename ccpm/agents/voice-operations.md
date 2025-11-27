@@ -236,7 +236,7 @@ Convert text to speech.
 voice:narrate "Hello, this is a test of the voice system."
 
 # Narrate from file
-voice:narrate:file .claude/logs/contexts/workflow-123/IMPLEMENTATION_SUMMARY.md
+voice:narrate:file .claude/logs/workflows/workflow-123/IMPLEMENTATION_SUMMARY.md
 
 # With voice customization
 voice:narrate "This is important [whispers] but this is secret" --voice="Antoni"

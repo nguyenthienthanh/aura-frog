@@ -359,7 +359,7 @@ Thank you for using CCPM Team Agents! 🚀
 ───────────────────────────────────────────────────────────
 
 Workflow closed automatically.
-All files saved in: .claude/logs/contexts/refactor-socialmarketingcompos-20251124-112323/
+All files saved in: .claude/logs/workflows/refactor-socialmarketingcompos-20251124-112323/
 
 To start a new workflow: /workflow:start <task>
 To view this workflow: /workflow:status

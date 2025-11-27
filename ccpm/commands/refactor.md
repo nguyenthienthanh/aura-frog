@@ -470,7 +470,7 @@ Options:
 - ✅ Confluence page ready
 
 **Files:**
-- `.claude/logs/contexts/[workflow]/REFACTOR_SUMMARY.md`
+- `.claude/logs/workflows/[workflow]/REFACTOR_SUMMARY.md`
 - `documents/refactors/[component-name].md`
 
 Options:
@@ -526,7 +526,7 @@ Options:
 2. Get team approval
 3. Merge to develop
 
-**Workflow archived:** `.claude/logs/contexts/refactor-[name]-[timestamp]/`
+**Workflow archived:** `.claude/logs/workflows/refactor-[name]-[timestamp]/`
 ```
 
 ---

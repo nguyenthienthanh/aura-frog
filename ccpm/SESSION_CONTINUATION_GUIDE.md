@@ -81,7 +81,7 @@ workflow:handoff
 ✅ Next steps
 
 **Location:**
-`.claude/logs/contexts/[workflow-id]/HANDOFF_CONTEXT.md`
+`.claude/logs/workflows/[workflow-id]/HANDOFF_CONTEXT.md`
 
 ---
 

@@ -102,14 +102,13 @@ Your response:
 ## 📂 Files Created
 
 ```
-ccpm/
+.claude/logs/workflows/{workflow-id}/
 ├── workflow-state.json (workflow tracking)
-└── context/
-    └── {workflow-id}/
-        ├── task-context.md
-        ├── deliverables/
-        │   └── PHASE_1_REQUIREMENTS_ANALYSIS.md
-        └── .claude/logs/
+├── task-context.md (requirements and context)
+├── deliverables/
+│   └── PHASE_1_REQUIREMENTS_ANALYSIS.md
+└── logs/
+    └── phase-execution.log
 ```
 
 ---

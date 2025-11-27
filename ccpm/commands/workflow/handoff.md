@@ -104,7 +104,7 @@ workflow:handoff
 ✅ Key decisions documented
 ✅ Next steps defined
 
-**Location:** `.claude/logs/contexts/[workflow-id]/HANDOFF_CONTEXT.md`
+**Location:** `.claude/logs/workflows/[workflow-id]/HANDOFF_CONTEXT.md`
 
 ---
 
@@ -128,7 +128,7 @@ workflow:resume add-user-authentication-20251124-120000
 
 Keep these files open in IDE for new session:
 - workflow-state.json
-- .claude/logs/contexts/[workflow-id]/HANDOFF_CONTEXT.md
+- .claude/logs/workflows/[workflow-id]/HANDOFF_CONTEXT.md
 - [Key files from previous phases]
 
 **Context preserved! Ready for new session! ✅**
@@ -333,8 +333,8 @@ workflow:resume add-user-authentication-20251124-120000
 
 **Load these files first:**
 - `workflow-state.json`
-- `.claude/logs/contexts/[workflow-id]/deliverables/04-test-planning/test-plan.md`
-- `.claude/logs/contexts/[workflow-id]/deliverables/02-technical-planning/tech-spec.md`
+- `.claude/logs/workflows/[workflow-id]/deliverables/04-test-planning/test-plan.md`
+- `.claude/logs/workflows/[workflow-id]/deliverables/02-technical-planning/tech-spec.md`
 
 **Then proceed with Phase 5a!**
 
