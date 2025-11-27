@@ -74,16 +74,21 @@ HTTP_CODE=$(curl -s -w "%{http_code}" -o "$OUTPUT_FILE" \
 
 # Check HTTP status
 if [ "$HTTP_CODE" -eq 200 ]; then
-  echo "✅ Voiceover saved: $OUTPUT_FILE" >&2
+  echo "✅ Voiceover generated" >&2
 
   # Auto-play on macOS
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    afplay "$OUTPUT_FILE" &
     echo "🔊 Playing notification..." >&2
+    afplay "$OUTPUT_FILE"  # Play synchronously (wait for completion)
+
+    # Delete after playing
+    rm -f "$OUTPUT_FILE"
+    echo "🗑️  Audio file deleted after playback" >&2
+  else
+    # Non-macOS: Save file path for manual playback
+    echo "$OUTPUT_FILE"
   fi
 
-  # Return file path
-  echo "$OUTPUT_FILE"
   exit 0
 else
   echo "❌ Failed to generate voiceover (HTTP $HTTP_CODE)" >&2

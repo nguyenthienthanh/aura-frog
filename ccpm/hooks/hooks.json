@@ -67,11 +67,6 @@
             "type": "command",
             "comment": "Suggest workflow handoff if active workflow exists",
             "command": "if [ -f .claude/logs/workflows/active-workflow.json ]; then echo '💾 Active workflow detected. Use workflow:handoff to save state for next session.' >&2; fi"
-          },
-          {
-            "type": "command",
-            "comment": "Clean up old voice files (older than 7 days) on session end",
-            "command": "PLUGIN_DIR=\"$HOME/.claude/plugins/marketplaces/ethan-ccpm/ccpm\"; if [ -d .claude/logs/audio ] && [ $(find .claude/logs/audio -name '*.mp3' -mtime +7 2>/dev/null | wc -l) -gt 0 ]; then find .claude/logs/audio -name '*.mp3' -type f -mtime +7 -delete 2>/dev/null && echo '🧹 Cleaned up old voice notification files (>7 days)' >&2; fi"
           }
         ]
       }

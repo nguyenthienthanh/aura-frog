@@ -250,25 +250,32 @@ Pattern: `{type}_{timestamp}.mp3`
 
 ## 🧹 Automatic Cleanup
 
-**Voice files are automatically cleaned up to save disk space!**
+**Voice files are automatically deleted after playback!**
 
 ### How It Works
 
-**SessionEnd Hook (Automatic):**
-- Runs when you close Claude Code session
-- Finds audio files older than 7 days
-- Deletes them automatically
-- Silent operation (no prompts)
-- Shows message if files were deleted
+**Immediate Deletion (macOS):**
+- Audio plays synchronously (afplay waits for completion)
+- File is deleted immediately after playback
+- Zero disk usage
+- No manual cleanup needed
 
-**Why 7 Days:**
-- Recent files useful for debugging
-- Prevents disk space buildup
-- Typical workflow cycle
+**Example output:**
+```
+🔊 Generating voiceover...
+✅ Voiceover generated
+🔊 Playing notification...
+🗑️  Audio file deleted after playback
+```
 
-### Manual Cleanup
+**Non-macOS Platforms:**
+- Files are saved to `.claude/logs/audio/`
+- User needs to manually play and delete
+- Use cleanup script for batch deletion
 
-**Interactive cleanup (with confirmation):**
+### Manual Cleanup (Non-macOS or Troubleshooting)
+
+**If you need to clean up manually:**
 ```bash
 cd ~/.claude/plugins/marketplaces/ethan-ccpm/ccpm
 bash scripts/cleanup-voice.sh
@@ -281,50 +288,28 @@ bash scripts/cleanup-voice.sh
 
 📊 Audio files statistics:
    Directory: .claude/logs/audio
-   Total files: 45
-   Total size: 1.2M
+   Total files: 5
+   Total size: 150K
 
 🔍 Finding files older than 7 days...
-   Found 28 files
+   Found 5 files
 
-Delete 28 old audio files? (y/N) y
+Delete 5 old audio files? (y/N) y
 
 ✅ Cleanup complete!
-   Files deleted: 28
-   Files remaining: 17
-   Current size: 680K
-```
-
-**Custom age threshold:**
-```bash
-# Clean files older than 3 days
-bash scripts/cleanup-voice.sh 3
-
-# Clean files older than 30 days
-bash scripts/cleanup-voice.sh 30
 ```
 
 ### Storage Impact
 
-**Typical usage:**
-- 1 workflow ≈ 3-5 voice files (one per approval gate)
+**macOS (Automatic deletion):**
+- ✅ Zero disk usage
+- ✅ Files deleted immediately after playback
+- ✅ No manual maintenance
+
+**Non-macOS:**
+- Files accumulate in `.claude/logs/audio/`
+- Use cleanup script periodically
 - Each file ≈ 30KB
-- 10 workflows ≈ 1.5MB
-- 100 workflows ≈ 15MB
-
-**With auto-cleanup (7 days):**
-- Maximum ~10-20 workflows worth of audio files
-- ~3-6MB maximum
-- Minimal disk usage
-- No manual maintenance needed
-
-### Disable Automatic Cleanup
-
-If you want to keep all audio files:
-
-1. Edit `~/.claude/plugins/marketplaces/ethan-ccpm/ccpm/hooks/hooks.json`
-2. Remove the SessionEnd cleanup hook (line with "Clean up old voice files")
-3. Files will be kept indefinitely
 
 ---
 
