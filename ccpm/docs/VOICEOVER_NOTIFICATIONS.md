@@ -243,7 +243,88 @@ Pattern: `{type}_{timestamp}.mp3`
 - **Sample Rate:** 44.1 kHz
 - **Bitrate:** 128 kbps
 - **Channels:** Mono
-- **Size:** ~100KB per notification (5-10 seconds)
+- **Size:** ~20-50KB per notification (3-5 seconds)
+- **Model:** eleven_turbo_v2_5 (free tier compatible)
+
+---
+
+## 🧹 Automatic Cleanup
+
+**Voice files are automatically cleaned up to save disk space!**
+
+### How It Works
+
+**SessionEnd Hook (Automatic):**
+- Runs when you close Claude Code session
+- Finds audio files older than 7 days
+- Deletes them automatically
+- Silent operation (no prompts)
+- Shows message if files were deleted
+
+**Why 7 Days:**
+- Recent files useful for debugging
+- Prevents disk space buildup
+- Typical workflow cycle
+
+### Manual Cleanup
+
+**Interactive cleanup (with confirmation):**
+```bash
+cd ~/.claude/plugins/marketplaces/ethan-ccpm/ccpm
+bash scripts/cleanup-voice.sh
+```
+
+**Example output:**
+```
+🧹 CCPM Voice File Cleanup
+==========================
+
+📊 Audio files statistics:
+   Directory: .claude/logs/audio
+   Total files: 45
+   Total size: 1.2M
+
+🔍 Finding files older than 7 days...
+   Found 28 files
+
+Delete 28 old audio files? (y/N) y
+
+✅ Cleanup complete!
+   Files deleted: 28
+   Files remaining: 17
+   Current size: 680K
+```
+
+**Custom age threshold:**
+```bash
+# Clean files older than 3 days
+bash scripts/cleanup-voice.sh 3
+
+# Clean files older than 30 days
+bash scripts/cleanup-voice.sh 30
+```
+
+### Storage Impact
+
+**Typical usage:**
+- 1 workflow ≈ 3-5 voice files (one per approval gate)
+- Each file ≈ 30KB
+- 10 workflows ≈ 1.5MB
+- 100 workflows ≈ 15MB
+
+**With auto-cleanup (7 days):**
+- Maximum ~10-20 workflows worth of audio files
+- ~3-6MB maximum
+- Minimal disk usage
+- No manual maintenance needed
+
+### Disable Automatic Cleanup
+
+If you want to keep all audio files:
+
+1. Edit `~/.claude/plugins/marketplaces/ethan-ccpm/ccpm/hooks/hooks.json`
+2. Remove the SessionEnd cleanup hook (line with "Clean up old voice files")
+3. Files will be kept indefinitely
 
 ---
 
