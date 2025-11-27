@@ -38,7 +38,12 @@ OUTPUT_FILE="$OUTPUT_DIR/${NOTIFICATION_TYPE}_${TIMESTAMP}.mp3"
 # Prepare message based on notification type
 case "$NOTIFICATION_TYPE" in
   "approval-gate")
-    FULL_MESSAGE="Hey, I need your input to continue."
+    # Use context message if provided, otherwise generic
+    if [ -n "$MESSAGE" ] && [ "$MESSAGE" != "Your attention is needed for approval" ]; then
+      FULL_MESSAGE="Hey, $MESSAGE"
+    else
+      FULL_MESSAGE="Hey, I need your input to continue."
+    fi
     ;;
   "error")
     FULL_MESSAGE="Heads up, something went wrong. Check the error when you can."

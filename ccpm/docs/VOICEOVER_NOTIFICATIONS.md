@@ -16,11 +16,24 @@ CCPM now includes **automatic voiceover notifications** that alert you when your
 
 ### Automatic Notifications
 
-**1. Approval Gates (Stop Hook)**
+**1. Approval Gates (Stop Hook) - Context-Aware! 🎯**
 - Triggers when Claude stops for approval
-- Plays audio: "Hey, I need your input to continue."
+- **Intelligently reads conversation context**
 - Auto-plays on macOS (afplay)
 - Happens at every phase completion
+
+**Example Messages:**
+- Generic: "Hey, I need your input to continue."
+- Phase 2: "Hey, Phase 2 - Design deliverables ready for review"
+- Phase 5a: "Hey, Phase 5a approval needed"
+- Tests: "Hey, All tests passed - review needed"
+- Code Review: "Hey, Code review complete - approval needed"
+
+**How It Works:**
+- Reads the conversation transcript
+- Extracts phase information and context
+- Summarizes key points (under 15 words)
+- Plays natural, context-aware message
 
 **2. Critical Errors (Notification Hook)**
 - Triggers on errors, failures, critical issues
@@ -75,7 +88,7 @@ source .envrc
 
 ## 🎙️ How It Works
 
-### Approval Gate Flow
+### Approval Gate Flow (Context-Aware)
 
 ```
 Workflow Phase Completes
@@ -86,7 +99,18 @@ Claude stops (waits for user input)
   ↓
 Stop hook triggers automatically
   ↓
-bash scripts/voice-notify.sh is executed
+hooks/stop-voice-notify.sh is executed
+  ↓
+Read conversation transcript (JSON)
+  ↓
+Extract context:
+  - Phase number (Phase 2, Phase 5a, etc.)
+  - Deliverables type (design, tests, code review)
+  - Status (passed, failed, complete)
+  ↓
+Summarize to under 15 words
+  ↓
+Call scripts/voice-notify.sh with context
   ↓
 ElevenLabs API generates audio
   ↓
@@ -94,8 +118,47 @@ Audio saved to .claude/logs/audio/approval-gate_*.mp3
   ↓
 Auto-plays (macOS: afplay)
   ↓
-User hears "Your attention is needed"
+User hears: "Hey, Phase 2 - Design deliverables ready for review"
+  ↓
+Audio file deleted after playback
 ```
+
+### Context Extraction Examples
+
+**Transcript contains:** `"Phase 2: Design - Technical Architecture..."`
+**Voiceover says:** "Hey, Phase 2 - Design deliverables ready for review"
+
+**Transcript contains:** `"All tests pass. ✅ Ready for review"`
+**Voiceover says:** "Hey, All tests passed - review needed"
+
+**Transcript contains:** `"Code review complete. Please approve to continue."`
+**Voiceover says:** "Hey, Code review complete - approval needed"
+
+**No specific context found:**
+**Voiceover says:** "Hey, I need your input to continue."
+
+### Script: stop-voice-notify.sh (NEW!)
+
+**Location:** `hooks/stop-voice-notify.sh`
+
+**Purpose:** Context-aware hook that extracts approval context from conversation
+
+**How It Works:**
+1. Reads conversation transcript JSON from stdin
+2. Extracts last assistant message
+3. Parses phase information, deliverables, status
+4. Summarizes to under 15 words
+5. Calls `voice-notify.sh` with context
+
+**Context Patterns Detected:**
+- Phase numbers: `Phase 2`, `Phase 5a`, etc.
+- Deliverables: `design`, `test plan`, `requirements`
+- Test status: `tests pass`, `tests fail`
+- Code review: `code review complete`
+
+**Automatic Invocation:** Called by Stop hook in `hooks.json`
+
+---
 
 ### Script: voice-notify.sh
 
@@ -103,7 +166,7 @@ User hears "Your attention is needed"
 
 **Usage:**
 ```bash
-bash scripts/voice-notify.sh "Message" "notification-type"
+bash scripts/voice-notify.sh "Context message" "notification-type"
 ```
 
 **Notification Types:**
@@ -115,9 +178,16 @@ bash scripts/voice-notify.sh "Message" "notification-type"
 
 **Examples:**
 ```bash
-# Approval notification
+# Approval notification (generic)
 bash scripts/voice-notify.sh "" "approval-gate"
 # → "Hey, I need your input to continue."
+
+# Approval with context (from stop-voice-notify.sh)
+bash scripts/voice-notify.sh "Phase 2 approval needed" "approval-gate"
+# → "Hey, Phase 2 approval needed"
+
+bash scripts/voice-notify.sh "Design deliverables ready for review" "approval-gate"
+# → "Hey, Design deliverables ready for review"
 
 # Error notification
 bash scripts/voice-notify.sh "" "error"
@@ -132,7 +202,10 @@ bash scripts/voice-notify.sh "" "completion"
 # → "All done! Task completed successfully."
 ```
 
-**Note:** Messages are now fixed per notification type for natural, conversational tone. The message parameter is ignored for standard types.
+**Note:**
+- For `approval-gate` type: Context message is prefixed with "Hey, " automatically
+- For other types: Fixed messages are used (context ignored)
+- Keep context under 15 words for natural speech
 
 ---
 

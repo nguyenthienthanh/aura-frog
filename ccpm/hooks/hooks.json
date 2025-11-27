@@ -76,8 +76,8 @@
         "hooks": [
           {
             "type": "command",
-            "comment": "Play voiceover notification when Claude stops for approval",
-            "command": "PLUGIN_DIR=\"$HOME/.claude/plugins/marketplaces/ethan-ccpm/ccpm\"; if [ -f \"$PLUGIN_DIR/scripts/voice-notify.sh\" ]; then bash \"$PLUGIN_DIR/scripts/voice-notify.sh\" 'Your attention is needed' 'approval-gate' 2>&1 || true; fi"
+            "comment": "Play context-aware voiceover notification when Claude stops for approval",
+            "command": "bash \"$HOME/.claude/plugins/marketplaces/ethan-ccpm/ccpm/hooks/stop-voice-notify.sh\" 2>&1 || true"
           }
         ]
       }
