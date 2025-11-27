@@ -58,7 +58,8 @@ Create:
 - Lines of code estimate
 - Dependencies to add/update
 - Potential risks
-- Time estimate
+- **Story Points** (Fibonacci: 1, 2, 3, 5, 8, 13, 21)
+- **Time estimate** (hours/days)
 
 ### Step 6: Generate Deliverables
 Create comprehensive tech spec document:
@@ -104,10 +105,35 @@ Create comprehensive tech spec document:
 ## Risks & Mitigation
 [Potential issues and solutions]
 
-## Timeline Estimate
+## Estimation
+### Story Points
+**Total:** X story points (Fibonacci scale)
+
+**Breakdown:**
+- Phase 4 (Test Planning): 1 point
+- Phase 5a (Write Tests): 2 points
+- Phase 5b (Implementation): 5 points
+- Phase 5c (Refactor): 2 points
+- Phase 6 (Code Review): 1 point
+- Phase 7 (QA Verification): 2 points
+
+**Confidence:** High/Medium/Low
+
+**Story Point Reference:**
+- 1 point: Trivial (~1-2 hours)
+- 2 points: Simple (~2-4 hours)
+- 3 points: Moderate (~4-6 hours)
+- 5 points: Complex (~1 day)
+- 8 points: Very Complex (~2 days)
+- 13 points: Extensive (~3 days)
+- 21 points: Epic (consider breaking down)
+
+### Time Estimate
 - Phase 4-5: X hours
 - Phase 6-7: Y hours
-- Total: Z hours
+- **Total:** Z hours (~W days)
+
+**Velocity Factor:** Based on team velocity (adjust for your team)
 ```
 
 ---
@@ -183,7 +209,9 @@ Created technical specification with architecture design
    - Components to create: 5
    - Files to change: 8 files
    - New dependencies: 2 packages
-   - Estimated effort: 6 hours
+   - Story Points: 8 points (Complex)
+   - Estimated effort: 1-2 days (~12-16 hours)
+   - Confidence: High
 
 ✅ Success Criteria:
    ✅ Architecture clearly defined

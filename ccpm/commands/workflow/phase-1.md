@@ -94,12 +94,18 @@ Phase 1 is where we understand the task requirements, goals, and success criteri
    - Mitigation strategies
    - Contingency plans
 
-7. **Questions & Clarifications**
+7. **Initial Estimation**
+   - **Story Points** (Fibonacci: 1, 2, 3, 5, 8, 13, 21)
+   - **Complexity Assessment** (Trivial, Simple, Moderate, Complex, Very Complex)
+   - **Time Estimate Range** (optimistic, likely, pessimistic)
+   - **Confidence Level** (High, Medium, Low)
+
+8. **Questions & Clarifications**
    - Open questions
    - Items needing user input
    - Ambiguous requirements
 
-8. **Cross-Review Feedback**
+9. **Cross-Review Feedback**
    - Dev review comments
    - QA review comments
    - UI review comments (if applicable)
@@ -200,6 +206,11 @@ After completing Phase 1, show this approval gate:
 - [Finding 1]
 - [Finding 2]
 - [Finding 3]
+
+**Initial Estimation:**
+- Story Points: X points (Complexity Level)
+- Time Estimate: Y-Z hours (~W days)
+- Confidence: High/Medium/Low
 
 **Cross-Review:**
 - ✅ Dev Agent: Technically feasible ✓
