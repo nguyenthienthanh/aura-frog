@@ -1,0 +1,75 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "🚀 CCPM Team Agents System v5.1.0 is active.\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all 24 specialized agents\n\n**Skills System:** 8 auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Block dangerous destructive commands",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '⚠️ Blocked: Potentially destructive command detected' >&2; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Remind to load project context before code generation",
+            "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '💡 Reminder: Run project:init to create project context before generating code' >&2; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Log command execution for workflow tracking",
+            "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Detect JIRA ticket IDs and suggest jira-integration skill",
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE '[A-Z]{2,10}-[0-9]+'; then echo '🎫 JIRA ticket detected - jira-integration skill may auto-activate' >&2; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Detect Figma URLs and suggest figma-integration skill",
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -q 'figma.com/file'; then echo '🎨 Figma link detected - figma-integration skill may auto-activate' >&2; fi"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Suggest workflow handoff if active workflow exists",
+            "command": "if [ -f .claude/logs/workflows/active-workflow.json ]; then echo '💾 Active workflow detected. Use workflow:handoff to save state for next session.' >&2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
