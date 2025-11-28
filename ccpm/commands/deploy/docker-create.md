@@ -2,7 +2,7 @@
 
 **Command:** `docker:create [options]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -95,4 +95,4 @@ volumes:
 ---
 
 **Command:** docker:create
-**Version:** 5.0.0
+**Version:** 5.2.0

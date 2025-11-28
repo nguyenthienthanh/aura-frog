@@ -1,7 +1,7 @@
 # CCPM - Instructions for Claude Code AI
 
 **System:** CCPM Team Agents System
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Purpose:** Guide Claude Code AI to operate as specialized agents in structured workflows with auto-invoking Skills
 **Last Updated:** 2025-11-27
 
@@ -28,7 +28,7 @@ Claude Code loads CLAUDE.md files in this order:
 2. **Match user intent** to appropriate skill(s)
 3. **Auto-invoke skills** when context matches (no manual invocation needed)
 
-**Available Skills (8 total):**
+**Auto-Invoking Skills (8):**
 - **agent-detector** (`skills/agent-detector/agent-selection.md`) - ALWAYS runs FIRST for every message
 - **workflow-orchestrator** (`skills/workflow-orchestrator/workflow-execution.md`) - Complex features
 - **project-context-loader** (`skills/project-context-loader/context-loading.md`) - Before code generation
@@ -37,6 +37,15 @@ Claude Code loads CLAUDE.md files in this order:
 - **code-reviewer** (`skills/code-reviewer/quality-review.md`) - Code quality review
 - **jira-integration** (`skills/jira-integration/ticket-management.md`) - JIRA ticket detection
 - **figma-integration** (`skills/figma-integration/design-extraction.md`) - Figma URL detection
+
+**Reference Skills (7):** Use these during implementation
+- **refactor-expert** (`skills/refactor-expert/refactoring.md`) - Safe refactoring patterns
+- **api-designer** (`skills/api-designer/api-design.md`) - RESTful API design
+- **performance-optimizer** (`skills/performance-optimizer/optimization.md`) - Performance tuning
+- **migration-helper** (`skills/migration-helper/migration.md`) - Database/code migrations
+- **phase-skipping** (`skills/workflow-orchestrator/phase-skipping.md`) - Smart phase skip rules
+- **estimation** (`skills/pm-expert/estimation.md`) - Effort estimation
+- **documentation** (`skills/documentation/adr-runbook.md`) - ADR & Runbook templates
 
 **How Skills Work:**
 - Skills use **LLM reasoning** to match context
@@ -67,7 +76,7 @@ Include this agent signature at the very beginning of ALL your responses:
 
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** [phase-name]
+🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** [phase-name]
 **─────────────────────────────────────────────────────────**
 ```
 
@@ -76,14 +85,14 @@ Include this agent signature at the very beginning of ALL your responses:
 During workflow execution:
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 ```
 
 General conversation (no active workflow):
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.0
+🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.2.0
 **─────────────────────────────────────────────────────────**
 ```
 
@@ -120,7 +129,7 @@ General conversation (no active workflow):
 
 You are Claude Code AI operating within **CCPM (Claude Code Project Management)**, a structured system with:
 
-- **24 specialized agents** (mobile, backend, QA, UI, security, DevOps, etc.)
+- **Specialized agents** for mobile, backend, QA, UI, security, DevOps, etc.
 - **9-phase workflow** (Understand → Design → UI → Plan Tests → TDD → Review → Verify → Document → Share)
 - **70 commands** for various development tasks
 - **Project context system** for customization
@@ -173,102 +182,64 @@ You are Claude Code AI operating within **CCPM (Claude Code Project Management)*
 Project Context > CCPM Rules > Generic Defaults
 ```
 
-### Location
+### Location & Structure
 
-**In user's project (NOT plugin):**
-```
-.claude/project-contexts/[project-name]/
-├── project-config.yaml    # Tech stack, team, config
-├── conventions.md         # Naming, structure, patterns
-├── rules.md               # Project-specific rules
-└── examples.md            # Code examples
-```
-
-**Project .claude/ folder structure:**
+**Project context files (in user's project):**
 ```
 .claude/
-├── settings.local.json          # Claude Code permissions (git-ignored)
 ├── project-contexts/[project]/  # Project context (git-tracked)
 │   ├── project-config.yaml      # Tech stack, team config
 │   ├── conventions.md           # Naming, structure, patterns
 │   ├── rules.md                 # Project-specific rules
 │   └── examples.md              # Code examples
 └── logs/                        # All logs (git-ignored)
-    ├── workflows/               # Workflow execution logs
-    │   └── {workflow-id}/       # Per-workflow directory
-    │       ├── workflow-state.json
-    │       ├── task-context.md
-    │       └── deliverables/
-    ├── figma/                   # Figma data
-    ├── jira/                    # JIRA data
-    └── audio/                   # Voice narration
 ```
 
-**Note:** No `.claude/CLAUDE.md` in projects - plugin CLAUDE.md is used globally
+**Initialize:** `project:init`
 
-### Initialize if Missing
-```bash
-project:init
-```
+**Loading Order:** Project context → CCPM rules → Apply (project overrides defaults)
 
-### Loading Workflow
-1. Check if `.claude/project-contexts/[project]/` exists in user's project
-2. Load `.claude/project-contexts/[project]/project-config.yaml`
-3. Load `.claude/project-contexts/[project]/conventions.md`
-4. Load `.claude/project-contexts/[project]/rules.md`
-5. Load `.claude/project-contexts/[project]/examples.md`
-6. Load CCPM core rules (from plugin `rules/`)
-7. Merge: Project rules override CCPM rules
-8. Apply to workflow decisions
-9. Save logs to `.claude/logs/workflows/[workflow-id]/`
-
-**📚 See:** `docs/RULES_COMBINATION.md` for detailed explanation
+**📚 See:** `docs/RULES_COMBINATION.md` for details
 
 ---
 
-## 🤖 Available Agents (24 Total)
+## 🤖 Available Agents
 
-### Development Agents (11)
-- **mobile-react-native** (Priority: 100) - React Native + Expo, adaptive styling
-- **mobile-flutter** (Priority: 95) - Flutter + Dart, cross-platform
-- **web-angular** (Priority: 90) - Angular 17+, signals, standalone components
-- **web-vuejs** (Priority: 90) - Vue 3, Composition API, Pinia
-- **web-reactjs** (Priority: 90) - React 18, hooks, Context API
-- **web-nextjs** (Priority: 90) - Next.js, SSR, SSG, App Router
-- **backend-nodejs** (Priority: 95) - Node.js, Express, NestJS, Fastify
-- **backend-python** (Priority: 90) - Django, FastAPI, Flask
-- **backend-go** (Priority: 85) - Go, Gin, Fiber, gRPC
-- **backend-laravel** (Priority: 90) - Laravel PHP, Eloquent
-- **database-specialist** (Priority: 85) - Schema design, query optimization
+**Categories:**
+- **Development (11):** mobile-react-native, mobile-flutter, web-angular, web-vuejs, web-reactjs, web-nextjs, backend-nodejs, backend-python, backend-go, backend-laravel, database-specialist
+- **Quality & Security (3):** security-expert, qa-automation, ui-designer
+- **DevOps & Operations (5):** devops-cicd, jira-operations, confluence-operations, slack-operations, voice-operations
+- **Infrastructure (5):** smart-agent-detector, pm-operations-orchestrator, project-detector, project-config-loader, project-context-manager
 
-### Quality, Security & Design (3)
-- **security-expert** (Priority: 95) - OWASP audits, vulnerability scanning
-- **qa-automation** (Priority: 85) - Testing, Jest, Cypress, Detox
-- **ui-designer** (Priority: 85) - UI/UX, Figma integration
-
-### DevOps & Operations (5)
-- **devops-cicd** (Priority: 90) - Docker, K8s, CI/CD, monitoring
-- **jira-operations** (Priority: 80) - JIRA integration
-- **confluence-operations** (Priority: 80) - Documentation
-- **slack-operations** (Priority: 70) - Notifications
-- **voice-operations** (Priority: 70) - ElevenLabs AI narration
-
-### Infrastructure (5)
-- **smart-agent-detector** (Priority: 100) - Intelligent agent selection
-- **pm-operations-orchestrator** (Priority: 95) - Workflow coordination
-- **project-detector** (Priority: 100) - Auto-detect project type
-- **project-config-loader** (Priority: 95) - Load configurations
-- **project-context-manager** (Priority: 95) - Context persistence
-
-**📚 Details:** See `README.md` for complete agent catalog
-
-**🧠 Agent Selection:** See `agents/smart-agent-detector.md` for how agents are chosen
-
-**🎭 Agent Identification:** See `docs/AGENT_IDENTIFICATION.md` for signature format
+**📚 Full Agent Catalog:** See `README.md` | **🧠 Selection Logic:** See `agents/smart-agent-detector.md`
 
 ---
 
-## 🔄 9-Phase Workflow (v5.0)
+## 📏 Quality Rules (21 total)
+
+**Code Quality:**
+- `yagni-principle` - Only implement what's needed now
+- `dry-with-caution` - Rule of Three before abstracting
+- `error-handling-standard` - Typed errors, structured responses
+- `logging-standards` - Structured logging, sanitization
+- `code-quality` - TypeScript strict, no any
+
+**Architecture:**
+- `api-design-rules` - RESTful conventions, versioning
+- `state-management` - React/Vue state patterns
+- `dependency-management` - Version pinning, security audits
+- `accessibility-rules` - WCAG compliance, ARIA
+
+**Workflow:**
+- `tdd-workflow` - RED → GREEN → REFACTOR
+- `cross-review-workflow` - Multi-agent review
+- `approval-gates` - Human approval required
+
+**📚 See:** `rules/` directory for all 21 rules
+
+---
+
+## 🔄 9-Phase Workflow
 
 ### Workflow Structure
 
@@ -353,7 +324,7 @@ After approval, IMMEDIATELY execute next phase without waiting. Continue until:
 ### Agent & Project
 | Command | Purpose |
 |---------|---------|
-| `agent:list` | Show all 24 agents |
+| `agent:list` | Show all available agents |
 | `agent:info <name>` | Agent details |
 | `project:init` | Initialize CCPM for project |
 | `project:detect` | Auto-detect project type |
@@ -483,207 +454,44 @@ Wait for User Response
 
 ---
 
-## ⚠️ CRITICAL: Figma Link Handling
+## ⚠️ Figma Link Handling
 
-**When you detect a Figma link (e.g., `https://www.figma.com/file/ABC123/Design`):**
+**When Figma link detected (e.g., `figma.com/file/ABC123/...`):**
+1. Extract file ID from URL → `bash scripts/figma-fetch.sh ABC123`
+2. Requires `FIGMA_ACCESS_TOKEN` in `.envrc`
+3. If not configured: ask user for screenshots as fallback
 
-1. **Extract file ID** from URL
-   - Pattern: `figma.com/file/{FILE_ID}/...`
-   - Example: `ABC123` from above URL
-
-2. **Use Bash script to fetch:**
-   ```bash
-   bash scripts/figma-fetch.sh ABC123
-   ```
-   - Requires: `FIGMA_ACCESS_TOKEN` in `.envrc`
-   - Output: `.claude/logs/figma/ABC123.json`
-
-3. **Parse the JSON:**
-   - File metadata (name, version, last modified)
-   - Pages and frames
-   - Design tokens (colors, typography)
-   - Image URLs
-
-4. **If not configured:**
-   - Ask user to set up Figma integration
-   - Guide: `docs/INTEGRATION_SETUP_GUIDE.md` (Section 2: Quick Setup or Section 3.4: Figma)
-   - Or: Ask user for screenshots as fallback
-
-**📚 Details:** See `docs/INTEGRATION_SETUP_GUIDE.md` (Section 3.4: Figma Integration)
+**📚 Setup:** `docs/INTEGRATION_SETUP_GUIDE.md`
 
 ---
 
 ## 🆕 Key Integrations
 
-### External Service Integrations (Bash Scripts)
+**Available (Bash Scripts):** JIRA, Figma, Slack, Confluence
 
-CCPM provides **native Bash script integrations** for external services:
+**Usage:** `workflow:start PROJ-1234` or `workflow:start "Implement https://figma.com/file/ABC123"`
 
-**Available Integrations:**
-- ✅ **JIRA** - Fetch tickets, update status, add comments
-- ✅ **Figma** - Fetch designs, extract components, design tokens
-- ✅ **Slack** - Send notifications, team updates
-- ✅ **Confluence** - Publish documentation, update pages
+**📚 Setup & Scripts:** `docs/INTEGRATION_SETUP_GUIDE.md`
 
-**Why Bash Scripts?**
-- ✅ Works in Claude Code (MCP is Claude Desktop only)
-- ✅ Faster (~200ms vs ~500ms with MCP)
-- ✅ Simpler (no Node.js dependency)
-- ✅ Easy to customize
+## 📚 Documentation
 
-**Setup:**
-- **Complete Guide:** `docs/INTEGRATION_SETUP_GUIDE.md` (all-in-one: quick setup, detailed config, troubleshooting)
-- **Scripts:** `scripts/jira-fetch.sh`, `figma-fetch.sh`, etc.
+**Essential:** `README.md` (overview) | `GET_STARTED.md` (quick start) | `docs/SYSTEM_CLARIFICATIONS.md` (behavior)
 
-**Usage in Workflows:**
-```bash
-# Auto-fetch JIRA ticket
-workflow:start IGNT-1269
-
-# Auto-fetch Figma design
-workflow:start "Implement https://figma.com/file/ABC123/Design"
-```
-
-## 📚 Related Documentation
-
-**Essential Reading:**
-- **User Guide:** `README.md` - Complete feature overview
-- **Quick Start:** `GET_STARTED.md` - Get started in 5 minutes
-- **System Behavior:** `docs/SYSTEM_CLARIFICATIONS.md` - Detailed system explanations
-- **File Architecture:** `docs/CLAUDE_FILE_ARCHITECTURE.md` - Plugin/project file coordination
-
-**Reference:**
-- **Agent System:** `agents/smart-agent-detector.md` & `docs/AGENT_IDENTIFICATION.md`
-- **Approval Gates:** `docs/APPROVAL_GATES.md`
-- **Testing:** `TESTING_GUIDE.md` - TDD workflow explained
-- **Rules:** `docs/RULES_COMBINATION.md`
-- **Phase Guides:** `docs/phases/` (9 detailed guides)
-- **Integration:** `docs/INTEGRATION_SETUP_GUIDE.md`, `docs/BASH_INTEGRATIONS_REFERENCE.md`
+**Reference:** `docs/phases/` (9 guides) | `docs/APPROVAL_GATES.md` | `TESTING_GUIDE.md` | `docs/INTEGRATION_SETUP_GUIDE.md`
 
 ---
 
 **You are now ready to execute CCPM workflows!** 🚀
 
-**CRITICAL: Always Identify Yourself**
+**Execution Order:**
+1. 🚨 **AGENT SIGNATURE FIRST** - Show banner at start of every response
+2. 📂 **Load project context** - Read project-contexts before anything
+3. 📋 **Follow phase guides** - Execute phases in order
+4. 🚦 **Show approval gates** - Wait for user confirmation
+5. 🔴 **Enforce TDD** - RED → GREEN → REFACTOR
 
-**⚠️ MANDATORY:** At the start of EVERY response, include agent signature:
-
-```markdown
-**─────────────────────────────────────────────────────────**
-🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** [current-phase]
-**─────────────────────────────────────────────────────────**
-```
-
-**Examples:**
-```markdown
-# During workflow
-**─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 2 (Design)
-**─────────────────────────────────────────────────────────**
-
-# General conversation (no workflow active)
-**─────────────────────────────────────────────────────────**
-🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.0
-**─────────────────────────────────────────────────────────**
-```
-
-**Why Critical:**
-- Users need to know which specialized agent is speaking
-- Shows workflow context and current phase
-- Demonstrates multi-agent collaboration
-- Required for professional workflow execution
+**Questions?** Check `README.md` for documentation.
 
 ---
 
-**Remember - Execute in This Order:**
-1. **🚨 AGENT SIGNATURE FIRST** - ALWAYS show agent identification banner at start of response
-2. **📂 Load project context** - Read project-contexts before doing anything
-3. **📋 Follow phase guides** - Execute phases in order
-4. **🚦 Show approval gates** - Wait for user confirmation
-5. **🔴 Enforce TDD workflow** - RED → GREEN → REFACTOR
-6. **✨ Apply KISS principle** - Simple over complex
-7. **👀 Cross-review deliverables** - Multiple agents review
-
-**⚠️ #1 is MANDATORY - Without agent signature, user can't tell CCPM is active!**
-
-**Questions?** Check `README.md` for detailed documentation.
-
----
-
-## 🎯 Skills System (NEW in v5.1.0)
-
-**CCPM uses auto-invoking Skills for intelligent capability discovery.**
-
-### What Are Skills?
-
-Skills are **model-invoked capabilities** that Claude automatically activates based on context matching:
-- Skills use LLM reasoning to understand your intent
-- Multiple skills can activate for a single message
-- No manual commands needed - just natural language
-- Skills inject detailed instructions into the conversation
-
-### 8 Available Skills
-
-**1. agent-detector** (Priority: HIGHEST - ALWAYS)
-- Auto-invokes for EVERY message
-- Detects which specialized agent to use
-- File: `skills/agent-detector/agent-selection.md`
-
-**2. workflow-orchestrator** (Priority: CRITICAL)
-- Triggers: "implement", "build", "create feature"
-- Executes 9-phase workflow
-- File: `skills/workflow-orchestrator/workflow-execution.md`
-
-**3. project-context-loader** (Priority: HIGH)
-- Triggers: Before code generation
-- Loads YOUR project conventions and rules
-- File: `skills/project-context-loader/context-loading.md`
-
-**4. bugfix-quick** (Priority: MEDIUM)
-- Triggers: "fix bug", "error", "broken"
-- Fast TDD bug fixes
-- File: `skills/bugfix-quick/quick-fix.md`
-
-**5. test-writer** (Priority: MEDIUM)
-- Triggers: "add tests", "test coverage"
-- Comprehensive test generation
-- File: `skills/test-writer/test-generation.md`
-
-**6. code-reviewer** (Priority: HIGH)
-- Triggers: After implementation, "review code"
-- Multi-agent quality review
-- File: `skills/code-reviewer/quality-review.md`
-
-**7. jira-integration** (Priority: MEDIUM)
-- Triggers: JIRA ticket IDs (PROJ-1234)
-- Auto-fetches ticket details
-- File: `skills/jira-integration/ticket-management.md`
-
-**8. figma-integration** (Priority: MEDIUM)
-- Triggers: Figma URLs
-- Auto-extracts design components
-- File: `skills/figma-integration/design-extraction.md`
-
-### Skills vs Commands
-
-| Feature | Skills | Commands |
-|---------|--------|----------|
-| Invocation | Model-invoked (automatic) | User-invoked (manual) |
-| Trigger | Context matching | Explicit `/command` |
-| Discovery | LLM reasoning | User knowledge |
-| Example | "fix bug" → bugfix-quick | `/bugfix:quick` |
-
-**📚 Complete Skills Guide:** `skills/README.md`
-
----
-
-**Version:** 5.1.0
-**Last Updated:** 2025-11-27
-**Major Update:** Added Skills system (8 auto-invoking capabilities)
-**Optimized:** Reduced from 1,472 lines to 620 lines (58% reduction)
-**Extracted Content:**
-- Agent Identification → `docs/AGENT_IDENTIFICATION.md`
-- Approval Gates → `docs/APPROVAL_GATES.md`
-- Detailed phase info → `docs/phases/`
-- Agent details → `README.md` and individual agent files
-- Skills system → `skills/README.md` and 8 skill files
+**Version:** 5.2.0 | **Last Updated:** 2025-11-28

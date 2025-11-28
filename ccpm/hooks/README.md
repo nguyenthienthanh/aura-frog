@@ -35,13 +35,13 @@ Referenced in plugin.json:
 
 **Output Example:**
 ```
-🚀 CCPM Team Agents System v5.1.0 is active.
+🚀 CCPM Team Agents System v5.2.0 is active.
 
 Available Commands:
 - workflow:start <task> - Start 9-phase TDD workflow
 - bugfix:quick <description> - Quick bug fix
 - project:init - Initialize project context
-- agent:list - Show all 24 specialized agents
+- agent:list - Show all available agents
 
 Skills System: 8 auto-invoking skills active
 Type any command or use natural language - Skills will auto-activate based on your intent.
@@ -265,6 +265,6 @@ To modify hooks:
 
 ---
 
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27
 **Status:** Active hooks system

@@ -1,253 +1,338 @@
 ---
 name: workflow-orchestrator
-description: "PROACTIVELY use when user requests to implement a new feature, build functionality, or create something complex that requires multiple phases. Triggers: 'implement', 'build', 'create feature', 'add new', 'develop', 'workflow:start'. DO NOT use for simple bug fixes or documentation. Executes CCPM's 9-phase workflow (Understand → Design → UI → Plan Tests → Write Tests → Build → Polish → Review → Verify → Document → Share) with TDD enforcement and quality gates."
+description: "Execute 9-phase workflow for complex features. Triggers: 'implement', 'build', 'create feature', 'workflow:start'. DO NOT use for simple bug fixes."
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 # CCPM Workflow Orchestrator
 
-**Version:** 5.0.0-beta
-**Purpose:** Execute structured 9-phase workflow for complex development tasks
-**Priority:** CRITICAL - Use for all complex feature implementations
+**Priority:** CRITICAL - Use for complex feature implementations
+**Version:** 5.2.0
 
 ---
 
-## 🎯 Overview
+## When to Use
 
-The Workflow Orchestrator executes CCPM's comprehensive 9-phase workflow system. This skill ensures proper planning, TDD enforcement, quality gates, and cross-agent collaboration for complex development tasks.
+**USE for:**
+- New features
+- Complex implementations
+- Tasks > 2 hours
+- Multi-file changes
+- Tasks requiring TDD workflow
 
----
-
-## ✅ When to Use This Skill
-
-**PROACTIVELY use when:**
-- User requests new feature implementation
-- Building complex functionality from scratch
-- User says: "implement", "build", "create feature", "add new", "develop"
-- User explicitly calls: `workflow:start <task>`
-- Task estimated to take > 2 hours
-- Requires multiple files or components
-- Needs UI/UX design considerations
-- Requires comprehensive testing
-
-**Examples that trigger this skill:**
-- "Implement user authentication with JWT"
-- "Build a dashboard with charts and filters"
-- "Create a payment integration with Stripe"
-- "Add real-time notifications using WebSocket"
-- "workflow:start implement search functionality"
+**DON'T use for:**
+- Bug fixes → use `bugfix-quick`
+- Quick refactors → direct edit
+- Config changes → direct edit
+- Simple questions → just answer
 
 ---
 
-## ❌ When NOT to Use This Skill
+## Pre-Execution Checklist
 
-**DO NOT use for:**
-- Simple bug fixes (use `bugfix-quick` skill instead)
-- Documentation-only tasks
-- Quick refactors (< 30 min)
-- Single-file changes
-- Configuration updates
-- Adding comments or fixing typos
+1. **agent-detector** → Select lead agent (MANDATORY)
+2. **project-context-loader** → Load conventions (MANDATORY)
+3. **Show agent banner** at start of response
+4. **Verify task complexity** - if simple, suggest lighter approach
 
 ---
 
-## 🔄 How It Works
+## 9-Phase Workflow
 
-### Pre-Execution Steps
-
-1. **Load Project Context** (use `project-context-loader` skill)
-2. **Detect Agent** (use `agent-detector` skill)
-3. **Show Agent Identification Banner**
-
-### 9-Phase Workflow Execution
-
-**Phase 1: Understand 🎯** (20-45 min)
-- Load: `commands/workflow/phase-1.md`
-- PM agent creates requirements document
-- Cross-review by Dev + QA + UI agents
-- **Approval gate:** User must approve before Phase 2
-
-**Phase 2: Design 🏗️** (30-60 min)
-- Load: `commands/workflow/phase-2.md`
-- Dev agent creates technical design
-- Defines architecture, data models, APIs
-- Cross-review by Secondary Dev + QA
-- **Approval gate:** User must approve before Phase 3
-
-**Phase 3: UI Breakdown 🎨** (20-40 min)
-- Load: `commands/workflow/phase-3.md`
-- UI agent creates component breakdown
-- Wireframes, design tokens, accessibility
-- Cross-review by Dev agent
-- **Approval gate:** User must approve before Phase 4
-
-**Phase 4: Plan Tests 🧪** (20-40 min)
-- Load: `commands/workflow/phase-4.md`
-- QA agent creates test strategy
-- Unit, integration, E2E test plans
-- Cross-review by Dev agent
-- **Approval gate:** User must approve before Phase 5a
-
-**Phase 5a: Write Tests 🔴** (30-60 min - TDD RED)
-- Load: `commands/workflow/phase-5a.md`
-- QA + Dev agents write failing tests FIRST
-- Tests MUST fail (no implementation yet)
-- **Approval gate:** Tests must be RED before Phase 5b
-
-**Phase 5b: Build 🟢** (2-4 hours - TDD GREEN)
-- Load: `commands/workflow/phase-5b.md`
-- Dev agent implements code to make tests pass
-- Tests MUST pass after implementation
-- **Approval gate:** Tests must be GREEN before Phase 5c
-
-**Phase 5c: Polish ♻️** (30-90 min - TDD REFACTOR)
-- Load: `commands/workflow/phase-5c.md`
-- Dev agent refactors for quality (KISS principle)
-- Tests MUST still pass after refactoring
-- **Approval gate:** Tests pass + code quality approved
-
-**Phase 6: Review 👀** (20-40 min)
-- Load: `commands/workflow/phase-6.md`
-- Code-reviewer skill performs quality review
-- Security expert checks vulnerabilities
-- **Approval gate:** Code quality must be approved
-
-**Phase 7: Verify ✅** (20-40 min)
-- Load: `commands/workflow/phase-7.md`
-- QA agent runs all tests (unit, integration, E2E)
-- Verifies test coverage (≥80% by default)
-- **Approval gate:** All tests must pass
-
-**Phase 8: Document 📚** (15-35 min)
-- Load: `commands/workflow/phase-8.md`
-- PM agent creates documentation
-- API docs, user guides, inline comments
-- Optional: Voice narration (voice-operations)
-- **Approval gate:** Documentation approved
-
-**Phase 9: Share 🔔** (10-20 min - AUTO-EXECUTE)
-- Load: `commands/workflow/phase-9.md`
-- Slack/Confluence/JIRA notifications
-- Team updates and handoff
-- **No approval gate** - executes automatically
+| Phase | Name | Lead Agent | Deliverable | Gate |
+|-------|------|------------|-------------|------|
+| 1 | Understand 🎯 | pm-operations-orchestrator | Requirements document | ✋ |
+| 2 | Design 🏗️ | Dev agent | Technical design | ✋ |
+| 3 | UI Breakdown 🎨 | ui-designer | Component breakdown | ✋ |
+| 4 | Plan Tests 🧪 | qa-automation | Test strategy | ✋ |
+| 5a | Write Tests 🔴 | qa-automation + Dev | Failing tests (TDD RED) | ✋ |
+| 5b | Build 🟢 | Dev agent | Implementation (TDD GREEN) | ✋ |
+| 5c | Polish ♻️ | Dev agent | Refactored code (TDD REFACTOR) | ✋ |
+| 6 | Review 👀 | security-expert | Quality review report | ✋ |
+| 7 | Verify ✅ | qa-automation | All tests pass, coverage ≥80% | ✋ |
+| 8 | Document 📚 | pm-operations-orchestrator | Documentation | ✋ |
+| 9 | Share 🔔 | slack-operations | Team notification | Auto |
 
 ---
 
-## 🚦 Approval Gates
+## Phase Transition Rules
 
-**After EVERY phase:**
-1. Show deliverables to user
-2. Wait for response:
-   - `approve` / `yes` → Continue to next phase (AUTO-CONTINUE)
-   - `reject: <reason>` → Restart phase with feedback
-   - `modify: <changes>` → Adjust deliverables
-   - `stop` / `cancel` → Cancel workflow
+### Valid Transitions
 
-**AUTO-CONTINUE Behavior:**
-- After approval, IMMEDIATELY execute next phase
-- Continue through all phases until complete
-- Only stop at: rejection, errors, or Phase 5c completion
+```
+Phase 1 (Understand) → Phase 2 (Design)
+  Requires: approve
+  Blocker: Unclear requirements
+
+Phase 2 (Design) → Phase 3 (UI)
+  Requires: approve
+  Blocker: No technical design
+
+Phase 3 (UI) → Phase 4 (Plan Tests)
+  Requires: approve
+  Skip if: No UI component in task
+
+Phase 4 (Plan Tests) → Phase 5a (Write Tests)
+  Requires: approve
+  Blocker: No test strategy
+
+Phase 5a (RED) → Phase 5b (GREEN)
+  Requires: approve + tests MUST fail
+  Blocker: Tests pass (they should fail!)
+
+Phase 5b (GREEN) → Phase 5c (REFACTOR)
+  Requires: approve + tests MUST pass
+  Blocker: Tests still failing
+
+Phase 5c (REFACTOR) → Phase 6 (Review)
+  Requires: approve + tests MUST still pass
+  Blocker: Tests broken by refactor
+
+Phase 6 (Review) → Phase 7 (Verify)
+  Requires: approve
+  Blocker: Critical security issues
+
+Phase 7 (Verify) → Phase 8 (Document)
+  Requires: approve + coverage ≥80%
+  Blocker: Coverage below target
+
+Phase 8 (Document) → Phase 9 (Share)
+  Requires: approve
+  Auto-executes Phase 9
+```
+
+### Invalid Transitions (BLOCKED)
+
+- ❌ Skip from Phase 1 to Phase 5 (no design)
+- ❌ Phase 5b without 5a (no TDD)
+- ❌ Phase 7 with failing tests
+- ❌ Any phase skip without explicit user request
 
 ---
 
-## 📋 Critical Rules
+## Approval Gates
 
-### TDD Enforcement (NON-NEGOTIABLE)
-- ✅ Phase 5a: Write tests FIRST (must FAIL)
-- ✅ Phase 5b: Implement code (tests must PASS)
-- ✅ Phase 5c: Refactor (tests must stay PASS)
-- ❌ NEVER write implementation before tests
-- ❌ NEVER proceed if tests don't fail in RED phase
-- ❌ NEVER proceed if tests don't pass in GREEN phase
+### Gate Format
+
+```markdown
+╔══════════════════════════════════════════════════════════╗
+║  🏗️  Phase [N]: [Name] - Approval Needed                ║
+╚══════════════════════════════════════════════════════════╝
+
+## [Friendly Summary] ✨
+
+[Deliverables list]
+
+---
+
+**Options:**
+- `approve` / `yes` → Continue to Phase [N+1]
+- `reject: <reason>` → Re-do this phase
+- `modify: <changes>` → Adjust deliverables
+- `stop` → Cancel workflow
+
+⚡ After approval, I'll AUTO-CONTINUE to Phase [N+1]!
+```
+
+### Valid Responses
+
+| Response | Action |
+|----------|--------|
+| `approve` / `yes` | Continue to next phase immediately |
+| `reject: <reason>` | Restart current phase with feedback |
+| `modify: <changes>` | Adjust deliverables then re-show gate |
+| `stop` / `cancel` | End workflow, save state |
+
+---
+
+## AUTO-CONTINUE Behavior
+
+**After user approves:**
+1. ✅ Immediately start next phase
+2. ✅ No waiting for additional input
+3. ✅ Continue until:
+   - Next approval gate
+   - User rejection
+   - Blocking error
+   - Token limit (150K) → suggest `workflow:handoff`
+
+**Example Flow:**
+```
+User: "approve"
+→ Claude immediately starts Phase 3
+→ Completes Phase 3 deliverables
+→ Shows Phase 3 approval gate
+→ Waits for user
+
+User: "approve"
+→ Claude immediately starts Phase 4
+→ ... continues ...
+```
+
+**Token Awareness:**
+- At 75% (150K tokens): Warn user
+- At 85% (170K tokens): Suggest `workflow:handoff`
+- At 90% (180K tokens): Force handoff
+
+---
+
+## Critical Rules
+
+### TDD (NON-NEGOTIABLE)
+
+```
+Phase 5a (RED):
+  ✅ Write tests FIRST
+  ✅ Run tests → MUST FAIL
+  ❌ If tests pass → STOP, tests aren't testing new code
+
+Phase 5b (GREEN):
+  ✅ Write minimal code to pass tests
+  ✅ Run tests → MUST PASS
+  ❌ If tests fail → Fix code, not tests
+
+Phase 5c (REFACTOR):
+  ✅ Clean up code
+  ✅ Run tests → MUST STILL PASS
+  ❌ If tests fail → Revert refactor
+```
 
 ### KISS Principle
-- ✅ Simple solutions over complex
+
+- ✅ Simple over complex
 - ✅ Standard patterns over custom
-- ✅ Readable code over clever code
+- ✅ Solve today's problem, not tomorrow's
 - ❌ No premature abstraction
 - ❌ No over-engineering
+- ❌ No excessive configuration
 
 ### Cross-Review
-- Phase 1: PM creates → Dev + QA + UI review
-- Phase 2: Dev creates → Secondary Dev + QA review
-- Phase 4: QA creates → Dev reviews
+
+| Phase | Creator | Reviewers |
+|-------|---------|-----------|
+| 1 (Understand) | PM | Dev + QA + UI |
+| 2 (Design) | Dev | Secondary Dev + QA |
+| 4 (Plan Tests) | QA | Dev |
+| 6 (Review) | Security | All |
 
 ---
 
-## 📂 Required Files to Load
+## Phase Skip Rules
 
-**Phase Commands:**
-- `commands/workflow/phase-1.md` through `commands/workflow/phase-9.md`
+### Automatic Skips
 
-**Project Context:**
-- `.claude/project-contexts/[project]/project-config.yaml`
-- `.claude/project-contexts/[project]/conventions.md`
-- `.claude/project-contexts/[project]/rules.md`
-- `.claude/project-contexts/[project]/examples.md`
+- **Phase 3 (UI):** Skip if task has no UI components
+- **Phase 9 (Share):** Skip if no Slack integration configured
 
-**Rules:**
-- `rules/tdd-workflow.md`
-- `rules/approval-gates.md`
-- `rules/kiss-principle.md`
-- `rules/cross-review.md`
+### User-Requested Skips
 
-**Agent References:**
-- `agents/pm-operations-orchestrator.md`
-- `agents/[detected-agent].md` (from agent-detector skill)
-- `agents/qa-automation.md`
-- `agents/ui-designer.md`
-
----
-
-## 🎭 Agent Collaboration
-
-**This skill coordinates multiple agents:**
-- **PM Orchestrator** - Leads Phase 1, 8, 9
-- **Primary Dev Agent** - Leads Phase 2, 5b, 5c (mobile-react-native, web-nextjs, etc.)
-- **UI Designer** - Leads Phase 3
-- **QA Automation** - Leads Phase 4, 5a, 7
-- **Security Expert** - Reviews in Phase 6
-- **Secondary Agents** - Support and cross-review
-
----
-
-## 💾 State Management
-
-**Workflow state saved to:**
+User can request skip with reason:
 ```
-.claude/logs/workflows/[workflow-id]/
-├── phase-1-deliverables.md
-├── phase-2-deliverables.md
-├── ... (all phases)
-├── workflow-state.json
-└── approval-history.json
+User: "skip phase 3, this is backend only"
+→ Log skip reason
+→ Proceed to Phase 4
 ```
 
-**For session continuation:**
-- Use `workflow:handoff` to save state
-- Use `workflow:resume <id>` to continue later
+---
+
+## Files to Load
+
+### Phase Guides
+```
+docs/phases/phase-1-understand.md
+docs/phases/phase-2-design.md
+docs/phases/phase-3-ui.md
+docs/phases/phase-4-test-planning.md
+docs/phases/phase-5-implementation.md
+docs/phases/phase-6-review.md
+docs/phases/phase-7-verification.md
+docs/phases/phase-8-documentation.md
+docs/phases/phase-9-notification.md
+```
+
+### Project Context
+```
+.claude/project-contexts/[project]/project-config.yaml
+.claude/project-contexts/[project]/conventions.md
+.claude/project-contexts/[project]/rules.md
+```
+
+### Rules
+```
+rules/tdd-workflow.md
+rules/kiss-principle.md
+rules/code-quality.md
+```
 
 ---
 
-## 📊 Success Metrics
+## State Management
 
-**Workflow complete when:**
-- ✅ All 9 phases executed
-- ✅ All approval gates passed
-- ✅ Tests passing (≥80% coverage)
-- ✅ Code reviewed and approved
-- ✅ Documentation complete
-- ✅ Team notified
+### Save State
+```
+workflow:handoff
+→ Saves to .claude/logs/workflows/[workflow-id]/
+→ Contains: current phase, deliverables, context
+```
+
+### Resume State
+```
+workflow:resume <workflow-id>
+→ Loads saved state
+→ Continues from last phase
+→ Re-shows approval gate if pending
+```
+
+### Workflow Status
+```
+workflow:status
+→ Shows: current phase, completed phases, pending tasks
+```
 
 ---
 
-## 🔗 Related Skills
+## Example Workflow Execution
 
-- **agent-detector** - Detects which agent leads the workflow
-- **project-context-loader** - Loads project conventions before workflow
-- **test-writer** - Used in Phase 5a
-- **code-reviewer** - Used in Phase 6
+```
+User: "workflow:start Add user authentication with JWT"
+
+Phase 1: Understand 🎯
+├── Analyze requirements
+├── Define success criteria
+├── Identify risks
+├── Cross-review with dev/QA/UI
+└── Show approval gate ✋
+
+User: "approve"
+
+Phase 2: Design 🏗️  [AUTO-CONTINUE]
+├── Design JWT architecture
+├── Define API endpoints
+├── Plan database schema
+├── Cross-review
+└── Show approval gate ✋
+
+User: "approve"
+
+Phase 3: UI Breakdown 🎨  [AUTO-CONTINUE]
+├── Design login/register screens
+├── Extract design tokens
+├── Plan component structure
+└── Show approval gate ✋
+
+... continues through all phases ...
+
+Phase 9: Share 🔔  [AUTO-EXECUTE]
+├── Send Slack notification
+├── Update JIRA ticket
+└── Workflow complete ✅
+```
 
 ---
 
-**Remember:** This is a STRUCTURED workflow. Follow phases in order. Never skip approval gates. TDD is NON-NEGOTIABLE.
+**Remember:**
+- Follow phases in order
+- Never skip approval gates without user consent
+- TDD is mandatory (RED → GREEN → REFACTOR)
+- AUTO-CONTINUE after approval
+- Save state at token limit

@@ -2,7 +2,7 @@
 
 **Command:** `deploy:setup [platform]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -98,4 +98,4 @@ deploy:setup --platform kubernetes
 ---
 
 **Command:** deploy:setup
-**Version:** 5.0.0
+**Version:** 5.2.0

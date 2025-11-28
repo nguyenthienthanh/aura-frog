@@ -2,7 +2,7 @@
 
 **Agent ID:** mobile-flutter
 **Priority:** 95
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -436,5 +436,5 @@ void main() {
 ---
 
 **Agent:** mobile-flutter
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** ✅ Active

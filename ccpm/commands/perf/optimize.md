@@ -1,7 +1,7 @@
 # Command: perf:optimize
 
 **Command:** `perf:optimize [options]`
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -62,4 +62,4 @@ perf:optimize --target code
 ---
 
 **Command:** perf:optimize
-**Version:** 5.0.0
+**Version:** 5.2.0

@@ -2,7 +2,7 @@
 
 **Command:** `monitor:errors [timeframe]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -360,4 +360,4 @@ monitor:errors --create-tickets --severity critical
 ---
 
 **Command:** monitor:errors
-**Version:** 5.0.0
+**Version:** 5.2.0

@@ -2,7 +2,7 @@
 
 **Command:** `logs:analyze [timeframe]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -454,4 +454,4 @@ logs:analyze --search "authentication failed|unauthorized|forbidden"
 ---
 
 **Command:** logs:analyze
-**Version:** 5.0.0
+**Version:** 5.2.0

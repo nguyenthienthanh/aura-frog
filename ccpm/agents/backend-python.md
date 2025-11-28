@@ -2,7 +2,7 @@
 
 **Agent ID:** backend-python
 **Priority:** 90
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -369,6 +369,6 @@ async def create_user(
 ---
 
 **Agent:** backend-python
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2024-11-26
 **Status:** ✅ Active

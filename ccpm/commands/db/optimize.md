@@ -2,7 +2,7 @@
 
 **Command:** `db:optimize [target]`
 **Agent:** database-specialist
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -100,4 +100,4 @@ SELECT * FROM users WHERE LOWER(email) = 'test@example.com';
 ---
 
 **Command:** db:optimize
-**Version:** 5.0.0
+**Version:** 5.2.0

@@ -1,6 +1,6 @@
 # CCPM Commands Directory
 
-**Version:** 4.5.0  
+**Version:** 5.2.0  
 **Last Updated:** 2025-11-25
 
 ---

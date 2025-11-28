@@ -165,7 +165,7 @@ project-config-loader
 ```
 pm-operations-orchestrator
 ├── Manage 9-phase workflow
-├── Coordinate 14 agents
+├── Coordinate agents
 ├── Approval gates (9 gates)
 ├── Smart agent selection
 ├── Progress tracking

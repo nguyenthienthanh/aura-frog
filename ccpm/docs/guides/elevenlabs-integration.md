@@ -686,9 +686,9 @@ voice:narrate:file GETTING_STARTED.md --voice="Rachel"
 - [Supported Languages](https://elevenlabs.io/languages)
 
 ### CCPM Documentation
-- [voice-operations Agent](./agents/voice-operations.md)
-- [Phase 8 Workflow](./commands/workflow/phase-8.md)
-- [Project Configuration](./project-contexts/template/project-config.yaml)
+- [voice-operations Agent](./../../agents/voice-operations.md)
+- [Phase 8 Workflow](./../../commands/workflow/phase-8.md)
+- [Voiceover Notifications](../VOICEOVER_NOTIFICATIONS.md)
 
 ### Support
 - ElevenLabs Support: https://elevenlabs.io/support

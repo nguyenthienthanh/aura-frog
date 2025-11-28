@@ -2,7 +2,7 @@
 
 **Command:** `quality:debt [target]`
 **Agent:** qa-automation
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -301,4 +301,4 @@ debt_ratio_target: 5  # percent
 ---
 
 **Command:** quality:debt
-**Version:** 5.0.0
+**Version:** 5.2.0

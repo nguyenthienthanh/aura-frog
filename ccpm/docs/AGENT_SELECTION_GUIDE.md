@@ -7,7 +7,7 @@
 
 ## 🎯 Overview
 
-CCPM v5.0.0 includes an advanced **Smart Agent Detector** that automatically selects the most appropriate agents for any task based on natural language understanding, project context, and conversation history.
+CCPM v5.2.0 includes an advanced **Smart Agent Detector** that automatically selects the most appropriate agents for any task based on natural language understanding, project context, and conversation history.
 
 ---
 
@@ -16,7 +16,7 @@ CCPM v5.0.0 includes an advanced **Smart Agent Detector** that automatically sel
 ### 3-Step Process
 
 **1. Analysis** → Parse user input, detect intent, extract keywords
-**2. Scoring** → Score all 23 agents using multi-criteria algorithm
+**2. Scoring** → Score all agents using multi-criteria algorithm
 **3. Selection** → Choose primary, secondary, and optional agents
 
 ---
@@ -422,5 +422,5 @@ Confidence: 85% (High)
 ---
 
 **Guide Version:** 2.0.0
-**CCPM Version:** 5.0.0
+**CCPM Version:** 5.2.0
 **Last Updated:** 2025-11-26

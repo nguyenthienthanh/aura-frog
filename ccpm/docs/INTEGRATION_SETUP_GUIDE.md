@@ -1,6 +1,6 @@
 # Integration Setup Guide
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27
 
 ---
@@ -1347,6 +1347,6 @@ After setting up environment variables:
 
 ---
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27
 **Total Lines:** ~800

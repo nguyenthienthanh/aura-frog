@@ -1,6 +1,6 @@
 # Configuration Loading Order
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27
 
 ---
@@ -604,5 +604,5 @@ cat .claude/project-contexts/*/project-config.yaml 2>/dev/null | head -20
 
 ---
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27

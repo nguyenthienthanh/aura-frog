@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "🚀 CCPM Team Agents System v5.1.0 is active.\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all 24 specialized agents\n\n**Skills System:** 8 auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
+            "prompt": "🚀 CCPM Team Agents System v5.2.0 is active.\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all available agents\n\n**Skills System:** Auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
           }
         ]
       }

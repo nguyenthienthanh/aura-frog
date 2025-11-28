@@ -1,6 +1,6 @@
 # Command: Phase 1 - Understand
 
-**Version:** 5.0.0-beta
+**Version:** 5.2.0
 **Phase:** 1 of 9
 **Duration:** 20-45 minutes
 **Tagline:** "What are we building?"
@@ -185,7 +185,7 @@ After completing Phase 1, show this approval gate:
 - ✅ **Cross-Review:** qa-automation (Testability Check)
 - 🎨 **Cross-Review:** ui-designer (Design Review) [if applicable]
 
-**🤖 System:** CCPM Team Agents v5.0
+**🤖 System:** CCPM Team Agents v5.2.0
 **📋 Mode:** Workflow Phase Execution
 
 ---
@@ -241,7 +241,7 @@ We'll design the technical solution architecture.
 ⚡ After approval, I'll AUTO-CONTINUE to Phase 2!
 
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.0
+🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.2.0
 **─────────────────────────────────────────────────────────**
 
 Your response:
@@ -313,7 +313,7 @@ Phase 1 is complete when:
 ---
 
 **Phase:** 1 of 9
-**Version:** 5.0.0-beta
+**Version:** 5.2.0
 **Status:** Active
 **Last Updated:** 2025-11-26
 

@@ -2,7 +2,7 @@
 
 **Command:** `quality:complexity [target]`
 **Agent:** qa-automation
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -377,4 +377,4 @@ fi
 ---
 
 **Command:** quality:complexity
-**Version:** 5.0.0
+**Version:** 5.2.0

@@ -60,8 +60,8 @@ Automatically activates when you mention:
 
 ## Skills
 - react-native-patterns.md
-- requirement-analysis.md
-- tdd-implementation.md
+- test-writer/test-generation.md
+- code-reviewer/quality-review.md
 
 ## Usage Example
 "Refactor the SocialMarketing component"

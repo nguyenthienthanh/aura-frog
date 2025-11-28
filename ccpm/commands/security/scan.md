@@ -2,7 +2,7 @@
 
 **Command:** `security:scan [path]`
 **Agent:** security-expert
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -112,4 +112,4 @@ db.query(query, [id]);
 ---
 
 **Command:** security:scan
-**Version:** 5.0.0
+**Version:** 5.2.0

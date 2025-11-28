@@ -2,7 +2,7 @@
 
 **Agent ID:** web-angular
 **Priority:** 90
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -456,5 +456,5 @@ export const routes: Routes = [
 ---
 
 **Agent:** web-angular
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** ✅ Active

@@ -1,6 +1,6 @@
 # Command: workflow:budget
 
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Purpose:** Show real-time token usage vs prediction during workflow
 **Category:** Workflow Enhancement
 **Last Updated:** 2025-11-26
@@ -156,6 +156,6 @@ Commands:
 ---
 
 **Command:** workflow:budget
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Status:** ✅ Ready
 **Priority:** High

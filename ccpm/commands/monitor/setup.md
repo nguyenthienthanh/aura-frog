@@ -2,7 +2,7 @@
 
 **Command:** `monitor:setup [platform]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -467,4 +467,4 @@ try {
 ---
 
 **Command:** monitor:setup
-**Version:** 5.0.0
+**Version:** 5.2.0

@@ -2,7 +2,7 @@
 
 **Command:** `db:design [feature]`
 **Agent:** database-specialist
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -100,4 +100,4 @@ CREATE INDEX idx_posts_created ON posts(created_at DESC);
 ---
 
 **Command:** db:design
-**Version:** 5.0.0
+**Version:** 5.2.0

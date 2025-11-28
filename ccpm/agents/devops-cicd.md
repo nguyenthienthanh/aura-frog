@@ -2,7 +2,7 @@
 
 **Agent ID:** devops-cicd
 **Priority:** 90
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -447,6 +447,6 @@ resource "aws_instance" "web" {
 ---
 
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2024-11-26
 **Status:** ✅ Active

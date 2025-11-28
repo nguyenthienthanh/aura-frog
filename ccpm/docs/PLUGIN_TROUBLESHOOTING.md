@@ -37,7 +37,7 @@ You should see:
 - ✅ `CLAUDE.md` (Main instructions)
 - ✅ `ccpm-config.yaml` (Global config)
 - ✅ `settings.example.json` (Settings template)
-- ✅ `agents/` (24 agent files)
+- ✅ `agents/` (agent definition files)
 - ✅ `commands/` (67 command files)
 
 ---
@@ -253,7 +253,7 @@ bash ~/.claude/plugins/marketplaces/ethan-ccpm/ccpm/scripts/jira-fetch.sh TEST-1
 ├── settings.local.json           # User settings (CREATE THIS)
 ├── settings.example.json         # Template
 ├── .envrc.template               # Template for integrations
-├── agents/                       # 24 agent definitions
+├── agents/                       # Agent definitions
 ├── commands/                     # 70 commands
 ├── rules/                        # Quality rules
 ├── docs/                         # Documentation

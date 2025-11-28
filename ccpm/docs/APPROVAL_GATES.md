@@ -1,6 +1,6 @@
 # Approval Gates Guide
 
-**Version:** 5.0.0-beta
+**Version:** 5.2.0
 **Purpose:** Define approval gate format and usage in CCPM workflows
 **Last Updated:** 2025-11-26
 
@@ -27,7 +27,7 @@ Approval gates ensure user control and oversight at critical workflow checkpoint
 
 ---
 
-## 📋 Approval Gate Format (v5.0)
+## 📋 Approval Gate Format (v5.2.0)
 
 ### New Friendly Format
 
@@ -367,6 +367,6 @@ Current usage: 162,450 / 200,000 (81.2%)
 
 ---
 
-**Document Version:** 5.0.0-beta
+**Document Version:** 5.2.0
 **Last Updated:** 2025-11-26
 **Extracted from:** CLAUDE.md (optimization)

@@ -2,7 +2,7 @@
 
 **Command:** `security:deps [options]`
 **Agent:** security-expert
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -110,4 +110,4 @@ npm audit fix
 ---
 
 **Command:** security:deps
-**Version:** 5.0.0
+**Version:** 5.2.0

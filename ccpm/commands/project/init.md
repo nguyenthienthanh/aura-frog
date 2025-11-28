@@ -616,7 +616,7 @@ Team Reviewers:
 
 ✅ ccpm-config.yaml (plugin root: ~/.claude/plugins/.../ccpm/)
    - Generated from template with detected values
-   - Version: 5.0.0
+   - Version: 5.2.0
    - Project context reference: .claude/project-contexts/[DETECTED_PROJECT_NAME]/
    - Primary agent: [DETECTED_PRIMARY_AGENT]
    - Workflow settings: auto mode, [DETECTED_COVERAGE]% coverage, strict TDD

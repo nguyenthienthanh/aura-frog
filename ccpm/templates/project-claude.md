@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**CCPM Version:** 5.0.0-beta
+**CCPM Version:** 5.2.0
 
 ---
 
@@ -17,7 +17,7 @@ Read the complete CCPM plugin CLAUDE.md file at:
 
 **This file contains:**
 - ALL core CCPM system instructions
-- 24 specialized agents
+- Specialized agents
 - 9-phase workflow execution
 - Agent detection logic
 - Quality rules and TDD enforcement
@@ -59,7 +59,7 @@ After reading the plugin CLAUDE.md, load this project's context from:
 
 **Plugin CLAUDE.md:**
 - ✅ Contains all CCPM system instructions
-- ✅ 24 agents, 70 commands, 9-phase workflow
+- ✅ Specialized agents, commands, 9-phase workflow
 - ✅ Updated when plugin updates
 
 **Project Context:**

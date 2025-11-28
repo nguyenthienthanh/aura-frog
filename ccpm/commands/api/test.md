@@ -2,7 +2,7 @@
 
 **Command:** `api:test [endpoint]`
 **Agent:** qa-automation
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -199,4 +199,4 @@ export default function() {
 ---
 
 **Command:** api:test
-**Version:** 5.0.0
+**Version:** 5.2.0

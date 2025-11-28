@@ -1,5 +1,89 @@
 # CCPM Team Agents System - Changelog
 
+## [5.2.0] - 2025-11-28
+
+### 🎯 Token Optimization & Skills Enhancement Release
+
+This release focuses on reducing token consumption, improving documentation accuracy, and rebuilding skills with comprehensive information.
+
+#### Skills Rebuilt (Critical Enhancement)
+
+**agent-detector** (skills/agent-detector/agent-selection.md):
+- Added Multi-Layer Detection System (4 layers)
+- Layer 1: Explicit Technology Detection (+60 pts)
+- Layer 2: Intent Detection Patterns (+50 pts)
+- Layer 3: Project Context Detection (+40 pts)
+- Layer 4: File Pattern Detection (+20 pts)
+- Added comprehensive Scoring Weights table
+- Added Agent Thresholds (Primary ≥80, Secondary 50-79, Optional 30-49)
+- Added QA Agent Conditional Activation rules
+- Added 6 detailed examples with scoring breakdowns
+- Lines: 89 → 330 (+271%)
+
+**workflow-orchestrator** (skills/workflow-orchestrator/workflow-execution.md):
+- Added Phase Transition Rules (valid/invalid)
+- Added AUTO-CONTINUE Behavior explanation
+- Added Token Awareness thresholds (75%/85%/90%)
+- Added Phase Skip Rules (automatic + user-requested)
+- Added detailed Example Workflow Execution
+- Lines: 92 → 340 (+270%)
+
+**test-writer** (skills/test-writer/test-generation.md):
+- Added PHPUnit examples (unit + Laravel feature tests)
+- Added PyTest examples (unit + FastAPI integration tests)
+- Added Go testing examples (unit + table-driven tests)
+- Added React Native Testing Library examples
+- Added Detox E2E examples
+- Added Test File Naming Conventions table
+- Added Running Tests by Framework commands
+- Lines: 88 → 510 (+480%)
+
+#### Token Reductions (Initial Optimization)
+
+**CLAUDE.md Optimization:**
+- Reduced from 660 → 464 lines (-30%)
+- Fixed version references (v5.0 → v5.2.0)
+- Removed duplicate sections
+- Condensed agent listings to reference
+
+**Initial Skills Optimization (56% reduction):**
+| Skill | Before | After | Reduction |
+|-------|--------|-------|-----------|
+| agent-detector | 304 | 89 | -71% |
+| workflow-orchestrator | 253 | 92 | -64% |
+| project-context-loader | 502 | 88 | -82% |
+| bugfix-quick | 161 | 73 | -55% |
+| test-writer | 185 | 88 | -52% |
+| code-reviewer | 171 | 97 | -43% |
+| jira-integration | 148 | 77 | -48% |
+| figma-integration | 256 | 79 | -69% |
+
+**Note:** agent-detector, workflow-orchestrator, and test-writer were subsequently rebuilt with comprehensive content as they were over-optimized initially.
+
+#### Accuracy Fixes
+
+- **Scalable Agent Counts:** Removed hardcoded "24 agents" references across 20+ files
+  - Changed to generic terms like "specialized agents", "available agents"
+  - Makes documentation future-proof for agent additions
+- **pm-operations-orchestrator:** Updated team roster table with all agents
+- **smart-agent-detector:** Removed hardcoded counts in selection logic
+
+#### Documentation Cleanup
+
+- **Removed:** `archive/` folder (outdated MCP migration docs)
+- **Updated:** Version references across all docs (4.5.0, 5.0.0-beta → 5.2.0)
+- **Professionalized:** README.md with badges, statistics table, collapsible sections
+
+#### README Enhancements
+
+- Added professional header with badges
+- Statistics table: Agents | Skills | Phases | Commands | Integrations
+- Collapsible sections for agent categories
+- Visual workflow and TDD diagrams
+- Comparison table (Traditional vs CCPM)
+
+---
+
 ## [5.1.0] - 2025-11-27
 
 ### 🆕 Major Features

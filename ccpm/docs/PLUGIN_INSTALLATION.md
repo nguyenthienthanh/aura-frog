@@ -74,7 +74,7 @@ your-project/
 │   ├── CLAUDE.md                 # AI instructions
 │   ├── README.md                 # User guide
 │   ├── GET_STARTED.md            # Quick start
-│   ├── agents/                   # 24 specialized agents
+│   ├── agents/                   # Specialized agents
 │   ├── commands/                 # 13 workflow commands
 │   ├── skills/                   # 5 reusable skills
 │   ├── hooks/                    # 4 workflow hooks
@@ -90,8 +90,8 @@ your-project/
 
 **Components Registered:**
 - ✅ **13 Commands**: workflow:start, workflow:status, bugfix:quick, etc.
-- ✅ **24 Agents**: mobile-react-native, backend-nodejs, security-expert, etc.
-- ✅ **5 Skills**: tdd-implementation, code-review, requirement-analysis, etc.
+- ✅ **Agents**: mobile-react-native, backend-nodejs, security-expert, etc.
+- ✅ **15 Skills**: test-writer, code-reviewer, workflow-orchestrator, etc.
 - ✅ **4 Hooks**: PrePhase, PostPhase, PreApproval, PostApproval
 
 ---
@@ -211,7 +211,7 @@ rm -rf .envrc ccpm-config.yaml
 
 # Expected output:
 # Installed Plugins:
-# - ccpm-team-agents (v5.0.0) - Claude Code Project Management
+# - ccpm-team-agents (v5.2.0) - Claude Code Project Management
 ```
 
 ---

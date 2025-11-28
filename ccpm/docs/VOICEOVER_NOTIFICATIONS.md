@@ -1,6 +1,6 @@
 # Voiceover Notifications System
 
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Purpose:** Automatic voice notifications for approval gates and critical events
 **Last Updated:** 2025-11-27
 
@@ -525,6 +525,6 @@ start "$OUTPUT_FILE" &
 
 ---
 
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Last Updated:** 2025-11-27
 **Status:** Active feature - Works out of the box with ElevenLabs API key

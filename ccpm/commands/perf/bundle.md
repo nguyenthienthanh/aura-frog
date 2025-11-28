@@ -1,7 +1,7 @@
 # Command: perf:bundle
 
 **Command:** `perf:bundle [options]`
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -68,4 +68,4 @@ perf:bundle --duplicates
 ---
 
 **Command:** perf:bundle
-**Version:** 5.0.0
+**Version:** 5.2.0

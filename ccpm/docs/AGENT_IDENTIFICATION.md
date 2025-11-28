@@ -1,6 +1,6 @@
 # Agent Identification System
 
-**Version:** 5.0.0-beta
+**Version:** 5.2.0
 **Purpose:** Guide Claude to always identify which agent is speaking
 **Last Updated:** 2025-11-26
 
@@ -20,7 +20,7 @@ Every message from Claude MUST include clear agent identification so users know 
 
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** [current-phase]
+🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** [current-phase]
 **─────────────────────────────────────────────────────────**
 ```
 
@@ -29,7 +29,7 @@ Every message from Claude MUST include clear agent identification so users know 
 **During Workflow Phase:**
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 ```
 
@@ -43,7 +43,7 @@ Every message from Claude MUST include clear agent identification so users know 
 **Cross-Review:**
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** qa-automation (Cross-Review) | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** qa-automation (Cross-Review) | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 ```
 
@@ -125,7 +125,7 @@ When transitioning between phases/agents:
 **Reason:** Design approved, ready for UI analysis
 **─────────────────────────────────────────────────────────**
 
-🤖 **Agent:** ui-designer | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 3 (UI Breakdown)
+🤖 **Agent:** ui-designer | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 3 (UI Breakdown)
 
 Hello! I'm the UI Designer agent. Let me analyze the design...
 ```
@@ -168,12 +168,12 @@ Writing implementation code for UserProfile component...
 
 ## 📚 Related Documentation
 
-- **Agent List:** `README.md` - All 24 available agents
+- **Agent List:** `README.md` - All available agents
 - **Agent Selection:** `agents/smart-agent-detector.md` - How agents are chosen
 - **CCPM Instructions:** `CLAUDE.md` - Core system guide
 
 ---
 
-**Document Version:** 5.0.0-beta
+**Document Version:** 5.2.0
 **Last Updated:** 2025-11-26
 **Extracted from:** CLAUDE.md (optimization)

@@ -50,7 +50,7 @@ CCPM provides **native Bash script integration** for JIRA, optimized for Claude 
 - Advanced customization
 
 ### 🤖 For Claude
-→ **[JIRA Fetch Skill](./../../skills/jira-fetch-webfetch.md)**
+→ **[JIRA Integration Skill](./../../skills/jira-integration/ticket-management.md)**
 - How Claude uses the script
 - Integration with workflows
 - Error handling
@@ -303,7 +303,7 @@ chmod +x scripts/jira-fetch.sh
 
 **Technical Details:**
 - [JIRA WebFetch Solution](../JIRA_WEBFETCH_SOLUTION.md)
-- [JIRA Fetch Skill](../../skills/jira-fetch-webfetch.md)
+- [JIRA Integration Skill](../../skills/jira-integration/ticket-management.md)
 
 **Agent Info:**
 - [JIRA Operations Agent](../../agents/jira-operations.md)

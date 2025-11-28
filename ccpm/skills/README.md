@@ -1,7 +1,7 @@
 # CCPM Skills
 
-**Version:** 5.1.0
-**Total Skills:** 8
+**Version:** 5.2.0
+**Total Skills:** 15 (8 auto-invoking + 7 reference)
 **Purpose:** Auto-invoking capabilities that extend Claude's CCPM functionality
 
 ---
@@ -39,7 +39,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 **What it does:**
 - Analyzes message for keywords and intent
-- Scores all 24 agents
+- Scores all available agents
 - Selects Primary (≥80), Secondary (50-79), Optional (30-49)
 - Shows agent identification banner
 - Proceeds as detected agent
@@ -351,6 +351,22 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 
 ---
 
-**Version:** 5.1.0
-**Last Updated:** 2025-11-27
-**Total Skills:** 8 (all auto-invoking)
+## 📖 Reference Skills (Non-Auto-Invoking)
+
+These skills provide guidance documents that agents reference during workflows:
+
+| Skill | Purpose | Location |
+|-------|---------|----------|
+| **refactor-expert** | Safe refactoring patterns | `skills/refactor-expert/` |
+| **api-designer** | RESTful API design | `skills/api-designer/` |
+| **performance-optimizer** | Performance profiling & optimization | `skills/performance-optimizer/` |
+| **migration-helper** | Database/code migrations | `skills/migration-helper/` |
+| **phase-skipping** | Smart phase skip rules | `skills/workflow-orchestrator/` |
+| **estimation** | Effort estimation techniques | `skills/pm-expert/` |
+| **documentation** | ADR & Runbook templates | `skills/documentation/` |
+
+---
+
+**Version:** 5.2.0
+**Last Updated:** 2025-11-28
+**Total Skills:** 15 (8 auto-invoking + 7 reference)

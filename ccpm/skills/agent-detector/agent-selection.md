@@ -1,304 +1,346 @@
 ---
 name: agent-detector
-description: "CRITICAL: MUST BE USED for EVERY single user message without exception. Auto-detects which specialized CCPM agent (from 24 available) should handle the request based on keywords, tech stack, project context, and task intent. Always runs FIRST before any other skill or action. This is NON-NEGOTIABLE and MANDATORY for all messages."
+description: "CRITICAL: MUST run for EVERY message. Detects which specialized agent should handle the request using multi-layer scoring. Always runs FIRST before any other skill."
 allowed-tools: Read, Grep, Glob
 ---
 
 # CCPM Agent Detector
 
-**Version:** 5.0.0-beta
-**Purpose:** Intelligent agent selection for every user interaction
-**Priority:** HIGHEST - Runs before EVERYTHING else
+**Priority:** HIGHEST - Runs FIRST for every message
+**Version:** 5.2.0
 
 ---
 
-## 🎯 Overview
+## When to Use
 
-The Agent Detector uses sophisticated Natural Language Understanding (NLU) to analyze every user message and select the most appropriate specialized agent(s) from CCPM's 24-agent system. This ensures expert-level responses tailored to the specific domain and task.
-
----
-
-## ✅ When to Use This Skill
-
-**ALWAYS** - This skill MUST run for **EVERY user message**, including:
-- ✅ Workflow commands (`workflow:start`, `bugfix:quick`, etc.)
-- ✅ Natural conversation ("Can you help me fix the login bug?")
-- ✅ Vague requests ("The app is slow")
-- ✅ Technical questions ("How does authentication work?")
-- ✅ ANY message from the user
-
-**NO EXCEPTIONS. This runs FIRST, ALWAYS.**
+**ALWAYS** - Every user message, no exceptions.
 
 ---
 
-## ❌ When NOT to Use This Skill
+## Multi-Layer Detection System
 
-Never skip this skill. It must ALWAYS run.
+### Layer 1: Explicit Technology Detection
+Check if user **directly mentions** a technology:
 
----
+| Technology | Keywords | Agent | Score |
+|------------|----------|-------|-------|
+| React Native | `react-native`, `expo`, `RN` | mobile-react-native | +60 |
+| Flutter | `flutter`, `dart`, `bloc` | mobile-flutter | +60 |
+| Angular | `angular`, `ngrx`, `rxjs` | web-angular | +60 |
+| Vue.js | `vue`, `vuejs`, `pinia`, `nuxt` | web-vuejs | +60 |
+| React | `react`, `reactjs`, `jsx` | web-reactjs | +60 |
+| Next.js | `next`, `nextjs`, `ssr`, `ssg` | web-nextjs | +60 |
+| Node.js | `nodejs`, `express`, `nestjs`, `fastify` | backend-nodejs | +60 |
+| Python | `python`, `django`, `fastapi`, `flask` | backend-python | +60 |
+| Go | `go`, `golang`, `gin`, `fiber` | backend-go | +60 |
+| Laravel | `laravel`, `php`, `eloquent`, `artisan` | backend-laravel | +60 |
 
-## 🔄 How It Works
+### Layer 2: Intent Detection Patterns
+Detect user **intent** from action keywords:
 
-### 5-Layer Detection System
+| Intent | Keywords | Primary Agent | Secondary |
+|--------|----------|---------------|-----------|
+| Implementation | `implement`, `create`, `add`, `build`, `develop` | Dev agent | ui-designer, qa-automation |
+| Bug Fix | `fix`, `bug`, `error`, `issue`, `broken`, `crash` | Dev agent | qa-automation |
+| Testing | `test`, `testing`, `coverage`, `QA`, `spec` | qa-automation | Dev agent |
+| Design/UI | `design`, `UI`, `UX`, `layout`, `figma`, `style` | ui-designer | Dev agent |
+| Database | `database`, `schema`, `query`, `migration`, `SQL` | database-specialist | Backend agent |
+| Security | `security`, `vulnerability`, `audit`, `owasp`, `secure` | security-expert | Dev agent |
+| Performance | `performance`, `slow`, `optimize`, `speed`, `memory` | devops-cicd | Dev agent |
+| Deployment | `deploy`, `docker`, `kubernetes`, `CI/CD`, `pipeline` | devops-cicd | - |
 
-**Layer 1: Natural Language Understanding (NLU)**
-- Extract keywords and phrases from user message
-- Perform semantic analysis for intent
-- Identify domain markers (mobile, web, backend, etc.)
+### Layer 3: Project Context Detection
+Read project files to **infer** tech stack:
 
-**Layer 2: Project Context Analysis**
-- Check current working directory
-- Analyze file structure and dependencies
-- Read package.json, composer.json, pubspec.yaml, etc.
-- Identify framework and tech stack
+| File | Indicates | Agent | Score |
+|------|-----------|-------|-------|
+| `app.json` (with expo) | React Native | mobile-react-native | +40 |
+| `pubspec.yaml` | Flutter | mobile-flutter | +40 |
+| `angular.json` | Angular | web-angular | +40 |
+| `*.vue` files | Vue.js | web-vuejs | +40 |
+| `next.config.js` | Next.js | web-nextjs | +40 |
+| `package.json` + react (no next) | React | web-reactjs | +40 |
+| `package.json` + express/nestjs | Node.js | backend-nodejs | +40 |
+| `requirements.txt`, `pyproject.toml` | Python | backend-python | +40 |
+| `go.mod`, `go.sum` | Go | backend-go | +40 |
+| `artisan`, `composer.json` + laravel | Laravel | backend-laravel | +40 |
 
-**Layer 3: Domain-Specific Scoring**
-- Score all 24 agents based on keyword matches
-- Apply weights: exact match (5 pts), semantic match (3 pts), category match (1 pt)
-- Consider tech stack compatibility
+### Layer 4: File Pattern Detection
+Check **recent files** and naming conventions:
 
-**Layer 4: Agent Prioritization**
-- **Primary agent:** ≥80 points (leads the task)
-- **Secondary agent:** 50-79 points (supports primary)
-- **Optional agent:** 30-49 points (may be helpful)
-
-**Layer 5: Agent Identification Display**
-- Show agent banner to user
-- Indicate which agent is responding
-- Display current phase (if in workflow)
-
----
-
-## 🤖 Available Agents (24 Total)
-
-### Development Agents (11)
-- **mobile-react-native** (Priority: 100) - React Native, Expo, adaptive styling
-- **mobile-flutter** (Priority: 95) - Flutter, Dart, cross-platform
-- **web-angular** (Priority: 90) - Angular 17+, signals, standalone
-- **web-vuejs** (Priority: 90) - Vue 3, Composition API, Pinia
-- **web-reactjs** (Priority: 90) - React 18, hooks, Context API
-- **web-nextjs** (Priority: 90) - Next.js, SSR, SSG, App Router
-- **backend-nodejs** (Priority: 95) - Node.js, Express, NestJS
-- **backend-python** (Priority: 90) - Django, FastAPI, Flask
-- **backend-go** (Priority: 85) - Go, Gin, Fiber, gRPC
-- **backend-laravel** (Priority: 90) - Laravel PHP, Eloquent
-- **database-specialist** (Priority: 85) - Schema design, query optimization
-
-### Quality, Security & Design (3)
-- **security-expert** (Priority: 95) - OWASP audits, vulnerabilities
-- **qa-automation** (Priority: 85) - Testing, Jest, Cypress, Detox
-- **ui-designer** (Priority: 85) - UI/UX, Figma integration
-
-### DevOps & Operations (5)
-- **devops-cicd** (Priority: 90) - Docker, K8s, CI/CD
-- **jira-operations** (Priority: 80) - JIRA integration
-- **confluence-operations** (Priority: 80) - Documentation
-- **slack-operations** (Priority: 70) - Notifications
-- **voice-operations** (Priority: 70) - AI narration
-
-### Infrastructure (5)
-- **smart-agent-detector** (Priority: 100) - This skill's logic
-- **pm-operations-orchestrator** (Priority: 95) - Workflow coordination
-- **project-detector** (Priority: 100) - Auto-detect project type
-- **project-config-loader** (Priority: 95) - Load configurations
-- **project-context-manager** (Priority: 95) - Context persistence
+| Pattern | Agent | Score |
+|---------|-------|-------|
+| `*.phone.tsx`, `*.tablet.tsx` | mobile-react-native | +20 |
+| `*.dart`, `lib/` folder | mobile-flutter | +20 |
+| `*.component.ts`, `*.service.ts` | web-angular | +20 |
+| `*.vue` | web-vuejs | +20 |
+| `app/`, `route.ts` (Next.js) | web-nextjs | +20 |
+| `*.controller.ts`, `*.module.ts` | backend-nodejs | +20 |
+| `views.py`, `models.py` | backend-python | +20 |
+| `*.go` | backend-go | +20 |
+| `*Controller.php`, `*Model.php` | backend-laravel | +20 |
 
 ---
 
-## 🎯 Detection Algorithm
+## Scoring Weights
 
-### Step 1: Keyword Extraction
+| Criterion | Weight | Description |
+|-----------|--------|-------------|
+| **Explicit Mention** | +60 | User directly mentions technology |
+| **Keyword Exact Match** | +50 | Direct keyword match to intent |
+| **Project Context** | +40 | CWD, file structure, package files |
+| **Semantic Match** | +35 | Contextual/implied match |
+| **Task Complexity** | +30 | Inferred complexity level |
+| **Conversation History** | +25 | Previous context, active agents |
+| **File Patterns** | +20 | Recent files, naming conventions |
+| **Project Priority Bonus** | +25 | Agent in project-config.yaml priority list |
 
-**Extract from user message:**
-```javascript
-const keywords = extractKeywords(userMessage)
-// Example: "Fix the React Native login bug"
-// → ["fix", "React Native", "login", "bug"]
+---
+
+## Agent Thresholds
+
+| Threshold | Score | Role |
+|-----------|-------|------|
+| **Primary Agent** | ≥80 | Leads the task |
+| **Secondary Agent** | 50-79 | Supporting role |
+| **Optional Agent** | 30-49 | May assist |
+| **Not Activated** | <30 | Not selected |
+
+---
+
+## QA Agent Conditional Activation
+
+**qa-automation is ALWAYS Secondary when:**
+- Intent = Implementation (+30 pts as secondary)
+- Intent = Bug Fix (+35 pts as secondary)
+- New feature being created
+- Code modification requested
+
+**qa-automation is Primary when:**
+- Intent = Testing (keywords: test, coverage, QA)
+- User explicitly asks for tests
+- Coverage report requested
+
+**qa-automation is SKIPPED when:**
+- Pure documentation task
+- Pure design discussion (no code)
+- Research/exploration only
+
+---
+
+## Detection Process
+
+### Step 1: Extract Keywords
+```
+User: "Fix the login button not working on iOS"
+
+Extracted:
+- Action: "fix" → Bug Fix intent
+- Component: "login button" → UI element
+- Platform: "iOS" → Mobile
+- Issue: "not working" → Bug context
 ```
 
-### Step 2: Tech Stack Detection
-
-**Check project files:**
-```javascript
-// Mobile indicators
-if (hasFile('package.json') && hasDepende ncy('react-native')) {
-  techStack = 'react-native'
-  primaryCandidate = 'mobile-react-native'
-}
-
-// Web indicators
-if (hasFile('package.json') && hasDependency('next')) {
-  techStack = 'nextjs'
-  primaryCandidate = 'web-nextjs'
-}
-
-// Backend indicators
-if (hasFile('composer.json') && hasFramework('laravel')) {
-  techStack = 'laravel'
-  primaryCandidate = 'backend-laravel'
-}
+### Step 2: Check Project Context
+```bash
+# Read these files in order:
+1. .claude/project-contexts/[project]/project-config.yaml
+2. package.json / composer.json / pubspec.yaml / go.mod
+3. Check CWD path for project hints
 ```
 
-### Step 3: Keyword Scoring
+### Step 3: Score All Agents
+```
+mobile-react-native:
+  - "iOS" keyword: +35 (semantic)
+  - CWD = /mobile-app: +40 (context)
+  - Recent *.phone.tsx: +20 (file pattern)
+  → Total: 95 pts ✅ PRIMARY
 
-**Score each agent based on keyword matches:**
+qa-automation:
+  - Bug fix intent: +35 (secondary for bugs)
+  → Total: 35 pts ✅ OPTIONAL
 
-```javascript
-// Example scoring for "Fix the React Native login bug"
-agents['mobile-react-native'] += 5 // "React Native" exact match
-agents['mobile-react-native'] += 5 // "mobile" from tech stack
-agents['qa-automation'] += 3      // "bug" semantic match (testing related)
-agents['security-expert'] += 3     // "login" security-related
+ui-designer:
+  - "button" keyword: +20 (UI element)
+  → Total: 20 pts ❌ NOT SELECTED
 ```
 
-**Scoring Rules:**
-- Exact keyword match: +5 points
-- Semantic match: +3 points
-- Category match: +1 point
-- Tech stack match: +10 points
-- Framework exact match: +15 points
+### Step 4: Select Agents
+- Primary: Highest score ≥80
+- Secondary: Score 50-79
+- Optional: Score 30-49
 
-### Step 4: Agent Selection
-
-```javascript
-// Sort agents by score
-const sortedAgents = Object.entries(agentScores)
-  .sort(([,a], [,b]) => b - a)
-
-// Classify by score
-const primary = sortedAgents.filter(([,score]) => score >= 80)
-const secondary = sortedAgents.filter(([,score]) => score >= 50 && score < 80)
-const optional = sortedAgents.filter(([,score]) => score >= 30 && score < 50)
-```
-
-### Step 5: Show Agent Banner
-
+### Step 5: Show Banner
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** [selected-agent] | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** [phase]
 **─────────────────────────────────────────────────────────**
 ```
 
-**Banner format during workflow:**
-```
-Agent: [agent-name] | System: CCPM v5.0 | Phase: [phase-name]
-```
+**Banner Examples:**
+```markdown
+# Single agent:
+🤖 **Agent:** backend-laravel | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 2 (Design)
 
-**Banner format general conversation:**
-```
-Agent: [agent-name] | System: CCPM v5.0
+# Multiple agents (full-stack):
+🤖 **Agent:** web-reactjs + backend-nodejs | 📋 **System:** CCPM v5.2.0 | 🎯 **Phase:** 5b (Build)
+
+# With secondary:
+🤖 **Agent:** mobile-flutter (+ qa-automation) | 📋 **System:** CCPM v5.2.0
+
+# General (no workflow):
+🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** CCPM v5.2.0
 ```
 
 ---
 
-## 📋 Example Detections
+## Available Agents
 
-### Example 1: Mobile Feature Request
-**User:** "Implement a user profile screen in React Native"
+**Development (11):**
+- mobile-react-native, mobile-flutter
+- web-angular, web-vuejs, web-reactjs, web-nextjs
+- backend-nodejs, backend-python, backend-go, backend-laravel
+- database-specialist
 
-**Detection Process:**
-1. Keywords: ["implement", "user profile", "screen", "React Native"]
-2. Tech stack: React Native detected from package.json
-3. Scoring:
-   - mobile-react-native: 85 pts (Primary)
-   - ui-designer: 55 pts (Secondary)
-   - qa-automation: 35 pts (Optional)
-4. Result: mobile-react-native agent leads
+**Quality & Security (3):**
+- security-expert, qa-automation, ui-designer
 
-### Example 2: Bug Fix
-**User:** "The login API returns 500 error"
+**DevOps & Operations (5):**
+- devops-cicd, jira-operations, confluence-operations, slack-operations, voice-operations
 
-**Detection Process:**
-1. Keywords: ["login", "API", "500 error"]
-2. Tech stack: Node.js backend detected
-3. Scoring:
-   - backend-nodejs: 90 pts (Primary)
-   - security-expert: 60 pts (Secondary)
-   - database-specialist: 40 pts (Optional)
-4. Result: backend-nodejs agent leads
+**Infrastructure (5):**
+- smart-agent-detector, pm-operations-orchestrator, project-detector, project-config-loader, project-context-manager
 
-### Example 3: Vague Request
-**User:** "The app is slow"
+---
 
-**Detection Process:**
-1. Keywords: ["slow", "performance"]
-2. Tech stack: React Native mobile app
-3. Scoring:
-   - mobile-react-native: 75 pts (Primary)
-   - devops-cicd: 50 pts (Secondary - profiling tools)
-   - qa-automation: 45 pts (Optional - performance tests)
-4. Result: mobile-react-native agent investigates
+## Detailed Examples
+
+### Example 1: Explicit Technology Mention
+```
+User: "Create a React Native screen for user profile"
+
+Layer 1 (Explicit): "React Native" → +60
+Layer 2 (Intent): "create" → Implementation → Dev agent primary
+Layer 3 (Context): Check package.json
+Layer 4 (Files): *.phone.tsx present → +20
+
+Scores:
+  ✅ mobile-react-native: 60+20 = 80 (PRIMARY)
+  ✅ ui-designer: 35 (screen/profile implies UI) (OPTIONAL)
+  ✅ qa-automation: 30 (implementation needs tests) (OPTIONAL)
+
+Banner:
+🤖 **Agent:** mobile-react-native | 📋 **System:** CCPM v5.2.0
+```
+
+### Example 2: Context-Based Detection (No Tech Mention)
+```
+User: "Fix the login bug"
+
+Layer 1 (Explicit): No tech mentioned
+Layer 2 (Intent): "fix", "bug" → Bug Fix intent
+Layer 3 (Context): CWD=/backend-api, composer.json has laravel → +40
+Layer 4 (Files): AuthController.php recent → +20
+
+Scores:
+  ✅ backend-laravel: 40+20 = 60, +35 (bug intent) = 95 (PRIMARY)
+  ✅ qa-automation: 35 (bug fix needs validation) (OPTIONAL)
+
+Banner:
+🤖 **Agent:** backend-laravel | 📋 **System:** CCPM v5.2.0
+```
+
+### Example 3: Full-Stack Feature
+```
+User: "Build user profile page with API"
+
+Layer 1 (Explicit): No specific tech
+Layer 2 (Intent): "build" → Implementation
+  - "page" → Frontend hint
+  - "API" → Backend hint
+Layer 3 (Context): Mixed project
+
+Scores:
+  ✅ web-reactjs: 55 (page + context) (PRIMARY - Frontend)
+  ✅ backend-nodejs: 55 (API + context) (PRIMARY - Backend)
+  ✅ ui-designer: 45 (profile UI) (OPTIONAL)
+  ✅ qa-automation: 30 (implementation) (OPTIONAL)
+
+Banner:
+🤖 **Agent:** web-reactjs + backend-nodejs | 📋 **System:** CCPM v5.2.0
+```
 
 ### Example 4: Security Audit
-**User:** "Can you review this code for security vulnerabilities?"
+```
+User: "Check if our authentication is secure"
 
-**Detection Process:**
-1. Keywords: ["review", "security", "vulnerabilities"]
-2. Tech stack: Any (security applies to all)
-3. Scoring:
-   - security-expert: 95 pts (Primary)
-   - [detected-backend]: 60 pts (Secondary)
-   - qa-automation: 35 pts (Optional)
-4. Result: security-expert agent leads
+Layer 1 (Explicit): No tech
+Layer 2 (Intent): "secure" → Security intent → +50
 
----
+Scores:
+  ✅ security-expert: 50+35 = 85 (PRIMARY)
+  ✅ backend-nodejs: 45 (auth context) (OPTIONAL)
 
-## 🔗 Integration with Other Skills
-
-**After agent detection:**
-1. Load detected agent's full instructions from `agents/[agent-name].md`
-2. If workflow requested → invoke `workflow-orchestrator` skill
-3. If bug fix requested → invoke `bugfix-quick` skill
-4. If test requested → invoke `test-writer` skill
-5. Always use `project-context-loader` before major actions
-
----
-
-## 📂 Required Files to Load
-
-**Agent definitions:**
-- `agents/smart-agent-detector.md` (full detection logic - 980 lines)
-- `agents/[detected-agent].md` (specific agent instructions)
-
-**Project detection:**
-- `package.json`, `composer.json`, `pubspec.yaml`, etc.
-- `.claude/project-contexts/[project]/project-config.yaml`
-
----
-
-## 🎭 Agent Identification Banner (MANDATORY)
-
-**⚠️ CRITICAL: ALWAYS show agent banner at start of EVERY response!**
-
-**Format:**
-```markdown
-**─────────────────────────────────────────────────────────**
-🤖 **Agent:** [agent-name] | 📋 **System:** CCPM v5.0 | 🎯 **Phase:** [phase] (if applicable)
-**─────────────────────────────────────────────────────────**
+Banner:
+🤖 **Agent:** security-expert | 📋 **System:** CCPM v5.2.0
 ```
 
-**Why Critical:**
-- Users NEED to know which specialized agent is responding
-- Shows workflow context and current phase
-- Demonstrates multi-agent collaboration
-- Without this, users can't tell if CCPM is active
+### Example 5: Testing Request
+```
+User: "Add unit tests for the payment service"
+
+Layer 1 (Explicit): No tech
+Layer 2 (Intent): "tests" → Testing intent → qa-automation PRIMARY
+
+Scores:
+  ✅ qa-automation: 50+30 = 80 (PRIMARY)
+  ✅ backend-nodejs: 40 (service context) (SECONDARY)
+
+Banner:
+🤖 **Agent:** qa-automation | 📋 **System:** CCPM v5.2.0
+```
+
+### Example 6: Database Task
+```
+User: "Design schema for orders, products, users"
+
+Layer 2 (Intent): "schema" → Database intent → +50
+
+Scores:
+  ✅ database-specialist: 50+35 = 85 (PRIMARY)
+  ✅ backend-nodejs: 40 (will implement models) (SECONDARY)
+
+Banner:
+🤖 **Agent:** database-specialist | 📋 **System:** CCPM v5.2.0
+```
 
 ---
 
-## 📊 Complete Detection Logic
+## After Detection
 
-**Full algorithm from `agents/smart-agent-detector.md`:**
-
-[This skill loads the complete 980-line smart-agent-detector.md file which contains:]
-- Comprehensive keyword dictionaries for all 24 agents
-- Semantic analysis patterns
-- Project context detection rules
-- Scoring algorithms
-- Edge case handling
-- Multi-agent collaboration rules
-
-**Load full logic:** `Read agents/smart-agent-detector.md`
+1. **Load agent instructions** from `agents/[agent-name].md`
+2. **Invoke appropriate skill:**
+   - Complex feature → `workflow-orchestrator`
+   - Bug fix → `bugfix-quick`
+   - Test request → `test-writer`
+   - Code review → `code-reviewer`
+3. **Always load project context** via `project-context-loader` before major actions
 
 ---
 
-**Remember:** This skill is MANDATORY for ALL messages. Never skip agent detection. Always show the banner.
+## Manual Override
+
+User can force specific agent:
+```
+User: "Use only qa-automation for this task"
+→ Override automatic selection
+→ qa-automation becomes PRIMARY regardless of scoring
+```
+
+---
+
+**Full detection algorithm:** `agents/smart-agent-detector.md`
+**Selection guide:** `docs/AGENT_SELECTION_GUIDE.md`
+
+**MANDATORY:** Always show agent banner at start of EVERY response.

@@ -2,6 +2,9 @@
 
 **CCPM Team Agents System** - AI-powered project management for development teams
 
+| **24 Agents** | **15 Skills** | **21 Rules** | **9 Phases** | **70 Commands** |
+|:-------------:|:-------------:|:------------:|:------------:|:---------------:|
+
 ---
 
 ## ⚡ Quick Setup (2 minutes)
@@ -32,7 +35,7 @@ Check that CCPM commands are available:
 You should see CCPM commands like:
 - `workflow:start` - Start 9-phase workflow
 - `workflow:status` - Check workflow progress
-- `agent:list` - Show all 24 agents
+- `agent:list` - Show all available agents
 - `bugfix:quick` - Quick bug fix
 - `project:init` - Initialize project context
 
@@ -275,6 +278,8 @@ workflow:start <your-task-description>
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
+- **Skills:** `skills/README.md` (15 skills)
+- **Rules:** `rules/README.md` (21 quality rules)
 - **Architecture:** `docs/architecture/overview.md`
 - **Phase Guides:** `docs/phases/`
 

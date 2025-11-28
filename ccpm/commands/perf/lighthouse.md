@@ -1,7 +1,7 @@
 # Command: perf:lighthouse
 
 **Command:** `perf:lighthouse [url]`
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -78,4 +78,4 @@ perf:lighthouse --device desktop
 ---
 
 **Command:** perf:lighthouse
-**Version:** 5.0.0
+**Version:** 5.2.0

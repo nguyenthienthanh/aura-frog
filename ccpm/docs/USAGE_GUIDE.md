@@ -1,6 +1,6 @@
 # 📘 CCPM Usage Guide - Clarifications & Best Practices
 
-**Version:** 4.5.0  
+**Version:** 5.2.0  
 **Date:** 2025-11-25
 
 ---

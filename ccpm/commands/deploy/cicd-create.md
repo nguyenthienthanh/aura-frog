@@ -2,7 +2,7 @@
 
 **Command:** `cicd:create [platform]`
 **Agent:** devops-cicd
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -114,4 +114,4 @@ jobs:
 ---
 
 **Command:** cicd:create
-**Version:** 5.0.0
+**Version:** 5.2.0

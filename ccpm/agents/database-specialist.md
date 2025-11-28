@@ -2,7 +2,7 @@
 
 **Agent ID:** database-specialist
 **Priority:** 85
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -311,5 +311,5 @@ CREATE INDEX idx_posts_user_id ON posts(user_id);
 ---
 
 **Agent:** database-specialist
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** ✅ Active

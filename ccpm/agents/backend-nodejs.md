@@ -2,7 +2,7 @@
 
 **Agent ID:** backend-nodejs
 **Priority:** 95
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Status:** Active
 
 ---
@@ -756,6 +756,6 @@ This agent activates when detecting:
 ---
 
 **Agent:** backend-nodejs
-**Version:** 5.0.0
+**Version:** 5.2.0
 **Last Updated:** 2024-11-26
 **Status:** ✅ Active

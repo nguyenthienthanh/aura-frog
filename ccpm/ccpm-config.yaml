@@ -1,8 +1,8 @@
 # CCPM Configuration
-# Version: 5.0.0
+# Version: 5.2.0
 # Purpose: Main CCPM configuration - project-specific settings in project-contexts/
 
-version: '5.0.0'
+version: '5.2.0'
 
 # =============================================================================
 # ACTIVE PROJECT

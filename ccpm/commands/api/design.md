@@ -2,7 +2,7 @@
 
 **Command:** `api:design [feature]`
 **Agents:** backend-nodejs, backend-python, backend-go
-**Version:** 5.0.0
+**Version:** 5.2.0
 
 ---
 
@@ -170,4 +170,4 @@ input CreateUserInput {
 ---
 
 **Command:** api:design
-**Version:** 5.0.0
+**Version:** 5.2.0

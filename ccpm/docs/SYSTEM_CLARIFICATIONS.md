@@ -158,7 +158,7 @@ Only if `.claude/` is missing:
 ║  👋 Welcome to CCPM Team Agents!                          ║
 ╚════════════════════════════════════════════════════════════╝
 
-🤖 **CCPM v5.0** - AI-powered project management is active!
+🤖 **CCPM v5.2.0** - AI-powered project management is active!
 
 **📋 Quick Setup Check:**
 
