@@ -473,12 +473,22 @@ Wait for User Response
 
 ---
 
-## ⚠️ Figma Link Handling
+## ⚠️ JIRA & Figma Integration (Cache-First)
 
-**When Figma link detected (e.g., `figma.com/file/ABC123/...`):**
-1. Extract file ID from URL → `bash scripts/figma-fetch.sh ABC123`
-2. Requires `FIGMA_ACCESS_TOKEN` in `.envrc`
-3. If not configured: ask user for screenshots as fallback
+**⚠️ IMPORTANT: Always check for cached log data before fetching!**
+
+### When JIRA ticket detected (e.g., `PROJ-1234`):
+1. **CHECK CACHE FIRST:** Look for `logs/jira/PROJ-1234-readable.txt` or `.json`
+2. **IF exists:** Read from cache → Show with "📋 Using cached data"
+3. **IF not exists OR user says "fetch/refresh":** Run `bash scripts/jira-fetch.sh PROJ-1234`
+
+### When Figma link detected (e.g., `figma.com/file/ABC123/...`):
+1. **CHECK CACHE FIRST:** Look for `logs/figma/ABC123-readable.txt` or `.json`
+2. **IF exists:** Read from cache → Show with "📋 Using cached data"
+3. **IF not exists OR user says "fetch/refresh":** Run `bash scripts/figma-fetch.sh ABC123`
+
+### Fetch Keywords (triggers fresh fetch):
+`fetch`, `refresh`, `update`, `get latest`, `fetch again`
 
 **📚 Setup:** `docs/INTEGRATION_SETUP_GUIDE.md`
 
@@ -489,6 +499,10 @@ Wait for User Response
 **Available (Bash Scripts):** JIRA, Figma, Slack, Confluence
 
 **Usage:** `workflow:start PROJ-1234` or `workflow:start "Implement https://figma.com/file/ABC123"`
+
+**Log locations:**
+- JIRA: `logs/jira/{TICKET_ID}-readable.txt`, `logs/jira/{TICKET_ID}.json`
+- Figma: `logs/figma/{FILE_ID}-readable.txt`, `logs/figma/{FILE_ID}.json`
 
 **📚 Setup & Scripts:** `docs/INTEGRATION_SETUP_GUIDE.md`
 

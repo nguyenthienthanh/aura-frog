@@ -182,18 +182,92 @@ echo "✅ Successfully fetched ticket"
 echo ""
 
 # Extract key fields
-summary=$(echo "$body" | jq -r '.fields.summary')
-description=$(echo "$body" | jq -r '.fields.description // "No description"')
-issue_type=$(echo "$body" | jq -r '.fields.issuetype.name')
-status=$(echo "$body" | jq -r '.fields.status.name')
+summary=$(echo "$body" | jq -r '.fields.summary // "No summary"')
+issue_type=$(echo "$body" | jq -r '.fields.issuetype.name // "Unknown"')
+status=$(echo "$body" | jq -r '.fields.status.name // "Unknown"')
 priority=$(echo "$body" | jq -r '.fields.priority.name // "None"')
 assignee=$(echo "$body" | jq -r '.fields.assignee.displayName // "Unassigned"')
 assignee_email=$(echo "$body" | jq -r '.fields.assignee.emailAddress // ""')
 reporter=$(echo "$body" | jq -r '.fields.reporter.displayName // "Unknown"')
-created=$(echo "$body" | jq -r '.fields.created')
-updated=$(echo "$body" | jq -r '.fields.updated')
-labels=$(echo "$body" | jq -r '.fields.labels | join(", ")')
-components=$(echo "$body" | jq -r '.fields.components | map(.name) | join(", ")')
+created=$(echo "$body" | jq -r '.fields.created // "Unknown"')
+updated=$(echo "$body" | jq -r '.fields.updated // "Unknown"')
+# Fix null handling for arrays
+labels=$(echo "$body" | jq -r '(.fields.labels // []) | join(", ")')
+components=$(echo "$body" | jq -r '(.fields.components // []) | map(.name) | join(", ")')
+
+# Parse ADF description to extract text and images
+# JIRA API v3 uses Atlassian Document Format (ADF) for description
+parse_adf_description() {
+  local adf_json="$1"
+
+  # Check if description is null or empty
+  if [ -z "$adf_json" ] || [ "$adf_json" = "null" ]; then
+    echo "No description"
+    return
+  fi
+
+  # Extract text content recursively from ADF
+  local text_content=$(echo "$adf_json" | jq -r '
+    def extract_text:
+      if type == "object" then
+        if .type == "text" then .text // ""
+        elif .type == "hardBreak" then "\n"
+        elif .type == "paragraph" then ((.content // []) | map(extract_text) | join("")) + "\n"
+        elif .type == "heading" then ((.content // []) | map(extract_text) | join("")) + "\n"
+        elif .type == "bulletList" or .type == "orderedList" then ((.content // []) | map(extract_text) | join(""))
+        elif .type == "listItem" then "• " + ((.content // []) | map(extract_text) | join(""))
+        elif .type == "codeBlock" then "```\n" + ((.content // []) | map(extract_text) | join("")) + "\n```\n"
+        elif .type == "blockquote" then "> " + ((.content // []) | map(extract_text) | join(""))
+        elif .type == "mention" then "@" + (.attrs.text // "user")
+        elif .type == "emoji" then .attrs.shortName // ""
+        elif .type == "inlineCard" or .type == "blockCard" then "[Link: " + (.attrs.url // "unknown") + "]"
+        else ((.content // []) | map(extract_text) | join(""))
+        end
+      elif type == "array" then map(extract_text) | join("")
+      else ""
+      end;
+    extract_text
+  ' 2>/dev/null)
+
+  # Trim whitespace
+  echo "$text_content" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+
+# Extract image URLs from ADF description and attachments
+extract_images() {
+  local adf_json="$1"
+  local attachments_json="$2"
+
+  local images=""
+
+  # Extract media references from ADF (mediaSingle, mediaInline nodes)
+  local media_ids=$(echo "$adf_json" | jq -r '
+    .. | objects | select(.type == "media" or .type == "mediaSingle" or .type == "mediaInline") |
+    .attrs.id // .content[]?.attrs.id // empty
+  ' 2>/dev/null | sort -u)
+
+  # Get image attachments
+  local image_attachments=$(echo "$attachments_json" | jq -r '
+    .[] | select(.mimeType | startswith("image/")) |
+    "  📷 " + .filename + "\n     URL: " + .content + "\n     Thumbnail: " + (.thumbnail // "N/A")
+  ' 2>/dev/null)
+
+  if [ -n "$image_attachments" ]; then
+    echo "$image_attachments"
+  else
+    echo "  No images found"
+  fi
+}
+
+# Get raw description JSON
+description_json=$(echo "$body" | jq -r '.fields.description')
+attachments_json=$(echo "$body" | jq -r '.fields.attachment // []')
+
+# Parse description
+description=$(parse_adf_description "$description_json")
+
+# Extract images
+images=$(extract_images "$description_json" "$attachments_json")
 
 # Log parsed JIRA data
 log "INFO" "=== JIRA Ticket Data ==="
@@ -208,7 +282,42 @@ log "INFO" "Labels: ${labels:-None}"
 log "INFO" "Components: ${components:-None}"
 log "INFO" "Created: $created"
 log "INFO" "Updated: $updated"
+log "INFO" "=== Description ==="
+echo "$description" >> "$LOG_FILE"
+log "INFO" "=== Images/Attachments ==="
+echo "$images" >> "$LOG_FILE"
 log "INFO" "========================"
+
+# Also save formatted output to a readable log file
+READABLE_LOG="${LOG_DIR}/${TICKET_KEY}-readable.txt"
+cat > "$READABLE_LOG" <<EOF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+JIRA TICKET: $TICKET_KEY
+Fetched: $(date '+%Y-%m-%d %H:%M:%S')
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SUMMARY: $summary
+
+DETAILS:
+  Type:       $issue_type
+  Status:     $status
+  Priority:   $priority
+  Assignee:   $assignee${assignee_email:+ ($assignee_email)}
+  Reporter:   $reporter
+  Labels:     ${labels:-None}
+  Components: ${components:-None}
+  Created:    $created
+  Updated:    $updated
+
+DESCRIPTION:
+$description
+
+IMAGES/ATTACHMENTS:
+$images
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
+log "INFO" "Readable log saved to: $READABLE_LOG"
 
 # Display formatted output
 cat <<EOF
@@ -235,6 +344,9 @@ cat <<EOF
 📝 Description:
 $description
 
+🖼️  Images/Attachments:
+$images
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
 
@@ -243,6 +355,9 @@ echo "$body" > "${LOG_DIR}/${TICKET_KEY}.json"
 log "INFO" "Raw JSON saved to: ${LOG_DIR}/${TICKET_KEY}.json"
 log "INFO" "=== JIRA Fetch Script Completed Successfully ==="
 echo ""
-echo "💾 Raw JSON saved to: ${LOG_DIR}/${TICKET_KEY}.json"
-echo "📋 Log file: $LOG_FILE"
-echo "🤖 Claude can now parse this file for detailed requirements"
+echo "📁 Files saved:"
+echo "   📄 Readable:  $READABLE_LOG"
+echo "   📋 Raw JSON:  ${LOG_DIR}/${TICKET_KEY}.json"
+echo "   📋 Log file:  $LOG_FILE"
+echo ""
+echo "🤖 Claude can now parse these files for detailed requirements"
