@@ -61,6 +61,7 @@ Skills activate automatically based on context:
 | `model-router` | Phase transitions |
 | `jira-integration` | Ticket ID detected (PROJ-123) |
 | `figma-integration` | Figma URL detected |
+| `confluence-integration` | Confluence URL or docs request |
 | `workflow-orchestrator` | Complex feature request |
 | `bugfix-quick` | Bug fix request |
 | `test-writer` | Test creation request |
@@ -167,7 +168,7 @@ Each phase requires approval before continuing.
 - **Agents:** 24 specialized (mobile, web, backend, QA, DevOps, etc.)
 - **Commands:** 70+ workflow commands
 - **Rules:** 27 quality/workflow rules
-- **Skills:** 22 (10 auto-invoking + 12 reference)
+- **Skills:** 23+ (11 auto-invoking + 12 reference)
 - **Phases:** 9-phase structured workflow
 
 ---

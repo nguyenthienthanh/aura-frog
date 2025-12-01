@@ -27,13 +27,13 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **22** | **27** | **9** | **70+** |
+| **24** | **23+** | **27** | **9** | **70+** |
 
 </div>
 
 **What's Inside:**
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
-- ⚡ **22 Skills** — 10 auto-invoking + 12 reference skills for specialized tasks
+- ⚡ **23+ Skills** — 11 auto-invoking + 12 reference skills for specialized tasks
 - 📏 **27 Quality Rules** — System, code quality, architecture, workflow, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
 - 🎮 **70+ Commands** — Full workflow control at your fingertips
@@ -172,7 +172,7 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### ⚡ 22 Skills (10 Auto-Invoking + 12 Reference)
+### ⚡ 23+ Skills (11 Auto-Invoking + 12 Reference)
 
 Skills activate automatically based on your message context — no commands needed:
 
@@ -199,8 +199,9 @@ Auto-invokes:
 | `code-reviewer` | After implementation | Multi-agent quality review |
 | `jira-integration` | PROJ-1234 patterns | Auto-fetch ticket details |
 | `figma-integration` | Figma URLs | Extract design components |
+| `confluence-integration` | Confluence URLs | Fetch/create/update pages |
 
-**Reference Skills (8):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator
+**Reference Skills (12):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator, qa-expert, dev-expert, design-expert, scalable-thinking
 
 **📚 See:** [skills/README.md](skills/README.md) for complete documentation
 
@@ -466,7 +467,7 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── agents/                      # 24 specialized agents
-│   ├── skills/                      # 22 skills (10 auto + 12 reference)
+│   ├── skills/                      # 23+ skills (11 auto + 12 reference)
 │   ├── commands/                    # 70+ workflow commands
 │   ├── rules/                       # 27 quality rules
 │   ├── docs/                        # Comprehensive documentation
