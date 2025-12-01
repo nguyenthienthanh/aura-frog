@@ -49,25 +49,60 @@ Examples:
 
 ## ⚙️ Execution Flow
 
+### Default Flow (Light Brainstorming)
+
 ```
 User types /workflow:modify <instructions>
     ↓
-Parse modification instructions
+Agent does LIGHT brainstorming:
+  - Quick consideration of alternatives
+  - Ask if related changes needed
     ↓
 Apply changes to deliverables
     ↓
-Update existing files (don't recreate)
+Show updated approval gate
+```
+
+### Force Mode (Skip Brainstorming)
+
+```
+User types /workflow:modify just do: <instructions>
+    ↓
+Skip brainstorming
+    ↓
+Apply changes directly
     ↓
 Show updated approval gate
 ```
+
+**Force phrases:** "just do:", "must do:", "exactly:", "no discussion"
+
+See: `rules/feedback-brainstorming.md`
 
 ---
 
 ## 📊 Modification Examples
 
-### Example 1: Add Missing Test Cases
+### Example 1: With Light Brainstorming (Default)
 ```
 User: /workflow:modify Add test cases for network timeout scenarios
+
+Agent Response:
+🤔 Adding timeout tests. Quick thought:
+
+Should I also add tests for:
+- Retry logic after timeout?
+- User-facing timeout message?
+- Timeout threshold configuration?
+
+Or just basic timeout handling?
+
+(Say "all" or "just basic" or list what you want)
+```
+
+### Example 2: Force Mode (Skip Brainstorming)
+```
+User: /workflow:modify just do: Add test cases for network timeout
 
 Agent Response:
 ✏️  Applying modifications...
@@ -80,37 +115,21 @@ Changes:
 
 Updated test count: 73 → 76 tests
 
-═══════════════════════════════════════════════════════════
-🎯 PHASE 4 UPDATED: Test Planning
-═══════════════════════════════════════════════════════════
-
-✅ Modifications Applied:
-   • Added 3 network timeout test cases
-   • Updated test plan document
-
-📊 Updated Stats:
-   Total test cases: 76 (was 73)
-
 [Approval gate with updated info...]
 ```
 
-### Example 2: Change Naming Convention
+### Example 3: Simple Change (Light Brainstorm)
 ```
-User: /workflow:modify Rename PostCaptionEditor to CaptionEditor for consistency
+User: /workflow:modify Rename PostCaptionEditor to CaptionEditor
 
 Agent Response:
-✏️  Applying modifications...
+🤔 Renaming to CaptionEditor. Quick check:
 
-Changes:
-- Renamed PostCaptionEditor → CaptionEditor
-- Updated imports in:
-  - SocialMarketingCompositePost.phone.tsx
-  - PostCaptionEditor.test.tsx (now CaptionEditor.test.tsx)
-- Updated documentation references
+I noticed similar components:
+- PostMediaEditor → Should this be MediaEditor too?
+- PostHashtagEditor → HashtagEditor?
 
-Files affected: 3 files
-
-[Shows updated approval gate...]
+Want me to rename all for consistency, or just this one?
 ```
 
 ### Example 3: Adjust Coverage Threshold
@@ -265,10 +284,14 @@ After modification, agent shows:
 ## 🎯 What Happens Next
 
 After modification:
-1. Changes applied
-2. Tests re-run (if code changed)
-3. Updated approval gate shown
-4. Can approve, modify again, or reject
+1. **Light brainstorm** (unless force mode)
+2. User confirms scope
+3. Changes applied
+4. Tests re-run (if code changed)
+5. Updated approval gate shown
+6. Can approve, modify again, or reject
+
+**Skip brainstorming:** Use "just do:", "exactly:", or "no discussion"
 
 ---
 

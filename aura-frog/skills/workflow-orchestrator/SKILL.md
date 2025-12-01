@@ -147,9 +147,24 @@ Phase 8 (Document) → Phase 9 (Share)
 | Response | Action |
 |----------|--------|
 | `approve` / `yes` | Continue to next phase immediately |
-| `reject: <reason>` | Restart current phase with feedback |
-| `modify: <changes>` | Adjust deliverables then re-show gate |
+| `reject: <reason>` | **Brainstorm first**, then restart phase |
+| `modify: <changes>` | **Light brainstorm**, then adjust deliverables |
 | `stop` / `cancel` | End workflow, save state |
+
+### Feedback Handling (IMPORTANT)
+
+**Default behavior:** Brainstorm feedback before implementing.
+- Analyze user's suggestion
+- Consider alternatives
+- Present options with pros/cons
+- Then implement agreed approach
+
+**Force mode:** Skip brainstorming when user says:
+- "must do: ..." → Implement directly
+- "just do: ..." → Skip discussion
+- "work like that" → No alternatives
+
+See: `rules/feedback-brainstorming.md`
 
 ---
 
@@ -270,6 +285,7 @@ docs/phases/phase-9-notification.md
 rules/tdd-workflow.md
 rules/kiss-principle.md
 rules/code-quality.md
+rules/feedback-brainstorming.md
 ```
 
 ---

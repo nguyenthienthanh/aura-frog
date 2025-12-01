@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.1.1
+**Aura Frog Version:** 1.1.2
 
 ---
 
@@ -23,7 +23,7 @@
 **YOU MUST show this banner at the START of EVERY response:**
 
 ```
-⚡ 🐸 AURA FROG v1.1.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

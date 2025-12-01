@@ -30,19 +30,38 @@ Examples:
 
 ## ⚙️ Execution Flow
 
+### Default Flow (WITH Brainstorming)
+
 ```
 User types /workflow:reject <reason>
     ↓
-Save rejection reason
+Agent BRAINSTORMS feedback:
+  - Analyze suggestion
+  - Consider alternatives
+  - Present options with pros/cons
     ↓
-Mark phase as "rejected"
-    ↓
-Show feedback to agent
+User chooses approach
     ↓
 Agent reworks deliverables
     ↓
 Show new approval gate
 ```
+
+### Force Mode (Skip Brainstorming)
+
+```
+User types /workflow:reject must do: <reason>
+    ↓
+Skip brainstorming
+    ↓
+Agent directly implements feedback
+    ↓
+Show new approval gate
+```
+
+**Force phrases:** "must do:", "just do:", "work like that", "I insist"
+
+See: `rules/feedback-brainstorming.md`
 
 ---
 
@@ -75,53 +94,66 @@ await executePhase(currentPhase, { feedback: userFeedback });
 
 ## 📊 Rejection Examples
 
-### Example 1: Requirements Phase
+### Example 1: With Brainstorming (Default)
 ```
-User: /workflow:reject Missing edge cases for empty input scenarios
+User: /workflow:reject Should use Redux instead of Zustand
 
 Agent Response:
-🔄 Phase 1 rejected. Restarting with feedback...
+🤔 I hear your feedback: Use Redux instead of Zustand.
 
-Feedback: Missing edge cases for empty input scenarios
+Before I switch, let me consider:
 
-Updating requirements analysis to include:
-- Empty caption handling
-- Null/undefined data handling
-- Network timeout scenarios
-- API failure edge cases
+**Current context:**
+- Project already uses Zustand (src/stores/)
+- Team is familiar with Zustand patterns
+- Bundle size: Zustand 2KB vs Redux 7KB
 
-[Generates updated requirements document]
+**Options I see:**
 
-═══════════════════════════════════════════════════════════
-🎯 PHASE 1 COMPLETE: Requirements Analysis (Updated)
-═══════════════════════════════════════════════════════════
+**Option A: Switch to Redux** (your suggestion)
+- Pros: More ecosystem, great devtools, middleware
+- Cons: More boilerplate, migration effort, larger bundle
 
-📊 Summary:
-Updated requirements with additional edge cases
+**Option B: Stay with Zustand**
+- Pros: Already set up, simpler API, smaller bundle
+- Cons: Less middleware options
 
-✅ Changes Made:
-   • Added 4 edge case scenarios
-   • Updated acceptance criteria
-   • Enhanced risk assessment
+**Option C: Zustand + middleware** (hybrid)
+- Pros: Keep simplicity, add persistence/devtools
+- Cons: Additional setup
 
-[New approval gate...]
+Which approach would you prefer? (A/B/C)
+
+💡 Tip: Say "must do: Redux" to skip discussion next time.
 ```
 
-### Example 2: Technical Planning
+### Example 2: Force Mode (Skip Brainstorming)
 ```
-User: /workflow:reject Should use Zustand instead of local state
+User: /workflow:reject must do: use Redux instead of Zustand
 
 Agent Response:
-🔄 Phase 2 rejected. Restarting with feedback...
+✅ Got it! Implementing Redux as requested.
 
-Feedback: Should use Zustand instead of local state
+🔄 Restarting Phase 2 with Redux architecture...
 
-Revising architecture:
-- Replace local state with Zustand store
-- Update state management strategy
-- Modify component props accordingly
+[Directly implements Redux without discussion]
+```
 
-[Generates updated tech spec]
+### Example 3: Simple Feedback (Light Brainstorming)
+```
+User: /workflow:reject Missing edge cases for empty input
+
+Agent Response:
+🤔 Good catch! Adding edge cases for empty input.
+
+Quick thought: Should I also add edge cases for:
+- Null/undefined values?
+- Whitespace-only input?
+- Max length exceeded?
+
+Or just empty string handling?
+
+(Say "just empty" or "all of them")
 ```
 
 ### Example 3: Implementation
@@ -222,10 +254,14 @@ Updates `workflow-state.json`:
 ## 🎯 What Happens Next
 
 After rejection:
-1. Agent reworks deliverables based on feedback
-2. Phase re-executes
-3. New approval gate shown
-4. User can approve or reject again
+1. **Agent brainstorms** (unless force mode)
+2. User confirms approach
+3. Agent reworks deliverables
+4. Phase re-executes
+5. New approval gate shown
+6. User can approve or reject again
+
+**Skip brainstorming:** Use "must do:", "just do:", or "work like that"
 
 ---
 

@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.1.1
+**System:** Aura Frog v1.1.2
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
 ---
@@ -72,4 +72,4 @@
 
 ---
 
-**Version:** 1.1.1
+**Version:** 1.1.2

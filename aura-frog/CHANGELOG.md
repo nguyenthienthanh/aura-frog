@@ -4,6 +4,35 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.1.2] - 2025-12-01
+
+### Feedback Brainstorming
+
+Agents now brainstorm feedback instead of blindly implementing it.
+
+#### New Rule: `rules/feedback-brainstorming.md`
+
+**Default behavior:** When user provides feedback (reject/modify), agent will:
+1. Analyze the suggestion
+2. Consider alternatives
+3. Present options with pros/cons
+4. Then implement the agreed approach
+
+**Force mode:** Skip brainstorming with phrases:
+- "must do: ..." → Implement directly
+- "just do: ..." → Skip discussion
+- "work like that" → No alternatives
+- "I insist" → Force approach
+
+#### Updated Commands
+- `workflow:reject` - Now brainstorms before restarting phase
+- `workflow:modify` - Now does light brainstorming before applying
+
+#### Updated Skills
+- `workflow-orchestrator` - Added feedback handling section
+
+---
+
 ## [1.1.1] - 2025-12-01
 
 ### Remove Multi-Model Selection Feature
