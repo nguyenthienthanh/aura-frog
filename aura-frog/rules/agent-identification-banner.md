@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -13,7 +13,7 @@
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ 🔥 [aura-message]                                       ┃
+┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -31,7 +31,8 @@
 - **Agent:** Active agent handling the task
 - **Phase:** Current workflow phase (or `-` if none)
 
-### Line 3: Aura
+### Line 3: Model & Aura
+- **Model:** AI model with version (e.g., Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3)
 - **Aura message:** Short, fun, contextual phrase (2-4 words)
 
 ---
@@ -115,7 +116,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
-┃ 🔥 Architecting greatness                              ┃
+┃ Model: Gemini 2.0 Flash │ 🔥 Architecting greatness     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -124,7 +125,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
-┃ 🔥 Ready to rock                                       ┃
+┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -133,7 +134,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: -                        ┃
-┃ 🔥 Bug hunter mode                                     ┃
+┃ Model: Opus 4.5 │ 🔥 Bug hunter mode                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -142,7 +143,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: backend-nodejs │ Phase: 5a - TDD RED            ┃
-┃ 🔥 Tests first, always                                 ┃
+┃ Model: DeepSeek V3 │ 🔥 Tests first, always             ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 

@@ -39,10 +39,11 @@
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]        ┃
-┃ 🔥 [aura-message]                                     ┃
+┃ Model: [model] │ 🔥 [aura-message]                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
+**Model options:** Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3 (based on phase config)
 **Aura messages:** "Let's cook", "Code go brrrr", "Bug hunter mode", "Nailed it"
 
 **📚 Details:** `rules/agent-identification-banner.md`
