@@ -27,17 +27,18 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **20** | **25** | **9** | **70** |
+| **24** | **22** | **27** | **9** | **70+** |
 
 </div>
 
 **What's Inside:**
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
-- ⚡ **20 Skills** — 9 auto-invoking + 11 reference skills for specialized tasks
-- 📏 **25 Quality Rules** — YAGNI, DRY, error handling, accessibility, and more
+- ⚡ **22 Skills** — 10 auto-invoking + 12 reference skills for specialized tasks
+- 📏 **27 Quality Rules** — System, code quality, architecture, workflow, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
-- 🎮 **70 Commands** — Full workflow control at your fingertips
+- 🎮 **70+ Commands** — Full workflow control at your fingertips
 - 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)
+- 🔀 **Multi-Model Support** — Use Gemini, OpenAI, DeepSeek per phase
 
 ---
 
@@ -171,7 +172,7 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### ⚡ 20 Skills (9 Auto-Invoking + 11 Reference)
+### ⚡ 22 Skills (10 Auto-Invoking + 12 Reference)
 
 Skills activate automatically based on your message context — no commands needed:
 
@@ -182,7 +183,8 @@ Auto-invokes:
   1. agent-detector      → Selects mobile-react-native agent
   2. jira-integration    → Fetches PROJ-1234 requirements
   3. project-context-loader → Loads your conventions
-  4. workflow-orchestrator  → Executes 9-phase workflow
+  4. model-router        → Selects model for current phase
+  5. workflow-orchestrator  → Executes 9-phase workflow
 ```
 
 | Skill | Triggers | Purpose |
@@ -190,13 +192,15 @@ Auto-invokes:
 | `agent-detector` | **Every message** | Select appropriate agent |
 | `workflow-orchestrator` | "implement", "build", "create" | Execute 9-phase workflow |
 | `project-context-loader` | Before code generation | Load project conventions |
+| `model-router` | Phase transitions | Select AI model per phase |
+| `session-manager` | Token limit (150K+) | Workflow state & handoff |
 | `bugfix-quick` | "fix", "error", "broken" | Fast TDD bug fixes |
 | `test-writer` | "add tests", "coverage" | Generate comprehensive tests |
 | `code-reviewer` | After implementation | Multi-agent quality review |
 | `jira-integration` | PROJ-1234 patterns | Auto-fetch ticket details |
 | `figma-integration` | Figma URLs | Extract design components |
 
-**Reference Skills (11):** refactor-expert, api-designer, performance-optimizer, migration-helper, scalable-thinking, documentation, pm-expert, qa-expert, dev-expert, design-expert, nativewind-component-generator
+**Reference Skills (8):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator
 
 **📚 See:** [skills/README.md](skills/README.md) for complete documentation
 
@@ -246,9 +250,23 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 📏 25 Quality Rules
+### 📏 27 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
+
+<details>
+<summary><b>System & Session Rules (6)</b></summary>
+
+| Rule | Purpose |
+|------|---------|
+| `agent-identification-banner` | Show agent banner every response |
+| `env-loading` | Load .envrc at session start |
+| `execution-rules` | ALWAYS/NEVER execution rules |
+| `priority-hierarchy` | Config priority order |
+| `dual-file-architecture` | Plugin + project structure |
+| `token-time-awareness` | Monitor token usage |
+
+</details>
 
 <details>
 <summary><b>Code Quality Rules (8)</b></summary>
@@ -380,12 +398,13 @@ document "API endpoints"           # 30 min
 | `project:init` | Initialize Aura Frog for project |
 | `project:detect` | Auto-detect project type |
 | `project:regen` | Re-generate context |
+| `project:reload-env` | Load/reload .envrc variables |
 | `agent:list` | Show all agents |
 | `agent:info <name>` | Show agent details |
 
 </details>
 
-**📚 See:** [commands/README.md](commands/README.md) for all 70 commands
+**📚 See:** [commands/README.md](commands/README.md) for all 70+ commands
 
 ---
 
@@ -447,9 +466,9 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── agents/                      # 24 specialized agents
-│   ├── skills/                      # 20 skills (9 auto + 11 reference)
-│   ├── commands/                    # 70 workflow commands
-│   ├── rules/                       # 25 quality rules
+│   ├── skills/                      # 22 skills (10 auto + 12 reference)
+│   ├── commands/                    # 70+ workflow commands
+│   ├── rules/                       # 27 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   └── phases/                  # 9 phase guides
 │   ├── hooks/                       # Lifecycle hooks

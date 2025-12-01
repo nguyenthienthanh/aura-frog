@@ -349,7 +349,7 @@ bugfix:hotfix "API down"
 # .envrc or .env
 
 # Figma Configuration
-export FIGMA_ACCESS_TOKEN="figd_your-personal-access-token"
+export FIGMA_API_TOKEN="figd_your-personal-access-token"
 export FIGMA_FILE_KEY="your-file-key"  # Default file (optional)
 export FIGMA_TEAM_ID="your-team-id"  # Optional
 ```
@@ -377,7 +377,7 @@ https://www.figma.com/file/ABC123xyz/Your-Design-Name
 
 ```bash
 # Test Figma API
-curl -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
+curl -H "X-Figma-Token: $FIGMA_API_TOKEN" \
   "https://api.figma.com/v1/me"
 ```
 
@@ -458,17 +458,17 @@ export SLACK_MENTION_PM="@pm-team"
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_ACCESS_TOKEN="figd_your-figma-token"
+export FIGMA_API_TOKEN="figd_your-figma-token"
 export FIGMA_FILE_KEY="your-default-file-key"
 export FIGMA_TEAM_ID="your-team-id"
 
 # ============================================
 # Aura Frog Configuration
 # ============================================
-export CCPM_AUTO_APPROVE="true"
-export CCPM_DEFAULT_COVERAGE="80"
-export CCPM_TDD_ENFORCE="true"
-export CCPM_AUTO_NOTIFY="true"
+export AURA_FROG_AUTO_APPROVE="true"
+export AURA_FROG_DEFAULT_COVERAGE="80"
+export AURA_FROG_TDD_ENFORCE="true"
+export AURA_FROG_AUTO_NOTIFY="true"
 
 # ============================================
 # Optional: Git Configuration
@@ -487,7 +487,7 @@ direnv allow .
 echo $JIRA_URL
 echo $CONFLUENCE_URL
 echo $SLACK_CHANNEL_ID
-echo $FIGMA_ACCESS_TOKEN
+echo $FIGMA_API_TOKEN
 ```
 
 ---
@@ -579,7 +579,7 @@ fi
 
 # Test Figma
 echo "Testing Figma..."
-if curl -s -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
+if curl -s -H "X-Figma-Token: $FIGMA_API_TOKEN" \
   "https://api.figma.com/v1/me" > /dev/null; then
   echo "✅ Figma: Connected"
 else

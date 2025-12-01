@@ -37,7 +37,7 @@ Aura Frog uses multiple configuration files with a clear priority system. Unders
 export CCPM_PROJECT="my-project"
 export CCPM_PROJECT_CONTEXT="project-contexts/my-project"
 export JIRA_URL="https://company.atlassian.net"
-export CCPM_DEFAULT_COVERAGE="85"
+export AURA_FROG_DEFAULT_COVERAGE="85"
 ```
 
 **Scope:** Session-specific, not committed to git
@@ -283,7 +283,7 @@ workflow:
 
 **Environment Variable:**
 ```bash
-export CCPM_DEFAULT_COVERAGE="90"
+export AURA_FROG_DEFAULT_COVERAGE="90"
 ```
 
 **Final Value:** `90` (from environment variable)
@@ -418,7 +418,7 @@ team:
 ```bash
 export CCPM_PROJECT="my-project"
 export JIRA_API_TOKEN="secret"
-export CCPM_DEFAULT_COVERAGE="90"
+export AURA_FROG_DEFAULT_COVERAGE="90"
 ```
 
 ---

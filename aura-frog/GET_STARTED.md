@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **24 Agents** | **20 Skills** | **25 Rules** | **9 Phases** | **70 Commands** |
+| **24 Agents** | **22 Skills** | **27 Rules** | **9 Phases** | **70+ Commands** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|
 
 ---
@@ -180,6 +180,7 @@ Edit `ccpm-config.yaml` to add:
 
 ### Other Commands
 - `project:init` - Initialize/reconfigure Aura Frog
+- `project:reload-env` - Reload .envrc variables
 - `help` - Show all available commands
 - `agent:list` - Show all agents and their capabilities
 
@@ -199,22 +200,33 @@ workflow-state.json
 
 ### Environment Variables (Optional)
 
-Create `.env` for integrations:
+Create `.envrc` for integrations and model selection:
 
 ```bash
-# JIRA Integration
-JIRA_EMAIL="your.email@example.com"
-JIRA_API_TOKEN="your-jira-api-token"
+# AI Model API Keys (for multi-model support)
+export GEMINI_API_KEY="your-gemini-api-key"
+export OPENAI_API_KEY="your-openai-api-key"
+export DEEPSEEK_API_KEY="your-deepseek-api-key"
 
-# Confluence Integration
-CONFLUENCE_EMAIL="${JIRA_EMAIL}"
-CONFLUENCE_API_TOKEN="${JIRA_API_TOKEN}"
+# Phase-Specific Model Overrides (Optional)
+# export AURA_PHASE_1_MODEL="gemini"   # Use Gemini for planning
+# export AURA_PHASE_2_MODEL="gemini"   # Use Gemini for design
+
+# JIRA Integration
+export JIRA_URL="https://your-company.atlassian.net"
+export JIRA_EMAIL="your.email@example.com"
+export JIRA_API_TOKEN="your-jira-api-token"
+
+# Figma Integration
+export FIGMA_API_TOKEN="your-figma-token"
 
 # Slack Integration
-SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 ```
 
-**Security:** Never commit `.env` file!
+**Reload after editing:** `project:reload-env`
+
+**Security:** Never commit `.envrc` file!
 
 ---
 
@@ -299,9 +311,9 @@ workflow:start <your-task-description>
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
-- **Skills:** `skills/README.md` (20 skills)
-- **Rules:** `rules/README.md` (25 quality rules)
-- **Architecture:** `docs/architecture/overview.md`
+- **Skills:** `skills/README.md` (22 skills)
+- **Rules:** `rules/README.md` (27 quality rules)
+- **Model Selection:** `docs/MODEL_SELECTION.md`
 - **Phase Guides:** `docs/phases/`
 
 ---

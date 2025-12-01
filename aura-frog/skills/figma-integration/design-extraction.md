@@ -1,6 +1,6 @@
 ---
 name: figma-integration
-description: "Auto-fetch Figma designs when URL detected. Extracts components, design tokens, images. Requires FIGMA_ACCESS_TOKEN."
+description: "Auto-fetch Figma designs when URL detected. Extracts components, design tokens, images. Requires FIGMA_API_TOKEN."
 allowed-tools: Read, Bash
 ---
 
@@ -99,7 +99,7 @@ Figma Frame → Code Components
 
 **In `.envrc`:**
 ```bash
-export FIGMA_ACCESS_TOKEN="figd_your-token"
+export FIGMA_API_TOKEN="figd_your-token"
 ```
 
 **Get token:** Figma → Settings → Personal Access Tokens
@@ -111,7 +111,7 @@ export FIGMA_ACCESS_TOKEN="figd_your-token"
 ```markdown
 ⚠️ **Figma not set up**
 
-1. Configure: Add FIGMA_ACCESS_TOKEN to .envrc
+1. Configure: Add FIGMA_API_TOKEN to .envrc
 2. Or: Provide screenshots instead
 
 Which option?

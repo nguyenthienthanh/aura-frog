@@ -45,7 +45,7 @@ export JIRA_PROJECT_KEY="PROJ"
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_ACCESS_TOKEN="your_figma_token"
+export FIGMA_API_TOKEN="your_figma_token"
 
 # ============================================
 # Slack Integration
@@ -136,7 +136,7 @@ source .envrc
 
 **Step 2: Configure**
 ```bash
-export FIGMA_ACCESS_TOKEN="figd_your_token_here"
+export FIGMA_API_TOKEN="figd_your_token_here"
 ```
 
 **Step 3: Test**
@@ -357,7 +357,7 @@ bash scripts/confluence-publish.sh 'DEV' 'ETHAN-1269: Implementation' '.claude/l
 - File: `.claude/logs/figma/<file-id>-images.json` (image URLs)
 
 **Requirements:**
-- `FIGMA_ACCESS_TOKEN`
+- `FIGMA_API_TOKEN`
 - `jq` (optional, for formatting)
 
 ---
@@ -614,7 +614,7 @@ Same as above - bot needs to be invited
 
 ### Figma
 - [ ] Figma access token generated
-- [ ] `FIGMA_ACCESS_TOKEN` set
+- [ ] `FIGMA_API_TOKEN` set
 - [ ] Test: `./scripts/figma-fetch.sh <file-id>`
 
 ### Slack

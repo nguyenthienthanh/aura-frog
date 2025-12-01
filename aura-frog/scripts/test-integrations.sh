@@ -95,17 +95,17 @@ fi
 
 # Test Figma
 echo -n "Testing Figma connection... "
-if [ -z "$FIGMA_ACCESS_TOKEN" ]; then
+if [ -z "$FIGMA_API_TOKEN" ]; then
   echo -e "${YELLOW}⚠️  SKIPPED${NC} (not configured)"
 else
-  if curl -s -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
+  if curl -s -H "X-Figma-Token: $FIGMA_API_TOKEN" \
     "https://api.figma.com/v1/me" \
     | grep -q '"email"'; then
     echo -e "${GREEN}✅ PASSED${NC}"
     ((PASSED++))
   else
     echo -e "${RED}❌ FAILED${NC}"
-    echo "   Check FIGMA_ACCESS_TOKEN"
+    echo "   Check FIGMA_API_TOKEN"
     ((FAILED++))
   fi
 fi
@@ -134,7 +134,7 @@ echo "CONFLUENCE_SPACE_KEY:  ${CONFLUENCE_SPACE_KEY:-Not set}"
 echo "SLACK_WEBHOOK_URL:     ${SLACK_WEBHOOK_URL:+***configured***}"
 echo "SLACK_BOT_TOKEN:       ${SLACK_BOT_TOKEN:+***configured***}"
 echo "SLACK_CHANNEL_ID:      ${SLACK_CHANNEL_ID:-Not set}"
-echo "FIGMA_ACCESS_TOKEN:    ${FIGMA_ACCESS_TOKEN:+***configured***}"
+echo "FIGMA_API_TOKEN:    ${FIGMA_API_TOKEN:+***configured***}"
 echo ""
 
 # Exit with appropriate code

@@ -73,18 +73,89 @@ workflow:
   # Test coverage settings
   test_coverage_target: 80  # Percentage
   tdd_enforcement: "strict"  # Options: strict, recommended, optional
-  
+
   # Review settings
   require_design_review: true
   require_qa_review: true
   auto_assign_reviewers: true
-  
+
   # Approval settings
   approval_gates: true
   require_explicit_approval: true
-  
+
   # Phase settings
   skip_phases: []  # Phases to skip (e.g., [3] to skip design review)
+
+# =============================================================================
+# MODEL SELECTION (Project-Level Overrides)
+# =============================================================================
+# Override global model settings for this specific project
+# Inherits from ccpm-config.yaml if not specified
+models:
+  # Phase-specific model overrides
+  # Uncomment and modify to use different models for specific phases
+  phase_models:
+    # === EXAMPLE: Use Gemini for reasoning phases ===
+    # phase_1_understand: "gemini"    # Deep reasoning for requirements
+    # phase_2_design: "gemini"        # Architecture visioning
+
+    # === EXAMPLE: Use Claude for implementation ===
+    # phase_5a_tdd_red: "claude"      # Write tests
+    # phase_5b_build: "claude"        # Implementation
+
+    # === EXAMPLE: Use GPT-4 for review ===
+    # phase_6_review: "openai"        # Code review
+
+    # Leave commented to use global defaults from ccpm-config.yaml
+
+  # Project-specific model preferences
+  preferences:
+    # Prefer speed over capability for this project
+    # optimize_for: "speed"  # Options: speed, quality, cost
+
+    # Use specific model variants
+    # claude_model: "claude-sonnet-4-20250514"
+    # gemini_model: "gemini-2.0-flash-thinking-exp"
+    # openai_model: "gpt-4o"
+
+# =============================================================================
+# COMMON MODEL CONFIGURATIONS
+# =============================================================================
+# Copy and uncomment the configuration that matches your needs:
+#
+# --- Option 1: Gemini for Planning, Claude for Coding ---
+# models:
+#   phase_models:
+#     phase_1_understand: "gemini"
+#     phase_2_design: "gemini"
+#     phase_3_ui_breakdown: "claude"
+#     phase_4_plan_tests: "claude"
+#     phase_5a_tdd_red: "claude"
+#     phase_5b_build: "claude"
+#     phase_5c_polish: "claude"
+#     phase_6_review: "claude"
+#     phase_7_verify: "claude"
+#     phase_8_document: "claude"
+#     phase_9_share: "claude"
+#
+# --- Option 2: DeepSeek for Cost-Effective Coding ---
+# models:
+#   phase_models:
+#     phase_1_understand: "claude"
+#     phase_2_design: "claude"
+#     phase_5a_tdd_red: "deepseek"
+#     phase_5b_build: "deepseek"
+#     phase_5c_polish: "deepseek"
+#
+# --- Option 3: Multi-Model Review Pipeline ---
+# models:
+#   phase_models:
+#     phase_1_understand: "gemini"     # Reasoning
+#     phase_2_design: "gemini"         # Architecture
+#     phase_5b_build: "claude"         # Implementation
+#     phase_6_review: "openai"         # Different perspective
+#
+# =============================================================================
 
 conventions:
   # Git conventions

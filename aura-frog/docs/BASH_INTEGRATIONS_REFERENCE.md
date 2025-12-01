@@ -136,7 +136,7 @@ export JIRA_API_TOKEN="token_here"
 - `FILE-KEY` (required): Figma file ID from URL
 
 **Environment Variables Required:**
-- `FIGMA_ACCESS_TOKEN` - Personal access token
+- `FIGMA_API_TOKEN` - Personal access token
 
 **Output:** JSON object with file data
 
@@ -148,7 +148,7 @@ export JIRA_API_TOKEN="token_here"
 
 **Example:**
 ```bash
-export FIGMA_ACCESS_TOKEN="figd_xyz123"
+export FIGMA_API_TOKEN="figd_xyz123"
 
 ./scripts/figma-fetch.sh ABC123xyz456
 ```
@@ -487,7 +487,7 @@ cat debug.log
 | Script | Required Variables |
 |--------|-------------------|
 | **jira-fetch.sh** | `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` |
-| **figma-fetch.sh** | `FIGMA_ACCESS_TOKEN` |
+| **figma-fetch.sh** | `FIGMA_API_TOKEN` |
 | **slack-notify.sh** | `SLACK_BOT_TOKEN` |
 | **confluence-publish.sh** | `CONFLUENCE_URL`, `CONFLUENCE_EMAIL`, `CONFLUENCE_API_TOKEN` |
 

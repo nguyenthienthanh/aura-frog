@@ -532,6 +532,25 @@ cat > "$PROJECT_ROOT/.envrc" << 'EOF'
 # export NODE_ENV="development"
 
 # ==============================================
+# AI Model Selection (Multi-Model Support)
+# ==============================================
+# API Keys for alternative models (Claude works without key in Claude Code)
+
+# Gemini - Strong reasoning, vision, long context
+# export GEMINI_API_KEY="your-gemini-api-key"
+
+# OpenAI GPT-4 - Diverse perspectives, code review
+# export OPENAI_API_KEY="your-openai-api-key"
+
+# DeepSeek - Cost-effective coding
+# export DEEPSEEK_API_KEY="your-deepseek-api-key"
+
+# Phase-Specific Model Overrides (Optional)
+# export AURA_PHASE_1_MODEL="gemini"   # Deep reasoning
+# export AURA_PHASE_2_MODEL="gemini"   # Architecture
+# export AURA_PHASE_6_MODEL="openai"   # Code review
+
+# ==============================================
 # Aura Frog Integrations
 # ==============================================
 # Uncomment and configure to enable Aura Frog integrations
@@ -543,8 +562,7 @@ cat > "$PROJECT_ROOT/.envrc" << 'EOF'
 # export JIRA_PROJECT_KEY="PROJ"
 
 # Figma Integration
-# export FIGMA_ACCESS_TOKEN="figd_your-token"
-# export FIGMA_FILE_KEY="your-file-key"
+# export FIGMA_API_TOKEN="figd_your-token"
 
 # Slack Integration
 # export SLACK_BOT_TOKEN="xoxb-your-token"
@@ -555,6 +573,15 @@ cat > "$PROJECT_ROOT/.envrc" << 'EOF'
 # export CONFLUENCE_EMAIL="your-email@company.com"
 # export CONFLUENCE_API_TOKEN="your-token"
 # export CONFLUENCE_SPACE_KEY="TEAM"
+
+# ==============================================
+# Aura Frog Workflow Settings
+# ==============================================
+# export AURA_FROG_AUTO_APPROVE="false"
+# export AURA_FROG_DEFAULT_COVERAGE="80"
+# export AURA_FROG_TDD_ENFORCE="true"
+# export AURA_FROG_AUTO_NOTIFY="true"
+# export AURA_FROG_TOKEN_WARNING="150000"
 EOF
 
 echo "✅ Created .envrc in project root"
@@ -569,6 +596,25 @@ if ! grep -q "Aura Frog Integrations" "$PROJECT_ROOT/.envrc"; then
   cat >> "$PROJECT_ROOT/.envrc" << 'EOF'
 
 # ==============================================
+# AI Model Selection (Multi-Model Support)
+# ==============================================
+# API Keys for alternative models (Claude works without key in Claude Code)
+
+# Gemini - Strong reasoning, vision, long context
+# export GEMINI_API_KEY="your-gemini-api-key"
+
+# OpenAI GPT-4 - Diverse perspectives, code review
+# export OPENAI_API_KEY="your-openai-api-key"
+
+# DeepSeek - Cost-effective coding
+# export DEEPSEEK_API_KEY="your-deepseek-api-key"
+
+# Phase-Specific Model Overrides (Optional)
+# export AURA_PHASE_1_MODEL="gemini"   # Deep reasoning
+# export AURA_PHASE_2_MODEL="gemini"   # Architecture
+# export AURA_PHASE_6_MODEL="openai"   # Code review
+
+# ==============================================
 # Aura Frog Integrations
 # ==============================================
 # Uncomment and configure to enable Aura Frog integrations
@@ -580,8 +626,7 @@ if ! grep -q "Aura Frog Integrations" "$PROJECT_ROOT/.envrc"; then
 # export JIRA_PROJECT_KEY="PROJ"
 
 # Figma Integration
-# export FIGMA_ACCESS_TOKEN="figd_your-token"
-# export FIGMA_FILE_KEY="your-file-key"
+# export FIGMA_API_TOKEN="figd_your-token"
 
 # Slack Integration
 # export SLACK_BOT_TOKEN="xoxb-your-token"
@@ -592,6 +637,15 @@ if ! grep -q "Aura Frog Integrations" "$PROJECT_ROOT/.envrc"; then
 # export CONFLUENCE_EMAIL="your-email@company.com"
 # export CONFLUENCE_API_TOKEN="your-token"
 # export CONFLUENCE_SPACE_KEY="TEAM"
+
+# ==============================================
+# Aura Frog Workflow Settings
+# ==============================================
+# export AURA_FROG_AUTO_APPROVE="false"
+# export AURA_FROG_DEFAULT_COVERAGE="80"
+# export AURA_FROG_TDD_ENFORCE="true"
+# export AURA_FROG_AUTO_NOTIFY="true"
+# export AURA_FROG_TOKEN_WARNING="150000"
 EOF
   echo "✅ Added Aura Frog section to existing .envrc"
   echo "⚠️  Run 'direnv allow' to reload environment"

@@ -4,6 +4,88 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.0.2] - 2025-12-01
+
+### Multi-Model Selection & CLAUDE.md Refactoring
+
+Major update adding multi-model support and restructuring documentation.
+
+#### Multi-Model Selection
+
+**New Feature:** Use different AI models for different workflow phases.
+
+**Configuration:**
+```yaml
+# In project-config.yaml
+models:
+  phase_models:
+    phase_1_understand: "gemini"  # Deep reasoning
+    phase_2_design: "gemini"      # Architecture
+    phase_5b_build: "claude"      # Implementation
+```
+
+**Supported Models:**
+- `claude` - Default (no API key needed in Claude Code)
+- `gemini` - Strong reasoning (requires GEMINI_API_KEY)
+- `openai` - Diverse perspectives (requires OPENAI_API_KEY)
+- `deepseek` - Cost-effective (requires DEEPSEEK_API_KEY)
+
+**Priority Order:**
+1. Environment variables (`AURA_PHASE_X_MODEL`)
+2. Project config
+3. Global config
+4. Default (claude)
+
+**New Files:**
+- `skills/model-router/model-selection.md` - Model routing skill
+- `docs/MODEL_SELECTION.md` - Complete guide
+- `rules/env-loading.md` - Environment loading rule
+
+#### CLAUDE.md Refactoring
+
+**Before:** ~580 lines → **After:** ~187 lines (68% reduction)
+
+Content moved to modular rules and skills files for better maintainability.
+
+**New Structure:**
+- Concise tables with file references
+- Session start checklist
+- Quick reference sections
+
+#### New Skills
+
+- `model-router` (Auto-invoking) - Phase-based model selection
+- `session-manager` (Auto-invoking) - Workflow state & token monitoring
+
+#### New Rules
+
+- `env-loading` - Load .envrc at session start
+- Total rules: 21 → 27
+
+#### New Command
+
+- `project:reload-env` - Load/reload .envrc variables
+
+#### Updated .envrc.template
+
+**Added:**
+- AI Model Selection section (GEMINI_API_KEY, OPENAI_API_KEY, DEEPSEEK_API_KEY)
+- Phase-specific model overrides (AURA_PHASE_X_MODEL)
+- Workflow settings (AURA_FROG_* prefix)
+
+**Removed:**
+- Deprecated FIGMA_ACCESS_TOKEN, FIGMA_FILE_KEY, FIGMA_MCP_ENABLED
+
+#### Documentation Updates
+
+- README.md - Updated counts (22 skills, 27 rules, 70+ commands)
+- GET_STARTED.md - Added model selection, reload-env command
+- commands/README.md - Added project:reload-env
+- skills/README.md - Added model-router, session-manager
+- rules/README.md - Added System & Session category
+
+---
+
 ## [1.0.1] - 2025-11-29
 
 ### Voice Notifications: Realtime Streaming Mode

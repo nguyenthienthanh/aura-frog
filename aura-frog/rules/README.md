@@ -1,12 +1,23 @@
 # Aura Frog Quality Rules
 
 **Version:** 1.0.0
-**Total Rules:** 21
+**Total Rules:** 27
 **Purpose:** Enforce consistent quality across all development
 
 ---
 
 ## Rule Categories
+
+### System & Session (6)
+
+| Rule | Priority | Purpose |
+|------|----------|---------|
+| [agent-identification-banner](agent-identification-banner.md) | Critical | Show agent banner every response |
+| [env-loading](env-loading.md) | Critical | Load .envrc at session start |
+| [execution-rules](execution-rules.md) | Critical | ALWAYS/NEVER execution rules |
+| [priority-hierarchy](priority-hierarchy.md) | Critical | Config priority order |
+| [dual-file-architecture](dual-file-architecture.md) | High | Plugin + project structure |
+| [token-time-awareness](token-time-awareness.md) | High | Monitor token usage |
 
 ### Code Quality (8)
 
@@ -75,6 +86,11 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ## Quick Reference
 
+### Session Start (CRITICAL)
+- [ ] Follow `agent-identification-banner` - Show banner every response
+- [ ] Follow `env-loading` - Load .envrc if exists
+- [ ] Follow `execution-rules` - Load project context first
+
 ### Before Coding
 - [ ] Read `yagni-principle` - Don't add unused features
 - [ ] Read `dry-with-caution` - Don't abstract prematurely
@@ -109,4 +125,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28
+**Version:** 1.0.0 | **Last Updated:** 2025-12-01

@@ -286,7 +286,7 @@ setup_figma() {
         {
             echo ""
             echo "# Figma Configuration"
-            echo "export FIGMA_ACCESS_TOKEN=\"\""
+            echo "export FIGMA_API_TOKEN=\"\""
         } >> "$INSTALL_DIR/.envrc"
     fi
 

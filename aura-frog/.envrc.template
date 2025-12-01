@@ -10,6 +10,41 @@ export PROJECT_NAME="{{PROJECT_NAME}}"
 export PROJECT_ENV="{{PROJECT_ENV}}"
 
 # ============================================
+# AI Model Selection (Multi-Model Support)
+# ============================================
+# API Keys for alternative models (Claude works without key in Claude Code)
+
+# Gemini - Strong reasoning, vision, long context
+export GEMINI_API_KEY="{{GEMINI_API_KEY}}"
+
+# OpenAI GPT-4 - Diverse perspectives, code review
+export OPENAI_API_KEY="{{OPENAI_API_KEY}}"
+
+# DeepSeek - Cost-effective coding
+export DEEPSEEK_API_KEY="{{DEEPSEEK_API_KEY}}"
+
+# ============================================
+# Phase-Specific Model Overrides (Optional)
+# ============================================
+# Uncomment to override model for specific phases
+# Values: claude, gemini, openai, deepseek
+
+# Planning phases - consider gemini for deep reasoning
+# export AURA_PHASE_1_MODEL="gemini"
+# export AURA_PHASE_2_MODEL="gemini"
+
+# Implementation phases - claude or deepseek
+# export AURA_PHASE_5A_MODEL="claude"
+# export AURA_PHASE_5B_MODEL="claude"
+# export AURA_PHASE_5C_MODEL="claude"
+
+# Review phase - consider openai for different perspective
+# export AURA_PHASE_6_MODEL="openai"
+
+# Global default (fallback for all phases)
+# export AURA_DEFAULT_MODEL="claude"
+
+# ============================================
 # Jira Integration
 # ============================================
 export JIRA_URL="{{JIRA_URL}}"
@@ -41,16 +76,13 @@ export SLACK_MENTION_PM="@pm-team"
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_ACCESS_TOKEN="{{FIGMA_ACCESS_TOKEN}}"
-export FIGMA_FILE_KEY="{{FIGMA_FILE_KEY}}"
-export FIGMA_MCP_ENABLED="true"
+export FIGMA_API_TOKEN="{{FIGMA_API_TOKEN}}"
 
 # ============================================
-# Aura Frog Configuration
+# Aura Frog Workflow Settings
 # ============================================
-export CCPM_AUTO_APPROVE="true"
-export CCPM_DEFAULT_COVERAGE="80"
-export CCPM_TDD_ENFORCE="true"
-export CCPM_AUTO_NOTIFY="true"
-export CCPM_TOKEN_WARNING="150000"
-
+export AURA_FROG_AUTO_APPROVE="false"
+export AURA_FROG_DEFAULT_COVERAGE="80"
+export AURA_FROG_TDD_ENFORCE="true"
+export AURA_FROG_AUTO_NOTIFY="true"
+export AURA_FROG_TOKEN_WARNING="150000"

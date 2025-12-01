@@ -205,7 +205,7 @@ bash aura-frog/scripts/slack-notify.sh "Test message from Aura Frog"
 ### Figma Integration
 
 ```bash
-export FIGMA_ACCESS_TOKEN="figd_your_figma_token_here"
+export FIGMA_API_TOKEN="figd_your_figma_token_here"
 export FIGMA_FILE_KEY="ABC123DEF456"
 export FIGMA_MCP_ENABLED="true"
 ```
@@ -228,7 +228,7 @@ https://www.figma.com/file/ABC123DEF456/Design-Name
 ```
 
 **Required Variables:**
-- ✅ `FIGMA_ACCESS_TOKEN` - Personal access token
+- ✅ `FIGMA_API_TOKEN` - Personal access token
 - ✅ `FIGMA_FILE_KEY` - File ID from URL
 
 **Optional Variables:**
@@ -244,20 +244,20 @@ bash aura-frog/scripts/figma-fetch.sh ABC123DEF456
 ### Aura Frog Configuration
 
 ```bash
-export CCPM_AUTO_APPROVE="true"
-export CCPM_DEFAULT_COVERAGE="80"
-export CCPM_TDD_ENFORCE="true"
-export CCPM_AUTO_NOTIFY="true"
-export CCPM_TOKEN_WARNING="150000"
+export AURA_FROG_AUTO_APPROVE="true"
+export AURA_FROG_DEFAULT_COVERAGE="80"
+export AURA_FROG_TDD_ENFORCE="true"
+export AURA_FROG_AUTO_NOTIFY="true"
+export AURA_FROG_TOKEN_WARNING="150000"
 ```
 
 **Variables:**
 
-- `CCPM_AUTO_APPROVE` - Auto-approve safe operations (default: true)
-- `CCPM_DEFAULT_COVERAGE` - Default test coverage threshold % (default: 80)
-- `CCPM_TDD_ENFORCE` - Enforce TDD workflow (default: true)
-- `CCPM_AUTO_NOTIFY` - Auto-send notifications (default: true)
-- `CCPM_TOKEN_WARNING` - Token usage warning threshold (default: 150000)
+- `AURA_FROG_AUTO_APPROVE` - Auto-approve safe operations (default: true)
+- `AURA_FROG_DEFAULT_COVERAGE` - Default test coverage threshold % (default: 80)
+- `AURA_FROG_TDD_ENFORCE` - Enforce TDD workflow (default: true)
+- `AURA_FROG_AUTO_NOTIFY` - Auto-send notifications (default: true)
+- `AURA_FROG_TOKEN_WARNING` - Token usage warning threshold (default: 150000)
 
 ---
 
@@ -375,7 +375,7 @@ else
 fi
 
 # Check Figma
-if [ -n "$FIGMA_ACCESS_TOKEN" ]; then
+if [ -n "$FIGMA_API_TOKEN" ]; then
   echo "✅ Figma: Configured"
 else
   echo "❌ Figma: Not configured"

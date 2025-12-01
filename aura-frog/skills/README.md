@@ -165,7 +165,57 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 - Loads into Phase 3 (UI Breakdown)
 - Downloads design images
 
-**Requires:** `FIGMA_ACCESS_TOKEN` in `.envrc`
+**Requires:** `FIGMA_API_TOKEN` in `.envrc`
+
+---
+
+### 9. **model-router** (Priority: MEDIUM)
+
+**Auto-invokes when:** Phase transitions in workflow
+
+**Triggers:**
+- Starting a new workflow phase
+- Model selection configuration exists
+- Phase-specific model override set
+
+**What it does:**
+- Selects appropriate AI model for each phase
+- Handles context handoff between models
+- Falls back to default model on errors
+- Logs model switches for debugging
+
+**Priority Order:**
+1. Environment variables (`AURA_PHASE_X_MODEL`)
+2. Project config (`project-config.yaml`)
+3. Global config (`ccpm-config.yaml`)
+4. Default (`claude`)
+
+**📚 Details:** `skills/model-router/model-selection.md`
+
+---
+
+### 10. **session-manager** (Priority: HIGH)
+
+**Auto-invokes when:** Token limit warning triggered
+
+**Triggers:**
+- Token count exceeds 150K (75% of limit)
+- User requests `workflow:handoff`
+- User requests `workflow:resume`
+- Long-running workflow needs state save
+
+**What it does:**
+- Monitors token usage
+- Saves workflow state to `.claude/context/`
+- Enables workflow resume across sessions
+- Warns user before token exhaustion
+
+**Thresholds:**
+- 150K tokens - Consider handoff
+- 175K tokens - Recommend handoff
+- 190K tokens - Urgent handoff
+
+**📚 Details:** `skills/session-manager/session-continuation.md`
 
 ---
 

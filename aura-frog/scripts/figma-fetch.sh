@@ -99,12 +99,12 @@ source_envrc() {
 }
 
 # Check if already set in environment (e.g., by direnv)
-if [ -n "$FIGMA_ACCESS_TOKEN" ]; then
-  log "INFO" "FIGMA_ACCESS_TOKEN already set in environment"
+if [ -n "$FIGMA_API_TOKEN" ]; then
+  log "INFO" "FIGMA_API_TOKEN already set in environment"
   ENVRC_LOADED=true
 elif [ -n "$FIGMA_API_TOKEN" ]; then
-  log "INFO" "FIGMA_API_TOKEN found, using as FIGMA_ACCESS_TOKEN"
-  FIGMA_ACCESS_TOKEN="$FIGMA_API_TOKEN"
+  log "INFO" "FIGMA_API_TOKEN found, using as FIGMA_API_TOKEN"
+  FIGMA_API_TOKEN="$FIGMA_API_TOKEN"
   ENVRC_LOADED=true
 fi
 
@@ -129,10 +129,10 @@ if [ "$ENVRC_LOADED" = false ]; then
   fi
 fi
 
-# Support both FIGMA_ACCESS_TOKEN and FIGMA_API_TOKEN (fallback)
-if [ -z "$FIGMA_ACCESS_TOKEN" ] && [ -n "$FIGMA_API_TOKEN" ]; then
-  log "INFO" "Using FIGMA_API_TOKEN as FIGMA_ACCESS_TOKEN"
-  FIGMA_ACCESS_TOKEN="$FIGMA_API_TOKEN"
+# Support both FIGMA_API_TOKEN and FIGMA_API_TOKEN (fallback)
+if [ -z "$FIGMA_API_TOKEN" ] && [ -n "$FIGMA_API_TOKEN" ]; then
+  log "INFO" "Using FIGMA_API_TOKEN as FIGMA_API_TOKEN"
+  FIGMA_API_TOKEN="$FIGMA_API_TOKEN"
 fi
 
 if [ "$ENVRC_LOADED" = false ]; then
@@ -145,23 +145,23 @@ if [ "$ENVRC_LOADED" = false ]; then
   echo "  3. Home directory (~/.envrc)"
   echo "  4. Plugin directory (${PLUGIN_DIR}/.envrc)"
   echo ""
-  echo "Please create .envrc with FIGMA_ACCESS_TOKEN in one of these locations"
+  echo "Please create .envrc with FIGMA_API_TOKEN in one of these locations"
   exit 1
 fi
 
 # Check required variables
-if [ -z "$FIGMA_ACCESS_TOKEN" ]; then
-  log "ERROR" "FIGMA_ACCESS_TOKEN not set"
-  echo "❌ Error: FIGMA_ACCESS_TOKEN not set"
+if [ -z "$FIGMA_API_TOKEN" ]; then
+  log "ERROR" "FIGMA_API_TOKEN not set"
+  echo "❌ Error: FIGMA_API_TOKEN not set"
   echo ""
   echo "Current environment check:"
-  echo "  FIGMA_ACCESS_TOKEN: ${FIGMA_ACCESS_TOKEN:-<not set>}"
+  echo "  FIGMA_API_TOKEN: ${FIGMA_API_TOKEN:-<not set>}"
   echo "  FIGMA_API_TOKEN: ${FIGMA_API_TOKEN:-<not set>}"
   echo ""
   echo "To fix:"
   echo "  1. Get token from: https://www.figma.com/developers/api#access-tokens"
   echo "  2. Edit .envrc and add:"
-  echo "     export FIGMA_ACCESS_TOKEN=\"figd_your_token_here\""
+  echo "     export FIGMA_API_TOKEN=\"figd_your_token_here\""
   echo "  3. Run: direnv allow . && direnv reload"
   echo "     OR:  source .envrc"
   echo ""
@@ -170,7 +170,7 @@ if [ -z "$FIGMA_ACCESS_TOKEN" ]; then
 fi
 
 log "INFO" "Figma credentials loaded successfully"
-log "INFO" "Token length: ${#FIGMA_ACCESS_TOKEN} chars"
+log "INFO" "Token length: ${#FIGMA_API_TOKEN} chars"
 
 # Construct API URL with query params
 API_URL="https://api.figma.com/v1/files/${FILE_ID}"
@@ -200,7 +200,7 @@ log "INFO" "Sending API request..."
 
 # Fetch file metadata
 response=$(curl -s -w "\n%{http_code}" \
-  -H "X-Figma-Token: ${FIGMA_ACCESS_TOKEN}" \
+  -H "X-Figma-Token: ${FIGMA_API_TOKEN}" \
   "$API_URL")
 
 # Extract HTTP status code
@@ -357,7 +357,7 @@ if [ -n "$frames" ]; then
 
   # Fetch image URLs
   images_response=$(curl -s \
-    -H "X-Figma-Token: ${FIGMA_ACCESS_TOKEN}" \
+    -H "X-Figma-Token: ${FIGMA_API_TOKEN}" \
     "https://api.figma.com/v1/images/${FILE_ID}?ids=${frame_ids}&format=png&scale=2")
 
   # Save images metadata

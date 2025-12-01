@@ -69,7 +69,7 @@ export JIRA_EMAIL="ethan.nguyen@example.com"
 export JIRA_API_TOKEN="paste_jira_token_here"
 
 # Figma
-export FIGMA_ACCESS_TOKEN="paste_figma_token_here"
+export FIGMA_API_TOKEN="paste_figma_token_here"
 
 # Slack
 export SLACK_BOT_TOKEN="paste_slack_token_here"  # xoxb-...

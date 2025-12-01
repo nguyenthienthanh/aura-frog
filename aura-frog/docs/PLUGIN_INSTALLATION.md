@@ -151,7 +151,7 @@ export JIRA_API_TOKEN="your-jira-api-token"
 export JIRA_PROJECT_KEY="PROJ"
 
 # Figma Integration
-export FIGMA_ACCESS_TOKEN="figd_your-personal-access-token"
+export FIGMA_API_TOKEN="figd_your-personal-access-token"
 export FIGMA_FILE_KEY="your-file-key"
 
 # Slack Integration

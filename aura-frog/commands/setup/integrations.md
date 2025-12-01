@@ -227,16 +227,16 @@ export SLACK_CHANNEL_ID="C1234567890"
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_ACCESS_TOKEN="***"
+export FIGMA_API_TOKEN="***"
 export FIGMA_MCP_ENABLED="true"
 
 # ============================================
 # Aura Frog Configuration
 # ============================================
-export CCPM_AUTO_APPROVE="true"
-export CCPM_DEFAULT_COVERAGE="80"
-export CCPM_TDD_ENFORCE="true"
-export CCPM_AUTO_NOTIFY="true"
+export AURA_FROG_AUTO_APPROVE="true"
+export AURA_FROG_DEFAULT_COVERAGE="80"
+export AURA_FROG_TDD_ENFORCE="true"
+export AURA_FROG_AUTO_NOTIFY="true"
 ```
 
 **Updates `.gitignore`:**

@@ -27,11 +27,12 @@ commands/
 │   ├── list.md         # planning:list
 │   └── refine.md       # planning:refine
 │
-├── project/            # Project operations (5 commands)
+├── project/            # Project operations (6 commands)
 │   ├── detect.md       # project:detect
 │   ├── init.md         # project:init
 │   ├── list.md         # project:list
 │   ├── regen.md        # project:regen
+│   ├── reload-env.md   # project:reload-env
 │   └── switch.md       # project:switch
 │
 ├── review/             # Code review (1 command)
@@ -103,13 +104,14 @@ commands/
 | `planning:list` | `planning/list.md` | List all saved plans |
 | `planning:refine` | `planning/refine.md` | Update existing plan |
 
-### Project Management (5)
+### Project Management (6)
 | Command | File | Description |
 |---------|------|-------------|
 | `project:init` | `project/init.md` | Initialize Aura Frog for project |
 | `project:detect` | `project/detect.md` | Auto-detect project type |
 | `project:list` | `project/list.md` | List indexed projects |
 | `project:regen` | `project/regen.md` | Re-generate project context |
+| `project:reload-env` | `project/reload-env.md` | Load/reload .envrc variables |
 | `project:switch` | `project/switch.md` | Switch between projects |
 
 ### Code Review (1)
@@ -181,19 +183,19 @@ commands/
 
 ## 📈 Statistics
 
-- **Total Commands:** 45
+- **Total Commands:** 70+
 - **Categories:** 9 folders + 4 standalone
 - **Agent:** 4 commands
 - **Bugfix:** 3 commands
 - **Planning:** 3 commands
-- **PM:** 1 command
-- **Project:** 3 commands
+- **Project:** 6 commands
 - **Review:** 1 command
-- **Setup:** 1 command
+- **Setup:** 2 commands
 - **Skill:** 1 command
 - **Test:** 4 commands
 - **Workflow:** 20 commands
 - **Standalone:** 4 commands
+- **Other categories:** See full directory listing
 
 ---
 
@@ -256,6 +258,6 @@ touch commands/deploy/staging.md
 
 ---
 
-**Last Updated:** 2025-11-25  
+**Last Updated:** 2025-12-01
 **Maintained By:** Aura Frog Team
 

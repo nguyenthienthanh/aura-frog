@@ -252,17 +252,17 @@ export SLACK_MENTION_PM="@pm-team"  # Optional
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_ACCESS_TOKEN="paste_figma_token_here"  # figd_...
+export FIGMA_API_TOKEN="paste_figma_token_here"  # figd_...
 export FIGMA_FILE_KEY="ABC123DEF456"  # Optional: default file
 
 # ============================================
 # Aura Frog Configuration
 # ============================================
-export CCPM_AUTO_APPROVE="true"
-export CCPM_DEFAULT_COVERAGE="80"
-export CCPM_TDD_ENFORCE="true"
-export CCPM_AUTO_NOTIFY="true"
-export CCPM_TOKEN_WARNING="150000"
+export AURA_FROG_AUTO_APPROVE="true"
+export AURA_FROG_DEFAULT_COVERAGE="80"
+export AURA_FROG_TDD_ENFORCE="true"
+export AURA_FROG_AUTO_NOTIFY="true"
+export AURA_FROG_TOKEN_WARNING="150000"
 ```
 
 ### 2.4 Load & Test (3 min)
@@ -744,7 +744,7 @@ https://www.figma.com/file/ABC123DEF456/Design-Name
 **Step 3: Configure Environment Variables**
 
 ```bash
-export FIGMA_ACCESS_TOKEN="figd_your_figma_token_here"
+export FIGMA_API_TOKEN="figd_your_figma_token_here"
 export FIGMA_FILE_KEY="ABC123DEF456"  # Optional: default file
 export FIGMA_MCP_ENABLED="true"  # Optional
 ```
@@ -753,7 +753,7 @@ export FIGMA_MCP_ENABLED="true"  # Optional
 
 ```bash
 # Test Figma API
-curl -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
+curl -H "X-Figma-Token: $FIGMA_API_TOKEN" \
   "https://api.figma.com/v1/me"
 
 # Test with Aura Frog script
@@ -785,7 +785,7 @@ Once configured, Aura Frog can:
 #### Two Methods of Usage
 
 **Option A: API Access (Recommended)**
-- Requires `FIGMA_ACCESS_TOKEN`
+- Requires `FIGMA_API_TOKEN`
 - Aura Frog will automatically extract design data via `figma-fetch.sh`
 - No screenshots needed
 
@@ -944,7 +944,7 @@ else
 fi
 
 # Check Figma
-if [ -n "$FIGMA_ACCESS_TOKEN" ]; then
+if [ -n "$FIGMA_API_TOKEN" ]; then
   echo "✅ Figma: Configured"
 else
   echo "❌ Figma: Not configured"
@@ -1158,7 +1158,7 @@ Aura Frog provides **native Bash script integrations** for external services:
 - File: `.claude/logs/figma/<file-id>-images.json` (image URLs)
 
 **Requirements:**
-- `FIGMA_ACCESS_TOKEN`
+- `FIGMA_API_TOKEN`
 - `jq` (optional, for formatting)
 
 ---
