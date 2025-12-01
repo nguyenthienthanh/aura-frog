@@ -28,21 +28,95 @@ export DEEPSEEK_API_KEY="{{DEEPSEEK_API_KEY}}"
 # ============================================
 # Uncomment to override model for specific phases
 # Values: claude, gemini, openai, deepseek
+#
+# CLAUDE (Opus 4.5 / Sonnet 4):
+#   ✓ Code generation & implementation (best)
+#   ✓ Refactoring & code quality
+#   ✓ Following complex instructions
+#   ✓ Test writing & TDD
+#   ✓ Debugging & fixing issues
+#   ✓ Documentation generation
+#
+# GEMINI (2.5 Pro / Flash):
+#   ✓ Deep reasoning & analysis
+#   ✓ Long context (up to 1M tokens)
+#   ✓ Architecture & system design
+#   ✓ Requirements analysis
+#   ✓ Multi-modal (image/vision tasks)
+#   ✓ Code review & pattern analysis
 
-# Planning phases - consider gemini for deep reasoning
-# export AURA_PHASE_1_MODEL="gemini"
-# export AURA_PHASE_2_MODEL="gemini"
+# ============================================
+# Phase-Specific Model Configuration
+# ============================================
+# 9-Phase Workflow Model Assignments
 
-# Implementation phases - claude or deepseek
-# export AURA_PHASE_5A_MODEL="claude"
-# export AURA_PHASE_5B_MODEL="claude"
-# export AURA_PHASE_5C_MODEL="claude"
+# Phase 1: Understand - Analyze requirements, codebase exploration
+# → GEMINI: Superior reasoning, long context for large codebases
+export AURA_PHASE_1_MODEL="gemini"
 
-# Review phase - consider openai for different perspective
-# export AURA_PHASE_6_MODEL="openai"
+# Phase 2: Design - Architecture, system design, planning
+# → GEMINI: Better at high-level thinking, trade-off analysis
+export AURA_PHASE_2_MODEL="gemini"
+
+# Phase 3: UI Breakdown - Component structure, UI analysis
+# → CLAUDE: Better at translating designs to component code
+export AURA_PHASE_3_MODEL="claude"
+
+# Phase 4: Test Plan - Define test strategy, test cases
+# → CLAUDE: Better at code-specific test planning
+export AURA_PHASE_4_MODEL="claude"
+
+# Phase 5A: TDD RED - Write failing tests first
+# → CLAUDE: Superior test code generation
+export AURA_PHASE_5A_MODEL="claude"
+
+# Phase 5B: TDD GREEN - Implement to pass tests
+# → CLAUDE: Best at code implementation
+export AURA_PHASE_5B_MODEL="claude"
+
+# Phase 5C: TDD REFACTOR - Clean up, optimize
+# → CLAUDE: Excellent at refactoring with context
+export AURA_PHASE_5C_MODEL="claude"
+
+# Phase 6: Review - Code review, quality check
+# → GEMINI: Great at pattern analysis, finding issues
+export AURA_PHASE_6_MODEL="gemini"
+
+# Phase 7: Verify - Run tests, validate
+# → CLAUDE: Better at interpreting test results, fixing
+export AURA_PHASE_7_MODEL="claude"
+
+# Phase 8: Document - Generate documentation
+# → CLAUDE: Superior documentation generation
+export AURA_PHASE_8_MODEL="claude"
+
+# Phase 9: Share - Summary, handoff notes
+# → GEMINI: Good at high-level summarization
+export AURA_PHASE_9_MODEL="gemini"
+
+# ============================================
+# Task-Based Model Selection (Non-Phase Work)
+# ============================================
+# Quick tasks, bug fixes, small features
+export AURA_TASK_QUICK_FIX="claude"
+
+# Large codebase exploration/understanding
+export AURA_TASK_EXPLORATION="gemini"
+
+# Architecture decisions, RFC writing
+export AURA_TASK_ARCHITECTURE="gemini"
+
+# Code implementation, new features
+export AURA_TASK_IMPLEMENTATION="claude"
+
+# Debugging complex issues
+export AURA_TASK_DEBUGGING="claude"
+
+# PR review, code review
+export AURA_TASK_REVIEW="gemini"
 
 # Global default (fallback for all phases)
-# export AURA_DEFAULT_MODEL="claude"
+export AURA_DEFAULT_MODEL="claude"
 
 # ============================================
 # Jira Integration
@@ -57,11 +131,16 @@ export JIRA_DEFAULT_PRIORITY="Medium"
 # ============================================
 # Confluence Integration
 # ============================================
+# URL should include /wiki path (e.g., https://company.atlassian.net/wiki)
 export CONFLUENCE_URL="{{CONFLUENCE_URL}}"
 export CONFLUENCE_EMAIL="{{CONFLUENCE_EMAIL}}"
+# Same API token as JIRA (Atlassian account)
 export CONFLUENCE_API_TOKEN="{{CONFLUENCE_API_TOKEN}}"
+# Default space for creating pages
 export CONFLUENCE_SPACE_KEY="{{CONFLUENCE_SPACE_KEY}}"
 export CONFLUENCE_DEFAULT_LABELS="aura-frog,generated,documentation"
+# Optional: Default parent page ID for new pages
+# export CONFLUENCE_DEFAULT_PARENT_ID=""
 
 # ============================================
 # Slack Integration

@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.0.0
-**Total Skills:** 15 (8 auto-invoking + 7 reference)
+**Version:** 1.1.0
+**Total Skills:** 23 (11 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -169,7 +169,44 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 9. **model-router** (Priority: MEDIUM)
+### 9. **confluence-integration** (Priority: MEDIUM)
+
+**Auto-invokes when:** Confluence page or documentation needed
+
+**Triggers:**
+- Confluence URLs: `https://company.atlassian.net/wiki/...`
+- "confluence page", "wiki page", "documentation"
+- Phase 8 (Documentation) - for publishing
+- Phase 9 (Share) - for team notifications
+
+**What it does:**
+- Fetches Confluence pages by ID or title
+- Searches pages across spaces
+- Creates new pages (with confirmation)
+- Updates existing pages (with confirmation)
+- Saves data to `.claude/logs/confluence/`
+
+**Operations:**
+```bash
+# Fetch page
+bash scripts/confluence-operations.sh fetch 123456
+bash scripts/confluence-operations.sh fetch "API Documentation" DEV
+
+# Search pages
+bash scripts/confluence-operations.sh search "deployment guide" PROJ
+
+# Create page (requires confirmation)
+bash scripts/confluence-operations.sh create DEV "New Page" content.md
+
+# Update page (requires confirmation)
+bash scripts/confluence-operations.sh update 123456 updated-content.md
+```
+
+**Requires:** `CONFLUENCE_API_TOKEN` in `.envrc`
+
+---
+
+### 10. **model-router** (Priority: MEDIUM)
 
 **Auto-invokes when:** Phase transitions in workflow
 
@@ -194,7 +231,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 10. **session-manager** (Priority: HIGH)
+### 11. **session-manager** (Priority: HIGH)
 
 **Auto-invokes when:** Token limit warning triggered
 
@@ -236,6 +273,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
    - "add tests" → test-writer
    - "PROJ-1234" → jira-integration
    - Figma URL → figma-integration
+   - Confluence URL → confluence-integration
    ↓
 6. Skills load project-context-loader if needed
    ↓
@@ -357,7 +395,7 @@ workflow-orchestrator, bugfix-quick, or test-writer
 ↓
 code-reviewer (After implementation)
 ↓
-jira-integration / figma-integration (When mentioned)
+jira-integration / figma-integration / confluence-integration (When mentioned)
 ```
 
 ---
@@ -370,10 +408,13 @@ jira-integration / figma-integration (When mentioned)
 | workflow-orchestrator | CRITICAL | Complex tasks |
 | project-context-loader | HIGH | Before code generation |
 | code-reviewer | HIGH | After implementation |
+| session-manager | HIGH | Token limit warning |
 | bugfix-quick | MEDIUM | Bug mentions |
 | test-writer | MEDIUM | Test requests |
 | jira-integration | MEDIUM | Ticket detected |
 | figma-integration | MEDIUM | Figma URL detected |
+| confluence-integration | MEDIUM | Confluence URL/docs |
+| model-router | MEDIUM | Phase transitions |
 
 ---
 
@@ -430,6 +471,6 @@ These skills provide guidance documents that agents reference during workflows:
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-28
-**Total Skills:** 15 (8 auto-invoking + 7 reference)
+**Version:** 1.1.0
+**Last Updated:** 2025-12-01
+**Total Skills:** 23 (11 auto-invoking + 12 reference)

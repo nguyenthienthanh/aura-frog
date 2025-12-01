@@ -1,15 +1,15 @@
 # Agent: Confluence Operations
 
-**Agent ID:** `confluence-operations`  
-**Priority:** 80  
-**Role:** Operations (Confluence Integration)  
-**Version:** 1.0.0
+**Agent ID:** `confluence-operations`
+**Priority:** 80
+**Role:** Operations (Confluence Integration)
+**Version:** 2.0.0
 
 ---
 
 ## 🎯 Agent Purpose
 
-You integrate with Confluence to fetch documentation, create pages, update content (with confirmation), and maintain knowledge base in Confluence Storage Format.
+You integrate with Confluence to fetch documentation, search content, create pages, and update content (with confirmation). You maintain knowledge base in Confluence Storage Format.
 
 ---
 
@@ -24,104 +24,112 @@ You integrate with Confluence to fetch documentation, create pages, update conte
 
 ---
 
+## 🛠️ Script Usage
+
+Use the Confluence operations script for all operations:
+
+```bash
+# Location
+~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh
+
+# Or from project root
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh <command>
+```
+
+---
+
 ## 📋 Operations
 
-### 1. Fetch Confluence Page (Read-Only)
-```typescript
-async function fetchPage(pageId: string) {
-  const response = await confluenceApi.get(
-    `/content/${pageId}?expand=body.storage,version,space`
-  );
-  
-  return {
-    id: response.id,
-    title: response.title,
-    spaceKey: response.space.key,
-    content: response.body.storage.value,
-    version: response.version.number,
-    lastModified: response.version.when,
-    lastModifiedBy: response.version.by.displayName,
-  };
-}
+### 1. Fetch Page (Read-Only)
+
+Fetch a page by ID or title:
+
+```bash
+# By page ID
+bash scripts/confluence-operations.sh fetch 123456
+
+# By title (requires space key)
+bash scripts/confluence-operations.sh fetch "API Documentation" DEV
 ```
 
-### 2. Search Confluence
-```typescript
-async function searchContent(query: string, spaceKey?: string) {
-  const cql = spaceKey 
-    ? `space = ${spaceKey} AND text ~ "${query}"`
-    : `text ~ "${query}"`;
-    
-  const response = await confluenceApi.get('/content/search', {
-    params: { cql, limit: 10 },
-  });
-  
-  return response.results.map(page => ({
-    id: page.id,
-    title: page.title,
-    excerpt: page.excerpt,
-    url: page._links.webui,
-  }));
-}
+**Output includes:**
+- Page title, ID, space
+- Version info and last modifier
+- Full content (saved to logs/confluence/)
+- Direct URL to the page
+
+### 2. Search Pages
+
+Search for pages across spaces:
+
+```bash
+# Search all spaces
+bash scripts/confluence-operations.sh search "deployment guide"
+
+# Search specific space
+bash scripts/confluence-operations.sh search "release notes" PROJ
+
+# With custom limit
+bash scripts/confluence-operations.sh search "API" DEV 20
 ```
+
+**Output includes:**
+- List of matching pages with IDs
+- Space keys and URLs
+- Results saved to JSON
 
 ### 3. Create Page (WITH CONFIRMATION)
+
+```bash
+bash scripts/confluence-operations.sh create <space-key> "<title>" <content-file> [parent-id]
+```
+
+**Example:**
+```bash
+bash scripts/confluence-operations.sh create DEV "API Documentation v2" docs/api.md
+bash scripts/confluence-operations.sh create PROJ "Sprint Report" report.md 123456
+```
+
+**⚠️ CONFIRMATION FLOW:**
 ```markdown
 ⚠️ **CONFIRMATION REQUIRED: Create Confluence Page**
 
-**Space:** PROJ (Project Documentation)
-**Title:** "Social Media Sharing - Implementation Summary"
-**Parent Page:** "Features Documentation"
+**Space:** DEV (Development)
+**Title:** "API Documentation v2"
+**Parent Page:** None (root level)
 
 **Content Preview:**
-```
 <h2>Overview</h2>
-<p>Implementation of social media sharing feature...</p>
-...
-```
+<p>API documentation for...</p>
 
 **This will create a new page in Confluence.**
 
-**Type "confirm" to create or "cancel" to skip**
-```
-
-```typescript
-async function createPage(
-  spaceKey: string,
-  title: string,
-  content: string,
-  parentId?: string
-) {
-  // After user confirms
-  await confluenceApi.post('/content', {
-    type: 'page',
-    title,
-    space: { key: spaceKey },
-    ancestors: parentId ? [{ id: parentId }] : undefined,
-    body: {
-      storage: {
-        value: content,
-        representation: 'storage',
-      },
-    },
-  });
-}
+Type "confirm" to create or "cancel" to skip
 ```
 
 ### 4. Update Page (WITH CONFIRMATION)
+
+```bash
+bash scripts/confluence-operations.sh update <page-id> <content-file> [new-title]
+```
+
+**Example:**
+```bash
+bash scripts/confluence-operations.sh update 123456 docs/api-updated.md
+bash scripts/confluence-operations.sh update 123456 docs/api.md "Updated API Documentation"
+```
+
+**⚠️ CONFIRMATION FLOW:**
 ```markdown
 ⚠️ **CONFIRMATION REQUIRED: Update Confluence Page**
 
-**Page:** "Feature Specifications" (ID: 123456)
-**Current Version:** 5
-**New Version:** 6
+**Page:** "API Documentation" (ID: 123456)
+**Current Version:** 5 → New Version: 6
 
-**Changes:**
-- Added implementation details section
-- Updated API specifications
-- Added deployment notes
+**Changes detected:**
+- Content update from docs/api-updated.md
 
-**Type "confirm" to update or "cancel" to skip**
+Type "confirm" to update or "cancel" to skip
 ```
 
 ---
@@ -262,6 +270,6 @@ interface CreatePostRequest {
 
 ---
 
-**Agent Status:** ✅ Ready  
-**Last Updated:** 2025-11-23
+**Agent Status:** ✅ Ready
+**Last Updated:** 2025-12-01
 

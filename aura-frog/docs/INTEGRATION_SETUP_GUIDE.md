@@ -302,9 +302,8 @@ source .envrc
 # Test Slack
 ./scripts/slack-notify.sh '#dev-team' '✅ Aura Frog integrations working!'
 
-# Test Confluence (creates test page)
-echo "# Test\nAura Frog is ready!" > /tmp/test.md
-./scripts/confluence-publish.sh 'DEV' 'Aura Frog Test' '/tmp/test.md'
+# Test Confluence (search pages)
+./scripts/confluence-operations.sh search "test" DEV
 ```
 
 **If all 4 succeed → You're done! ✅**
@@ -321,8 +320,10 @@ workflow:start "Implement https://figma.com/file/ABC123/Design"
 # Slack: Manual notification
 bash scripts/slack-notify.sh '#team' 'Update message'
 
-# Confluence: Publish docs
-bash scripts/confluence-publish.sh 'SPACE' 'Title' 'file.md'
+# Confluence: Fetch, search, create, update pages
+bash scripts/confluence-operations.sh fetch 123456
+bash scripts/confluence-operations.sh search "api docs" SPACE
+bash scripts/confluence-operations.sh create SPACE 'Title' file.md
 ```
 
 ### 2.6 Quick Troubleshooting
@@ -955,7 +956,7 @@ echo "Run individual tests with:"
 echo "  bash scripts/jira-fetch.sh TICKET-123"
 echo "  bash scripts/slack-notify.sh '#channel' 'Test message'"
 echo "  bash scripts/figma-fetch.sh FILE_KEY"
-echo "  bash scripts/confluence-publish.sh 'SPACE' 'Title' 'file.md'"
+echo "  bash scripts/confluence-operations.sh search 'test' SPACE"
 ```
 
 **Run it:**
@@ -1105,7 +1106,8 @@ Aura Frog provides **native Bash script integrations** for external services:
 | **JIRA** | `jira-fetch.sh` | Fetch tickets, requirements | ✅ Ready |
 | **Figma** | `figma-fetch.sh` | Fetch designs, extract components | ✅ Ready |
 | **Slack** | `slack-notify.sh` | Send notifications, updates | ✅ Ready |
-| **Confluence** | `confluence-publish.sh` | Publish documentation | ✅ Ready |
+| **Confluence** | `confluence-operations.sh` | Fetch, search, create, update pages | ✅ Ready |
+| **Confluence** | `confluence-publish.sh` | Simple page publish (legacy) | ✅ Ready |
 
 ### 5.2 Script Reference
 
@@ -1198,9 +1200,74 @@ Aura Frog provides **native Bash script integrations** for external services:
 
 ---
 
-#### confluence-publish.sh
+#### confluence-operations.sh (Recommended)
 
-**Purpose:** Publish markdown to Confluence
+**Purpose:** Full Confluence operations - fetch, search, create, update pages
+
+**Usage:**
+```bash
+./scripts/confluence-operations.sh <command> [options]
+```
+
+**Commands:**
+
+**Fetch Page:**
+```bash
+# By page ID
+./scripts/confluence-operations.sh fetch 123456
+
+# By title (requires space key)
+./scripts/confluence-operations.sh fetch "API Documentation" DEV
+```
+
+**Search Pages:**
+```bash
+# Search all spaces
+./scripts/confluence-operations.sh search "deployment guide"
+
+# Search specific space
+./scripts/confluence-operations.sh search "release notes" PROJ
+
+# With custom limit
+./scripts/confluence-operations.sh search "API" DEV 20
+```
+
+**Create Page (requires confirmation):**
+```bash
+# Basic
+./scripts/confluence-operations.sh create DEV "New Page Title" content.md
+
+# With parent page
+./scripts/confluence-operations.sh create PROJ "Child Page" docs/page.md 123456
+```
+
+**Update Page (requires confirmation):**
+```bash
+# Update content
+./scripts/confluence-operations.sh update 123456 updated-content.md
+
+# Update content and title
+./scripts/confluence-operations.sh update 123456 content.md "New Title"
+```
+
+**Output:**
+- Console: Formatted results with URLs
+- Files saved to `.claude/logs/confluence/`:
+  - `page-<id>.html` - Page content
+  - `page-<id>.json` - Full metadata
+  - `search-results-<timestamp>.json` - Search results
+
+**Requirements:**
+- `CONFLUENCE_URL` (include `/wiki` path)
+- `CONFLUENCE_EMAIL`
+- `CONFLUENCE_API_TOKEN`
+- `jq` (for JSON construction)
+
+---
+
+#### confluence-publish.sh (Legacy)
+
+**Purpose:** Simple markdown publish to Confluence (use confluence-operations.sh for more features)
 
 **Usage:**
 ```bash
@@ -1347,6 +1414,6 @@ After setting up environment variables:
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-27
-**Total Lines:** ~800
+**Version:** 1.1.0
+**Last Updated:** 2025-12-01
+**Total Lines:** ~900
