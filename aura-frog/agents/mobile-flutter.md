@@ -284,11 +284,12 @@ Consumer(
 
 ### Widget Optimization
 ```dart
-// ✅ Use const constructors
+// ✅ Use const constructors - prevents rebuilds
 const Text('Hello');
 const SizedBox(height: 16);
+const EdgeInsets.all(16);
 
-// ✅ ListView.builder for long lists
+// ✅ ListView.builder for long lists (lazy loading)
 ListView.builder(
   itemCount: items.length,
   itemBuilder: (context, index) => ListTile(
@@ -296,18 +297,198 @@ ListView.builder(
   ),
 )
 
-// ❌ Avoid ListView with all items
+// ✅ Use RepaintBoundary for complex widgets
+RepaintBoundary(
+  child: ExpensiveWidget(),
+)
+
+// ❌ Avoid ListView with all items (loads everything)
 ListView(
   children: items.map((item) => ListTile(...)).toList(),
 )
+
+// ❌ Avoid anonymous functions in build (creates new closures)
+// Bad: onTap: () => doSomething()
+// Good: onTap: _handleTap (use method reference)
 ```
 
-### State Management Choice
+### Performance Critical Rules
 ```dart
-// Simple local state → setState
-// Medium complexity → Provider
-// Complex app → Bloc/Riverpod
-// Reactive patterns → GetX, MobX
+// ✅ Split large widgets into smaller StatelessWidgets
+class UserCard extends StatelessWidget {
+  const UserCard({super.key, required this.user});
+  final User user;
+
+  @override
+  Widget build(BuildContext context) => Card(
+    child: Column(
+      children: [
+        UserAvatar(user: user),  // Separate widget
+        UserInfo(user: user),    // Separate widget
+      ],
+    ),
+  );
+}
+
+// ✅ Use keys for list items (proper reconciliation)
+ListView.builder(
+  itemBuilder: (context, index) => UserTile(
+    key: ValueKey(users[index].id),  // Important!
+    user: users[index],
+  ),
+)
+
+// ✅ Use itemExtent for fixed-height lists
+ListView.builder(
+  itemExtent: 72.0,  // Improves performance significantly
+  itemBuilder: (context, index) => ListTile(...),
+)
+
+// ✅ Cache expensive computations
+final cachedGradient = LinearGradient(...);
+
+// ❌ Never build heavy widgets inside build()
+// ❌ Avoid unnecessary AnimatedBuilder rebuilds
+```
+
+### State Management Best Practices
+
+#### Bloc Pattern (Recommended for Complex Apps)
+```dart
+// ✅ Separate events clearly
+abstract class UserEvent {}
+class LoadUser extends UserEvent {
+  final String userId;
+  LoadUser(this.userId);
+}
+class RefreshUser extends UserEvent {}
+
+// ✅ Use Equatable for state comparison
+class UserState extends Equatable {
+  final User? user;
+  final bool isLoading;
+  final String? error;
+
+  @override
+  List<Object?> get props => [user, isLoading, error];
+}
+
+// ✅ Use BlocListener for one-time effects (navigation, snackbar)
+BlocListener<AuthBloc, AuthState>(
+  listenWhen: (prev, curr) => prev.isLoggedIn != curr.isLoggedIn,
+  listener: (context, state) {
+    if (state.isLoggedIn) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  },
+  child: LoginForm(),
+)
+
+// ✅ Use BlocSelector for granular rebuilds
+BlocSelector<UserBloc, UserState, String>(
+  selector: (state) => state.user?.name ?? '',
+  builder: (context, name) => Text(name),
+)
+```
+
+#### Riverpod (Type-Safe Alternative)
+```dart
+// ✅ Use ref.watch for reactive rebuilds
+final userProvider = FutureProvider.family<User, String>((ref, id) async {
+  return ref.read(userRepositoryProvider).getUser(id);
+});
+
+// ✅ Use ref.listen for side effects
+ref.listen(authProvider, (prev, next) {
+  if (next.hasError) {
+    showSnackBar('Authentication failed');
+  }
+});
+
+// ✅ Dispose resources properly
+final timerProvider = Provider.autoDispose((ref) {
+  final timer = Timer.periodic(Duration(seconds: 1), (_) {});
+  ref.onDispose(() => timer.cancel());
+  return timer;
+});
+```
+
+### Navigation Best Practices
+```dart
+// ✅ Use named routes with arguments
+Navigator.pushNamed(
+  context,
+  '/user',
+  arguments: UserArguments(userId: '123'),
+);
+
+// ✅ Type-safe navigation with go_router
+GoRouter(
+  routes: [
+    GoRoute(
+      path: '/user/:id',
+      builder: (context, state) => UserScreen(
+        userId: state.pathParameters['id']!,
+      ),
+    ),
+  ],
+)
+
+// ✅ Deep linking support
+final router = GoRouter(
+  initialLocation: '/',
+  redirect: (context, state) {
+    final isLoggedIn = context.read<AuthBloc>().state.isLoggedIn;
+    if (!isLoggedIn && state.matchedLocation != '/login') {
+      return '/login';
+    }
+    return null;
+  },
+)
+
+// ✅ Pop with result
+final result = await Navigator.push<bool>(
+  context,
+  MaterialPageRoute(builder: (_) => ConfirmDialog()),
+);
+if (result == true) {
+  // Confirmed
+}
+```
+
+### Async Best Practices
+```dart
+// ✅ Cancel async operations in dispose
+class _MyWidgetState extends State<MyWidget> {
+  StreamSubscription? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = userStream.listen(_onData);
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();  // Critical!
+    super.dispose();
+  }
+}
+
+// ✅ Use CancelableOperation for cancellable futures
+final operation = CancelableOperation.fromFuture(
+  fetchUser(),
+);
+// Later: operation.cancel();
+
+// ✅ Debounce search input
+Timer? _debounce;
+void _onSearchChanged(String query) {
+  _debounce?.cancel();
+  _debounce = Timer(Duration(milliseconds: 300), () {
+    _performSearch(query);
+  });
+}
 ```
 
 ### Null Safety
@@ -316,23 +497,114 @@ ListView(
 String? name = user?.name;
 String displayName = name ?? 'Guest';
 
-// ✅ Late initialization
+// ✅ Late initialization (use sparingly)
 late final String apiKey;
 
-// ✅ Required parameters
-UserWidget({required this.userId});
+// ✅ Required parameters with super
+UserWidget({super.key, required this.userId});
+
+// ✅ Collection literals with null checks
+final items = [
+  if (user != null) UserItem(user),
+  ...additionalItems,
+];
+
+// ❌ Avoid bang operator (!) unless 100% sure
+// Bad: user!.name
+// Good: user?.name ?? 'Unknown'
 ```
 
 ### Error Handling
 ```dart
+// ✅ Type-specific error handling
 try {
   final user = await repository.getUser(userId);
   return UserLoaded(user);
 } on NetworkException catch (e) {
   return UserError('Network error: ${e.message}');
+} on AuthException catch (e) {
+  // Handle auth errors differently
+  return UserError('Auth failed: ${e.message}');
 } catch (e, stackTrace) {
   logger.error('Failed to load user', error: e, stackTrace: stackTrace);
   return UserError('Failed to load user');
+}
+
+// ✅ Use Result pattern for expected failures
+sealed class Result<T> {}
+class Success<T> extends Result<T> { final T value; }
+class Failure<T> extends Result<T> { final String error; }
+
+Future<Result<User>> getUser(String id) async {
+  try {
+    return Success(await api.getUser(id));
+  } catch (e) {
+    return Failure(e.toString());
+  }
+}
+```
+
+### Image & Asset Optimization
+```dart
+// ✅ Use cached_network_image
+CachedNetworkImage(
+  imageUrl: user.avatarUrl,
+  placeholder: (_, __) => CircularProgressIndicator(),
+  errorWidget: (_, __, ___) => Icon(Icons.error),
+  memCacheWidth: 200,  // Memory optimization
+)
+
+// ✅ Use flutter_svg for vector graphics
+SvgPicture.asset(
+  'assets/icons/logo.svg',
+  width: 48,
+  height: 48,
+)
+
+// ✅ Preload images
+precacheImage(NetworkImage(url), context);
+
+// ✅ Use ResizeImage for large images
+Image(
+  image: ResizeImage(
+    NetworkImage(url),
+    width: 200,
+    height: 200,
+  ),
+)
+```
+
+### Form Validation Best Practices
+```dart
+// ✅ Use Form with GlobalKey
+final _formKey = GlobalKey<FormState>();
+
+Form(
+  key: _formKey,
+  child: Column(
+    children: [
+      TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required field';
+          }
+          if (!RegExp(r'^[\w-\.]+@').hasMatch(value)) {
+            return 'Invalid email';
+          }
+          return null;
+        },
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+      ),
+    ],
+  ),
+)
+
+// Validate before submit
+void _submit() {
+  if (_formKey.currentState?.validate() ?? false) {
+    _formKey.currentState?.save();
+    // Proceed with submission
+  }
 }
 ```
 

@@ -325,6 +325,337 @@ if (isLeadData(data)) {
 
 ---
 
+## 🎯 Best Practices (CRITICAL)
+
+### React Navigation Hooks
+```typescript
+// ✅ useFocusEffect - Run effects on screen focus
+import { useFocusEffect } from '@react-navigation/native';
+
+const ProfileScreen = () => {
+  useFocusEffect(
+    useCallback(() => {
+      // Called when screen comes into focus
+      fetchUserData();
+
+      return () => {
+        // Called when screen goes out of focus
+        cancelPendingRequests();
+      };
+    }, [])
+  );
+};
+
+// ✅ useIsFocused - Check if screen is focused
+import { useIsFocused } from '@react-navigation/native';
+
+const CameraScreen = () => {
+  const isFocused = useIsFocused();
+
+  // Only render camera when screen is focused
+  return isFocused ? <Camera /> : null;
+};
+
+// ✅ useNavigation - Type-safe navigation
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Home: undefined;
+  Profile: { userId: string };
+  Settings: undefined;
+};
+
+const HomeScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const goToProfile = useCallback((userId: string) => {
+    navigation.navigate('Profile', { userId });
+  }, [navigation]);
+};
+
+// ✅ useRoute - Access route params with types
+import { useRoute, RouteProp } from '@react-navigation/native';
+
+const ProfileScreen = () => {
+  const route = useRoute<RouteProp<RootStackParamList, 'Profile'>>();
+  const { userId } = route.params; // Type-safe access
+};
+
+// ✅ useNavigationState - Access navigation state
+import { useNavigationState } from '@react-navigation/native';
+
+const MyComponent = () => {
+  const routesLength = useNavigationState(state => state.routes.length);
+  const currentRouteName = useNavigationState(
+    state => state.routes[state.index].name
+  );
+};
+
+// ✅ usePreventRemove - Prevent navigation away
+import { usePreventRemove } from '@react-navigation/native';
+
+const FormScreen = () => {
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  usePreventRemove(hasUnsavedChanges, ({ data }) => {
+    Alert.alert(
+      'Discard changes?',
+      'You have unsaved changes. Discard them?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Discard',
+          style: 'destructive',
+          onPress: () => data.action, // Continue navigation
+        },
+      ]
+    );
+  });
+};
+
+// ✅ useScrollToTop - Scroll to top on tab press
+import { useScrollToTop } from '@react-navigation/native';
+
+const FeedScreen = () => {
+  const scrollRef = useRef<FlatList>(null);
+  useScrollToTop(scrollRef); // Scrolls to top when tab is pressed
+
+  return <FlatList ref={scrollRef} data={items} />;
+};
+```
+
+### Performance Hooks (CRITICAL)
+```typescript
+// ✅ useMemo - Memoize expensive computations
+const sortedUsers = useMemo(() => {
+  return users.slice().sort((a, b) => a.name.localeCompare(b.name));
+}, [users]);
+
+const filteredData = useMemo(() => {
+  return data.filter(item =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  );
+}, [data, search]);
+
+// ✅ useCallback - Stable function references for child components
+const handlePress = useCallback(() => {
+  onSubmit(formData);
+}, [onSubmit, formData]);
+
+// ✅ ALWAYS use useCallback for functions passed to:
+// - FlatList renderItem
+// - Pressable/TouchableOpacity onPress
+// - Child components as props
+// - useEffect dependencies
+
+// ❌ BAD - Creates new function every render
+<FlatList
+  renderItem={({ item }) => <UserCard user={item} />}
+/>
+
+// ✅ GOOD - Stable function reference
+const renderItem = useCallback(
+  ({ item }: { item: User }) => <UserCard user={item} />,
+  []
+);
+<FlatList renderItem={renderItem} />
+```
+
+### useEffect Best Practices
+```typescript
+// ✅ Cleanup subscriptions and timers
+useEffect(() => {
+  const subscription = eventEmitter.addListener('event', handler);
+  return () => subscription.remove(); // Cleanup!
+}, []);
+
+useEffect(() => {
+  const timer = setTimeout(doSomething, 1000);
+  return () => clearTimeout(timer); // Cleanup!
+}, []);
+
+// ✅ Cancel async operations
+useEffect(() => {
+  let isMounted = true;
+
+  const fetchData = async () => {
+    const result = await api.getData();
+    if (isMounted) {
+      setData(result);
+    }
+  };
+
+  fetchData();
+  return () => { isMounted = false; };
+}, []);
+
+// ✅ AbortController for fetch
+useEffect(() => {
+  const controller = new AbortController();
+
+  fetch(url, { signal: controller.signal })
+    .then(res => res.json())
+    .then(setData)
+    .catch(err => {
+      if (err.name !== 'AbortError') setError(err);
+    });
+
+  return () => controller.abort();
+}, [url]);
+
+// ❌ NEVER ignore exhaustive-deps warning
+// ❌ NEVER use empty deps when values change
+```
+
+### FlatList Optimization
+```typescript
+// ✅ Always use keyExtractor
+<FlatList
+  data={items}
+  keyExtractor={(item) => item.id} // NOT index!
+  renderItem={renderItem}
+/>
+
+// ✅ Use getItemLayout for fixed-height items
+<FlatList
+  getItemLayout={(_, index) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  })}
+/>
+
+// ✅ Optimize with windowSize and maxToRenderPerBatch
+<FlatList
+  windowSize={5}          // Render 5 screens worth
+  maxToRenderPerBatch={10} // Render 10 items per batch
+  initialNumToRender={10}  // Initial render count
+  removeClippedSubviews={Platform.OS === 'android'}
+/>
+
+// ✅ Use React.memo for list items
+const UserCard = React.memo(({ user, onPress }: Props) => {
+  return (
+    <Pressable onPress={() => onPress(user.id)}>
+      <Text>{user.name}</Text>
+    </Pressable>
+  );
+});
+```
+
+### Image Performance
+```typescript
+// ✅ Use FastImage for network images
+import FastImage from 'react-native-fast-image';
+
+<FastImage
+  source={{ uri: imageUrl, priority: FastImage.priority.high }}
+  style={styles.image}
+  resizeMode={FastImage.resizeMode.cover}
+/>
+
+// ✅ Preload critical images
+FastImage.preload([
+  { uri: 'https://example.com/image1.jpg' },
+  { uri: 'https://example.com/image2.jpg' },
+]);
+
+// ✅ Use appropriate image sizes
+const imageSize = {
+  width: PixelRatio.getPixelSizeForLayoutSize(100),
+  height: PixelRatio.getPixelSizeForLayoutSize(100),
+};
+```
+
+### Animation Performance
+```typescript
+// ✅ Use Reanimated worklets for 60fps animations
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
+
+const Component = () => {
+  const offset = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: offset.value }],
+  }));
+
+  const handlePress = () => {
+    offset.value = withSpring(100);
+  };
+
+  return <Animated.View style={animatedStyle} />;
+};
+
+// ✅ Use useAnimatedGestureHandler for gestures
+const gestureHandler = useAnimatedGestureHandler({
+  onStart: (_, ctx) => {
+    ctx.startX = offset.value;
+  },
+  onActive: (event, ctx) => {
+    offset.value = ctx.startX + event.translationX;
+  },
+  onEnd: () => {
+    offset.value = withSpring(0);
+  },
+});
+```
+
+### State Management Best Practices
+```typescript
+// ✅ Use selectors for Zustand to prevent re-renders
+const userName = useBoundStore((state) => state.user.name);
+const updateUser = useBoundStore((state) => state.updateUser);
+
+// ❌ BAD - Subscribes to entire store
+const store = useBoundStore();
+const { user } = store; // Re-renders on ANY store change
+
+// ✅ GOOD - Subscribes only to user.name
+const userName = useBoundStore((state) => state.user.name);
+
+// ✅ Use shallow equality for objects
+import { shallow } from 'zustand/shallow';
+
+const { user, settings } = useBoundStore(
+  (state) => ({ user: state.user, settings: state.settings }),
+  shallow
+);
+```
+
+### Memory Leak Prevention
+```typescript
+// ✅ Clean up event listeners
+useEffect(() => {
+  const subscription = AppState.addEventListener('change', handleChange);
+  return () => subscription.remove();
+}, []);
+
+// ✅ Clean up keyboard listeners
+useEffect(() => {
+  const showSub = Keyboard.addListener('keyboardDidShow', onKeyboardShow);
+  const hideSub = Keyboard.addListener('keyboardDidHide', onKeyboardHide);
+
+  return () => {
+    showSub.remove();
+    hideSub.remove();
+  };
+}, []);
+
+// ✅ Cancel navigation listeners
+useEffect(() => {
+  const unsubscribe = navigation.addListener('focus', handleFocus);
+  return unsubscribe;
+}, [navigation]);
+```
+
+---
+
 ## 🎨 Styling Conventions (Adaptive)
 
 ### STEP 1: Detect Project Styling Approach

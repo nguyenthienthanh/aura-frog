@@ -317,7 +317,7 @@ export class UserFormComponent {
 
 ---
 
-## 🎨 Best Practices
+## 🎨 Best Practices (CRITICAL)
 
 ### Component Design
 ```typescript
@@ -327,53 +327,309 @@ export class UserFormComponent {
   imports: [CommonModule, FormsModule]
 })
 
-// ✅ OnPush change detection
+// ✅ OnPush change detection (ALWAYS for performance)
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-// ✅ Use signals (Angular 16+)
+// ✅ Use signals (Angular 16+) - Preferred over BehaviorSubject
 count = signal(0);
 increment() { this.count.update(v => v + 1); }
+
+// ✅ Use inject() function instead of constructor injection
+export class UserComponent {
+  private userService = inject(UserService);
+  private router = inject(Router);
+}
 ```
 
-### RxJS Subscription Management
+### Signals Best Practices (Angular 16+)
 ```typescript
-// ✅ Use async pipe (auto-unsubscribe)
+// ✅ Basic signals
+const count = signal(0);
+count.set(5);           // Set new value
+count.update(v => v + 1); // Update based on previous
+
+// ✅ Computed signals (memoized, auto-tracked)
+const firstName = signal('John');
+const lastName = signal('Doe');
+const fullName = computed(() => `${firstName()} ${lastName()}`);
+
+// ✅ Effects for side effects (logging, localStorage, etc.)
+effect(() => {
+  console.log('User changed:', this.user());
+  localStorage.setItem('user', JSON.stringify(this.user()));
+});
+
+// ✅ toSignal() - Convert Observable to Signal
+import { toSignal } from '@angular/core/rxjs-interop';
+
+users = toSignal(this.userService.getUsers(), { initialValue: [] });
+
+// ✅ toObservable() - Convert Signal to Observable
+import { toObservable } from '@angular/core/rxjs-interop';
+
+userId$ = toObservable(this.userId);
+
+// ✅ Signal inputs (Angular 17.1+)
+@Component({...})
+export class UserCard {
+  userId = input.required<string>();       // Required input
+  showAvatar = input(true);                // Optional with default
+  user = input<User>();                    // Optional
+}
+
+// ✅ Model inputs for two-way binding (Angular 17.2+)
+value = model<string>('');  // Creates [(value)] binding
+
+// ✅ Output with outputFromObservable
+userSelected = output<User>();
+this.userSelected.emit(user);
+```
+
+### RxJS Best Practices
+```typescript
+// ✅ Use async pipe (auto-unsubscribe, triggers OnPush)
 users$ = this.userService.getUsers();
-// Template: users$ | async
+// Template: {{ users$ | async }}
 
-// ✅ takeUntil pattern
-private destroy$ = new Subject<void>();
+// ✅ takeUntilDestroyed() (Angular 16+) - Cleaner than takeUntil
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-ngOnInit() {
-  this.userService.getUsers()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(users => this.users = users);
+@Component({...})
+export class UserComponent {
+  private destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    this.userService.getUsers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(users => this.users.set(users));
+  }
 }
 
-ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
+// ✅ shareReplay for cached observables
+users$ = this.http.get<User[]>('/api/users').pipe(
+  shareReplay({ bufferSize: 1, refCount: true })
+);
+
+// ✅ distinctUntilChanged for preventing duplicate emissions
+search$ = this.searchControl.valueChanges.pipe(
+  debounceTime(300),
+  distinctUntilChanged(),
+  switchMap(term => this.searchService.search(term))
+);
+
+// ✅ catchError with typed errors
+getUser(id: string) {
+  return this.http.get<User>(`/api/users/${id}`).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 404) {
+        return of(null);
+      }
+      return throwError(() => error);
+    })
+  );
 }
+
+// ❌ Avoid nested subscribes
+// Bad:
+this.user$.subscribe(user => {
+  this.posts$.subscribe(posts => {...}); // Nested!
+});
+
+// ✅ Good: Use operators
+combineLatest([this.user$, this.posts$]).pipe(
+  map(([user, posts]) => ({ user, posts }))
+).subscribe(data => {...});
+```
+
+### Performance Optimization
+```typescript
+// ✅ trackBy for @for (Angular 17+)
+@for (user of users(); track user.id) {
+  <user-card [user]="user" />
+}
+
+// ✅ Defer loading (Angular 17+) - Lazy load heavy components
+@defer (on viewport) {
+  <heavy-chart-component />
+} @placeholder {
+  <p>Chart loading...</p>
+} @loading (minimum 500ms) {
+  <spinner />
+}
+
+// ✅ Preload on interaction
+@defer (on interaction; prefetch on hover) {
+  <modal-content />
+}
+
+// ✅ Virtual scrolling for long lists
+import { ScrollingModule } from '@angular/cdk/scrolling';
+
+<cdk-virtual-scroll-viewport itemSize="50" class="viewport">
+  <div *cdkVirtualFor="let item of items" class="item">
+    {{ item.name }}
+  </div>
+</cdk-virtual-scroll-viewport>
+
+// ✅ Lazy load routes
+export const routes: Routes = [
+  {
+    path: 'admin',
+    loadComponent: () => import('./admin/admin.component')
+      .then(m => m.AdminComponent)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./dashboard/dashboard.routes')
+  }
+];
 ```
 
 ### Control Flow (Angular 17+)
 ```typescript
-// ✅ New syntax (Angular 17+)
-@if (loading) {
+// ✅ New syntax (Angular 17+) - Better performance, type narrowing
+@if (loading()) {
   <p>Loading...</p>
-} @else if (users.length > 0) {
-  @for (user of users; track user.id) {
-    <p>{{ user.name }}</p>
+} @else if (users().length > 0) {
+  @for (user of users(); track user.id) {
+    <user-card [user]="user" />
+  } @empty {
+    <p>No users found</p>
   }
 } @else {
   <p>No users</p>
 }
 
-// ❌ Old syntax (still works, but prefer new)
-<p *ngIf="loading">Loading...</p>
-<p *ngFor="let user of users; trackBy: trackById">{{ user.name }}</p>
+// ✅ @switch for multiple conditions
+@switch (status()) {
+  @case ('loading') { <spinner /> }
+  @case ('error') { <error-message /> }
+  @case ('success') { <content /> }
+  @default { <placeholder /> }
+}
+
+// ❌ Avoid old syntax in new projects
+// *ngIf, *ngFor, *ngSwitch - prefer @if, @for, @switch
+```
+
+### HTTP & API Best Practices
+```typescript
+// ✅ Typed HTTP responses
+interface ApiResponse<T> {
+  data: T;
+  meta: { total: number };
+}
+
+getUsers(): Observable<ApiResponse<User[]>> {
+  return this.http.get<ApiResponse<User[]>>('/api/users');
+}
+
+// ✅ HTTP interceptors (functional style - Angular 17+)
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = inject(AuthService).getToken();
+  if (token) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  }
+  return next(req);
+};
+
+// ✅ Error interceptor
+export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        inject(Router).navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
+  );
+};
+
+// Register in app.config.ts
+provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]))
+```
+
+### Forms Best Practices
+```typescript
+// ✅ Typed reactive forms (Angular 14+)
+interface UserForm {
+  name: FormControl<string>;
+  email: FormControl<string>;
+  roles: FormArray<FormControl<string>>;
+}
+
+form = new FormGroup<UserForm>({
+  name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+  email: new FormControl('', { nonNullable: true, validators: [Validators.email] }),
+  roles: new FormArray<FormControl<string>>([])
+});
+
+// ✅ Custom validators
+const passwordMatchValidator: ValidatorFn = (control: AbstractControl) => {
+  const password = control.get('password');
+  const confirm = control.get('confirmPassword');
+  return password?.value === confirm?.value ? null : { passwordMismatch: true };
+};
+
+// ✅ Async validators
+const uniqueEmailValidator: AsyncValidatorFn = (control) => {
+  return inject(UserService).checkEmail(control.value).pipe(
+    map(exists => exists ? { emailTaken: true } : null),
+    catchError(() => of(null))
+  );
+};
+```
+
+### State Management (NgRx Best Practices)
+```typescript
+// ✅ Use createFeature for reducers (NgRx 15+)
+export const usersFeature = createFeature({
+  name: 'users',
+  reducer: createReducer(
+    initialState,
+    on(UsersActions.loadSuccess, (state, { users }) => ({
+      ...state,
+      users,
+      loading: false
+    }))
+  ),
+  extraSelectors: ({ selectUsers }) => ({
+    selectActiveUsers: createSelector(
+      selectUsers,
+      users => users.filter(u => u.active)
+    )
+  })
+});
+
+// ✅ Use createActionGroup
+export const UsersActions = createActionGroup({
+  source: 'Users',
+  events: {
+    'Load': emptyProps(),
+    'Load Success': props<{ users: User[] }>(),
+    'Load Failure': props<{ error: string }>(),
+  }
+});
+
+// ✅ Functional effects (NgRx 15+)
+export const loadUsers = createEffect(
+  (actions$ = inject(Actions), userService = inject(UserService)) => {
+    return actions$.pipe(
+      ofType(UsersActions.load),
+      exhaustMap(() =>
+        userService.getUsers().pipe(
+          map(users => UsersActions.loadSuccess({ users })),
+          catchError(error => of(UsersActions.loadFailure({ error: error.message })))
+        )
+      )
+    );
+  },
+  { functional: true }
+);
 ```
 
 ---

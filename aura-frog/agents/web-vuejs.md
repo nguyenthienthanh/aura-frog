@@ -142,21 +142,365 @@ export const useMyStore = defineStore('my', {
     items: [] as Item[],
     selectedItem: null as Item | null,
   }),
-  
+
   getters: {
     activeItems: (state) => state.items.filter(i => i.active),
   },
-  
+
   actions: {
     async fetchItems() {
       this.items = await api.getItems();
     },
-    
+
     selectItem(item: Item) {
       this.selectedItem = item;
     },
   },
 });
+```
+
+---
+
+## 🎯 Best Practices (CRITICAL)
+
+### Reactivity Best Practices
+```typescript
+// ✅ Use ref for primitives
+const count = ref(0);
+const isLoading = ref(false);
+
+// ✅ Use reactive for objects (but prefer ref)
+const state = reactive({ count: 0, name: '' });
+
+// ✅ Use shallowRef for large objects that don't need deep reactivity
+const users = shallowRef<User[]>([]);
+users.value = newUsers; // Triggers reactivity
+
+// ✅ Use shallowReactive for performance
+const state = shallowReactive({
+  nested: { /* won't be reactive */ }
+});
+
+// ✅ toRef for reactive property extraction
+const props = defineProps<{ user: User }>();
+const userName = toRef(props, 'user'); // Keeps reactivity
+
+// ✅ Use computed for derived state (cached)
+const fullName = computed(() => `${firstName.value} ${lastName.value}`);
+
+// ❌ Never destructure reactive objects
+// Bad: const { count } = reactive({ count: 0 }); // Loses reactivity
+// Good: const state = reactive({ count: 0 }); state.count++;
+```
+
+### Composables Best Practices
+```typescript
+// ✅ Return reactive state, readonly when needed
+export function useUser(id: Ref<string>) {
+  const user = ref<User | null>(null);
+  const isLoading = ref(false);
+  const error = ref<Error | null>(null);
+
+  const fetchUser = async () => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      user.value = await api.getUser(id.value);
+    } catch (e) {
+      error.value = e as Error;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // Watch for id changes
+  watch(id, fetchUser, { immediate: true });
+
+  return {
+    user: readonly(user),      // Prevent external mutation
+    isLoading: readonly(isLoading),
+    error: readonly(error),
+    refetch: fetchUser,
+  };
+}
+
+// ✅ Accept both ref and raw values
+export function useFetch(url: MaybeRef<string>) {
+  const resolvedUrl = toRef(url); // Converts raw to ref if needed
+  // ...
+}
+
+// ✅ Cleanup side effects
+export function useEventListener(
+  target: EventTarget,
+  event: string,
+  handler: EventListener
+) {
+  onMounted(() => target.addEventListener(event, handler));
+  onUnmounted(() => target.removeEventListener(event, handler));
+}
+```
+
+### Watch & WatchEffect Best Practices
+```typescript
+// ✅ watch - explicit dependencies
+watch(userId, async (newId, oldId) => {
+  if (newId !== oldId) {
+    user.value = await fetchUser(newId);
+  }
+});
+
+// ✅ Watch multiple sources
+watch([firstName, lastName], ([newFirst, newLast]) => {
+  fullName.value = `${newFirst} ${newLast}`;
+});
+
+// ✅ Deep watch for objects (use sparingly - expensive)
+watch(
+  () => state.nested,
+  (newVal) => { /* ... */ },
+  { deep: true }
+);
+
+// ✅ watchEffect - auto-tracks dependencies
+watchEffect(async () => {
+  // Automatically tracks userId.value
+  user.value = await fetchUser(userId.value);
+});
+
+// ✅ Stop watcher when done
+const stop = watchEffect(() => { /* ... */ });
+// Later: stop();
+
+// ✅ Flush timing
+watch(source, callback, {
+  flush: 'post' // After DOM update (default: 'pre')
+});
+
+// ✅ watchPostEffect for DOM updates
+watchPostEffect(() => {
+  // Runs after DOM updates
+  element.value?.focus();
+});
+```
+
+### Performance Optimization
+```typescript
+// ✅ v-memo for list items (Vue 3.2+)
+<div v-for="item in items" :key="item.id" v-memo="[item.selected]">
+  {{ item.name }}
+</div>
+
+// ✅ defineAsyncComponent for lazy loading
+const HeavyComponent = defineAsyncComponent(() =>
+  import('./HeavyComponent.vue')
+);
+
+// With loading/error states
+const AsyncComp = defineAsyncComponent({
+  loader: () => import('./Comp.vue'),
+  loadingComponent: LoadingSpinner,
+  errorComponent: ErrorDisplay,
+  delay: 200,
+  timeout: 3000,
+});
+
+// ✅ Use keep-alive for cached components
+<KeepAlive :max="10">
+  <component :is="currentView" />
+</KeepAlive>
+
+// ✅ Use v-once for static content
+<div v-once>{{ staticContent }}</div>
+
+// ✅ Debounce expensive operations
+const debouncedSearch = useDebounceFn(search, 300);
+
+// ✅ Virtual scrolling for long lists (vue-virtual-scroller)
+<RecycleScroller
+  :items="items"
+  :item-size="50"
+  key-field="id"
+  v-slot="{ item }"
+>
+  <ItemRow :item="item" />
+</RecycleScroller>
+```
+
+### Props & Emits Best Practices
+```typescript
+// ✅ Type-safe props with defaults
+interface Props {
+  title: string;
+  count?: number;
+  user?: User;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  count: 0,
+  user: () => ({ name: 'Guest' }), // Factory for objects
+});
+
+// ✅ Type-safe emits
+const emit = defineEmits<{
+  update: [value: string];
+  delete: [id: number];
+  'update:modelValue': [value: string]; // v-model
+}>();
+
+// ✅ v-model with defineModel (Vue 3.4+)
+const modelValue = defineModel<string>(); // Creates v-model binding
+const count = defineModel<number>('count'); // Named v-model
+
+// ✅ Expose specific properties to parent
+defineExpose({
+  focus: () => inputRef.value?.focus(),
+  reset,
+});
+```
+
+### Template Best Practices
+```typescript
+// ✅ Use :key for v-for (always use unique id, not index)
+<div v-for="user in users" :key="user.id">
+
+// ✅ Avoid v-if with v-for (use computed instead)
+// ❌ Bad:
+<div v-for="user in users" v-if="user.active">
+
+// ✅ Good:
+const activeUsers = computed(() => users.filter(u => u.active));
+<div v-for="user in activeUsers" :key="user.id">
+
+// ✅ Use template refs with typing
+const inputRef = ref<HTMLInputElement | null>(null);
+const childRef = ref<InstanceType<typeof ChildComponent> | null>(null);
+
+// ✅ Teleport for modals/tooltips
+<Teleport to="body">
+  <Modal v-if="showModal" />
+</Teleport>
+```
+
+### Pinia Best Practices
+```typescript
+// ✅ Setup store syntax (preferred for TypeScript)
+export const useUserStore = defineStore('user', () => {
+  // State
+  const user = ref<User | null>(null);
+  const isLoading = ref(false);
+
+  // Getters (computed)
+  const isLoggedIn = computed(() => !!user.value);
+  const fullName = computed(() =>
+    user.value ? `${user.value.firstName} ${user.value.lastName}` : ''
+  );
+
+  // Actions
+  async function login(credentials: Credentials) {
+    isLoading.value = true;
+    try {
+      user.value = await authApi.login(credentials);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  function logout() {
+    user.value = null;
+  }
+
+  return {
+    user: readonly(user),
+    isLoading: readonly(isLoading),
+    isLoggedIn,
+    fullName,
+    login,
+    logout,
+  };
+});
+
+// ✅ Use storeToRefs for reactive destructuring
+const store = useUserStore();
+const { user, isLoggedIn } = storeToRefs(store); // Keeps reactivity
+const { login, logout } = store; // Actions don't need storeToRefs
+
+// ✅ Persist store (pinia-plugin-persistedstate)
+export const useSettingsStore = defineStore('settings', {
+  state: () => ({ theme: 'light' }),
+  persist: true, // or { storage: sessionStorage }
+});
+```
+
+### Router Best Practices
+```typescript
+// ✅ Navigation guards in composition API
+onBeforeRouteLeave((to, from) => {
+  if (hasUnsavedChanges.value) {
+    return confirm('Discard changes?');
+  }
+});
+
+onBeforeRouteUpdate(async (to) => {
+  await loadUser(to.params.id);
+});
+
+// ✅ Type-safe route params
+const route = useRoute();
+const userId = computed(() => route.params.id as string);
+
+// ✅ Programmatic navigation
+const router = useRouter();
+router.push({ name: 'user', params: { id: '123' } });
+router.replace({ path: '/login' });
+router.go(-1);
+
+// ✅ Route-level code splitting
+const routes = [
+  {
+    path: '/dashboard',
+    component: () => import('./views/Dashboard.vue'),
+    meta: { requiresAuth: true },
+  },
+];
+```
+
+### Error Handling Best Practices
+```typescript
+// ✅ Error boundaries (errorCaptured)
+onErrorCaptured((error, instance, info) => {
+  logError(error, info);
+  return false; // Prevent propagation
+});
+
+// ✅ Global error handler
+app.config.errorHandler = (err, instance, info) => {
+  console.error('Global error:', err);
+  reportToSentry(err);
+};
+
+// ✅ Async error handling in composables
+export function useAsyncData<T>(fetcher: () => Promise<T>) {
+  const data = ref<T | null>(null);
+  const error = ref<Error | null>(null);
+  const isLoading = ref(true);
+
+  const execute = async () => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      data.value = await fetcher();
+    } catch (e) {
+      error.value = e as Error;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  execute();
+
+  return { data, error, isLoading, refetch: execute };
+}
 ```
 
 ---

@@ -618,6 +618,427 @@ export class UsersController {
 
 ---
 
+## 🎯 Best Practices (CRITICAL)
+
+### Async/Await Best Practices
+```typescript
+// ✅ Use Promise.all for parallel operations
+async function getUserDashboard(userId: string) {
+  const [user, posts, notifications] = await Promise.all([
+    getUser(userId),
+    getUserPosts(userId),
+    getNotifications(userId),
+  ]);
+  return { user, posts, notifications };
+}
+
+// ✅ Use Promise.allSettled when some failures are acceptable
+const results = await Promise.allSettled([
+  fetchFromAPI1(),
+  fetchFromAPI2(),
+  fetchFromAPI3(),
+]);
+
+const successful = results
+  .filter((r) => r.status === 'fulfilled')
+  .map((r) => r.value);
+
+// ✅ Handle async errors properly
+async function safeOperation() {
+  try {
+    return await riskyOperation();
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      throw new BadRequestError(error.message);
+    }
+    logger.error('Operation failed', { error });
+    throw new InternalError('Operation failed');
+  }
+}
+
+// ✅ Use AbortController for cancellable requests
+async function fetchWithTimeout(url: string, timeout = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    return response.json();
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// ❌ Never use async in Array.forEach
+// Bad:
+items.forEach(async (item) => await process(item)); // Fire and forget!
+
+// ✅ Good:
+await Promise.all(items.map((item) => process(item)));
+// Or sequential:
+for (const item of items) {
+  await process(item);
+}
+```
+
+### Error Handling Best Practices
+```typescript
+// ✅ Custom error hierarchy
+class AppError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 500,
+    public code: string = 'INTERNAL_ERROR',
+    public isOperational: boolean = true
+  ) {
+    super(message);
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(`${resource} not found`, 404, 'NOT_FOUND');
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message: string, public details?: Record<string, string[]>) {
+    super(message, 400, 'VALIDATION_ERROR');
+  }
+}
+
+// ✅ Express async error handler wrapper
+const asyncHandler = (fn: RequestHandler): RequestHandler => {
+  return (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
+
+router.get('/users/:id', asyncHandler(async (req, res) => {
+  const user = await userService.findById(req.params.id);
+  if (!user) throw new NotFoundError('User');
+  res.json(user);
+}));
+
+// ✅ Global error handler
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      status: 'error',
+      code: err.code,
+      message: err.message,
+      ...(err instanceof ValidationError && { details: err.details }),
+    });
+  }
+
+  // Log unexpected errors
+  logger.error('Unexpected error', { error: err, path: req.path });
+
+  res.status(500).json({
+    status: 'error',
+    code: 'INTERNAL_ERROR',
+    message: 'Something went wrong',
+  });
+});
+```
+
+### Memory Management
+```typescript
+// ✅ Stream large files instead of loading into memory
+import { createReadStream } from 'fs';
+import { pipeline } from 'stream/promises';
+
+async function processLargeFile(filePath: string, res: Response) {
+  const stream = createReadStream(filePath);
+  await pipeline(stream, res);
+}
+
+// ✅ Use cursor-based pagination for large datasets
+async function getUsers(cursor?: string, limit = 20) {
+  const query = User.find();
+
+  if (cursor) {
+    query.where('_id').gt(cursor);
+  }
+
+  const users = await query.limit(limit + 1).exec();
+  const hasMore = users.length > limit;
+
+  return {
+    data: users.slice(0, limit),
+    nextCursor: hasMore ? users[limit - 1]._id : null,
+  };
+}
+
+// ✅ Implement circuit breaker for external services
+class CircuitBreaker {
+  private failures = 0;
+  private lastFailure: number | null = null;
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
+
+  constructor(
+    private threshold: number = 5,
+    private timeout: number = 30000
+  ) {}
+
+  async execute<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (Date.now() - (this.lastFailure ?? 0) > this.timeout) {
+        this.state = 'HALF_OPEN';
+      } else {
+        throw new Error('Circuit breaker is OPEN');
+      }
+    }
+
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure();
+      throw error;
+    }
+  }
+
+  private onSuccess() {
+    this.failures = 0;
+    this.state = 'CLOSED';
+  }
+
+  private onFailure() {
+    this.failures++;
+    this.lastFailure = Date.now();
+    if (this.failures >= this.threshold) {
+      this.state = 'OPEN';
+    }
+  }
+}
+```
+
+### Database Best Practices
+```typescript
+// ✅ Use transactions for multi-step operations
+async function transferFunds(fromId: string, toId: string, amount: number) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    await Account.updateOne(
+      { _id: fromId },
+      { $inc: { balance: -amount } },
+      { session }
+    );
+    await Account.updateOne(
+      { _id: toId },
+      { $inc: { balance: amount } },
+      { session }
+    );
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+}
+
+// ✅ Use connection pooling
+const pool = new Pool({
+  max: 20,        // Max connections
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// ✅ Prevent N+1 with eager loading (Prisma)
+const users = await prisma.user.findMany({
+  include: { posts: true, profile: true },
+});
+
+// ✅ Use database indexes
+// In Prisma schema:
+// @@index([email])
+// @@index([createdAt(sort: Desc)])
+
+// ✅ Batch operations
+await prisma.user.createMany({
+  data: users,
+  skipDuplicates: true,
+});
+```
+
+### Security Best Practices
+```typescript
+// ✅ Validate and sanitize input
+import { z } from 'zod';
+
+const createUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2).max(100),
+  password: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/),
+});
+
+// ✅ Rate limiting
+import rateLimit from 'express-rate-limit';
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: 'Too many requests',
+  standardHeaders: true,
+});
+
+app.use('/api/', apiLimiter);
+
+// ✅ Helmet for security headers
+import helmet from 'helmet';
+app.use(helmet());
+
+// ✅ CORS configuration
+import cors from 'cors';
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(','),
+  credentials: true,
+}));
+
+// ✅ Never expose stack traces in production
+if (process.env.NODE_ENV !== 'development') {
+  app.use((err, req, res, next) => {
+    res.status(500).json({ error: 'Internal server error' });
+  });
+}
+
+// ✅ Use parameterized queries (Prisma does this automatically)
+// Never: `SELECT * FROM users WHERE email = '${email}'`
+// Always use ORM or parameterized queries
+```
+
+### Performance Optimization
+```typescript
+// ✅ Use compression middleware
+import compression from 'compression';
+app.use(compression());
+
+// ✅ Cache responses
+import NodeCache from 'node-cache';
+
+const cache = new NodeCache({ stdTTL: 300 }); // 5 minutes
+
+async function getCachedUsers() {
+  const cached = cache.get<User[]>('users');
+  if (cached) return cached;
+
+  const users = await prisma.user.findMany();
+  cache.set('users', users);
+  return users;
+}
+
+// ✅ Use Redis for distributed caching
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
+
+async function getCachedData<T>(key: string, ttl: number, fn: () => Promise<T>): Promise<T> {
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const data = await fn();
+  await redis.setex(key, ttl, JSON.stringify(data));
+  return data;
+}
+
+// ✅ Use worker threads for CPU-intensive tasks
+import { Worker } from 'worker_threads';
+
+function runWorker(workerPath: string, data: unknown): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(workerPath, { workerData: data });
+    worker.on('message', resolve);
+    worker.on('error', reject);
+    worker.on('exit', (code) => {
+      if (code !== 0) reject(new Error(`Worker stopped with code ${code}`));
+    });
+  });
+}
+```
+
+### Logging Best Practices
+```typescript
+// ✅ Structured logging with context
+import pino from 'pino';
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  redact: ['password', 'token', 'authorization'],
+});
+
+// Add request context
+app.use((req, res, next) => {
+  req.log = logger.child({
+    requestId: req.headers['x-request-id'] || crypto.randomUUID(),
+    path: req.path,
+    method: req.method,
+  });
+  next();
+});
+
+// ✅ Log at appropriate levels
+logger.debug('Detailed debug info');
+logger.info('User created', { userId: user.id });
+logger.warn('Deprecated endpoint used', { endpoint: req.path });
+logger.error('Failed to process', { error, userId });
+
+// ✅ Never log sensitive data
+// Bad: logger.info('Login', { password });
+// Good: logger.info('Login attempt', { email });
+```
+
+### Testing Best Practices
+```typescript
+// ✅ Use factories for test data
+import { faker } from '@faker-js/faker';
+
+const createUser = (overrides?: Partial<User>): User => ({
+  id: faker.string.uuid(),
+  email: faker.internet.email(),
+  name: faker.person.fullName(),
+  createdAt: new Date(),
+  ...overrides,
+});
+
+// ✅ Test with supertest
+import request from 'supertest';
+
+describe('POST /users', () => {
+  it('creates a user', async () => {
+    const response = await request(app)
+      .post('/users')
+      .send({ email: 'test@example.com', name: 'Test' })
+      .expect(201);
+
+    expect(response.body.data).toMatchObject({
+      email: 'test@example.com',
+      name: 'Test',
+    });
+  });
+
+  it('returns 400 for invalid email', async () => {
+    await request(app)
+      .post('/users')
+      .send({ email: 'invalid', name: 'Test' })
+      .expect(400);
+  });
+});
+
+// ✅ Mock external services
+jest.mock('./services/email', () => ({
+  sendEmail: jest.fn().mockResolvedValue(undefined),
+}));
+```
+
+---
+
 ## 🔍 Quality Standards
 
 ### Code Quality

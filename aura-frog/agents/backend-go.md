@@ -238,19 +238,415 @@ myapp/
 - Types/Functions: `PascalCase` (exported), `camelCase` (unexported)
 - Constants: `PascalCase` or `UPPER_CASE`
 
+---
+
+## 🎯 Best Practices (CRITICAL)
+
 ### Error Handling
 ```go
-// Always check errors
+// ✅ Always check errors - NEVER ignore
 user, err := userService.GetUser(id)
 if err != nil {
-    return nil, fmt.Errorf("get user: %w", err)
+    return nil, fmt.Errorf("get user: %w", err) // Wrap with context
 }
 
-// Custom errors
-var ErrUserNotFound = errors.New("user not found")
+// ✅ Custom sentinel errors
+var (
+    ErrUserNotFound = errors.New("user not found")
+    ErrInvalidInput = errors.New("invalid input")
+)
 
 if user == nil {
-    return ErrUserNotFound
+    return nil, ErrUserNotFound
+}
+
+// ✅ Check for specific errors
+if errors.Is(err, ErrUserNotFound) {
+    return c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+}
+
+// ✅ Custom error types with context
+type ValidationError struct {
+    Field   string
+    Message string
+}
+
+func (e ValidationError) Error() string {
+    return fmt.Sprintf("validation error: %s - %s", e.Field, e.Message)
+}
+
+// ✅ Error wrapping with stack traces (pkg/errors)
+import "github.com/pkg/errors"
+return errors.Wrap(err, "failed to fetch user")
+
+// ❌ Never do this
+_ = SomeFunction() // Ignoring error!
+```
+
+### Concurrency Best Practices
+```go
+// ✅ Always use context for cancellation
+func (s *Service) FetchUser(ctx context.Context, id string) (*User, error) {
+    select {
+    case <-ctx.Done():
+        return nil, ctx.Err()
+    default:
+    }
+
+    // Proceed with operation
+    return s.repo.GetUser(ctx, id)
+}
+
+// ✅ Worker pool pattern
+func processItems(ctx context.Context, items []Item, workers int) []Result {
+    jobs := make(chan Item, len(items))
+    results := make(chan Result, len(items))
+
+    // Start workers
+    var wg sync.WaitGroup
+    for i := 0; i < workers; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for item := range jobs {
+                select {
+                case <-ctx.Done():
+                    return
+                case results <- processItem(item):
+                }
+            }
+        }()
+    }
+
+    // Send jobs
+    for _, item := range items {
+        jobs <- item
+    }
+    close(jobs)
+
+    // Wait and collect
+    go func() {
+        wg.Wait()
+        close(results)
+    }()
+
+    var output []Result
+    for r := range results {
+        output = append(output, r)
+    }
+    return output
+}
+
+// ✅ Use errgroup for parallel operations with error handling
+import "golang.org/x/sync/errgroup"
+
+func fetchAllData(ctx context.Context) (*Data, error) {
+    g, ctx := errgroup.WithContext(ctx)
+    var users []User
+    var orders []Order
+
+    g.Go(func() error {
+        var err error
+        users, err = fetchUsers(ctx)
+        return err
+    })
+
+    g.Go(func() error {
+        var err error
+        orders, err = fetchOrders(ctx)
+        return err
+    })
+
+    if err := g.Wait(); err != nil {
+        return nil, err
+    }
+
+    return &Data{Users: users, Orders: orders}, nil
+}
+
+// ✅ Mutex for shared state
+type SafeCounter struct {
+    mu    sync.RWMutex
+    count int
+}
+
+func (c *SafeCounter) Inc() {
+    c.mu.Lock()
+    defer c.mu.Unlock()
+    c.count++
+}
+
+func (c *SafeCounter) Get() int {
+    c.mu.RLock()
+    defer c.mu.RUnlock()
+    return c.count
+}
+
+// ✅ Use sync.Once for initialization
+var (
+    instance *Service
+    once     sync.Once
+)
+
+func GetService() *Service {
+    once.Do(func() {
+        instance = &Service{}
+    })
+    return instance
+}
+
+// ❌ Goroutine leaks - Always ensure goroutines can exit
+// Bad:
+go func() {
+    for {
+        // Infinite loop with no exit
+    }
+}()
+
+// ✅ Good:
+go func(ctx context.Context) {
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        default:
+            // work
+        }
+    }
+}(ctx)
+```
+
+### Context Best Practices
+```go
+// ✅ Pass context as first parameter
+func (s *Service) GetUser(ctx context.Context, id string) (*User, error) {
+    return s.repo.FindByID(ctx, id)
+}
+
+// ✅ Set timeouts
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel() // Always defer cancel!
+
+result, err := service.LongOperation(ctx)
+
+// ✅ Pass values through context (sparingly)
+type contextKey string
+const userIDKey contextKey = "userID"
+
+ctx = context.WithValue(ctx, userIDKey, "123")
+userID := ctx.Value(userIDKey).(string)
+
+// ✅ Check context cancellation in loops
+for _, item := range items {
+    if ctx.Err() != nil {
+        return ctx.Err()
+    }
+    process(item)
+}
+```
+
+### Memory Management
+```go
+// ✅ Preallocate slices when size is known
+users := make([]User, 0, len(ids)) // Preallocate capacity
+for _, id := range ids {
+    users = append(users, fetchUser(id))
+}
+
+// ✅ Use sync.Pool for frequently allocated objects
+var bufferPool = sync.Pool{
+    New: func() interface{} {
+        return new(bytes.Buffer)
+    },
+}
+
+func process(data []byte) {
+    buf := bufferPool.Get().(*bytes.Buffer)
+    defer func() {
+        buf.Reset()
+        bufferPool.Put(buf)
+    }()
+    // Use buf...
+}
+
+// ✅ Avoid string concatenation in loops
+var builder strings.Builder
+for _, s := range strings {
+    builder.WriteString(s)
+}
+result := builder.String()
+
+// ✅ Use pointers for large structs
+func ProcessLargeData(data *LargeStruct) {} // Pass pointer, not value
+
+// ❌ Don't return slices of pointers if data is small
+// Bad: func GetIDs() []*int
+// Good: func GetIDs() []int
+```
+
+### Interface Best Practices
+```go
+// ✅ Accept interfaces, return structs
+type UserRepository interface {
+    FindByID(ctx context.Context, id string) (*User, error)
+    Save(ctx context.Context, user *User) error
+}
+
+func NewUserService(repo UserRepository) *UserService {
+    return &UserService{repo: repo}
+}
+
+// ✅ Keep interfaces small (1-3 methods)
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+// ✅ Define interfaces where they're used, not implemented
+// In consumer package:
+type UserFetcher interface {
+    GetUser(ctx context.Context, id string) (*User, error)
+}
+
+// ❌ Avoid empty interface (any) unless necessary
+// Bad: func Process(data interface{})
+// Good: func Process(data UserData)
+```
+
+### HTTP Handler Best Practices
+```go
+// ✅ Structured response format
+type Response struct {
+    Data    interface{} `json:"data,omitempty"`
+    Error   string      `json:"error,omitempty"`
+    Message string      `json:"message,omitempty"`
+}
+
+func (h *Handler) GetUser(c *gin.Context) {
+    id := c.Param("id")
+
+    user, err := h.service.GetUser(c.Request.Context(), id)
+    if err != nil {
+        if errors.Is(err, ErrUserNotFound) {
+            c.JSON(http.StatusNotFound, Response{Error: "user not found"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, Response{Error: "internal error"})
+        return
+    }
+
+    c.JSON(http.StatusOK, Response{Data: user})
+}
+
+// ✅ Request validation
+type CreateUserRequest struct {
+    Email string `json:"email" binding:"required,email"`
+    Name  string `json:"name" binding:"required,min=2,max=100"`
+}
+
+func (h *Handler) CreateUser(c *gin.Context) {
+    var req CreateUserRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, Response{Error: err.Error()})
+        return
+    }
+    // Process validated request...
+}
+
+// ✅ Middleware pattern
+func AuthMiddleware(authService AuthService) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        token := c.GetHeader("Authorization")
+        user, err := authService.ValidateToken(token)
+        if err != nil {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, Response{Error: "unauthorized"})
+            return
+        }
+        c.Set("user", user)
+        c.Next()
+    }
+}
+```
+
+### Database Best Practices
+```go
+// ✅ Use transactions properly
+func (r *UserRepo) CreateWithProfile(ctx context.Context, user *User, profile *Profile) error {
+    return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+        if err := tx.Create(user).Error; err != nil {
+            return err
+        }
+        profile.UserID = user.ID
+        if err := tx.Create(profile).Error; err != nil {
+            return err
+        }
+        return nil
+    })
+}
+
+// ✅ Use prepared statements for repeated queries
+stmt, err := db.Prepare("SELECT * FROM users WHERE id = ?")
+defer stmt.Close()
+
+for _, id := range ids {
+    row := stmt.QueryRow(id)
+    // ...
+}
+
+// ✅ Prevent N+1 queries with preloading (GORM)
+db.Preload("Posts").Preload("Profile").Find(&users)
+
+// ✅ Use connection pooling
+db.SetMaxOpenConns(25)
+db.SetMaxIdleConns(5)
+db.SetConnMaxLifetime(5 * time.Minute)
+```
+
+### Testing Best Practices
+```go
+// ✅ Table-driven tests
+func TestGetUser(t *testing.T) {
+    tests := []struct {
+        name    string
+        id      string
+        want    *User
+        wantErr bool
+    }{
+        {"valid user", "123", &User{ID: "123"}, false},
+        {"not found", "999", nil, true},
+        {"empty id", "", nil, true},
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got, err := service.GetUser(context.Background(), tt.id)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
+            }
+            if !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("GetUser() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+// ✅ Use testify for assertions
+import "github.com/stretchr/testify/assert"
+
+func TestCreateUser(t *testing.T) {
+    user, err := service.CreateUser(ctx, req)
+    assert.NoError(t, err)
+    assert.NotNil(t, user)
+    assert.Equal(t, "test@example.com", user.Email)
+}
+
+// ✅ Mock interfaces
+type MockUserRepo struct {
+    mock.Mock
+}
+
+func (m *MockUserRepo) FindByID(ctx context.Context, id string) (*User, error) {
+    args := m.Called(ctx, id)
+    return args.Get(0).(*User), args.Error(1)
 }
 ```
 
