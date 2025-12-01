@@ -1,6 +1,12 @@
 ---
 name: jira-integration
-description: "Auto-fetch JIRA tickets when ID detected. Triggers: 'PROJ-1234', JIRA URLs. Requires JIRA credentials in .envrc."
+description: "Auto-fetch JIRA tickets when ID detected. Requires JIRA credentials in .envrc."
+autoInvoke: true
+priority: medium
+triggers:
+  - "PROJ-1234"
+  - "ticket ID pattern"
+  - "JIRA URL"
 allowed-tools: Read, Bash
 ---
 

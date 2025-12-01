@@ -1,6 +1,13 @@
 ---
 name: confluence-integration
-description: "Manage Confluence pages - fetch, search, create, update. Triggers: Confluence URLs, page IDs, documentation requests. Requires Confluence credentials in .envrc."
+description: "Manage Confluence pages - fetch, search, create, update. Requires Confluence credentials in .envrc."
+autoInvoke: true
+priority: medium
+triggers:
+  - "Confluence URL"
+  - "confluence page"
+  - "wiki page"
+  - "documentation request"
 allowed-tools: Read, Bash
 ---
 

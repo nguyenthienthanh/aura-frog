@@ -1,3 +1,14 @@
+---
+name: migration-helper
+description: "Guide safe database and code migrations with zero-downtime strategies."
+autoInvoke: false
+priority: medium
+triggers:
+  - "database migration"
+  - "code migration"
+  - "zero-downtime"
+---
+
 # Skill: Migration Helper
 
 **Category:** Dev Expert

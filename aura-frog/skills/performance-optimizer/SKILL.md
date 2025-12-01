@@ -1,3 +1,14 @@
+---
+name: performance-optimizer
+description: "Identify and resolve performance bottlenecks through profiling, measurement, and targeted optimization."
+autoInvoke: false
+priority: medium
+triggers:
+  - "performance optimization"
+  - "slow"
+  - "bottleneck"
+---
+
 # Skill: Performance Optimizer
 
 **Category:** Dev Expert

@@ -1,6 +1,14 @@
 ---
 name: bugfix-quick
-description: "Fast bug fixes with TDD. Triggers: 'fix bug', 'error', 'not working', 'broken', 'crash'. Lightweight: understand → test → fix → verify."
+description: "Fast bug fixes with TDD. Lightweight: understand → test → fix → verify."
+autoInvoke: true
+priority: medium
+triggers:
+  - "fix bug"
+  - "error"
+  - "not working"
+  - "broken"
+  - "crash"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

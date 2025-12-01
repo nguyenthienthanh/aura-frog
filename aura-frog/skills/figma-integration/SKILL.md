@@ -1,6 +1,12 @@
 ---
 name: figma-integration
 description: "Auto-fetch Figma designs when URL detected. Extracts components, design tokens, images. Requires FIGMA_API_TOKEN."
+autoInvoke: true
+priority: medium
+triggers:
+  - "Figma URL"
+  - "figma.com/file"
+  - "implement Figma design"
 allowed-tools: Read, Bash
 ---
 

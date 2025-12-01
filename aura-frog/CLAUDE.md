@@ -1,189 +1,76 @@
-<div align="center">
-
-![Aura Frog](../assets/logo/main.png)
-
-# Aura Frog
-
-### Plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-
-> **Code with main character energy**
-
-</div>
-
----
-
-# Instructions for Claude Code AI
+# Aura Frog - Plugin for Claude Code
 
 **System:** Aura Frog v1.0.0
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
 ---
 
-## CRITICAL: Session Start Checklist
+## Session Start (MANDATORY)
 
-**Do these at EVERY session start:**
-
-| # | Action | Rule/Skill |
-|---|--------|------------|
+| # | Action | Load |
+|---|--------|------|
 | 1 | Show agent banner | `rules/agent-identification-banner.md` |
-| 2 | Load `.envrc` if exists | `rules/env-loading.md` |
-| 3 | Load project context | `skills/project-context-loader/` |
-| 4 | Detect appropriate agent | `skills/agent-detector/` |
+| 2 | Load `.envrc` | `rules/env-loading.md` |
+| 3 | Detect agent | `skills/agent-detector/SKILL.md` |
+| 4 | Load project context | `skills/project-context-loader/SKILL.md` |
 
 ---
 
-## Agent Banner (MANDATORY)
-
-**Show this at the START of EVERY response:**
+## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: [agent-name] │ Phase: [phase] - [name]        ┃
-┃ Model: [model] │ 🔥 [aura-message]                    ┃
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
+┃ Model: [model] │ 🔥 [aura-message]                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Model options:** Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3 (based on phase config)
-**Aura messages:** "Let's cook", "Code go brrrr", "Bug hunter mode", "Nailed it"
-
-**📚 Details:** `rules/agent-identification-banner.md`
+**Details:** `rules/agent-identification-banner.md`
 
 ---
 
-## Auto-Invoking Skills
+## Auto-Invoke Skills
 
-Skills activate automatically based on context:
+| Skill | Trigger | File |
+|-------|---------|------|
+| agent-detector | Every message | `skills/agent-detector/SKILL.md` |
+| project-context-loader | Before code gen | `skills/project-context-loader/SKILL.md` |
+| model-router | Phase transitions | `skills/model-router/SKILL.md` |
+| jira-integration | Ticket ID (PROJ-123) | `skills/jira-integration/SKILL.md` |
+| figma-integration | Figma URL | `skills/figma-integration/SKILL.md` |
+| confluence-integration | Confluence URL | `skills/confluence-integration/SKILL.md` |
+| workflow-orchestrator | Complex feature | `skills/workflow-orchestrator/SKILL.md` |
+| bugfix-quick | Bug fix request | `skills/bugfix-quick/SKILL.md` |
+| test-writer | Test request | `skills/test-writer/SKILL.md` |
+| code-reviewer | Code review | `skills/code-reviewer/SKILL.md` |
+| session-manager | Token limit | `skills/session-manager/SKILL.md` |
 
-| Skill | Trigger |
-|-------|---------|
-| `agent-detector` | Every message (ALWAYS first) |
-| `project-context-loader` | Before code generation |
-| `model-router` | Phase transitions |
-| `jira-integration` | Ticket ID detected (PROJ-123) |
-| `figma-integration` | Figma URL detected |
-| `confluence-integration` | Confluence URL or docs request |
-| `workflow-orchestrator` | Complex feature request |
-| `bugfix-quick` | Bug fix request |
-| `test-writer` | Test creation request |
-| `code-reviewer` | Code review request |
-| `session-manager` | Token limit warning |
-
-**📚 All skills:** `skills/README.md`
+**All skills:** `skills/README.md`
 
 ---
 
-## Core Commands
+## Execution Rules
 
-| Command | Purpose |
-|---------|---------|
-| `workflow:start <task>` | Start 9-phase workflow |
-| `bugfix:quick <desc>` | Fast bug fix |
-| `refactor <file>` | Code refactoring |
-| `project:init` | Initialize project |
-| `project:reload-env` | Reload .envrc |
-| `approve` / `reject` | Approval gates |
+**ALWAYS:** Show banner → Load context → Follow TDD
 
-**📚 All 70+ commands:** `README.md`
+**NEVER:** Skip banner, auto-approve, skip tests
+
+**Details:** `rules/execution-rules.md`
 
 ---
 
-## 9-Phase Workflow
+## Resources
 
-```
-1: Understand  →  2: Design     →  3: UI Breakdown  →  4: Plan Tests
-       ↓               ↓                ↓                  ↓
-5a: TDD Red    →  5b: Build    →  5c: Polish
-       ↓               ↓                ↓
-6: Review      →  7: Verify    →  8: Document     →  9: Share
-```
-
-Each phase requires approval before continuing.
-
-**📚 Phase guides:** `docs/phases/`
+| Resource | Location |
+|----------|----------|
+| Agents (24) | `agents/` |
+| Commands (70+) | `commands/` |
+| Rules (27) | `rules/` |
+| Skills (23+) | `skills/` |
+| Phases (9) | `docs/phases/` |
+| Getting Started | `GET_STARTED.md` |
+| Integrations | `docs/INTEGRATION_SETUP_GUIDE.md` |
 
 ---
 
-## Key Rules
-
-| Rule | File |
-|------|------|
-| Agent Banner | `rules/agent-identification-banner.md` |
-| Environment Loading | `rules/env-loading.md` |
-| Execution Rules | `rules/execution-rules.md` |
-| Approval Gates | `rules/approval-gates.md` |
-| TDD Workflow | `rules/tdd-workflow.md` |
-| KISS Principle | `rules/kiss-avoid-over-engineering.md` |
-| Code Quality | `rules/code-quality.md` |
-| Cross-Review | `rules/cross-review-workflow.md` |
-
-**📚 All 27 rules:** `rules/README.md`
-
----
-
-## Execution Summary
-
-**ALWAYS:**
-- ✅ Show agent banner first
-- ✅ Load `.envrc` if exists
-- ✅ Load project context before code generation
-- ✅ Show approval gate after each phase
-- ✅ Follow TDD: RED → GREEN → REFACTOR
-
-**NEVER:**
-- ❌ Skip agent banner
-- ❌ Skip project context loading
-- ❌ Auto-approve without user confirmation
-- ❌ Implement without tests (Phase 5)
-
-**📚 Full rules:** `rules/execution-rules.md`
-
----
-
-## Priority Hierarchy
-
-```
-1. Environment Variables (.envrc)
-2. Project Context (.claude/project-contexts/)
-3. Aura Frog Rules (rules/)
-4. Default Behavior
-```
-
----
-
-## File Locations
-
-| Type | Location |
-|------|----------|
-| Plugin | `~/.claude/plugins/marketplaces/aurafrog/aura-frog/` |
-| Project | `<project>/.claude/` |
-| Rules | `rules/` |
-| Skills | `skills/` |
-| Agents | `agents/` |
-| Commands | `commands/` |
-
----
-
-## Quick Reference
-
-- **Agents:** 24 specialized (mobile, web, backend, QA, DevOps, etc.)
-- **Commands:** 70+ workflow commands
-- **Rules:** 27 quality/workflow rules
-- **Skills:** 23+ (11 auto-invoking + 12 reference)
-- **Phases:** 9-phase structured workflow
-
----
-
-## Documentation
-
-| Doc | Purpose |
-|-----|---------|
-| `README.md` | Overview & commands |
-| `GET_STARTED.md` | Quick start |
-| `docs/MODEL_SELECTION.md` | Multi-model config |
-| `docs/APPROVAL_GATES.md` | Gate format |
-| `docs/INTEGRATION_SETUP_GUIDE.md` | JIRA/Figma/Slack |
-| `docs/phases/` | Phase guides |
-
----
-
-**Version:** 1.0.0 | **Last Updated:** 2025-12-01
+**Version:** 1.0.0

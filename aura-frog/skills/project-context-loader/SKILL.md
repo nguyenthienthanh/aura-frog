@@ -1,6 +1,12 @@
 ---
 name: project-context-loader
-description: "Load project conventions, rules, and examples BEFORE any code generation. Ensures AI follows YOUR project standards. Triggers: before workflow:start, before implement, before code generation."
+description: "Load project conventions, rules, and examples BEFORE any code generation. Ensures AI follows YOUR project standards."
+autoInvoke: true
+priority: high
+triggers:
+  - "before workflow:start"
+  - "before code generation"
+  - "before implement"
 allowed-tools: Read, Grep, Glob
 ---
 

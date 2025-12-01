@@ -1,3 +1,17 @@
+---
+name: session-manager
+description: "Manage workflow state across sessions. Pause/resume long workflows, token awareness."
+autoInvoke: true
+priority: medium
+triggers:
+  - "token limit warning"
+  - "save workflow"
+  - "pause workflow"
+  - "resume workflow"
+  - "150K tokens"
+allowed-tools: Read, Write
+---
+
 # Session Continuation Skill
 
 ## Purpose

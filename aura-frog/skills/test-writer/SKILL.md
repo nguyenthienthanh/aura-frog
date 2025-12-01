@@ -1,6 +1,14 @@
 ---
 name: test-writer
-description: "Write tests with TDD. Triggers: 'add tests', 'test coverage', 'unit test', 'E2E test'. Supports Jest, Cypress, Detox, PHPUnit, PyTest, Go testing."
+description: "Write tests with TDD. Supports Jest, Cypress, Detox, PHPUnit, PyTest, Go testing."
+autoInvoke: true
+priority: medium
+triggers:
+  - "add tests"
+  - "test coverage"
+  - "unit test"
+  - "E2E test"
+  - "write tests"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

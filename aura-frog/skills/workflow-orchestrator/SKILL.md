@@ -1,6 +1,14 @@
 ---
 name: workflow-orchestrator
-description: "Execute 9-phase workflow for complex features. Triggers: 'implement', 'build', 'create feature', 'workflow:start'. DO NOT use for simple bug fixes."
+description: "Execute 9-phase workflow for complex features. DO NOT use for simple bug fixes."
+autoInvoke: true
+priority: high
+triggers:
+  - "implement"
+  - "build feature"
+  - "create feature"
+  - "workflow:start"
+  - "complex task"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

@@ -1,6 +1,13 @@
 ---
 name: code-reviewer
-description: "Comprehensive code review with multi-agent analysis. Triggers: 'review code', after Phase 5c, before merge. Checks security, performance, maintainability, tests."
+description: "Comprehensive code review with multi-agent analysis. Checks security, performance, maintainability, tests."
+autoInvoke: true
+priority: high
+triggers:
+  - "review code"
+  - "code review"
+  - "after Phase 5c"
+  - "before merge"
 allowed-tools: Read, Grep, Glob, Bash
 ---
 

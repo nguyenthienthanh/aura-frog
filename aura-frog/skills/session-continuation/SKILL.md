@@ -1,3 +1,14 @@
+---
+name: session-continuation
+description: "Manage workflow state across sessions with handoff and resume."
+autoInvoke: false
+priority: high
+triggers:
+  - "handoff"
+  - "save state"
+  - "resume workflow"
+---
+
 # Skill: Session Continuation
 
 **Purpose:** Manage workflow state across sessions with handoff and resume

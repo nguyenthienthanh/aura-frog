@@ -1,3 +1,14 @@
+---
+name: nativewind-generator
+description: "Generate React Native components styled with NativeWind (Tailwind CSS)."
+autoInvoke: false
+priority: medium
+triggers:
+  - "NativeWind component"
+  - "Tailwind React Native"
+  - "styled component"
+---
+
 # NativeWind Component Generator
 
 **Category:** Mobile Development

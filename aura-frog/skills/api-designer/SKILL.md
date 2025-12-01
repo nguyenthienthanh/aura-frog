@@ -1,3 +1,14 @@
+---
+name: api-designer
+description: "Design consistent, RESTful APIs with proper versioning, documentation, and error handling."
+autoInvoke: false
+priority: medium
+triggers:
+  - "API design"
+  - "REST API"
+  - "endpoint design"
+---
+
 # Skill: API Designer
 
 **Category:** Dev Expert

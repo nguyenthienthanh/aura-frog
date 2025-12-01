@@ -1,6 +1,11 @@
 ---
 name: agent-detector
 description: "CRITICAL: MUST run for EVERY message. Detects which specialized agent should handle the request using multi-layer scoring. Always runs FIRST before any other skill."
+autoInvoke: true
+priority: highest
+triggers:
+  - "every message"
+  - "always first"
 allowed-tools: Read, Grep, Glob
 ---
 

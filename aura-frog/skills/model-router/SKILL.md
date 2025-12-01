@@ -1,3 +1,15 @@
+---
+name: model-router
+description: "Dynamically select AI model based on workflow phase and project configuration."
+autoInvoke: true
+priority: high
+triggers:
+  - "phase transition"
+  - "workflow phase"
+  - "model selection"
+allowed-tools: Read
+---
+
 # Model Selection Skill
 
 ## Purpose

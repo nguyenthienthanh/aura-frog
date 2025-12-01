@@ -1,3 +1,14 @@
+---
+name: documentation
+description: "Create Architecture Decision Records (ADRs) and Runbooks for operational documentation."
+autoInvoke: false
+priority: medium
+triggers:
+  - "ADR"
+  - "runbook"
+  - "architecture decision"
+---
+
 # Skill: Documentation (ADR & Runbook)
 
 **Category:** Documentation

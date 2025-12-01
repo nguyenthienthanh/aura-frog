@@ -1,3 +1,14 @@
+---
+name: refactor-expert
+description: "Guide safe, incremental refactoring that improves code quality without changing behavior."
+autoInvoke: false
+priority: medium
+triggers:
+  - "refactor"
+  - "code cleanup"
+  - "improve code"
+---
+
 # Skill: Refactor Expert
 
 **Category:** Dev Expert

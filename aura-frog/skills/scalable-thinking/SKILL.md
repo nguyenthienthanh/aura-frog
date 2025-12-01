@@ -1,3 +1,15 @@
+---
+name: scalable-thinking
+description: "Design for scale while keeping implementation simple (KISS)."
+autoInvoke: false
+priority: high
+triggers:
+  - "architecture"
+  - "API design"
+  - "data modeling"
+  - "database schema"
+---
+
 # Skill: Scalable Thinking
 
 **Purpose:** Design for scale while keeping implementation simple (KISS)

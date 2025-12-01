@@ -227,7 +227,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 3. Global config (`ccpm-config.yaml`)
 4. Default (`claude`)
 
-**📚 Details:** `skills/model-router/model-selection.md`
+**📚 Details:** `skills/model-router/SKILL.md`
 
 ---
 
@@ -252,7 +252,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 - 175K tokens - Recommend handoff
 - 190K tokens - Urgent handoff
 
-**📚 Details:** `skills/session-manager/session-continuation.md`
+**📚 Details:** `skills/session-manager/SKILL.md`
 
 ---
 
@@ -330,26 +330,21 @@ Each skill follows this structure:
 ```
 skills/
 └── [skill-name]/
-    ├── [descriptive-name].md (required) - Full skill instructions
-    ├── reference.md (optional) - Additional reference docs
+    ├── SKILL.md (required) - Main skill instructions with frontmatter
+    ├── [reference].md (optional) - Additional reference docs
     └── scripts/ (optional) - Bash scripts for integrations
 ```
 
-**Example file names:**
-- `workflow-execution.md` - Main workflow orchestration
-- `agent-selection.md` - Agent detection logic
-- `context-loading.md` - Project context loader
-- `quick-fix.md` - Bug fix skill
-- `test-generation.md` - Test writer
-- `quality-review.md` - Code reviewer
-- `ticket-management.md` - JIRA integration
-- `design-extraction.md` - Figma integration
-
-**Skill file format:**
+**Skill file format (SKILL.md):**
 ```markdown
 ---
 name: skill-name
 description: "Clear description with TRIGGER words"
+autoInvoke: true|false
+priority: highest|high|medium|low
+triggers:
+  - "trigger phrase 1"
+  - "trigger phrase 2"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
