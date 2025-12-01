@@ -13,9 +13,11 @@
 ```
 ⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ 🔥 [aura-message]                                       ┃
+┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+**Model options:** Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3
 
 **This is NOT optional. Do it EVERY time.**
 
@@ -77,8 +79,8 @@ Short (2-4 words), fun, contextual phrase. Examples:
 This provides:
 - 24 specialized agents
 - 70+ commands
-- 26 rules
-- 20 skills (9 auto-invoking)
+- 27 rules
+- 23+ skills (11 auto-invoking)
 - 9-phase structured workflow
 
 ---
@@ -104,7 +106,9 @@ This provides:
 
 ---
 
-## JIRA Integration
+## Integrations
+
+### JIRA Integration
 
 When ticket ID detected (e.g., `PROJ-1234`):
 
@@ -112,11 +116,49 @@ When ticket ID detected (e.g., `PROJ-1234`):
 bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/jira-fetch.sh PROJ-1234
 ```
 
-**Required env vars in `.envrc`:**
+**Required env vars:**
 ```bash
 export JIRA_URL="https://company.atlassian.net"
 export JIRA_EMAIL="your-email"
 export JIRA_API_TOKEN="your-token"
+```
+
+### Confluence Integration
+
+When Confluence URL or documentation request detected:
+
+```bash
+# Fetch page
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh fetch PAGE_ID
+
+# Search pages
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh search "query"
+
+# Create page (requires confirmation)
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh create SPACE "Title" content.md
+
+# Update page (requires confirmation)
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh update PAGE_ID content.md
+```
+
+**Required env vars:**
+```bash
+export CONFLUENCE_URL="https://company.atlassian.net/wiki"
+export CONFLUENCE_EMAIL="your-email"
+export CONFLUENCE_API_TOKEN="your-token"
+```
+
+### Figma Integration
+
+When Figma URL detected:
+
+```bash
+bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/figma-fetch.sh "FIGMA_URL"
+```
+
+**Required env vars:**
+```bash
+export FIGMA_API_TOKEN="your-figma-token"
 ```
 
 ---
