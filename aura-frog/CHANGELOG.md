@@ -4,6 +4,57 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.1.0] - 2025-12-01
+
+### Skills Standardization & Plugin Refactoring
+
+Major update standardizing skill file format and streamlining plugin structure.
+
+#### SKILL.md Standard
+
+**All skills now use standardized `SKILL.md` naming with frontmatter metadata:**
+
+```yaml
+---
+name: skill-name
+description: "Description"
+autoInvoke: true|false
+priority: highest|high|medium|low
+triggers:
+  - "trigger phrase"
+allowed-tools: Read, Grep, Glob
+---
+```
+
+**Auto-Invoke Skills (11):**
+- agent-detector (highest priority - runs first)
+- project-context-loader, model-router
+- jira-integration, figma-integration, confluence-integration
+- workflow-orchestrator, bugfix-quick, test-writer, code-reviewer
+- session-manager
+
+**Reference Skills (12+):**
+- dev-expert, qa-expert, pm-expert, design-expert (with sub-skills)
+- api-designer, documentation, migration-helper, performance-optimizer
+- refactor-expert, scalable-thinking, session-continuation, nativewind-generator
+
+#### Plugin CLAUDE.md Simplified
+
+**Before:** ~190 lines → **After:** ~77 lines (60% reduction)
+
+CLAUDE.md now serves as an index pointing to skills, rules, and resources.
+
+#### Other Changes
+
+- Added Model line to agent banner format
+- Added Session Start Checklist to project template
+- Added Confluence integration with full CRUD operations
+- Updated env-loading rule to check `.claude/.envrc`
+- Removed archived docs (~2K lines)
+- Updated skill counts to 23+ (11 auto-invoking + 12 reference)
+
+---
+
 ## [1.0.2] - 2025-12-01
 
 ### Multi-Model Selection & CLAUDE.md Refactoring

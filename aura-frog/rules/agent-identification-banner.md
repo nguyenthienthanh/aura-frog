@@ -11,7 +11,7 @@
 **YOU MUST show this banner at the START of EVERY response:**
 
 ```
-⚡ 🐸 AURA FROG v1.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -24,7 +24,7 @@
 ## Banner Components
 
 ### Line 1: Header
-- Version indicator: `AURA FROG v1.0.0`
+- Version indicator: `AURA FROG v1.1.0`
 - Visual separator with lightning bolt
 
 ### Line 2: Context
