@@ -6,6 +6,18 @@
 
 ---
 
+## CRITICAL: Session Start Checklist
+
+**Do these at EVERY session start:**
+
+| # | Action | How |
+|---|--------|-----|
+| 1 | Show agent banner | See format below |
+| 2 | Load `.envrc` if exists | Check `.envrc` or `.claude/.envrc` |
+| 3 | Detect appropriate agent | Based on task context |
+
+---
+
 ## CRITICAL: Agent Identification Banner
 
 **YOU MUST show this banner at the START of EVERY response:**
@@ -160,6 +172,20 @@ bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/figma-fetch.sh "F
 ```bash
 export FIGMA_API_TOKEN="your-figma-token"
 ```
+
+---
+
+## Execution Rules
+
+**ALWAYS:**
+- Show agent banner at start of EVERY response
+- Load `.envrc` if exists at session start
+- Follow project conventions from `.claude/project-contexts/`
+
+**NEVER:**
+- Skip agent banner
+- Auto-approve without user confirmation
+- Implement without showing banner first
 
 ---
 

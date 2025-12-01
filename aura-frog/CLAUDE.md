@@ -116,7 +116,7 @@ Each phase requires approval before continuing.
 | Code Quality | `rules/code-quality.md` |
 | Cross-Review | `rules/cross-review-workflow.md` |
 
-**📚 All 26 rules:** `rules/README.md`
+**📚 All 27 rules:** `rules/README.md`
 
 ---
 
