@@ -231,8 +231,8 @@ Add this instruction to CLAUDE.md:
 ## Environment Loading
 
 **ALWAYS load .envrc at session start:**
-1. Check if `.envrc` exists in project root
-2. If exists, parse and load all exported variables
+1. Check for `.envrc` in: project root, then `.claude/.envrc`
+2. If found, parse and load all exported variables
 3. Use loaded variables for integrations and model selection
 ```
 

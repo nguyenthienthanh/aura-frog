@@ -13,9 +13,13 @@
 
 ## Steps
 
-1. **Check if `.envrc` exists** in project root
-2. **If exists, parse** all `export VAR=value` statements
+1. **Check for `.envrc`** in these locations (in order):
+   - `.envrc` (project root)
+   - `.claude/.envrc` (Claude config directory)
+2. **If found, parse** all `export VAR=value` statements
 3. **Load variables** into current session context
+
+**Note:** If both files exist, project root takes priority. Variables from `.claude/.envrc` are loaded first, then overridden by `.envrc` if present.
 
 ---
 
