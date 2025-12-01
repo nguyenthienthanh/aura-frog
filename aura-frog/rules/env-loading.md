@@ -25,23 +25,6 @@
 
 ## Variable Categories
 
-### AI Model API Keys
-```bash
-GEMINI_API_KEY      # For Gemini model
-OPENAI_API_KEY      # For OpenAI GPT models
-DEEPSEEK_API_KEY    # For DeepSeek model
-```
-
-### Phase-Specific Model Overrides
-```bash
-AURA_PHASE_1_MODEL  # Phase 1: Understand
-AURA_PHASE_2_MODEL  # Phase 2: Design
-AURA_PHASE_5A_MODEL # Phase 5a: TDD Red
-AURA_PHASE_5B_MODEL # Phase 5b: Build
-AURA_PHASE_6_MODEL  # Phase 6: Review
-AURA_DEFAULT_MODEL  # Fallback for all phases
-```
-
 ### Integration Credentials
 ```bash
 JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY

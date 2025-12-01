@@ -179,42 +179,10 @@ fi
 - Project type changed?
 - Ticket format changed?
 - Main branch changed?
-- Model configuration changed?
 
 **If changes detected:**
 - Update `ccpm-config.yaml`
 - Show diff of changes
-
-### 6.1. Update .envrc with New Model Config (If Missing)
-
-**Check if .envrc has model selection section:**
-```bash
-if ! grep -q "AI Model Selection" "$PROJECT_ROOT/.envrc"; then
-  # Append model selection section
-  cat >> "$PROJECT_ROOT/.envrc" << 'EOF'
-
-# ==============================================
-# AI Model Selection (Multi-Model Support)
-# ==============================================
-# API Keys for alternative models (Claude works without key in Claude Code)
-
-# Gemini - Strong reasoning, vision, long context
-# export GEMINI_API_KEY="your-gemini-api-key"
-
-# OpenAI GPT-4 - Diverse perspectives, code review
-# export OPENAI_API_KEY="your-openai-api-key"
-
-# DeepSeek - Cost-effective coding
-# export DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# Phase-Specific Model Overrides (Optional)
-# export AURA_PHASE_1_MODEL="gemini"   # Deep reasoning
-# export AURA_PHASE_2_MODEL="gemini"   # Architecture
-# export AURA_PHASE_6_MODEL="openai"   # Code review
-EOF
-  echo "✅ Added AI Model Selection section to .envrc"
-fi
-```
 
 ### 7. Validate Updates
 

@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.1.0
+**System:** Aura Frog v1.1.1
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
 ---
@@ -35,7 +35,6 @@
 |-------|---------|------|
 | agent-detector | Every message | `skills/agent-detector/SKILL.md` |
 | project-context-loader | Before code gen | `skills/project-context-loader/SKILL.md` |
-| model-router | Phase transitions | `skills/model-router/SKILL.md` |
 | jira-integration | Ticket ID (PROJ-123) | `skills/jira-integration/SKILL.md` |
 | figma-integration | Figma URL | `skills/figma-integration/SKILL.md` |
 | confluence-integration | Confluence URL | `skills/confluence-integration/SKILL.md` |
@@ -66,11 +65,11 @@
 | Agents (24) | `agents/` |
 | Commands (70+) | `commands/` |
 | Rules (27) | `rules/` |
-| Skills (23+) | `skills/` |
+| Skills (22+) | `skills/` |
 | Phases (9) | `docs/phases/` |
 | Getting Started | `GET_STARTED.md` |
 | Integrations | `docs/INTEGRATION_SETUP_GUIDE.md` |
 
 ---
 
-**Version:** 1.1.0
+**Version:** 1.1.1

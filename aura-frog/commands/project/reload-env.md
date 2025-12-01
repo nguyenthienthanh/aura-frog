@@ -20,9 +20,7 @@ Load or reload environment variables from the project's `.envrc` file. This comm
 
 ## When to Use
 
-- After adding new API keys (GEMINI_API_KEY, OPENAI_API_KEY, etc.)
-- After modifying integration credentials (JIRA, Slack, Figma, etc.)
-- After changing model selection environment variables
+- After modifying integration credentials (JIRA, Slack, Figma, Confluence)
 - When starting a new session and env vars aren't loaded
 - To debug environment variable issues
 
@@ -91,22 +89,7 @@ echo ""
 echo "📋 Environment Status:"
 echo ""
 
-# AI Model API Keys
-echo "🤖 AI Model API Keys:"
-[ -n "$GEMINI_API_KEY" ] && echo "   ✅ GEMINI_API_KEY (set)" || echo "   ⚪ GEMINI_API_KEY (not set)"
-[ -n "$OPENAI_API_KEY" ] && echo "   ✅ OPENAI_API_KEY (set)" || echo "   ⚪ OPENAI_API_KEY (not set)"
-[ -n "$DEEPSEEK_API_KEY" ] && echo "   ✅ DEEPSEEK_API_KEY (set)" || echo "   ⚪ DEEPSEEK_API_KEY (not set)"
-
-# Model Overrides
-echo ""
-echo "🔀 Model Phase Overrides:"
-[ -n "$AURA_PHASE_1_MODEL" ] && echo "   ✅ Phase 1: $AURA_PHASE_1_MODEL" || echo "   ⚪ Phase 1: default (claude)"
-[ -n "$AURA_PHASE_2_MODEL" ] && echo "   ✅ Phase 2: $AURA_PHASE_2_MODEL" || echo "   ⚪ Phase 2: default (claude)"
-[ -n "$AURA_PHASE_5B_MODEL" ] && echo "   ✅ Phase 5b: $AURA_PHASE_5B_MODEL" || echo "   ⚪ Phase 5b: default (claude)"
-[ -n "$AURA_PHASE_6_MODEL" ] && echo "   ✅ Phase 6: $AURA_PHASE_6_MODEL" || echo "   ⚪ Phase 6: default (claude)"
-
 # Integrations
-echo ""
 echo "🔗 Integration Credentials:"
 [ -n "$JIRA_URL" ] && echo "   ✅ JIRA (configured)" || echo "   ⚪ JIRA (not configured)"
 [ -n "$FIGMA_API_TOKEN" ] && echo "   ✅ Figma (configured)" || echo "   ⚪ Figma (not configured)"
@@ -132,17 +115,6 @@ echo "⚙️  Workflow Settings:"
 📁 Source: ./.envrc
 
 📋 Environment Status:
-
-🤖 AI Model API Keys:
-   ✅ GEMINI_API_KEY (set)
-   ⚪ OPENAI_API_KEY (not set)
-   ⚪ DEEPSEEK_API_KEY (not set)
-
-🔀 Model Phase Overrides:
-   ✅ Phase 1: gemini
-   ✅ Phase 2: gemini
-   ⚪ Phase 5b: default (claude)
-   ⚪ Phase 6: default (claude)
 
 🔗 Integration Credentials:
    ✅ JIRA (configured)
@@ -172,12 +144,11 @@ Claude:
 📁 Source: ./.envrc
 
 Loaded variables:
-   ✅ GEMINI_API_KEY
-   ✅ AURA_PHASE_1_MODEL
-   ✅ AURA_PHASE_2_MODEL
    ✅ JIRA_URL
    ✅ JIRA_EMAIL
    ✅ JIRA_API_TOKEN
+   ✅ FIGMA_API_TOKEN
+   ✅ CONFLUENCE_URL
 
 📋 Environment Status:
 [Full status output...]
@@ -200,24 +171,6 @@ Or create manually:
    cp ~/.claude/plugins/marketplaces/aurafrog/aura-frog/.envrc.template .envrc
 ```
 
-### Example 3: Verify Model Configuration
-
-```
-You: project:reload-env
-
-Claude:
-🔄 Loading environment...
-
-📋 Model Configuration Active:
-
-Phase 1 (Understand): gemini
-Phase 2 (Design): gemini
-Phase 3-5c: claude (default)
-Phase 6 (Review): claude (default)
-
-✅ Multi-model workflow ready!
-```
-
 ---
 
 ## Important Notes
@@ -233,7 +186,7 @@ Add this instruction to CLAUDE.md:
 **ALWAYS load .envrc at session start:**
 1. Check for `.envrc` in: project root, then `.claude/.envrc`
 2. If found, parse and load all exported variables
-3. Use loaded variables for integrations and model selection
+3. Use loaded variables for integrations
 ```
 
 ### Security
@@ -254,15 +207,6 @@ direnv reload
 ```
 
 **Note:** Claude Code doesn't use direnv directly. This command manually parses .envrc.
-
-### Variable Priority
-
-```
-Environment Variable > Project Config > Global Config > Default
-```
-
-Example:
-- `AURA_PHASE_1_MODEL=gemini` in .envrc overrides `phase_1_understand: claude` in config
 
 ---
 

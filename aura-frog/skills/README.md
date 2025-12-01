@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.1.0
-**Total Skills:** 23+ (11 auto-invoking + 12 reference)
+**Version:** 1.1.1
+**Total Skills:** 22+ (10 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -206,32 +206,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
-### 10. **model-router** (Priority: MEDIUM)
-
-**Auto-invokes when:** Phase transitions in workflow
-
-**Triggers:**
-- Starting a new workflow phase
-- Model selection configuration exists
-- Phase-specific model override set
-
-**What it does:**
-- Selects appropriate AI model for each phase
-- Handles context handoff between models
-- Falls back to default model on errors
-- Logs model switches for debugging
-
-**Priority Order:**
-1. Environment variables (`AURA_PHASE_X_MODEL`)
-2. Project config (`project-config.yaml`)
-3. Global config (`ccpm-config.yaml`)
-4. Default (`claude`)
-
-**📚 Details:** `skills/model-router/SKILL.md`
-
----
-
-### 11. **session-manager** (Priority: HIGH)
+### 10. **session-manager** (Priority: HIGH)
 
 **Auto-invokes when:** Token limit warning triggered
 
@@ -409,8 +384,6 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 | jira-integration | MEDIUM | Ticket detected |
 | figma-integration | MEDIUM | Figma URL detected |
 | confluence-integration | MEDIUM | Confluence URL/docs |
-| model-router | MEDIUM | Phase transitions |
-
 ---
 
 ## 🚀 Using Skills
@@ -466,6 +439,6 @@ These skills provide guidance documents that agents reference during workflows:
 
 ---
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 **Last Updated:** 2025-12-01
-**Total Skills:** 23+ (11 auto-invoking + 12 reference)
+**Total Skills:** 22+ (10 auto-invoking + 12 reference)

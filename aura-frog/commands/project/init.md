@@ -532,25 +532,6 @@ cat > "$PROJECT_ROOT/.envrc" << 'EOF'
 # export NODE_ENV="development"
 
 # ==============================================
-# AI Model Selection (Multi-Model Support)
-# ==============================================
-# API Keys for alternative models (Claude works without key in Claude Code)
-
-# Gemini - Strong reasoning, vision, long context
-# export GEMINI_API_KEY="your-gemini-api-key"
-
-# OpenAI GPT-4 - Diverse perspectives, code review
-# export OPENAI_API_KEY="your-openai-api-key"
-
-# DeepSeek - Cost-effective coding
-# export DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# Phase-Specific Model Overrides (Optional)
-# export AURA_PHASE_1_MODEL="gemini"   # Deep reasoning
-# export AURA_PHASE_2_MODEL="gemini"   # Architecture
-# export AURA_PHASE_6_MODEL="openai"   # Code review
-
-# ==============================================
 # Aura Frog Integrations
 # ==============================================
 # Uncomment and configure to enable Aura Frog integrations
@@ -594,25 +575,6 @@ echo "⚠️  Run 'direnv allow' to enable environment loading"
 if ! grep -q "Aura Frog Integrations" "$PROJECT_ROOT/.envrc"; then
   # Append Aura Frog section
   cat >> "$PROJECT_ROOT/.envrc" << 'EOF'
-
-# ==============================================
-# AI Model Selection (Multi-Model Support)
-# ==============================================
-# API Keys for alternative models (Claude works without key in Claude Code)
-
-# Gemini - Strong reasoning, vision, long context
-# export GEMINI_API_KEY="your-gemini-api-key"
-
-# OpenAI GPT-4 - Diverse perspectives, code review
-# export OPENAI_API_KEY="your-openai-api-key"
-
-# DeepSeek - Cost-effective coding
-# export DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# Phase-Specific Model Overrides (Optional)
-# export AURA_PHASE_1_MODEL="gemini"   # Deep reasoning
-# export AURA_PHASE_2_MODEL="gemini"   # Architecture
-# export AURA_PHASE_6_MODEL="openai"   # Code review
 
 # ==============================================
 # Aura Frog Integrations

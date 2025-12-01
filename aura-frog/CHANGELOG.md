@@ -4,6 +4,16 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.1.1] - 2025-12-01
+
+### Remove Multi-Model Selection Feature
+
+Removed multi-model selection feature (not supported by Claude Code).
+
+See "Removed: Multi-Model Selection Feature" section in v1.1.0 for details.
+
+---
+
 ## [1.1.0] - 2025-12-01
 
 ### Skills Standardization & Plugin Refactoring
@@ -26,9 +36,9 @@ allowed-tools: Read, Grep, Glob
 ---
 ```
 
-**Auto-Invoke Skills (11):**
+**Auto-Invoke Skills (10):**
 - agent-detector (highest priority - runs first)
-- project-context-loader, model-router
+- project-context-loader
 - jira-integration, figma-integration, confluence-integration
 - workflow-orchestrator, bugfix-quick, test-writer, code-reviewer
 - session-manager
@@ -51,48 +61,35 @@ CLAUDE.md now serves as an index pointing to skills, rules, and resources.
 - Added Confluence integration with full CRUD operations
 - Updated env-loading rule to check `.claude/.envrc`
 - Removed archived docs (~2K lines)
-- Updated skill counts to 23+ (11 auto-invoking + 12 reference)
+- Updated skill counts to 22+ (10 auto-invoking + 12 reference)
+
+#### Removed: Multi-Model Selection Feature
+
+**Removed** the multi-model selection feature introduced in v1.0.2.
+
+**Reason:** Claude Code does not support switching AI models mid-conversation. The feature was aspirational but not functional in practice.
+
+**Removed Files:**
+- `skills/model-router/` - Model routing skill
+- `docs/MODEL_SELECTION.md` - Model selection guide
+
+**Updated Files:**
+- `.envrc.template` - Removed model selection variables
+- `rules/env-loading.md` - Removed model-related variable categories
+- `commands/project/reload-env.md` - Removed model verification
+- `commands/project/init.md` - Removed model section from .envrc template
+- `commands/project/regen.md` - Removed model configuration step
+- `GET_STARTED.md` - Removed model selection documentation
 
 ---
 
-## [1.0.2] - 2025-12-01
+## [1.0.2] - 2025-12-01 (DEPRECATED)
 
 ### Multi-Model Selection & CLAUDE.md Refactoring
 
-Major update adding multi-model support and restructuring documentation.
+**NOTE:** Multi-model selection feature was removed in v1.1.0 (not supported by Claude Code).
 
-#### Multi-Model Selection
-
-**New Feature:** Use different AI models for different workflow phases.
-
-**Configuration:**
-```yaml
-# In project-config.yaml
-models:
-  phase_models:
-    phase_1_understand: "gemini"  # Deep reasoning
-    phase_2_design: "gemini"      # Architecture
-    phase_5b_build: "claude"      # Implementation
-```
-
-**Supported Models:**
-- `claude` - Default (no API key needed in Claude Code)
-- `gemini` - Strong reasoning (requires GEMINI_API_KEY)
-- `openai` - Diverse perspectives (requires OPENAI_API_KEY)
-- `deepseek` - Cost-effective (requires DEEPSEEK_API_KEY)
-
-**Priority Order:**
-1. Environment variables (`AURA_PHASE_X_MODEL`)
-2. Project config
-3. Global config
-4. Default (claude)
-
-**New Files:**
-- `skills/model-router/model-selection.md` - Model routing skill
-- `docs/MODEL_SELECTION.md` - Complete guide
-- `rules/env-loading.md` - Environment loading rule
-
-#### CLAUDE.md Refactoring
+#### CLAUDE.md Refactoring (Still Applies)
 
 **Before:** ~580 lines → **After:** ~187 lines (68% reduction)
 
@@ -103,37 +100,18 @@ Content moved to modular rules and skills files for better maintainability.
 - Session start checklist
 - Quick reference sections
 
-#### New Skills
+#### New Skills (Still Active)
 
-- `model-router` (Auto-invoking) - Phase-based model selection
 - `session-manager` (Auto-invoking) - Workflow state & token monitoring
 
-#### New Rules
+#### New Rules (Still Active)
 
 - `env-loading` - Load .envrc at session start
 - Total rules: 21 → 27
 
-#### New Command
+#### New Command (Still Active)
 
 - `project:reload-env` - Load/reload .envrc variables
-
-#### Updated .envrc.template
-
-**Added:**
-- AI Model Selection section (GEMINI_API_KEY, OPENAI_API_KEY, DEEPSEEK_API_KEY)
-- Phase-specific model overrides (AURA_PHASE_X_MODEL)
-- Workflow settings (AURA_FROG_* prefix)
-
-**Removed:**
-- Deprecated FIGMA_ACCESS_TOKEN, FIGMA_FILE_KEY, FIGMA_MCP_ENABLED
-
-#### Documentation Updates
-
-- README.md - Updated counts (22 skills, 27 rules, 70+ commands)
-- GET_STARTED.md - Added model selection, reload-env command
-- commands/README.md - Added project:reload-env
-- skills/README.md - Added model-router, session-manager
-- rules/README.md - Added System & Session category
 
 ---
 

@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **24 Agents** | **23+ Skills** | **27 Rules** | **9 Phases** | **70+ Commands** |
+| **24 Agents** | **22+ Skills** | **27 Rules** | **9 Phases** | **70+ Commands** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|
 
 ---
@@ -200,18 +200,9 @@ workflow-state.json
 
 ### Environment Variables (Optional)
 
-Create `.envrc` for integrations and model selection:
+Create `.envrc` for integrations:
 
 ```bash
-# AI Model API Keys (for multi-model support)
-export GEMINI_API_KEY="your-gemini-api-key"
-export OPENAI_API_KEY="your-openai-api-key"
-export DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# Phase-Specific Model Overrides (Optional)
-# export AURA_PHASE_1_MODEL="gemini"   # Use Gemini for planning
-# export AURA_PHASE_2_MODEL="gemini"   # Use Gemini for design
-
 # JIRA Integration
 export JIRA_URL="https://your-company.atlassian.net"
 export JIRA_EMAIL="your.email@example.com"
@@ -219,6 +210,11 @@ export JIRA_API_TOKEN="your-jira-api-token"
 
 # Figma Integration
 export FIGMA_API_TOKEN="your-figma-token"
+
+# Confluence Integration
+export CONFLUENCE_URL="https://your-company.atlassian.net/wiki"
+export CONFLUENCE_EMAIL="your.email@example.com"
+export CONFLUENCE_API_TOKEN="your-confluence-api-token"
 
 # Slack Integration
 export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
@@ -311,9 +307,8 @@ workflow:start <your-task-description>
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
-- **Skills:** `skills/README.md` (23+ skills)
+- **Skills:** `skills/README.md` (22+ skills)
 - **Rules:** `rules/README.md` (27 quality rules)
-- **Model Selection:** `docs/MODEL_SELECTION.md`
 - **Phase Guides:** `docs/phases/`
 
 ---
