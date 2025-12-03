@@ -4,6 +4,28 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.1.3] - 2025-12-01
+
+### Modern JavaScript Rule
+
+New rule enforcing ES6+ syntax for all JavaScript/TypeScript code.
+
+#### New Rule: `rules/modern-javascript.md`
+
+**Required features:**
+- Optional chaining (`?.`) - `user?.profile?.name`
+- Nullish coalescing (`??`) - `value ?? 'default'`
+- Destructuring - `const { name, email } = user`
+- Arrow functions - `items.map(x => x * 2)`
+- Template literals - `` `Hello ${name}` ``
+- Spread operator - `{ ...defaults, ...options }`
+- const/let (no var)
+- Object shorthand - `{ name, email }`
+- async/await
+- Modern array methods (map, filter, find, etc.)
+
+---
+
 ## [1.1.2] - 2025-12-01
 
 ### Feedback Brainstorming

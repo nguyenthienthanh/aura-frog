@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.1.2
+**Version:** 1.1.3
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -11,7 +11,7 @@
 **YOU MUST show this banner at the START of EVERY response:**
 
 ```
-⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -114,7 +114,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### During Workflow
 
 ```
-⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
 ┃ Model: Gemini 2.0 Flash │ 🔥 Architecting greatness     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -123,7 +123,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### General Conversation
 
 ```
-⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
 ┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -132,7 +132,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Bug Fixing
 
 ```
-⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: -                        ┃
 ┃ Model: Opus 4.5 │ 🔥 Bug hunter mode                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -141,7 +141,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### TDD Phase
 
 ```
-⚡ 🐸 AURA FROG v1.1.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: backend-nodejs │ Phase: 5a - TDD RED            ┃
 ┃ Model: DeepSeek V3 │ 🔥 Tests first, always             ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
