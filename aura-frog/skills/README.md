@@ -12,7 +12,7 @@
 
 ---
 
-**Version:** 1.1.3
+**Version:** 1.1.4
 **Total Skills:** 22+ (10 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
@@ -439,6 +439,6 @@ These skills provide guidance documents that agents reference during workflows:
 
 ---
 
-**Version:** 1.1.3
+**Version:** 1.1.4
 **Last Updated:** 2025-12-01
 **Total Skills:** 22+ (10 auto-invoking + 12 reference)

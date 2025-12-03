@@ -255,5 +255,5 @@ User: modify: just do [changes]
 
 ---
 
-**Version:** 1.1.3
+**Version:** 1.1.4
 **Last Updated:** 2025-12-01

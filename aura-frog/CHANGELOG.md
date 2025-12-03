@@ -4,6 +4,39 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.1.4] - 2025-12-01
+
+### Workflow Navigation
+
+After each phase, agents now show what comes next and what will be skipped.
+
+#### New Rule: `rules/workflow-navigation.md`
+
+**Shows after every phase:**
+- Progress bar with percentage
+- What phase is next
+- What phases will be skipped (and why)
+- Remaining phases overview
+
+**Example:**
+```
+📍 WORKFLOW PROGRESS
+Progress: ████████░░░░░░░░ 50% (4/8 phases)
+
+✅ Phase 1-4: Completed
+🔄 Phase 5a: TDD RED - UP NEXT
+⏩ Phase 3: SKIPPED (backend-only task)
+⏳ Phase 5b-9: Pending
+
+After approval → Phase 5a: Write failing tests
+```
+
+#### Updated
+- `workflow-orchestrator` - Navigation block in approval gates
+- Approval gates now show progress and next steps
+
+---
+
 ## [1.1.3] - 2025-12-01
 
 ### Modern JavaScript Rule

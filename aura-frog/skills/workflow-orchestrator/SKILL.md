@@ -133,14 +133,24 @@ Phase 8 (Document) → Phase 9 (Share)
 
 ---
 
+📍 **Progress:** ████░░░░░░░░░░░░ [X]% ([N]/8 phases)
+
+⏭️ **After approval:**
+→ Phase [N+1]: [Name] - [Brief description]
+→ Will skip: [Phase X] ([reason]) — if applicable
+
+---
+
 **Options:**
 - `approve` / `yes` → Continue to Phase [N+1]
-- `reject: <reason>` → Re-do this phase
+- `reject: <reason>` → Brainstorm & re-do
 - `modify: <changes>` → Adjust deliverables
 - `stop` → Cancel workflow
 
 ⚡ After approval, I'll AUTO-CONTINUE to Phase [N+1]!
 ```
+
+See: `rules/workflow-navigation.md` for full navigation format.
 
 ### Valid Responses
 
@@ -286,6 +296,7 @@ rules/tdd-workflow.md
 rules/kiss-principle.md
 rules/code-quality.md
 rules/feedback-brainstorming.md
+rules/workflow-navigation.md
 ```
 
 ---
@@ -360,3 +371,4 @@ Phase 9: Share 🔔  [AUTO-EXECUTE]
 - TDD is mandatory (RED → GREEN → REFACTOR)
 - AUTO-CONTINUE after approval
 - Save state at token limit
+- **ALWAYS show what's next** after each phase (see `rules/workflow-navigation.md`)

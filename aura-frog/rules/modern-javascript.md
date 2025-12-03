@@ -1,6 +1,6 @@
 # Rule: Modern JavaScript (ES6+)
 
-**Version:** 1.1.2
+**Version:** 1.1.4
 **Priority:** HIGH
 **Applies:** All JavaScript/TypeScript code generation
 
@@ -289,5 +289,5 @@ const displayName = name || 'Anonymous';  // '' should become 'Anonymous'
 
 ---
 
-**Version:** 1.1.2
+**Version:** 1.1.4
 **Last Updated:** 2025-12-01
