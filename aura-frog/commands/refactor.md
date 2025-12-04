@@ -10,6 +10,115 @@ refactor <file>
 refactor <description>
 refactor:component <component-file>
 refactor:performance <file>
+
+# Documentation-only commands
+refactor:analyze <file>        # Generate analysis document only
+refactor:plan <file>           # Generate implementation plan only
+```
+
+---
+
+## 📄 Documentation Commands
+
+### refactor:analyze
+
+**Purpose:** Generate comprehensive analysis document without executing refactoring
+
+**Usage:**
+```
+refactor:analyze <file>
+refactor:analyze <file> --output=./docs/
+refactor:analyze <file> --type=performance
+```
+
+**What it does:**
+1. Analyzes target file/component
+2. Measures code quality metrics
+3. Identifies code smells
+4. Maps dependencies
+5. Generates `REFACTOR_ANALYSIS.md`
+
+**Output:** `documents/refactors/{target}-analysis-{date}.md`
+
+**Template:** `templates/refactor-analysis.md`
+
+**Example:**
+```
+User: refactor:analyze src/components/Dashboard.tsx
+
+AI generates:
+- Code quality assessment (LOC, complexity, coverage)
+- Code smells detected with severity
+- Dependency map
+- Recommended refactoring approach
+- Risk assessment
+- Effort estimation
+- Success criteria
+```
+
+---
+
+### refactor:plan
+
+**Purpose:** Generate detailed implementation plan (requires prior analysis)
+
+**Usage:**
+```
+refactor:plan <file>
+refactor:plan <file> --analysis=./docs/analysis.md
+refactor:plan <file> --approach=extract-components
+```
+
+**What it does:**
+1. Reads existing analysis (or generates one)
+2. Designs target structure
+3. Creates step-by-step implementation plan
+4. Defines test strategy
+5. Creates rollback plan
+6. Generates `REFACTOR_PLAN.md`
+
+**Output:** `documents/refactors/{target}-plan-{date}.md`
+
+**Template:** `templates/refactor-plan.md`
+
+**Example:**
+```
+User: refactor:plan src/components/Dashboard.tsx
+
+AI generates:
+- Target structure (before/after)
+- Implementation phases (5 phases)
+- Code examples for each step
+- Test strategy
+- Rollback plan
+- Risk mitigation
+- Timeline estimation
+```
+
+---
+
+### refactor:docs
+
+**Purpose:** Generate both analysis and plan documents
+
+**Usage:**
+```
+refactor:docs <file>
+refactor:docs <file> --output=./docs/refactoring/
+```
+
+**What it does:**
+1. Runs `refactor:analyze`
+2. Runs `refactor:plan`
+3. Creates summary document
+4. Outputs all documents to specified directory
+
+**Output:**
+```
+documents/refactors/{target}/
+├── {target}-analysis-{date}.md
+├── {target}-plan-{date}.md
+└── {target}-summary-{date}.md
 ```
 
 ---
@@ -788,20 +897,41 @@ if (isAdmin) {
 
 ## 📝 Templates Used
 
-- `REFACTOR_ANALYSIS.md` - Code analysis template
-- `REFACTOR_PLAN.md` - Refactoring plan template
-- `REFACTOR_SUMMARY.md` - Implementation summary
-- `REFACTOR_REVIEW.md` - Code review report
-- `MIGRATION_GUIDE.md` - Breaking changes guide
-- `CONFLUENCE_REFACTOR.md` - Confluence format
+| Template | Location | Purpose |
+|----------|----------|---------|
+| `refactor-analysis.md` | `templates/` | Comprehensive code analysis |
+| `refactor-plan.md` | `templates/` | Step-by-step implementation plan |
+| `REFACTOR_SUMMARY.md` | Generated | Implementation summary |
+| `REFACTOR_REVIEW.md` | Generated | Code review report |
+| `MIGRATION_GUIDE.md` | Generated | Breaking changes guide |
+| `CONFLUENCE_REFACTOR.md` | Generated | Confluence format |
+
+---
+
+## 📂 Output Locations
+
+```
+documents/refactors/
+├── {target}-analysis-{date}.md    # From refactor:analyze
+├── {target}-plan-{date}.md        # From refactor:plan
+└── {target}-summary-{date}.md     # After completion
+
+.claude/logs/workflows/refactor-{id}/
+├── REFACTOR_ANALYSIS.md           # During workflow
+├── REFACTOR_PLAN.md               # During workflow
+├── REFACTOR_SUMMARY.md            # After completion
+└── workflow-state.json            # Workflow state
+```
 
 ---
 
 ## ✅ Command Complete
 
-**Workflow:** 9 phases (Refactoring-specific)  
-**Duration:** 2-4 hours (typical)  
-**Enforces:** TDD workflow, behavior preservation  
-**Output:** Improved code + documentation  
+**Workflow:** 9 phases (Refactoring-specific)
+**Duration:** 2-4 hours (typical)
+**Enforces:** TDD workflow, behavior preservation
+**Output:** Improved code + documentation
 **Integration:** Jira + Slack + Confluence
+
+**Version:** 1.1.0 | **Last Updated:** 2025-12-04
 

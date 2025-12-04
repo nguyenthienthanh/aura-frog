@@ -7,12 +7,14 @@ triggers:
   - "refactor"
   - "code cleanup"
   - "improve code"
+  - "refactor:analyze"
+  - "refactor:plan"
 ---
 
 # Skill: Refactor Expert
 
 **Category:** Dev Expert
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Used By:** All development agents
 
 ---
@@ -20,6 +22,20 @@ triggers:
 ## Overview
 
 Guide safe, incremental refactoring that improves code quality without changing behavior.
+
+---
+
+## Documentation Commands
+
+Generate analysis and implementation plans before refactoring:
+
+| Command | Purpose | Output |
+|---------|---------|--------|
+| `refactor:analyze <file>` | Code analysis document | `documents/refactors/{target}-analysis.md` |
+| `refactor:plan <file>` | Implementation plan | `documents/refactors/{target}-plan.md` |
+| `refactor:docs <file>` | Both documents | Analysis + Plan + Summary |
+
+**Templates:** `templates/refactor-analysis.md`, `templates/refactor-plan.md`
 
 ---
 
@@ -155,4 +171,16 @@ After:
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28
+## Related Commands
+
+- `refactor <file>` - Full refactoring workflow
+- `refactor:analyze <file>` - Analysis document only
+- `refactor:plan <file>` - Implementation plan only
+- `refactor:docs <file>` - Both documents
+- `refactor:quick <file>` - Skip approvals
+- `refactor:performance <file>` - Performance-focused
+- `refactor:structure <file>` - Structure-focused
+
+---
+
+**Version:** 1.1.0 | **Last Updated:** 2025-12-04

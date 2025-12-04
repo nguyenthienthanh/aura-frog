@@ -1,7 +1,7 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-25
+**Version:** 1.1.0
+**Last Updated:** 2025-12-04
 
 ---
 
@@ -152,12 +152,15 @@ commands/
 | `workflow:metrics` | `workflow/metrics.md` | Show metrics |
 | `workflow:phase-2` to `workflow:phase-9` | `workflow/phase-*.md` | Execute specific phases |
 
-### Standalone Commands (4)
+### Standalone Commands (4 files, 7 commands)
 | Command | File | Description |
 |---------|------|-------------|
 | `document` | `document.md` | Generate documentation |
 | `execute` | `execute.md` | Execute saved plan |
 | `refactor` | `refactor.md` | Code refactoring workflow |
+| `refactor:analyze` | `refactor.md` | Generate analysis document only |
+| `refactor:plan` | `refactor.md` | Generate implementation plan only |
+| `refactor:docs` | `refactor.md` | Generate both analysis + plan |
 | `help` | `help.md` | Show all commands |
 
 ---
