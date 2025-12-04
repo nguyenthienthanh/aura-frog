@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.1.4
+**Version:** 1.1.5
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -11,7 +11,7 @@
 **YOU MUST show this banner at the START of EVERY response:**
 
 ```
-⚡ 🐸 AURA FROG v1.1.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -24,7 +24,7 @@
 ## Banner Components
 
 ### Line 1: Header
-- Version indicator: `AURA FROG v1.1.0`
+- Version indicator: `AURA FROG v1.1.5`
 - Visual separator with lightning bolt
 
 ### Line 2: Context
@@ -114,7 +114,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### During Workflow
 
 ```
-⚡ 🐸 AURA FROG v1.1.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
 ┃ Model: Gemini 2.0 Flash │ 🔥 Architecting greatness     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -123,7 +123,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### General Conversation
 
 ```
-⚡ 🐸 AURA FROG v1.1.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
 ┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -132,7 +132,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Bug Fixing
 
 ```
-⚡ 🐸 AURA FROG v1.1.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: -                        ┃
 ┃ Model: Opus 4.5 │ 🔥 Bug hunter mode                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -141,7 +141,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### TDD Phase
 
 ```
-⚡ 🐸 AURA FROG v1.1.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: backend-nodejs │ Phase: 5a - TDD RED            ┃
 ┃ Model: DeepSeek V3 │ 🔥 Tests first, always             ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -170,5 +170,44 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-29
+## Complete Response Structure
+
+Every response should follow this structure:
+
+```
+┌─────────────────────────────────────────────┐
+│  AGENT BANNER (start of response)           │
+│  ⚡ 🐸 AURA FROG v1.1.5 ...                  │
+└─────────────────────────────────────────────┘
+            │
+            ▼
+┌─────────────────────────────────────────────┐
+│  RESPONSE CONTENT                           │
+│  (deliverables, explanations, code, etc.)   │
+└─────────────────────────────────────────────┘
+            │
+            ▼
+┌─────────────────────────────────────────────┐
+│  NEXT STEP GUIDANCE (end of response)       │
+│  💡 WHAT'S NEXT ...                         │
+└─────────────────────────────────────────────┘
+```
+
+**Rule:** Banner = START, Guidance = END
+
+---
+
+## Related Rules
+
+| Rule | Purpose |
+|------|---------|
+| `next-step-guidance.md` | End-of-response guidance block |
+| `workflow-navigation.md` | Progress tracking and phase status |
+| `execution-rules.md` | ALWAYS/NEVER constraints |
+
+**See:** `rules/next-step-guidance.md` for detailed guidance formats.
+
+---
+
+**Version:** 1.1.5
+**Last Updated:** 2025-12-04

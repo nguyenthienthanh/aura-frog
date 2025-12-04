@@ -27,14 +27,15 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **23+** | **27** | **9** | **70+** |
+| **24** | **23+** | **32** | **9** | **70+** |
 
 </div>
 
 **What's Inside:**
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
 - ⚡ **23+ Skills** — 11 auto-invoking + 12 reference skills for specialized tasks
-- 📏 **27 Quality Rules** — System, code quality, architecture, workflow, and accessibility
+- 🎨 **10 Design Systems** — MUI, Ant Design, Tailwind, shadcn/ui, Chakra, NativeWind, and more
+- 📏 **32 Quality Rules** — System, code quality, architecture, workflow, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
 - 🎮 **70+ Commands** — Full workflow control at your fingertips
 - 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)

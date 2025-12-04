@@ -245,6 +245,12 @@ Progress: ████░░░░░░░░░░░░ 25% (2/8 phases)
 
 ---
 
+## Related Rule
+
+**See also:** `rules/next-step-guidance.md` for comprehensive command reference and context-aware guidance blocks.
+
+---
+
 ## Token Awareness Integration
 
 Include token status in navigation when relevant:
@@ -261,5 +267,5 @@ Tokens: ████████████░░░░ 75% (~150K used)
 
 ---
 
-**Version:** 1.1.3
-**Last Updated:** 2025-12-01
+**Version:** 1.1.4
+**Last Updated:** 2025-12-04

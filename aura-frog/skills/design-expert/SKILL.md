@@ -54,4 +54,25 @@ Atoms → Molecules → Organisms → Templates → Pages
 
 ---
 
+## Related Skills
+
+For implementation with specific design system libraries, use:
+
+**Design System Library:** `skills/design-system-library/`
+
+| System | File |
+|--------|------|
+| Material UI | `material-ui.md` |
+| Ant Design | `ant-design.md` |
+| Tailwind CSS | `tailwind-css.md` |
+| shadcn/ui | `shadcn-ui.md` |
+| Chakra UI | `chakra-ui.md` |
+| NativeWind | `nativewind.md` |
+| Bootstrap | `bootstrap.md` |
+| Mantine | `mantine.md` |
+| Radix UI | `radix-ui.md` |
+| Headless UI | `headless-ui.md` |
+
+---
+
 **Load sub-skills as needed for detailed guidance.**

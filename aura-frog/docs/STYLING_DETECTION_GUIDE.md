@@ -601,13 +601,32 @@ cat package.json | grep -E "(nativewind|emotion|styled-components)"
 
 ## 📖 Related Documentation
 
+- **Design System Library:** `skills/design-system-library/` → Full design system patterns
+- **Design System Guide:** `docs/DESIGN_SYSTEM_GUIDE.md` → Selection and implementation
+- **Design System Rule:** `rules/design-system-usage.md` → Enforcement rules
 - **Agent Guide:** `agents/mobile-react-native.md` → "Styling Conventions"
+- **UI Designer Agent:** `agents/ui-designer.md` → Design system detection
 - **NativeWind Skill:** `skills/nativewind-component-generator.md`
 - **Project Config:** `.claude/project-contexts/template/project-config.yaml`
 - **Conventions:** `.claude/project-contexts/template/conventions.md`
 
+### Supported Design Systems (Full Docs)
+
+| System | Skill File |
+|--------|------------|
+| Material UI | `skills/design-system-library/material-ui.md` |
+| Ant Design | `skills/design-system-library/ant-design.md` |
+| Tailwind CSS | `skills/design-system-library/tailwind-css.md` |
+| shadcn/ui | `skills/design-system-library/shadcn-ui.md` |
+| Chakra UI | `skills/design-system-library/chakra-ui.md` |
+| NativeWind | `skills/design-system-library/nativewind.md` |
+| Bootstrap | `skills/design-system-library/bootstrap.md` |
+| Mantine | `skills/design-system-library/mantine.md` |
+| Radix UI | `skills/design-system-library/radix-ui.md` |
+| Headless UI | `skills/design-system-library/headless-ui.md` |
+
 ---
 
-**Last Updated:** 2024-11-26
-**Version:** 4.6.0
+**Last Updated:** 2025-12-04
+**Version:** 4.7.0
 **Status:** ✅ Active Standard

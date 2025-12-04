@@ -40,6 +40,7 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 | 10 | **Show approval gate** | Human oversight required |
 | 11 | **Wait for explicit approval** | No auto-progression |
 | 12 | **Save workflow state** | Enable resume if interrupted |
+| 13 | **Show next step guidance** | User knows available actions |
 
 ### After User Approval
 
@@ -232,6 +233,7 @@ At 150K tokens (75% of 200K):
 □ Load project context
 □ Follow phase order
 □ Show approval gates
+□ Show next step guidance (commands & suggestions)
 □ Wait for approval
 □ Save state
 □ Run tests

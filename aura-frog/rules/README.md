@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.0.0
-**Total Rules:** 27
+**Version:** 1.1.5
+**Total Rules:** 32
 **Purpose:** Enforce consistent quality across all development
 
 ---
@@ -19,7 +19,7 @@
 | [dual-file-architecture](dual-file-architecture.md) | High | Plugin + project structure |
 | [token-time-awareness](token-time-awareness.md) | High | Monitor token usage |
 
-### Code Quality (8)
+### Code Quality (9)
 
 | Rule | Priority | Purpose |
 |------|----------|---------|
@@ -31,8 +31,9 @@
 | [code-quality](code-quality.md) | High | TypeScript strict, no any |
 | [naming-conventions](naming-conventions.md) | Medium | Consistent naming patterns |
 | [smart-commenting](smart-commenting.md) | Medium | Comment why, not what |
+| [modern-javascript](modern-javascript.md) | High | ES6+ syntax (optional chaining, nullish coalescing) |
 
-### Architecture (5)
+### Architecture (6)
 
 | Rule | Priority | Purpose |
 |------|----------|---------|
@@ -41,8 +42,9 @@
 | [dependency-management](dependency-management.md) | High | Version pinning, security audits |
 | [performance-rules](performance-rules.md) | Medium | Optimization guidelines |
 | [theme-consistency](theme-consistency.md) | Medium | Design system adherence |
+| [design-system-usage](design-system-usage.md) | High | Proper design system implementation |
 
-### Workflow (5)
+### Workflow (8)
 
 | Rule | Priority | Purpose |
 |------|----------|---------|
@@ -51,6 +53,9 @@
 | [approval-gates](approval-gates.md) | Critical | Human approval required |
 | [git-workflow](git-workflow.md) | High | Commit conventions |
 | [safety-rules](safety-rules.md) | Critical | Security guidelines |
+| [next-step-guidance](next-step-guidance.md) | Critical | Always show next steps and commands |
+| [workflow-navigation](workflow-navigation.md) | High | Progress tracking and phase status |
+| [feedback-brainstorming](feedback-brainstorming.md) | High | Brainstorm before implementing feedback |
 
 ### Accessibility & UI (3)
 
@@ -90,6 +95,7 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 - [ ] Follow `agent-identification-banner` - Show banner every response
 - [ ] Follow `env-loading` - Load .envrc if exists
 - [ ] Follow `execution-rules` - Load project context first
+- [ ] Follow `next-step-guidance` - Show next steps every response
 
 ### Before Coding
 - [ ] Read `yagni-principle` - Don't add unused features
@@ -125,4 +131,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-12-01
+**Version:** 1.1.5 | **Last Updated:** 2025-12-04

@@ -12,7 +12,7 @@
 
 ---
 
-**Version:** 1.1.4
+**Version:** 1.1.5
 **Total Skills:** 22+ (10 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
@@ -206,7 +206,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
-### 10. **session-manager** (Priority: HIGH)
+### 10. **session-continuation** (Priority: HIGH)
 
 **Auto-invokes when:** Token limit warning triggered
 
@@ -218,16 +218,17 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 **What it does:**
 - Monitors token usage
-- Saves workflow state to `.claude/context/`
+- Saves workflow state to `.claude/logs/workflows/`
 - Enables workflow resume across sessions
 - Warns user before token exhaustion
+- Detailed handoff/resume flows
 
 **Thresholds:**
 - 150K tokens - Consider handoff
 - 175K tokens - Recommend handoff
 - 190K tokens - Urgent handoff
 
-**📚 Details:** `skills/session-manager/SKILL.md`
+**📚 Details:** `skills/session-continuation/SKILL.md`
 
 ---
 
@@ -378,7 +379,7 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 | workflow-orchestrator | CRITICAL | Complex tasks |
 | project-context-loader | HIGH | Before code generation |
 | code-reviewer | HIGH | After implementation |
-| session-manager | HIGH | Token limit warning |
+| session-continuation | HIGH | Token limit warning |
 | bugfix-quick | MEDIUM | Bug mentions |
 | test-writer | MEDIUM | Test requests |
 | jira-integration | MEDIUM | Ticket detected |
@@ -429,6 +430,7 @@ These skills provide guidance documents that agents reference during workflows:
 
 | Skill | Purpose | Location |
 |-------|---------|----------|
+| **design-system-library** | Design system patterns (MUI, Ant, Tailwind, etc.) | `skills/design-system-library/` |
 | **refactor-expert** | Safe refactoring patterns | `skills/refactor-expert/` |
 | **api-designer** | RESTful API design | `skills/api-designer/` |
 | **performance-optimizer** | Performance profiling & optimization | `skills/performance-optimizer/` |
@@ -437,8 +439,37 @@ These skills provide guidance documents that agents reference during workflows:
 | **estimation** | Effort estimation techniques | `skills/pm-expert/` |
 | **documentation** | ADR & Runbook templates | `skills/documentation/` |
 
+### 11. **design-system-library** (Priority: HIGH)
+
+**Auto-invokes when:** Building UI components or user mentions design system
+
+**Triggers:**
+- "material ui", "mui", "ant design", "tailwind", "shadcn", "chakra"
+- "design system", "component library", "ui library"
+- Building web/mobile app UI
+
+**What it does:**
+- Auto-detects project's design system from package.json
+- Loads appropriate design system patterns
+- Generates code using correct component library
+- Ensures theme consistency
+
+**Supported Systems:**
+- Material UI (MUI)
+- Ant Design
+- Tailwind CSS
+- shadcn/ui
+- Chakra UI
+- NativeWind
+- Bootstrap
+- Mantine
+- Radix UI
+- Headless UI
+
+**📚 Details:** `skills/design-system-library/SKILL.md`
+
 ---
 
-**Version:** 1.1.4
-**Last Updated:** 2025-12-01
-**Total Skills:** 22+ (10 auto-invoking + 12 reference)
+**Version:** 1.1.5
+**Last Updated:** 2025-12-04
+**Total Skills:** 23+ (11 auto-invoking + 12 reference)

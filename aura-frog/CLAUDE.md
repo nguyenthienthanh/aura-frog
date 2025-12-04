@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.1.4
+**System:** Aura Frog v1.1.5
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
 ---
@@ -19,7 +19,7 @@
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.1.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -35,6 +35,7 @@
 |-------|---------|------|
 | agent-detector | Every message | `skills/agent-detector/SKILL.md` |
 | project-context-loader | Before code gen | `skills/project-context-loader/SKILL.md` |
+| design-system-library | UI/design system | `skills/design-system-library/SKILL.md` |
 | jira-integration | Ticket ID (PROJ-123) | `skills/jira-integration/SKILL.md` |
 | figma-integration | Figma URL | `skills/figma-integration/SKILL.md` |
 | confluence-integration | Confluence URL | `skills/confluence-integration/SKILL.md` |
@@ -42,7 +43,7 @@
 | bugfix-quick | Bug fix request | `skills/bugfix-quick/SKILL.md` |
 | test-writer | Test request | `skills/test-writer/SKILL.md` |
 | code-reviewer | Code review | `skills/code-reviewer/SKILL.md` |
-| session-manager | Token limit | `skills/session-manager/SKILL.md` |
+| session-continuation | Token limit | `skills/session-continuation/SKILL.md` |
 
 **All skills:** `skills/README.md`
 
@@ -64,12 +65,13 @@
 |----------|----------|
 | Agents (24) | `agents/` |
 | Commands (70+) | `commands/` |
-| Rules (27) | `rules/` |
-| Skills (22+) | `skills/` |
+| Rules (32) | `rules/` |
+| Skills (23+) | `skills/` |
 | Phases (9) | `docs/phases/` |
+| Design Systems | `skills/design-system-library/` |
 | Getting Started | `GET_STARTED.md` |
 | Integrations | `docs/INTEGRATION_SETUP_GUIDE.md` |
 
 ---
 
-**Version:** 1.1.4
+**Version:** 1.1.5
