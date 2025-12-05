@@ -591,8 +591,8 @@ Options:
 **Coverage:** 80%+
 
 **Files Generated:**
-- `documents/tests/COMPLETE_TEST_DOCUMENT.md`
-- `documents/tests/CONFLUENCE_TEST_DOCUMENT.md`
+- `.claude/logs/documents/tests/COMPLETE_TEST_DOCUMENT.md`
+- `.claude/logs/documents/tests/CONFLUENCE_TEST_DOCUMENT.md`
 - `src/**/__tests__/*.test.tsx` (5 files)
 
 Options:
@@ -633,7 +633,7 @@ Options:
 
 **Published:**
 - Confluence: https://company.atlassian.net/wiki/spaces/QA/pages/123456
-- Local: documents/tests/user-authentication-test-doc.md
+- Local: .claude/logs/documents/tests/user-authentication-test-doc.md
 
 **Slack:** #qa-team notified
 

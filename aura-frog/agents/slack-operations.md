@@ -99,7 +99,7 @@ async function postRichMessage(channel: string, blocks: Block[]) {
 
 📚 **Documentation:**
 - Tech Spec: [Link]
-- Deployment Guide: documents/deployment_guide.md
+- Deployment Guide: .claude/logs/documents/deployment_guide.md
 
 👀 **Ready for:**
 - Final UAT

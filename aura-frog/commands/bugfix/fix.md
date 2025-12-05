@@ -400,7 +400,7 @@ Options:
 - `BUG_FIX_SUMMARY.md` - Implementation summary
 - `CHANGELOG.md` - Updated
 - `CONFLUENCE_BUG_FIX.md` - Confluence format
-- Local copies in `documents/bugs/`
+- Local copies in `.claude/logs/bugs/`
 
 **Approval Gate:**
 ```markdown
@@ -413,7 +413,7 @@ Options:
 
 **Files:**
 - `.claude/logs/workflows/[workflow]/BUG_FIX_SUMMARY.md`
-- `documents/bugs/[bug-id].md`
+- `.claude/logs/bugs/[bug-id].md`
 
 Options:
 - "approve" → Notify team

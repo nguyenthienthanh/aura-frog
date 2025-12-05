@@ -616,7 +616,7 @@ Creates user-facing documentation with screenshots and step-by-step instructions
 ## 📁 Output Location
 
 ```
-documents/
+.claude/logs/documents/
 ├── features/
 │   └── user-authentication.md
 ├── api/

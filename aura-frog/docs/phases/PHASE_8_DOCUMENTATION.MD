@@ -34,7 +34,7 @@
 ## Deliverables
 
 ```
-documents/
+.claude/logs/documents/
 ├── implementation-summary.md
 ├── api-documentation.md
 ├── user-guide.md

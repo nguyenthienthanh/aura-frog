@@ -566,7 +566,7 @@ Options:
 - `MIGRATION_GUIDE.md` - If breaking changes
 - Updated code documentation
 - `CONFLUENCE_REFACTOR.md` - Confluence format
-- Local copies in `documents/refactors/`
+- Local copies in `.claude/logs/refactors/`
 
 **Approval Gate:**
 ```markdown
@@ -580,7 +580,7 @@ Options:
 
 **Files:**
 - `.claude/logs/workflows/[workflow]/REFACTOR_SUMMARY.md`
-- `documents/refactors/[component-name].md`
+- `.claude/logs/refactors/[component-name].md`
 
 Options:
 - "approve" → Notify team

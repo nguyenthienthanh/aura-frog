@@ -191,8 +191,8 @@ code block
 ### Phase 2-7: Development
 ```
 1. Generate local markdown files
-2. Store in documents/ folder
-3. Track in git
+2. Store in .claude/logs/documents/ folder
+3. Track in git (optional)
 ```
 
 ### Phase 8: Documentation

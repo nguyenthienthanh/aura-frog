@@ -399,7 +399,7 @@ logs/audio/{workflow-id}/ (if narration generated)
 ├── deployment_guide.mp3
 └── changelog.mp3
 
-documents/ (local copies)
+.claude/logs/documents/ (local copies)
 ├── implementation-summary-{date}.md
 └── deployment-guide-{date}.md
 ```

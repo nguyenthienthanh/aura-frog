@@ -2,13 +2,14 @@
 
 **Purpose:** Stores generated documentation from `document` command
 
+**Location:** `.claude/logs/documents/`
+
 ---
 
 ## 📁 Structure
 
 ```
-documents/
-├── README.md
+.claude/logs/documents/
 ├── features/          # Feature documentation
 │   ├── user-authentication.md
 │   └── dark-mode.md
@@ -21,6 +22,8 @@ documents/
 ├── specs/             # Technical specifications
 │   ├── dark-mode-spec.md
 │   └── api-refactor-spec.md
+├── refactors/         # Refactoring documentation
+│   └── {component}-analysis.md
 └── guides/            # User guides
     ├── authentication-guide.md
     └── deployment-guide.md
@@ -33,7 +36,7 @@ documents/
 ### 1. Feature Documentation
 ```bash
 document feature "User Authentication"
-# Output: documents/features/user-authentication.md
+# Output: .claude/logs/documents/features/user-authentication.md
 ```
 
 **Contains:**
@@ -48,7 +51,7 @@ document feature "User Authentication"
 ### 2. API Documentation
 ```bash
 document api "src/api/authApi.ts"
-# Output: documents/api/auth-api.md
+# Output: .claude/logs/documents/api/auth-api.md
 ```
 
 **Contains:**
@@ -62,7 +65,7 @@ document api "src/api/authApi.ts"
 ### 3. Component Documentation
 ```bash
 document component "src/components/UserProfile.tsx"
-# Output: documents/components/user-profile.md
+# Output: .claude/logs/documents/components/user-profile.md
 ```
 
 **Contains:**
@@ -77,7 +80,7 @@ document component "src/components/UserProfile.tsx"
 ### 4. Technical Specifications
 ```bash
 document spec "Add dark mode support"
-# Output: documents/specs/dark-mode-spec.md
+# Output: .claude/logs/documents/specs/dark-mode-spec.md
 ```
 
 **Contains:**
@@ -91,7 +94,7 @@ document spec "Add dark mode support"
 ### 5. User Guides
 ```bash
 document guide "How to use authentication"
-# Output: documents/guides/authentication-guide.md
+# Output: .claude/logs/documents/guides/authentication-guide.md
 ```
 
 **Contains:**
