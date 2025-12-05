@@ -284,4 +284,4 @@ refactor:quick {TARGET_PATH}
 **Generated:** {TIMESTAMP}
 **Agent:** {AGENT_NAME}
 **Based on:** `{ANALYSIS_PATH}`
-**Document:** `{OUTPUT_PATH}`
+**Document:** `.claude/logs/refactors/{TARGET_NAME}/{OUTPUT_PATH}`

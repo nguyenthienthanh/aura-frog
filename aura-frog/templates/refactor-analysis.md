@@ -173,6 +173,8 @@
 2. **Generate implementation plan** - Run `refactor:plan {TARGET_PATH}`
 3. **Start TDD workflow** - Run `refactor {TARGET_PATH}` to begin
 
+**Output location:** `.claude/logs/refactors/`
+
 ---
 
 **Generated:** {TIMESTAMP}

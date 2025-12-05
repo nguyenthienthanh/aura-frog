@@ -31,8 +31,8 @@ Generate analysis and implementation plans before refactoring:
 
 | Command | Purpose | Output |
 |---------|---------|--------|
-| `refactor:analyze <file>` | Code analysis document | `documents/refactors/{target}-analysis.md` |
-| `refactor:plan <file>` | Implementation plan | `documents/refactors/{target}-plan.md` |
+| `refactor:analyze <file>` | Code analysis document | `.claude/logs/refactors/{target}-analysis.md` |
+| `refactor:plan <file>` | Implementation plan | `.claude/logs/refactors/{target}-plan.md` |
 | `refactor:docs <file>` | Both documents | Analysis + Plan + Summary |
 
 **Templates:** `templates/refactor-analysis.md`, `templates/refactor-plan.md`

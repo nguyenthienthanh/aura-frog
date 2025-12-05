@@ -38,7 +38,7 @@ refactor:analyze <file> --type=performance
 4. Maps dependencies
 5. Generates `REFACTOR_ANALYSIS.md`
 
-**Output:** `documents/refactors/{target}-analysis-{date}.md`
+**Output:** `.claude/logs/refactors/{target}-analysis-{date}.md`
 
 **Template:** `templates/refactor-analysis.md`
 
@@ -77,7 +77,7 @@ refactor:plan <file> --approach=extract-components
 5. Creates rollback plan
 6. Generates `REFACTOR_PLAN.md`
 
-**Output:** `documents/refactors/{target}-plan-{date}.md`
+**Output:** `.claude/logs/refactors/{target}-plan-{date}.md`
 
 **Template:** `templates/refactor-plan.md`
 
@@ -115,7 +115,7 @@ refactor:docs <file> --output=./docs/refactoring/
 
 **Output:**
 ```
-documents/refactors/{target}/
+.claude/logs/refactors/{target}/
 ├── {target}-analysis-{date}.md
 ├── {target}-plan-{date}.md
 └── {target}-summary-{date}.md
@@ -911,16 +911,11 @@ if (isAdmin) {
 ## 📂 Output Locations
 
 ```
-documents/refactors/
+.claude/logs/refactors/{target}/
 ├── {target}-analysis-{date}.md    # From refactor:analyze
 ├── {target}-plan-{date}.md        # From refactor:plan
 └── {target}-summary-{date}.md     # After completion
-
-.claude/logs/workflows/refactor-{id}/
-├── REFACTOR_ANALYSIS.md           # During workflow
-├── REFACTOR_PLAN.md               # During workflow
-├── REFACTOR_SUMMARY.md            # After completion
-└── workflow-state.json            # Workflow state
+└── workflow-state.json            # Workflow state (if full workflow)
 ```
 
 ---
