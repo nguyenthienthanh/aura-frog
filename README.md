@@ -10,7 +10,7 @@
 
 AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-phase TDD workflow.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.5-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -252,7 +252,7 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 📏 27 Quality Rules
+### 📏 32 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 

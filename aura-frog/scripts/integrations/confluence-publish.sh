@@ -25,7 +25,7 @@ PAGE_TITLE=$2
 
 if [ -z "$DOC_FILE" ] || [ -z "$PAGE_TITLE" ]; then
     echo "Usage: $0 <DOC_FILE> <PAGE_TITLE>"
-    echo "Example: $0 documents/implementation-summary.md 'Feature Implementation'"
+    echo "Example: $0 .claude/logs/documents/implementation-summary.md 'Feature Implementation'"
     exit 1
 fi
 

@@ -131,4 +131,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.1.5 | **Last Updated:** 2025-12-04
+**Version:** 1.1.5 | **Last Updated:** 2025-12-08

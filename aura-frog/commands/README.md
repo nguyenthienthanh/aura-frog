@@ -1,7 +1,7 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.1.0
-**Last Updated:** 2025-12-04
+**Version:** 1.1.5
+**Last Updated:** 2025-12-08
 
 ---
 
