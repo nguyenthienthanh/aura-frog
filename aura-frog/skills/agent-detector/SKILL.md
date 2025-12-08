@@ -12,7 +12,7 @@ allowed-tools: Read, Grep, Glob
 # Aura Frog Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ---
 
@@ -177,25 +177,53 @@ ui-designer:
 - Optional: Score 30-49
 
 ### Step 5: Show Banner
-```markdown
-**─────────────────────────────────────────────────────────**
-🤖 **Agent:** [selected-agent] | 📋 **System:** Aura Frog v1.0.0 | 🎯 **Phase:** [phase]
-**─────────────────────────────────────────────────────────**
+
+**See:** `rules/agent-identification-banner.md` for official format.
+
+**Single Agent Banner:**
+```
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
+┃ Model: [model] │ 🔥 [aura-message]                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Multi-Agent Banner (when collaboration needed):**
+```
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: [primary] + [secondary], [tertiary]            ┃
+┃ Phase: [phase] - [name] │ 🔥 [aura-message]            ┃
+┃ Model: [model]                                         ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 **Banner Examples:**
-```markdown
+```
 # Single agent:
-🤖 **Agent:** backend-laravel | 📋 **System:** Aura Frog v1.0.0 | 🎯 **Phase:** 2 (Design)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: backend-laravel │ Phase: 2 - Design             ┃
+┃ Model: Sonnet 4.5 │ 🔥 Architecting greatness          ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Multiple agents (full-stack):
-🤖 **Agent:** web-reactjs + backend-nodejs | 📋 **System:** Aura Frog v1.0.0 | 🎯 **Phase:** 5b (Build)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: web-reactjs + backend-nodejs                   ┃
+┃ Phase: 5b - TDD GREEN │ 🔥 Full stack flow             ┃
+┃ Model: Opus 4.5                                        ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# With secondary:
-🤖 **Agent:** mobile-flutter (+ qa-automation) | 📋 **System:** Aura Frog v1.0.0
+# With QA secondary:
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: mobile-flutter + qa-automation                 ┃
+┃ Phase: - │ 🔥 Bug hunter squad                         ┃
+┃ Model: Sonnet 4.5                                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # General (no workflow):
-🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** Aura Frog v1.0.0
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
+┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                   ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
@@ -235,8 +263,11 @@ Scores:
   ✅ ui-designer: 35 (screen/profile implies UI) (OPTIONAL)
   ✅ qa-automation: 30 (implementation needs tests) (OPTIONAL)
 
-Banner:
-🤖 **Agent:** mobile-react-native | 📋 **System:** Aura Frog v1.0.0
+Banner: (single agent - ui-designer & qa-automation are optional, not shown)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: mobile-react-native │ Phase: -                  ┃
+┃ Model: Sonnet 4.5 │ 🔥 Let's build                     ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Example 2: Context-Based Detection (No Tech Mention)
@@ -252,8 +283,12 @@ Scores:
   ✅ backend-laravel: 40+20 = 60, +35 (bug intent) = 95 (PRIMARY)
   ✅ qa-automation: 35 (bug fix needs validation) (OPTIONAL)
 
-Banner:
-🤖 **Agent:** backend-laravel | 📋 **System:** Aura Frog v1.0.0
+Banner: (multi-agent - qa involved in bug fix)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: backend-laravel + qa-automation                ┃
+┃ Phase: - │ 🔥 Bug hunter mode                          ┃
+┃ Model: Sonnet 4.5                                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Example 3: Full-Stack Feature
@@ -272,8 +307,12 @@ Scores:
   ✅ ui-designer: 45 (profile UI) (OPTIONAL)
   ✅ qa-automation: 30 (implementation) (OPTIONAL)
 
-Banner:
-🤖 **Agent:** web-reactjs + backend-nodejs | 📋 **System:** Aura Frog v1.0.0
+Banner: (multi-agent - full stack collaboration)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: web-reactjs + backend-nodejs, ui-designer      ┃
+┃ Phase: - │ 🔥 Full stack mode                          ┃
+┃ Model: Opus 4.5                                        ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Example 4: Security Audit
@@ -287,8 +326,12 @@ Scores:
   ✅ security-expert: 50+35 = 85 (PRIMARY)
   ✅ backend-nodejs: 45 (auth context) (OPTIONAL)
 
-Banner:
-🤖 **Agent:** security-expert | 📋 **System:** Aura Frog v1.0.0
+Banner: (multi-agent - security with backend context)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: security-expert + backend-nodejs               ┃
+┃ Phase: - │ 🔥 Security audit                           ┃
+┃ Model: Opus 4.5                                        ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Example 5: Testing Request
@@ -302,8 +345,12 @@ Scores:
   ✅ qa-automation: 50+30 = 80 (PRIMARY)
   ✅ backend-nodejs: 40 (service context) (SECONDARY)
 
-Banner:
-🤖 **Agent:** qa-automation | 📋 **System:** Aura Frog v1.0.0
+Banner: (multi-agent - QA leads with backend support)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: qa-automation + backend-nodejs                 ┃
+┃ Phase: - │ 🔥 Test warrior mode                        ┃
+┃ Model: Sonnet 4.5                                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Example 6: Database Task
@@ -316,8 +363,12 @@ Scores:
   ✅ database-specialist: 50+35 = 85 (PRIMARY)
   ✅ backend-nodejs: 40 (will implement models) (SECONDARY)
 
-Banner:
-🤖 **Agent:** database-specialist | 📋 **System:** Aura Frog v1.0.0
+Banner: (multi-agent - DB leads with backend for models)
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: database-specialist + backend-nodejs           ┃
+┃ Phase: - │ 🔥 Schema architect                         ┃
+┃ Model: Sonnet 4.5                                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---

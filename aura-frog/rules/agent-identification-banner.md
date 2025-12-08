@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.1.5
+**Version:** 1.2.0
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -10,10 +10,20 @@
 
 **YOU MUST show this banner at the START of EVERY response:**
 
+### Single Agent (Default)
 ```
 ⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Multiple Agents (Collaboration)
+```
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: [primary] + [secondary], [tertiary]            ┃
+┃ Phase: [phase] - [name] │ 🔥 [aura-message]            ┃
+┃ Model: [model]                                         ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -27,13 +37,30 @@
 - Version indicator: `AURA FROG v1.1.5`
 - Visual separator with lightning bolt
 
-### Line 2: Context
-- **Agent:** Active agent handling the task
-- **Phase:** Current workflow phase (or `-` if none)
+### Line 2: Agent(s) & Context
+- **Single Agent:** `Agent: [agent-name] │ Phase: [phase]`
+- **Multiple Agents:** `Agents: [primary] + [secondary], [tertiary]`
+  - Primary agent listed first (leading the task)
+  - Secondary/supporting agents after `+`
+  - Comma-separated if more than 2
 
 ### Line 3: Model & Aura
 - **Model:** AI model with version (e.g., Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3)
 - **Aura message:** Short, fun, contextual phrase (2-4 words)
+
+---
+
+## When to Use Multi-Agent Banner
+
+| Scenario | Banner Type | Example |
+|----------|-------------|---------|
+| Simple coding task | Single | `Agent: backend-nodejs` |
+| Code review | Multi | `Agents: qa-automation + security-expert` |
+| Full feature workflow | Multi | `Agents: mobile-react-native + ui-designer, qa-automation` |
+| Bug fix with testing | Multi | `Agents: backend-python + qa-automation` |
+| API design | Multi | `Agents: backend-nodejs + database-specialist` |
+| Security audit | Multi | `Agents: security-expert + qa-automation` |
+| General question | Single | `Agent: pm-operations-orchestrator` |
 
 ---
 
@@ -111,7 +138,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ## Examples
 
-### During Workflow
+### Single Agent - During Workflow
 
 ```
 ⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -120,7 +147,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### General Conversation
+### Single Agent - General Conversation
 
 ```
 ⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -129,16 +156,37 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Bug Fixing
+### Multi-Agent - Code Review
 
 ```
 ⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: qa-automation │ Phase: -                        ┃
-┃ Model: Opus 4.5 │ 🔥 Bug hunter mode                    ┃
+┃ Agents: qa-automation + security-expert                ┃
+┃ Phase: 6 - Review │ 🔥 Eagle eyes on                   ┃
+┃ Model: Opus 4.5                                        ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### TDD Phase
+### Multi-Agent - Feature Implementation
+
+```
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: mobile-react-native + ui-designer, qa-automation┃
+┃ Phase: 5b - TDD GREEN │ 🔥 Squad goals                  ┃
+┃ Model: Sonnet 4.5                                       ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Multi-Agent - Bug Fix with Testing
+
+```
+⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: backend-nodejs + qa-automation                 ┃
+┃ Phase: - │ 🔥 Bug hunter squad                         ┃
+┃ Model: DeepSeek V3                                     ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Single Agent - TDD Phase
 
 ```
 ⚡ 🐸 AURA FROG v1.1.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -209,5 +257,5 @@ Every response should follow this structure:
 
 ---
 
-**Version:** 1.1.5
-**Last Updated:** 2025-12-04
+**Version:** 1.2.0
+**Last Updated:** 2025-12-08
