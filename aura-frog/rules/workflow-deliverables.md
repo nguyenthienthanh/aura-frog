@@ -1,6 +1,6 @@
 # Workflow Deliverables Rule
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Priority:** CRITICAL - Must verify deliverables at each phase
 **Type:** Rule (Mandatory Checklist)
 
@@ -37,20 +37,123 @@
 
 ### Phase 2: Design (Technical Specification)
 
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `TECH_SPEC.md` | `.claude/logs/workflows/{id}/` | YES |
-| Architecture diagram | In TECH_SPEC.md | YES |
-| File structure | In TECH_SPEC.md | YES |
-| API contracts | In TECH_SPEC.md | If API |
-| Database schema | In TECH_SPEC.md | If DB changes |
-| Component hierarchy | In TECH_SPEC.md | If frontend |
+| Deliverable | Location | Required | Purpose |
+|-------------|----------|----------|---------|
+| `TECH_SPEC.md` | `.claude/logs/workflows/{id}/` | YES | **AI reads this** - Concise, structured for AI |
+| `TECH_SPEC_CONFLUENCE.md` | `.claude/logs/workflows/{id}/` | YES | Full Confluence page format for humans |
+| Architecture diagram | In both files | YES | System design |
+| File structure | In both files | YES | Code organization |
+| API contracts | In both files | If API | Endpoint definitions |
+| Database schema | In both files | If DB changes | Data model |
+| Component hierarchy | In both files | If frontend | UI structure |
+
+**CRITICAL: AI must ALWAYS read `TECH_SPEC.md`, NOT Confluence version.**
+
+#### TECH_SPEC.md (For AI)
+
+Concise, structured format optimized for AI consumption:
+
+```markdown
+# Tech Spec: [Feature Name]
+
+## Overview
+[1-2 sentences]
+
+## Architecture
+- Pattern: [e.g., Repository, Service Layer]
+- Key components: [list]
+
+## Files to Create/Modify
+| File | Action | Purpose |
+|------|--------|---------|
+| src/services/auth.ts | CREATE | Auth service |
+| src/hooks/useAuth.ts | MODIFY | Add logout |
+
+## API Contracts
+### POST /api/auth/login
+- Request: { email: string, password: string }
+- Response: { token: string, user: User }
+
+## Database Changes
+[If applicable]
+
+## Dependencies
+- [package@version] - reason
+
+## Risks & Mitigations
+| Risk | Mitigation |
+|------|------------|
+| [risk] | [mitigation] |
+```
+
+#### TECH_SPEC_CONFLUENCE.md (For Humans)
+
+Full Confluence page format with rich documentation:
+
+```markdown
+# [Feature Name] - Technical Specification
+
+## Document Info
+| Field | Value |
+|-------|-------|
+| Author | [name] |
+| Status | Draft / In Review / Approved |
+| Created | [date] |
+| JIRA | [ticket-id] |
+
+## Executive Summary
+[Detailed overview for stakeholders]
+
+## Background & Context
+[Why this feature is needed]
+
+## Goals & Non-Goals
+### Goals
+- [goal 1]
+### Non-Goals
+- [explicitly out of scope]
+
+## Technical Design
+### Architecture Overview
+[Detailed architecture with diagrams]
+
+### Component Design
+[Detailed component descriptions]
+
+### Data Flow
+[Step-by-step data flow]
+
+### API Design
+[Full API documentation with examples]
+
+### Database Schema
+[Complete schema with relationships]
+
+## Security Considerations
+[Security analysis]
+
+## Performance Considerations
+[Performance requirements and optimizations]
+
+## Testing Strategy
+[High-level testing approach]
+
+## Rollout Plan
+[Deployment strategy]
+
+## Open Questions
+[Unresolved items]
+
+## Appendix
+[Additional diagrams, references]
+```
 
 **Validation:**
 ```markdown
 ## Phase 2 Deliverables Check
-- [ ] TECH_SPEC.md created
-- [ ] Architecture diagram included
+- [ ] TECH_SPEC.md created (AI-readable format)
+- [ ] TECH_SPEC_CONFLUENCE.md created (human-readable)
+- [ ] Architecture diagram included in both
 - [ ] File structure planned
 - [ ] Dependencies identified
 - [ ] Risk assessment documented
@@ -247,18 +350,20 @@ Every workflow MUST create this folder structure:
 
 ```
 .claude/logs/workflows/{workflow-id}/
-├── REQUIREMENTS.md          # Phase 1
-├── TECH_SPEC.md             # Phase 2
-├── UI_BREAKDOWN.md          # Phase 3 (if UI)
-├── TEST_PLAN.md             # Phase 4
-├── CODE_REVIEW.md           # Phase 6
-├── QA_REPORT.md             # Phase 7
+├── REQUIREMENTS.md           # Phase 1
+├── TECH_SPEC.md              # Phase 2 - AI reads this (concise)
+├── TECH_SPEC_CONFLUENCE.md   # Phase 2 - Human-readable (full Confluence format)
+├── UI_BREAKDOWN.md           # Phase 3 (if UI)
+├── TEST_PLAN.md              # Phase 4
+├── CODE_REVIEW.md            # Phase 6
+├── QA_REPORT.md              # Phase 7
 ├── IMPLEMENTATION_SUMMARY.md # Phase 8
-├── DEPLOYMENT_GUIDE.md      # Phase 8 (if deployment)
-├── CONFLUENCE_PAGE.md       # Phase 8 (if Confluence)
-├── CHANGELOG_ENTRY.md       # Phase 8
-└── workflow-state.json      # Workflow metadata
+├── DEPLOYMENT_GUIDE.md       # Phase 8 (if deployment)
+├── CHANGELOG_ENTRY.md        # Phase 8
+└── workflow-state.json       # Workflow metadata
 ```
+
+**IMPORTANT:** AI must read `TECH_SPEC.md` for implementation guidance, not `TECH_SPEC_CONFLUENCE.md`.
 
 ---
 
@@ -294,7 +399,8 @@ Phase 1 (Understand):
   ✅ REQUIREMENTS.md
 
 Phase 2 (Design):
-  ✅ TECH_SPEC.md
+  ✅ TECH_SPEC.md (AI-readable)
+  ✅ TECH_SPEC_CONFLUENCE.md (human-readable)
 
 Phase 3 (UI Breakdown):
   ✅ UI_BREAKDOWN.md
@@ -354,7 +460,8 @@ Skipped deliverables:
 | Phase | Key Document | Must Have |
 |-------|--------------|-----------|
 | 1 | REQUIREMENTS.md | User stories, acceptance criteria |
-| 2 | TECH_SPEC.md | Architecture, file structure |
+| 2 | TECH_SPEC.md | AI-readable: Architecture, files, APIs |
+| 2 | TECH_SPEC_CONFLUENCE.md | Human-readable: Full Confluence format |
 | 3 | UI_BREAKDOWN.md | Components, props, accessibility |
 | 4 | TEST_PLAN.md | Test scenarios, coverage target |
 | 5a | Test files | Failing tests |
@@ -377,7 +484,8 @@ ls .claude/logs/workflows/{workflow-id}/
 
 # Check required documents
 [ -f "REQUIREMENTS.md" ] && echo "✅ Phase 1" || echo "❌ Phase 1"
-[ -f "TECH_SPEC.md" ] && echo "✅ Phase 2" || echo "❌ Phase 2"
+[ -f "TECH_SPEC.md" ] && echo "✅ Phase 2 (AI)" || echo "❌ Phase 2 (AI)"
+[ -f "TECH_SPEC_CONFLUENCE.md" ] && echo "✅ Phase 2 (Confluence)" || echo "❌ Phase 2 (Confluence)"
 [ -f "UI_BREAKDOWN.md" ] && echo "✅ Phase 3" || echo "⚠️ Phase 3 (optional)"
 [ -f "TEST_PLAN.md" ] && echo "✅ Phase 4" || echo "❌ Phase 4"
 [ -f "CODE_REVIEW.md" ] && echo "✅ Phase 6" || echo "❌ Phase 6"
@@ -398,5 +506,5 @@ ls .claude/logs/workflows/{workflow-id}/
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-08
+**Version:** 1.1.0
+**Last Updated:** 2025-12-09
