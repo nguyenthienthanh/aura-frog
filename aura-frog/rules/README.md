@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.1.5
-**Total Rules:** 32
+**Version:** 1.1.6
+**Total Rules:** 33
 **Purpose:** Enforce consistent quality across all development
 
 ---
@@ -44,7 +44,7 @@
 | [theme-consistency](theme-consistency.md) | Medium | Design system adherence |
 | [design-system-usage](design-system-usage.md) | High | Proper design system implementation |
 
-### Workflow (8)
+### Workflow (9)
 
 | Rule | Priority | Purpose |
 |------|----------|---------|
@@ -56,6 +56,7 @@
 | [next-step-guidance](next-step-guidance.md) | Critical | Always show next steps and commands |
 | [workflow-navigation](workflow-navigation.md) | High | Progress tracking and phase status |
 | [feedback-brainstorming](feedback-brainstorming.md) | High | Brainstorm before implementing feedback |
+| [impact-analysis](impact-analysis.md) | Critical | Analyze all usages before modifying code |
 
 ### Accessibility & UI (3)
 
@@ -118,6 +119,12 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 ### For Testing
 - [ ] Follow `tdd-workflow` - Tests first
 
+### For Refactoring
+- [ ] Follow `impact-analysis` - Analyze all usages before modifying
+- [ ] Run grep/search to find all references
+- [ ] Update all affected files
+- [ ] Verify no breaking changes
+
 ### For Review
 - [ ] Follow `cross-review-workflow` - Multi-agent review
 
@@ -131,4 +138,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.1.5 | **Last Updated:** 2025-12-08
+**Version:** 1.1.6 | **Last Updated:** 2025-12-08
