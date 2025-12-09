@@ -27,7 +27,7 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **23+** | **33** | **9** | **70+** |
+| **24** | **23+** | **34** | **9** | **70+** |
 
 </div>
 
@@ -35,7 +35,7 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
 - ⚡ **23+ Skills** — 11 auto-invoking + 12 reference skills for specialized tasks
 - 🎨 **10 Design Systems** — MUI, Ant Design, Tailwind, shadcn/ui, Chakra, NativeWind, and more
-- 📏 **33 Quality Rules** — System, code quality, architecture, workflow, and accessibility
+- 📏 **34 Quality Rules** — System, code quality, architecture, workflow, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
 - 🎮 **70+ Commands** — Full workflow control at your fingertips
 - 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)
@@ -252,7 +252,7 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 📏 33 Quality Rules
+### 📏 34 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 
@@ -300,7 +300,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 </details>
 
 <details>
-<summary><b>Workflow Rules (9)</b></summary>
+<summary><b>Workflow Rules (10)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -313,6 +313,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `workflow-navigation` | Progress tracking |
 | `feedback-brainstorming` | Brainstorm before feedback |
 | `impact-analysis` | Analyze usages before modifying |
+| `workflow-deliverables` | Verify all phase docs created |
 
 </details>
 
