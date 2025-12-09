@@ -106,9 +106,9 @@ try {
 }
 ```
 
-### 4. Divider Comments (Noise)
+### 4. Divider Comments & Section Headers (Noise)
 
-❌ **BAD:**
+❌ **BAD - Simple dividers:**
 ```typescript
 // ===== IMPORTS =====
 import { useState } from 'react';
@@ -120,16 +120,39 @@ const MAX_ITEMS = 10;
 export const MyComponent = () => {
   // ===== STATE =====
   const [count, setCount] = useState(0);
-  
+
   // ===== HANDLERS =====
   const handleClick = () => {};
-  
+
   // ===== RENDER =====
   return <div />;
 };
 ```
 
-✅ **GOOD:**
+❌ **BAD - Decorative block comments:**
+```typescript
+// ════════════════════════════════════════════════════════════
+// API HOOKS
+// ════════════════════════════════════════════════════════════
+
+// ╔════════════════════════════════════════════════════════════╗
+// ║                      CONSTANTS                              ║
+// ╚════════════════════════════════════════════════════════════╝
+
+// ############################################################
+// #                    STATE MANAGEMENT                       #
+// ############################################################
+
+// ************************************************************
+// *                      UTILITIES                           *
+// ************************************************************
+
+// -------- Types --------
+// ======== Interfaces ========
+// ~~~~~~~~ Helpers ~~~~~~~~
+```
+
+✅ **GOOD - Use whitespace and code structure:**
 ```typescript
 import { useState } from 'react';
 
@@ -137,14 +160,100 @@ const MAX_ITEMS = 10;
 
 export const MyComponent = () => {
   const [count, setCount] = useState(0);
-  
+
   const handleClick = () => {};
-  
+
   return <div />;
 };
 ```
 
-### 5. Commented-Out Code
+**Why dividers are bad:**
+- Code structure should be clear from indentation and whitespace
+- Section headers add visual noise without adding information
+- If you need sections, consider splitting into separate files
+- IDE folding and outline view provide better navigation
+
+### 5. Unnecessary JSDoc Comments
+
+❌ **BAD - JSDoc that just repeats type information:**
+```typescript
+/**
+ * User interface
+ */
+interface User {
+  /** The user's name */
+  name: string;
+  /** The user's age */
+  age: number;
+  /** The user's email address */
+  email: string;
+}
+
+/**
+ * Get user by ID
+ * @param id - The user ID
+ * @returns The user object
+ */
+function getUser(id: string): User {
+  return users.find(u => u.id === id);
+}
+
+/**
+ * Calculate total
+ * @param items - Array of items
+ * @returns The total price
+ */
+const calculateTotal = (items: Item[]): number => {
+  return items.reduce((sum, item) => sum + item.price, 0);
+};
+```
+
+✅ **GOOD - Let TypeScript do the work:**
+```typescript
+interface User {
+  name: string;
+  age: number;
+  email: string;
+}
+
+function getUser(id: string): User {
+  return users.find(u => u.id === id);
+}
+
+const calculateTotal = (items: Item[]): number => {
+  return items.reduce((sum, item) => sum + item.price, 0);
+};
+```
+
+✅ **GOOD - JSDoc only when it adds value:**
+```typescript
+interface User {
+  name: string;
+  age: number;
+  /** Must be verified before sending marketing emails (GDPR) */
+  email: string;
+}
+
+/**
+ * Fetches user with retry logic and caching.
+ * Cached for 5 minutes to reduce API load.
+ *
+ * @throws {NotFoundError} When user doesn't exist
+ * @throws {RateLimitError} When API quota exceeded
+ */
+function getUser(id: string): Promise<User> {
+  return cachedFetch(`/api/users/${id}`);
+}
+```
+
+**When JSDoc IS useful:**
+- Documenting thrown exceptions
+- Explaining non-obvious behavior
+- Library/SDK public APIs
+- Complex parameters with constraints
+- Deprecation notices with migration paths
+
+### 6. Commented-Out Code
 
 ❌ **BAD:**
 ```typescript
@@ -152,9 +261,9 @@ const UserProfile = () => {
   // const oldLogic = () => {
   //   return user.name;
   // };
-  
+
   // return <OldComponent />;
-  
+
   return <NewComponent />;
 };
 ```
@@ -651,9 +760,10 @@ rules: {
 
 ---
 
-**Rule:** smart-commenting  
-**Version:** 1.0.0  
-**Added:** Aura Frog v1.4  
-**Priority:** High  
+**Rule:** smart-commenting
+**Version:** 1.1.0
+**Added:** Aura Frog v1.4
+**Updated:** 2025-12-08
+**Priority:** High
 **Impact:** Code quality, maintainability
 
