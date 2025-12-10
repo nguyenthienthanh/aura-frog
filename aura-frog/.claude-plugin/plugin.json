@@ -23,13 +23,5 @@
     "laravel",
     "nextjs",
     "flutter"
-  ],
-  "category": "development",
-  "tags": [
-    "agents",
-    "workflow",
-    "tdd",
-    "code-review",
-    "testing"
   ]
 }
