@@ -10,7 +10,7 @@
 
 AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-phase TDD workflow.
 
-[![Version](https://img.shields.io/badge/version-1.1.5-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.6-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -27,7 +27,7 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **23+** | **34** | **9** | **70+** |
+| **24** | **23+** | **35** | **9** | **70+** |
 
 </div>
 
@@ -35,7 +35,7 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
 - ⚡ **23+ Skills** — 11 auto-invoking + 12 reference skills for specialized tasks
 - 🎨 **10 Design Systems** — MUI, Ant Design, Tailwind, shadcn/ui, Chakra, NativeWind, and more
-- 📏 **34 Quality Rules** — System, code quality, architecture, workflow, and accessibility
+- 📏 **35 Quality Rules** — System, code quality, architecture, workflow, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
 - 🎮 **70+ Commands** — Full workflow control at your fingertips
 - 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)
@@ -65,6 +65,13 @@ In Claude Code terminal:
 # Step 3: Create local settings (required)
 cd ~/.claude/plugins/marketplaces/aurafrog/aura-frog/
 cp settings.example.json settings.local.json
+```
+
+### Updating
+
+```bash
+# Update to latest version
+/plugin marketplace update aurafrog
 ```
 
 ### First Workflow

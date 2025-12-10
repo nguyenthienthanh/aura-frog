@@ -1,16 +1,97 @@
 {
   "name": "aurafrog",
+  "description": "Official Aura Frog marketplace - AI-powered development with specialized agents and structured workflows",
+  "version": "1.1.6",
   "owner": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
     "url": "https://github.com/nguyenthienthanh"
   },
+  "homepage": "https://github.com/nguyenthienthanh/aura-frog",
+  "repository": "https://github.com/nguyenthienthanh/aura-frog",
+  "pluginRoot": "./",
   "plugins": [
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "Aura Frog - A Claude Code plugin for AI-powered development with 24 specialized agents, 9-phase TDD workflow, and main character energy 🐸✨",
-      "version": "1.0.0"
+      "description": "24 specialized agents, 9-phase TDD workflow, 35 rules, 23+ skills. Main character energy for your codebase 🐸✨",
+      "version": "1.1.6",
+      "author": {
+        "name": "Nguyen Thien Thanh",
+        "url": "https://github.com/nguyenthienthanh"
+      },
+      "homepage": "https://github.com/nguyenthienthanh/aura-frog",
+      "repository": "https://github.com/nguyenthienthanh/aura-frog",
+      "license": "MIT",
+      "keywords": [
+        "claude-code",
+        "ai-agents",
+        "workflow",
+        "tdd",
+        "multi-agent",
+        "react-native",
+        "vue",
+        "laravel",
+        "nextjs",
+        "flutter"
+      ],
+      "category": "development",
+      "tags": [
+        "agents",
+        "workflow",
+        "tdd",
+        "code-review",
+        "testing"
+      ],
+      "agents": [
+        "pm-operations-orchestrator",
+        "mobile-react-native",
+        "mobile-flutter",
+        "web-vuejs",
+        "web-reactjs",
+        "web-nextjs",
+        "web-angular",
+        "backend-nodejs",
+        "backend-python",
+        "backend-laravel",
+        "backend-go",
+        "database-specialist",
+        "security-expert",
+        "qa-automation",
+        "ui-designer",
+        "devops-cicd",
+        "smart-agent-detector",
+        "project-detector",
+        "project-config-loader",
+        "jira-operations",
+        "confluence-operations",
+        "slack-operations",
+        "voice-operations",
+        "project-context-manager"
+      ],
+      "commands": [
+        "workflow:start",
+        "workflow:status",
+        "workflow:approve",
+        "workflow:reject",
+        "bugfix",
+        "bugfix:quick",
+        "bugfix:hotfix",
+        "test:unit",
+        "test:e2e",
+        "test:coverage",
+        "project:init",
+        "project:detect",
+        "project:regen",
+        "agent:list",
+        "agent:activate",
+        "planning",
+        "refactor",
+        "document",
+        "review:fix",
+        "setup:integrations"
+      ],
+      "strict": true
     }
   ]
 }
