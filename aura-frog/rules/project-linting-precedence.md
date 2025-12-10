@@ -1,6 +1,6 @@
 # Rule: Project Linting Precedence
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Priority:** CRITICAL
 **Applies:** All code generation and review
 
@@ -8,21 +8,21 @@
 
 ## Core Rule
 
-**Project's ESLint/TSLint/linting configuration ALWAYS takes precedence over Aura Frog default rules.**
+**Project's ESLint/TSLint/Prettier configuration MERGES with Aura Frog rules.**
 
-When a project has its own linting configuration, Claude MUST follow that configuration, not Aura Frog's generic code quality rules.
+- Project linting config **overrides** conflicting Aura Frog rules
+- Aura Frog rules **still apply** where project config is silent
+- Result: Best of both worlds
 
 ---
 
-## Priority Order
+## Merge Strategy
 
 ```toon
-linting_priority[5]{priority,source,example}:
-  1,Project ESLint/TSLint,.eslintrc + .prettierrc + tsconfig
-  2,Project conventions,.claude/project-contexts/[project]/rules.md
-  3,Project examples,.claude/project-contexts/[project]/examples.md
-  4,Aura Frog rules,aura-frog/rules/*.md
-  5,Claude defaults,Built-in training
+merge_strategy[3]{layer,behavior,example}:
+  1,Project config overrides,Semicolons: project says no → no semicolons
+  2,Aura Frog fills gaps,Error handling: project silent → use Aura Frog
+  3,Combined result,Follow project style + Aura Frog best practices
 ```
 
 ---
@@ -68,47 +68,35 @@ tsconfig_files[3]{file,purpose}:
 
 ---
 
-## What Project Config Overrides
+## How Merging Works
 
-### Naming Conventions
+### Project Overrides (Conflicts)
 ```yaml
-# If project .eslintrc has:
-rules:
-  "@typescript-eslint/naming-convention": [...]
-  camelcase: "error"
+# Project .prettierrc:
+{ "semi": false, "tabWidth": 4 }
 
-# Claude MUST follow these, not Aura Frog's naming-conventions.md
+# Aura Frog code-quality.md says: use semicolons
+# Result: NO semicolons (project wins on conflicts)
 ```
 
-### Import Order
+### Aura Frog Applies (No Conflict)
 ```yaml
-# If project has eslint-plugin-import:
-rules:
-  "import/order": [...]
+# Project ESLint: only has naming rules
+# Aura Frog: has error handling, logging, TDD rules
 
-# Claude MUST follow project's import order, not Aura Frog's code-quality.md
+# Result: Use project naming + Aura Frog error handling + logging + TDD
 ```
 
-### Formatting
-```yaml
-# If project .prettierrc has:
-{
-  "semi": false,
-  "singleQuote": true,
-  "tabWidth": 4
-}
+### Merge Examples
 
-# Claude MUST use these settings, even if Aura Frog examples use different style
-```
-
-### Code Style
-```yaml
-# If project ESLint allows:
-rules:
-  "no-console": "off"
-
-# Claude CAN use console.log, even if Aura Frog rules say don't
-```
+| Topic | Project Config | Aura Frog Rule | Result |
+|-------|---------------|----------------|--------|
+| Semicolons | `semi: false` | Use semicolons | No semicolons (project) |
+| Naming | `camelCase` | `camelCase` | camelCase (same) |
+| Error handling | (silent) | Typed errors | Typed errors (Aura Frog) |
+| TDD | (silent) | RED-GREEN-REFACTOR | TDD applies (Aura Frog) |
+| Import order | Custom order | Standard order | Custom order (project) |
+| Logging | (silent) | Structured logs | Structured logs (Aura Frog) |
 
 ---
 
@@ -121,12 +109,13 @@ rules:
    ls -la .eslintrc* eslint.config.* .prettierrc* tsconfig.json 2>/dev/null
    ```
 
-2. **Read project config if exists:**
-   - Parse ESLint rules
-   - Parse Prettier settings
-   - Parse TypeScript strict settings
+2. **Read and merge configs:**
+   - Parse ESLint rules → Override Aura Frog where conflicts
+   - Parse Prettier settings → Override formatting rules
+   - Parse TypeScript settings → Override type rules
+   - Keep Aura Frog rules where project is silent
 
-3. **Apply project config FIRST, then fill gaps with Aura Frog rules**
+3. **Apply merged ruleset**
 
 ### Project Context Integration
 
@@ -227,12 +216,12 @@ const userAge = 30
 
 ---
 
-## Fallback Behavior
+## When No Project Config Exists
 
-When NO project linting config exists:
-1. Use Aura Frog rules as defaults
+When project has NO linting config:
+1. Aura Frog rules apply fully (no conflicts to resolve)
 2. Follow `code-quality.md`, `naming-conventions.md`, etc.
-3. Apply consistent style throughout the codebase
+3. Apply consistent Aura Frog style throughout
 
 ---
 
@@ -263,5 +252,5 @@ npx prettier --check .
 
 ---
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** 2025-12-10

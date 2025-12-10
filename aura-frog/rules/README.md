@@ -16,16 +16,16 @@ rules[35]{category,rule,priority,purpose}:
   system,priority-hierarchy,critical,Config priority order
   system,dual-file-architecture,high,Plugin + project structure
   system,token-time-awareness,high,Monitor token usage
-  system,project-linting-precedence,critical,Project ESLint/Prettier takes priority
+  system,project-linting-precedence,critical,Merge project + Aura Frog rules
   quality,yagni-principle,critical,Only implement what's needed now
   quality,dry-with-caution,high,Rule of Three before abstracting
   quality,kiss-avoid-over-engineering,critical,Keep implementations simple
   quality,error-handling-standard,critical,Typed errors + structured responses
   quality,logging-standards,high,Structured logging + sanitization
-  quality,code-quality,high,TypeScript strict + no any (fallback)
-  quality,naming-conventions,medium,Consistent naming (fallback)
+  quality,code-quality,high,TypeScript strict + no any
+  quality,naming-conventions,medium,Consistent naming patterns
   quality,smart-commenting,medium,Comment why not what
-  quality,modern-javascript,high,ES6+ syntax (fallback)
+  quality,modern-javascript,high,ES6+ syntax
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -73,17 +73,22 @@ categories[5]{name,count,critical_rules}:
 
 ---
 
-## Rule Loading Order
+## Rule Merge Strategy
 
 ```
-0. Project linting config (.eslintrc, .prettierrc, tsconfig.json) - HIGHEST
-1. Project rules (.claude/project-contexts/[project]/rules.md)
-2. Aura Frog core rules (this directory) - FALLBACK
-3. Generic defaults - LOWEST
+Project linting ─┬─► MERGE ─► Combined Ruleset
+Project rules   ─┤
+Aura Frog rules ─┤
+Claude defaults ─┘
 
-Project linting config ALWAYS overrides Aura Frog code quality rules.
-See: project-linting-precedence.md
+Conflicts: Higher priority wins
+No conflict: All rules apply together
 ```
+
+**Example:** Project has `semi: false`, Aura Frog has TDD rule
+→ Result: No semicolons (project) + TDD (Aura Frog)
+
+See: `project-linting-precedence.md`
 
 ---
 
@@ -96,7 +101,7 @@ See: project-linting-precedence.md
 - [ ] Follow `next-step-guidance` - Show next steps every response
 
 ### Before Coding
-- [ ] Check `project-linting-precedence` - Project ESLint/Prettier takes priority!
+- [ ] Check `project-linting-precedence` - Merge project config with Aura Frog rules
 - [ ] Read `yagni-principle` - Don't add unused features
 - [ ] Read `dry-with-caution` - Don't abstract prematurely
 - [ ] Read `kiss-avoid-over-engineering` - Keep it simple

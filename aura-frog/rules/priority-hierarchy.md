@@ -9,9 +9,11 @@
 
 ## Core Rule
 
-Claude Code loads instructions in a specific order. Higher-priority sources ALWAYS override lower-priority ones.
+Claude Code loads instructions in a specific order and MERGES them together.
 
-**CRITICAL:** Project linting config (ESLint/TSLint/Prettier) takes precedence over Aura Frog rules.
+**CRITICAL:** Project linting config (ESLint/TSLint/Prettier) MERGES with Aura Frog rules.
+- Conflicts: Project config wins
+- No conflict: Aura Frog rules apply
 
 ---
 
@@ -35,18 +37,20 @@ Claude Code loads instructions in a specific order. Higher-priority sources ALWA
 
 ---
 
-## Code Quality Priority (TOON)
+## Code Quality Merge Order (TOON)
 
 ```toon
-code_quality_priority[5]{priority,source,examples}:
-  1,Project linting,.eslintrc + .prettierrc + tsconfig.json
-  2,Project conventions,.claude/project-contexts/[project]/rules.md
-  3,Project examples,.claude/project-contexts/[project]/examples.md
-  4,Aura Frog rules,aura-frog/rules/*.md
-  5,Claude defaults,Built-in training
+code_quality_merge[5]{priority,source,behavior}:
+  1,Project linting,Overrides conflicts in layers 2-5
+  2,Project conventions,Overrides conflicts in layers 3-5
+  3,Project examples,Overrides conflicts in layers 4-5
+  4,Aura Frog rules,Applies where layers 1-3 are silent
+  5,Claude defaults,Applies where layers 1-4 are silent
 ```
 
-**See:** `rules/project-linting-precedence.md` for detailed linting precedence.
+**Result:** Merged ruleset combining project config + Aura Frog best practices.
+
+**See:** `rules/project-linting-precedence.md` for detailed merge strategy.
 
 ---
 
@@ -110,31 +114,34 @@ Read: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 
 ---
 
-## Context Priority
+## Context Merge Strategy
 
-Beyond CLAUDE.md files, project context also has priority:
-
-```
-Project Linting > Project Context > Aura Frog Rules > Generic Defaults
-```
-
-### Loading Order for Context
+Beyond CLAUDE.md files, all contexts MERGE together:
 
 ```
-0. Project Linting Config (HIGHEST)
+Project Linting ─┬─► MERGE ─► Combined Ruleset
+Project Context ─┤
+Aura Frog Rules ─┤
+Claude Defaults ─┘
+```
+
+### Merge Order for Context
+
+```
+0. Project Linting Config (overrides on conflict)
    ├── .eslintrc.*            # ESLint rules
    ├── .prettierrc*           # Prettier config
    └── tsconfig.json          # TypeScript settings
 
-1. .claude/project-contexts/[project]/
+1. .claude/project-contexts/[project]/ (overrides on conflict)
    ├── project-config.yaml    # Tech stack, team
    ├── conventions.md         # Naming, structure
-   ├── rules.md               # Project rules (extracted from linting)
+   ├── rules.md               # Project rules
    └── examples.md            # Code examples
 
-2. aura-frog/rules/           # Plugin rules (fallback)
+2. aura-frog/rules/           # Applies where above are silent
 
-3. Claude's training          # Generic defaults (lowest)
+3. Claude's training          # Applies where above are silent
 ```
 
 ---

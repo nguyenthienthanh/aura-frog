@@ -7,17 +7,18 @@
 
 ---
 
-## ⚠️ Project Config Takes Precedence
+## ⚠️ Merge With Project Config
 
-**IMPORTANT:** If the project has ESLint naming rules (e.g., `@typescript-eslint/naming-convention`), those ALWAYS override the defaults below.
+**IMPORTANT:** These conventions MERGE with project's ESLint naming rules.
 
 ```
-Project ESLint naming rules > Project conventions.md > These defaults
+Project config overrides conflicts → Aura Frog fills gaps → Combined result
 ```
+
+- If project defines naming rules → Project wins
+- If project is silent → These conventions apply
 
 **See:** `rules/project-linting-precedence.md` for details.
-
-These conventions serve as **fallbacks** when no project naming config exists.
 
 ---
 

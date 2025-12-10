@@ -5,17 +5,18 @@
 
 ---
 
-## ⚠️ Project Config Takes Precedence
+## ⚠️ Merge With Project Config
 
-**IMPORTANT:** If the project has ESLint, TSLint, or Prettier configuration, those rules ALWAYS override the defaults below.
+**IMPORTANT:** These rules MERGE with project's ESLint/TSLint/Prettier configuration.
 
 ```
-Project .eslintrc > Project .prettierrc > These defaults
+Project config overrides conflicts → Aura Frog fills gaps → Combined result
 ```
+
+- If project defines a rule → Project wins
+- If project is silent → These rules apply
 
 **See:** `rules/project-linting-precedence.md` for details.
-
-These rules serve as **fallbacks** when no project linting config exists.
 
 ---
 

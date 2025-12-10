@@ -6,17 +6,18 @@
 
 ---
 
-## ⚠️ Project Config Takes Precedence
+## ⚠️ Merge With Project Config
 
-**IMPORTANT:** If the project's ESLint/tsconfig has specific rules, those ALWAYS override these defaults.
+**IMPORTANT:** These patterns MERGE with project's ESLint/tsconfig rules.
 
 ```
-Project ESLint rules > Project tsconfig.json > These defaults
+Project config overrides conflicts → Aura Frog fills gaps → Combined result
 ```
+
+- If project defines specific rules → Project wins
+- If project is silent → These patterns apply
 
 **See:** `rules/project-linting-precedence.md` for details.
-
-These patterns serve as **fallbacks** when no project config exists.
 
 ---
 
