@@ -371,20 +371,22 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 
 ---
 
-## 📊 Skill Priorities
+## 📊 Skill Priorities (TOON)
 
-| Skill | Priority | Auto-Invoke |
-|-------|----------|-------------|
-| agent-detector | HIGHEST | ALWAYS (100%) |
-| workflow-orchestrator | CRITICAL | Complex tasks |
-| project-context-loader | HIGH | Before code generation |
-| code-reviewer | HIGH | After implementation |
-| session-continuation | HIGH | Token limit warning |
-| bugfix-quick | MEDIUM | Bug mentions |
-| test-writer | MEDIUM | Test requests |
-| jira-integration | MEDIUM | Ticket detected |
-| figma-integration | MEDIUM | Figma URL detected |
-| confluence-integration | MEDIUM | Confluence URL/docs |
+```toon
+skills[11]{name,priority,trigger}:
+  agent-detector,highest,ALWAYS (100%)
+  workflow-orchestrator,critical,Complex tasks
+  project-context-loader,high,Before code generation
+  design-system-library,high,UI components + design system
+  code-reviewer,high,After implementation
+  session-continuation,high,Token limit warning
+  bugfix-quick,medium,Bug mentions
+  test-writer,medium,Test requests
+  jira-integration,medium,Ticket detected
+  figma-integration,medium,Figma URL detected
+  confluence-integration,medium,Confluence URL/docs
+```
 ---
 
 ## 🚀 Using Skills
@@ -428,16 +430,17 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 
 These skills provide guidance documents that agents reference during workflows:
 
-| Skill | Purpose | Location |
-|-------|---------|----------|
-| **design-system-library** | Design system patterns (MUI, Ant, Tailwind, etc.) | `skills/design-system-library/` |
-| **refactor-expert** | Safe refactoring patterns | `skills/refactor-expert/` |
-| **api-designer** | RESTful API design | `skills/api-designer/` |
-| **performance-optimizer** | Performance profiling & optimization | `skills/performance-optimizer/` |
-| **migration-helper** | Database/code migrations | `skills/migration-helper/` |
-| **phase-skipping** | Smart phase skip rules | `skills/workflow-orchestrator/` |
-| **estimation** | Effort estimation techniques | `skills/pm-expert/` |
-| **documentation** | ADR & Runbook templates | `skills/documentation/` |
+```toon
+reference_skills[8]{name,purpose,location}:
+  design-system-library,Design system patterns (MUI Ant Tailwind),skills/design-system-library/
+  refactor-expert,Safe refactoring patterns,skills/refactor-expert/
+  api-designer,RESTful API design,skills/api-designer/
+  performance-optimizer,Performance profiling + optimization,skills/performance-optimizer/
+  migration-helper,Database/code migrations,skills/migration-helper/
+  phase-skipping,Smart phase skip rules,skills/workflow-orchestrator/
+  estimation,Effort estimation techniques,skills/pm-expert/
+  documentation,ADR + Runbook templates,skills/documentation/
+```
 
 ### 11. **design-system-library** (Priority: HIGH)
 
@@ -470,6 +473,7 @@ These skills provide guidance documents that agents reference during workflows:
 
 ---
 
-**Version:** 1.1.5
-**Last Updated:** 2025-12-04
+**Version:** 1.1.6
+**Last Updated:** 2025-12-10
+**Format:** TOON (Token-Optimized)
 **Total Skills:** 23+ (11 auto-invoking + 12 reference)

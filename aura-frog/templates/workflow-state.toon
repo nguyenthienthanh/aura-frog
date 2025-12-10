@@ -1,0 +1,140 @@
+# Workflow State (TOON Format)
+
+**Purpose:** Token-optimized workflow state for AI reading
+**Use:** AI reads this for workflow context, saves ~35% tokens vs JSON
+
+---
+
+## Basic Info
+
+```toon
+workflow:
+  id: [workflow-id]
+  name: [workflow-name]
+  created: [ISO-8601]
+  updated: [ISO-8601]
+  status: [initialized|in_progress|completed|paused]
+  phase: [1-9]
+  phase_name: [phase-name]
+  tokens_used: [number]
+  tokens_remaining: [number]
+```
+
+---
+
+## Git State
+
+```toon
+git:
+  branch: [current-branch]
+  base: [base-branch]
+  initial_commit: [hash]
+  latest_commit: [hash]
+
+commits[N]{hash,message,phase,time}:
+  abc1234,chore: start workflow,1,2025-11-24T12:00:00Z
+  def5678,feat: add auth types,2,2025-11-24T12:30:00Z
+
+uncommitted[N]: path/to/file1.ts,path/to/file2.ts
+```
+
+---
+
+## Changes
+
+```toon
+files_created[N]{path,phase,commit,lines}:
+  src/auth/Login.tsx,5,def5678,150
+  src/auth/AuthContext.tsx,5,def5678,80
+  src/auth/types.ts,2,abc1234,45
+
+files_modified[N]{path,phase,commit,diff}:
+  src/App.tsx,5,def5678,+15 -3
+  src/navigation/index.tsx,5,def5678,+8 -2
+
+stats:
+  files_touched: [N]
+  lines_added: [N]
+  lines_removed: [N]
+  commits_made: [N]
+```
+
+---
+
+## Phases
+
+```toon
+phases[9]{num,name,status,started,completed,tokens}:
+  1,Requirements,completed,2025-11-24T12:00:00Z,2025-11-24T12:07:00Z,25000
+  2,Tech Planning,completed,2025-11-24T12:07:00Z,2025-11-24T12:20:00Z,30000
+  3,UI Breakdown,completed,2025-11-24T12:20:00Z,2025-11-24T12:30:00Z,20000
+  4,Test Planning,completed,2025-11-24T12:30:00Z,2025-11-24T12:40:00Z,15000
+  5,TDD Implementation,in_progress,2025-11-24T12:40:00Z,,45000
+  6,Code Review,pending,,,0
+  7,QA Validation,pending,,,0
+  8,Documentation,pending,,,0
+  9,Notification,pending,,,0
+```
+
+---
+
+## Deliverables
+
+```toon
+deliverables[N]{phase,file,status}:
+  1,REQUIREMENTS.md,created
+  2,TECH_SPEC.md,created
+  2,TECH_SPEC_CONFLUENCE.md,created
+  3,UI_BREAKDOWN.md,created
+  4,TEST_PLAN.md,created
+  5,tests/__tests__/auth.test.ts,created
+  5,src/auth/Login.tsx,created
+```
+
+---
+
+## Sessions
+
+```toon
+sessions[N]{id,started,ended,tokens,phases_done}:
+  session-1,2025-11-24T12:00:00Z,2025-11-24T13:00:00Z,155000,1;2;3;4
+  session-2,2025-11-24T14:00:00Z,,45000,5
+```
+
+---
+
+## Context
+
+```toon
+context:
+  task: [Task description]
+  project_root: [path]
+  logs_dir: .claude/logs/workflows/[id]
+
+agents[N]: pm-operations-orchestrator,mobile-react-native,qa-automation
+```
+
+---
+
+## Handoffs
+
+```toon
+handoffs[N]{phase,tokens,time,branch,commit,uncommitted}:
+  4,155000,2025-11-24T13:00:00Z,feature/user-auth,def5678,2
+```
+
+---
+
+## Recovery
+
+```toon
+recovery:
+  backup_branch: backup/[workflow]-[timestamp]
+  backup_stash: stash@{0}
+  backup_dir: .claude/logs/workflows/[id]/backup/
+```
+
+---
+
+**Format:** TOON v1.0
+**Tokens Saved:** ~35% vs JSON
