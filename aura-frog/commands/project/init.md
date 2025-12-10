@@ -73,7 +73,7 @@ echo "✅ Created .claude/ folder structure"
 ```
 
 **Purpose:**
-- `.claude/CLAUDE.md` - **CRITICAL:** Contains agent banner format and Aura Frog instructions
+- `.claude/CLAUDE.md` - **CRITICAL:** References plugin CLAUDE.md for full instructions
 - `.claude/ccpm-config.yaml` - Project-specific workflow configuration
 - `.claude/project-contexts/` - Project context (conventions, rules, examples)
 - `.claude/logs/` - Workflow execution logs
@@ -496,11 +496,11 @@ fi
 
 **Why This File is Critical:**
 - ✅ Claude Code loads `.claude/CLAUDE.md` at session start (highest priority)
-- ✅ **Contains the agent banner format directly** (not just a reference!)
-- ✅ Includes agent selection table, phase display, and aura message guidelines
-- ✅ Contains token/time awareness rules
-- ✅ Points to plugin CLAUDE.md for full 70+ commands and 24 agents
-- ✅ Includes JIRA integration instructions
+- ✅ **References plugin CLAUDE.md** for full instructions (lean approach)
+- ✅ Contains project-specific settings (name, tech stack, primary agent)
+- ✅ Points to project context location
+- ✅ Includes integration script paths (JIRA, Confluence, Figma)
+- ✅ Uses TOON format for token efficiency
 - ✅ Preserves existing project instructions if file already exists
 
 **Without this file:** Claude responds as vanilla "Claude Code" without Aura Frog banner!
@@ -697,10 +697,10 @@ Team Reviewers:
    - Consider adding to .gitignore if contains secrets
 
 ✅ .claude/CLAUDE.md (CRITICAL - enables Aura Frog)
-   - Contains agent identification banner format
-   - JIRA integration instructions
-   - Points to plugin CLAUDE.md for full instructions
+   - References plugin CLAUDE.md for full instructions (lean approach)
+   - Contains project-specific settings
    - Points to project context location
+   - Uses TOON format for token efficiency
    - If file existed: Aura Frog section prepended (existing content preserved)
 
 ✅ .claude/ccpm-config.yaml (project-specific config)
@@ -954,7 +954,7 @@ ccpm-config.yaml → References .claude/project-contexts/[project]/
 └── context/                     # Active contexts (git-ignored)
 ```
 
-**Note:** Project `.claude/CLAUDE.md` is **CRITICAL** - it contains the agent banner format and tells Claude to read the plugin CLAUDE.md. Without it, Aura Frog won't work properly!
+**Note:** Project `.claude/CLAUDE.md` is **CRITICAL** - it references the plugin CLAUDE.md for full instructions. Without it, Aura Frog won't work properly!
 
 This keeps all Aura Frog data organized in one place!
 
@@ -1090,6 +1090,6 @@ integrations:
 
 ---
 
-**Version:** 2.0.0  
-**Last Updated:** 2025-11-25
+**Version:** 2.1.0
+**Last Updated:** 2025-12-10
 
