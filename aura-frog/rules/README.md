@@ -1,81 +1,74 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.1.7
+**Version:** 1.1.8
 **Total Rules:** 34
-**Purpose:** Enforce consistent quality across all development
+**Format:** TOON (Token-Optimized)
 
 ---
 
-## Rule Categories
+## Rule Index (TOON Format)
 
-### System & Session (6)
-
-| Rule | Priority | Purpose |
-|------|----------|---------|
-| [agent-identification-banner](agent-identification-banner.md) | Critical | Show agent banner every response |
-| [env-loading](env-loading.md) | Critical | Load .envrc at session start |
-| [execution-rules](execution-rules.md) | Critical | ALWAYS/NEVER execution rules |
-| [priority-hierarchy](priority-hierarchy.md) | Critical | Config priority order |
-| [dual-file-architecture](dual-file-architecture.md) | High | Plugin + project structure |
-| [token-time-awareness](token-time-awareness.md) | High | Monitor token usage |
-
-### Code Quality (9)
-
-| Rule | Priority | Purpose |
-|------|----------|---------|
-| [yagni-principle](yagni-principle.md) | Critical | Only implement what's needed now |
-| [dry-with-caution](dry-with-caution.md) | High | Rule of Three before abstracting |
-| [kiss-avoid-over-engineering](kiss-avoid-over-engineering.md) | Critical | Keep implementations simple |
-| [error-handling-standard](error-handling-standard.md) | Critical | Typed errors, structured responses |
-| [logging-standards](logging-standards.md) | High | Structured logging, sanitization |
-| [code-quality](code-quality.md) | High | TypeScript strict, no any |
-| [naming-conventions](naming-conventions.md) | Medium | Consistent naming patterns |
-| [smart-commenting](smart-commenting.md) | Medium | Comment why, not what |
-| [modern-javascript](modern-javascript.md) | High | ES6+ syntax (optional chaining, nullish coalescing) |
-
-### Architecture (6)
-
-| Rule | Priority | Purpose |
-|------|----------|---------|
-| [api-design-rules](api-design-rules.md) | High | RESTful conventions, versioning |
-| [state-management](state-management.md) | High | React/Vue state patterns |
-| [dependency-management](dependency-management.md) | High | Version pinning, security audits |
-| [performance-rules](performance-rules.md) | Medium | Optimization guidelines |
-| [theme-consistency](theme-consistency.md) | Medium | Design system adherence |
-| [design-system-usage](design-system-usage.md) | High | Proper design system implementation |
-
-### Workflow (10)
-
-| Rule | Priority | Purpose |
-|------|----------|---------|
-| [tdd-workflow](tdd-workflow.md) | Critical | RED → GREEN → REFACTOR |
-| [cross-review-workflow](cross-review-workflow.md) | High | Multi-agent review process |
-| [approval-gates](approval-gates.md) | Critical | Human approval required |
-| [git-workflow](git-workflow.md) | High | Commit conventions |
-| [safety-rules](safety-rules.md) | Critical | Security guidelines |
-| [next-step-guidance](next-step-guidance.md) | Critical | Always show next steps and commands |
-| [workflow-navigation](workflow-navigation.md) | High | Progress tracking and phase status |
-| [feedback-brainstorming](feedback-brainstorming.md) | High | Brainstorm before implementing feedback |
-| [impact-analysis](impact-analysis.md) | Critical | Analyze all usages before modifying code |
-| [workflow-deliverables](workflow-deliverables.md) | Critical | Verify all phase documents created |
-
-### Accessibility & UI (3)
-
-| Rule | Priority | Purpose |
-|------|----------|---------|
-| [accessibility-rules](accessibility-rules.md) | High | WCAG compliance, ARIA |
-| [correct-file-extensions](correct-file-extensions.md) | Medium | Proper file naming |
-| [direct-hook-access](direct-hook-access.md) | Medium | Lifecycle hooks |
+```toon
+rules[34]{category,rule,priority,purpose}:
+  system,agent-identification-banner,critical,Show agent banner every response
+  system,env-loading,critical,Load .envrc at session start
+  system,execution-rules,critical,ALWAYS/NEVER execution rules
+  system,priority-hierarchy,critical,Config priority order
+  system,dual-file-architecture,high,Plugin + project structure
+  system,token-time-awareness,high,Monitor token usage
+  quality,yagni-principle,critical,Only implement what's needed now
+  quality,dry-with-caution,high,Rule of Three before abstracting
+  quality,kiss-avoid-over-engineering,critical,Keep implementations simple
+  quality,error-handling-standard,critical,Typed errors + structured responses
+  quality,logging-standards,high,Structured logging + sanitization
+  quality,code-quality,high,TypeScript strict + no any
+  quality,naming-conventions,medium,Consistent naming patterns
+  quality,smart-commenting,medium,Comment why not what
+  quality,modern-javascript,high,ES6+ syntax
+  architecture,api-design-rules,high,RESTful conventions + versioning
+  architecture,state-management,high,React/Vue state patterns
+  architecture,dependency-management,high,Version pinning + security audits
+  architecture,performance-rules,medium,Optimization guidelines
+  architecture,theme-consistency,medium,Design system adherence
+  architecture,design-system-usage,high,Proper design system implementation
+  workflow,tdd-workflow,critical,RED → GREEN → REFACTOR
+  workflow,cross-review-workflow,high,Multi-agent review process
+  workflow,approval-gates,critical,Human approval required
+  workflow,git-workflow,high,Commit conventions
+  workflow,safety-rules,critical,Security guidelines
+  workflow,next-step-guidance,critical,Always show next steps and commands
+  workflow,workflow-navigation,high,Progress tracking and phase status
+  workflow,feedback-brainstorming,high,Brainstorm before implementing feedback
+  workflow,impact-analysis,critical,Analyze all usages before modifying
+  workflow,workflow-deliverables,critical,Verify all phase documents created
+  ui,accessibility-rules,high,WCAG compliance + ARIA
+  ui,correct-file-extensions,medium,Proper file naming
+  ui,direct-hook-access,medium,Lifecycle hooks
+```
 
 ---
 
 ## Priority Levels
 
-| Priority | Meaning | Enforcement |
-|----------|---------|-------------|
-| **Critical** | Must follow | Blocks workflow progression |
-| **High** | Should follow | Generates warnings |
-| **Medium** | Recommended | Best practices |
+```toon
+priorities[3]{level,meaning,enforcement}:
+  critical,Must follow,Blocks workflow progression
+  high,Should follow,Generates warnings
+  medium,Recommended,Best practices
+```
+
+---
+
+## Categories Summary
+
+```toon
+categories[5]{name,count,critical_rules}:
+  system,6,4
+  quality,9,4
+  architecture,6,0
+  workflow,10,6
+  ui,3,0
+```
 
 ---
 
@@ -139,4 +132,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.1.7 | **Last Updated:** 2025-12-08
+**Version:** 1.1.8 | **Last Updated:** 2025-12-10 | **Format:** TOON

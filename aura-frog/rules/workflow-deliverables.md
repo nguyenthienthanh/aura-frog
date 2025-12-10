@@ -1,6 +1,6 @@
 # Workflow Deliverables Rule
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Priority:** CRITICAL - Must verify deliverables at each phase
 **Type:** Rule (Mandatory Checklist)
 
@@ -9,6 +9,50 @@
 ## Core Rule
 
 **Every workflow phase MUST produce its required deliverables before proceeding to the next phase.**
+
+---
+
+## TOON Format for AI-Readable Documents
+
+**Use TOON (Token-Oriented Object Notation) for structured data in AI-readable documents.**
+
+TOON reduces token usage by ~40% while improving AI accuracy. See `docs/TOON_FORMAT_GUIDE.md` for full syntax.
+
+### When to Use TOON
+
+```toon
+format_usage[4]{document,format,reason}:
+  TECH_SPEC.md,TOON,AI reads for implementation
+  TEST_PLAN.md,TOON,AI reads for test generation
+  REQUIREMENTS.md,Markdown,Narrative content
+  TECH_SPEC_CONFLUENCE.md,Markdown,Human-readable
+```
+
+### TOON Syntax Quick Reference
+
+```toon
+# Basic key-value
+feature: User Authentication
+
+# Simple arrays
+tags[3]: auth,profile,api
+
+# Tabular arrays (biggest savings)
+files[3]{path,action,purpose}:
+  src/auth.ts,CREATE,Auth service
+  src/login.tsx,CREATE,Login screen
+  src/types.ts,MODIFY,Add types
+
+# Use semicolons for nested values
+models[2]{name,fields}:
+  User,id;email;name
+  Post,id;title;userId
+```
+
+### Templates
+
+- `templates/tech-spec-toon.md` - TOON-enabled tech spec
+- `templates/test-plan-toon.md` - TOON-enabled test plan
 
 ---
 
@@ -506,5 +550,5 @@ ls .claude/logs/workflows/{workflow-id}/
 
 ---
 
-**Version:** 1.1.0
-**Last Updated:** 2025-12-09
+**Version:** 1.2.0
+**Last Updated:** 2025-12-10
