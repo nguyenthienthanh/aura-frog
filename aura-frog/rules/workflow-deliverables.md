@@ -16,7 +16,10 @@
 
 **Use TOON (Token-Oriented Object Notation) for structured data in AI-readable documents.**
 
-TOON reduces token usage by ~40% while improving AI accuracy. See `docs/TOON_FORMAT_GUIDE.md` for full syntax.
+TOON reduces token usage by ~40% while improving AI accuracy.
+
+- **Source:** [TOON Format](https://github.com/toon-format/toon)
+- **Guide:** `docs/TOON_FORMAT_GUIDE.md`
 
 ### When to Use TOON
 

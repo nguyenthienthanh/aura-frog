@@ -2,6 +2,20 @@
 
 **Version:** 1.0.0
 **Purpose:** Token-optimized notation for AI-readable documents
+**Source:** [TOON Format](https://github.com/toon-format/toon) by toon-format
+**License:** MIT
+
+---
+
+## Credits & Attribution
+
+TOON (Token-Oriented Object Notation) is an open-source format created by the [toon-format](https://github.com/toon-format) team.
+
+- **Repository:** https://github.com/toon-format/toon
+- **Documentation:** https://toonformat.dev
+- **NPM Package:** `@toon-format/toon`
+
+Aura Frog uses TOON format under the MIT license to optimize token usage in AI-readable documents.
 
 ---
 

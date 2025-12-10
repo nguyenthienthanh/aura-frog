@@ -1,6 +1,7 @@
 # Agent Selection Guide
 
-**Version:** 2.0.0
+**Version:** 2.1.0
+**Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Complete guide to intelligent agent selection in Aura Frog
 
 ---
@@ -21,28 +22,24 @@ Aura Frog v1.0.0 includes an advanced **Smart Agent Detector** that automaticall
 
 ---
 
-## 📊 Scoring System
+## 📊 Scoring System (TOON)
 
-### Scoring Weights
+```toon
+scoring_weights[7]{criterion,weight,description}:
+  explicit_mention,60,User directly mentions tech (React Native)
+  keyword_exact_match,50,Direct keyword match (test → qa-automation)
+  project_context,40,CWD + file structure + package.json
+  semantic_match,35,Contextual/implied match
+  task_complexity,30,Inferred from task description
+  conversation_history,25,Previous context + active agents
+  file_patterns,20,Recent files + naming conventions
 
-| Criterion | Weight | Description |
-|-----------|--------|-------------|
-| Explicit Mention | 60 | User directly mentions tech (e.g., "React Native") |
-| Keyword Exact Match | 50 | Direct keyword match (e.g., "test" → qa-automation) |
-| Project Context | 40 | CWD, file structure, package.json |
-| Semantic Match | 35 | Contextual/implied match |
-| Task Complexity | 30 | Inferred from task description |
-| Conversation History | 25 | Previous context, active agents |
-| File Patterns | 20 | Recent files, naming conventions |
-
-### Agent Thresholds
-
-| Threshold | Score | Role |
-|-----------|-------|------|
-| Primary Agent | ≥80 | Lead development |
-| Secondary Agent | 50-79 | Supporting role |
-| Optional Agent | 30-49 | Nice-to-have |
-| Not Activated | <30 | Not selected |
+thresholds[4]{level,score,role}:
+  primary_agent,>=80,Lead development
+  secondary_agent,50-79,Supporting role
+  optional_agent,30-49,Nice-to-have
+  not_activated,<30,Not selected
+```
 
 ---
 
@@ -421,6 +418,7 @@ Confidence: 85% (High)
 
 ---
 
-**Guide Version:** 2.0.0
-**Aura Frog Version:** 1.0.0
-**Last Updated:** 2025-11-26
+**Guide Version:** 2.1.0
+**Aura Frog Version:** 1.1.6
+**Format:** TOON
+**Last Updated:** 2025-12-10
