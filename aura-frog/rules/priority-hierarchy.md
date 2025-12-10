@@ -1,14 +1,17 @@
 # Priority Hierarchy
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Priority:** HIGH - Determines how instructions are loaded and merged
 **Type:** Rule (Structural Standard)
+**Format:** [TOON](https://github.com/toon-format/toon)
 
 ---
 
 ## Core Rule
 
-Claude Code loads CLAUDE.md files in a specific order. Instructions from higher-priority sources override lower-priority ones.
+Claude Code loads instructions in a specific order. Higher-priority sources ALWAYS override lower-priority ones.
+
+**CRITICAL:** Project linting config (ESLint/TSLint/Prettier) takes precedence over Aura Frog rules.
 
 ---
 
@@ -16,7 +19,10 @@ Claude Code loads CLAUDE.md files in a specific order. Instructions from higher-
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ 1. Project: .claude/CLAUDE.md        (HIGHEST PRIORITY) │
+│ 0. Project Linting Config            (HIGHEST PRIORITY) │
+│    └─ .eslintrc, .prettierrc, tsconfig.json             │
+├─────────────────────────────────────────────────────────┤
+│ 1. Project: .claude/CLAUDE.md        (HIGH PRIORITY)    │
 │    └─ Project-specific overrides                        │
 ├─────────────────────────────────────────────────────────┤
 │ 2. Plugin: aura-frog/CLAUDE.md       (MEDIUM PRIORITY)  │
@@ -26,6 +32,21 @@ Claude Code loads CLAUDE.md files in a specific order. Instructions from higher-
 │    └─ User's global defaults                            │
 └─────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Code Quality Priority (TOON)
+
+```toon
+code_quality_priority[5]{priority,source,examples}:
+  1,Project linting,.eslintrc + .prettierrc + tsconfig.json
+  2,Project conventions,.claude/project-contexts/[project]/rules.md
+  3,Project examples,.claude/project-contexts/[project]/examples.md
+  4,Aura Frog rules,aura-frog/rules/*.md
+  5,Claude defaults,Built-in training
+```
+
+**See:** `rules/project-linting-precedence.md` for detailed linting precedence.
 
 ---
 
@@ -94,21 +115,26 @@ Read: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 Beyond CLAUDE.md files, project context also has priority:
 
 ```
-Project Context > Aura Frog Rules > Generic Defaults
+Project Linting > Project Context > Aura Frog Rules > Generic Defaults
 ```
 
 ### Loading Order for Context
 
 ```
+0. Project Linting Config (HIGHEST)
+   ├── .eslintrc.*            # ESLint rules
+   ├── .prettierrc*           # Prettier config
+   └── tsconfig.json          # TypeScript settings
+
 1. .claude/project-contexts/[project]/
    ├── project-config.yaml    # Tech stack, team
    ├── conventions.md         # Naming, structure
-   ├── rules.md               # Project rules
+   ├── rules.md               # Project rules (extracted from linting)
    └── examples.md            # Code examples
 
-2. aura-frog/rules/           # Plugin rules
+2. aura-frog/rules/           # Plugin rules (fallback)
 
-3. Claude's training          # Generic defaults
+3. Claude's training          # Generic defaults (lowest)
 ```
 
 ---
@@ -217,5 +243,5 @@ test_coverage: 90
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-29
+**Version:** 1.1.0
+**Last Updated:** 2025-12-10

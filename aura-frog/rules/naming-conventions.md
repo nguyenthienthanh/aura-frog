@@ -1,8 +1,23 @@
 # Naming Conventions
 
-**Category:** Code Quality  
-**Priority:** High  
+**Category:** Code Quality
+**Priority:** High
 **Enforcement:** Linter + Code Review
+**Version:** 1.1.0
+
+---
+
+## ⚠️ Project Config Takes Precedence
+
+**IMPORTANT:** If the project has ESLint naming rules (e.g., `@typescript-eslint/naming-convention`), those ALWAYS override the defaults below.
+
+```
+Project ESLint naming rules > Project conventions.md > These defaults
+```
+
+**See:** `rules/project-linting-precedence.md` for details.
+
+These conventions serve as **fallbacks** when no project naming config exists.
 
 ---
 
@@ -149,4 +164,9 @@ const apiConfig = {
 ---
 
 **Applied in:** All phases, enforced in Phase 6 (Code Review)
+
+---
+
+**Version:** 1.1.0
+**Last Updated:** 2025-12-10
 

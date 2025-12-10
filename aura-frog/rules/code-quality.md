@@ -1,7 +1,21 @@
 # Code Quality Rules
 
-**Version:** 1.0.0  
+**Version:** 1.1.0
 **Purpose:** Ensure consistent, high-quality code across all projects
+
+---
+
+## ⚠️ Project Config Takes Precedence
+
+**IMPORTANT:** If the project has ESLint, TSLint, or Prettier configuration, those rules ALWAYS override the defaults below.
+
+```
+Project .eslintrc > Project .prettierrc > These defaults
+```
+
+**See:** `rules/project-linting-precedence.md` for details.
+
+These rules serve as **fallbacks** when no project linting config exists.
 
 ---
 
@@ -369,6 +383,6 @@ Before submitting code:
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-23
+**Version:** 1.1.0
+**Last Updated:** 2025-12-10
 

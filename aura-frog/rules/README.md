@@ -1,30 +1,31 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.1.8
-**Total Rules:** 34
-**Format:** TOON (Token-Optimized)
+**Version:** 1.1.9
+**Total Rules:** 35
+**Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
 
 ## Rule Index (TOON Format)
 
 ```toon
-rules[34]{category,rule,priority,purpose}:
+rules[35]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
   system,priority-hierarchy,critical,Config priority order
   system,dual-file-architecture,high,Plugin + project structure
   system,token-time-awareness,high,Monitor token usage
+  system,project-linting-precedence,critical,Project ESLint/Prettier takes priority
   quality,yagni-principle,critical,Only implement what's needed now
   quality,dry-with-caution,high,Rule of Three before abstracting
   quality,kiss-avoid-over-engineering,critical,Keep implementations simple
   quality,error-handling-standard,critical,Typed errors + structured responses
   quality,logging-standards,high,Structured logging + sanitization
-  quality,code-quality,high,TypeScript strict + no any
-  quality,naming-conventions,medium,Consistent naming patterns
+  quality,code-quality,high,TypeScript strict + no any (fallback)
+  quality,naming-conventions,medium,Consistent naming (fallback)
   quality,smart-commenting,medium,Comment why not what
-  quality,modern-javascript,high,ES6+ syntax
+  quality,modern-javascript,high,ES6+ syntax (fallback)
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -63,7 +64,7 @@ priorities[3]{level,meaning,enforcement}:
 
 ```toon
 categories[5]{name,count,critical_rules}:
-  system,6,4
+  system,7,5
   quality,9,4
   architecture,6,0
   workflow,10,6
@@ -75,11 +76,13 @@ categories[5]{name,count,critical_rules}:
 ## Rule Loading Order
 
 ```
+0. Project linting config (.eslintrc, .prettierrc, tsconfig.json) - HIGHEST
 1. Project rules (.claude/project-contexts/[project]/rules.md)
-2. Aura Frog core rules (this directory)
-3. Generic defaults
+2. Aura Frog core rules (this directory) - FALLBACK
+3. Generic defaults - LOWEST
 
-Project rules OVERRIDE Aura Frog rules when conflicts exist.
+Project linting config ALWAYS overrides Aura Frog code quality rules.
+See: project-linting-precedence.md
 ```
 
 ---
@@ -93,6 +96,7 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 - [ ] Follow `next-step-guidance` - Show next steps every response
 
 ### Before Coding
+- [ ] Check `project-linting-precedence` - Project ESLint/Prettier takes priority!
 - [ ] Read `yagni-principle` - Don't add unused features
 - [ ] Read `dry-with-caution` - Don't abstract prematurely
 - [ ] Read `kiss-avoid-over-engineering` - Keep it simple
@@ -132,4 +136,4 @@ Project rules OVERRIDE Aura Frog rules when conflicts exist.
 
 ---
 
-**Version:** 1.1.8 | **Last Updated:** 2025-12-10 | **Format:** TOON
+**Version:** 1.1.9 | **Last Updated:** 2025-12-10 | **Format:** TOON

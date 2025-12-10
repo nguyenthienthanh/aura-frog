@@ -1,8 +1,22 @@
 # Rule: Modern JavaScript (ES6+)
 
-**Version:** 1.1.4
+**Version:** 1.1.5
 **Priority:** HIGH
 **Applies:** All JavaScript/TypeScript code generation
+
+---
+
+## ⚠️ Project Config Takes Precedence
+
+**IMPORTANT:** If the project's ESLint/tsconfig has specific rules, those ALWAYS override these defaults.
+
+```
+Project ESLint rules > Project tsconfig.json > These defaults
+```
+
+**See:** `rules/project-linting-precedence.md` for details.
+
+These patterns serve as **fallbacks** when no project config exists.
 
 ---
 
@@ -289,5 +303,5 @@ const displayName = name || 'Anonymous';  // '' should become 'Anonymous'
 
 ---
 
-**Version:** 1.1.4
-**Last Updated:** 2025-12-01
+**Version:** 1.1.5
+**Last Updated:** 2025-12-10
