@@ -172,6 +172,14 @@ for (const section of requiredSections) {
     throw new Error(`Tech spec missing section: ${section}`);
   }
 }
+
+// DIAGRAM REQUIREMENT: Check for Mermaid diagrams
+const hasDiagram = content.includes('```mermaid');
+if (!hasDiagram) {
+  console.warn('⚠️  DIAGRAM REQUIRED: Tech spec should include architecture diagram');
+  console.warn('   See rules/diagram-requirements.md for requirements');
+  // Not blocking, but warning
+}
 ```
 
 ### Phase 3: Design Review
@@ -442,6 +450,7 @@ try {
 - [ ] Timer stopped
 - [ ] Duration calculated
 - [ ] Deliverables validated
+- [ ] **Diagrams validated (Phase 2, 3, 4)** ← NEW
 - [ ] Phase-specific validation passed
 - [ ] Success criteria checked
 - [ ] Metrics collected
@@ -449,6 +458,59 @@ try {
 - [ ] State saved
 - [ ] Approval data prepared
 - [ ] Logs written
+
+---
+
+## 📊 Diagram Validation (Phase 2, 3, 4)
+
+Complex phases MUST include Mermaid diagrams. See `rules/diagram-requirements.md`.
+
+```typescript
+function validateDiagrams(phase: number, deliverables: string[]): DiagramValidation {
+  const diagramRequirements = {
+    2: { // Technical Planning
+      required: ['architecture', 'sequence'],
+      message: 'Phase 2 requires architecture diagram and main flow sequence diagram'
+    },
+    3: { // UI Breakdown
+      required: ['component'],
+      message: 'Phase 3 should include component hierarchy diagram'
+    },
+    4: { // Test Planning
+      required: ['flowchart'],
+      message: 'Phase 4 should include test coverage flowchart'
+    }
+  };
+
+  const req = diagramRequirements[phase];
+  if (!req) return { valid: true, warnings: [] };
+
+  const warnings: string[] = [];
+
+  for (const deliverable of deliverables) {
+    const content = readFile(deliverable);
+    const hasMermaid = content.includes('```mermaid');
+
+    if (!hasMermaid && req.required.length > 0) {
+      warnings.push(`⚠️  ${req.message}`);
+      warnings.push(`   Add Mermaid diagrams to: ${deliverable}`);
+    }
+  }
+
+  return {
+    valid: warnings.length === 0,
+    warnings
+  };
+}
+
+// Usage in post-phase hook
+const diagramValidation = validateDiagrams(currentPhase, phaseState.deliverables);
+if (!diagramValidation.valid) {
+  diagramValidation.warnings.forEach(w => console.warn(w));
+  console.warn('   See: rules/diagram-requirements.md');
+  console.warn('   Reference: docs/WORKFLOW_DIAGRAMS.md');
+}
+```
 
 ---
 

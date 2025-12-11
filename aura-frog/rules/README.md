@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.1.9
-**Total Rules:** 35
+**Version:** 1.2.0
+**Total Rules:** 36
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[35]{category,rule,priority,purpose}:
+rules[36]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
@@ -42,6 +42,7 @@ rules[35]{category,rule,priority,purpose}:
   workflow,feedback-brainstorming,high,Brainstorm before implementing feedback
   workflow,impact-analysis,critical,Analyze all usages before modifying
   workflow,workflow-deliverables,critical,Verify all phase documents created
+  documentation,diagram-requirements,medium,Mermaid diagrams for complex features
   ui,accessibility-rules,high,WCAG compliance + ARIA
   ui,correct-file-extensions,medium,Proper file naming
   ui,direct-hook-access,medium,Lifecycle hooks
@@ -63,11 +64,12 @@ priorities[3]{level,meaning,enforcement}:
 ## Categories Summary
 
 ```toon
-categories[5]{name,count,critical_rules}:
+categories[6]{name,count,critical_rules}:
   system,7,5
   quality,9,4
   architecture,6,0
   workflow,10,6
+  documentation,1,0
   ui,3,0
 ```
 
