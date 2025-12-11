@@ -14,7 +14,7 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "24 specialized agents, 9-phase TDD workflow, 35 rules, 23+ skills. Main character energy for your codebase 🐸✨",
+      "description": "24 specialized agents, 9-phase TDD workflow, 36 rules, 26+ skills. Main character energy for your codebase 🐸✨",
       "version": "1.2.0",
       "author": {
         "name": "Nguyen Thien Thanh",

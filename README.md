@@ -215,7 +215,7 @@ Auto-invokes:
 
 **Reference Skills (12):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator, qa-expert, dev-expert, design-expert, scalable-thinking
 
-**📚 See:** [skills/README.md](skills/README.md) for complete documentation
+**📚 See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
 
 ---
 
@@ -348,7 +348,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 
 </details>
 
-**📚 See:** [rules/](rules/) for all rule definitions
+**📚 See:** [aura-frog/rules/](aura-frog/rules/) for all rule definitions
 
 ---
 
@@ -431,7 +431,7 @@ document "API endpoints"           # 30 min
 
 </details>
 
-**📚 See:** [commands/README.md](commands/README.md) for all 70+ commands
+**📚 See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 70+ commands
 
 ---
 
@@ -454,7 +454,7 @@ workflow:start "Implement PROJ-1234"
 workflow:start "Build https://figma.com/file/ABC123/Design"
 ```
 
-**📚 Setup:** [docs/INTEGRATION_SETUP_GUIDE.md](docs/INTEGRATION_SETUP_GUIDE.md)
+**📚 Setup:** [aura-frog/docs/INTEGRATION_SETUP_GUIDE.md](aura-frog/docs/INTEGRATION_SETUP_GUIDE.md)
 
 ---
 
@@ -464,28 +464,28 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 
 | Document | Description |
 |----------|-------------|
-| [GET_STARTED.md](GET_STARTED.md) | Quick start guide (5 minutes) |
-| [docs/PLUGIN_INSTALLATION.md](docs/PLUGIN_INSTALLATION.md) | Official installation guide |
-| [TESTING_GUIDE.md](TESTING_GUIDE.md) | Testing workflows |
+| [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) | Quick start guide (5 minutes) |
+| [aura-frog/docs/PLUGIN_INSTALLATION.md](aura-frog/docs/PLUGIN_INSTALLATION.md) | Official installation guide |
+| [aura-frog/TESTING_GUIDE.md](aura-frog/TESTING_GUIDE.md) | Testing workflows |
 
 ### Core Documentation
 
 | Document | Description |
 |----------|-------------|
-| [CLAUDE.md](CLAUDE.md) | AI instructions (for Claude) |
-| [docs/phases/](docs/phases/) | 9 detailed phase guides |
-| [docs/RULES_COMBINATION.md](docs/RULES_COMBINATION.md) | How rules are combined |
-| [skills/README.md](skills/README.md) | Skills system guide |
-| [docs/WORKFLOW_DIAGRAMS.md](docs/WORKFLOW_DIAGRAMS.md) | 10 visual workflow diagrams |
-| [docs/MULTI_SESSION_ARCHITECTURE.md](docs/MULTI_SESSION_ARCHITECTURE.md) | Token optimization & session handoff |
+| [aura-frog/CLAUDE.md](aura-frog/CLAUDE.md) | AI instructions (for Claude) |
+| [aura-frog/docs/phases/](aura-frog/docs/phases/) | 9 detailed phase guides |
+| [aura-frog/docs/RULES_COMBINATION.md](aura-frog/docs/RULES_COMBINATION.md) | How rules are combined |
+| [aura-frog/skills/README.md](aura-frog/skills/README.md) | Skills system guide |
+| [aura-frog/docs/WORKFLOW_DIAGRAMS.md](aura-frog/docs/WORKFLOW_DIAGRAMS.md) | 10 visual workflow diagrams |
+| [aura-frog/docs/MULTI_SESSION_ARCHITECTURE.md](aura-frog/docs/MULTI_SESSION_ARCHITECTURE.md) | Token optimization & session handoff |
 
 ### Reference
 
 | Document | Description |
 |----------|-------------|
-| [commands/README.md](commands/README.md) | All 70 commands |
-| [agents/](agents/) | All agent definitions |
-| [rules/](rules/) | Core quality rules |
+| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 70 commands |
+| [aura-frog/agents/](aura-frog/agents/) | All agent definitions |
+| [aura-frog/rules/](aura-frog/rules/) | Core quality rules |
 
 ---
 
