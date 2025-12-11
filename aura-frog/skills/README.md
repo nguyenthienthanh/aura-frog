@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.1.5
-**Total Skills:** 23+ (11 auto-invoking + 12 reference)
+**Version:** 1.1.6
+**Total Skills:** 26+ (14 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -232,6 +232,61 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
+### 11. **lazy-agent-loader** (Priority: HIGH)
+
+**Auto-invokes when:** Agent detection runs (integrated with agent-detector)
+
+**Triggers:**
+- When agent is selected
+- "agent:load" command
+
+**What it does:**
+- Loads only agent **summaries** initially (~50 tokens each)
+- Loads **full definition** only when agent is activated (≥80 score)
+- Reduces context bloat from 48K to ~2.7K tokens (94% savings)
+
+**📚 Details:** `skills/lazy-agent-loader/SKILL.md`
+
+---
+
+### 12. **state-persistence** (Priority: HIGH)
+
+**Auto-invokes when:** Session handoff needed or workflow resume requested
+
+**Triggers:**
+- "workflow:handoff", "session:save", "context:persist"
+- Token limit warnings
+- Manual save requests
+
+**What it does:**
+- Saves workflow state to `.claude/state/`
+- Generates human-readable handoff documents
+- Enables clean session restarts
+- TOON format for token-efficient loading
+
+**📚 Details:** `skills/state-persistence/SKILL.md`
+
+---
+
+### 13. **response-analyzer** (Priority: MEDIUM)
+
+**Auto-invokes when:** Large command outputs or API responses
+
+**Triggers:**
+- Command output >100 lines
+- API response >5KB
+- File search results >50 files
+
+**What it does:**
+- Writes large responses to `/tmp/aura-frog/`
+- Loads only **summaries** into conversation context
+- References full data when needed
+- 95% token savings on verbose outputs
+
+**📚 Details:** `skills/response-analyzer/SKILL.md`
+
+---
+
 ## 🎭 Skill Invocation Flow
 
 ```
@@ -374,18 +429,21 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[11]{name,priority,trigger}:
+skills[14]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
   design-system-library,high,UI components + design system
   code-reviewer,high,After implementation
   session-continuation,high,Token limit warning
+  state-persistence,high,Session handoff/resume
+  lazy-agent-loader,high,Agent loading optimization
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
   jira-integration,medium,Ticket detected
   figma-integration,medium,Figma URL detected
   confluence-integration,medium,Confluence URL/docs
+  response-analyzer,medium,Large output handling
 ```
 ---
 
@@ -474,6 +532,6 @@ reference_skills[8]{name,purpose,location}:
 ---
 
 **Version:** 1.1.6
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-11
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 23+ (11 auto-invoking + 12 reference)
+**Total Skills:** 26+ (14 auto-invoking + 12 reference)
