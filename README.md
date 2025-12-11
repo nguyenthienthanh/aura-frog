@@ -27,19 +27,20 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **23+** | **35** | **9** | **70+** |
+| **24** | **26+** | **36** | **9** | **70+** |
 
 </div>
 
 **What's Inside:**
 - 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
-- ⚡ **23+ Skills** — 11 auto-invoking + 12 reference skills for specialized tasks
+- ⚡ **26+ Skills** — 14 auto-invoking + 12 reference skills for specialized tasks
 - 🎨 **10 Design Systems** — MUI, Ant Design, Tailwind, shadcn/ui, Chakra, NativeWind, and more
-- 📏 **35 Quality Rules** — System, code quality, architecture, workflow, and accessibility
+- 📏 **36 Quality Rules** — System, code quality, architecture, workflow, documentation, and accessibility
 - 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
 - 🎮 **70+ Commands** — Full workflow control at your fingertips
 - 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)
 - 🔀 **Multi-Model Support** — Use Gemini, OpenAI, DeepSeek per phase
+- 📊 **10 Mermaid Diagrams** — Visual workflow documentation
 
 ---
 
@@ -180,7 +181,7 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### ⚡ 23+ Skills (11 Auto-Invoking + 12 Reference)
+### ⚡ 26+ Skills (14 Auto-Invoking + 12 Reference)
 
 Skills activate automatically based on your message context — no commands needed:
 
@@ -201,13 +202,16 @@ Auto-invokes:
 | `workflow-orchestrator` | "implement", "build", "create" | Execute 9-phase workflow |
 | `project-context-loader` | Before code generation | Load project conventions |
 | `model-router` | Phase transitions | Select AI model per phase |
-| `session-manager` | Token limit (150K+) | Workflow state & handoff |
+| `session-continuation` | Token limit (150K+) | Workflow state & handoff |
 | `bugfix-quick` | "fix", "error", "broken" | Fast TDD bug fixes |
 | `test-writer` | "add tests", "coverage" | Generate comprehensive tests |
 | `code-reviewer` | After implementation | Multi-agent quality review |
 | `jira-integration` | PROJ-1234 patterns | Auto-fetch ticket details |
 | `figma-integration` | Figma URLs | Extract design components |
 | `confluence-integration` | Confluence URLs | Fetch/create/update pages |
+| `lazy-agent-loader` | Agent loading | 94% token savings on agent defs |
+| `response-analyzer` | Large outputs | Save verbose output to temp |
+| `state-persistence` | Session handoff | File-based state management |
 
 **Reference Skills (12):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator, qa-expert, dev-expert, design-expert, scalable-thinking
 
@@ -259,7 +263,7 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 📏 34 Quality Rules
+### 📏 36 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 
@@ -321,6 +325,15 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `feedback-brainstorming` | Brainstorm before feedback |
 | `impact-analysis` | Analyze usages before modifying |
 | `workflow-deliverables` | Verify all phase docs created |
+
+</details>
+
+<details>
+<summary><b>Documentation Rules (1)</b></summary>
+
+| Rule | Purpose |
+|------|---------|
+| `diagram-requirements` | Mermaid diagrams for complex features |
 
 </details>
 
@@ -463,6 +476,8 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 | [docs/phases/](docs/phases/) | 9 detailed phase guides |
 | [docs/RULES_COMBINATION.md](docs/RULES_COMBINATION.md) | How rules are combined |
 | [skills/README.md](skills/README.md) | Skills system guide |
+| [docs/WORKFLOW_DIAGRAMS.md](docs/WORKFLOW_DIAGRAMS.md) | 10 visual workflow diagrams |
+| [docs/MULTI_SESSION_ARCHITECTURE.md](docs/MULTI_SESSION_ARCHITECTURE.md) | Token optimization & session handoff |
 
 ### Reference
 
@@ -480,11 +495,12 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── agents/                      # 24 specialized agents
-│   ├── skills/                      # 23+ skills (11 auto + 12 reference)
+│   ├── skills/                      # 26+ skills (14 auto + 12 reference)
 │   ├── commands/                    # 70+ workflow commands
-│   ├── rules/                       # 27 quality rules
+│   ├── rules/                       # 36 quality rules
 │   ├── docs/                        # Comprehensive documentation
-│   │   └── phases/                  # 9 phase guides
+│   │   ├── phases/                  # 9 phase guides
+│   │   └── WORKFLOW_DIAGRAMS.md     # 10 Mermaid diagrams
 │   ├── hooks/                       # Lifecycle hooks
 │   ├── scripts/                     # Integration scripts
 │   └── templates/                   # Document templates

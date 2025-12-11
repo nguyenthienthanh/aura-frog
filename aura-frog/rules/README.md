@@ -143,4 +143,4 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.1.9 | **Last Updated:** 2025-12-10 | **Format:** TOON
+**Version:** 1.2.0 | **Last Updated:** 2025-12-11 | **Format:** TOON

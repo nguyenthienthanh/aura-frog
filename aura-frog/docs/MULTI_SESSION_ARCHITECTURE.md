@@ -129,18 +129,18 @@ bash scripts/session-handoff.sh create wf-001
 
 ```bash
 # Export to files
-bash scripts/workflow-state.sh export wf-001
+bash scripts/workflow-manager.sh export wf-001
 
 # Creates:
 # - state.json (full state)
-# - state.toon (token-efficient)
+# - state.toon (token-efficient via workflow-export-toon.sh)
 ```
 
 ### Step 4: New Session Resume
 
 ```bash
 # Load TOON state (minimal tokens)
-bash scripts/workflow-state.sh get-toon wf-001
+bash scripts/workflow/workflow-export-toon.sh wf-001
 
 # Show handoff document
 bash scripts/session-handoff.sh show wf-001
@@ -207,7 +207,7 @@ No special handling needed. Use standard workflow.
 
 1. **Before starting:**
    ```bash
-   bash scripts/workflow-state.sh init wf-001 "Feature Name"
+   bash scripts/workflow-manager.sh init wf-001 "Feature Name"
    ```
 
 2. **During workflow:**
@@ -274,7 +274,7 @@ cat /tmp/aura-frog/agents/output-tests.md
 cp /tmp/aura-frog/agents/tests/* tests/
 
 # Update state
-bash scripts/workflow-state.sh set wf-001 "deliverables" "tests/auth/Login.test.tsx"
+bash scripts/workflow-manager.sh set wf-001 "deliverables" "tests/auth/Login.test.tsx"
 ```
 
 ---
@@ -316,16 +316,16 @@ git log --all --oneline
 
 ```bash
 # Regenerate from git
-bash scripts/workflow-state.sh init wf-002 "Feature (recovered)"
+bash scripts/workflow-manager.sh init wf-002 "Feature (recovered)"
 # Manually set phase based on git history
-bash scripts/workflow-state.sh phase wf-002 5
+bash scripts/workflow-manager.sh phase wf-002 5
 ```
 
 ### Token Limit Hit
 
 ```bash
 # Emergency save
-bash scripts/workflow-state.sh export wf-001
+bash scripts/workflow-manager.sh export wf-001
 bash scripts/session-handoff.sh create wf-001
 
 # Start new session
@@ -352,5 +352,7 @@ optimization_savings[6]{technique,before,after,savings}:
 - `skills/state-persistence/SKILL.md`
 - `skills/lazy-agent-loader/SKILL.md`
 - `skills/response-analyzer/SKILL.md`
-- `scripts/workflow-state.sh`
+- `scripts/workflow-manager.sh`
+- `scripts/workflow/workflow-export-toon.sh`
 - `scripts/session-handoff.sh`
+- `docs/WORKFLOW_DIAGRAMS.md`

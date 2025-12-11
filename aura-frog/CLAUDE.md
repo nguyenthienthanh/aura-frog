@@ -34,7 +34,7 @@ session_start[4]{step,action,file}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[11]{name,trigger,file}:
+skills[14]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -46,6 +46,9 @@ skills[11]{name,trigger,file}:
   test-writer,Test request,skills/test-writer/SKILL.md
   code-reviewer,Code review,skills/code-reviewer/SKILL.md
   session-continuation,Token limit,skills/session-continuation/SKILL.md
+  lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
+  response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
+  state-persistence,Session handoff,skills/state-persistence/SKILL.md
 ```
 
 **All skills:** `skills/README.md`
@@ -65,15 +68,16 @@ skills[11]{name,trigger,file}:
 ## Resources
 
 ```toon
-resources[8]{name,location}:
+resources[9]{name,location}:
   Agents (24),agents/
   Commands (70+),commands/
-  Rules (34),rules/
-  Skills (23+),skills/
+  Rules (36),rules/
+  Skills (26+),skills/
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
   Getting Started,GET_STARTED.md
   Integrations,docs/INTEGRATION_SETUP_GUIDE.md
+  Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
 ```
 
 ---
