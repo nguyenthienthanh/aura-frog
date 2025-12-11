@@ -4,6 +4,42 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.0] - 2025-12-11
+
+### Token Optimization System
+
+Major update focused on token efficiency and multi-session support.
+
+#### New Skills (3)
+- `lazy-agent-loader` - Load agent summaries first, full definitions on demand (~94% token savings)
+- `response-analyzer` - Save large outputs to temp files, load summaries (~95% savings)
+- `state-persistence` - File-based workflow state for session handoffs
+
+#### New Scripts (5)
+- `scripts/validate-toon.sh` - Validate TOON format array declarations
+- `scripts/context-compress.sh` - Generate compressed project context
+- `scripts/response-save.sh` - Save verbose outputs to /tmp/aura-frog/
+- `scripts/session-handoff.sh` - Generate human-readable handoff documents
+- `scripts/workflow/workflow-export-toon.sh` - Export workflow state in TOON format
+
+#### New Documentation
+- `docs/WORKFLOW_DIAGRAMS.md` - 10 comprehensive Mermaid diagrams
+- `docs/MULTI_SESSION_ARCHITECTURE.md` - Token optimization & session handoff guide
+
+#### New Rules (1)
+- `rules/diagram-requirements.md` - Mermaid diagrams required for complex features
+
+#### Updated
+- `skills/agent-detector/SKILL.md` - Converted to TOON format (~35% token savings)
+- `hooks/post-phase.md` - Added diagram validation for Phase 2, 3, 4
+- `rules/README.md` - Now 36 total rules
+
+#### Removed Duplicates
+- Consolidated duplicate integration scripts
+- Removed redundant workflow-state.sh (use workflow-manager.sh)
+
+---
+
 ## [1.1.4] - 2025-12-01
 
 ### Workflow Navigation

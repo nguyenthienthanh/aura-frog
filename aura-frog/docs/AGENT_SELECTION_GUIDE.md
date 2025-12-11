@@ -419,6 +419,6 @@ Confidence: 85% (High)
 ---
 
 **Guide Version:** 2.1.0
-**Aura Frog Version:** 1.1.6
+**Aura Frog Version:** 1.2.0
 **Format:** TOON
 **Last Updated:** 2025-12-10
