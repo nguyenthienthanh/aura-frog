@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **24 Agents** | **26+ Skills** | **37 Rules** | **9 Phases** | **70+ Commands** |
+| **24 Agents** | **26+ Skills** | **38 Rules** | **9 Phases** | **70+ Commands** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|
 
 ---
@@ -308,7 +308,7 @@ workflow:start <your-task-description>
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
 - **Skills:** `skills/README.md` (26+ skills)
-- **Rules:** `rules/README.md` (37 quality rules)
+- **Rules:** `rules/README.md` (38 quality rules)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md` (10 Mermaid diagrams)
 - **Phase Guides:** `docs/phases/`
 

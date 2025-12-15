@@ -282,7 +282,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 </details>
 
 <details>
-<summary><b>Code Quality Rules (8)</b></summary>
+<summary><b>Code Quality Rules (10)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -294,6 +294,8 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `code-quality` | TypeScript strict, no any |
 | `naming-conventions` | Consistent naming |
 | `smart-commenting` | Why, not what |
+| `modern-javascript` | ES6+ syntax required |
+| `prefer-established-libraries` | Use lodash/es-toolkit over custom utils |
 
 </details>
 
@@ -506,7 +508,7 @@ aura-frog/                           # Repository root
 │   ├── agents/                      # 24 specialized agents
 │   ├── skills/                      # 26+ skills (14 auto + 12 reference)
 │   ├── commands/                    # 70+ workflow commands
-│   ├── rules/                       # 37 quality rules
+│   ├── rules/                       # 38 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
 │   │   └── WORKFLOW_DIAGRAMS.md     # 10 Mermaid diagrams

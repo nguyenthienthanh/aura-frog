@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
 **Version:** 1.2.0
-**Total Rules:** 37
+**Total Rules:** 38
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[37]{category,rule,priority,purpose}:
+rules[38]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
@@ -26,6 +26,7 @@ rules[37]{category,rule,priority,purpose}:
   quality,naming-conventions,medium,Consistent naming patterns
   quality,smart-commenting,medium,Comment why not what
   quality,modern-javascript,high,ES6+ syntax
+  quality,prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -67,7 +68,7 @@ priorities[3]{level,meaning,enforcement}:
 ```toon
 categories[7]{name,count,critical_rules}:
   system,7,5
-  quality,9,4
+  quality,10,4
   architecture,6,0
   security,1,1
   workflow,10,6
@@ -109,6 +110,7 @@ See: `project-linting-precedence.md`
 - [ ] Read `yagni-principle` - Don't add unused features
 - [ ] Read `dry-with-caution` - Don't abstract prematurely
 - [ ] Read `kiss-avoid-over-engineering` - Keep it simple
+- [ ] Read `prefer-established-libraries` - Use lodash/es-toolkit first
 
 ### During Coding
 - [ ] Follow `code-quality` - TypeScript strict mode
