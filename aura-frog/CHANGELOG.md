@@ -6,28 +6,34 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [1.2.1] - 2025-12-15
 
-### Enhanced Hooks System
+### Expert Skills System & Enhanced Hooks
 
-Major update to Claude Code lifecycle hooks with security and productivity enhancements.
+Major update introducing framework-specific expert skills for on-demand loading and enhanced lifecycle hooks.
+
+#### New Expert Skills (5)
+- **typescript-expert** - Strict types, ESLint config, nullish handling, modern patterns
+- **react-expert** - Components, hooks, performance, state management, forms
+- **react-native-expert** - FlatList optimization, navigation, platform code, animations
+- **vue-expert** - Composition API, script setup, Pinia, reactivity patterns
+- **nextjs-expert** - App Router, Server Components, caching, Server Actions
 
 #### New Hooks (6)
-- **PreToolUse - Secrets Protection** - Warns when writing to files containing secrets (.env, credentials)
-- **PreToolUse - SAST Security** - Detects security anti-patterns (eval, innerHTML, exec, hardcoded passwords)
-- **PostToolUse - Large File Warning** - Warns when reading files >500 lines (context optimization)
+- **PreToolUse - Secrets Protection** - Warns when writing to files containing secrets
+- **PreToolUse - SAST Security** - Detects security anti-patterns
+- **PostToolUse - Large File Warning** - Warns when reading files >500 lines
 - **UserPromptSubmit - Confluence Detection** - Auto-detects Confluence URLs
 - **UserPromptSubmit - GitHub Detection** - Auto-detects GitHub PR/Issue URLs
-- **SessionEnd - Uncommitted Changes** - Reminds about staged uncommitted changes
+- **SessionEnd - Uncommitted Changes** - Reminds about staged changes
 
-#### New Rules (1)
-- **typescript-strict-practices** - Explicit nullish/empty handling in conditionals for React/Vue/RN
-
-#### Updated
-- SessionStart hook updated to v1.2.1, skills count to 26+
-- Full documentation for Stop and Notification hooks
+#### Architecture Change
+- Migrated framework-specific rules to expert skills for on-demand loading
+- Removed `modern-javascript.md` and `typescript-strict-practices.md` (now in skills)
+- Expert skills auto-invoke based on project context
 
 #### Stats
+- **Total Skills:** 30+ (19 auto-invoking + 12 reference)
+- **Total Rules:** 37
 - **Total Hooks:** 15
-- **Total Rules:** 39 (quality: 11)
 
 ---
 

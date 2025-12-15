@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.2.0
-**Total Skills:** 26+ (14 auto-invoking + 12 reference)
+**Version:** 1.2.1
+**Total Skills:** 30+ (19 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -429,7 +429,7 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[14]{name,priority,trigger}:
+skills[19]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
@@ -438,6 +438,11 @@ skills[14]{name,priority,trigger}:
   session-continuation,high,Token limit warning
   state-persistence,high,Session handoff/resume
   lazy-agent-loader,high,Agent loading optimization
+  typescript-expert,high,TypeScript/ESLint/type errors
+  react-expert,high,React components/hooks
+  react-native-expert,high,React Native/Expo/mobile
+  vue-expert,high,Vue 3/Composition API/Pinia
+  nextjs-expert,high,Next.js/App Router/Server Components
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
   jira-integration,medium,Ticket detected
@@ -531,7 +536,88 @@ reference_skills[8]{name,purpose,location}:
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** 2025-12-11
+---
+
+## 🧠 Expert Skills (Framework-Specific)
+
+Expert skills provide comprehensive best practices for specific frameworks. They auto-invoke when working with the respective technology:
+
+### 14. **typescript-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with TypeScript files, type errors, ESLint issues
+
+**Triggers:** .ts, .tsx, type errors, eslint, strict mode
+
+**What it does:**
+- Strict null handling (no implicit truthiness)
+- ESLint best practices configuration
+- Type guards and validation patterns
+- Modern JavaScript/TypeScript patterns
+- Error handling with typed errors
+
+---
+
+### 15. **react-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with React components, hooks
+
+**Triggers:** React, JSX, useState, useEffect, hooks, component
+
+**What it does:**
+- Function component patterns
+- Hooks best practices (useState, useEffect, useMemo, useCallback)
+- Performance optimization (React.memo, code splitting)
+- State management patterns
+- Form handling with validation
+
+---
+
+### 16. **react-native-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with React Native, mobile apps
+
+**Triggers:** react-native, expo, mobile, iOS, Android, NativeWind
+
+**What it does:**
+- FlatList/FlashList optimization
+- Navigation (React Navigation) patterns
+- Platform-specific code handling
+- Animation with Reanimated
+- Storage patterns (AsyncStorage, SecureStore, MMKV)
+
+---
+
+### 17. **vue-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Vue 3, Composition API
+
+**Triggers:** vue, composition api, pinia, nuxt, ref, reactive
+
+**What it does:**
+- Script setup patterns
+- Reactivity best practices (ref vs reactive)
+- Composables (custom hooks)
+- Pinia state management
+- VeeValidate + Zod forms
+
+---
+
+### 18. **nextjs-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Next.js projects
+
+**Triggers:** nextjs, app router, server component, api route
+
+**What it does:**
+- App Router structure and conventions
+- Server vs Client Components
+- Data fetching and caching strategies
+- Server Actions for forms
+- Middleware and API routes
+
+---
+
+**Version:** 1.2.1
+**Last Updated:** 2025-12-15
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 26+ (14 auto-invoking + 12 reference)
+**Total Skills:** 30+ (19 auto-invoking + 12 reference)
