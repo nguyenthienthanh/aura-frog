@@ -4,6 +4,29 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.1] - 2025-12-15
+
+### Enhanced Hooks System
+
+Major update to Claude Code lifecycle hooks with security and productivity enhancements.
+
+#### New Hooks (6)
+- `PreToolUse - Secrets Protection` - Warns when writing to files that may contain secrets
+- `PreToolUse - SAST Security Check` - Detects common security anti-patterns (eval, innerHTML, exec)
+- `PostToolUse - Large File Warning` - Warns when reading files >500 lines
+- `UserPromptSubmit - Confluence Detection` - Auto-detects Confluence URLs
+- `UserPromptSubmit - GitHub Detection` - Auto-detects GitHub PR/Issue URLs
+- `SessionEnd - Uncommitted Changes` - Reminds about staged uncommitted changes
+
+#### Updated Hooks
+- `SessionStart` - Updated version to 1.2.1, skills count to 26+
+- Full documentation for Stop and Notification hooks (previously undocumented)
+
+#### Total Hooks: 15
+- SessionStart (1), PreToolUse (4), PostToolUse (2), UserPromptSubmit (4), SessionEnd (2), Stop (1), Notification (1)
+
+---
+
 ## [1.2.0] - 2025-12-11
 
 ### Token Optimization System

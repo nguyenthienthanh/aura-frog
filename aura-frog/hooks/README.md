@@ -1,6 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
+**Version:** 1.2.0
 
 ---
 
@@ -22,20 +23,20 @@ Referenced in plugin.json:
 
 ---
 
-## 🎯 Active Hooks
+## 🎯 Active Hooks (15 Total)
 
-### 1. SessionStart
+### 1. SessionStart - Welcome Message
 **When:** Every time Claude Code session begins
 
 **Actions:**
 - ✅ Display Aura Frog welcome message
 - ✅ Show available commands
-- ✅ List active Skills (8 auto-invoking capabilities)
+- ✅ List active Skills (26+ auto-invoking capabilities)
 - ✅ Guide user on natural language usage
 
 **Output Example:**
 ```
-🚀 Aura Frog v1.0.0 is active.
+🐸 Aura Frog v1.2.1 is active - A Claude Code Plugin
 
 Available Commands:
 - workflow:start <task> - Start 9-phase TDD workflow
@@ -43,7 +44,7 @@ Available Commands:
 - project:init - Initialize project context
 - agent:list - Show all available agents
 
-Skills System: 8 auto-invoking skills active
+Skills System: 26+ auto-invoking skills active
 Type any command or use natural language - Skills will auto-activate based on your intent.
 ```
 
@@ -87,7 +88,44 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 4. PostToolUse - Command Logging
+### 4. PreToolUse - Secrets Protection
+**When:** Before Write or Edit to sensitive files
+
+**Actions:**
+- ✅ Detect files that may contain secrets (.env, credentials, tokens, api-keys)
+- ✅ Check if file is tracked by git
+- ✅ Warn user to add to .gitignore
+
+**Example:**
+```
+🔒 Warning: This file may contain secrets and is tracked by git. Consider adding to .gitignore
+```
+
+---
+
+### 5. PreToolUse - SAST Security Check
+**When:** Before Write or Edit tool execution
+
+**Actions:**
+- ✅ Detect common security anti-patterns (eval, innerHTML, exec, hardcoded passwords)
+- ✅ Reference OWASP guidelines
+- ✅ Point to rules/sast-security-scanning.md
+
+**Detected Patterns:**
+- `eval()` - Code injection risk
+- `innerHTML =` - XSS vulnerability
+- `dangerouslySetInnerHTML` - React XSS risk
+- `exec()` - Command injection
+- Hardcoded passwords/API keys
+
+**Example:**
+```
+🔐 Security: Potential security concern detected. Review OWASP guidelines in rules/sast-security-scanning.md
+```
+
+---
+
+### 6. PostToolUse - Command Logging
 **When:** After any Bash command completes
 
 **Actions:**
@@ -104,7 +142,22 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 5. UserPromptSubmit - JIRA Detection
+### 7. PostToolUse - Large File Warning
+**When:** After Read tool completes
+
+**Actions:**
+- ✅ Detect files over 500 lines
+- ✅ Warn about context consumption
+- ✅ Suggest response-analyzer skill for chunked reading
+
+**Example:**
+```
+📄 Large file (1234 lines). Consider using response-analyzer skill for chunked reading.
+```
+
+---
+
+### 8. UserPromptSubmit - JIRA Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -120,7 +173,7 @@ Hook: 🎫 JIRA ticket detected - jira-integration skill may auto-activate
 
 ---
 
-### 6. UserPromptSubmit - Figma Detection
+### 9. UserPromptSubmit - Figma Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -136,7 +189,39 @@ Hook: 🎨 Figma link detected - figma-integration skill may auto-activate
 
 ---
 
-### 7. SessionEnd - Workflow Handoff Reminder
+### 10. UserPromptSubmit - Confluence Detection
+**When:** User submits a prompt
+
+**Actions:**
+- ✅ Detect Confluence URLs (`atlassian.net/wiki`, `confluence`)
+- ✅ Notify that confluence-integration skill may auto-activate
+- ✅ Enables automatic documentation fetching
+
+**Example:**
+```
+User: "Check the docs at https://mycompany.atlassian.net/wiki/spaces/DEV/pages/123"
+Hook: 📚 Confluence link detected - confluence-integration skill may auto-activate
+```
+
+---
+
+### 11. UserPromptSubmit - GitHub PR/Issue Detection
+**When:** User submits a prompt
+
+**Actions:**
+- ✅ Detect GitHub PR URLs (`github.com/.*/pull/[0-9]+`)
+- ✅ Detect GitHub Issue URLs (`github.com/.*/issues/[0-9]+`)
+- ✅ Notify user of detected link
+
+**Example:**
+```
+User: "Review https://github.com/user/repo/pull/123"
+Hook: 🔗 GitHub PR/Issue detected
+```
+
+---
+
+### 12. SessionEnd - Workflow Handoff Reminder
 **When:** Session ends
 
 **Actions:**
@@ -147,6 +232,48 @@ Hook: 🎨 Figma link detected - figma-integration skill may auto-activate
 **Example:**
 ```
 💾 Active workflow detected. Use workflow:handoff to save state for next session.
+```
+
+---
+
+### 13. SessionEnd - Uncommitted Changes Reminder
+**When:** Session ends
+
+**Actions:**
+- ✅ Check for staged uncommitted changes
+- ✅ Remind user to commit before ending
+- ✅ Prevents work loss
+
+**Example:**
+```
+📝 You have uncommitted staged changes. Consider committing before ending session.
+```
+
+---
+
+### 14. Stop - Voice Notification
+**When:** Claude stops for user approval
+
+**Actions:**
+- ✅ Play context-aware voiceover notification
+- ✅ Alert user that approval is needed
+- ✅ Uses macOS `say` command
+
+**Script:** `hooks/stop-voice-notify.sh`
+
+---
+
+### 15. Notification - Critical Alert Voice
+**When:** Critical notifications occur
+
+**Actions:**
+- ✅ Detect critical notifications (error, critical, failed)
+- ✅ Play voice alert for urgent issues
+- ✅ Uses `scripts/voice-notify.sh`
+
+**Example:**
+```
+Alert: Please check the notification
 ```
 
 ---
@@ -265,6 +392,29 @@ To modify hooks:
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-27
-**Status:** Active hooks system
+## 📊 Hook Summary Table
+
+```toon
+hooks[15]{event,name,purpose}:
+  SessionStart,Welcome Message,Display plugin status and commands
+  PreToolUse,Bash Safety,Block destructive system commands
+  PreToolUse,Project Context,Remind to initialize project context
+  PreToolUse,Secrets Protection,Warn about secrets in tracked files
+  PreToolUse,SAST Security,Detect security anti-patterns
+  PostToolUse,Command Logging,Log bash commands for audit
+  PostToolUse,Large File Warning,Warn about context consumption
+  UserPromptSubmit,JIRA Detection,Auto-detect ticket IDs
+  UserPromptSubmit,Figma Detection,Auto-detect design URLs
+  UserPromptSubmit,Confluence Detection,Auto-detect wiki URLs
+  UserPromptSubmit,GitHub Detection,Auto-detect PR/Issue URLs
+  SessionEnd,Workflow Handoff,Remind to save active workflow
+  SessionEnd,Uncommitted Changes,Remind to commit staged changes
+  Stop,Voice Notification,Alert user for approval needed
+  Notification,Critical Alert,Voice alert for errors/critical issues
+```
+
+---
+
+**Version:** 1.2.0
+**Last Updated:** 2025-12-15
+**Status:** Active hooks system (15 hooks)

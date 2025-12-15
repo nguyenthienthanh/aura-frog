@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "🐸 Aura Frog v1.0.0 is active - A Claude Code Plugin\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all available agents\n\n**Skills System:** Auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
+            "prompt": "🐸 Aura Frog v1.2.1 is active - A Claude Code Plugin\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all available agents\n\n**Skills System:** 26+ auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration, confluence-integration, session-continuation, lazy-agent-loader, response-analyzer, state-persistence)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
           }
         ]
       }
@@ -28,6 +28,16 @@
             "type": "command",
             "comment": "Remind to load project context before code generation",
             "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '💡 Reminder: Run project:init to create project context before generating code' >&2; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Block writing secrets to tracked files (.env, credentials, tokens)",
+            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '(\\.env$|\\.env\\.|credentials|secrets|tokens\\.json|api[_-]?keys)'; then if git ls-files --error-unmatch \"$CLAUDE_FILE_PATHS\" 2>/dev/null; then echo '🔒 Warning: This file may contain secrets and is tracked by git. Consider adding to .gitignore' >&2; fi; fi"
+          },
+          {
+            "type": "command",
+            "comment": "SAST: Warn about common security anti-patterns",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qiE '(eval\\(|innerHTML\\s*=|dangerouslySetInnerHTML|exec\\(|password\\s*=\\s*[\"'\\'']\"|api[_-]?key\\s*=\\s*[\"'\\'']\")'; then echo '🔐 Security: Potential security concern detected. Review OWASP guidelines in rules/sast-security-scanning.md' >&2; fi"
           }
         ]
       }
@@ -40,6 +50,16 @@
             "type": "command",
             "comment": "Log command execution for workflow tracking",
             "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Warn when reading large files that may consume significant context",
+            "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"📄 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
           }
         ]
       }
@@ -56,6 +76,16 @@
             "type": "command",
             "comment": "Detect Figma URLs and suggest figma-integration skill",
             "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -q 'figma.com/file'; then echo '🎨 Figma link detected - figma-integration skill may auto-activate' >&2; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Detect Confluence URLs and suggest confluence-integration skill",
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'atlassian.net/wiki|confluence'; then echo '📚 Confluence link detected - confluence-integration skill may auto-activate' >&2; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Detect GitHub PR/Issue URLs",
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'github.com/.*/pull/[0-9]+|github.com/.*/issues/[0-9]+'; then echo '🔗 GitHub PR/Issue detected' >&2; fi"
           }
         ]
       }
@@ -67,6 +97,11 @@
             "type": "command",
             "comment": "Suggest workflow handoff if active workflow exists",
             "command": "if [ -f .claude/logs/workflows/active-workflow.json ]; then echo '💾 Active workflow detected. Use workflow:handoff to save state for next session.' >&2; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Remind about uncommitted changes",
+            "command": "if git status --porcelain 2>/dev/null | grep -q '^[MADRC]'; then echo '📝 You have uncommitted staged changes. Consider committing before ending session.' >&2; fi"
           }
         ]
       }
