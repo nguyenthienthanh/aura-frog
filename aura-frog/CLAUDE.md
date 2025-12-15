@@ -71,7 +71,7 @@ skills[14]{name,trigger,file}:
 resources[9]{name,location}:
   Agents (24),agents/
   Commands (70+),commands/
-  Rules (36),rules/
+  Rules (37),rules/
   Skills (26+),skills/
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/

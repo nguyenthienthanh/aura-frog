@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
 **Version:** 1.2.0
-**Total Rules:** 36
+**Total Rules:** 37
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[36]{category,rule,priority,purpose}:
+rules[37]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
@@ -32,6 +32,7 @@ rules[36]{category,rule,priority,purpose}:
   architecture,performance-rules,medium,Optimization guidelines
   architecture,theme-consistency,medium,Design system adherence
   architecture,design-system-usage,high,Proper design system implementation
+  security,sast-security-scanning,critical,OWASP Top 10 + SAST scanning
   workflow,tdd-workflow,critical,RED → GREEN → REFACTOR
   workflow,cross-review-workflow,high,Multi-agent review process
   workflow,approval-gates,critical,Human approval required
@@ -64,10 +65,11 @@ priorities[3]{level,meaning,enforcement}:
 ## Categories Summary
 
 ```toon
-categories[6]{name,count,critical_rules}:
+categories[7]{name,count,critical_rules}:
   system,7,5
   quality,9,4
   architecture,6,0
+  security,1,1
   workflow,10,6
   documentation,1,0
   ui,3,0
@@ -129,6 +131,10 @@ See: `project-linting-precedence.md`
 - [ ] Run grep/search to find all references
 - [ ] Update all affected files
 - [ ] Verify no breaking changes
+
+### For Security
+- [ ] Follow `sast-security-scanning` - OWASP Top 10 checks
+- [ ] Follow `safety-rules` - External system safety
 
 ### For Review
 - [ ] Follow `cross-review-workflow` - Multi-agent review
