@@ -18,12 +18,16 @@ Major update to Claude Code lifecycle hooks with security and productivity enhan
 - **UserPromptSubmit - GitHub Detection** - Auto-detects GitHub PR/Issue URLs
 - **SessionEnd - Uncommitted Changes** - Reminds about staged uncommitted changes
 
+#### New Rules (1)
+- **typescript-strict-practices** - Explicit nullish/empty handling in conditionals for React/Vue/RN
+
 #### Updated
 - SessionStart hook updated to v1.2.1, skills count to 26+
 - Full documentation for Stop and Notification hooks
 
 #### Stats
-- **Total Hooks:** 15 (SessionStart: 1, PreToolUse: 4, PostToolUse: 2, UserPromptSubmit: 4, SessionEnd: 2, Stop: 1, Notification: 1)
+- **Total Hooks:** 15
+- **Total Rules:** 39 (quality: 11)
 
 ---
 

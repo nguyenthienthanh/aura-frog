@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.2.0
-**Total Rules:** 38
+**Version:** 1.2.1
+**Total Rules:** 39
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[38]{category,rule,priority,purpose}:
+rules[39]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
@@ -27,6 +27,7 @@ rules[38]{category,rule,priority,purpose}:
   quality,smart-commenting,medium,Comment why not what
   quality,modern-javascript,high,ES6+ syntax
   quality,prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
+  quality,typescript-strict-practices,high,Explicit nullish/empty handling in conditionals
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -68,7 +69,7 @@ priorities[3]{level,meaning,enforcement}:
 ```toon
 categories[7]{name,count,critical_rules}:
   system,7,5
-  quality,10,4
+  quality,11,4
   architecture,6,0
   security,1,1
   workflow,10,6
