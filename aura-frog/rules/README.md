@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.2.1
+**Version:** 1.2.2
 **Total Rules:** 37
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 

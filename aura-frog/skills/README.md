@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.2.1
-**Total Skills:** 30+ (19 auto-invoking + 12 reference)
+**Version:** 1.2.2
+**Total Skills:** 38+ (25 auto-invoking + 13 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -429,7 +429,7 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[19]{name,priority,trigger}:
+skills[25]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
@@ -443,6 +443,12 @@ skills[19]{name,priority,trigger}:
   react-native-expert,high,React Native/Expo/mobile
   vue-expert,high,Vue 3/Composition API/Pinia
   nextjs-expert,high,Next.js/App Router/Server Components
+  nodejs-expert,high,Node.js/Express/NestJS/Fastify
+  python-expert,high,Python/Django/FastAPI/Flask
+  laravel-expert,high,Laravel/PHP/Eloquent
+  go-expert,high,Go/Gin/Echo/Fiber
+  flutter-expert,high,Flutter/Dart/Bloc/Riverpod
+  angular-expert,high,Angular/NgRx/RxJS
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
   jira-integration,medium,Ticket detected
@@ -617,7 +623,97 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.2.1
+### 19. **nodejs-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Node.js backend, Express, NestJS, Fastify
+
+**Triggers:** nodejs, express, nestjs, fastify, api route, backend
+
+**What it does:**
+- Express/NestJS/Fastify patterns
+- Async error handling and typed errors
+- Database patterns (Prisma, TypeORM)
+- Validation with Zod
+- Security (Helmet, rate limiting, CORS)
+
+---
+
+### 20. **python-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Python backend, Django, FastAPI, Flask
+
+**Triggers:** python, django, fastapi, flask, pydantic, sqlalchemy
+
+**What it does:**
+- FastAPI Pydantic patterns
+- Django ORM best practices (N+1 prevention)
+- SQLAlchemy 2.0 async patterns
+- Async programming with asyncio
+- Type hints and testing
+
+---
+
+### 21. **laravel-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Laravel/PHP projects
+
+**Triggers:** laravel, php, eloquent, artisan, blade, sanctum
+
+**What it does:**
+- Eloquent best practices (eager loading)
+- Service pattern with DTOs
+- Request validation and API Resources
+- Queue jobs and caching
+- Testing with PHPUnit/Pest
+
+---
+
+### 22. **go-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Go/Golang projects
+
+**Triggers:** golang, go, gin, echo, fiber, goroutine
+
+**What it does:**
+- Gin/Echo/Fiber patterns
+- Error handling and interfaces
+- Concurrency (goroutines, channels)
+- Database with sqlx/GORM
+- Testing patterns
+
+---
+
+### 23. **flutter-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Flutter/Dart projects
+
+**Triggers:** flutter, dart, widget, bloc, riverpod, pubspec
+
+**What it does:**
+- Widget best practices (const, extraction)
+- State management (Riverpod, Bloc)
+- Navigation with GoRouter
+- Forms and validation
+- Performance optimization
+
+---
+
+### 24. **angular-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Angular projects
+
+**Triggers:** angular, ngrx, rxjs, component.ts, ng serve
+
+**What it does:**
+- Standalone components with signals
+- RxJS best practices
+- NgRx state management
+- Reactive forms
+- Performance (OnPush, trackBy, defer)
+
+---
+
+**Version:** 1.2.2
 **Last Updated:** 2025-12-15
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 30+ (19 auto-invoking + 12 reference)
+**Total Skills:** 38+ (25 auto-invoking + 13 reference)

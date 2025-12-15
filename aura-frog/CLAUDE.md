@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.2.1
+**System:** Aura Frog v1.2.2
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
@@ -21,7 +21,7 @@ session_start[4]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.2.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.2.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -34,7 +34,7 @@ session_start[4]{step,action,file}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[14]{name,trigger,file}:
+skills[25]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -49,6 +49,17 @@ skills[14]{name,trigger,file}:
   lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
   state-persistence,Session handoff,skills/state-persistence/SKILL.md
+  typescript-expert,TypeScript/ESLint,skills/typescript-expert/SKILL.md
+  react-expert,React/hooks,skills/react-expert/SKILL.md
+  react-native-expert,React Native/mobile,skills/react-native-expert/SKILL.md
+  vue-expert,Vue/Composition API,skills/vue-expert/SKILL.md
+  nextjs-expert,Next.js/App Router,skills/nextjs-expert/SKILL.md
+  nodejs-expert,Node.js/Express/NestJS,skills/nodejs-expert/SKILL.md
+  python-expert,Python/Django/FastAPI,skills/python-expert/SKILL.md
+  laravel-expert,Laravel/PHP,skills/laravel-expert/SKILL.md
+  go-expert,Go/Gin/Echo,skills/go-expert/SKILL.md
+  flutter-expert,Flutter/Dart,skills/flutter-expert/SKILL.md
+  angular-expert,Angular/NgRx,skills/angular-expert/SKILL.md
 ```
 
 **All skills:** `skills/README.md`
@@ -71,8 +82,8 @@ skills[14]{name,trigger,file}:
 resources[9]{name,location}:
   Agents (24),agents/
   Commands (70+),commands/
-  Rules (38),rules/
-  Skills (26+),skills/
+  Rules (37),rules/
+  Skills (38+),skills/
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
   Getting Started,GET_STARTED.md
@@ -82,4 +93,4 @@ resources[9]{name,location}:
 
 ---
 
-**Version:** 1.2.0
+**Version:** 1.2.2

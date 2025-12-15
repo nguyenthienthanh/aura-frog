@@ -4,6 +4,34 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.2] - 2025-12-15
+
+### Backend Expert Skills & Rule Optimization
+
+Expanded expert skills system with backend frameworks and significantly condensed verbose rules.
+
+#### New Expert Skills (6)
+- **nodejs-expert** - Express, NestJS, Fastify, async patterns, Prisma/TypeORM
+- **python-expert** - Django, FastAPI, Flask, SQLAlchemy 2.0, async/await
+- **laravel-expert** - Eloquent, service pattern, DTOs, queues, caching
+- **go-expert** - Gin, Echo, Fiber, goroutines, channels, interfaces
+- **flutter-expert** - Widgets, Riverpod, Bloc, GoRouter, forms
+- **angular-expert** - Signals, RxJS, NgRx, reactive forms, OnPush
+
+#### Rule Optimization (~85% reduction in verbose rules)
+- Condensed `theme-consistency.md`: 961 → 134 lines
+- Condensed `direct-hook-access.md`: 820 → 131 lines
+- Condensed `smart-commenting.md`: 769 → 130 lines
+- Condensed `correct-file-extensions.md`: 732 → 117 lines
+- Total savings: ~2,770 lines
+
+#### Stats
+- **Total Skills:** 38+ (25 auto-invoking + 13 reference)
+- **Total Rules:** 37
+- **Total Hooks:** 15
+
+---
+
 ## [1.2.1] - 2025-12-15
 
 ### Expert Skills System & Enhanced Hooks
