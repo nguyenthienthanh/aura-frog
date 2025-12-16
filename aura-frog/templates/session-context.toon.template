@@ -1,0 +1,52 @@
+# Session Context Template
+# Copy to .aura-frog/session-context.toon and customize
+# Generated: {TIMESTAMP}
+# Valid for: 1 hour (regenerate if patterns change)
+
+---
+
+## Project Info
+
+project:
+  name: {PROJECT_NAME}
+  stack: {STACK_COMMA_SEPARATED}
+
+---
+
+## Codebase Patterns
+
+patterns[6]{type,convention,example}:
+  file_naming,{PascalCase|kebab-case},{ExampleFile.tsx}
+  imports,{absolute|relative},{@/components/Button}
+  exports,{named|default},{export const Component}
+  errors,{result|exceptions},{return { ok, data }}
+  testing,{jest|vitest},{describe/it pattern}
+  styling,{tailwind|css-modules|styled},{className="..."}
+
+---
+
+## Active Workflow (optional)
+
+workflow:
+  id: {WORKFLOW_ID}
+  phase: {1-9}
+  phase_name: {PHASE_NAME}
+  feature: {FEATURE_NAME}
+  branch: {GIT_BRANCH}
+
+---
+
+## Decisions (optional)
+
+decisions[0]{id,choice,reason}:
+  # Example:
+  # auth,JWT,Stateless authentication
+  # db,PostgreSQL,ACID compliance needed
+
+---
+
+# Instructions:
+# 1. Copy this to .claude/session-context.toon
+# 2. Fill in {PLACEHOLDERS} with actual values
+# 3. Remove unused sections
+# 4. Claude will read this at session start

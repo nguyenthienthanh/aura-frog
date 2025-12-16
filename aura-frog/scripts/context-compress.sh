@@ -1,7 +1,7 @@
 #!/bin/bash
 # Context Compression Generator
-# Creates token-efficient project context summaries
-# Version: 1.0.0
+# Creates token-efficient session context in TOON format
+# Version: 1.1.0
 
 set -e
 
@@ -14,22 +14,19 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Directories
-OUTPUT_DIR="${1:-.claude/context}"
+OUTPUT_DIR="${1:-.claude}"
 PROJECT_ROOT="${2:-.}"
 
 usage() {
-    echo "Context Compression Generator v1.0.0"
+    echo "Context Compression Generator v1.1.0"
     echo ""
     echo "Usage: $0 [output-dir] [project-root]"
     echo ""
-    echo "Generates compressed project context for AI consumption."
-    echo "Reduces context size by ~90% while preserving essential info."
+    echo "Generates session-context.toon for AI consumption."
+    echo "Token-efficient TOON format with codebase patterns."
     echo ""
-    echo "Output files:"
-    echo "  summary.toon     - Compressed project summary (~500 tokens)"
-    echo "  structure.toon   - Directory structure (~200 tokens)"
-    echo "  patterns.toon    - Code patterns detected (~300 tokens)"
-    echo "  full-context.md  - Reference file (not loaded into context)"
+    echo "Output:"
+    echo "  session-context.toon  - Patterns + workflow state (~150 tokens)"
 }
 
 # Detect project type and tech stack
@@ -37,245 +34,169 @@ detect_tech_stack() {
     local techs=""
 
     # Frontend
-    [ -f "package.json" ] && grep -q '"react"' package.json 2>/dev/null && techs+="react,"
-    [ -f "package.json" ] && grep -q '"next"' package.json 2>/dev/null && techs+="nextjs,"
-    [ -f "package.json" ] && grep -q '"vue"' package.json 2>/dev/null && techs+="vue,"
-    [ -f "angular.json" ] && techs+="angular,"
-    [ -f "app.json" ] && grep -q '"expo"' app.json 2>/dev/null && techs+="react-native,"
-    [ -f "pubspec.yaml" ] && techs+="flutter,"
+    [ -f "package.json" ] && grep -q '"react"' package.json 2>/dev/null && techs+="React,"
+    [ -f "package.json" ] && grep -q '"next"' package.json 2>/dev/null && techs+="Next.js,"
+    [ -f "package.json" ] && grep -q '"vue"' package.json 2>/dev/null && techs+="Vue,"
+    [ -f "angular.json" ] && techs+="Angular,"
+    [ -f "app.json" ] && grep -q '"expo"' app.json 2>/dev/null && techs+="React Native,"
+    [ -f "pubspec.yaml" ] && techs+="Flutter,"
 
     # Backend
-    [ -f "package.json" ] && grep -q '"express"' package.json 2>/dev/null && techs+="express,"
-    [ -f "package.json" ] && grep -q '"@nestjs"' package.json 2>/dev/null && techs+="nestjs,"
-    [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] && techs+="python,"
-    [ -f "go.mod" ] && techs+="go,"
-    [ -f "composer.json" ] && grep -q '"laravel"' composer.json 2>/dev/null && techs+="laravel,"
+    [ -f "package.json" ] && grep -q '"express"' package.json 2>/dev/null && techs+="Express,"
+    [ -f "package.json" ] && grep -q '"@nestjs"' package.json 2>/dev/null && techs+="NestJS,"
+    [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] && techs+="Python,"
+    [ -f "go.mod" ] && techs+="Go,"
+    [ -f "composer.json" ] && grep -q '"laravel"' composer.json 2>/dev/null && techs+="Laravel,"
 
-    # Database
-    [ -f "prisma/schema.prisma" ] && techs+="prisma,"
-    grep -rq "mongoose" --include="*.js" --include="*.ts" . 2>/dev/null && techs+="mongodb,"
-    grep -rq "sequelize\|typeorm" --include="*.js" --include="*.ts" . 2>/dev/null && techs+="sql,"
+    # TypeScript
+    [ -f "tsconfig.json" ] && techs+="TypeScript,"
 
-    # Testing
-    [ -f "jest.config.js" ] || [ -f "jest.config.ts" ] && techs+="jest,"
-    [ -f "cypress.config.js" ] || [ -f "cypress.config.ts" ] && techs+="cypress,"
-    [ -f "vitest.config.ts" ] && techs+="vitest,"
+    # Styling
+    [ -f "tailwind.config.js" ] || [ -f "tailwind.config.ts" ] && techs+="TailwindCSS,"
 
     # Remove trailing comma
     echo "${techs%,}"
 }
 
-# Count files by type
-count_files() {
+# Detect file naming convention
+detect_file_naming() {
+    if [ -d "src/components" ]; then
+        local sample=$(ls src/components/ 2>/dev/null | head -1)
+        if [[ "$sample" =~ ^[A-Z] ]]; then
+            echo "PascalCase"
+        elif [[ "$sample" =~ ^[a-z].*-[a-z] ]]; then
+            echo "kebab-case"
+        else
+            echo "camelCase"
+        fi
+    else
+        echo "PascalCase"
+    fi
+}
+
+# Detect import style
+detect_import_style() {
+    if grep -rq "from ['\"]@/" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "absolute @/"
+    elif grep -rq "from ['\"]~/" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "absolute ~/"
+    else
+        echo "relative"
+    fi
+}
+
+# Detect export pattern
+detect_export_pattern() {
+    local default_count=$(grep -r "export default" --include="*.ts" --include="*.tsx" . 2>/dev/null | wc -l)
+    local named_count=$(grep -r "export const\|export function\|export class" --include="*.ts" --include="*.tsx" . 2>/dev/null | wc -l)
+
+    if [ "$default_count" -gt "$named_count" ]; then
+        echo "default"
+    else
+        echo "named"
+    fi
+}
+
+# Detect error handling pattern
+detect_error_pattern() {
+    if grep -rq "Result<\|Either<\|{ ok:" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "result"
+    else
+        echo "exceptions"
+    fi
+}
+
+# Detect testing framework
+detect_testing() {
+    if [ -f "vitest.config.ts" ] || [ -f "vitest.config.js" ]; then
+        echo "vitest"
+    elif [ -f "jest.config.ts" ] || [ -f "jest.config.js" ]; then
+        echo "jest"
+    elif [ -f "pytest.ini" ] || [ -f "pyproject.toml" ]; then
+        echo "pytest"
+    else
+        echo "unknown"
+    fi
+}
+
+# Detect styling approach
+detect_styling() {
+    if [ -f "tailwind.config.js" ] || [ -f "tailwind.config.ts" ]; then
+        echo "tailwind"
+    elif grep -rq "styled-components\|@emotion" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "css-in-js"
+    elif find . -name "*.module.css" -type f 2>/dev/null | head -1 | grep -q .; then
+        echo "css-modules"
+    else
+        echo "css"
+    fi
+}
+
+# Get current git branch
+get_git_branch() {
+    git branch --show-current 2>/dev/null || echo "main"
+}
+
+# Get example for pattern
+get_example() {
     local pattern="$1"
-    find . -name "$pattern" -type f 2>/dev/null | wc -l | tr -d ' '
+    case "$pattern" in
+        "PascalCase") echo "UserProfile.tsx" ;;
+        "kebab-case") echo "user-profile.tsx" ;;
+        "camelCase") echo "userProfile.tsx" ;;
+        "absolute @/") echo "@/components/Button" ;;
+        "absolute ~/") echo "~/components/Button" ;;
+        "relative") echo "../components/Button" ;;
+        "named") echo "export const Component" ;;
+        "default") echo "export default Component" ;;
+        "result") echo "{ ok: true, data }" ;;
+        "exceptions") echo "try/catch" ;;
+        "tailwind") echo "className=\"flex\"" ;;
+        "css-in-js") echo "styled.div" ;;
+        "css-modules") echo "styles.container" ;;
+        *) echo "$pattern" ;;
+    esac
 }
 
-# Get directory structure (depth 2)
-get_structure() {
-    find . -maxdepth 2 -type d ! -path '*/\.*' ! -path './node_modules*' ! -path './vendor*' ! -path './.git*' 2>/dev/null | head -50
-}
-
-# Detect coding patterns
-detect_patterns() {
-    local patterns=""
-
-    # Component patterns
-    [ -d "src/components" ] && patterns+="component-based,"
-    [ -d "src/features" ] && patterns+="feature-sliced,"
-    [ -d "src/modules" ] && patterns+="modular,"
-
-    # State patterns
-    grep -rq "useContext\|createContext" --include="*.tsx" --include="*.jsx" . 2>/dev/null && patterns+="context-api,"
-    grep -rq "zustand\|create\(" --include="*.ts" --include="*.tsx" . 2>/dev/null && patterns+="zustand,"
-    [ -d "src/store" ] || [ -d "src/redux" ] && patterns+="redux,"
-
-    # API patterns
-    grep -rq "useQuery\|useMutation" --include="*.ts" --include="*.tsx" . 2>/dev/null && patterns+="tanstack-query,"
-    grep -rq "createApi\|fetchBaseQuery" --include="*.ts" . 2>/dev/null && patterns+="rtk-query,"
-
-    # Styling
-    [ -f "tailwind.config.js" ] || [ -f "tailwind.config.ts" ] && patterns+="tailwind,"
-    grep -rq "styled-components\|emotion" --include="*.ts" --include="*.tsx" . 2>/dev/null && patterns+="css-in-js,"
-    [ -d "src/styles" ] || find . -name "*.module.css" -type f | head -1 | grep -q . && patterns+="css-modules,"
-
-    echo "${patterns%,}"
-}
-
-# Get key files
-get_key_files() {
-    local files=""
-
-    # Config files
-    [ -f "package.json" ] && files+="package.json,"
-    [ -f "tsconfig.json" ] && files+="tsconfig.json,"
-    [ -f ".env.example" ] && files+=".env.example,"
-
-    # Entry points
-    [ -f "src/index.ts" ] && files+="src/index.ts,"
-    [ -f "src/index.tsx" ] && files+="src/index.tsx,"
-    [ -f "src/App.tsx" ] && files+="src/App.tsx,"
-    [ -f "src/main.ts" ] && files+="src/main.ts,"
-    [ -f "app/page.tsx" ] && files+="app/page.tsx,"
-
-    echo "${files%,}"
-}
-
-# Generate summary.toon
-generate_summary() {
+# Generate session-context.toon
+generate_session_context() {
     local project_name=$(basename "$(pwd)")
     local tech_stack=$(detect_tech_stack)
-    local patterns=$(detect_patterns)
-    local key_files=$(get_key_files)
-
-    # Count files
-    local ts_count=$(count_files "*.ts")
-    local tsx_count=$(count_files "*.tsx")
-    local js_count=$(count_files "*.js")
-    local vue_count=$(count_files "*.vue")
-    local py_count=$(count_files "*.py")
-    local go_count=$(count_files "*.go")
-    local php_count=$(count_files "*.php")
+    local file_naming=$(detect_file_naming)
+    local imports=$(detect_import_style)
+    local exports=$(detect_export_pattern)
+    local errors=$(detect_error_pattern)
+    local testing=$(detect_testing)
+    local styling=$(detect_styling)
+    local branch=$(get_git_branch)
 
     cat << EOF
-# Project Context Summary (Compressed)
+# Session Context
 # Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-# Token savings: ~90% vs full context
+# Valid for: 1 hour (regenerate if patterns change)
 
 ---
 
-## Project
-
-\`\`\`toon
 project:
   name: $project_name
-  root: $(pwd)
-  tech_stack: $tech_stack
-  patterns: $patterns
-\`\`\`
+  stack: $tech_stack
 
----
+patterns[6]{type,convention,example}:
+  file_naming,$file_naming,$(get_example "$file_naming")
+  imports,$imports,$(get_example "$imports")
+  exports,$exports,$(get_example "$exports")
+  errors,$errors,$(get_example "$errors")
+  testing,$testing,describe/it
+  styling,$styling,$(get_example "$styling")
 
-## File Counts
+workflow:
+  phase: 0
+  feature: none
+  branch: $branch
 
-\`\`\`toon
-files{type,count}:
-  TypeScript,$ts_count
-  TSX,$tsx_count
-  JavaScript,$js_count
-  Vue,$vue_count
-  Python,$py_count
-  Go,$go_count
-  PHP,$php_count
-\`\`\`
-
----
-
-## Key Files
-
-\`\`\`toon
-key_files: $key_files
-\`\`\`
-
----
-
-## Quick Reference
-
-- **For full context:** Read \`full-context.md\`
-- **For structure:** Read \`structure.toon\`
-- **For patterns:** Read \`patterns.toon\`
-
+decisions[0]{id,choice,reason}:
+  # Add decisions as they are made
 EOF
-}
-
-# Generate structure.toon
-generate_structure() {
-    cat << EOF
-# Directory Structure (Compressed)
-# Depth: 2 levels
-
-\`\`\`toon
-structure:
-EOF
-
-    # Get unique directories at depth 1
-    for dir in $(find . -maxdepth 1 -type d ! -path '.' ! -path './node_modules' ! -path './vendor' ! -path './.git' ! -path './.next' ! -path './dist' ! -path './build' 2>/dev/null | sort); do
-        local dirname=$(basename "$dir")
-        local subcount=$(find "$dir" -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-        local filecount=$(find "$dir" -maxdepth 1 -type f 2>/dev/null | wc -l | tr -d ' ')
-        echo "  $dirname/: $((subcount-1)) dirs, $filecount files"
-    done
-
-    echo "\`\`\`"
-}
-
-# Generate patterns.toon
-generate_patterns() {
-    local patterns=$(detect_patterns)
-
-    cat << EOF
-# Code Patterns (Detected)
-
-\`\`\`toon
-patterns: $patterns
-\`\`\`
-
----
-
-## Naming Conventions
-
-\`\`\`toon
-conventions{type,pattern,example}:
-EOF
-
-    # Detect naming conventions
-    [ -n "$(find . -name '*.component.ts' -type f 2>/dev/null | head -1)" ] && echo "  Component,*.component.ts,user.component.ts"
-    [ -n "$(find . -name '*.service.ts' -type f 2>/dev/null | head -1)" ] && echo "  Service,*.service.ts,auth.service.ts"
-    [ -n "$(find . -name '*.module.ts' -type f 2>/dev/null | head -1)" ] && echo "  Module,*.module.ts,app.module.ts"
-    [ -n "$(find . -name '*Controller.php' -type f 2>/dev/null | head -1)" ] && echo "  Controller,*Controller.php,UserController.php"
-    [ -n "$(find . -name '*.test.ts' -o -name '*.spec.ts' -type f 2>/dev/null | head -1)" ] && echo "  Test,*.test.ts/*.spec.ts,auth.test.ts"
-    [ -n "$(find . -name 'use*.ts' -o -name 'use*.tsx' -type f 2>/dev/null | head -1)" ] && echo "  Hook,use*.ts,useAuth.ts"
-
-    echo "\`\`\`"
-}
-
-# Generate full context (reference file)
-generate_full_context() {
-    cat << EOF
-# Full Project Context
-# Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-# NOTE: This file is for reference only. Load summary.toon for AI context.
-
-## Project: $(basename "$(pwd)")
-
-### Tech Stack
-$(detect_tech_stack | tr ',' '\n' | sed 's/^/- /')
-
-### Directory Structure
-\`\`\`
-$(tree -L 3 -I 'node_modules|vendor|.git|.next|dist|build|coverage' 2>/dev/null || get_structure)
-\`\`\`
-
-### Key Configuration Files
-
-EOF
-
-    # Include key config content
-    if [ -f "package.json" ]; then
-        echo "#### package.json (dependencies)"
-        echo "\`\`\`json"
-        jq '{name, version, dependencies, devDependencies}' package.json 2>/dev/null || cat package.json
-        echo "\`\`\`"
-        echo ""
-    fi
-
-    if [ -f "tsconfig.json" ]; then
-        echo "#### tsconfig.json"
-        echo "\`\`\`json"
-        cat tsconfig.json
-        echo "\`\`\`"
-        echo ""
-    fi
 }
 
 # Main
@@ -287,41 +208,39 @@ main() {
 
     cd "$PROJECT_ROOT"
 
-    echo -e "${CYAN}Context Compression Generator v1.0.0${NC}"
+    echo -e "${CYAN}Context Compression Generator v1.1.0${NC}"
     echo "======================================="
     echo ""
     echo -e "Project: ${GREEN}$(basename "$(pwd)")${NC}"
-    echo -e "Output:  ${BLUE}$OUTPUT_DIR${NC}"
+    echo -e "Output:  ${BLUE}$OUTPUT_DIR/session-context.toon${NC}"
     echo ""
 
     mkdir -p "$OUTPUT_DIR"
 
-    echo -e "${YELLOW}Generating summary.toon...${NC}"
-    generate_summary > "$OUTPUT_DIR/summary.toon"
+    echo -e "${YELLOW}Scanning codebase patterns...${NC}"
 
-    echo -e "${YELLOW}Generating structure.toon...${NC}"
-    generate_structure > "$OUTPUT_DIR/structure.toon"
+    echo -e "  File naming: $(detect_file_naming)"
+    echo -e "  Imports:     $(detect_import_style)"
+    echo -e "  Exports:     $(detect_export_pattern)"
+    echo -e "  Errors:      $(detect_error_pattern)"
+    echo -e "  Testing:     $(detect_testing)"
+    echo -e "  Styling:     $(detect_styling)"
+    echo ""
 
-    echo -e "${YELLOW}Generating patterns.toon...${NC}"
-    generate_patterns > "$OUTPUT_DIR/patterns.toon"
+    echo -e "${YELLOW}Generating session-context.toon...${NC}"
+    generate_session_context > "$OUTPUT_DIR/session-context.toon"
 
-    echo -e "${YELLOW}Generating full-context.md...${NC}"
-    generate_full_context > "$OUTPUT_DIR/full-context.md"
+    local size=$(wc -c < "$OUTPUT_DIR/session-context.toon" | tr -d ' ')
+    local tokens=$((size / 4))
 
     echo ""
     echo -e "${GREEN}Done!${NC}"
     echo ""
-    echo "Generated files:"
-    for f in "$OUTPUT_DIR"/*; do
-        local size=$(wc -c < "$f" | tr -d ' ')
-        local tokens=$((size / 4))  # Rough estimate: 4 chars per token
-        echo "  - $(basename "$f"): ~$tokens tokens"
-    done
-
+    echo "Generated: $OUTPUT_DIR/session-context.toon (~$tokens tokens)"
     echo ""
     echo -e "${CYAN}Usage:${NC}"
-    echo "  Load summary.toon into AI context (~500 tokens)"
-    echo "  Reference full-context.md when detailed info needed"
+    echo "  Claude will auto-read .claude/session-context.toon at session start"
+    echo "  To regenerate: bash scripts/context-compress.sh"
 }
 
 main "$@"

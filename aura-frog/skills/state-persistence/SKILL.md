@@ -1,6 +1,6 @@
 ---
 name: state-persistence
-description: "File-based state management for session handoff and context persistence"
+description: "TOON-based state management for session handoff and context persistence"
 autoInvoke: false
 priority: high
 triggers:
@@ -13,14 +13,14 @@ allowed-tools: Read, Write, Bash
 # State Persistence
 
 **Priority:** HIGH - Enable session continuity
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ---
 
 ## Purpose
 
 Enable true session handoff by:
-1. Saving workflow state to `.claude/state/`
+1. Saving workflow state to `.aura-frog/` (TOON format)
 2. Reducing conversation history dependency
 3. Allowing clean session restarts
 
@@ -29,97 +29,132 @@ Enable true session handoff by:
 ## State Directory Structure
 
 ```
-~/.claude/state/
+.claude/                             # Project Claude root
+├── session-context.toon             # Current session patterns + workflow
+├── workflow-state.toon              # Active workflow state
+├── decisions.toon                   # Architectural decisions
+└── project-contexts/                # Project config
+    └── {project}/
+        ├── project-config.yaml
+        └── conventions.md
+
+~/.claude/state/                     # Global state (optional)
 ├── workflows/
-│   ├── wf-001.json          # Workflow state (JSON)
-│   └── wf-001.toon          # Workflow state (TOON)
-├── sessions/
-│   ├── current.json         # Current session info
-│   └── history/             # Past sessions
-│       └── session-{id}.json
-├── context/
-│   ├── project-cache.json   # Cached project contexts
-│   └── agent-cache.json     # Loaded agent cache
-└── temp/
-    └── handoff-{id}.md      # Handoff documents
+│   └── {project}-{id}.toon
+└── handoffs/
+    └── handoff-{id}.md
 ```
 
 ---
 
-## State Types
+## TOON State Format
+
+### Session Context (patterns + workflow)
 
 ```toon
-state_types[4]{type,location,purpose,ttl}:
-  Workflow,workflows/,Track 9-phase progress,Until completed
-  Session,sessions/,Track current session,24 hours
-  Context,context/,Cache loaded contexts,1 hour
-  Handoff,temp/,Session transition docs,Until resumed
+# .claude/session-context.toon
+# Generated: 2025-12-16T10:00:00Z
+
+project:
+  name: my-app
+  stack: React,TypeScript,TailwindCSS
+
+patterns[6]{type,convention,example}:
+  file_naming,PascalCase,UserProfile.tsx
+  imports,absolute,@/components/Button
+  exports,named,export const Card
+  errors,result,{ ok: true, data }
+  testing,vitest,describe/it
+  styling,tailwind,className
+
+workflow:
+  id: auth-feature-20251216
+  phase: 5
+  phase_name: TDD Implementation
+  feature: user-authentication
+  branch: feature/user-auth
+
+decisions[3]{id,choice,reason}:
+  auth,JWT,Stateless + scalable
+  storage,Redis,Fast session lookup
+  validation,Zod,Runtime type safety
 ```
+
+### Workflow State (detailed)
+
+```toon
+# .claude/workflow-state.toon
+
+workflow:
+  id: auth-feature-20251216
+  name: User Authentication
+  status: in_progress
+  phase: 5
+  created: 2025-12-16T10:00:00Z
+  task: Implement JWT authentication with refresh tokens
+
+phases[9]{num,name,status}:
+  1,Requirements,completed
+  2,Tech Planning,completed
+  3,UI Breakdown,completed
+  4,Test Planning,completed
+  5,TDD Implementation,in_progress
+  6,Code Review,pending
+  7,QA Validation,pending
+  8,Documentation,pending
+  9,Notification,pending
+
+agents[4]: pm-requirements,tech-lead,frontend-senior,tdd-specialist
+
+deliverables[8]{phase,file}:
+  1,docs/requirements.md
+  2,docs/tech-spec.md
+  3,docs/ui-breakdown.md
+  4,tests/auth.test.ts
+  5,src/auth/Login.tsx
+  5,src/auth/useAuth.ts
+  5,src/auth/authService.ts
+  5,src/auth/types.ts
+```
+
+---
+
+## Token Comparison
+
+| Format | Lines | Est. Tokens |
+|--------|-------|-------------|
+| JSON (old) | ~150 | ~600 |
+| TOON (new) | ~40 | ~160 |
+| **Savings** | **73%** | **~440 tokens** |
 
 ---
 
 ## Commands
 
-### Save Current State
-```bash
-# Via workflow-manager.sh
-bash scripts/workflow/workflow-manager.sh load wf-001
+### Save State
 
-# State stored in:
-# - .claude/logs/workflows/wf-001/workflow-state.json
+```bash
+# Auto-save after phase completion
+# State written to .claude/workflow-state.toon
+
+# Manual save
+bash scripts/workflow/workflow-save-toon.sh
 ```
 
-### Load State on Resume
-```bash
-# Get state in TOON format (token-efficient)
-bash scripts/workflow/workflow-export-toon.sh wf-001
+### Load State
 
-# Or get full JSON
-bash scripts/workflow/workflow-manager.sh load wf-001
+```bash
+# Read TOON directly (token-efficient)
+Read .claude/session-context.toon
+
+# Export from JSON to TOON
+bash scripts/workflow/workflow-export-toon.sh {workflow-id}
 ```
 
-### Create Handoff Document
+### Handoff Document
+
 ```bash
-# Generate handoff for new session
-bash scripts/session-handoff.sh create wf-001
-```
-
----
-
-## Handoff Document Format
-
-```markdown
-# Session Handoff: wf-001
-
-## Quick Context
-- **Task:** [task description]
-- **Phase:** 5b - TDD GREEN
-- **Progress:** 62% (5/8 phases)
-
-## What's Done
-- Phase 1-4: Requirements, Design, UI, Test Plan
-- Phase 5a: Tests written (all failing as expected)
-
-## Current State
-- Branch: feature/user-auth
-- Last commit: abc1234 - "feat: add auth types"
-- Uncommitted: 2 files
-
-## Next Steps
-1. Implement Login component to pass tests
-2. Run tests, ensure GREEN
-3. Proceed to Phase 5c (Refactor)
-
-## Files to Review
-- src/auth/Login.tsx (in progress)
-- tests/auth.test.ts (failing - expected)
-
-## Token Usage
-- Previous session: 155,000 tokens
-- This session starts fresh: 0 tokens
-
----
-Load full state: `bash scripts/workflow-state.sh get wf-001`
+bash scripts/session-handoff.sh create {workflow-id}
 ```
 
 ---
@@ -127,54 +162,63 @@ Load full state: `bash scripts/workflow-state.sh get wf-001`
 ## Session Lifecycle
 
 ### Start New Session
+
 ```
-1. Check for existing workflow: ~/.claude/state/workflows/
-2. If found, load handoff document
-3. Read TOON state (token-efficient)
-4. Continue from last phase
+1. Check .claude/session-context.toon
+2. If exists and < 1 hour old → use cached
+3. If not → run project-context-loader
+4. Load .claude/workflow-state.toon if active workflow
 ```
 
 ### During Session
+
 ```
-1. Update state after each phase completion
+1. Update state after each phase
 2. Track token usage
-3. At 75% tokens (150K), warn user
-4. At 85% tokens (170K), suggest handoff
+3. At 75% tokens → warn user
+4. At 85% tokens → suggest handoff
 ```
 
 ### End Session
+
 ```
-1. Save current state to file
-2. Generate handoff document
-3. Commit any uncommitted changes (optional)
+1. Save session-context.toon
+2. Save workflow-state.toon
+3. Generate handoff if needed
 4. Show resume instructions
 ```
 
 ---
 
-## Integration with Workflow
+## Handoff Document Format
 
-```toon
-workflow_events[6]{event,action,file}:
-  Phase complete,Update state,workflows/{id}.json
-  Token warning,Generate handoff,temp/handoff-{id}.md
-  User says stop,Full state save,All state files
-  Session timeout,Auto-save state,workflows/{id}.json
-  Resume command,Load state,Read from files
-  Workflow complete,Archive state,Archive + cleanup
-```
+```markdown
+# Session Handoff: auth-feature-20251216
 
----
+## Quick Context
+- **Task:** User authentication with JWT
+- **Phase:** 5 - TDD Implementation (GREEN)
+- **Progress:** 56% (5/9 phases)
 
-## Token Savings
+## Patterns (from session-context.toon)
+- File naming: PascalCase
+- Imports: @/ absolute paths
+- Testing: vitest
 
-By persisting state to files:
+## What's Done
+- Requirements, Design, UI, Test Planning complete
+- Tests written (passing)
 
-```toon
-comparison[3]{approach,context_tokens,persistent_tokens}:
-  Full conversation history,150K-200K,0
-  State in context,10K-20K,500 (TOON summary)
-  Reference-based,500,500 (just pointers)
+## Next Steps
+1. Complete Login component
+2. Add refresh token logic
+3. Proceed to Code Review
+
+## Resume
+\`\`\`
+Read .claude/session-context.toon
+Read .claude/workflow-state.toon
+\`\`\`
 ```
 
 ---
@@ -183,41 +227,20 @@ comparison[3]{approach,context_tokens,persistent_tokens}:
 
 ### Do
 - Save state after each phase gate
-- Use TOON format for loading into context
-- Keep JSON for programmatic access
+- Use TOON format for all state files
+- Keep session-context.toon updated
 - Generate human-readable handoffs
 
 ### Don't
 - Keep full state in conversation context
 - Rely on conversation history for state
 - Skip state saves between phases
-- Lose uncommitted work on session end
+- Use JSON when TOON suffices
 
 ---
 
-## Recovery
-
-If session ends unexpectedly:
-
-```bash
-# List available workflows
-bash scripts/workflow-state.sh list
-
-# Resume specific workflow
-bash scripts/workflow-state.sh get-toon wf-001
-
-# Check git state
-git status
-git stash list
-```
-
----
-
-**Note:** State persistence enables the multi-session architecture pattern.
-See: `docs/MULTI_SESSION_ARCHITECTURE.md`
-
-**Related Scripts:**
-- `scripts/workflow/workflow-manager.sh` - Main workflow management
-- `scripts/workflow/workflow-export-toon.sh` - TOON format export
-- `scripts/workflow/workflow-status.sh` - Status display
-- `scripts/session-handoff.sh` - Handoff document generation
+**Related:**
+- `skills/project-context-loader/SKILL.md` - Context generation
+- `rules/codebase-consistency.md` - Pattern matching
+- `scripts/workflow/workflow-export-toon.sh` - TOON export
+- `docs/MULTI_SESSION_ARCHITECTURE.md` - Architecture guide

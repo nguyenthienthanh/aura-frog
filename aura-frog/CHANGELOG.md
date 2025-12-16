@@ -4,6 +4,36 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.3] - 2025-12-16
+
+### Session Context & Codebase Consistency
+
+Token-efficient session context with TOON format and codebase pattern learning.
+
+#### New Features
+- **codebase-consistency rule** - Learn patterns before writing code
+- **session-context.toon** - Cached codebase patterns (~150 tokens vs ~600)
+- **TOON state format** - 73% token savings for workflow state
+
+#### Updated Skills
+- **project-context-loader** - Now generates session-context.toon automatically
+- **state-persistence** - Migrated to TOON format for all state files
+
+#### Updated Scripts
+- **context-compress.sh** - Generates session-context.toon with pattern detection
+
+#### Architecture
+- `.claude/session-context.toon` - Cached patterns + workflow state
+- `.claude/workflow-state.toon` - Detailed workflow (TOON format)
+- Dynamic pattern scanning with caching (regenerate if > 1 hour)
+
+#### Stats
+- **Total Skills:** 38+ (25 auto-invoking + 13 reference)
+- **Total Rules:** 38
+- **Total Hooks:** 15
+
+---
+
 ## [1.2.2] - 2025-12-15
 
 ### Backend Expert Skills & Rule Optimization

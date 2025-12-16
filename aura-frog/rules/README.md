@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.2.2
-**Total Rules:** 37
+**Version:** 1.2.3
+**Total Rules:** 38
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,8 +9,9 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[37]{category,rule,priority,purpose}:
+rules[38]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
+  system,codebase-consistency,high,Learn patterns before writing code
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
   system,priority-hierarchy,critical,Config priority order
