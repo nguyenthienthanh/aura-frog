@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.2.0
+**Version:** 1.2.4
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.2.0
+**Aura Frog Version:** 1.2.4
 
 ---
 

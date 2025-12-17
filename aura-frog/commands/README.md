@@ -1,8 +1,8 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.2.0
+**Version:** 1.2.4
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-17
 
 ---
 
