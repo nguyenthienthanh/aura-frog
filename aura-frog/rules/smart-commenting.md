@@ -1,55 +1,68 @@
-# Rule: Smart Commenting - Avoid Redundant Comments
+# Rule: Smart Commenting - Meaningful Comments Only
 
-**Priority:** Medium
-**Applies To:** All code
+**Priority:** High
+**Applies To:** All code, JSDoc, and commit messages
 
 ---
 
 ## Core Principle
 
-**Comments should explain WHY, not WHAT.**
+**Only comment what's HARD TO UNDERSTAND. Never comment the obvious.**
+
+Comments and JSDoc are ONLY for:
+- Complex business logic
+- Non-obvious decisions
+- Workarounds/hacks with context
+- Public API documentation (exported functions)
 
 ---
 
 ## Quick Reference
 
 ```toon
-comment_types[2]{type,rule}:
-  Bad,"Describes what code does (obvious from reading)"
-  Good,"Explains WHY business rules or non-obvious decisions"
+comment_rules[4]{type,when,example}:
+  JSDoc,Public API + complex functions,"@param user - Must be verified (see auth flow)"
+  Inline,Non-obvious WHY,"// Safari bug workaround - see webkit#12345"
+  TODO,With ticket reference,"// TODO: Add caching (PROJ-1234)"
+  NEVER,Obvious/redundant code,"// New test" "// Create user" "// Loop"
 ```
 
 ---
 
-## What NOT to Comment
+## NEVER Comment These
 
-### Self-Explanatory Code
+### Obvious Code
 
 ```typescript
-// ❌ BAD - Obvious
-// Set user name to John
-const userName = 'John';
+// ❌ BAD - Meaningless comments
+// Create new user
+const user = createUser();
 
-// Loop through users
-users.forEach(user => {
-  // Print user name
-  console.log(user.name);
-});
+// New branch for testing
+if (isAdmin) { ... }
+
+// New test to increase coverage
+it('should return true', () => { ... });
+
+// Set loading to true
+setLoading(true);
 ```
 
 ```typescript
-// ✅ GOOD - No comments needed
-const userName = 'John';
+// ✅ GOOD - No comments needed, code is self-explanatory
+const user = createUser();
 
-users.forEach(user => {
-  console.log(user.name);
-});
+if (isAdmin) { ... }
+
+it('should return true', () => { ... });
+
+setLoading(true);
 ```
 
 ### Standard Patterns
 
 ```typescript
-// ❌ BAD - Standard React patterns
+// ❌ BAD - Never comment standard patterns
 // useEffect hook to fetch data on mount
 useEffect(() => {
   fetchUserData();
@@ -57,6 +70,9 @@ useEffect(() => {
 
 // useState hook for loading state
 const [loading, setLoading] = useState(false);
+
+// Map users to names
+const names = users.map(u => u.name);
 ```
 
 ---
@@ -107,24 +123,71 @@ if (isIOS) {
 ## Comment Anti-Patterns
 
 ```toon
-anti_patterns[5]{pattern,problem}:
-  "// Set x to 5",Describes obvious assignment
-  "// Loop through array",Describes standard iteration
-  "// Check if null",Describes obvious null check
-  "// Return value",Describes obvious return
-  "// Import React",Describes obvious import
+anti_patterns[10]{pattern,why_bad}:
+  "// Set x to 5",Obvious assignment
+  "// Loop through array",Standard iteration
+  "// Check if null",Obvious null check
+  "// Return value",Obvious return
+  "// Import React",Obvious import
+  "// New test",Meaningless test description
+  "// New branch",Meaningless branch description
+  "// Add coverage",Coverage is implied
+  "// Create function",Obvious function creation
+  "// Update state",Obvious state update
+```
+
+---
+
+## JSDoc Rules
+
+### When to Use JSDoc
+
+```typescript
+// ✅ GOOD - Complex public API
+/**
+ * Calculates pro-rated subscription cost.
+ * Uses billing cycle start date to determine remaining days.
+ * @throws {BillingError} If subscription is already cancelled
+ */
+export function calculateProRatedCost(subscription: Subscription): number
+
+// ✅ GOOD - Non-obvious parameter requirements
+/**
+ * @param userId - Must be verified user (unverified users throw)
+ */
+export function fetchUserProfile(userId: string): Promise<Profile>
+```
+
+### When NOT to Use JSDoc
+
+```typescript
+// ❌ BAD - Obvious from types and naming
+/**
+ * Gets user by ID
+ * @param id - The user ID
+ * @returns The user
+ */
+function getUserById(id: string): User
+
+// ❌ BAD - Simple internal function
+/**
+ * Formats the date
+ */
+function formatDate(date: Date): string
 ```
 
 ---
 
 ## Code Review Checklist
 
-- [ ] No comments describing obvious code
-- [ ] Complex logic has WHY explanation
-- [ ] Workarounds documented with context
+- [ ] No comments on obvious/self-explanatory code
+- [ ] No "new test", "new branch", "add coverage" comments
+- [ ] JSDoc only on complex public APIs
+- [ ] Complex business logic has WHY explanation
+- [ ] Workarounds documented with links/context
 - [ ] TODOs reference ticket numbers
 - [ ] No commented-out code (delete it)
 
 ---
 
-**Version:** 1.2.1 | **Priority:** Medium
+**Version:** 1.2.4 | **Priority:** High
