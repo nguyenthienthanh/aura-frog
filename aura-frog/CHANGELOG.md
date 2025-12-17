@@ -4,6 +4,44 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.4] - 2025-12-17
+
+### Plugin Optimization - Massive Token Reduction
+
+Condensed verbose agents and commands to reduce plugin size by ~60%.
+
+#### Condensed Agents (5 files)
+- **backend-nodejs.md** - 1,182 → 100 lines (92% reduction)
+- **backend-python.md** - 781 → 91 lines (88% reduction)
+- **backend-laravel.md** - 766 → 95 lines (88% reduction)
+- **backend-go.md** - 753 → 79 lines (89% reduction)
+- **mobile-react-native.md** - 1,318 → 109 lines (92% reduction)
+
+#### Condensed Commands (10 files)
+- **project/init.md** - 1,095 → 115 lines (89% reduction)
+- **refactor.md** - 932 → 95 lines (90% reduction)
+- **test/document.md** - 808 → 87 lines (89% reduction)
+- **review/fix.md** - 799 → 93 lines (88% reduction)
+- **test/unit.md** - 702 → 102 lines (85% reduction)
+- **document.md** - 697 → 87 lines (88% reduction)
+- **bugfix/fix.md** - 645 → 93 lines (86% reduction)
+- **setup/integrations.md** - 646 → 94 lines (85% reduction)
+- **workflow/start.md** - 137 → 81 lines (41% reduction)
+- **test/e2e.md** - 638 → 97 lines (85% reduction)
+
+#### Architecture
+- Agents now defer to expert skills for detailed patterns
+- Commands use TOON format for compact structured data
+- Removed redundant examples (users can ask for examples)
+- Focused on essential information only
+
+#### Stats (Before → After)
+- **Agent lines:** ~8,500 → ~4,800 (44% reduction)
+- **Command lines:** ~22,000 → ~16,600 (25% reduction)
+- **Total estimated:** ~5,100 fewer lines
+
+---
+
 ## [1.2.3] - 2025-12-16
 
 ### Session Context & Codebase Consistency
