@@ -5,27 +5,32 @@
 
 ---
 
-## Core Principle
+## Core Principles
 
+### 1. Learn Before Acting
 **Before any work, study existing patterns in the codebase.**
 
+### 2. Reuse Before Creating
+**Search for existing code before writing new. Extend or compose existing solutions.**
+
 This applies to:
-- **Phase 1 (Requirements):** Understand existing features before proposing new ones
-- **Phase 2 (Tech Planning):** Study current architecture before designing
-- **Phase 3 (UI Breakdown):** Check existing components before planning new UI
-- **Phase 4 (Test Planning):** Review existing test patterns
-- **Phase 5 (Implementation):** Match code style and patterns
+- **Phase 1 (Requirements):** Check if feature already exists or can be extended
+- **Phase 2 (Tech Planning):** Reuse existing services, APIs, patterns
+- **Phase 3 (UI Breakdown):** Use existing components, extend if needed
+- **Phase 4 (Test Planning):** Reuse test utilities, fixtures, helpers
+- **Phase 5 (Implementation):** Reuse hooks, utils, components before creating new
 
 ---
 
 ## Quick Reference
 
 ```toon
-consistency_steps[4]{step,action,how}:
-  1,Find similar code,"Grep for related patterns"
-  2,Check naming,"Look at adjacent files"
-  3,Match imports,"Copy import style from nearby"
-  4,Follow structure,"Mirror existing file organization"
+consistency_steps[5]{step,action,how}:
+  1,Search existing,"Grep/Glob for similar code"
+  2,Evaluate reuse,"Can existing code be used or extended?"
+  3,Check naming,"Look at adjacent files"
+  4,Match imports,"Copy import style from nearby"
+  5,Follow structure,"Mirror existing file organization"
 ```
 
 ---
@@ -72,6 +77,70 @@ Read: tests/[similar].test.ts
 
 # Check error handling pattern
 Grep: "catch|throw|Error"
+```
+
+---
+
+## Reuse Before Create
+
+### Before Creating New Component
+
+```bash
+# Search for similar components
+Glob: src/components/**/*Card*.tsx
+Glob: src/components/**/*List*.tsx
+Grep: "export.*Card|export.*List"
+
+# Found similar? → Extend or compose it
+# Not found? → Create new (following patterns)
+```
+
+### Before Creating New Hook
+
+```bash
+# Search for similar hooks
+Glob: src/hooks/use*.ts
+Grep: "export.*use.*Auth|use.*User"
+
+# Found similar? → Add to existing or compose
+# Not found? → Create new hook
+```
+
+### Before Creating New Utility
+
+```bash
+# Search existing utils
+Glob: src/utils/*.ts
+Glob: src/lib/*.ts
+Grep: "export.*format|export.*validate"
+
+# Also check: Does lodash/es-toolkit have this?
+```
+
+### Before Creating New Service/API
+
+```bash
+# Search for similar services
+Glob: src/services/*.ts
+Glob: src/api/*.ts
+Grep: "class.*Service|export.*api"
+
+# Found similar? → Extend existing service
+# Not found? → Create following existing patterns
+```
+
+### Reuse Decision Flow
+
+```
+Need new code?
+├── Search for existing similar code
+│   ├── Found exact match → USE IT
+│   ├── Found similar → Can extend?
+│   │   ├── YES → EXTEND IT
+│   │   └── NO → Can compose?
+│   │       ├── YES → COMPOSE IT
+│   │       └── NO → CREATE NEW (following patterns)
+│   └── Not found → CREATE NEW (following patterns)
 ```
 
 ---
@@ -135,6 +204,22 @@ Skip scan when:
 (When project uses Playwright)
 ```
 
+### Reuse
+
+```markdown
+❌ BAD - Creating duplicate component
+"I'll create a new ProductCard component"
+(When UserCard exists and can be generalized to Card)
+
+❌ BAD - Creating duplicate hook
+"I'll create useProductData hook"
+(When useEntityData exists and can handle products)
+
+❌ BAD - Creating duplicate utility
+"I'll write a formatCurrency function"
+(When formatMoney already exists in utils/)
+```
+
 ### Code
 
 ```typescript
@@ -149,6 +234,10 @@ Skip scan when:
 // ❌ BAD - Inconsistent error handling
 // Existing: Returns Result<T, Error> type
 // New code: Throws exceptions
+
+// ❌ BAD - Duplicate logic
+// Existing: src/hooks/useAuth.ts has user fetching logic
+// New code: Writing same fetch logic in new component
 ```
 
 ---
@@ -171,18 +260,41 @@ the new auth feature should be at src/features/auth/"
 We'll add new E2E tests following this pattern."
 ```
 
+### Reuse
+
+```markdown
+✅ GOOD - Extend existing component
+"UserCard already handles this pattern. I'll extend it to
+support products by adding a generic Card component."
+
+✅ GOOD - Compose existing hooks
+"useAuth already fetches user data. I'll compose it with
+usePermissions for the new feature."
+
+✅ GOOD - Use existing utility
+"Found formatMoney in src/utils/format.ts.
+Using that instead of creating new formatter."
+```
+
 ### Code
 
 ```typescript
-// ✅ GOOD - Match existing file naming
-// Existing: src/components/UserCard.tsx
-// New file: src/components/ProductList.tsx
+// ✅ GOOD - Reuse existing component
+import { Card } from '@/components/Card';
+const ProductCard = (props) => <Card type="product" {...props} />;
 
-// ✅ GOOD - Match import style
-// Existing: import { Button } from '@/components/Button'
-// New code: import { Input } from '@/components/Input'
+// ✅ GOOD - Compose existing hooks
+const useProductWithAuth = () => {
+  const auth = useAuth();
+  const products = useProducts(auth.userId);
+  return { ...auth, products };
+};
 
-// ✅ GOOD - Match error handling
+// ✅ GOOD - Use existing utility
+import { formatMoney } from '@/utils/format';
+const price = formatMoney(product.price);
+
+// ✅ GOOD - Match existing patterns
 // Existing: return { ok: true, data }
 // New code: return { ok: true, data: newData }
 ```
@@ -193,9 +305,17 @@ We'll add new E2E tests following this pattern."
 
 ### Analysis & Design Phases
 - [ ] Checked existing architecture before proposing new
+- [ ] Searched for existing features that can be extended
 - [ ] Referenced existing patterns in recommendations
 - [ ] Folder structure aligns with project conventions
 - [ ] Tech choices match existing stack
+
+### Before Creating New Code
+- [ ] Searched for existing similar components
+- [ ] Searched for existing similar hooks
+- [ ] Searched for existing utilities (and lodash/es-toolkit)
+- [ ] Evaluated if existing code can be extended/composed
+- [ ] If creating new: documented why reuse wasn't possible
 
 ### Implementation Phase
 - [ ] File naming matches existing convention
@@ -203,6 +323,7 @@ We'll add new E2E tests following this pattern."
 - [ ] Export pattern matches similar files
 - [ ] Error handling follows established pattern
 - [ ] Test structure matches existing tests
+- [ ] No duplicate logic (reused existing where possible)
 
 ---
 
