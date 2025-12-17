@@ -26,12 +26,13 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 4 | **Read command definition** | Follow exact execution steps |
-| 5 | **Follow phase order** | Phases build on each other |
-| 6 | **Execute hooks** | Pre/post phase automation |
-| 7 | **Load relevant rules** | Apply quality standards |
-| 8 | **Activate appropriate agents** | Multi-agent collaboration |
-| 9 | **Generate deliverables** | Tangible outputs per phase |
+| 4 | **Show banner before each phase** | User knows which agent handles phase |
+| 5 | **Read command definition** | Follow exact execution steps |
+| 6 | **Follow phase order** | Phases build on each other |
+| 7 | **Execute hooks** | Pre/post phase automation |
+| 8 | **Load relevant rules** | Apply quality standards |
+| 9 | **Activate appropriate agents** | Multi-agent collaboration |
+| 10 | **Generate deliverables** | Tangible outputs per phase |
 
 ### At Phase Completion
 
@@ -134,7 +135,8 @@ Continue Until:
 
 ### Phase Start
 ```markdown
-- [ ] Banner shown with correct agent
+- [ ] Banner shown with correct agent(s) for this phase
+- [ ] Agent change announced if different from previous phase
 - [ ] Project context loaded
 - [ ] Phase guide read
 - [ ] Relevant rules loaded
@@ -229,7 +231,8 @@ At 150K tokens (75% of 200K):
 
 ### ALWAYS Checklist
 ```
-□ Show agent banner
+□ Show agent banner (start of response)
+□ Show banner before each workflow phase
 □ Load project context
 □ Follow phase order
 □ Show approval gates
@@ -253,5 +256,5 @@ At 150K tokens (75% of 200K):
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-29
+**Version:** 1.2.4
+**Last Updated:** 2025-12-17

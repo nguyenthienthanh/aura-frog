@@ -211,10 +211,49 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 | Scenario | Show Banner? |
 |----------|--------------|
 | Start of response | YES |
+| **Before each workflow phase** | **YES (mandatory)** |
 | After tool use | NO (continue without) |
 | Multi-part response | First part only |
 | Error response | YES |
 | Short answer | YES |
+
+---
+
+## Phase Transition Banner (MANDATORY)
+
+**Before starting ANY workflow phase, show the banner with:**
+1. Current agent(s) handling the phase
+2. Phase number and name
+3. Contextual aura message
+
+### Example - Starting Phase 2
+
+```
+⚡ 🐸 AURA FROG v1.2.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
+┃ Model: Sonnet 4.5 │ 🔥 Architecting greatness           ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## Phase 2: Technical Planning
+
+Starting technical design for [feature]...
+```
+
+### Example - Starting Phase 5b with Agent Change
+
+```
+⚡ 🐸 AURA FROG v1.2.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agents: backend-nodejs + qa-automation                 ┃
+┃ Phase: 5b - TDD GREEN │ 🔥 Make it pass                ┃
+┃ Model: Opus 4.5                                        ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## Phase 5b: Implementation (TDD GREEN)
+
+Implementing code to pass the failing tests...
+```
+
+**Why:** Users need to know which agent(s) are handling each phase, especially when agents change between phases
 
 ---
 
@@ -257,5 +296,5 @@ Every response should follow this structure:
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** 2025-12-08
+**Version:** 1.2.4
+**Last Updated:** 2025-12-17
