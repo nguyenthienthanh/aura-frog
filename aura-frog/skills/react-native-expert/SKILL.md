@@ -453,4 +453,4 @@ checklist[12]{area,best_practice}:
 
 ---
 
-**Version:** 1.2.1
+**Version:** 1.2.5

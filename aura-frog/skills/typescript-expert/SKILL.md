@@ -359,4 +359,4 @@ checklist[8]{check,action}:
 
 ---
 
-**Version:** 1.2.1
+**Version:** 1.2.5

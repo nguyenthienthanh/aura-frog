@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.2.4
+**Version:** 1.2.5
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -296,5 +296,5 @@ Every response should follow this structure:
 
 ---
 
-**Version:** 1.2.4
+**Version:** 1.2.5
 **Last Updated:** 2025-12-17

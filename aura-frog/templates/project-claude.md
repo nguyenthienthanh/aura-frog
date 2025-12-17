@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.2.4
+**Aura Frog Version:** 1.2.5
 
 ---
 
@@ -66,4 +66,4 @@ bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/figma-fetch.sh "F
 
 ---
 
-**Version:** 1.2.0 | **Generated:** [DATE]
+**Version:** 1.2.5 | **Generated:** [DATE]

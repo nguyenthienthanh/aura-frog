@@ -596,4 +596,4 @@ checklist[12]{pattern,best_practice}:
 
 ---
 
-**Version:** 1.2.1
+**Version:** 1.2.5
