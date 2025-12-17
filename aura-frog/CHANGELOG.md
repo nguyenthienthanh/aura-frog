@@ -4,6 +4,26 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.5] - 2025-12-17
+
+### Workflow & Comment Quality Improvements
+
+Enhanced workflow visibility and comment quality standards.
+
+#### New Features
+- **Phase transition banner** - Show agent banner before each workflow phase
+- **Agent visibility** - Users see which agent handles each phase
+
+#### Rule Updates
+- **smart-commenting.md** - Strengthened to "meaningful comments only"
+  - Priority raised: Medium → High
+  - Added anti-patterns: "new test", "new branch", "add coverage"
+  - Added JSDoc rules section
+- **execution-rules.md** - Added "show banner before each phase" requirement
+- **agent-identification-banner.md** - Added "Phase Transition Banner" section
+
+---
+
 ## [1.2.4] - 2025-12-17
 
 ### Plugin Optimization - Massive Token Reduction

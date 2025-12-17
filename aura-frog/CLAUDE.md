@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.2.4
+**System:** Aura Frog v1.2.5
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
 
@@ -21,7 +21,7 @@ session_start[4]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.2.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.2.5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -93,4 +93,4 @@ resources[9]{name,location}:
 
 ---
 
-**Version:** 1.2.4
+**Version:** 1.2.5
