@@ -23,34 +23,9 @@ Referenced in plugin.json:
 
 ---
 
-## 🎯 Active Hooks (15 Total)
+## 🎯 Active Hooks (10 Total)
 
-### 1. SessionStart - Welcome Message
-**When:** Every time Claude Code session begins
-
-**Actions:**
-- ✅ Display Aura Frog welcome message
-- ✅ Show available commands
-- ✅ List active Skills (26+ auto-invoking capabilities)
-- ✅ Guide user on natural language usage
-
-**Output Example:**
-```
-🐸 Aura Frog v1.2.6 is active - A Claude Code Plugin
-
-Available Commands:
-- workflow:start <task> - Start 9-phase TDD workflow
-- bugfix:quick <description> - Quick bug fix
-- project:init - Initialize project context
-- agent:list - Show all available agents
-
-Skills System: 26+ auto-invoking skills active
-Type any command or use natural language - Skills will auto-activate based on your intent.
-```
-
----
-
-### 2. PreToolUse - Bash Safety
+### 1. PreToolUse - Bash Safety
 **When:** Before any Bash tool execution
 
 **Actions:**
@@ -73,7 +48,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 3. PreToolUse - Project Context Reminder
+### 2. PreToolUse - Project Context Reminder
 **When:** Before Write or Edit tool execution
 
 **Actions:**
@@ -88,7 +63,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 4. PreToolUse - Secrets Protection
+### 3. PreToolUse - Secrets Protection
 **When:** Before Write or Edit to sensitive files
 
 **Actions:**
@@ -103,29 +78,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 5. PreToolUse - SAST Security Check
-**When:** Before Write or Edit tool execution
-
-**Actions:**
-- ✅ Detect common security anti-patterns (eval, innerHTML, exec, hardcoded passwords)
-- ✅ Reference OWASP guidelines
-- ✅ Point to rules/sast-security-scanning.md
-
-**Detected Patterns:**
-- `eval()` - Code injection risk
-- `innerHTML =` - XSS vulnerability
-- `dangerouslySetInnerHTML` - React XSS risk
-- `exec()` - Command injection
-- Hardcoded passwords/API keys
-
-**Example:**
-```
-🔐 Security: Potential security concern detected. Review OWASP guidelines in rules/sast-security-scanning.md
-```
-
----
-
-### 6. PostToolUse - Command Logging
+### 4. PostToolUse - Command Logging
 **When:** After any Bash command completes
 
 **Actions:**
@@ -137,12 +90,11 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 ```
 [2025-11-27 14:30:45] Bash: npm test
 [2025-11-27 14:31:02] Bash: git status
-[2025-11-27 14:31:15] Bash: workflow:start "Add user profile"
 ```
 
 ---
 
-### 7. PostToolUse - Large File Warning
+### 5. PostToolUse - Large File Warning
 **When:** After Read tool completes
 
 **Actions:**
@@ -157,7 +109,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 8. UserPromptSubmit - JIRA Detection
+### 6. UserPromptSubmit - JIRA Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -173,7 +125,7 @@ Hook: 🎫 JIRA ticket detected - jira-integration skill may auto-activate
 
 ---
 
-### 9. UserPromptSubmit - Figma Detection
+### 7. UserPromptSubmit - Figma Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -189,7 +141,7 @@ Hook: 🎨 Figma link detected - figma-integration skill may auto-activate
 
 ---
 
-### 10. UserPromptSubmit - Confluence Detection
+### 8. UserPromptSubmit - Confluence Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -205,7 +157,7 @@ Hook: 📚 Confluence link detected - confluence-integration skill may auto-acti
 
 ---
 
-### 11. UserPromptSubmit - GitHub PR/Issue Detection
+### 9. UserPromptSubmit - GitHub PR/Issue Detection
 **When:** User submits a prompt
 
 **Actions:**
@@ -221,37 +173,7 @@ Hook: 🔗 GitHub PR/Issue detected
 
 ---
 
-### 12. SessionEnd - Workflow Handoff Reminder
-**When:** Session ends
-
-**Actions:**
-- ✅ Check if active workflow exists (`.claude/logs/workflows/active-workflow.json`)
-- ✅ Remind user to save state with `workflow:handoff`
-- ✅ Prevents workflow loss between sessions
-
-**Example:**
-```
-💾 Active workflow detected. Use workflow:handoff to save state for next session.
-```
-
----
-
-### 13. SessionEnd - Uncommitted Changes Reminder
-**When:** Session ends
-
-**Actions:**
-- ✅ Check for staged uncommitted changes
-- ✅ Remind user to commit before ending
-- ✅ Prevents work loss
-
-**Example:**
-```
-📝 You have uncommitted staged changes. Consider committing before ending session.
-```
-
----
-
-### 14. Stop - Voice Notification
+### 10. Stop - Voice Notification
 **When:** Claude stops for user approval
 
 **Actions:**
@@ -263,18 +185,13 @@ Hook: 🔗 GitHub PR/Issue detected
 
 ---
 
-### 15. Notification - Critical Alert Voice
+### 11. Notification - Critical Alert Voice
 **When:** Critical notifications occur
 
 **Actions:**
 - ✅ Detect critical notifications (error, critical, failed)
 - ✅ Play voice alert for urgent issues
 - ✅ Uses `scripts/voice-notify.sh`
-
-**Example:**
-```
-Alert: Please check the notification
-```
 
 ---
 
@@ -285,9 +202,6 @@ Executes bash command, uses exit code:
 - **Exit 0:** Continue normally
 - **Exit 1:** Warning (show stderr, continue)
 - **Exit 2:** Block operation (show stderr, stop)
-
-### Type: "prompt"
-Returns text to inject into conversation context
 
 ---
 
@@ -301,12 +215,7 @@ Returns text to inject into conversation context
 **Workflow Enhancement:**
 - ✅ Auto-detects JIRA tickets and Figma links
 - ✅ Reminds about project context
-- ✅ Suggests workflow handoff
-
-**Visibility:**
-- ✅ Welcome message shows active system
 - ✅ Command logging for debugging
-- ✅ Skill activation notifications
 
 **User Experience:**
 - ✅ Guided workflow (reminders at right time)
@@ -323,16 +232,13 @@ Claude Code provides these environment variables to hooks:
 - `$CLAUDE_TOOL_OUTPUT` - Output from completed tool (PostToolUse only)
 - `$CLAUDE_USER_INPUT` - User's prompt text (UserPromptSubmit only)
 - `$CLAUDE_FILE_PATHS` - File paths affected by tool (if applicable)
+- `$CLAUDE_NOTIFICATION` - Notification content (Notification only)
 
 ---
 
 ## 🔄 Hook Execution Flow
 
 ```
-Session Start
-  ↓
-[SessionStart Hook] - Show Aura Frog welcome
-  ↓
 User Input
   ↓
 [UserPromptSubmit Hook] - Detect JIRA/Figma
@@ -343,72 +249,28 @@ Claude Decides to Use Tool (e.g., Bash, Write, Edit)
   ↓
 Tool Execution
   ↓
-[PostToolUse Hook] - Logging, formatting
+[PostToolUse Hook] - Logging, warnings
   ↓
 Response to User
   ↓
-(repeat)
-  ↓
-Session End
-  ↓
-[SessionEnd Hook] - Workflow handoff reminder
+[Stop Hook] - Voice notification if approval needed
 ```
-
----
-
-## 🚫 What Hooks DON'T Do
-
-**Hooks are NOT:**
-- ❌ Auto-invoked capabilities (that's Skills)
-- ❌ Instruction injection (that's CLAUDE.md)
-- ❌ Context loaders (that's project-context-loader skill)
-
-**Hooks ARE:**
-- ✅ Lifecycle events (session start/end, tool use)
-- ✅ Safety guards (block dangerous commands)
-- ✅ Workflow helpers (reminders, logging)
-
----
-
-## 📖 Related Documentation
-
-- **Skills System:** `skills/README.md` - Auto-invoking capabilities
-- **CLAUDE.md:** Main instruction file (always loaded)
-- **Project Context:** `.claude/project-contexts/` - Project-specific conventions
-- **Claude Code Hooks:** Official docs for hook system
-
----
-
-## 🔧 Customization
-
-To modify hooks:
-
-1. Edit `hooks/hooks.json`
-2. Test with Claude Code session
-3. Verify hook execution (check stderr for notifications)
-4. Commit changes
-
-**Note:** Hooks are part of plugin, applied globally to all projects using Aura Frog.
 
 ---
 
 ## 📊 Hook Summary Table
 
 ```toon
-hooks[15]{event,name,purpose}:
-  SessionStart,Welcome Message,Display plugin status and commands
+hooks[11]{event,name,purpose}:
   PreToolUse,Bash Safety,Block destructive system commands
   PreToolUse,Project Context,Remind to initialize project context
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
-  PreToolUse,SAST Security,Detect security anti-patterns
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
   UserPromptSubmit,JIRA Detection,Auto-detect ticket IDs
   UserPromptSubmit,Figma Detection,Auto-detect design URLs
   UserPromptSubmit,Confluence Detection,Auto-detect wiki URLs
   UserPromptSubmit,GitHub Detection,Auto-detect PR/Issue URLs
-  SessionEnd,Workflow Handoff,Remind to save active workflow
-  SessionEnd,Uncommitted Changes,Remind to commit staged changes
   Stop,Voice Notification,Alert user for approval needed
   Notification,Critical Alert,Voice alert for errors/critical issues
 ```
@@ -416,5 +278,5 @@ hooks[15]{event,name,purpose}:
 ---
 
 **Version:** 1.2.6
-**Last Updated:** 2025-12-15
-**Status:** Active hooks system (15 hooks)
+**Last Updated:** 2025-12-18
+**Status:** Active hooks system (11 hooks)
