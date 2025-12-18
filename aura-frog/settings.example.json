@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "# Aura Frog Script Permissions",
       "Bash(bash **/scripts/**/*.sh:*)",
       "Bash(bash **/scripts/workflow-manager.sh:*)",
       "Bash(bash **/scripts/workflow/*.sh:*)",
@@ -10,8 +9,6 @@
       "Read(./**)",
       "Edit(./**)",
       "Write(./**)",
-      
-      "# Linting & Formatting",
       "Bash(npx tsc:*)",
       "Bash(npx prettier:*)",
       "Bash(npx eslint:*)",
@@ -23,8 +20,6 @@
       "Bash(npm run format:*)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm prettier:*)",
-      
-      "# Testing",
       "Bash(yarn test:*)",
       "Bash(yarn jest:*)",
       "Bash(npm run test:*)",
@@ -34,15 +29,11 @@
       "Bash(pnpm test:*)",
       "Bash(php artisan test:*)",
       "Bash(phpunit:*)",
-      
-      "# Build & Type Checking",
       "Bash(yarn build:*)",
       "Bash(npm run build:*)",
       "Bash(yarn tsc:*)",
       "Bash(npx tsc --noEmit:*)",
       "Bash(pnpm build:*)",
-      
-      "# File Operations (Read-only)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(grep:*)",
@@ -50,20 +41,14 @@
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(wc:*)",
-      
-      "# Git (Read-only)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git branch:*)",
       "Bash(git show:*)",
-      
-      "# Package Manager (Read-only)",
       "Bash(npm list:*)",
       "Bash(yarn list:*)",
       "Bash(pnpm list:*)",
-      
-      "# Project Info",
       "Bash(node --version:*)",
       "Bash(npm --version:*)",
       "Bash(yarn --version:*)",
@@ -71,53 +56,12 @@
       "Bash(php artisan --version:*)"
     ],
     "deny": [
-      "# Dangerous Operations",
       "Bash(rm -rf:*)",
       "Bash(sudo:*)",
-      "Bash(git push:*)",
       "Bash(git push --force:*)",
       "Bash(npm publish:*)",
       "Bash(yarn publish:*)",
       "Bash(git reset --hard:*)"
-    ],
-    "ask": [
-      "# Operations that need confirmation",
-      "Bash(git commit:*)",
-      "Bash(git add:*)",
-      "Bash(npm install:*)",
-      "Bash(yarn install:*)",
-      "Bash(yarn add:*)",
-      "Bash(npm uninstall:*)",
-      "Bash(git checkout:*)",
-      "Bash(git merge:*)",
-      "Bash(php artisan migrate:*)"
     ]
-  },
-  
-  "auto_approve": {
-    "description": "Auto-approve these AI actions without prompting",
-    "enabled": true,
-    "actions": [
-      "read_file",
-      "list_dir",
-      "grep",
-      "codebase_search"
-    ]
-  },
-  
-  "workflow": {
-    "auto_continue_after_approval": true,
-    "show_token_usage": true,
-    "token_warning_threshold": 150000,
-    "default_test_coverage": 80
-  },
-  
-  "notes": [
-    "This is a template file. Copy to settings.local.json and customize.",
-    "Update paths with your absolute project path.",
-    "Use glob patterns (**) for flexibility.",
-    "Deny list takes precedence over allow list.",
-    "Ask list prompts user for confirmation."
-  ]
+  }
 }
-
