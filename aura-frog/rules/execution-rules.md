@@ -34,6 +34,15 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 | 9 | **Activate appropriate agents** | Multi-agent collaboration |
 | 10 | **Generate deliverables** | Tangible outputs per phase |
 
+### After Implementation
+
+| # | Rule | Why |
+|---|------|-----|
+| 11 | **Run ESLint/TSLint** | Catch code quality issues |
+| 12 | **Run TypeScript check** | Verify type safety |
+| 13 | **Fix ALL lint issues** | Zero warnings policy |
+| 14 | **Verify clean output** | No errors before proceeding |
+
 ### At Phase Completion
 
 | # | Rule | Why |
@@ -235,6 +244,9 @@ At 150K tokens (75% of 200K):
 □ Show banner before each workflow phase
 □ Load project context
 □ Follow phase order
+□ Run lint after implementation (eslint/tslint)
+□ Run TypeScript check (tsc --noEmit)
+□ Fix ALL lint issues before proceeding
 □ Show approval gates
 □ Show next step guidance (commands & suggestions)
 □ Wait for approval
