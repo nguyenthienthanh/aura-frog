@@ -1,7 +1,7 @@
 # Skill: Design System Library
 
 **Category:** Implementation Skill
-**Version:** 1.2.5
+**Version:** 1.2.6
 
 ---
 

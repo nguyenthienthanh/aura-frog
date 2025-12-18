@@ -327,4 +327,4 @@ const price = formatMoney(product.price);
 
 ---
 
-**Version:** 1.2.5 | **Priority:** High
+**Version:** 1.2.6 | **Priority:** High

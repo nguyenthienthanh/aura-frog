@@ -1,6 +1,6 @@
 # Workflow Deliverables Rule
 
-**Version:** 1.2.5
+**Version:** 1.2.6
 **Priority:** CRITICAL - Must verify deliverables at each phase
 **Type:** Rule (Mandatory Checklist)
 
@@ -553,5 +553,5 @@ ls .claude/logs/workflows/{workflow-id}/
 
 ---
 
-**Version:** 1.2.5
+**Version:** 1.2.6
 **Last Updated:** 2025-12-10

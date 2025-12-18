@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.2.5
+**Version:** 1.2.6
 
 ---
 
@@ -415,6 +415,6 @@ hooks[15]{event,name,purpose}:
 
 ---
 
-**Version:** 1.2.5
+**Version:** 1.2.6
 **Last Updated:** 2025-12-15
 **Status:** Active hooks system (15 hooks)

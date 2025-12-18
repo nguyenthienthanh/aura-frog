@@ -509,4 +509,4 @@ checklist[10]{pattern,do_this}:
 
 ---
 
-**Version:** 1.2.5
+**Version:** 1.2.6

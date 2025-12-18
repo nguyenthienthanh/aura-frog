@@ -4,6 +4,36 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.2.6] - 2025-12-18
+
+### Context7 Integration - Library Documentation Optimization
+
+Replaced static design system documentation with Context7 MCP server integration for live, up-to-date library docs.
+
+#### Removed Files (~6,100 lines)
+- **skills/design-system-library/** - Deleted 10 static documentation files:
+  - ant-design.md, bootstrap.md, chakra-ui.md, headless-ui.md
+  - mantine.md, material-ui.md, nativewind.md, radix-ui.md
+  - shadcn-ui.md, tailwind-css.md
+
+#### Updated Files
+- **skills/design-system-library/SKILL.md** - Now references Context7 for live docs
+- **rules/prefer-established-libraries.md** - Condensed with Context7 integration
+
+#### Benefits
+- **Context7 provides:** Up-to-date, version-specific library documentation
+- **No more stale docs:** Always fetches current API references
+- **Massive reduction:** ~6,100 lines removed from plugin
+
+#### How to Use Context7
+```
+"Build a login form with Material UI" use context7
+"Create dashboard with Ant Design" use context7
+"lodash groupBy usage" use context7
+```
+
+---
+
 ## [1.2.5] - 2025-12-17
 
 ### Workflow & Comment Quality Improvements
