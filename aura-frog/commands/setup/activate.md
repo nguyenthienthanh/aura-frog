@@ -139,7 +139,35 @@ else
 fi
 ```
 
-### 4. Verify Activation
+### 4. Merge Plugin Settings
+
+**Copy plugin permissions to project:**
+
+```bash
+PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
+PROJECT_SETTINGS="$PROJECT_ROOT/.claude/settings.local.json"
+
+if [ -f "$PLUGIN_SETTINGS" ]; then
+  if [ -f "$PROJECT_SETTINGS" ]; then
+    # Merge: combine allow/deny arrays
+    jq -s '
+      {
+        permissions: {
+          allow: (.[0].permissions.allow + .[1].permissions.allow | unique),
+          deny: (.[0].permissions.deny + .[1].permissions.deny | unique)
+        }
+      }
+    ' "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS" > "${PROJECT_SETTINGS}.tmp"
+    mv "${PROJECT_SETTINGS}.tmp" "$PROJECT_SETTINGS"
+    echo "✅ Merged plugin settings into .claude/settings.local.json"
+  else
+    cp "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS"
+    echo "✅ Created .claude/settings.local.json from plugin"
+  fi
+fi
+```
+
+### 5. Verify Activation
 
 **Check file exists and has correct content:**
 ```bash
@@ -163,8 +191,9 @@ fi
 🛠️  Tech Stack: [TECH_STACK]
 🤖 Primary Agent: [PRIMARY_AGENT]
 
-📄 File Created:
+📄 Files Created:
    .claude/CLAUDE.md - Aura Frog instructions
+   .claude/settings.local.json - Plugin permissions
 
 🎯 What's Next:
 

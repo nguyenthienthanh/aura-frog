@@ -29,6 +29,7 @@ Initialize Aura Frog for a project:
 ```
 .claude/
 ├── CLAUDE.md                    # References plugin for instructions
+├── settings.local.json          # Merged permissions from plugin
 ├── project-contexts/[project]/
 │   ├── project-config.yaml      # Tech stack, integrations
 │   ├── conventions.md           # Naming, structure patterns
@@ -89,7 +90,42 @@ integrations:
 **Project Context:** `.claude/project-contexts/{project}/`
 ```
 
-### 5. Generate .envrc (Optional)
+### 5. Merge Plugin Settings
+
+Copy and merge plugin permissions to project:
+
+```bash
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PROJECT_SETTINGS=".claude/settings.local.json"
+
+if [ -f "$PLUGIN_DIR/settings.example.json" ]; then
+  if [ -f "$PROJECT_SETTINGS" ]; then
+    # Merge: combine allow arrays, keep deny from both
+    jq -s '.[0].permissions.allow + .[1].permissions.allow | unique' \
+      "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS" > /tmp/merged_allow.json
+
+    jq -s '.[0].permissions.deny + .[1].permissions.deny | unique' \
+      "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS" > /tmp/merged_deny.json
+
+    jq --slurpfile allow /tmp/merged_allow.json \
+       --slurpfile deny /tmp/merged_deny.json \
+       '{permissions: {allow: $allow[0], deny: $deny[0]}}' \
+       <<< '{}' > "$PROJECT_SETTINGS"
+  else
+    # Copy plugin settings as base
+    cp "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS"
+  fi
+  echo "✅ Created/merged .claude/settings.local.json"
+fi
+```
+
+**Settings include:**
+- Script execution permissions
+- Linting/testing commands
+- Git read-only commands
+- Dangerous operation denials
+
+### 6. Generate .envrc (Optional)
 
 If direnv installed, create `.envrc` for auto-loading.
 
