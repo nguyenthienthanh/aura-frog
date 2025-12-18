@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "🐸 Aura Frog v1.2.1 is active - A Claude Code Plugin\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all available agents\n\n**Skills System:** 26+ auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration, confluence-integration, session-continuation, lazy-agent-loader, response-analyzer, state-persistence)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
+            "prompt": "🐸 Aura Frog v1.2.6 is active - A Claude Code Plugin\n\n**Available Commands:**\n- workflow:start <task> - Start 9-phase TDD workflow\n- bugfix:quick <description> - Quick bug fix\n- project:init - Initialize project context\n- agent:list - Show all available agents\n\n**Skills System:** 26+ auto-invoking skills active (agent-detector, workflow-orchestrator, project-context-loader, bugfix-quick, test-writer, code-reviewer, jira-integration, figma-integration, confluence-integration, session-continuation, lazy-agent-loader, response-analyzer, state-persistence)\n\nType any command or use natural language - Skills will auto-activate based on your intent."
           }
         ]
       }

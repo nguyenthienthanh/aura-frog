@@ -36,7 +36,7 @@ Referenced in plugin.json:
 
 **Output Example:**
 ```
-🐸 Aura Frog v1.2.1 is active - A Claude Code Plugin
+🐸 Aura Frog v1.2.6 is active - A Claude Code Plugin
 
 Available Commands:
 - workflow:start <task> - Start 9-phase TDD workflow
