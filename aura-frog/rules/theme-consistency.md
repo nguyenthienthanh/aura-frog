@@ -131,4 +131,4 @@ interface Theme {
 
 ---
 
-**Version:** 1.2.6 | **Priority:** Critical
+**Version:** 1.3.0 | **Priority:** Critical

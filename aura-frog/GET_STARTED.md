@@ -16,8 +16,8 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **24 Agents** | **26+ Skills** | **38 Rules** | **9 Phases** | **70+ Commands** |
-|:-------------:|:-------------:|:------------:|:------------:|:---------------:|
+| **14 Agents** | **35 Skills** | **39 Rules** | **9 Phases** | **70+ Commands** | **6 MCP Servers** |
+|:-------------:|:-------------:|:------------:|:------------:|:---------------:|:----------------:|
 
 ---
 
@@ -226,6 +226,25 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
 ---
 
+## 🔌 MCP Servers (Auto-Configured)
+
+Aura Frog bundles 6 MCP servers for external integrations:
+
+| MCP | Purpose | Auto-Triggers On |
+|-----|---------|------------------|
+| **context7** | Library docs | "Build with MUI", "Tailwind", library names |
+| **playwright** | E2E testing | "Test the login page", browser automation |
+| **vitest** | Unit tests | "Run tests", "Check coverage" |
+| **atlassian** | JIRA/Confluence | Ticket IDs (PROJ-123) |
+| **figma** | Design files | Figma URLs |
+| **slack** | Notifications | Phase 9 completion |
+
+**No explicit commands needed** - Claude auto-detects context and uses appropriate MCP.
+
+**Create your own MCP:** See `docs/MCP_GUIDE.md` for a complete guide.
+
+---
+
 ## 💡 How It Works
 
 ### 1. You Give a Command
@@ -307,8 +326,9 @@ workflow:start <your-task-description>
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
-- **Skills:** `skills/README.md` (26+ skills)
-- **Rules:** `rules/README.md` (38 quality rules)
+- **MCP Guide:** `docs/MCP_GUIDE.md` (create custom integrations)
+- **Skills:** `skills/README.md` (35 skills)
+- **Rules:** `rules/README.md` (39 quality rules)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md` (10 Mermaid diagrams)
 - **Phase Guides:** `docs/phases/`
 

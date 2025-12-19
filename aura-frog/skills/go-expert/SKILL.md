@@ -547,4 +547,4 @@ checklist[12]{pattern,best_practice}:
 
 ---
 
-**Version:** 1.2.6
+**Version:** 1.3.0

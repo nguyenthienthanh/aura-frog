@@ -49,15 +49,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE '[A-Z]{2,10}-[0-9]+'; then echo '🎫 JIRA ticket detected - jira-integration skill may auto-activate' >&2; fi"
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE '[A-Z]{2,10}-[0-9]+'; then echo '🎫 JIRA ticket detected - MCP atlassian server available' >&2; fi"
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -q 'figma.com/file'; then echo '🎨 Figma link detected - figma-integration skill may auto-activate' >&2; fi"
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -q 'figma.com/file'; then echo '🎨 Figma link detected - MCP figma server available' >&2; fi"
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'atlassian.net/wiki|confluence'; then echo '📚 Confluence link detected - confluence-integration skill may auto-activate' >&2; fi"
+            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'atlassian.net/wiki|confluence'; then echo '📚 Confluence link detected - MCP atlassian server available' >&2; fi"
           },
           {
             "type": "command",

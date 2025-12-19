@@ -12,10 +12,12 @@
 
 ---
 
-**Version:** 1.2.6
-**Total Skills:** 38+ (25 auto-invoking + 13 reference)
+**Version:** 1.3.0
+**Total Skills:** 35 (22 auto-invoking + 13 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
+
+> **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
 
 ---
 
@@ -130,83 +132,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 7. **jira-integration** (Priority: MEDIUM)
-
-**Auto-invokes when:** JIRA ticket mentioned
-
-**Triggers:**
-- Ticket IDs: "PROJ-1234", "IGNT-567"
-- JIRA URLs: `https://company.atlassian.net/browse/PROJ-1234`
-- "jira:fetch <ticket-id>"
-
-**What it does:**
-- Auto-fetches ticket details via Bash script
-- Loads requirements into workflow
-- Updates ticket status throughout development
-- Saves data to `.claude/logs/jira/`
-
-**Requires:** `JIRA_API_TOKEN` in `.envrc`
-
----
-
-### 8. **figma-integration** (Priority: MEDIUM)
-
-**Auto-invokes when:** Figma URL detected
-
-**Triggers:**
-- Figma URLs: `https://figma.com/file/ABC123/Design`
-- "figma:fetch <file-id>"
-- "implement this Figma design"
-
-**What it does:**
-- Auto-fetches design data via Bash script
-- Extracts components and design tokens
-- Generates styling constants
-- Loads into Phase 3 (UI Breakdown)
-- Downloads design images
-
-**Requires:** `FIGMA_API_TOKEN` in `.envrc`
-
----
-
-### 9. **confluence-integration** (Priority: MEDIUM)
-
-**Auto-invokes when:** Confluence page or documentation needed
-
-**Triggers:**
-- Confluence URLs: `https://company.atlassian.net/wiki/...`
-- "confluence page", "wiki page", "documentation"
-- Phase 8 (Documentation) - for publishing
-- Phase 9 (Share) - for team notifications
-
-**What it does:**
-- Fetches Confluence pages by ID or title
-- Searches pages across spaces
-- Creates new pages (with confirmation)
-- Updates existing pages (with confirmation)
-- Saves data to `.claude/logs/confluence/`
-
-**Operations:**
-```bash
-# Fetch page
-bash scripts/confluence-operations.sh fetch 123456
-bash scripts/confluence-operations.sh fetch "API Documentation" DEV
-
-# Search pages
-bash scripts/confluence-operations.sh search "deployment guide" PROJ
-
-# Create page (requires confirmation)
-bash scripts/confluence-operations.sh create DEV "New Page" content.md
-
-# Update page (requires confirmation)
-bash scripts/confluence-operations.sh update 123456 updated-content.md
-```
-
-**Requires:** `CONFLUENCE_API_TOKEN` in `.envrc`
-
----
-
-### 10. **session-continuation** (Priority: HIGH)
+### 7. **session-continuation** (Priority: HIGH)
 
 **Auto-invokes when:** Token limit warning triggered
 
@@ -232,7 +158,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
-### 11. **lazy-agent-loader** (Priority: HIGH)
+### 8. **lazy-agent-loader** (Priority: HIGH)
 
 **Auto-invokes when:** Agent detection runs (integrated with agent-detector)
 
@@ -249,7 +175,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
-### 12. **state-persistence** (Priority: HIGH)
+### 9. **state-persistence** (Priority: HIGH)
 
 **Auto-invokes when:** Session handoff needed or workflow resume requested
 
@@ -268,7 +194,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
 
 ---
 
-### 13. **response-analyzer** (Priority: MEDIUM)
+### 10. **response-analyzer** (Priority: MEDIUM)
 
 **Auto-invokes when:** Large command outputs or API responses
 
@@ -302,9 +228,7 @@ bash scripts/confluence-operations.sh update 123456 updated-content.md
    - "implement feature" → workflow-orchestrator
    - "fix bug" → bugfix-quick
    - "add tests" → test-writer
-   - "PROJ-1234" → jira-integration
-   - Figma URL → figma-integration
-   - Confluence URL → confluence-integration
+   - JIRA/Figma/Confluence → MCP tools (bundled)
    ↓
 6. Skills load project-context-loader if needed
    ↓
@@ -327,8 +251,8 @@ User: "Implement user profile screen from PROJ-1234 Figma design"
 
 Auto-invokes:
 1. agent-detector (ALWAYS)
-2. jira-integration (ticket detected)
-3. figma-integration (Figma URL detected)
+2. MCP: atlassian (JIRA ticket fetch)
+3. MCP: figma (design fetch)
 4. project-context-loader (before implementation)
 5. workflow-orchestrator (complex feature)
 ```
@@ -421,7 +345,7 @@ workflow-orchestrator, bugfix-quick, or test-writer
 ↓
 code-reviewer (After implementation)
 ↓
-jira-integration / figma-integration / confluence-integration (When mentioned)
+MCP tools: atlassian / figma / slack (When mentioned)
 ```
 
 ---
@@ -429,7 +353,7 @@ jira-integration / figma-integration / confluence-integration (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[25]{name,priority,trigger}:
+skills[22]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
@@ -451,11 +375,10 @@ skills[25]{name,priority,trigger}:
   angular-expert,high,Angular/NgRx/RxJS
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
-  jira-integration,medium,Ticket detected
-  figma-integration,medium,Figma URL detected
-  confluence-integration,medium,Confluence URL/docs
   response-analyzer,medium,Large output handling
 ```
+
+> **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
 ---
 
 ## 🚀 Using Skills
@@ -491,7 +414,7 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 2. **Multiple skills can activate** for a single message
 3. **Skills are auto-invoked** - You don't call them manually
 4. **project-context-loader should run** before code generation
-5. **Integration skills require setup** - Check `.envrc` for tokens
+5. **MCP integrations require env vars** - Set tokens in `.envrc` (see `.mcp.json`)
 
 ---
 
@@ -713,7 +636,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.2.6
-**Last Updated:** 2025-12-15
+**Version:** 1.3.0
+**Last Updated:** 2025-12-19
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 38+ (25 auto-invoking + 13 reference)
+**Total Skills:** 35 (22 auto-invoking + 13 reference)

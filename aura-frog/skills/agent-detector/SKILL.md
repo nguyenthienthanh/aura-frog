@@ -12,7 +12,7 @@ allowed-tools: Read, Grep, Glob
 # Aura Frog Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message
-**Version:** 1.2.6
+**Version:** 1.3.0
 
 ---
 

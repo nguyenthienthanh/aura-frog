@@ -1,8 +1,8 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.2.6
+**System:** Aura Frog v1.3.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills
+**Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
@@ -21,7 +21,7 @@ session_start[4]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.2.6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -31,16 +31,34 @@ session_start[4]{step,action,file}:
 
 ---
 
+## Bundled MCP Servers
+
+```toon
+mcp_servers[6]{name,package,purpose}:
+  context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
+  playwright,@playwright/mcp,Browser automation + E2E tests
+  vitest,@djankies/vitest-mcp,Test execution + coverage
+  atlassian,@anthropic/atlassian-mcp,JIRA + Confluence
+  figma,@anthropic/figma-mcp,Figma design fetch
+  slack,@anthropic/slack-mcp,Slack notifications
+```
+
+**Auto-invocation:** Claude uses these automatically based on context:
+- "Build with MUI" → context7 fetches docs
+- "Run tests" → vitest executes
+- "PROJ-123" → atlassian fetches ticket
+
+**Configuration:** `.mcp.json` | **Guide:** `docs/MCP_GUIDE.md`
+
+---
+
 ## Auto-Invoke Skills
 
 ```toon
-skills[25]{name,trigger,file}:
+skills[22]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
-  jira-integration,Ticket ID (PROJ-123),skills/jira-integration/SKILL.md
-  figma-integration,Figma URL,skills/figma-integration/SKILL.md
-  confluence-integration,Confluence URL,skills/confluence-integration/SKILL.md
   workflow-orchestrator,Complex feature,skills/workflow-orchestrator/SKILL.md
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
@@ -79,18 +97,19 @@ skills[25]{name,trigger,file}:
 ## Resources
 
 ```toon
-resources[9]{name,location}:
-  Agents (24),agents/
+resources[10]{name,location}:
+  Agents (14),agents/
   Commands (70+),commands/
-  Rules (38),rules/
-  Skills (38+),skills/
+  Rules (39),rules/
+  Skills (35),skills/
+  MCP Servers (6),.mcp.json
+  MCP Guide,docs/MCP_GUIDE.md
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
   Getting Started,GET_STARTED.md
-  Integrations,docs/INTEGRATION_SETUP_GUIDE.md
   Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
 ```
 
 ---
 
-**Version:** 1.2.6
+**Version:** 1.3.0

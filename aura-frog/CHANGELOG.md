@@ -4,6 +4,55 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.3.0] - 2025-12-19
+
+### Major Cleanup - MCP Integration & Agent Consolidation
+
+Streamlined the plugin by replacing custom integration scripts with bundled MCP servers and merging related agents.
+
+#### New Features
+- **Bundled MCP Servers** - `.mcp.json` auto-configures:
+  - `context7` - Library documentation (MUI, Tailwind, lodash, etc.)
+  - `playwright` - Browser automation and E2E testing
+  - `vitest` - Test execution and coverage analysis
+  - `atlassian` - JIRA + Confluence integration
+  - `figma` - Design system fetching
+  - `slack` - Notifications
+
+#### Consolidated Agents (24 → 14)
+- **backend-expert** - Merged: backend-go, backend-laravel, backend-nodejs, backend-python
+- **web-expert** - Merged: web-angular, web-nextjs, web-reactjs, web-vuejs
+- **mobile-expert** - Merged: mobile-flutter, mobile-react-native
+- **Removed** - jira-operations, confluence-operations, slack-operations (use MCP)
+
+#### Removed Files
+- **Scripts** - jira-fetch.sh, jira-sync.sh, figma-fetch.sh, confluence-operations.sh, slack-notify.sh
+- **Skills** - jira-integration, figma-integration, confluence-integration (replaced by MCP)
+- **Agents** - 10 individual backend/web/mobile agents (merged into 3)
+
+#### New Documentation
+- **docs/MCP_GUIDE.md** - Complete guide for using and creating MCP servers
+
+#### Updated Documentation
+- CLAUDE.md - Added MCP servers section with auto-invocation examples
+- GET_STARTED.md - Added MCP section with trigger examples
+- skills/README.md - Updated skill count and MCP references
+- rules/README.md - Updated version
+
+#### Benefits
+- **Cleaner plugin** - 10 fewer agents, 5 fewer scripts, 3 fewer skills
+- **Native MCP** - Official MCP servers for integrations
+- **Merged agents** - Still access detailed patterns via expert skills
+- **Better UX** - Users don't need separate MCP installation
+
+#### Migration
+- Set env vars in `.envrc` for MCP servers:
+  - `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`
+  - `FIGMA_API_TOKEN`
+  - `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID`
+
+---
+
 ## [1.2.6] - 2025-12-18
 
 ### Context7 Integration - Library Documentation Optimization

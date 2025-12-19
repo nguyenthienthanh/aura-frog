@@ -128,4 +128,4 @@ benefits[4]{aspect,improvement}:
 
 ---
 
-**Version:** 1.2.6 | **Priority:** High
+**Version:** 1.3.0 | **Priority:** High

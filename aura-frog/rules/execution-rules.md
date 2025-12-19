@@ -268,5 +268,5 @@ At 150K tokens (75% of 200K):
 
 ---
 
-**Version:** 1.2.6
+**Version:** 1.3.0
 **Last Updated:** 2025-12-17

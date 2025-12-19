@@ -114,4 +114,4 @@ file_types[6]{type,extension,example}:
 
 ---
 
-**Version:** 1.2.6 | **Priority:** Medium
+**Version:** 1.3.0 | **Priority:** Medium
