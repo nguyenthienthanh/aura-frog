@@ -2,15 +2,15 @@
 
 ![Aura Frog](assets/logo/github_banner.png)
 
-# 🐸 Aura Frog
+# Aura Frog
 
 ### A Plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 
-> **Code with main character energy** ✨
+> **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-phase TDD workflow.
+AI-powered development plugin for **Claude Code** with 14 specialized agents, 9-phase TDD workflow, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -21,30 +21,28 @@ AI-powered development plugin for **Claude Code** with 24 specialized agents, 9-
 
 ---
 
-## 📊 At a Glance
+## At a Glance
 
 <div align="center">
 
-| **Agents** | **Skills** | **Rules** | **Phases** | **Commands** |
-|:----------:|:----------:|:---------:|:----------:|:------------:|
-| **24** | **26+** | **36** | **9** | **70+** |
+| **Agents** | **Skills** | **Rules** | **Phases** | **Commands** | **MCP Servers** |
+|:----------:|:----------:|:---------:|:----------:|:------------:|:---------------:|
+| **14** | **35** | **39** | **9** | **70+** | **6** |
 
 </div>
 
 **What's Inside:**
-- 🤖 **24 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, and more
-- ⚡ **26+ Skills** — 14 auto-invoking + 12 reference skills for specialized tasks
-- 🎨 **10 Design Systems** — MUI, Ant Design, Tailwind, shadcn/ui, Chakra, NativeWind, and more
-- 📏 **37 Quality Rules** — System, code quality, architecture, workflow, documentation, and accessibility
-- 🔄 **9-Phase Workflow** — From requirements to deployment with quality gates
-- 🎮 **70+ Commands** — Full workflow control at your fingertips
-- 🔗 **4 Integrations** — JIRA, Figma, Slack, Confluence (via Bash scripts)
-- 🔀 **Multi-Model Support** — Use Gemini, OpenAI, DeepSeek per phase
-- 📊 **10 Mermaid Diagrams** — Visual workflow documentation
+- **14 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps experts
+- **35 Skills** — 22 auto-invoking + 13 reference skills for specialized tasks
+- **6 Bundled MCP Servers** — Context7, Playwright, Vitest, Atlassian, Figma, Slack
+- **39 Quality Rules** — System, code quality, architecture, workflow, documentation
+- **9-Phase Workflow** — From requirements to deployment with quality gates
+- **70+ Commands** — Full workflow control at your fingertips
+- **Multi-Model Support** — Use Gemini, OpenAI, DeepSeek per phase
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -92,11 +90,11 @@ At each phase, review and respond:
 - `reject: <reason>` — Restart current phase
 - `modify: <changes>` — Adjust deliverables
 
-**📚 See:** [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) for complete guide
+**See:** [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) for complete guide
 
 ---
 
-## 🎯 Overview
+## Overview
 
 **Aura Frog** is a plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** (Anthropic's official CLI for Claude) that transforms it into a **structured development platform** with specialized agents, enforced TDD, and quality gates at every step.
 
@@ -107,43 +105,36 @@ At each phase, review and respond:
 | Traditional Development | With Aura Frog |
 |------------------------|----------------|
 | Manual task management | AI-powered 9-phase workflow |
-| Generic AI responses | 24 specialized agents auto-selected |
+| Generic AI responses | 14 specialized agents auto-selected |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
 | Context switching | CLI-first with 70 commands |
 | Manual documentation | Auto-generated docs |
+| Manual integrations | Bundled MCP servers (JIRA, Figma, Slack) |
 
 **Result:** 60-70% reduction in PM overhead while improving code quality.
 
 ---
 
-## 🎨 Key Features
+## Key Features
 
-### 🤖 24 Specialized Agents
+### 14 Specialized Agents
 
 Agents auto-activate based on your prompt context:
 
 <details>
-<summary><b>Development Agents (11)</b></summary>
+<summary><b>Expert Agents (3)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
-| `mobile-react-native` | React Native + Expo, adaptive styling |
-| `mobile-flutter` | Flutter + Dart, cross-platform |
-| `web-angular` | Angular 17+, signals, standalone components |
-| `web-vuejs` | Vue 3, Composition API, Pinia |
-| `web-reactjs` | React 18, hooks, Context API |
-| `web-nextjs` | Next.js, SSR, SSG, App Router |
-| `backend-nodejs` | Node.js, Express, NestJS, Fastify |
-| `backend-python` | Django, FastAPI, Flask |
-| `backend-go` | Go, Gin, Fiber, gRPC |
-| `backend-laravel` | Laravel PHP, Eloquent |
-| `database-specialist` | Schema design, query optimization |
+| `backend-expert` | Node.js, Python, Laravel, Go — Express, Django, FastAPI, Gin |
+| `web-expert` | React, Vue, Angular, Next.js — SSR, SSG, state management |
+| `mobile-expert` | React Native, Flutter — Expo, cross-platform, NativeWind |
 
 </details>
 
 <details>
-<summary><b>Quality, Security & Design (3)</b></summary>
+<summary><b>Quality & Security (3)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
@@ -154,14 +145,12 @@ Agents auto-activate based on your prompt context:
 </details>
 
 <details>
-<summary><b>DevOps & Operations (5)</b></summary>
+<summary><b>Operations (3)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
 | `devops-cicd` | Docker, K8s, CI/CD, monitoring |
-| `jira-operations` | JIRA integration, ticket management |
-| `confluence-operations` | Documentation publishing |
-| `slack-operations` | Team notifications |
+| `database-specialist` | Schema design, query optimization |
 | `voice-operations` | ElevenLabs AI narration |
 
 </details>
@@ -181,7 +170,35 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### ⚡ 26+ Skills (14 Auto-Invoking + 12 Reference)
+### 6 Bundled MCP Servers
+
+MCP (Model Context Protocol) servers auto-invoke based on context — no setup required:
+
+| MCP Server | Purpose | Auto-Triggers |
+|------------|---------|---------------|
+| **context7** | Library documentation | "Build with MUI", "Tailwind", library names |
+| **playwright** | Browser automation, E2E | "Test the login page", browser automation |
+| **vitest** | Test execution, coverage | "Run tests", "Check coverage" |
+| **atlassian** | JIRA + Confluence | Ticket IDs (PROJ-123) |
+| **figma** | Design file fetching | Figma URLs |
+| **slack** | Notifications | Phase 9 completion |
+
+```bash
+# Context7 auto-fetches React docs
+"Build a form with Material UI"
+
+# Atlassian MCP auto-fetches ticket
+"Implement PROJ-1234"
+
+# Playwright runs E2E test
+"Test the checkout flow in browser"
+```
+
+**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for setup and creating custom MCP servers
+
+---
+
+### 35 Skills (22 Auto-Invoking + 13 Reference)
 
 Skills activate automatically based on your message context — no commands needed:
 
@@ -189,11 +206,10 @@ Skills activate automatically based on your message context — no commands need
 User: "Implement user profile from PROJ-1234"
          ↓
 Auto-invokes:
-  1. agent-detector      → Selects mobile-react-native agent
-  2. jira-integration    → Fetches PROJ-1234 requirements
+  1. agent-detector      → Selects mobile-expert agent
+  2. atlassian MCP       → Fetches PROJ-1234 requirements
   3. project-context-loader → Loads your conventions
-  4. model-router        → Selects model for current phase
-  5. workflow-orchestrator  → Executes 9-phase workflow
+  4. workflow-orchestrator  → Executes 9-phase workflow
 ```
 
 | Skill | Triggers | Purpose |
@@ -201,41 +217,37 @@ Auto-invokes:
 | `agent-detector` | **Every message** | Select appropriate agent |
 | `workflow-orchestrator` | "implement", "build", "create" | Execute 9-phase workflow |
 | `project-context-loader` | Before code generation | Load project conventions |
-| `model-router` | Phase transitions | Select AI model per phase |
 | `session-continuation` | Token limit (150K+) | Workflow state & handoff |
 | `bugfix-quick` | "fix", "error", "broken" | Fast TDD bug fixes |
 | `test-writer` | "add tests", "coverage" | Generate comprehensive tests |
 | `code-reviewer` | After implementation | Multi-agent quality review |
-| `jira-integration` | PROJ-1234 patterns | Auto-fetch ticket details |
-| `figma-integration` | Figma URLs | Extract design components |
-| `confluence-integration` | Confluence URLs | Fetch/create/update pages |
 | `lazy-agent-loader` | Agent loading | 94% token savings on agent defs |
 | `response-analyzer` | Large outputs | Save verbose output to temp |
 | `state-persistence` | Session handoff | File-based state management |
 
-**Reference Skills (12):** refactor-expert, api-designer, performance-optimizer, migration-helper, phase-skipping, estimation, documentation, nativewind-component-generator, qa-expert, dev-expert, design-expert, scalable-thinking
+**Expert Skills:** typescript-expert, react-expert, vue-expert, nextjs-expert, nodejs-expert, python-expert, laravel-expert, go-expert, flutter-expert, angular-expert, react-native-expert
 
-**📚 See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
+**See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
 
 ---
 
-### 🔄 9-Phase Workflow
+### 9-Phase Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Phase 1: Understand 🎯    →  "What are we building?"       │
-│  Phase 2: Design 🏗️        →  "How will we build it?"       │
-│  Phase 3: UI Breakdown 🎨  →  "What does it look like?"     │
-│  Phase 4: Plan Tests 🧪    →  "How will we test it?"        │
+│  Phase 1: Understand    →  "What are we building?"          │
+│  Phase 2: Design        →  "How will we build it?"          │
+│  Phase 3: UI Breakdown  →  "What does it look like?"        │
+│  Phase 4: Plan Tests    →  "How will we test it?"           │
 ├─────────────────────────────────────────────────────────────┤
-│  Phase 5a: Write Tests 🔴  →  TDD RED - Tests must FAIL     │
-│  Phase 5b: Build 🟢        →  TDD GREEN - Tests must PASS   │
-│  Phase 5c: Polish ♻️       →  TDD REFACTOR - Stay green     │
+│  Phase 5a: Write Tests  →  TDD RED - Tests must FAIL        │
+│  Phase 5b: Build        →  TDD GREEN - Tests must PASS      │
+│  Phase 5c: Polish       →  TDD REFACTOR - Stay green        │
 ├─────────────────────────────────────────────────────────────┤
-│  Phase 6: Review 👀        →  Multi-agent code review       │
-│  Phase 7: Verify ✅        →  QA validation                 │
-│  Phase 8: Document 📚      →  Auto-generate docs            │
-│  Phase 9: Share 🔔         →  Team notification             │
+│  Phase 6: Review        →  Multi-agent code review          │
+│  Phase 7: Verify        →  QA validation                    │
+│  Phase 8: Document      →  Auto-generate docs               │
+│  Phase 9: Share         →  Team notification                │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -243,7 +255,7 @@ Auto-invokes:
 
 ---
 
-### 🧪 TDD Enforcement
+### TDD Enforcement
 
 TDD is **non-negotiable** in Aura Frog:
 
@@ -256,19 +268,19 @@ TDD is **non-negotiable** in Aura Frog:
    FAIL           PASS            PASS
 ```
 
-- ❌ Cannot implement without tests
-- ❌ Cannot proceed if tests don't fail (RED)
-- ❌ Cannot proceed if tests don't pass (GREEN)
-- ❌ Cannot proceed if coverage below 80%
+- Cannot implement without tests
+- Cannot proceed if tests don't fail (RED)
+- Cannot proceed if tests don't pass (GREEN)
+- Cannot proceed if coverage below 80%
 
 ---
 
-### 📏 37 Quality Rules
+### 39 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 
 <details>
-<summary><b>System & Session Rules (6)</b></summary>
+<summary><b>System & Session Rules (8)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -278,11 +290,13 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `priority-hierarchy` | Config priority order |
 | `dual-file-architecture` | Plugin + project structure |
 | `token-time-awareness` | Monitor token usage |
+| `project-linting-precedence` | Merge project + Aura Frog rules |
+| `codebase-consistency` | Learn patterns before writing code |
 
 </details>
 
 <details>
-<summary><b>Code Quality Rules (10)</b></summary>
+<summary><b>Code Quality Rules (9)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -294,21 +308,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `code-quality` | TypeScript strict, no any |
 | `naming-conventions` | Consistent naming |
 | `smart-commenting` | Why, not what |
-| `modern-javascript` | ES6+ syntax required |
 | `prefer-established-libraries` | Use lodash/es-toolkit over custom utils |
-
-</details>
-
-<details>
-<summary><b>Architecture Rules (5)</b></summary>
-
-| Rule | Purpose |
-|------|---------|
-| `api-design-rules` | RESTful conventions |
-| `state-management` | React/Vue state patterns |
-| `dependency-management` | Version pinning, audits |
-| `performance-rules` | Optimization guidelines |
-| `theme-consistency` | Design system adherence |
 
 </details>
 
@@ -330,40 +330,11 @@ Aura Frog enforces consistent quality through comprehensive rules:
 
 </details>
 
-<details>
-<summary><b>Security Rules (1)</b></summary>
-
-| Rule | Purpose |
-|------|---------|
-| `sast-security-scanning` | OWASP Top 10, SAST scanning, secrets detection |
-
-</details>
-
-<details>
-<summary><b>Documentation Rules (1)</b></summary>
-
-| Rule | Purpose |
-|------|---------|
-| `diagram-requirements` | Mermaid diagrams for complex features |
-
-</details>
-
-<details>
-<summary><b>Accessibility & UI Rules (3)</b></summary>
-
-| Rule | Purpose |
-|------|---------|
-| `accessibility-rules` | WCAG compliance, ARIA |
-| `correct-file-extensions` | Proper file naming |
-| `direct-hook-access` | Lifecycle hooks |
-
-</details>
-
-**📚 See:** [aura-frog/rules/](aura-frog/rules/) for all rule definitions
+**See:** [aura-frog/rules/](aura-frog/rules/) for all rule definitions
 
 ---
 
-## 🔄 Workflow Modes
+## Workflow Modes
 
 ### Full 9-Phase Workflow
 
@@ -372,23 +343,22 @@ workflow:start "Your complex task"
 ```
 
 **Best for:** New features, complex changes, production code
-**Time:** 2-4 hours | **Quality:** Maximum ✅
+**Quality:** Maximum
 
 ### Lightweight Commands
 
 ```bash
-bugfix:quick "Fix login button"    # 30 min
-refactor "src/utils/api.ts"        # 1 hour
-planning "new feature"             # 30 min
-document "API endpoints"           # 30 min
+bugfix:quick "Fix login button"    # Fast TDD bug fix
+refactor "src/utils/api.ts"        # Code refactoring
+planning "new feature"             # Create plan
+document "API endpoints"           # Generate docs
 ```
 
 **Best for:** Small bugs, documentation, simple refactors
-**Time:** 30 min - 1 hour | **Quality:** Good ✅
 
 ---
 
-## 📋 Commands Reference
+## Commands Reference
 
 <details>
 <summary><b>Workflow Commands</b></summary>
@@ -442,34 +412,46 @@ document "API endpoints"           # 30 min
 
 </details>
 
-**📚 See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 70+ commands
+**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 70+ commands
 
 ---
 
-## 🔗 Integrations
+## MCP Integrations
 
-Aura Frog includes native Bash script integrations:
+Aura Frog bundles 6 MCP servers that auto-invoke based on context:
 
-| Integration | Purpose | Auto-Trigger |
-|-------------|---------|--------------|
-| **JIRA** | Fetch tickets, update status | `PROJ-1234` in message |
-| **Figma** | Extract designs, components | Figma URL in message |
-| **Slack** | Send notifications | Phase 9 completion |
-| **Confluence** | Publish documentation | Phase 8 completion |
+| MCP | Purpose | Setup Required |
+|-----|---------|----------------|
+| **context7** | Library docs (React, MUI, Tailwind) | None (public) |
+| **playwright** | E2E browser testing | `npx playwright install` |
+| **vitest** | Unit test execution | Project with vitest |
+| **atlassian** | JIRA + Confluence | `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` |
+| **figma** | Design extraction | `FIGMA_API_TOKEN` |
+| **slack** | Team notifications | `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` |
+
+### Environment Setup
+
+Copy `.envrc.template` and set your tokens:
 
 ```bash
-# Auto-fetch JIRA ticket requirements
-workflow:start "Implement PROJ-1234"
+# Atlassian (JIRA + Confluence)
+export JIRA_URL="https://company.atlassian.net"
+export JIRA_EMAIL="your-email@company.com"
+export JIRA_API_TOKEN="your-api-token"
 
-# Auto-fetch Figma design
-workflow:start "Build https://figma.com/file/ABC123/Design"
+# Figma
+export FIGMA_API_TOKEN="your-figma-token"
+
+# Slack
+export SLACK_BOT_TOKEN="xoxb-your-bot-token"
+export SLACK_CHANNEL_ID="C0123456789"
 ```
 
-**📚 Setup:** [aura-frog/docs/INTEGRATION_SETUP_GUIDE.md](aura-frog/docs/INTEGRATION_SETUP_GUIDE.md)
+**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for complete setup and custom MCP creation
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Getting Started
 
@@ -485,10 +467,9 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 |----------|-------------|
 | [aura-frog/CLAUDE.md](aura-frog/CLAUDE.md) | AI instructions (for Claude) |
 | [aura-frog/docs/phases/](aura-frog/docs/phases/) | 9 detailed phase guides |
-| [aura-frog/docs/RULES_COMBINATION.md](aura-frog/docs/RULES_COMBINATION.md) | How rules are combined |
+| [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) | MCP servers guide |
 | [aura-frog/skills/README.md](aura-frog/skills/README.md) | Skills system guide |
 | [aura-frog/docs/WORKFLOW_DIAGRAMS.md](aura-frog/docs/WORKFLOW_DIAGRAMS.md) | 10 visual workflow diagrams |
-| [aura-frog/docs/MULTI_SESSION_ARCHITECTURE.md](aura-frog/docs/MULTI_SESSION_ARCHITECTURE.md) | Token optimization & session handoff |
 
 ### Reference
 
@@ -500,23 +481,24 @@ workflow:start "Build https://figma.com/file/ABC123/Design"
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
-│   ├── agents/                      # 24 specialized agents
-│   ├── skills/                      # 26+ skills (14 auto + 12 reference)
+│   ├── .mcp.json                    # Bundled MCP servers config
+│   ├── agents/                      # 14 specialized agents
+│   ├── skills/                      # 35 skills (22 auto + 13 reference)
 │   ├── commands/                    # 70+ workflow commands
-│   ├── rules/                       # 38 quality rules
+│   ├── rules/                       # 39 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
+│   │   ├── MCP_GUIDE.md             # MCP setup & custom servers
 │   │   └── WORKFLOW_DIAGRAMS.md     # 10 Mermaid diagrams
 │   ├── hooks/                       # Lifecycle hooks
-│   ├── scripts/                     # Integration scripts
+│   ├── scripts/                     # Utility scripts
 │   └── templates/                   # Document templates
 ├── assets/                          # Logo and images
-├── scripts/                         # Development scripts
 └── README.md                        # This file
 ```
 
@@ -530,29 +512,30 @@ Your project conventions always win over Aura Frog defaults.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Here's how you can help:
 
 | Priority | Area | Description |
 |----------|------|-------------|
-| 🔴 High | Agents | Add new specialized agents |
-| 🔴 High | Skills | Create new auto-invoking skills |
-| 🟡 Medium | Commands | Add workflow commands |
-| 🟡 Medium | Docs | Improve documentation |
-| 🟢 Low | Templates | Add document templates |
+| High | MCP | Add new MCP server integrations |
+| High | Agents | Add new specialized agents |
+| High | Skills | Create new auto-invoking skills |
+| Medium | Commands | Add workflow commands |
+| Medium | Docs | Improve documentation |
+| Low | Templates | Add document templates |
 
 Submit issues or pull requests to [GitHub](https://github.com/nguyenthienthanh/aura-frog)
 
 ---
 
-## 📄 License
+## License
 
 MIT License — See [LICENSE](LICENSE) for details
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **[Claude Code](https://claude.ai)** — AI-powered development platform
 - **[duongdev/ccpm](https://github.com/duongdev/ccpm)** — Original inspiration
@@ -562,12 +545,12 @@ MIT License — See [LICENSE](LICENSE) for details
 
 <div align="center">
 
-**Code with main character energy! 🐸✨**
+**Code with main character energy!**
 
 [Get Started](aura-frog/GET_STARTED.md) • [Documentation](aura-frog/docs/) • [Report Issue](https://github.com/nguyenthienthanh/aura-frog/issues)
 
 ---
 
-*Built with ❤️ by [@nguyenthienthanh](https://github.com/nguyenthienthanh)*
+*Built with love by [@nguyenthienthanh](https://github.com/nguyenthienthanh)*
 
 </div>
