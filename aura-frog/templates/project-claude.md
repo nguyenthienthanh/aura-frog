@@ -10,10 +10,13 @@
 
 **Read and follow:** `~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md`
 
-This plugin provides rules and skills that auto-load. Key files:
-- `rules/agent-identification-banner.md` - Banner format
-- `rules/execution-rules.md` - Always/Never constraints
-- `skills/` - Auto-invoking behaviors
+This plugin provides rules and skills that auto-load:
+- **Banner:** Follow `rules/agent-identification-banner.md` (includes MCP display)
+- **Execution:** Follow `rules/execution-rules.md`
+- **Skills:** Auto-invoke from `skills/`
+- **MCP:** Use bundled servers from `.mcp.json`
+
+**Important:** Banner format is defined in the plugin. Do NOT duplicate here.
 
 ---
 
@@ -39,30 +42,20 @@ context_files[4]{file,purpose}:
 
 ---
 
-## Integrations
+## MCP Integrations
 
-### JIRA
+Bundled MCP servers auto-invoke based on context:
 
-When ticket ID detected (e.g., `PROJ-1234`):
-```bash
-bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/jira-fetch.sh PROJ-1234
-```
+| MCP | Triggers |
+|-----|----------|
+| **context7** | Library names (React, MUI, Tailwind) |
+| **atlassian** | Ticket IDs (PROJ-123) |
+| **figma** | Figma URLs |
+| **playwright** | E2E test requests |
+| **vitest** | Unit test requests |
+| **slack** | Phase 9 notifications |
 
-### Confluence
-
-When Confluence URL or docs request detected:
-```bash
-bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/confluence-operations.sh fetch|search|create|update
-```
-
-### Figma
-
-When Figma URL detected:
-```bash
-bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/figma-fetch.sh "FIGMA_URL"
-```
-
-**See:** `docs/INTEGRATION_SETUP_GUIDE.md` for env var setup.
+**Setup:** Copy `.envrc.template` and set tokens. See `docs/MCP_GUIDE.md`.
 
 ---
 
