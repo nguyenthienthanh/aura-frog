@@ -41,17 +41,89 @@ NC='\033[0m'
 # Supported MCP types
 SUPPORTED_TYPES=("jira" "figma" "confluence" "slack" "context7")
 
-# Get file extension based on content type
-get_extension() {
-    local mcp_type="$1"
-    local content="$2"
+# Convert JIRA JSON to TOON format
+json_to_toon() {
+    local json="$1"
+    local mcp_type="$2"
 
-    # Check if content looks like JSON
-    if [[ "$content" =~ ^\s*[\{\[] ]]; then
-        echo "json"
-    else
-        echo "md"
-    fi
+    case "$mcp_type" in
+        jira)
+            # Extract JIRA fields using jq
+            if command -v jq &> /dev/null; then
+                local key=$(echo "$json" | jq -r '.key // "UNKNOWN"')
+                local summary=$(echo "$json" | jq -r '.fields.summary // "No summary"')
+                local status=$(echo "$json" | jq -r '.fields.status.name // "Unknown"')
+                local priority=$(echo "$json" | jq -r '.fields.priority.name // "None"')
+                local assignee=$(echo "$json" | jq -r '.fields.assignee.displayName // "Unassigned"')
+                local reporter=$(echo "$json" | jq -r '.fields.reporter.displayName // "Unknown"')
+                local created=$(echo "$json" | jq -r '.fields.created // ""' | cut -d'T' -f1)
+                local updated=$(echo "$json" | jq -r '.fields.updated // ""' | cut -d'T' -f1)
+                local issuetype=$(echo "$json" | jq -r '.fields.issuetype.name // "Task"')
+                local description=$(echo "$json" | jq -r '.fields.description.content[0].content[0].text // .fields.description // "No description"' 2>/dev/null | head -c 500)
+                local labels=$(echo "$json" | jq -r '.fields.labels | join(", ") // ""')
+                local components=$(echo "$json" | jq -r '.fields.components | map(.name) | join(", ") // ""')
+
+                cat <<EOF
+# ${key}: ${summary}
+
+\`\`\`toon
+ticket[1]{key,summary,type,status,priority}:
+  ${key},${summary},${issuetype},${status},${priority}
+
+metadata[1]{assignee,reporter,created,updated}:
+  ${assignee},${reporter},${created},${updated}
+
+labels: ${labels:-none}
+components: ${components:-none}
+\`\`\`
+
+## Description
+
+${description}
+
+---
+**Fetched:** $(date '+%Y-%m-%d %H:%M:%S')
+EOF
+            else
+                echo "# JIRA Ticket (raw)"
+                echo ""
+                echo "\`\`\`json"
+                echo "$json" | head -100
+                echo "\`\`\`"
+            fi
+            ;;
+        figma)
+            # Extract Figma fields
+            if command -v jq &> /dev/null; then
+                local name=$(echo "$json" | jq -r '.name // "Untitled"')
+                local lastModified=$(echo "$json" | jq -r '.lastModified // ""' | cut -d'T' -f1)
+                local version=$(echo "$json" | jq -r '.version // "unknown"')
+
+                cat <<EOF
+# Figma: ${name}
+
+\`\`\`toon
+design[1]{name,version,lastModified}:
+  ${name},${version},${lastModified}
+\`\`\`
+
+---
+**Fetched:** $(date '+%Y-%m-%d %H:%M:%S')
+EOF
+            else
+                echo "$json"
+            fi
+            ;;
+        *)
+            # Default: just output as-is or convert to markdown
+            echo "$json"
+            ;;
+    esac
+}
+
+# Always use .toon extension for structured data
+get_extension() {
+    echo "toon"
 }
 
 # Validate MCP type
@@ -109,6 +181,11 @@ save_mcp_response() {
         exit 1
     fi
 
+    # Convert JSON to TOON format if content looks like JSON
+    if [[ "$content" =~ ^\s*\{ ]]; then
+        content=$(json_to_toon "$content" "$mcp_type")
+    fi
+
     # Create MCP-specific logs directory
     local mcp_logs_dir="${LOGS_DIR}/${mcp_type}"
     mkdir -p "$mcp_logs_dir"
@@ -117,7 +194,7 @@ save_mcp_response() {
     local safe_id=$(sanitize_filename "$identifier")
 
     # Determine file extension
-    local ext=$(get_extension "$mcp_type" "$content")
+    local ext=$(get_extension)
 
     # Generate filename with timestamp
     local timestamp=$(date +%Y%m%d-%H%M%S)

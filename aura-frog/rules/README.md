@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
 **Version:** 1.3.1
-**Total Rules:** 39
+**Total Rules:** 40
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,8 +9,9 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[39]{category,rule,priority,purpose}:
+rules[40]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
+  system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
   system,env-loading,critical,Load .envrc at session start
   system,execution-rules,critical,ALWAYS/NEVER execution rules
