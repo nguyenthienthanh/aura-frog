@@ -101,7 +101,7 @@ resources[10]{name,location}:
   Agents (14),agents/
   Commands (70+),commands/
   Rules (39),rules/
-  Skills (35),skills/
+  Skills (33),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Phases (9),docs/phases/

@@ -1,1 +1,0 @@
-../../../scripts/jira-fetch.sh
