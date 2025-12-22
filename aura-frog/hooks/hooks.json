@@ -44,28 +44,7 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE '[A-Z]{2,10}-[0-9]+'; then echo '🎫 JIRA ticket detected - MCP atlassian server available' >&2; fi"
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -q 'figma.com/file'; then echo '🎨 Figma link detected - MCP figma server available' >&2; fi"
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'atlassian.net/wiki|confluence'; then echo '📚 Confluence link detected - MCP atlassian server available' >&2; fi"
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_USER_INPUT\" | grep -qE 'github.com/.*/pull/[0-9]+|github.com/.*/issues/[0-9]+'; then echo '🔗 GitHub PR/Issue detected' >&2; fi"
-          }
-        ]
-      }
-    ],
+    "UserPromptSubmit": [],
     "Stop": [
       {
         "hooks": [
