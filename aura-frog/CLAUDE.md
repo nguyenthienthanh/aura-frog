@@ -9,11 +9,17 @@
 ## Session Start (MANDATORY)
 
 ```toon
-session_start[4]{step,action,file}:
+session_start[5]{step,action,file}:
   1,Show agent banner,rules/agent-identification-banner.md
   2,Load .envrc,rules/env-loading.md
   3,Detect agent,skills/agent-detector/SKILL.md
   4,Load project context,skills/project-context-loader/SKILL.md
+  5,Verify MCP servers,commands/mcp/status.md
+```
+
+**MCP Verification:** Show loaded MCP servers in first response:
+```
+🔌 MCP: context7 ✓ | atlassian ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
 ```
 
 ---
