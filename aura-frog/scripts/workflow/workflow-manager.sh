@@ -300,8 +300,7 @@ EXAMPLES:
 
 LOCATION:
     Workflows: logs/workflows/
-    Contexts:  logs/contexts/
-    Deliverables: logs/contexts/{id}/deliverables/
+    Deliverables: logs/workflows/{id}/deliverables/
     Active:    active-workflow.txt
 EOF
 }

@@ -167,10 +167,10 @@ save_deliverable() {
         filename="${filename}.md"
     fi
 
-    # Get phase directory
+    # Get phase directory (store in workflows, not contexts)
     local phase_dir_name=$(get_phase_dir_name "$phase")
     local phase_name=$(get_phase_name "$phase")
-    local deliverables_dir="${CONTEXTS_DIR}/${workflow_id}/deliverables/${phase_dir_name}"
+    local deliverables_dir="${WORKFLOWS_DIR}/${workflow_id}/deliverables/${phase_dir_name}"
 
     # Create directory if needed
     mkdir -p "$deliverables_dir"
@@ -210,9 +210,9 @@ list_deliverables() {
         exit 1
     fi
 
-    local contexts_dir="${CONTEXTS_DIR}/${workflow_id}/deliverables"
+    local deliverables_dir="${WORKFLOWS_DIR}/${workflow_id}/deliverables"
 
-    if [[ ! -d "$contexts_dir" ]]; then
+    if [[ ! -d "$deliverables_dir" ]]; then
         echo -e "${YELLOW}No deliverables found${NC}"
         return 0
     fi
@@ -224,7 +224,7 @@ list_deliverables() {
         for i in {1..9}; do
             local phase_dir_name=$(get_phase_dir_name "$i")
             local phase_name=$(get_phase_name "$i")
-            local phase_dir="${contexts_dir}/${phase_dir_name}"
+            local phase_dir="${deliverables_dir}/${phase_dir_name}"
 
             if [[ -d "$phase_dir" ]] && [[ -n "$(ls -A "$phase_dir" 2>/dev/null)" ]]; then
                 echo -e "${GREEN}Phase $i: $phase_name${NC}"
@@ -241,7 +241,7 @@ list_deliverables() {
     else
         local phase_dir_name=$(get_phase_dir_name "$phase")
         local phase_name=$(get_phase_name "$phase")
-        local phase_dir="${contexts_dir}/${phase_dir_name}"
+        local phase_dir="${deliverables_dir}/${phase_dir_name}"
 
         echo -e "${GREEN}Phase $phase: $phase_name${NC}"
 
@@ -302,7 +302,7 @@ EXAMPLES:
     bash $0 list 1
 
 OUTPUT LOCATION:
-    .claude/logs/contexts/{workflow-id}/deliverables/{phase}/
+    .claude/logs/workflows/{workflow-id}/deliverables/{phase}/
 
 EOF
 }
