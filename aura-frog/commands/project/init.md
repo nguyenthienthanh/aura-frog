@@ -80,15 +80,41 @@ integrations:
   figma: {if FIGMA_* env vars present}
 ```
 
-### 4. Create CLAUDE.md
+### 4. Create/Update CLAUDE.md
 
-```markdown
-# {Project Name}
+**Use sectioned template with auto-update support:**
 
-**Load Aura Frog:** `~/.claude/plugins/.../CLAUDE.md`
+```bash
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PROJECT_ROOT=$(pwd)
+PROJECT_NAME="[DETECTED_PROJECT_NAME]"
+TECH_STACK="[DETECTED_TECH_STACK]"
+PRIMARY_AGENT="[DETECTED_PRIMARY_AGENT]"
+PROJECT_TYPE="[DETECTED_TYPE]"
+CURRENT_DATE=$(date +%Y-%m-%d)
 
-**Project Context:** `.claude/project-contexts/{project}/`
+if [ ! -f "$PROJECT_ROOT/.claude/CLAUDE.md" ]; then
+  # Create from template
+  cp "$PLUGIN_DIR/templates/project-claude.md" "$PROJECT_ROOT/.claude/CLAUDE.md"
+
+  # Replace placeholders
+  sed -i '' "s/\[PROJECT_NAME\]/$PROJECT_NAME/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[TECH_STACK\]/$TECH_STACK/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[PRIMARY_AGENT\]/$PRIMARY_AGENT/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[PROJECT_TYPE\]/$PROJECT_TYPE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[DATE\]/$CURRENT_DATE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+
+  echo "✅ Created .claude/CLAUDE.md"
+else
+  # Update AURA-FROG section, preserve USER-CUSTOM
+  bash "$PLUGIN_DIR/scripts/claude-md-update.sh" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  echo "✅ Updated .claude/CLAUDE.md (AURA-FROG section refreshed)"
+fi
 ```
+
+**Template sections:**
+- `<!-- AURA-FROG:START -->` ... `<!-- AURA-FROG:END -->` - Auto-updated by plugin
+- `<!-- USER-CUSTOM:START -->` ... `<!-- USER-CUSTOM:END -->` - Preserved during updates
 
 ### 5. Merge Plugin Settings
 

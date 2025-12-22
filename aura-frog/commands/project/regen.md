@@ -107,69 +107,49 @@ Choice [1]:
 - Update test examples
 - Update API examples
 
-### 5. Create/Update `.claude/CLAUDE.md` (CRITICAL)
+### 5. Update `.claude/CLAUDE.md` (CRITICAL)
 
 **⚠️ CRITICAL:** This file is required for Claude Code to load Aura Frog instructions!
 
-**Check if `.claude/CLAUDE.md` exists:**
+**Use the auto-update script to refresh AURA-FROG section:**
 
-**If NOT exists:**
 ```bash
-# Get plugin directory and project info
 PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
 PROJECT_ROOT=$(pwd)
 PROJECT_NAME="[DETECTED_PROJECT_NAME]"
 TECH_STACK="[DETECTED_TECH_STACK]"
 PRIMARY_AGENT="[DETECTED_PRIMARY_AGENT]"
+PROJECT_TYPE="[DETECTED_TYPE]"
 CURRENT_DATE=$(date +%Y-%m-%d)
 
-# Copy template and replace placeholders
-cp "$PLUGIN_DIR/templates/project-claude.md" "$PROJECT_ROOT/.claude/CLAUDE.md"
+if [ ! -f "$PROJECT_ROOT/.claude/CLAUDE.md" ]; then
+  # Create from template
+  cp "$PLUGIN_DIR/templates/project-claude.md" "$PROJECT_ROOT/.claude/CLAUDE.md"
 
-# Replace placeholders
-sed -i '' "s/\[PROJECT_NAME\]/$PROJECT_NAME/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
-sed -i '' "s/\[TECH_STACK\]/$TECH_STACK/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
-sed -i '' "s/\[PRIMARY_AGENT\]/$PRIMARY_AGENT/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
-sed -i '' "s/\[PROJECT_TYPE\]/$PROJECT_TYPE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
-sed -i '' "s/\[DATE\]/$CURRENT_DATE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  # Replace placeholders
+  sed -i '' "s/\[PROJECT_NAME\]/$PROJECT_NAME/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[TECH_STACK\]/$TECH_STACK/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[PRIMARY_AGENT\]/$PRIMARY_AGENT/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[PROJECT_TYPE\]/$PROJECT_TYPE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  sed -i '' "s/\[DATE\]/$CURRENT_DATE/g" "$PROJECT_ROOT/.claude/CLAUDE.md"
 
-echo "✅ Created .claude/CLAUDE.md"
-```
-
-**If EXISTS but missing Aura Frog section:**
-```bash
-# Check if Aura Frog section already exists
-if ! grep -q "AURA FROG" "$PROJECT_ROOT/.claude/CLAUDE.md"; then
-  # Prepend Aura Frog section to existing CLAUDE.md
-  TEMP_FILE=$(mktemp)
-
-  # Get template and replace placeholders
-  sed "s/\[PROJECT_NAME\]/$PROJECT_NAME/g; s/\[TECH_STACK\]/$TECH_STACK/g; s/\[PRIMARY_AGENT\]/$PRIMARY_AGENT/g; s/\[PROJECT_TYPE\]/$PROJECT_TYPE/g; s/\[DATE\]/$(date +%Y-%m-%d)/g" \
-    "$PLUGIN_DIR/templates/project-claude.md" > "$TEMP_FILE"
-
-  # Add separator and existing content
-  echo "" >> "$TEMP_FILE"
-  echo "---" >> "$TEMP_FILE"
-  echo "" >> "$TEMP_FILE"
-  echo "# Existing Project Instructions" >> "$TEMP_FILE"
-  echo "" >> "$TEMP_FILE"
-  cat "$PROJECT_ROOT/.claude/CLAUDE.md" >> "$TEMP_FILE"
-
-  # Replace original
-  mv "$TEMP_FILE" "$PROJECT_ROOT/.claude/CLAUDE.md"
-
-  echo "✅ Updated .claude/CLAUDE.md (prepended Aura Frog instructions)"
+  echo "✅ Created .claude/CLAUDE.md"
 else
-  echo "✅ .claude/CLAUDE.md already has Aura Frog instructions"
+  # Update AURA-FROG section, preserve USER-CUSTOM
+  bash "$PLUGIN_DIR/scripts/claude-md-update.sh" "$PROJECT_ROOT/.claude/CLAUDE.md"
+  echo "✅ Updated .claude/CLAUDE.md (AURA-FROG section refreshed)"
 fi
 ```
 
+**Template sections:**
+- `<!-- AURA-FROG:START -->` ... `<!-- AURA-FROG:END -->` - Auto-updated by plugin
+- `<!-- USER-CUSTOM:START -->` ... `<!-- USER-CUSTOM:END -->` - Preserved during updates
+
 **Why This is Critical:**
 - ✅ Claude Code loads `.claude/CLAUDE.md` at session start (highest priority)
-- ✅ **Contains the agent banner format directly** (not just a reference!)
-- ✅ Includes agent selection table, phase display, and aura message guidelines
-- ✅ Contains token/time awareness rules
-- ✅ Points to plugin CLAUDE.md for full 70+ commands and 24 agents
+- ✅ References plugin for banner format and MCP display
+- ✅ User customizations preserved in USER-CUSTOM section
+- ✅ Auto-syncs with plugin updates via `project:regen`
 - ✅ Without it, Aura Frog won't activate!
 
 ### 6. Update ccpm-config.yaml (If Needed)

@@ -11,6 +11,12 @@ All notable changes to Aura Frog will be documented in this file.
 Streamlined the plugin by replacing custom integration scripts with bundled MCP servers and merging related agents.
 
 #### New Features
+- **MCP in Agent Banner** - Show which MCP servers are active (single or multiple)
+- **Sectioned CLAUDE.md Template** - Auto-update plugin sections, preserve user content:
+  - `<!-- AURA-FROG:START -->` / `<!-- AURA-FROG:END -->` - Plugin-managed
+  - `<!-- USER-CUSTOM:START -->` / `<!-- USER-CUSTOM:END -->` - User-preserved
+- **claude-md-update.sh Script** - Sync plugin sections without losing customizations
+- **project:init/regen Integration** - Automatically uses update script
 - **Bundled MCP Servers** - `.mcp.json` auto-configures:
   - `context7` - Library documentation (MUI, Tailwind, lodash, etc.)
   - `playwright` - Browser automation and E2E testing
@@ -30,8 +36,10 @@ Streamlined the plugin by replacing custom integration scripts with bundled MCP 
 - **Skills** - jira-integration, figma-integration, confluence-integration (replaced by MCP)
 - **Agents** - 10 individual backend/web/mobile agents (merged into 3)
 
-#### New Documentation
+#### New Files
 - **docs/MCP_GUIDE.md** - Complete guide for using and creating MCP servers
+- **scripts/claude-md-update.sh** - Update AURA-FROG sections in project CLAUDE.md
+- **templates/project-claude.md** - Sectioned template with auto-update markers
 
 #### Updated Documentation
 - CLAUDE.md - Added MCP servers section with auto-invocation examples
