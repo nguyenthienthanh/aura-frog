@@ -246,6 +246,22 @@ archive_workflow() {
     fi
 }
 
+# Save deliverable (wrapper)
+save_deliverable() {
+    local phase="$1"
+    local filename="$2"
+    shift 2
+    local content="$@"
+
+    bash "${SCRIPT_DIR}/save-deliverable.sh" save "$phase" "$filename" "$content"
+}
+
+# List deliverables (wrapper)
+list_deliverables() {
+    local phase="${1:-all}"
+    bash "${SCRIPT_DIR}/save-deliverable.sh" list "$phase"
+}
+
 # Show usage
 show_usage() {
     cat <<EOF
@@ -255,30 +271,37 @@ USAGE:
     bash $0 <command> [arguments]
 
 COMMANDS:
-    list                    List all workflows
-    active                  Show active workflow
-    switch <workflow-id>    Switch to workflow
-    load <workflow-id>      Load workflow state
-    delete <workflow-id>    Delete workflow
-    archive <workflow-id>   Archive workflow
-    help                    Show this help
+    list                           List all workflows
+    active                         Show active workflow
+    switch <workflow-id>           Switch to workflow
+    load <workflow-id>             Load workflow state
+    delete <workflow-id>           Delete workflow
+    archive <workflow-id>          Archive workflow
+    save <phase> <file> <content>  Save deliverable (markdown)
+    deliverables [phase]           List deliverables
+    help                           Show this help
 
 EXAMPLES:
     # List all workflows
     bash $0 list
-    
+
     # Switch workflow
     bash $0 switch add-auth-20251124-120000
-    
-    # Load workflow state
-    bash $0 load add-auth-20251124-120000
-    
+
+    # Save a deliverable
+    bash $0 save 1 requirements.md "# Requirements\n- Feature 1"
+
+    # List deliverables
+    bash $0 deliverables
+    bash $0 deliverables 1
+
     # Archive completed workflow
     bash $0 archive add-auth-20251124-120000
 
 LOCATION:
     Workflows: logs/workflows/
     Contexts:  logs/contexts/
+    Deliverables: logs/contexts/{id}/deliverables/
     Active:    active-workflow.txt
 EOF
 }
@@ -329,6 +352,17 @@ main() {
                 exit 1
             fi
             archive_workflow "$2"
+            ;;
+        save)
+            if [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
+                echo -e "${RED}Error: phase and filename required${NC}"
+                echo "Usage: $0 save <phase> <filename> <content|--file|--stdin>"
+                exit 1
+            fi
+            save_deliverable "$2" "$3" "${4:-}" "${5:-}"
+            ;;
+        deliverables)
+            list_deliverables "${2:-all}"
             ;;
         help|--help|-h)
             show_usage
