@@ -4,6 +4,37 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.3.1] - 2025-12-22
+
+### Documentation Cleanup
+
+Removed obsolete documentation that referenced deleted integration scripts.
+
+#### Removed Files
+- **docs/BASH_INTEGRATIONS_REFERENCE.md** - Obsolete (scripts replaced by MCP)
+- **docs/INTEGRATION_SETUP_GUIDE.md** - Obsolete (1,419 lines, now use MCP_GUIDE.md)
+- **docs/JIRA_WEBFETCH_SOLUTION.md** - Obsolete (MCP handles JIRA)
+- **docs/PLUGIN_TROUBLESHOOTING.md** - Obsolete (moved to PLUGIN_INSTALLATION.md)
+- **docs/guides/JIRA_INTEGRATION.md** - Obsolete (MCP handles JIRA)
+- **docs/AGENT_IDENTIFICATION.md** - Duplicate of rules/agent-identification-banner.md
+- **docs/APPROVAL_GATES.md** - Duplicate of rules/approval-gates.md
+- **skills/jira-integration/** - Empty directory (dangling symlinks)
+- **skills/figma-integration/** - Empty directory (dangling symlinks)
+
+#### Updated Files
+- **docs/PLUGIN_INSTALLATION.md** - Troubleshooting now references MCP
+- **CONTRIBUTING.md** - Testing section uses `mcp:status` instead of jira-fetch.sh
+- **hooks/hooks.json** - Removed redundant UserPromptSubmit hooks
+- **commands/mcp/status.md** - New command to verify MCP server loading
+- **CLAUDE.md** - Session start now includes MCP verification (step 5)
+
+#### Stats
+- **Lines removed:** ~3,500+
+- **Skills:** 35 → 33 (removed empty integration dirs)
+- **Docs:** Consolidated troubleshooting into PLUGIN_INSTALLATION.md
+
+---
+
 ## [1.3.0] - 2025-12-19
 
 ### Major Cleanup - MCP Integration & Agent Consolidation
