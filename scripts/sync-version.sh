@@ -1,8 +1,15 @@
 #!/bin/bash
 # Aura Frog Version Sync Script
 # Purpose: Synchronize version numbers across all configuration files
-# Usage: ./scripts/sync-version.sh [VERSION]
-# Example: ./scripts/sync-version.sh 1.1.0
+#
+# SINGLE SOURCE OF TRUTH: aura-frog/.claude-plugin/plugin.json
+#
+# Usage:
+#   ./scripts/sync-version.sh           # Sync all files to current version
+#   ./scripts/sync-version.sh 1.4.0     # Bump to new version and sync
+#   ./scripts/sync-version.sh patch     # Auto-increment patch (1.3.2 -> 1.3.3)
+#   ./scripts/sync-version.sh minor     # Auto-increment minor (1.3.2 -> 1.4.0)
+#   ./scripts/sync-version.sh major     # Auto-increment major (1.3.2 -> 2.0.0)
 
 set -e
 
@@ -16,19 +23,36 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-CCPM_DIR="$PROJECT_ROOT/aura-frog"
+PLUGIN_DIR="$PROJECT_ROOT/aura-frog"
+
+# Single source of truth
+SOURCE_FILE="$PLUGIN_DIR/.claude-plugin/plugin.json"
 
 # Version pattern
-VERSION_PATTERN="[0-9]+\.[0-9]+\.[0-9]+"
+VERSION_PATTERN="[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+)?"
 
-# Files to update
-declare -a FILES=(
-  "$CCPM_DIR/CLAUDE.md"
-  "$CCPM_DIR/README.md"
-  "$CCPM_DIR/ccpm-config.yaml"
-  "$CCPM_DIR/GET_STARTED.md"
-  "$CCPM_DIR/TODO.md"
+# All files that need version updates
+declare -a JSON_FILES=(
+  "$PLUGIN_DIR/.claude-plugin/plugin.json"
+  "$PROJECT_ROOT/.claude-plugin/marketplace.json"
+)
+
+declare -a MD_FILES=(
+  "$PLUGIN_DIR/CLAUDE.md"
+  "$PLUGIN_DIR/README.md"
+  "$PLUGIN_DIR/GET_STARTED.md"
+  "$PLUGIN_DIR/TODO.md"
+  "$PLUGIN_DIR/rules/README.md"
+  "$PLUGIN_DIR/skills/README.md"
+  "$PLUGIN_DIR/hooks/README.md"
+  "$PLUGIN_DIR/commands/README.md"
+  "$PLUGIN_DIR/docs/MCP_GUIDE.md"
+  "$PLUGIN_DIR/rules/agent-identification-banner.md"
   "$PROJECT_ROOT/README.md"
+)
+
+declare -a YAML_FILES=(
+  "$PLUGIN_DIR/ccpm-config.yaml"
 )
 
 print_header() {
@@ -55,13 +79,34 @@ print_warning() {
   echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
-# Get current version from CLAUDE.md
+# Get current version from plugin.json (single source of truth)
 get_current_version() {
-  if [ -f "$CCPM_DIR/CLAUDE.md" ]; then
-    grep -m 1 "Version:" "$CCPM_DIR/CLAUDE.md" | sed -E 's/.*Version:\*\* ([0-9]+\.[0-9]+\.[0-9]+(-[a-z]+)?).*/\1/'
+  if [ -f "$SOURCE_FILE" ]; then
+    grep -o '"version": *"[^"]*"' "$SOURCE_FILE" | head -1 | sed 's/"version": *"\([^"]*\)"/\1/'
   else
     echo "1.0.0"
   fi
+}
+
+# Calculate next version based on bump type
+calculate_next_version() {
+  local current=$1
+  local bump_type=$2
+
+  local major minor patch
+  IFS='.' read -r major minor patch <<< "${current%%-*}"  # Remove suffix like -beta
+
+  case "$bump_type" in
+    major)
+      echo "$((major + 1)).0.0"
+      ;;
+    minor)
+      echo "${major}.$((minor + 1)).0"
+      ;;
+    patch)
+      echo "${major}.${minor}.$((patch + 1))"
+      ;;
+  esac
 }
 
 # Validate version format
@@ -74,41 +119,77 @@ validate_version() {
   fi
 }
 
-# Update version in specific file
-update_file_version() {
+# Update JSON files
+update_json_version() {
   local file=$1
-  local old_version=$2
-  local new_version=$3
+  local new_version=$2
 
   if [ ! -f "$file" ]; then
     print_warning "File not found: $file (skipping)"
     return
   fi
 
-  # Backup file
   cp "$file" "$file.bak"
 
-  # Different patterns for different files
-  case "$file" in
-    *ccpm-config.yaml)
-      # Update YAML version field
-      sed -i '' "s/version: '[0-9.]*'/version: '$new_version'/" "$file"
-      sed -i '' "s/# Version: [0-9.-]*/# Version: $new_version/" "$file"
-      ;;
-    *.md)
-      # Update markdown version references
-      sed -i '' "s/\*\*Version:\*\* [0-9.-]*[a-z]*/\*\*Version:\*\* $new_version/" "$file"
-      sed -i '' "s/Version: [0-9.-]*[a-z]*/Version: $new_version/" "$file"
-      sed -i '' "s/v[0-9]\.[0-9]\.[0-9](-[a-z]*)?/v$new_version/g" "$file"
-      ;;
-  esac
+  # Update all "version": "x.x.x" patterns in JSON
+  sed -i '' "s/\"version\": *\"[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?\"/\"version\": \"$new_version\"/g" "$file"
 
-  # Check if file was actually modified
   if diff -q "$file" "$file.bak" > /dev/null; then
-    print_warning "No changes made to $(basename "$file")"
+    print_warning "No changes: $(basename "$file")"
     rm "$file.bak"
   else
-    print_success "Updated $(basename "$file")"
+    print_success "Updated: $(basename "$file")"
+    rm "$file.bak"
+  fi
+}
+
+# Update Markdown files
+update_md_version() {
+  local file=$1
+  local new_version=$2
+
+  if [ ! -f "$file" ]; then
+    print_warning "File not found: $file (skipping)"
+    return
+  fi
+
+  cp "$file" "$file.bak"
+
+  # Update various version patterns in markdown
+  sed -i '' "s/\*\*Version:\*\* [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*Version:\*\* $new_version/g" "$file"
+  sed -i '' "s/Version: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/Version: $new_version/g" "$file"
+  sed -i '' "s/v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/v$new_version/g" "$file"
+  sed -i '' "s/AURA FROG v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/AURA FROG v$new_version/g" "$file"
+
+  if diff -q "$file" "$file.bak" > /dev/null; then
+    print_warning "No changes: $(basename "$file")"
+    rm "$file.bak"
+  else
+    print_success "Updated: $(basename "$file")"
+    rm "$file.bak"
+  fi
+}
+
+# Update YAML files
+update_yaml_version() {
+  local file=$1
+  local new_version=$2
+
+  if [ ! -f "$file" ]; then
+    print_warning "File not found: $file (skipping)"
+    return
+  fi
+
+  cp "$file" "$file.bak"
+
+  sed -i '' "s/version: '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?'/version: '$new_version'/" "$file"
+  sed -i '' "s/# Version: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/# Version: $new_version/" "$file"
+
+  if diff -q "$file" "$file.bak" > /dev/null; then
+    print_warning "No changes: $(basename "$file")"
+    rm "$file.bak"
+  else
+    print_success "Updated: $(basename "$file")"
     rm "$file.bak"
   fi
 }
@@ -117,53 +198,83 @@ update_file_version() {
 main() {
   print_header
 
-  # Get target version
-  if [ -n "$1" ]; then
-    NEW_VERSION="$1"
-    print_info "Target version: $NEW_VERSION"
-  else
-    CURRENT_VERSION=$(get_current_version)
-    print_info "Current version: $CURRENT_VERSION"
-    echo ""
-    read -p "Enter new version (or press Enter to keep current): " NEW_VERSION
+  CURRENT_VERSION=$(get_current_version)
+  print_info "Current version: $CURRENT_VERSION (from plugin.json)"
 
-    if [ -z "$NEW_VERSION" ]; then
-      NEW_VERSION="$CURRENT_VERSION"
-      print_info "Keeping current version: $NEW_VERSION"
+  # Determine target version
+  if [ -n "$1" ]; then
+    case "$1" in
+      major|minor|patch)
+        NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$1")
+        print_info "Bump type: $1"
+        ;;
+      *)
+        NEW_VERSION="$1"
+        ;;
+    esac
+  else
+    echo ""
+    echo "Usage:"
+    echo "  ./scripts/sync-version.sh patch     # $CURRENT_VERSION -> $(calculate_next_version "$CURRENT_VERSION" "patch")"
+    echo "  ./scripts/sync-version.sh minor     # $CURRENT_VERSION -> $(calculate_next_version "$CURRENT_VERSION" "minor")"
+    echo "  ./scripts/sync-version.sh major     # $CURRENT_VERSION -> $(calculate_next_version "$CURRENT_VERSION" "major")"
+    echo "  ./scripts/sync-version.sh 1.4.0     # Set specific version"
+    echo ""
+    read -p "Enter version or bump type: " INPUT
+
+    if [ -z "$INPUT" ]; then
+      print_info "No version specified. Exiting."
+      exit 0
     fi
+
+    case "$INPUT" in
+      major|minor|patch)
+        NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$INPUT")
+        ;;
+      *)
+        NEW_VERSION="$INPUT"
+        ;;
+    esac
   fi
 
   # Validate version
   validate_version "$NEW_VERSION"
 
   echo ""
-  print_info "Updating version to: $NEW_VERSION"
+  print_info "Updating version: $CURRENT_VERSION -> $NEW_VERSION"
   echo ""
 
-  # Get old version for comparison
-  OLD_VERSION=$(get_current_version)
+  # Update JSON files
+  echo -e "${BLUE}JSON files:${NC}"
+  for file in "${JSON_FILES[@]}"; do
+    update_json_version "$file" "$NEW_VERSION"
+  done
 
-  # Update all files
-  for file in "${FILES[@]}"; do
-    update_file_version "$file" "$OLD_VERSION" "$NEW_VERSION"
+  # Update Markdown files
+  echo ""
+  echo -e "${BLUE}Markdown files:${NC}"
+  for file in "${MD_FILES[@]}"; do
+    update_md_version "$file" "$NEW_VERSION"
+  done
+
+  # Update YAML files
+  echo ""
+  echo -e "${BLUE}YAML files:${NC}"
+  for file in "${YAML_FILES[@]}"; do
+    update_yaml_version "$file" "$NEW_VERSION"
   done
 
   echo ""
-  print_success "Version sync complete!"
-  echo ""
-  print_info "Files updated:"
-  for file in "${FILES[@]}"; do
-    if [ -f "$file" ]; then
-      echo "  - $(basename "$file")"
-    fi
-  done
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  print_success "Version sync complete! $CURRENT_VERSION -> $NEW_VERSION"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
   echo ""
   print_info "Next steps:"
   echo "  1. Review changes: git diff"
-  echo "  2. Update CHANGELOG.md with new version"
-  echo "  3. Commit changes: git commit -am \"chore: Bump version to $NEW_VERSION\""
-  echo "  4. Tag release: git tag v$NEW_VERSION"
+  echo "  2. Update CHANGELOG.md with new version entry"
+  echo "  3. Commit: git commit -am \"chore: Bump version to $NEW_VERSION\""
+  echo "  4. Tag: git tag v$NEW_VERSION"
   echo ""
 }
 
