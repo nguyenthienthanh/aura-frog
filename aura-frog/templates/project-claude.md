@@ -6,6 +6,9 @@
 
 ---
 
+<!-- AURA-FROG:START - Do not edit this section manually -->
+<!-- This section is auto-updated by project:regen -->
+
 ## Load Aura Frog Plugin
 
 **Read and follow:** `~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md`
@@ -17,6 +20,25 @@ This plugin provides rules and skills that auto-load:
 - **MCP:** Use bundled servers from `.mcp.json`
 
 **Important:** Banner format is defined in the plugin. Do NOT duplicate here.
+
+---
+
+## MCP Integrations
+
+Bundled MCP servers auto-invoke based on context:
+
+| MCP | Triggers |
+|-----|----------|
+| **context7** | Library names (React, MUI, Tailwind) |
+| **atlassian** | Ticket IDs (PROJ-123) |
+| **figma** | Figma URLs |
+| **playwright** | E2E test requests |
+| **vitest** | Unit test requests |
+| **slack** | Phase 9 notifications |
+
+**Setup:** Copy `.envrc.template` and set tokens. See `docs/MCP_GUIDE.md`.
+
+<!-- AURA-FROG:END -->
 
 ---
 
@@ -42,20 +64,15 @@ context_files[4]{file,purpose}:
 
 ---
 
-## MCP Integrations
+<!-- USER-CUSTOM:START - Add your project-specific rules below -->
+<!-- This section is preserved during project:regen -->
 
-Bundled MCP servers auto-invoke based on context:
+## Project Rules
 
-| MCP | Triggers |
-|-----|----------|
-| **context7** | Library names (React, MUI, Tailwind) |
-| **atlassian** | Ticket IDs (PROJ-123) |
-| **figma** | Figma URLs |
-| **playwright** | E2E test requests |
-| **vitest** | Unit test requests |
-| **slack** | Phase 9 notifications |
+<!-- Add your project-specific rules, integrations, or instructions here -->
+<!-- This section will NOT be overwritten by Aura Frog updates -->
 
-**Setup:** Copy `.envrc.template` and set tokens. See `docs/MCP_GUIDE.md`.
+<!-- USER-CUSTOM:END -->
 
 ---
 
