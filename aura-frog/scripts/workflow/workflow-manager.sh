@@ -262,6 +262,27 @@ list_deliverables() {
     bash "${SCRIPT_DIR}/save-deliverable.sh" list "$phase"
 }
 
+# Save MCP response (wrapper)
+save_mcp_response() {
+    local mcp_type="$1"
+    local identifier="$2"
+    shift 2
+    bash "${SCRIPT_DIR}/save-mcp-response.sh" save "$mcp_type" "$identifier" "$@"
+}
+
+# List MCP responses (wrapper)
+list_mcp_responses() {
+    local mcp_type="${1:-all}"
+    bash "${SCRIPT_DIR}/save-mcp-response.sh" list "$mcp_type"
+}
+
+# Get MCP response (wrapper)
+get_mcp_response() {
+    local mcp_type="$1"
+    local identifier="$2"
+    bash "${SCRIPT_DIR}/save-mcp-response.sh" get "$mcp_type" "$identifier"
+}
+
 # Show usage
 show_usage() {
     cat <<EOF
@@ -279,6 +300,9 @@ COMMANDS:
     archive <workflow-id>          Archive workflow
     save <phase> <file> <content>  Save deliverable (markdown)
     deliverables [phase]           List deliverables
+    mcp-save <type> <id> <content> Save MCP response (jira, figma, etc.)
+    mcp-list [type]                List MCP responses
+    mcp-get <type> <id>            Get latest MCP response
     help                           Show this help
 
 EXAMPLES:
@@ -295,12 +319,23 @@ EXAMPLES:
     bash $0 deliverables
     bash $0 deliverables 1
 
+    # Save MCP response (JIRA ticket)
+    bash $0 mcp-save jira PROJ-123 "# PROJ-123: Title\n..."
+
+    # List all MCP responses
+    bash $0 mcp-list
+    bash $0 mcp-list jira
+
+    # Get latest JIRA response
+    bash $0 mcp-get jira PROJ-123
+
     # Archive completed workflow
     bash $0 archive add-auth-20251124-120000
 
 LOCATION:
     Workflows: logs/workflows/
     Deliverables: logs/workflows/{id}/deliverables/
+    MCP Logs: logs/{jira|figma|confluence|slack}/
     Active:    active-workflow.txt
 EOF
 }
@@ -362,6 +397,25 @@ main() {
             ;;
         deliverables)
             list_deliverables "${2:-all}"
+            ;;
+        mcp-save)
+            if [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
+                echo -e "${RED}Error: type and identifier required${NC}"
+                echo "Usage: $0 mcp-save <type> <identifier> <content|--file|--stdin>"
+                exit 1
+            fi
+            save_mcp_response "$2" "$3" "${4:-}" "${5:-}"
+            ;;
+        mcp-list)
+            list_mcp_responses "${2:-all}"
+            ;;
+        mcp-get)
+            if [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
+                echo -e "${RED}Error: type and identifier required${NC}"
+                echo "Usage: $0 mcp-get <type> <identifier>"
+                exit 1
+            fi
+            get_mcp_response "$2" "$3"
             ;;
         help|--help|-h)
             show_usage

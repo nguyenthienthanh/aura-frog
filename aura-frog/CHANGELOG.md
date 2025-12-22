@@ -15,6 +15,10 @@ Streamlined the plugin by replacing custom integration scripts with bundled MCP 
   - `save-deliverable.sh` - Save markdown content to phase folders
   - `workflow-manager.sh save` - Wrapper command for easy access
   - Tracks deliverables in workflow-state.json
+- **MCP Response Logging** - Save JIRA, Figma, Confluence responses for reference:
+  - `save-mcp-response.sh` - Save MCP responses to logs/{type}/
+  - `workflow-manager.sh mcp-save/mcp-list/mcp-get` - Easy access commands
+  - Auto-keeps "latest" file for each identifier
 - **MCP in Agent Banner** - Show which MCP servers are active (single or multiple)
 - **Sectioned CLAUDE.md Template** - Auto-update plugin sections, preserve user content:
   - `<!-- AURA-FROG:START -->` / `<!-- AURA-FROG:END -->` - Plugin-managed
@@ -44,6 +48,7 @@ Streamlined the plugin by replacing custom integration scripts with bundled MCP 
 - **docs/MCP_GUIDE.md** - Complete guide for using and creating MCP servers
 - **scripts/claude-md-update.sh** - Update AURA-FROG sections in project CLAUDE.md
 - **scripts/workflow/save-deliverable.sh** - Save phase deliverables (MD files) to logs
+- **scripts/workflow/save-mcp-response.sh** - Save MCP responses (JIRA, Figma, etc.) to logs
 - **templates/project-claude.md** - Sectioned template with auto-update markers
 
 #### Updated Documentation
