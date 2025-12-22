@@ -18,6 +18,15 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
+### With MCP Server (When using external tools)
+```
+⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
+┃ Model: [model] │ 🔌 MCP: [mcp-name]                     ┃
+┃ 🔥 [aura-message]                                      ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
 ### Multiple Agents (Collaboration)
 ```
 ⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -44,9 +53,54 @@
   - Secondary/supporting agents after `+`
   - Comma-separated if more than 2
 
-### Line 3: Model & Aura
+### Line 3: Model & Aura (or MCP)
 - **Model:** AI model with version (e.g., Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3)
 - **Aura message:** Short, fun, contextual phrase (2-4 words)
+- **MCP indicator:** When using MCP server, show `🔌 MCP: [name]` instead of aura on line 2
+
+---
+
+## MCP Server Display
+
+**Show MCP in banner when using external tools:**
+
+| MCP Server | Display | Triggers |
+|------------|---------|----------|
+| context7 | `🔌 MCP: context7` | Library docs (React, MUI, Tailwind) |
+| playwright | `🔌 MCP: playwright` | E2E testing, browser automation |
+| vitest | `🔌 MCP: vitest` | Test execution, coverage |
+| atlassian | `🔌 MCP: atlassian` | JIRA tickets, Confluence pages |
+| figma | `🔌 MCP: figma` | Design file fetching |
+| slack | `🔌 MCP: slack` | Team notifications |
+
+### MCP Banner Examples
+
+**Fetching library docs:**
+```
+⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: web-expert │ Phase: -                           ┃
+┃ Model: Opus 4.5 │ 🔌 MCP: context7                      ┃
+┃ 🔥 Fetching React docs                                 ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Fetching JIRA ticket:**
+```
+⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: backend-expert │ Phase: 1 - Understand          ┃
+┃ Model: Sonnet 4.5 │ 🔌 MCP: atlassian                   ┃
+┃ 🔥 Loading PROJ-1234                                   ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Running E2E tests:**
+```
+⚡ 🐸 AURA FROG v1.3.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: qa-automation │ Phase: 7 - Verify               ┃
+┃ Model: Opus 4.5 │ 🔌 MCP: playwright                    ┃
+┃ 🔥 Testing login flow                                  ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
 ---
 
@@ -297,4 +351,4 @@ Every response should follow this structure:
 ---
 
 **Version:** 1.3.0
-**Last Updated:** 2025-12-17
+**Last Updated:** 2025-12-22
