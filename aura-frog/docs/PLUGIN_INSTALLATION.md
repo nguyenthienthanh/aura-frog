@@ -399,35 +399,37 @@ Unknown command: /workflow:start
 
 **Error:**
 ```
-bash: scripts/jira-fetch.sh: No such file or directory
+MCP server not responding
 ```
 
 **Solution:**
 ```bash
-# Verify plugin is installed
-/plugin list
+# Check MCP configuration
+cat .mcp.json
 
-# Check plugin directory
-ls -la ~/.claude/plugins/marketplaces/aurafrog/aura-frog/
+# Verify environment variables are set
+echo $JIRA_API_TOKEN
 
-# Test JIRA script (from plugin)
-bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/jira-fetch.sh PROJ-123
+# Run mcp:status to check loaded servers
+mcp:status
 ```
 
-### Issue 5: Permission Denied on Scripts
+### Issue 5: MCP Server Not Loading
 
 **Error:**
 ```
-Permission denied: scripts/jira-fetch.sh
+MCP tools not available
 ```
 
 **Solution:**
 ```bash
-# Make all scripts executable
-chmod +x scripts/*.sh
+# Check .envrc has required tokens
+cat .envrc
 
-# Or for specific script
-chmod +x scripts/jira-fetch.sh
+# Reload environment
+direnv allow
+
+# Restart Claude Code session (MCP loads at startup)
 ```
 
 ---
@@ -448,14 +450,15 @@ After installation, we recommend:
 
 3. **Set Up Integrations (if needed):**
    ```bash
-   # Edit .envrc with your API tokens
+   # Copy and edit .envrc with your API tokens
+   cp .envrc.template .envrc
    nano .envrc
 
    # Load configuration
-   source .envrc
+   direnv allow
 
-   # Test JIRA integration
-   scripts/jira-fetch.sh YOUR-TICKET-123
+   # MCP servers auto-load - verify with:
+   mcp:status
    ```
 
 4. **Start Your First Workflow:**
@@ -476,8 +479,7 @@ After installation, we recommend:
 **Documentation:**
 - [Complete User Guide](./../README.md)
 - [Quick Start Guide](./../GET_STARTED.md)
-- [Integration Setup Guide](./INTEGRATION_SETUP_GUIDE.md)
-- [Bash Integrations Reference](./BASH_INTEGRATIONS_REFERENCE.md)
+- [MCP Setup Guide](./MCP_GUIDE.md)
 - [Agent Selection Guide](./AGENT_SELECTION_GUIDE.md)
 
 **External:**

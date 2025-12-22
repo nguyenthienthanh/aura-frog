@@ -271,25 +271,37 @@ workflow:start "Test feature"
 # 4. Agent activation
 agent:list
 
-# 5. Integration scripts (if applicable)
-bash aura-frog/scripts/jira-fetch.sh TEST-123
+# 5. MCP integrations (if applicable)
+mcp:status
 ```
 
 ### Integration Testing
 
-If modifying bash integration scripts:
+Aura Frog uses bundled MCP servers for integrations (JIRA, Figma, Confluence, Slack).
 
+**Testing MCP Integrations:**
+
+1. Configure environment variables in `.envrc`:
 ```bash
-# Set up test environment variables
 export JIRA_URL="https://test.atlassian.net"
 export JIRA_EMAIL="test@example.com"
 export JIRA_API_TOKEN="test-token"
-
-# Run script
-bash aura-frog/scripts/jira-fetch.sh TEST-123
-
-# Verify output format
+direnv allow
 ```
+
+2. Restart Claude Code (MCP loads at startup)
+
+3. Verify MCP status:
+```bash
+mcp:status
+```
+
+4. Test with a ticket reference in conversation:
+```
+"Fetch JIRA ticket TEST-123"
+```
+
+**See:** `aura-frog/docs/MCP_GUIDE.md` for complete MCP setup
 
 ---
 
