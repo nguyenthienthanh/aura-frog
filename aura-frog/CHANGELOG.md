@@ -4,6 +4,28 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.3.2] - 2025-12-22
+
+### MCP Response Logging in TOON Format
+
+Auto-save JIRA/Figma responses to logs in token-efficient TOON format.
+
+#### New Features
+- **TOON format for MCP responses** - JSON automatically converted to TOON
+- **Auto-save rule** - `mcp-response-logging.md` instructs Claude to save after fetch
+
+#### Updated Files
+- **scripts/workflow/save-mcp-response.sh** - Added `json_to_toon()` converter
+- **rules/README.md** - Updated rule count (39 → 40)
+
+#### Example Output
+```toon
+ticket[1]{key,summary,type,status,priority}:
+  PROJ-123,Fix bug,Bug,In Progress,High
+```
+
+---
+
 ## [1.3.1] - 2025-12-22
 
 ### Documentation Cleanup
