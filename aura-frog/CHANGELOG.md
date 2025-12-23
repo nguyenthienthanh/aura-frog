@@ -11,6 +11,15 @@ All notable changes to Aura Frog will be documented in this file.
 Major improvements inspired by ClaudeKit Engineer, focused on token efficiency and automatic complexity detection.
 
 #### New Features
+- **Model auto-selection** - Agent-detector now selects optimal model:
+  - haiku for quick tasks (typo fixes, orchestration)
+  - sonnet for standard implementation (coding, testing, bug fixes)
+  - opus for deep analysis (architecture, security audits, migrations)
+  - Detection result includes: Agent, Model, Complexity, Reason
+  - Model passed to Task tool when spawning subagents
+- **TOON format convention** - All structured data must use TOON:
+  - Added to `rules/naming-conventions.md` (v1.2.0)
+  - Converted critical rule files from markdown tables to TOON
 - **git-workflow skill** - Token-efficient git operations:
   - Single compound command gathers all data (staging, security, metrics, file groups)
   - Auto-split commits into logical groups (deps, code, docs, tests)
@@ -48,8 +57,15 @@ Major improvements inspired by ClaudeKit Engineer, focused on token efficiency a
 - `.afignore` - Custom patterns for scout-block
 
 #### Updated Files
-- `skills/agent-detector/SKILL.md` - Auto-complexity detection
+- `skills/agent-detector/SKILL.md` - Auto-complexity detection + model selection (v3.0.0)
 - `skills/state-persistence/SKILL.md` - Plan state variables
+- `rules/naming-conventions.md` - Added TOON format convention (v1.2.0)
+- `rules/estimation.md` - Converted tables to TOON
+- `rules/verification.md` - Converted tables to TOON
+- `rules/error-handling-standard.md` - Converted tables to TOON
+- `rules/api-design-rules.md` - Converted tables to TOON
+- `rules/logging-standards.md` - Converted tables to TOON
+- `rules/sast-security-scanning.md` - Converted tables to TOON
 - `hooks/hooks.json` - Added scout-block hook
 - `agents/backend-expert.md` - Model specification
 - `agents/qa-automation.md` - Model specification

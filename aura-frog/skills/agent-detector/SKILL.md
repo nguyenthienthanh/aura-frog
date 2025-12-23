@@ -1,6 +1,6 @@
 ---
 name: agent-detector
-description: "CRITICAL: MUST run for EVERY message. Detects agent AND task complexity automatically. Always runs FIRST."
+description: "CRITICAL: MUST run for EVERY message. Detects agent, complexity, AND model automatically. Always runs FIRST."
 autoInvoke: true
 priority: highest
 model: haiku
@@ -13,7 +13,7 @@ allowed-tools: Read, Grep, Glob
 # Aura Frog Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message
-**Version:** 2.0.0
+**Version:** 3.0.0
 
 ---
 
@@ -67,6 +67,85 @@ complexity[3]{level,criteria,approach}:
 3. Detect scope modifiers (all, entire, every)
 4. Check for research keywords (how, why, best way)
 5. Assign complexity level
+```
+
+---
+
+## Model Selection
+
+**Auto-select model based on task complexity and agent type.**
+
+### Model Mapping
+
+```toon
+model_selection[3]{model,when_to_use,agents}:
+  haiku,Quick tasks/Simple queries/Orchestration,pm-operations-orchestrator/project-detector/voice-operations
+  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/qa-automation/ui-designer
+  opus,Architecture/Deep analysis/Security audits/Complex planning,security-expert (audits)/Any agent (architecture mode)
+```
+
+### Complexity → Model
+
+```toon
+complexity_model[3]{complexity,default_model,override_to_opus}:
+  Quick,haiku,Never
+  Standard,sonnet,User asks for architecture/design
+  Deep,sonnet,Always consider opus for planning phase
+```
+
+### Task Type → Model
+
+```toon
+task_model[8]{task_type,model,reason}:
+  Typo fix / config change,haiku,Minimal reasoning needed
+  Bug fix / feature add,sonnet,Standard implementation
+  API endpoint / component,sonnet,Standard implementation
+  Test writing,sonnet,Requires code understanding
+  Code review,sonnet,Pattern matching + analysis
+  Architecture design,opus,Complex trade-off analysis
+  Security audit,opus,Deep vulnerability analysis
+  Refactoring / migration,opus,Cross-cutting impact analysis
+```
+
+### Agent Default Models
+
+```toon
+agent_models[14]{agent,default_model,opus_when}:
+  pm-operations-orchestrator,haiku,Never (orchestration only)
+  project-detector,haiku,Never (detection only)
+  project-context-manager,haiku,Never (context loading)
+  mobile-react-native,sonnet,Architecture decisions
+  mobile-flutter,sonnet,Architecture decisions
+  web-angular,sonnet,Architecture decisions
+  web-vuejs,sonnet,Architecture decisions
+  web-reactjs,sonnet,Architecture decisions
+  web-nextjs,sonnet,Architecture decisions
+  backend-nodejs,sonnet,Architecture decisions
+  backend-python,sonnet,Architecture decisions
+  backend-go,sonnet,Architecture decisions
+  backend-laravel,sonnet,Architecture decisions
+  database-specialist,sonnet,Schema design / migration planning
+  security-expert,sonnet,opus for full audits
+  qa-automation,sonnet,Never
+  ui-designer,sonnet,Design system architecture
+  devops-cicd,sonnet,Infrastructure architecture
+```
+
+### Model Selection Output
+
+Include in detection result:
+
+```markdown
+## Detection Result
+- **Agent:** backend-nodejs
+- **Model:** sonnet
+- **Complexity:** Standard
+- **Reason:** API endpoint implementation
+```
+
+When spawning Task tool, use the detected model:
+```
+Task(subagent_type="backend-nodejs", model="sonnet", ...)
 ```
 
 ---
@@ -280,10 +359,11 @@ Layer 1 (Explicit): "React Native" → +60
 Layer 2 (Intent): "create" → Implementation
 Layer 4 (Files): *.phone.tsx present → +20
 
-Scores:
-  ✅ mobile-react-native: 80 (PRIMARY)
-  ✅ ui-designer: 35 (OPTIONAL)
-  ✅ qa-automation: 30 (OPTIONAL)
+Detection Result:
+  ✅ Agent: mobile-react-native (PRIMARY, 80 pts)
+  ✅ Model: sonnet
+  ✅ Complexity: Standard
+  ✅ Secondary: ui-designer (35), qa-automation (30)
 ```
 
 ### Example 2: Context-Based Detection (No Tech Mention)
@@ -294,33 +374,55 @@ Layer 2 (Intent): "fix", "bug" → Bug Fix intent
 Layer 3 (Context): CWD=/backend-api, composer.json has laravel → +40
 Layer 4 (Files): AuthController.php recent → +20
 
-Scores:
-  ✅ backend-laravel: 95 (PRIMARY)
-  ✅ qa-automation: 35 (OPTIONAL)
+Detection Result:
+  ✅ Agent: backend-laravel (PRIMARY, 95 pts)
+  ✅ Model: sonnet
+  ✅ Complexity: Standard
+  ✅ Secondary: qa-automation (35)
 ```
 
-### Example 3: Full-Stack Feature
+### Example 3: Architecture Task (Uses Opus)
 ```
-User: "Build user profile page with API"
+User: "Design the authentication system architecture"
 
-Scores:
-  ✅ web-reactjs: 55 (PRIMARY - Frontend)
-  ✅ backend-nodejs: 55 (PRIMARY - Backend)
-  ✅ ui-designer: 45 (OPTIONAL)
-  ✅ qa-automation: 30 (OPTIONAL)
+Layer 2 (Intent): "design", "architecture" → Architecture intent
+Complexity: Deep (architecture keyword)
+
+Detection Result:
+  ✅ Agent: backend-nodejs (PRIMARY)
+  ✅ Model: opus (architecture task)
+  ✅ Complexity: Deep
+  ✅ Secondary: security-expert (55), database-specialist (45)
+```
+
+### Example 4: Quick Fix (Uses Haiku)
+```
+User: "Fix typo in README.md line 42"
+
+Complexity: Quick (single file, explicit location)
+
+Detection Result:
+  ✅ Agent: pm-operations-orchestrator
+  ✅ Model: haiku
+  ✅ Complexity: Quick
 ```
 
 ---
 
 ## After Detection
 
-1. **Load agent instructions** from `agents/[agent-name].md`
-2. **Invoke appropriate skill:**
+1. **Output detection result** with agent, model, and complexity
+2. **Load agent instructions** from `agents/[agent-name].md`
+3. **Use detected model** when spawning Task tool:
+   ```
+   Task(subagent_type="[agent]", model="[detected-model]", ...)
+   ```
+4. **Invoke appropriate skill:**
    - Complex feature → `workflow-orchestrator`
    - Bug fix → `bugfix-quick`
    - Test request → `test-writer`
    - Code review → `code-reviewer`
-3. **Always load project context** via `project-context-loader` before major actions
+5. **Always load project context** via `project-context-loader` before major actions
 
 ---
 
