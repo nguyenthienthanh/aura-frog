@@ -106,7 +106,7 @@ skills[22]{name,trigger,file}:
 resources[10]{name,location}:
   Agents (14),agents/
   Commands (70+),commands/
-  Rules (39),rules/
+  Rules (40),rules/
   Skills (33),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md

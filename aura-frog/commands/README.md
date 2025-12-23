@@ -2,7 +2,7 @@
 
 **Version:** 1.3.2
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2025-12-17
+**Last Updated:** 2025-12-23
 
 ---
 
@@ -13,14 +13,23 @@ Commands are organized by category with naming convention: `category/action.md`
 ```
 commands/
 ├── agent/              # Agent management (4 commands)
+├── api/                # API operations (2 commands)
 ├── bugfix/             # Bug fixing workflows (3 commands)
+├── db/                 # Database operations (2 commands)
+├── deploy/             # Deployment & CI/CD (3 commands)
+├── logs/               # Log analysis (1 command)
+├── mcp/                # MCP server management (1 command)
+├── monitor/            # Monitoring setup (2 commands)
+├── perf/               # Performance optimization (4 commands)
 ├── planning/           # Planning & execution (3 commands)
 ├── project/            # Project operations (6 commands)
+├── quality/            # Code quality (3 commands)
 ├── review/             # Code review (1 command)
+├── security/           # Security scanning (3 commands)
 ├── setup/              # Setup & configuration (2 commands)
 ├── skill/              # Skill management (1 command)
 ├── test/               # Testing commands (4 commands)
-├── workflow/           # Core workflow commands (20 commands)
+├── workflow/           # Core workflow commands (23 commands)
 ├── document.md         # document (standalone)
 ├── execute.md          # execute (standalone)
 ├── help.md             # help (standalone)
@@ -32,7 +41,7 @@ commands/
 ## 📊 Commands Index (TOON)
 
 ```toon
-commands[48]{category,command,file,description}:
+commands[72]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -88,18 +97,27 @@ commands[48]{category,command,file,description}:
 ## 📈 Statistics (TOON)
 
 ```toon
-stats[11]{category,count}:
-  agent,4
-  bugfix,3
-  planning,3
+stats[19]{category,count}:
+  workflow,23
   project,6
-  review,1
-  setup,2
-  skill,1
+  agent,4
   test,4
-  workflow,20
+  perf,4
+  bugfix,3
+  deploy,3
+  planning,3
+  quality,3
+  security,3
+  api,2
+  db,2
+  monitor,2
+  setup,2
+  logs,1
+  mcp,1
+  review,1
+  skill,1
   standalone,4
-  total,48
+  total,72
 ```
 
 ---
