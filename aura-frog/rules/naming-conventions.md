@@ -148,6 +148,38 @@ const apiConfig = {
 
 ---
 
+## Structured Data Format
+
+**ALWAYS use TOON format for structured data in documentation.**
+
+```toon
+format_rules[3]{element,format,avoid}:
+  Tables,TOON blocks,Markdown tables
+  Lists with structure,TOON arrays,Bullet lists
+  Configuration,TOON key-value,Plain text
+```
+
+### Example
+
+```toon
+# ✅ Use TOON
+items[3]{name,type,required}:
+  email,string,yes
+  age,number,no
+  role,enum,yes
+```
+
+```markdown
+<!-- ❌ Avoid markdown tables -->
+| Name | Type | Required |
+|------|------|----------|
+| email | string | yes |
+```
+
+**Reference:** `docs/TOON_FORMAT_GUIDE.md`
+
+---
+
 ## Best Practices
 
 ### Do's ✅
@@ -155,12 +187,14 @@ const apiConfig = {
 - ✅ Be consistent across codebase
 - ✅ Follow language conventions
 - ✅ Use meaningful abbreviations only
+- ✅ Use TOON for structured data
 
 ### Don'ts ❌
 - ❌ Single letter variables (except i, j in loops)
 - ❌ Abbreviations like `usr`, `btn`, `msg`
 - ❌ Generic names like `data`, `temp`, `obj`
 - ❌ Inconsistent casing
+- ❌ Markdown tables in documentation
 
 ---
 
@@ -168,6 +202,6 @@ const apiConfig = {
 
 ---
 
-**Version:** 1.1.0
-**Last Updated:** 2025-12-10
+**Version:** 1.2.0
+**Last Updated:** 2025-12-23
 

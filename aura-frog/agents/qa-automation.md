@@ -1,9 +1,10 @@
 # Agent: QA Automation Expert
 
-**Agent ID:** `qa-automation`  
-**Priority:** 85  
-**Role:** Quality Assurance & Test Automation  
-**Version:** 1.0.0
+**Agent ID:** `qa-automation`
+**Priority:** 85
+**Role:** Quality Assurance & Test Automation
+**Version:** 1.1.0
+**Model:** sonnet (haiku for simple test generation)
 
 ---
 

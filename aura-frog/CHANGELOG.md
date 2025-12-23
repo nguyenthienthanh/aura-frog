@@ -4,6 +4,83 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.4.0] - 2025-12-23
+
+### Token Efficiency & Auto-Detection Improvements
+
+Major improvements inspired by ClaudeKit Engineer, focused on token efficiency and automatic complexity detection.
+
+#### New Features
+- **git-workflow skill** - Token-efficient git operations:
+  - Single compound command gathers all data (staging, security, metrics, file groups)
+  - Auto-split commits into logical groups (deps, code, docs, tests)
+  - Security scanning for secrets before commit
+  - 2-4 tool calls vs 15 baseline (73-80% fewer)
+- **scout-block hook** - Prevents wasteful token usage:
+  - Blocks scanning of node_modules, dist, build, vendor, .git
+  - Custom patterns via `.afignore` file
+  - Cross-platform support (Node.js)
+- **Auto-complexity detection** - AI detects task complexity automatically:
+  - Quick (1-2 tools): Simple fixes, clear scope
+  - Standard (3-6 tools): New feature, bug with context
+  - Deep (7+ tools): Architecture, vague requirements
+  - No need for `:fast` or `:hard` variants
+- **Plan state management** - Session-based plan context:
+  - `AF_ACTIVE_PLAN` - Current active plan
+  - `AF_SUGGESTED_PLAN` - Branch-matched hint
+  - Persists across agent handoffs
+
+#### Updated Features
+- **debugging skill** - Now with reference documents:
+  - `references/systematic-debugging.md` - Four-phase process
+  - `references/root-cause-tracing.md` - Call stack tracing
+  - `references/verification.md` - Iron law of verification
+- **Agent model specifications** - Agents now specify recommended models:
+  - haiku for orchestration and simple tasks
+  - sonnet for implementation
+  - opus for architecture decisions
+- **state-persistence skill** - Enhanced with plan state variables
+
+#### New Files
+- `skills/git-workflow/SKILL.md` - Token-efficient git operations
+- `skills/debugging/references/*.md` - Debugging reference docs
+- `hooks/scout-block.cjs` - Block wasteful directory scanning
+- `.afignore` - Custom patterns for scout-block
+
+#### Updated Files
+- `skills/agent-detector/SKILL.md` - Auto-complexity detection
+- `skills/state-persistence/SKILL.md` - Plan state variables
+- `hooks/hooks.json` - Added scout-block hook
+- `agents/backend-expert.md` - Model specification
+- `agents/qa-automation.md` - Model specification
+- `agents/ui-designer.md` - Model specification
+
+#### Documentation Cleanup
+- **Deleted obsolete docs:**
+  - `TODO.md` - Optimization complete
+  - `docs/RELEASE_NOTES_V5.md` - Outdated versioning
+  - `docs/SETTINGS_GUIDE.md` - Redundant with CONFIG_LOADING_ORDER
+  - `docs/STORY_POINTS_GUIDE.md` - Niche agile doc
+  - `docs/TOKEN_TRACKING.md` - Merged into session-continuation skill
+  - `docs/RULES_COMBINATION.md` - Covered by CONFIG_LOADING_ORDER
+  - `docs/SYSTEM_CLARIFICATIONS.md` - Internal implementation details
+  - `docs/WORKFLOW_NAMING.md` - Niche workflow doc
+  - `docs/examples/AGENT_SELECTION_EXAMPLES.md` - Merged into agent-detector
+- **Deleted verbose templates:**
+  - `templates/tech-spec.md` - Keeping TOON version only
+  - `templates/test-plan.md` - Keeping TOON version only
+- **Fixed broken cross-references** in remaining docs
+
+#### Stats
+- **Skills:** 33 → 35 (+git-workflow, +debugging references)
+- **Hooks:** +1 (scout-block)
+- **Docs:** 24 → 15 (cleanup)
+- **Templates:** 16 → 14 (TOON only)
+- **Token savings:** Up to 80% reduction in git operations
+- **Lines removed:** ~3,000+ lines of redundant documentation
+
+---
+
 ## [1.3.2] - 2025-12-22
 
 ### MCP Response Logging in TOON Format

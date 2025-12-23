@@ -2,6 +2,15 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "Bash|Read|Write|Edit|Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/scout-block.cjs\" 2>&1 || true"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {

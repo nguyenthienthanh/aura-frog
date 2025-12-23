@@ -12,12 +12,19 @@
 
 ---
 
-**Version:** 1.3.2
-**Total Skills:** 33 (22 auto-invoking + 11 reference)
+**Version:** 1.4.0
+**Total Skills:** 35 (24 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
+
+---
+
+## 🆕 New in 1.4.0
+
+- **git-workflow** - Token-efficient git operations with security scanning and auto-split commits
+- **debugging** - Systematic debugging with root cause investigation (now with reference docs)
 
 ---
 
@@ -636,7 +643,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.3.2
+**Version:** 1.4.0
 **Last Updated:** 2025-12-19
 **Format:** TOON (Token-Optimized)
 **Total Skills:** 33 (22 auto-invoking + 11 reference)

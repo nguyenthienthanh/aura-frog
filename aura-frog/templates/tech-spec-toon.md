@@ -188,7 +188,7 @@ packages[N]{name,version,purpose}:
   react-query,4.26.1,Server state
   zustand,4.3.6,Client state
   axios,1.6.0,HTTP client
-  yup,1.3.2,Validation
+  yup,1.4.0,Validation
 ```
 
 ---

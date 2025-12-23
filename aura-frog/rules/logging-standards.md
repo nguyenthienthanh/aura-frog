@@ -15,13 +15,14 @@ Consistent, structured logging improves debugging, monitoring, and incident resp
 
 ## 1. Log Levels
 
-| Level | When to Use | Example |
-|-------|-------------|---------|
-| ERROR | Failures requiring attention | Database connection failed |
-| WARN | Potential issues, recoverable | Rate limit approaching |
-| INFO | Important business events | User registered, order placed |
-| DEBUG | Development troubleshooting | Function input/output |
-| TRACE | Detailed execution flow | Loop iterations |
+```toon
+log_levels[5]{level,when_to_use,example}:
+  ERROR,Failures requiring attention,Database connection failed
+  WARN,Potential issues / recoverable,Rate limit approaching
+  INFO,Important business events,User registered / order placed
+  DEBUG,Development troubleshooting,Function input/output
+  TRACE,Detailed execution flow,Loop iterations
+```
 
 ### Level Selection
 ```typescript
@@ -76,23 +77,27 @@ logger.error('Payment failed for order 12345, amount 99.99 USD')
 ## 3. What to Log
 
 ### Always Log
-| Event | Fields |
-|-------|--------|
-| Request start/end | method, path, duration, status |
-| Authentication | userId, success/failure, method |
-| Business events | eventType, entityId, outcome |
-| Errors | message, stack, context |
-| External calls | service, endpoint, duration, status |
+
+```toon
+always_log[5]{event,fields}:
+  Request start/end,method / path / duration / status
+  Authentication,userId / success/failure / method
+  Business events,eventType / entityId / outcome
+  Errors,message / stack / context
+  External calls,service / endpoint / duration / status
+```
 
 ### Never Log
-| Data Type | Reason |
-|-----------|--------|
-| Passwords | Security |
-| API tokens/keys | Security |
-| Credit card numbers | PCI compliance |
-| Full SSN/ID numbers | Privacy |
-| Session tokens | Security |
-| PII in production | GDPR/Privacy |
+
+```toon
+never_log[6]{data_type,reason}:
+  Passwords,Security
+  API tokens/keys,Security
+  Credit card numbers,PCI compliance
+  Full SSN/ID numbers,Privacy
+  Session tokens,Security
+  PII in production,GDPR/Privacy
+```
 
 ### Sanitization
 ```typescript
@@ -181,11 +186,12 @@ if (duration > 1000) {
 
 ## 7. Environment-Specific
 
-| Environment | Level | Format | Output |
-|-------------|-------|--------|--------|
-| Development | DEBUG | Pretty | Console |
-| Staging | DEBUG | JSON | Console + File |
-| Production | INFO | JSON | Aggregator (DataDog, etc.) |
+```toon
+env_logging[3]{environment,level,format,output}:
+  Development,DEBUG,Pretty,Console
+  Staging,DEBUG,JSON,Console + File
+  Production,INFO,JSON,Aggregator (DataDog etc.)
+```
 
 ```typescript
 const logger = createLogger({

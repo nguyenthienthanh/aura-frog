@@ -446,7 +446,7 @@ cp .claude/logs/workflows/[id]/backup/src/* src/
 - **commands/workflow/handoff.md** - Detailed handoff process
 - **commands/workflow/resume.md** - Detailed resume process
 - **docs/WORKFLOW_STATE_MANAGEMENT.md** - Git tracking details
-- **docs/TOKEN_TRACKING.md** - Token monitoring guide
+- **skills/session-continuation/SKILL.md** - Token monitoring
 - **CLAUDE.md** - Agent behavior rules
 
 ---

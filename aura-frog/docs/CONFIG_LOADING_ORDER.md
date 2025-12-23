@@ -50,7 +50,7 @@ export AURA_FROG_DEFAULT_COVERAGE="85"
 - ✅ CI/CD configuration
 - ✅ Temporary overrides
 
-**Documentation:** `INTEGRATION_SETUP_GUIDE.md`
+**Documentation:** `MCP_GUIDE.md` for integration setup
 
 ---
 
@@ -104,7 +104,7 @@ team:
 
 **Purpose:** Claude Code permissions, auto-approval settings
 
-**📚 Detailed Guide:** See [`SETTINGS_GUIDE.md`](SETTINGS_GUIDE.md) for complete configuration reference
+**📚 Example:** `settings.example.json` for full configuration reference
 
 **Example:**
 ```json
@@ -587,8 +587,7 @@ cat .claude/project-contexts/*/project-config.yaml 2>/dev/null | head -20
 
 ## Related Documentation
 
-- **INTEGRATION_SETUP_GUIDE.md** - Environment variables and integration setup
-- **RULES_COMBINATION.md** - How rules are merged
+- **MCP_GUIDE.md** - MCP server configuration and integrations
 - **project-contexts/template/README.md** - Project context setup
 - **settings.example.json** - Settings template
 
@@ -598,9 +597,8 @@ cat .claude/project-contexts/*/project-config.yaml 2>/dev/null | head -20
 
 **Configuration issues?**
 - Review this document
-- Check `TODO.md` for known issues
 - Run `config:validate` command
-- See `aura-frog/README.md` for troubleshooting
+- See `PLUGIN_INSTALLATION.md` for troubleshooting
 
 ---
 

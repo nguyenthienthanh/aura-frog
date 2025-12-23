@@ -3,7 +3,8 @@
 **Agent ID:** `ui-designer`
 **Priority:** 85
 **Role:** Design Analysis, Component Breakdown & Design System Implementation
-**Version:** 1.1.0
+**Version:** 1.2.0
+**Model:** sonnet (requires vision for image analysis)
 
 ---
 

@@ -208,12 +208,13 @@ Final validation:
 **Tool:** [TOOL_NAME]
 
 ### Summary
-| Severity | Count | Fixed | Accepted |
-|----------|-------|-------|----------|
-| Critical | 0     | 0     | 0        |
-| High     | 2     | 1     | 1        |
-| Medium   | 5     | 3     | 2        |
-| Low      | 10    | 5     | 5        |
+```toon
+severity[4]{level,count,fixed,accepted}:
+  Critical,0,0,0
+  High,2,1,1
+  Medium,5,3,2
+  Low,10,5,5
+```
 
 ### Critical Findings
 [NONE - Ready for merge]

@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.3.2
+**Version:** 1.4.0
 
 ---
 
@@ -23,9 +23,43 @@ Referenced in plugin.json:
 
 ---
 
-## 🎯 Active Hooks (10 Total)
+## 🎯 Active Hooks (11 Total)
 
-### 1. PreToolUse - Bash Safety
+### 1. PreToolUse - Scout Block (NEW in 1.4.0)
+**When:** Before Bash, Read, Write, Edit, Glob, or Grep tool execution
+
+**Actions:**
+- ✅ Block scanning of node_modules, dist, build, vendor, .git
+- ✅ Prevent wasteful token usage from large directory scans
+- ✅ Allow build commands (npm build, yarn build)
+- ✅ Custom patterns via `.afignore` file
+
+**Blocked Directories:**
+- `node_modules` - NPM packages
+- `dist`, `build` - Build outputs
+- `vendor` - Vendor packages
+- `.git` - Git internals
+- `__pycache__` - Python cache
+- `.next`, `.nuxt` - Framework caches
+- `coverage` - Test coverage
+
+**Example:**
+```bash
+User: cat node_modules/react/package.json
+Hook: ⛔ Blocked: command accesses node_modules
+```
+
+**Customization:** Add patterns to `.afignore`:
+```
+# .afignore
+.expo
+android/build
+ios/Pods
+```
+
+---
+
+### 2. PreToolUse - Bash Safety
 **When:** Before any Bash tool execution
 
 **Actions:**
@@ -48,7 +82,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 2. PreToolUse - Project Context Reminder
+### 3. PreToolUse - Project Context Reminder
 **When:** Before Write or Edit tool execution
 
 **Actions:**
@@ -277,6 +311,6 @@ hooks[11]{event,name,purpose}:
 
 ---
 
-**Version:** 1.3.2
+**Version:** 1.4.0
 **Last Updated:** 2025-12-18
 **Status:** Active hooks system (11 hooks)

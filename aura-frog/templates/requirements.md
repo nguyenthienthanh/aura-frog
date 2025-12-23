@@ -130,5 +130,5 @@ Brief description of the feature.
 - **Uncertainty (20%):** [How many unknowns? Familiar tech?]
 - **Risk (10%):** [What can go wrong? How critical?]
 
-**📚 Reference:** See `docs/STORY_POINTS_GUIDE.md` for detailed estimation guidance
+**📚 Reference:** Use Fibonacci scale (1, 2, 3, 5, 8, 13, 21) for estimation
 

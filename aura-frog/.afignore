@@ -1,0 +1,16 @@
+# Aura Frog Ignore File
+# Directories listed here will be blocked from scanning
+# to save tokens and improve performance
+
+# Default blocked (always applied)
+# node_modules
+# __pycache__
+# .git
+# dist
+# build
+# vendor
+
+# Add project-specific patterns below:
+# .expo
+# android/build
+# ios/Pods

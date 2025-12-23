@@ -17,24 +17,26 @@ Standards for designing consistent, maintainable APIs.
 
 ## 1. RESTful Conventions
 
-| Method | Action | Success | Failure |
-|--------|--------|---------|---------|
-| GET | Read | 200 | 404 |
-| POST | Create | 201 | 400/409 |
-| PUT | Replace | 200 | 404 |
-| PATCH | Update | 200 | 404 |
-| DELETE | Delete | 204 | 404 |
+```toon
+rest_methods[5]{method,action,success,failure}:
+  GET,Read,200,404
+  POST,Create,201,400/409
+  PUT,Replace,200,404
+  PATCH,Update,200,404
+  DELETE,Delete,204,404
+```
 
 ---
 
 ## 2. Naming Rules
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Endpoints | Plural nouns | `/users`, `/orders` |
-| Query params | snake_case | `?page_size=20` |
-| Request body | camelCase | `{ "firstName": "John" }` |
-| Response body | camelCase | `{ "createdAt": "..." }` |
+```toon
+naming_rules[4]{element,convention,example}:
+  Endpoints,Plural nouns,/users /orders
+  Query params,snake_case,?page_size=20
+  Request body,camelCase,{ "firstName": "John" }
+  Response body,camelCase,{ "createdAt": "..." }
+```
 
 ```
 ✅ GET /users/:id/orders
@@ -84,10 +86,11 @@ Standards for designing consistent, maintainable APIs.
 /api/v2/users
 ```
 
-| Strategy | Example | Use When |
-|----------|---------|----------|
-| URL path | `/v1/users` | Default choice |
-| Header | `Accept-Version: 1` | Clean URLs needed |
+```toon
+versioning[2]{strategy,example,use_when}:
+  URL path,/v1/users,Default choice
+  Header,Accept-Version: 1,Clean URLs needed
+```
 
 ---
 
@@ -122,19 +125,20 @@ GET /users?status=active&sort=name:asc&page=1
 
 ## 7. Status Codes Quick Reference
 
-| Code | Meaning |
-|------|---------|
-| 200 | OK |
-| 201 | Created |
-| 204 | No Content (DELETE) |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 422 | Validation Failed |
-| 429 | Rate Limited |
-| 500 | Server Error |
+```toon
+status_codes[11]{code,meaning}:
+  200,OK
+  201,Created
+  204,No Content (DELETE)
+  400,Bad Request
+  401,Unauthorized
+  403,Forbidden
+  404,Not Found
+  409,Conflict
+  422,Validation Failed
+  429,Rate Limited
+  500,Server Error
+```
 
 ---
 

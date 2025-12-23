@@ -66,16 +66,17 @@ class ConflictError extends AppError {
 
 ## Error Codes Standard
 
-| Code | HTTP Status | When to Use |
-|------|-------------|-------------|
-| VALIDATION_ERROR | 400 | Invalid input data |
-| UNAUTHORIZED | 401 | Missing/invalid authentication |
-| FORBIDDEN | 403 | Authenticated but not authorized |
-| NOT_FOUND | 404 | Resource doesn't exist |
-| CONFLICT | 409 | Duplicate or state conflict |
-| RATE_LIMITED | 429 | Too many requests |
-| INTERNAL_ERROR | 500 | Unexpected server error |
-| SERVICE_UNAVAILABLE | 503 | Dependency failure |
+```toon
+error_codes[8]{code,http_status,when_to_use}:
+  VALIDATION_ERROR,400,Invalid input data
+  UNAUTHORIZED,401,Missing/invalid authentication
+  FORBIDDEN,403,Authenticated but not authorized
+  NOT_FOUND,404,Resource doesn't exist
+  CONFLICT,409,Duplicate or state conflict
+  RATE_LIMITED,429,Too many requests
+  INTERNAL_ERROR,500,Unexpected server error
+  SERVICE_UNAVAILABLE,503,Dependency failure
+```
 
 ---
 
@@ -261,13 +262,14 @@ class ErrorBoundary extends React.Component<Props, State> {
 
 ## User-Friendly Messages
 
-| Error Code | Technical Message | User-Friendly Message |
-|------------|-------------------|----------------------|
-| VALIDATION_ERROR | Field X failed regex | Please enter a valid X |
-| NOT_FOUND | Entity not found | This item doesn't exist |
-| UNAUTHORIZED | JWT expired | Please log in again |
-| RATE_LIMITED | 429 Too Many Requests | Please wait before trying again |
-| INTERNAL_ERROR | NullPointerException | Something went wrong. Please try again |
+```toon
+user_messages[5]{error_code,technical,user_friendly}:
+  VALIDATION_ERROR,Field X failed regex,Please enter a valid X
+  NOT_FOUND,Entity not found,This item doesn't exist
+  UNAUTHORIZED,JWT expired,Please log in again
+  RATE_LIMITED,429 Too Many Requests,Please wait before trying again
+  INTERNAL_ERROR,NullPointerException,Something went wrong. Please try again
+```
 
 ---
 

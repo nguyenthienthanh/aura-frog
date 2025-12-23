@@ -1,6 +1,6 @@
 # Aura Frog Agents Directory
 
-**Version:** 1.3.2
+**Version:** 1.4.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2025-12-23
 
@@ -67,4 +67,4 @@ agent:list
 
 ---
 
-**Version:** 1.3.2
+**Version:** 1.4.0

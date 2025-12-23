@@ -3,6 +3,7 @@ name: state-persistence
 description: "TOON-based state management for session handoff and context persistence"
 autoInvoke: false
 priority: high
+model: haiku
 triggers:
   - "workflow:handoff"
   - "session:save"
@@ -13,7 +14,53 @@ allowed-tools: Read, Write, Bash
 # State Persistence
 
 **Priority:** HIGH - Enable session continuity
-**Version:** 1.1.0
+**Version:** 2.0.0
+
+---
+
+## Plan State Variables
+
+```toon
+state_vars[4]{var,purpose,persistence}:
+  AF_ACTIVE_PLAN,Current active plan path,Session temp file
+  AF_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
+  AF_COMPLEXITY,Auto-detected task complexity,Session memory
+  AF_ACTIVE_AGENTS,Currently active agents,Session memory
+```
+
+### Plan State Detection (On Session Start)
+
+```bash
+# 1. Check session state file
+if [ -f /tmp/af-session-*.json ]; then
+  ACTIVE_PLAN=$(cat /tmp/af-session-*.json | grep -o '"activePlan":"[^"]*"' | cut -d'"' -f4)
+  echo "📋 Active plan found: $ACTIVE_PLAN"
+fi
+
+# 2. Check branch-matched plan
+BRANCH=$(git branch --show-current 2>/dev/null)
+if [ -n "$BRANCH" ]; then
+  SUGGESTED=$(find plans/ -name "*${BRANCH}*" -type d 2>/dev/null | head -1)
+  if [ -n "$SUGGESTED" ]; then
+    echo "💡 Suggested plan from branch: $SUGGESTED"
+  fi
+fi
+```
+
+### On Plan Activation
+
+```bash
+# Write to session state (not git)
+cat > /tmp/af-session-$(date +%s).json << EOF
+{
+  "activePlan": "plans/2025-12-23-feature-auth/",
+  "complexity": "standard",
+  "activeAgents": ["backend-nodejs", "qa-automation"],
+  "phase": 3,
+  "timestamp": "$(date -Iseconds)"
+}
+EOF
+```
 
 ---
 
