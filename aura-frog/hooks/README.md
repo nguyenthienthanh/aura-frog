@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.4.0
+**Version:** 1.4.1
 
 ---
 
@@ -24,6 +24,49 @@ Referenced in plugin.json:
 ---
 
 ## 🎯 Active Hooks (11 Total)
+
+### 0. SessionStart - Environment Injection (NEW in 1.4.0)
+**When:** Once per session (startup, resume, clear, compact)
+
+**Actions:**
+- ✅ Auto-detect project type (monorepo, library, single-repo)
+- ✅ Auto-detect package manager (npm, pnpm, yarn, bun, composer, poetry, go, cargo)
+- ✅ Auto-detect framework (Next.js, React, Vue, Laravel, Django, etc.)
+- ✅ Resolve active/suggested plans from branch matching
+- ✅ Inject 20+ environment variables for agents
+
+**Injected Environment Variables:**
+```toon
+env_vars[16]{var,description}:
+  AF_SESSION_ID,Current session identifier
+  AF_PROJECT_TYPE,monorepo | library | single-repo
+  AF_PACKAGE_MANAGER,npm | pnpm | yarn | bun | composer | etc.
+  AF_FRAMEWORK,nextjs | react | vue | laravel | django | etc.
+  AF_ACTIVE_PLAN,Explicitly active plan path
+  AF_SUGGESTED_PLAN,Branch-matched plan path (hint only)
+  AF_REPORTS_PATH,Where to save reports
+  AF_PLANS_PATH,Plans directory
+  AF_GIT_BRANCH,Current git branch
+  AF_NODE_VERSION,Node.js version
+  AF_PYTHON_VERSION,Python version (if available)
+  AF_PHP_VERSION,PHP version (if available)
+  AF_GO_VERSION,Go version (if available)
+  AF_OS_PLATFORM,darwin | linux | win32
+  AF_USER,Current username
+  AF_TIMEZONE,System timezone
+```
+
+**Configuration:** `.claude/.af.json` (local) or `~/.claude/.af.json` (global)
+
+**Example Output:**
+```
+🐸 Session startup. Type: single-repo | PM: pnpm | Framework: nextjs | Suggested: 241223-user-auth
+```
+
+**Script:** `hooks/session-start.cjs`
+**Config Utils:** `hooks/lib/af-config-utils.cjs`
+
+---
 
 ### 1. PreToolUse - Scout Block (NEW in 1.4.0)
 **When:** Before Bash, Read, Write, Edit, Glob, or Grep tool execution
@@ -97,7 +140,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 3. PreToolUse - Secrets Protection
+### 4. PreToolUse - Secrets Protection
 **When:** Before Write or Edit to sensitive files
 
 **Actions:**
@@ -112,7 +155,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 4. PostToolUse - Command Logging
+### 5. PostToolUse - Command Logging
 **When:** After any Bash command completes
 
 **Actions:**
@@ -128,7 +171,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 5. PostToolUse - Large File Warning
+### 6. PostToolUse - Large File Warning
 **When:** After Read tool completes
 
 **Actions:**
@@ -143,71 +186,48 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 6. UserPromptSubmit - JIRA Detection
-**When:** User submits a prompt
+### 7. UserPromptSubmit - Prompt Reminder (NEW in 1.4.0)
+**When:** Every user prompt submission
 
 **Actions:**
-- ✅ Detect JIRA ticket IDs (e.g., `PROJ-1234`, `IGNT-5678`)
-- ✅ Notify that jira-integration skill may auto-activate
-- ✅ Pattern: `[A-Z]{2,10}-[0-9]+`
+- ✅ Inject TDD reminder for code-related tasks
+- ✅ Show approval gate reminder for relevant phases
+- ✅ Security reminder for sensitive operations (auth, password, token)
 
 **Example:**
 ```
-User: "Implement PROJ-1234"
-Hook: 🎫 JIRA ticket detected - jira-integration skill may auto-activate
+💡 🧪 TDD: Write tests first | 🔒 Security: Review before commit
 ```
+
+**Script:** `hooks/prompt-reminder.cjs`
 
 ---
 
-### 7. UserPromptSubmit - Figma Detection
-**When:** User submits a prompt
+### 8. SubagentStart - Context Injection (NEW in 1.4.0)
+**When:** Any subagent starts
 
 **Actions:**
-- ✅ Detect Figma URLs (`figma.com/file/...`)
-- ✅ Notify that figma-integration skill may auto-activate
-- ✅ Enables automatic design extraction
+- ✅ Inject current workflow phase
+- ✅ Inject active plan path
+- ✅ Show pending approvals
+- ✅ Pass project context to subagents
 
 **Example:**
 ```
-User: "Build this design https://figma.com/file/ABC123/Design"
-Hook: 🎨 Figma link detected - figma-integration skill may auto-activate
+--- Aura Frog Context ---
+📍 Phase: 5b
+📋 Plan: plans/241223-user-profile
+📦 Project: my-app
+🤖 Agents: backend-nodejs, qa-automation
+-------------------------
 ```
+
+**Script:** `hooks/subagent-init.cjs`
+**Session State:** `hooks/lib/session-state.cjs`
 
 ---
 
-### 8. UserPromptSubmit - Confluence Detection
-**When:** User submits a prompt
-
-**Actions:**
-- ✅ Detect Confluence URLs (`atlassian.net/wiki`, `confluence`)
-- ✅ Notify that confluence-integration skill may auto-activate
-- ✅ Enables automatic documentation fetching
-
-**Example:**
-```
-User: "Check the docs at https://mycompany.atlassian.net/wiki/spaces/DEV/pages/123"
-Hook: 📚 Confluence link detected - confluence-integration skill may auto-activate
-```
-
----
-
-### 9. UserPromptSubmit - GitHub PR/Issue Detection
-**When:** User submits a prompt
-
-**Actions:**
-- ✅ Detect GitHub PR URLs (`github.com/.*/pull/[0-9]+`)
-- ✅ Detect GitHub Issue URLs (`github.com/.*/issues/[0-9]+`)
-- ✅ Notify user of detected link
-
-**Example:**
-```
-User: "Review https://github.com/user/repo/pull/123"
-Hook: 🔗 GitHub PR/Issue detected
-```
-
----
-
-### 10. Stop - Voice Notification
+### 9. Stop - Voice Notification
 **When:** Claude stops for user approval
 
 **Actions:**
@@ -219,7 +239,7 @@ Hook: 🔗 GitHub PR/Issue detected
 
 ---
 
-### 11. Notification - Critical Alert Voice
+### 10. Notification - Critical Alert Voice
 **When:** Critical notifications occur
 
 **Actions:**
@@ -273,6 +293,10 @@ Claude Code provides these environment variables to hooks:
 ## 🔄 Hook Execution Flow
 
 ```
+Session Start (startup/resume/clear/compact)
+  ↓
+[SessionStart Hook] - Auto-detect project, inject env vars
+  ↓
 User Input
   ↓
 [UserPromptSubmit Hook] - Detect JIRA/Figma
@@ -296,21 +320,21 @@ Response to User
 
 ```toon
 hooks[11]{event,name,purpose}:
+  SessionStart,Environment Injection,Auto-detect project and inject env vars
+  PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
   PreToolUse,Project Context,Remind to initialize project context
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
-  UserPromptSubmit,JIRA Detection,Auto-detect ticket IDs
-  UserPromptSubmit,Figma Detection,Auto-detect design URLs
-  UserPromptSubmit,Confluence Detection,Auto-detect wiki URLs
-  UserPromptSubmit,GitHub Detection,Auto-detect PR/Issue URLs
+  UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
+  SubagentStart,Context Injection,Auto-inject workflow context to subagents
   Stop,Voice Notification,Alert user for approval needed
   Notification,Critical Alert,Voice alert for errors/critical issues
 ```
 
 ---
 
-**Version:** 1.4.0
-**Last Updated:** 2025-12-18
+**Version:** 1.4.1
+**Last Updated:** 2025-12-23
 **Status:** Active hooks system (11 hooks)

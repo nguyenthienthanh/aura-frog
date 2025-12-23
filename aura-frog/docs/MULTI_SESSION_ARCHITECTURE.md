@@ -349,7 +349,7 @@ optimization_savings[6]{technique,before,after,savings}:
 ---
 
 **Related:**
-- `skills/state-persistence/SKILL.md`
+- `skills/session-continuation/SKILL.md` (includes state persistence)
 - `skills/lazy-agent-loader/SKILL.md`
 - `skills/response-analyzer/SKILL.md`
 - `scripts/workflow-manager.sh`

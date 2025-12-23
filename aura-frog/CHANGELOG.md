@@ -4,13 +4,75 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.4.1] - 2025-12-23
+
+### Fixes & Code Cleanup
+
+Code quality improvements and documentation fixes.
+
+#### Fixed
+- **Removed duplicate session state functions** - `session-state.cjs` now imports from `af-config-utils.cjs` instead of duplicating code
+- **Fixed hook count mismatch** - README documented 14 hooks but only 11 exist (removed ghost JIRA/Figma/Confluence/GitHub detection sections)
+- **Removed unused import** - `set-active-plan.cjs` no longer imports unused `getSessionTempPath`
+- **Fixed duplicate section numbering** - hooks/README.md had two section "3"s
+
+#### Updated
+- `hooks/lib/session-state.cjs` - v1.1.0: Uses `af-config-utils.cjs` for core operations
+- `hooks/subagent-init.cjs` - v1.2.0: Removed fallback duplication, uses `af-config-utils.cjs`
+- `hooks/prompt-reminder.cjs` - v1.1.0: Uses `af-config-utils.cjs` for session state
+- `hooks/README.md` - Fixed to show correct 11 hooks, removed ghost sections
+
+#### Stats
+- **Hooks:** 11 (corrected from incorrect 14)
+- **Skills:** 32 (corrected from 33)
+
+---
+
 ## [1.4.0] - 2025-12-23
 
 ### Token Efficiency & Auto-Detection Improvements
 
-Major improvements inspired by ClaudeKit Engineer, focused on token efficiency and automatic complexity detection.
+Major improvements focused on token efficiency and automatic complexity detection.
 
 #### New Features
+- **SessionStart hook** - Environment injection on session startup:
+  - Auto-detect project type (monorepo, library, single-repo)
+  - Auto-detect package manager (npm, pnpm, yarn, bun, composer, poetry, go, cargo)
+  - Auto-detect framework (Next.js, React, Vue, Laravel, Django, etc.)
+  - Inject 20+ `AF_*` environment variables
+  - Fires once per session (startup, resume, clear, compact)
+- **Plan resolution** - Branch-matching and active plan management:
+  - `AF_ACTIVE_PLAN` - Explicitly set via session (`/plan:set`)
+  - `AF_SUGGESTED_PLAN` - Branch-matched hint (no stale pollution)
+  - `AF_REPORTS_PATH` - Dynamic path tied to active plan
+- **Cascading config** - `.af.json` configuration with precedence:
+  - DEFAULT → `~/.claude/.af.json` (global) → `.claude/.af.json` (local)
+  - Supports plan naming format, paths, project overrides
+  - `.af.json.example` included as reference
+- **set-active-plan command** - `/plan:set` to explicitly set active plan
+- **SubagentStart hook** - Auto-inject context for subagents:
+  - Injects current workflow phase, active plan, pending approvals
+  - Passes project context automatically
+  - Session state management via `/tmp/af-session-{id}.json`
+  - ~200 tokens per subagent (efficient)
+- **Prompt reminder hook** - Inject reminders each user prompt:
+  - TDD reminder for code-related tasks
+  - Security reminder for auth/password/token operations
+  - Approval gate reminder for relevant phases
+- **sequential-thinking skill** - Structured thinking for complex analysis:
+  - Dynamic adjustment (expand/contract)
+  - Revision capability
+  - Branching for alternatives
+  - Perfect for Phase 1 and debugging
+- **problem-solving skill** - 5 techniques for different problem types:
+  - Simplification Cascades (complexity spiraling)
+  - Collision-Zone Thinking (innovation blocks)
+  - Meta-Pattern Recognition (recurring issues)
+  - Inversion Exercise (tunnel vision)
+  - Scale Game (production readiness)
+- **Session state library** - Shared state across hooks:
+  - `hooks/lib/session-state.cjs` - CLI and programmatic interface
+  - Track phase, plan, approvals, active agents
 - **Model auto-selection** - Agent-detector now selects optimal model:
   - haiku for quick tasks (typo fixes, orchestration)
   - sonnet for standard implementation (coding, testing, bug fixes)
@@ -51,14 +113,25 @@ Major improvements inspired by ClaudeKit Engineer, focused on token efficiency a
 - **state-persistence skill** - Enhanced with plan state variables
 
 #### New Files
+- `hooks/session-start.cjs` - SessionStart hook with env injection
+- `hooks/lib/af-config-utils.cjs` - Cascading config + project detection utils
+- `hooks/set-active-plan.cjs` - Set active plan CLI command
+- `.af.json.example` - Example config file with all options
+- `commands/plan/set.md` - Plan set command documentation
 - `skills/git-workflow/SKILL.md` - Token-efficient git operations
 - `skills/debugging/references/*.md` - Debugging reference docs
+- `skills/sequential-thinking/SKILL.md` - Structured thinking process
+- `skills/problem-solving/SKILL.md` - 5 problem-solving techniques
 - `hooks/scout-block.cjs` - Block wasteful directory scanning
+- `hooks/subagent-init.cjs` - SubagentStart context injection
+- `hooks/prompt-reminder.cjs` - UserPromptSubmit reminders
+- `hooks/lib/session-state.cjs` - Session state management library
 - `.afignore` - Custom patterns for scout-block
 
 #### Updated Files
 - `skills/agent-detector/SKILL.md` - Auto-complexity detection + model selection (v3.0.0)
-- `skills/state-persistence/SKILL.md` - Plan state variables
+- `skills/session-continuation/SKILL.md` - Merged state-persistence, added plan state variables (v2.0.0)
+- `skills/dev-expert/SKILL.md` - References expert skills, keeps generic patterns only (v2.0.0)
 - `rules/naming-conventions.md` - Added TOON format convention (v1.2.0)
 - `rules/estimation.md` - Converted tables to TOON
 - `rules/verification.md` - Converted tables to TOON
@@ -66,7 +139,11 @@ Major improvements inspired by ClaudeKit Engineer, focused on token efficiency a
 - `rules/api-design-rules.md` - Converted tables to TOON
 - `rules/logging-standards.md` - Converted tables to TOON
 - `rules/sast-security-scanning.md` - Converted tables to TOON
-- `hooks/hooks.json` - Added scout-block hook
+- `hooks/hooks.json` - Added SessionStart, scout-block, SubagentStart, UserPromptSubmit hooks
+- `hooks/README.md` - Updated with new hooks (7 → 11)
+- `hooks/subagent-init.cjs` - Now uses af-config-utils, shows framework/PM (v1.1.0)
+- `hooks/lib/session-state.cjs` - Added projectType, packageManager, framework fields
+- `skills/README.md` - Added new skills (35 → 37)
 - `agents/backend-expert.md` - Model specification
 - `agents/qa-automation.md` - Model specification
 - `agents/ui-designer.md` - Model specification
@@ -87,13 +164,28 @@ Major improvements inspired by ClaudeKit Engineer, focused on token efficiency a
   - `templates/test-plan.md` - Keeping TOON version only
 - **Fixed broken cross-references** in remaining docs
 
+#### Removed/Merged (Redundancy Cleanup)
+- **Skill consolidation:**
+  - `skills/state-persistence/` - Merged into `session-continuation` (90% overlap)
+  - `SESSION_CONTINUATION_GUIDE.md` - Redundant with skill
+- **dev-expert pattern files** (covered by individual expert skills):
+  - `skills/dev-expert/react-patterns.md` - Covered by `react-expert`
+  - `skills/dev-expert/vue-patterns.md` - Covered by `vue-expert`
+  - `skills/dev-expert/react-native-patterns.md` - Covered by `react-native-expert`
+  - `skills/dev-expert/laravel-patterns.md` - Covered by `laravel-expert`
+  - `skills/dev-expert/nextjs-patterns.md` - Covered by `nextjs-expert`
+- **Documentation slimmed:**
+  - `docs/PLUGIN_INSTALLATION.md` - From 515 lines to 57 lines (references GET_STARTED.md)
+- **Total removed:** ~1,800 lines of redundant content
+
 #### Stats
-- **Skills:** 33 → 35 (+git-workflow, +debugging references)
-- **Hooks:** +1 (scout-block)
+- **Skills:** 33 → 32 (net -1: +4 new, -1 merged, -5 redundant pattern files removed)
+- **Hooks:** 7 → 11 (+SessionStart, +scout-block, +SubagentStart, +UserPromptSubmit)
+- **Commands:** +1 (`/plan:set`)
 - **Docs:** 24 → 15 (cleanup)
 - **Templates:** 16 → 14 (TOON only)
 - **Token savings:** Up to 80% reduction in git operations
-- **Lines removed:** ~3,000+ lines of redundant documentation
+- **Lines removed:** ~4,800+ lines of redundant documentation and patterns
 
 ---
 

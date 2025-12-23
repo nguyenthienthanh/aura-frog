@@ -1,0 +1,26 @@
+{
+  "plan": {
+    "namingFormat": "{date}-{slug}",
+    "dateFormat": "YYMMDD",
+    "issuePrefix": null,
+    "reportsDir": "reports",
+    "resolution": {
+      "order": ["session", "branch"],
+      "branchPattern": "(?:feat|fix|chore|refactor|docs)/(?:[^/]+/)?(.+)"
+    }
+  },
+  "paths": {
+    "docs": "docs",
+    "plans": "plans",
+    "workflows": ".claude/logs/workflows"
+  },
+  "project": {
+    "type": "auto",
+    "packageManager": "auto",
+    "framework": "auto"
+  },
+  "locale": {
+    "responseLanguage": null
+  },
+  "assertions": []
+}

@@ -181,5 +181,5 @@ Run `project:init` for full project config.
 
 **Related:**
 - `rules/codebase-consistency.md` - Pattern matching rule
-- `skills/state-persistence/SKILL.md` - Workflow state
+- `skills/session-continuation/SKILL.md` - Workflow state + handoff
 - `scripts/context-compress.sh` - Context generator

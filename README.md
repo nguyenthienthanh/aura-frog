@@ -10,7 +10,7 @@
 
 AI-powered development plugin for **Claude Code** with 14 specialized agents, 9-phase TDD workflow, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.3.2-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.1-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -27,13 +27,13 @@ AI-powered development plugin for **Claude Code** with 14 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** | **MCP Servers** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|:---------------:|
-| **14** | **33** | **40** | **9** | **70+** | **6** |
+| **14** | **32** | **40** | **9** | **70+** | **6** |
 
 </div>
 
 **What's Inside:**
 - **14 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps experts
-- **33 Skills** — 22 auto-invoking + 11 reference skills for specialized tasks
+- **32 Skills** — 21 auto-invoking + 11 reference skills for specialized tasks
 - **6 Bundled MCP Servers** — Context7, Playwright, Vitest, Atlassian, Figma, Slack
 - **40 Quality Rules** — System, code quality, architecture, workflow, documentation
 - **9-Phase Workflow** — From requirements to deployment with quality gates

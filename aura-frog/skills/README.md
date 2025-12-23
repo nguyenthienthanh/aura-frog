@@ -12,8 +12,8 @@
 
 ---
 
-**Version:** 1.4.0
-**Total Skills:** 35 (24 auto-invoking + 11 reference)
+**Version:** 1.4.1
+**Total Skills:** 32 (21 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
@@ -25,6 +25,8 @@
 
 - **git-workflow** - Token-efficient git operations with security scanning and auto-split commits
 - **debugging** - Systematic debugging with root cause investigation (now with reference docs)
+- **sequential-thinking** - Structured thinking process for complex analysis with revision and branching
+- **problem-solving** - 5 techniques for different problem types (Simplification, Collision-Zone, Meta-Pattern, Inversion, Scale Game)
 
 ---
 
@@ -182,26 +184,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 9. **state-persistence** (Priority: HIGH)
-
-**Auto-invokes when:** Session handoff needed or workflow resume requested
-
-**Triggers:**
-- "workflow:handoff", "session:save", "context:persist"
-- Token limit warnings
-- Manual save requests
-
-**What it does:**
-- Saves workflow state to `.claude/state/`
-- Generates human-readable handoff documents
-- Enables clean session restarts
-- TOON format for token-efficient loading
-
-**📚 Details:** `skills/state-persistence/SKILL.md`
-
----
-
-### 10. **response-analyzer** (Priority: MEDIUM)
+### 9. **response-analyzer** (Priority: MEDIUM)
 
 **Auto-invokes when:** Large command outputs or API responses
 
@@ -360,15 +343,16 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[22]{name,priority,trigger}:
+skills[23]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
   design-system-library,high,UI components + design system
   code-reviewer,high,After implementation
-  session-continuation,high,Token limit warning
-  state-persistence,high,Session handoff/resume
+  session-continuation,high,Token limit warning + handoff/resume
   lazy-agent-loader,high,Agent loading optimization
+  sequential-thinking,high,Complex analysis / step by step
+  problem-solving,high,Stuck / need breakthrough
   typescript-expert,high,TypeScript/ESLint/type errors
   react-expert,high,React components/hooks
   react-native-expert,high,React Native/Expo/mobile
@@ -643,7 +627,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.4.0
-**Last Updated:** 2025-12-19
+**Version:** 1.4.1
+**Last Updated:** 2025-12-23
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 33 (22 auto-invoking + 11 reference)
+**Total Skills:** 32 (21 auto-invoking + 11 reference)

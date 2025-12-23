@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-start.cjs\" 2>&1 || true"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|Read|Write|Edit|Glob|Grep",
@@ -53,7 +63,27 @@
         ]
       }
     ],
-    "UserPromptSubmit": [],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/prompt-reminder.cjs\" 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/subagent-init.cjs\" 2>&1 || true"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

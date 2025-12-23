@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.4.0
+**System:** Aura Frog v1.4.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.4.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -61,7 +61,7 @@ mcp_servers[6]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[22]{name,trigger,file}:
+skills[21]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -69,10 +69,9 @@ skills[22]{name,trigger,file}:
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
   code-reviewer,Code review,skills/code-reviewer/SKILL.md
-  session-continuation,Token limit,skills/session-continuation/SKILL.md
+  session-continuation,Token limit/handoff,skills/session-continuation/SKILL.md
   lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
-  state-persistence,Session handoff,skills/state-persistence/SKILL.md
   typescript-expert,TypeScript/ESLint,skills/typescript-expert/SKILL.md
   react-expert,React/hooks,skills/react-expert/SKILL.md
   react-native-expert,React Native/mobile,skills/react-native-expert/SKILL.md
@@ -107,7 +106,7 @@ resources[10]{name,location}:
   Agents (14),agents/
   Commands (73),commands/
   Rules (41),rules/
-  Skills (35),skills/
+  Skills (32),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Phases (9),docs/phases/
@@ -118,4 +117,4 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.4.0
+**Version:** 1.4.1

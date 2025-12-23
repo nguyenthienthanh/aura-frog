@@ -1,32 +1,48 @@
 ---
 name: session-continuation
-description: "Manage workflow state across sessions with handoff and resume."
+description: "Manage workflow state across sessions with handoff and resume. TOON-based state persistence."
 autoInvoke: false
 priority: high
+model: haiku
 triggers:
   - "handoff"
   - "save state"
   - "resume workflow"
+  - "workflow:handoff"
+  - "workflow:resume"
+allowed-tools: Read, Write, Bash
 ---
 
-# Skill: Session Continuation
+# Session Continuation
 
 **Purpose:** Manage workflow state across sessions with handoff and resume
 **Priority:** HIGH
-**Auto-invokes:** When token limit approaching, session ending, or resuming workflow
-**Type:** Skill (Dynamic Execution)
+**Version:** 2.0.0
+
+---
+
+## Plan State Variables
+
+```toon
+state_vars[4]{var,purpose,persistence}:
+  AF_ACTIVE_PLAN,Current active plan path,Session temp file
+  AF_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
+  AF_COMPLEXITY,Auto-detected task complexity,Session memory
+  AF_ACTIVE_AGENTS,Currently active agents,Session memory
+```
 
 ---
 
 ## When This Skill Activates
 
-| Trigger | Action |
-|---------|--------|
-| Token count reaches 150K (75%) | Suggest handoff |
-| User says "handoff" / "save state" | Execute handoff |
-| User says "resume" + workflow ID | Execute resume |
-| Session about to end | Auto-save state |
-| User returns to incomplete workflow | Prompt to resume |
+```toon
+triggers[5]{trigger,action}:
+  Token 150K (75%),Suggest handoff
+  User says handoff/save,Execute handoff
+  User says resume + ID,Execute resume
+  Session ending,Auto-save state
+  Incomplete workflow,Prompt to resume
+```
 
 ---
 
@@ -398,5 +414,32 @@ Continue? (yes/no)
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-29
+## TOON State Format (Token-Efficient)
+
+```toon
+# .claude/workflow-state.toon
+workflow:
+  id: auth-feature-20251216
+  phase: 5
+  status: in_progress
+
+phases[9]{num,name,status}:
+  1,Requirements,completed
+  2,Tech Planning,completed
+  3,UI Breakdown,skipped
+  4,Test Planning,completed
+  5,TDD Implementation,in_progress
+  6,Code Review,pending
+  7,QA Validation,pending
+  8,Documentation,pending
+  9,Notification,pending
+
+agents[2]: backend-nodejs,qa-automation
+```
+
+**Token savings:** TOON uses ~160 tokens vs JSON ~600 tokens (73% reduction)
+
+---
+
+**Version:** 2.0.0
+**Last Updated:** 2025-12-23
