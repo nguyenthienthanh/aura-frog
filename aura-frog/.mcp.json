@@ -14,29 +14,26 @@
     },
     "atlassian": {
       "command": "npx",
-      "args": ["-y", "@anthropic/atlassian-mcp"],
+      "args": ["-y", "atlassian-mcp-server"],
       "env": {
-        "JIRA_URL": "${JIRA_URL}",
-        "JIRA_EMAIL": "${JIRA_EMAIL}",
-        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}",
-        "CONFLUENCE_URL": "${CONFLUENCE_URL}",
-        "CONFLUENCE_EMAIL": "${CONFLUENCE_EMAIL}",
-        "CONFLUENCE_API_TOKEN": "${CONFLUENCE_API_TOKEN}"
+        "ATLASSIAN_BASE_URL": "${JIRA_URL}",
+        "ATLASSIAN_EMAIL": "${JIRA_EMAIL}",
+        "ATLASSIAN_TOKEN": "${JIRA_API_TOKEN}"
       }
     },
     "figma": {
       "command": "npx",
-      "args": ["-y", "@anthropic/figma-mcp"],
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
       "env": {
-        "FIGMA_API_TOKEN": "${FIGMA_API_TOKEN}"
+        "FIGMA_API_KEY": "${FIGMA_API_TOKEN}"
       }
     },
     "slack": {
       "command": "npx",
-      "args": ["-y", "@anthropic/slack-mcp"],
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
       "env": {
         "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
-        "SLACK_CHANNEL_ID": "${SLACK_CHANNEL_ID}"
+        "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
       }
     }
   }

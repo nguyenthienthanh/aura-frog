@@ -44,9 +44,9 @@ mcp_servers[6]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
   playwright,@playwright/mcp,Browser automation + E2E tests
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,@anthropic/atlassian-mcp,JIRA + Confluence
-  figma,@anthropic/figma-mcp,Figma design fetch
-  slack,@anthropic/slack-mcp,Slack notifications
+  atlassian,atlassian-mcp-server,JIRA + Confluence
+  figma,figma-developer-mcp,Figma design fetch
+  slack,@modelcontextprotocol/server-slack,Slack notifications
 ```
 
 **Auto-invocation:** Claude uses these automatically based on context:

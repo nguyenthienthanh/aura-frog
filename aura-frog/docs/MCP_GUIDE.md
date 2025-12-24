@@ -28,9 +28,9 @@ servers[6]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc)
   playwright,@playwright/mcp,Browser automation + E2E testing
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,@anthropic/atlassian-mcp,JIRA + Confluence
-  figma,@anthropic/figma-mcp,Design file fetching
-  slack,@anthropic/slack-mcp,Notifications
+  atlassian,atlassian-mcp-server,JIRA + Confluence
+  figma,figma-developer-mcp,Design file fetching
+  slack,@modelcontextprotocol/server-slack,Notifications
 ```
 
 ---
@@ -59,20 +59,17 @@ Claude detects context and uses appropriate MCP:
 Create `.envrc` in your project root:
 
 ```bash
-# Atlassian (JIRA + Confluence)
+# Atlassian (JIRA + Confluence - uses unified auth)
 export JIRA_URL="https://company.atlassian.net"
 export JIRA_EMAIL="your-email@company.com"
 export JIRA_API_TOKEN="your-api-token"
-export CONFLUENCE_URL="https://company.atlassian.net/wiki"
-export CONFLUENCE_EMAIL="your-email@company.com"
-export CONFLUENCE_API_TOKEN="your-api-token"
 
 # Figma
 export FIGMA_API_TOKEN="your-figma-token"
 
 # Slack
 export SLACK_BOT_TOKEN="xoxb-your-bot-token"
-export SLACK_CHANNEL_ID="C0123456789"
+export SLACK_TEAM_ID="T0123456789"
 ```
 
 ### How to Get Tokens
