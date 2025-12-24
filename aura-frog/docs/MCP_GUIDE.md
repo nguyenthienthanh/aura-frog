@@ -28,7 +28,7 @@ servers[6]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc)
   playwright,@playwright/mcp,Browser automation + E2E testing
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,atlassian-mcp-server,JIRA + Confluence
+  atlassian,mcp-remote (Official Atlassian),JIRA + Confluence (OAuth)
   figma,figma-developer-mcp,Design file fetching
   slack,@modelcontextprotocol/server-slack,Notifications
 ```
@@ -59,10 +59,8 @@ Claude detects context and uses appropriate MCP:
 Create `.envrc` in your project root:
 
 ```bash
-# Atlassian (JIRA + Confluence - uses unified auth)
-export JIRA_URL="https://company.atlassian.net"
-export JIRA_EMAIL="your-email@company.com"
-export JIRA_API_TOKEN="your-api-token"
+# Atlassian (JIRA + Confluence)
+# Uses OAuth - no env vars needed! Browser popup handles auth on first use.
 
 # Figma
 export FIGMA_API_TOKEN="your-figma-token"

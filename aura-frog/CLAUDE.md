@@ -44,7 +44,7 @@ mcp_servers[6]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
   playwright,@playwright/mcp,Browser automation + E2E tests
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,atlassian-mcp-server,JIRA + Confluence
+  atlassian,Official Atlassian (OAuth),JIRA + Confluence
   figma,figma-developer-mcp,Figma design fetch
   slack,@modelcontextprotocol/server-slack,Slack notifications
 ```

@@ -15,8 +15,8 @@ Code quality improvements and documentation fixes.
 - **Fixed hook count mismatch** - README documented 14 hooks but only 11 exist (removed ghost JIRA/Figma/Confluence/GitHub detection sections)
 - **Removed unused import** - `set-active-plan.cjs` no longer imports unused `getSessionTempPath`
 - **Fixed duplicate section numbering** - hooks/README.md had two section "3"s
-- **Fixed MCP package names** - Replaced non-existent `@anthropic/*` packages with real npm packages:
-  - `atlassian`: `@anthropic/atlassian-mcp` → `atlassian-mcp-server`
+- **Fixed MCP package names** - Replaced non-existent `@anthropic/*` packages with real packages:
+  - `atlassian`: `@anthropic/atlassian-mcp` → Official Atlassian Remote MCP (OAuth, no env vars needed)
   - `figma`: `@anthropic/figma-mcp` → `figma-developer-mcp` (maps `FIGMA_API_TOKEN` internally)
   - `slack`: `@anthropic/slack-mcp` → `@modelcontextprotocol/server-slack` (added `SLACK_TEAM_ID`)
 

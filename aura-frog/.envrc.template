@@ -17,18 +17,11 @@ export PROJECT_ENV="{{PROJECT_ENV}}"
 # See docs/MCP_GUIDE.md for setup instructions
 
 # --------------------------------------------
-# Atlassian MCP (atlassian-mcp-server)
+# Atlassian MCP (Official Remote Server)
 # --------------------------------------------
-# Get API token: https://id.atlassian.com/manage-profile/security/api-tokens
-# MCP uses unified Atlassian auth (same creds for JIRA + Confluence)
-export JIRA_URL="{{JIRA_URL}}"
-export JIRA_EMAIL="{{JIRA_EMAIL}}"
-export JIRA_API_TOKEN="{{JIRA_API_TOKEN}}"
-
+# Uses OAuth - no tokens needed! Browser popup handles auth on first use.
 # Optional: Project defaults for workflow commands
 export JIRA_PROJECT_KEY="{{JIRA_PROJECT_KEY}}"
-export JIRA_DEFAULT_ASSIGNEE="{{JIRA_DEFAULT_ASSIGNEE}}"
-export JIRA_DEFAULT_PRIORITY="Medium"
 export CONFLUENCE_SPACE_KEY="{{CONFLUENCE_SPACE_KEY}}"
 
 # --------------------------------------------

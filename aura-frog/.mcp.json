@@ -14,12 +14,7 @@
     },
     "atlassian": {
       "command": "npx",
-      "args": ["-y", "atlassian-mcp-server"],
-      "env": {
-        "ATLASSIAN_BASE_URL": "${JIRA_URL}",
-        "ATLASSIAN_EMAIL": "${JIRA_EMAIL}",
-        "ATLASSIAN_TOKEN": "${JIRA_API_TOKEN}"
-      }
+      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
     },
     "figma": {
       "command": "npx",
