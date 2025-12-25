@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.4.1
+**Version:** 1.4.4
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 **Type:** Rule (Mandatory Format)
 
@@ -12,7 +12,7 @@
 
 ### Single Agent (Default)
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -20,7 +20,7 @@
 
 ### With MCP Server (Single)
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔌 MCP: [mcp-name]                     ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -29,7 +29,7 @@
 
 ### With Multiple MCPs
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔌 MCP: [mcp1], [mcp2], [mcp3]         ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -38,7 +38,7 @@
 
 ### Multiple Agents (Collaboration)
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: [primary] + [secondary], [tertiary]            ┃
 ┃ Phase: [phase] - [name] │ 🔥 [aura-message]            ┃
 ┃ Model: [model]                                         ┃
@@ -52,7 +52,7 @@
 ## Banner Components
 
 ### Line 1: Header
-- Version indicator: `AURA FROG v1.4.1`
+- Version indicator: `AURA FROG v1.4.4`
 - Visual separator with lightning bolt
 
 ### Line 2: Agent(s) & Context
@@ -78,7 +78,6 @@
 | context7 | `🔌 MCP: context7` | Library docs (React, MUI, Tailwind) |
 | playwright | `🔌 MCP: playwright` | E2E testing, browser automation |
 | vitest | `🔌 MCP: vitest` | Test execution, coverage |
-| atlassian | `🔌 MCP: atlassian` | JIRA tickets, Confluence pages |
 | figma | `🔌 MCP: figma` | Design file fetching |
 | slack | `🔌 MCP: slack` | Team notifications |
 
@@ -86,43 +85,25 @@
 
 **Fetching library docs:**
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: web-expert │ Phase: -                           ┃
 ┃ Model: Opus 4.5 │ 🔌 MCP: context7                      ┃
 ┃ 🔥 Fetching React docs                                 ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Fetching JIRA ticket:**
-```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: backend-expert │ Phase: 1 - Understand          ┃
-┃ Model: Sonnet 4.5 │ 🔌 MCP: atlassian                   ┃
-┃ 🔥 Loading PROJ-1234                                   ┃
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
 **Running E2E tests:**
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: 7 - Verify               ┃
 ┃ Model: Opus 4.5 │ 🔌 MCP: playwright                    ┃
 ┃ 🔥 Testing login flow                                  ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Multiple MCPs (JIRA + Figma for feature implementation):**
-```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: mobile-expert │ Phase: 1 - Understand           ┃
-┃ Model: Opus 4.5 │ 🔌 MCP: atlassian, figma              ┃
-┃ 🔥 Loading requirements                                ┃
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
 **Multiple MCPs (docs + testing):**
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: web-expert │ Phase: 5b - TDD GREEN              ┃
 ┃ Model: Sonnet 4.5 │ 🔌 MCP: context7, vitest            ┃
 ┃ 🔥 Building with tests                                 ┃
@@ -222,7 +203,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Single Agent - During Workflow
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
 ┃ Model: Gemini 2.0 Flash │ 🔥 Architecting greatness     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -231,7 +212,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Single Agent - General Conversation
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
 ┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -240,7 +221,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Multi-Agent - Code Review
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: qa-automation + security-expert                ┃
 ┃ Phase: 6 - Review │ 🔥 Eagle eyes on                   ┃
 ┃ Model: Opus 4.5                                        ┃
@@ -250,7 +231,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Multi-Agent - Feature Implementation
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: mobile-react-native + ui-designer, qa-automation┃
 ┃ Phase: 5b - TDD GREEN │ 🔥 Squad goals                  ┃
 ┃ Model: Sonnet 4.5                                       ┃
@@ -260,7 +241,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Multi-Agent - Bug Fix with Testing
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: backend-nodejs + qa-automation                 ┃
 ┃ Phase: - │ 🔥 Bug hunter squad                         ┃
 ┃ Model: DeepSeek V3                                     ┃
@@ -270,7 +251,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Single Agent - TDD Phase
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: backend-nodejs │ Phase: 5a - TDD RED            ┃
 ┃ Model: DeepSeek V3 │ 🔥 Tests first, always             ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -310,7 +291,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ### Example - Starting Phase 2
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
 ┃ Model: Sonnet 4.5 │ 🔥 Architecting greatness           ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -323,7 +304,7 @@ Starting technical design for [feature]...
 ### Example - Starting Phase 5b with Agent Change
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: backend-nodejs + qa-automation                 ┃
 ┃ Phase: 5b - TDD GREEN │ 🔥 Make it pass                ┃
 ┃ Model: Opus 4.5                                        ┃
@@ -345,7 +326,7 @@ Every response should follow this structure:
 ```
 ┌─────────────────────────────────────────────┐
 │  AGENT BANNER (start of response)           │
-│  ⚡ 🐸 AURA FROG v1.4.1 ...                  │
+│  ⚡ 🐸 AURA FROG v1.4.4 ...                  │
 └─────────────────────────────────────────────┘
             │
             ▼
@@ -377,5 +358,5 @@ Every response should follow this structure:
 
 ---
 
-**Version:** 1.4.1
+**Version:** 1.4.4
 **Last Updated:** 2025-12-22

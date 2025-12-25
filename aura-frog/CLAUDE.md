@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.4.1
+**System:** Aura Frog v1.4.4
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.4.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -40,11 +40,10 @@ session_start[5]{step,action,file}:
 ## Bundled MCP Servers
 
 ```toon
-mcp_servers[6]{name,package,purpose}:
+mcp_servers[5]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
   playwright,@playwright/mcp,Browser automation + E2E tests
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,Official Atlassian (OAuth),JIRA + Confluence
   figma,figma-developer-mcp,Figma design fetch
   slack,@modelcontextprotocol/server-slack,Slack notifications
 ```
@@ -52,7 +51,11 @@ mcp_servers[6]{name,package,purpose}:
 **Auto-invocation:** Claude uses these automatically based on context:
 - "Build with MUI" → context7 fetches docs
 - "Run tests" → vitest executes
-- "PROJ-123" → atlassian fetches ticket
+- "Get Figma design" → figma fetches components
+
+**Atlassian (Jira/Confluence):** Use bash scripts instead (simpler):
+- `./scripts/jira-fetch.sh PROJ-123`
+- `./scripts/confluence-fetch.sh 123456789`
 
 **Configuration:** `.mcp.json` | **Guide:** `docs/MCP_GUIDE.md`
 
@@ -107,7 +110,7 @@ resources[10]{name,location}:
   Commands (73),commands/
   Rules (41),rules/
   Skills (32),skills/
-  MCP Servers (6),.mcp.json
+  MCP Servers (5),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
@@ -117,4 +120,4 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.4.1
+**Version:** 1.4.4

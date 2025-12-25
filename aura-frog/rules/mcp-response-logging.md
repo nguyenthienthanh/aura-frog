@@ -22,9 +22,9 @@ bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/workflow/save-mcp
 ```
 
 **Or in Claude's workflow:**
-1. Fetch ticket via Atlassian MCP
-2. Extract JSON response
-3. Save to `.claude/logs/jira/{ticket-id}_latest.toon`
+1. Fetch ticket via `./scripts/jira-fetch.sh TICKET-ID`
+2. Output is already in TOON format
+3. Redirect to `.claude/logs/jira/{ticket-id}_latest.toon`
 
 ---
 

@@ -4,6 +4,80 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.4.4] - 2025-12-25
+
+### Cleanup & Simplification
+
+Removed unused MCP server files, keeping only simple bash scripts for Atlassian.
+
+#### Removed
+- **`mcp-servers/`** - Removed entire folder (unused MCP server attempt)
+
+#### Updated
+- All version references updated to 1.4.4
+
+---
+
+## [1.4.3] - 2025-12-25
+
+### Atlassian Scripts with TOON Format
+
+Bash scripts for Jira and Confluence with TOON format output.
+
+#### Added
+- **`scripts/confluence-fetch.sh`** - Fetch Confluence pages in TOON format
+  - By page ID: `./scripts/confluence-fetch.sh 123456789`
+  - By space/title: `./scripts/confluence-fetch.sh --space PROJ --title "API Docs"`
+  - `--verbose` flag for comments
+
+#### Updated
+- **`scripts/jira-fetch.sh`** - Now outputs TOON format:
+  - `ticket[1]{key,summary,type,status,priority}:` - Core ticket data
+  - `metadata[1]{assignee,reporter,created,updated}:` - Ticket metadata
+  - `subtasks[N]{key,summary,status}:` - Child issues
+  - `links[N]{type,key,summary}:` - Issue links
+  - `--verbose` flag for comments
+- **`docs/MCP_GUIDE.md`** - Atlassian section with script usage
+
+#### Example Output (TOON)
+```toon
+ticket[1]{key,summary,type,status,priority}:
+  PROJ-123,Fix login bug,Bug,In Progress,High
+
+metadata[1]{assignee,reporter,created,updated}:
+  John Doe,Jane Smith,2025-01-15,2025-01-20
+
+labels[2]: frontend;auth
+subtasks[2]{key,summary,status}:
+  PROJ-124,Write tests,Done
+  PROJ-125,Update docs,To Do
+```
+
+---
+
+## [1.4.2] - 2025-12-24
+
+### Remove Atlassian MCP
+
+Removed Atlassian MCP from default bundled servers due to OAuth stability issues.
+
+#### Removed
+- **Atlassian MCP** - OAuth tokens expire every 55 mins, browser auth doesn't work in Claude Code's non-interactive subprocess environment
+
+#### Added
+- **`scripts/jira-fetch.sh`** - Bash script alternative for fetching Jira tickets via REST API (requires `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`)
+
+#### Updated
+- `.mcp.json` - Reduced from 6 to 5 bundled MCP servers
+- `docs/MCP_GUIDE.md` - Removed Atlassian references
+- `rules/agent-identification-banner.md` - Removed Atlassian examples
+- `commands/mcp/status.md` - Removed Atlassian from status output
+
+#### Stats
+- **MCP Servers:** 5 (was 6)
+
+---
+
 ## [1.4.1] - 2025-12-23
 
 ### Fixes & Code Cleanup

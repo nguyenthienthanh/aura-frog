@@ -30,7 +30,6 @@ Show status of bundled MCP servers and verify they are loaded correctly.
 | Server | Status | Tools Available |
 |--------|--------|-----------------|
 | context7 | ✅ Loaded | resolve-library-id, get-library-docs |
-| atlassian | ✅ Loaded | jira-get-issue, confluence-search |
 | figma | ⚠️ No Token | - |
 | playwright | ✅ Loaded | browser-*, navigate, screenshot |
 | vitest | ✅ Loaded | run-tests, get-coverage |
@@ -57,7 +56,6 @@ Claude checks MCP status by:
 ```yaml
 MCP Prefixes:
   context7: mcp__plugin_context7_context7__
-  atlassian: mcp__plugin_atlassian_atlassian__
   figma: mcp__plugin_figma_figma__
   playwright: mcp__plugin_playwright_playwright__
   vitest: mcp__plugin_vitest_vitest__
@@ -118,7 +116,6 @@ When user runs `mcp:status`:
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| No atlassian tools | Missing JIRA_API_TOKEN | Add to .envrc |
 | No figma tools | Missing FIGMA_API_TOKEN | Add to .envrc |
 | No slack tools | Missing SLACK_BOT_TOKEN | Add to .envrc |
 | context7 missing | Package not installed | Check .mcp.json |

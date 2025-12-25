@@ -1,6 +1,6 @@
 # MCP Integration Guide
 
-**Version:** 1.4.1
+**Version:** 1.4.4
 **Purpose:** How to use bundled MCP servers and create your own
 
 ---
@@ -21,14 +21,13 @@ User Message → Claude → MCP Server → External Service
 
 ## Bundled MCP Servers
 
-Aura Frog bundles 6 MCP servers in `.mcp.json`:
+Aura Frog bundles 5 MCP servers in `.mcp.json`:
 
 ```toon
-servers[6]{name,package,purpose}:
+servers[5]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc)
   playwright,@playwright/mcp,Browser automation + E2E testing
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  atlassian,mcp-remote (Official Atlassian),JIRA + Confluence (OAuth)
   figma,figma-developer-mcp,Design file fetching
   slack,@modelcontextprotocol/server-slack,Notifications
 ```
@@ -44,7 +43,6 @@ Claude detects context and uses appropriate MCP:
 | "Build with Material UI" | context7 | Fetches MUI docs |
 | "Test the login page" | playwright | Opens browser, runs E2E |
 | "Run unit tests" | vitest | Executes tests, shows results |
-| "Check PROJ-1234" | atlassian | Fetches JIRA ticket |
 | "Get the Figma design" | figma | Fetches design tokens |
 | "Notify the team" | slack | Sends message |
 
@@ -59,9 +57,6 @@ Claude detects context and uses appropriate MCP:
 Create `.envrc` in your project root:
 
 ```bash
-# Atlassian (JIRA + Confluence)
-# Uses OAuth - no env vars needed! Browser popup handles auth on first use.
-
 # Figma
 export FIGMA_API_TOKEN="your-figma-token"
 
@@ -74,9 +69,54 @@ export SLACK_TEAM_ID="T0123456789"
 
 | Service | Token URL |
 |---------|-----------|
-| JIRA/Confluence | https://id.atlassian.com/manage-profile/security/api-tokens |
 | Figma | https://www.figma.com/developers/api#access-tokens |
 | Slack | https://api.slack.com/apps → OAuth & Permissions |
+
+---
+
+## Atlassian Integration (Jira & Confluence)
+
+Bash scripts for Jira and Confluence with TOON format output.
+
+### Setup
+
+Add environment variables to `.envrc`:
+
+```bash
+export JIRA_BASE_URL="https://company.atlassian.net"
+export JIRA_EMAIL="your-email@company.com"
+export JIRA_API_TOKEN="your-api-token"
+```
+
+**Get API token:** https://id.atlassian.com/manage-profile/security/api-tokens
+
+### Usage
+
+```bash
+# Jira
+./scripts/jira-fetch.sh PROJ-123
+./scripts/jira-fetch.sh PROJ-123 --verbose  # Include comments
+
+# Confluence
+./scripts/confluence-fetch.sh 123456789                        # By page ID
+./scripts/confluence-fetch.sh --space PROJ --title "API Docs"  # By space/title
+./scripts/confluence-fetch.sh 123456789 --verbose              # Include comments
+```
+
+### Output Format (TOON)
+
+```toon
+ticket[1]{key,summary,type,status,priority}:
+  PROJ-123,Fix login bug,Bug,In Progress,High
+
+metadata[1]{assignee,reporter,created,updated}:
+  John Doe,Jane Smith,2025-01-15,2025-01-20
+
+labels[2]: frontend;auth
+subtasks[2]{key,summary,status}:
+  PROJ-124,Write tests,Done
+  PROJ-125,Update docs,To Do
+```
 
 ---
 
@@ -90,9 +130,9 @@ export SLACK_TEAM_ID="T0123456789"
 
 **Example Flow:**
 ```
-1. User: "Implement PROJ-123 from Figma"
-2. MCP atlassian → fetches JIRA ticket requirements
-3. MCP figma → fetches design tokens and components
+1. User: "Implement this button from Figma"
+2. MCP figma → fetches design tokens and components
+3. MCP context7 → fetches React/MUI docs
 4. Skill react-expert → applies React patterns
 5. Agent web-expert → executes implementation
 ```
@@ -391,4 +431,4 @@ async function getCachedData(key: string) {
 
 ---
 
-**Version:** 1.4.1 | **Last Updated:** 2025-12-19
+**Version:** 1.4.4 | **Last Updated:** 2025-12-19

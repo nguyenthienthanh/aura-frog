@@ -12,10 +12,6 @@
       "command": "npx",
       "args": ["-y", "@djankies/vitest-mcp"]
     },
-    "atlassian": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
-    },
     "figma": {
       "command": "npx",
       "args": ["-y", "figma-developer-mcp", "--stdio"],
