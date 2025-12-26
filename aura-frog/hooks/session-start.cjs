@@ -21,6 +21,7 @@
  *   AF_PYTHON_VERSION    - Python version (if available)
  *   AF_PHP_VERSION       - PHP version (if available)
  *   AF_GO_VERSION        - Go version (if available)
+ *   AF_GODOT_VERSION     - Godot version (if available, detected from project.godot)
  *   AF_OS_PLATFORM       - darwin | linux | win32
  *   AF_USER              - Current username
  *   AF_TIMEZONE          - System timezone
@@ -47,6 +48,7 @@ const {
   getPythonVersion,
   getPhpVersion,
   getGoVersion,
+  getGodotVersion,
   getGitBranch,
   getGitRemoteUrl,
   resolvePlanPath,
@@ -130,6 +132,7 @@ async function main() {
       pythonVersion: getPythonVersion(),
       phpVersion: getPhpVersion(),
       goVersion: getGoVersion(),
+      godotVersion: getGodotVersion(),
       osPlatform: process.platform,
       gitBranch: getGitBranch(),
       gitUrl: getGitRemoteUrl(),
@@ -172,6 +175,7 @@ async function main() {
       if (staticEnv.pythonVersion) writeEnv(envFile, 'AF_PYTHON_VERSION', staticEnv.pythonVersion);
       if (staticEnv.phpVersion) writeEnv(envFile, 'AF_PHP_VERSION', staticEnv.phpVersion);
       if (staticEnv.goVersion) writeEnv(envFile, 'AF_GO_VERSION', staticEnv.goVersion);
+      if (staticEnv.godotVersion) writeEnv(envFile, 'AF_GODOT_VERSION', staticEnv.godotVersion);
 
       // System info
       writeEnv(envFile, 'AF_OS_PLATFORM', staticEnv.osPlatform);

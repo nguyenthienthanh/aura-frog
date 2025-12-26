@@ -1,24 +1,25 @@
 # Aura Frog Agents Directory
 
-**Version:** 1.4.1
+**Version:** 1.6.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2025-12-23
+**Last Updated:** 2025-12-26
 
 ---
 
 ## Overview
 
-Aura Frog provides **14 specialized agents** that are automatically selected based on task context. Each agent has domain expertise and specific capabilities.
+Aura Frog provides **15 specialized agents** that are automatically selected based on task context. Each agent has domain expertise and specific capabilities.
 
 ---
 
 ## Agents Index (TOON)
 
 ```toon
-agents[14]{name,file,expertise}:
+agents[15]{name,file,expertise}:
   backend-expert,backend-expert.md,Backend APIs + databases + server logic
   database-specialist,database-specialist.md,Database design + queries + migrations
   devops-cicd,devops-cicd.md,CI/CD pipelines + deployment + infrastructure
+  game-developer,game-developer.md,Godot game development + multi-platform export
   mobile-expert,mobile-expert.md,React Native + Flutter + mobile platforms
   pm-operations-orchestrator,pm-operations-orchestrator.md,Project management + workflow coordination
   project-config-loader,project-config-loader.md,Project configuration + context loading
@@ -58,7 +59,7 @@ agent:list
 
 | Category | Agents | Purpose |
 |----------|--------|---------|
-| **Development** | web-expert, mobile-expert, backend-expert | Code implementation |
+| **Development** | web-expert, mobile-expert, backend-expert, game-developer | Code implementation |
 | **Infrastructure** | devops-cicd, database-specialist | Deployment + data |
 | **Quality** | qa-automation, security-expert | Testing + security |
 | **Design** | ui-designer | UI/UX decisions |
@@ -67,4 +68,4 @@ agent:list
 
 ---
 
-**Version:** 1.4.1
+**Version:** 1.6.0

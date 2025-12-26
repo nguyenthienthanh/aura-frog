@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.5.0
+**System:** Aura Frog v1.6.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.5.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.6.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -64,7 +64,7 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[22]{name,trigger,file}:
+skills[23]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -87,6 +87,7 @@ skills[22]{name,trigger,file}:
   go-expert,Go/Gin/Echo,skills/go-expert/SKILL.md
   flutter-expert,Flutter/Dart,skills/flutter-expert/SKILL.md
   angular-expert,Angular/NgRx,skills/angular-expert/SKILL.md
+  godot-expert,Godot/GDScript/game,skills/godot-expert/SKILL.md
 ```
 
 **All skills:** `skills/README.md`
@@ -107,10 +108,10 @@ skills[22]{name,trigger,file}:
 
 ```toon
 resources[10]{name,location}:
-  Agents (14),agents/
+  Agents (15),agents/
   Commands (73),commands/
-  Rules (41),rules/
-  Skills (32),skills/
+  Rules (44),rules/
+  Skills (34),skills/
   MCP Servers (5),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Phases (9),docs/phases/
@@ -121,4 +122,4 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.5.0
+**Version:** 1.6.0

@@ -276,6 +276,11 @@ function detectFramework(configOverride) {
     } catch (e) { /* ignore */ }
   }
 
+  // Godot
+  if (fs.existsSync('project.godot')) {
+    return 'godot';
+  }
+
   return null;
 }
 
@@ -308,6 +313,33 @@ function getGoVersion() {
   const result = execSafe('go version');
   if (result) {
     const match = result.match(/go(\d+\.\d+\.\d+)/);
+    return match ? match[1] : null;
+  }
+  return null;
+}
+
+function getGodotVersion() {
+  // Try reading from project.godot file
+  if (fs.existsSync('project.godot')) {
+    try {
+      const content = fs.readFileSync('project.godot', 'utf8');
+      // Godot 4.x uses config_version=5
+      // Godot 3.x uses config_version=4
+      const configMatch = content.match(/config_version=(\d+)/);
+      if (configMatch) {
+        const configVersion = parseInt(configMatch[1]);
+        if (configVersion >= 5) return '4.x';
+        if (configVersion === 4) return '3.x';
+      }
+      // Try to find version from features
+      const featuresMatch = content.match(/config\/features=PackedStringArray\("([0-9.]+)"/);
+      if (featuresMatch) return featuresMatch[1];
+    } catch (e) { /* ignore */ }
+  }
+  // Try godot command
+  const result = execSafe('godot --version 2>/dev/null || godot4 --version 2>/dev/null');
+  if (result) {
+    const match = result.match(/^(\d+\.\d+(?:\.\d+)?)/);
     return match ? match[1] : null;
   }
   return null;
@@ -486,6 +518,7 @@ module.exports = {
   getPythonVersion,
   getPhpVersion,
   getGoVersion,
+  getGodotVersion,
 
   // Git utilities
   getGitBranch,

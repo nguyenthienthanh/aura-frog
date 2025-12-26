@@ -12,14 +12,18 @@
 
 ---
 
-**Version:** 1.5.0
-**Total Skills:** 33 (22 auto-invoking + 11 reference)
+**Version:** 1.6.0
+**Total Skills:** 34 (23 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
 
 ---
+
+## 🆕 New in 1.6.0
+
+- **godot-expert** - Godot game development expert for HTML5, Android, iOS, and desktop exports with GDScript best practices
 
 ## 🆕 New in 1.5.0
 
@@ -368,6 +372,7 @@ skills[24]{name,priority,trigger}:
   go-expert,high,Go/Gin/Echo/Fiber
   flutter-expert,high,Flutter/Dart/Bloc/Riverpod
   angular-expert,high,Angular/NgRx/RxJS
+  godot-expert,high,Godot/GDScript/game development
   stitch-design,medium,AI design / Stitch prompts
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
@@ -663,7 +668,32 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.5.0
+### 25. **godot-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with Godot game projects
+
+**Triggers:** godot, gdscript, game, .gd, .tscn, scene, node, project.godot
+
+**What it does:**
+- Scene composition patterns
+- GDScript typed best practices
+- Physics and collision handling
+- Input handling (desktop + touch/mobile)
+- Animation and audio systems
+- Multi-platform export (HTML5, Android, iOS, Desktop)
+- Testing with GDUnit
+
+**Export Targets:**
+- HTML5 (WebGL, browser games)
+- Android (APK/AAB for Google Play)
+- iOS (IPA for App Store)
+- Windows, macOS, Linux
+
+**📚 Details:** `skills/godot-expert/SKILL.md`
+
+---
+
+**Version:** 1.6.0
 **Last Updated:** 2025-12-26
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 33 (22 auto-invoking + 11 reference)
+**Total Skills:** 34 (23 auto-invoking + 11 reference)

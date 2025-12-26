@@ -4,6 +4,65 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.6.0] - 2025-12-26
+
+### Godot Game Development Support
+
+Comprehensive Godot engine support for multi-platform game development (HTML5, Android, iOS, Desktop).
+
+#### Added
+- **`skills/godot-expert/`** - New skill for Godot game development
+  - `SKILL.md` - Main skill with 10 content sections (~600 lines)
+  - `references/export-platforms.md` - HTML5, Android, iOS, Desktop export guides
+  - `references/ui-patterns.md` - Game UI (HUD, menus, dialogs, touch controls)
+  - `references/testing-gdunit.md` - GDUnit testing patterns
+
+- **`agents/game-developer.md`** - New agent for game development
+  - Detects Godot projects from `project.godot`
+  - Routes to `godot-expert` skill
+  - Future support for Phaser.js, Unity, Unreal
+
+- **`rules/godot-scene-composition.md`** - Scene vs node patterns
+  - When to create scenes vs add nodes
+  - Composition and inheritance patterns
+  - Anti-patterns to avoid
+
+- **`rules/godot-gdscript-typing.md`** - GDScript typing rules
+  - Type hints for variables, functions, signals
+  - Static typing best practices
+  - Performance benefits
+
+#### Updated
+- **Session-start hook** - Added Godot version detection
+  - Detects `project.godot` file
+  - Parses `config_version` for Godot 3.x vs 4.x
+  - Sets `AF_GODOT_VERSION` environment variable
+
+- **Documentation**
+  - `CLAUDE.md` - Added godot-expert to skills (23 auto-invoking)
+  - `skills/README.md` - Added skill documentation, updated counts
+  - `agents/README.md` - Added game-developer agent (15 agents)
+  - `rules/README.md` - Added 2 Godot rules (44 total)
+
+#### Skill Content (godot-expert)
+1. Project Structure - Directory layout, res:// paths
+2. Scenes & Nodes - Composition, inheritance, instancing
+3. GDScript Patterns - Typing, signals, async, classes
+4. Physics & Collision - Bodies, areas, layers
+5. Input Handling - Actions, events, touch
+6. UI/Control Nodes - HUD, menus, themes
+7. Animation & Audio - AnimationPlayer, Tweens, AudioStreamPlayer
+8. Performance - Object pooling, LOD, profiling
+9. Export Targets - HTML5, Android, iOS, Desktop
+10. Testing - GDUnit, scene testing, mocking
+
+#### Stats
+- **Skills:** 34 (was 33) - 23 auto-invoking + 11 reference
+- **Agents:** 15 (was 14)
+- **Rules:** 44 (was 42)
+
+---
+
 ## [1.5.0] - 2025-12-26
 
 ### Google Stitch AI Design Integration
