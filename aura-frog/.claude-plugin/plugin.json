@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "1.4.4",
-  "description": "14 specialized agents, 9-phase TDD workflow, 40 rules, 32 skills, bundled MCP. Main character energy for your codebase 🐸✨",
+  "version": "1.5.0",
+  "description": "14 specialized agents, 9-phase TDD workflow, 40 rules, 33 skills, bundled MCP. Main character energy for your codebase 🐸✨",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

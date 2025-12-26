@@ -1,8 +1,8 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.4.1
+**Version:** 1.5.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2025-12-23
+**Last Updated:** 2025-12-26
 
 ---
 
@@ -17,6 +17,7 @@ commands/
 ├── bugfix/             # Bug fixing workflows (3 commands)
 ├── db/                 # Database operations (2 commands)
 ├── deploy/             # Deployment & CI/CD (3 commands)
+├── design/             # Design workflows (2 commands) - NEW
 ├── logs/               # Log analysis (1 command)
 ├── mcp/                # MCP server management (1 command)
 ├── monitor/            # Monitoring setup (2 commands)
@@ -41,7 +42,7 @@ commands/
 ## 📊 Commands Index (TOON)
 
 ```toon
-commands[72]{category,command,file,description}:
+commands[74]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -49,6 +50,8 @@ commands[72]{category,command,file,description}:
   bugfix,bugfix,bugfix/fix.md,Full 9-phase bug fix workflow
   bugfix,bugfix:quick,bugfix/quick.md,Quick bug fix (grouped phases)
   bugfix,bugfix:hotfix,bugfix/hotfix.md,Emergency production hotfix
+  design,design:stitch,design/stitch.md,Generate Stitch AI design prompts
+  design,design:stitch-review,design/stitch-review.md,Review Stitch export and integrate
   planning,planning,planning/plan.md,Create execution plan
   planning,planning:list,planning/list.md,List all saved plans
   planning,planning:refine,planning/refine.md,Update existing plan
@@ -97,7 +100,7 @@ commands[72]{category,command,file,description}:
 ## 📈 Statistics (TOON)
 
 ```toon
-stats[19]{category,count}:
+stats[20]{category,count}:
   workflow,23
   project,6
   agent,4
@@ -110,6 +113,7 @@ stats[19]{category,count}:
   security,3
   api,2
   db,2
+  design,2
   monitor,2
   setup,2
   logs,1
@@ -117,7 +121,7 @@ stats[19]{category,count}:
   review,1
   skill,1
   standalone,4
-  total,72
+  total,74
 ```
 
 ---

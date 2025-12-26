@@ -12,14 +12,18 @@
 
 ---
 
-**Version:** 1.4.1
-**Total Skills:** 32 (21 auto-invoking + 11 reference)
+**Version:** 1.5.0
+**Total Skills:** 33 (22 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
 
 ---
+
+## 🆕 New in 1.5.0
+
+- **stitch-design** - Generate UI designs using Google Stitch AI with optimized prompts, review docs, and code integration
 
 ## 🆕 New in 1.4.0
 
@@ -343,7 +347,7 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[23]{name,priority,trigger}:
+skills[24]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   project-context-loader,high,Before code generation
@@ -364,6 +368,7 @@ skills[23]{name,priority,trigger}:
   go-expert,high,Go/Gin/Echo/Fiber
   flutter-expert,high,Flutter/Dart/Bloc/Riverpod
   angular-expert,high,Angular/NgRx/RxJS
+  stitch-design,medium,AI design / Stitch prompts
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
   response-analyzer,medium,Large output handling
@@ -453,6 +458,37 @@ reference_skills[8]{name,purpose,location}:
 - Headless UI
 
 **📚 Details:** `skills/design-system-library/SKILL.md`
+
+---
+
+### 12. **stitch-design** (Priority: MEDIUM)
+
+**Auto-invokes when:** User requests AI-generated UI designs
+
+**Triggers:**
+- "stitch", "AI design", "generate UI", "design with AI"
+- "stitch design", "create UI with Stitch"
+- `/design:stitch` command
+
+**What it does:**
+- Generates optimized prompts for Google Stitch AI
+- Creates review documents for stakeholder approval
+- Guides users through Stitch workflow (no API, manual interaction)
+- Processes exported code for integration
+- Supports 5 design types: Dashboard, Landing, Mobile, E-commerce, Forms
+
+**Workflow:**
+1. Gather requirements (app type, theme, features)
+2. Generate optimized Stitch prompt
+3. Create review doc (saved to `.claude/workflow/`)
+4. Guide user through Stitch (https://stitch.withgoogle.com)
+5. Process exported code/Figma
+
+**Commands:**
+- `/design:stitch "requirements"` - Generate Stitch prompt
+- `/design:stitch-review` - Process exported code
+
+**📚 Details:** `skills/stitch-design/SKILL.md`
 
 ---
 
@@ -627,7 +663,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.4.1
-**Last Updated:** 2025-12-23
+**Version:** 1.5.0
+**Last Updated:** 2025-12-26
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 32 (21 auto-invoking + 11 reference)
+**Total Skills:** 33 (22 auto-invoking + 11 reference)

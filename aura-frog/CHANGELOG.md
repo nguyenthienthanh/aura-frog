@@ -4,6 +4,50 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.5.0] - 2025-12-26
+
+### Google Stitch AI Design Integration
+
+New skill and commands for generating UI designs using Google Stitch AI.
+
+#### Added
+- **`skills/stitch-design/`** - New skill for AI-powered UI design generation
+  - `SKILL.md` - Main skill definition with workflow instructions
+  - `references/prompt-templates.md` - 5 optimized prompt templates (Dashboard, Landing, Mobile, E-commerce, Forms)
+  - `references/design-checklist.md` - Comprehensive design review checklist
+  - `references/export-guide.md` - How to export from Stitch to Figma/code
+
+- **`commands/design/`** - New design command category
+  - `design:stitch` - Generate optimized Stitch prompts from requirements
+  - `design:stitch-review` - Process exported code and create review documents
+
+- **Phase 3 Enhancement** - Added Step 0 "Design Approach Selection"
+  - Option 1: Manual design (Figma/wireframes)
+  - Option 2: AI-assisted (Google Stitch)
+  - Option 3: Hybrid (Stitch prototype + manual refinement)
+
+#### Updated
+- `CLAUDE.md` - Added stitch-design to skills list (22 auto-invoking skills)
+- `skills/README.md` - Added stitch-design documentation, updated counts
+- `commands/README.md` - Added design category with 2 commands, updated counts
+- `docs/phases/PHASE_3_DESIGN_REVIEW.MD` - Added design approach selection step
+
+#### Workflow
+```
+Requirements → Generate Stitch prompt → User pastes in Stitch →
+Export to Figma/code → Review & integrate → Save review doc
+```
+
+#### Review Doc Output
+`.claude/workflow/stitch-design-review-{project}.md`
+
+#### Stats
+- **Skills:** 33 (was 32) - 22 auto-invoking + 11 reference
+- **Commands:** 74 (was 72)
+- **Command Categories:** 20 (was 19)
+
+---
+
 ## [1.4.4] - 2025-12-25
 
 ### Cleanup & Simplification

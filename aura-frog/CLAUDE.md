@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.4.4
+**System:** Aura Frog v1.5.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.4.4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.5.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -64,10 +64,11 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[21]{name,trigger,file}:
+skills[22]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
+  stitch-design,AI design/Stitch,skills/stitch-design/SKILL.md
   workflow-orchestrator,Complex feature,skills/workflow-orchestrator/SKILL.md
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
@@ -120,4 +121,4 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.4.4
+**Version:** 1.5.0

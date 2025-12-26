@@ -20,6 +20,44 @@
 
 ## 📋 Step-by-Step Process
 
+### Step 0: Design Approach Selection (5 min) - NEW
+
+Before starting design review, determine the design approach:
+
+```markdown
+🎨 DESIGN APPROACH SELECTION
+
+Choose your design approach:
+
+1. **Manual Design** (Traditional)
+   - Use existing Figma designs
+   - Work from wireframes/mockups
+   - Best for: Established design systems, detailed specs
+
+2. **AI-Assisted** (Google Stitch)
+   - Generate UI designs with AI
+   - Quick prototypes from requirements
+   - Best for: Rapid prototyping, exploring ideas
+   - Command: `/design:stitch "<requirements>"`
+
+3. **Hybrid** (Stitch + Manual)
+   - Generate initial prototype with Stitch
+   - Refine in Figma
+   - Best for: Starting from scratch, design exploration
+
+Select approach: [1/2/3]
+```
+
+**If AI-Assisted (Option 2 or 3):**
+1. Run `/design:stitch` skill to generate optimized prompt
+2. User generates designs in Stitch (https://stitch.withgoogle.com)
+3. User exports to Figma or HTML/CSS
+4. Continue with Step 1 using exported assets
+
+**Skill:** `skills/stitch-design/SKILL.md`
+
+---
+
 ### Step 1: Request Design Assets (5 min)
 
 #### 1.1 Ask User for Figma Screenshots
