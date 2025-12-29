@@ -4,6 +4,61 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.7.0] - 2025-12-26
+
+### Fast-Track Workflow for Pre-Approved Specs
+
+New workflow mode for executing phases 4-9 without approval gates when design/specs are already complete.
+
+#### Added
+- **`skills/workflow-fasttrack/`** - New skill for fast-track execution
+  - `SKILL.md` - Full skill with spec validation, auto-execution, error handling
+  - Skips phases 1-3 (requirements, design, UI breakdown)
+  - Auto-executes phases 4-9 without approval gates
+  - Only stops on errors (test failures, security issues, coverage < 80%)
+  - TDD still enforced (RED → GREEN → REFACTOR)
+
+#### How to Use
+```
+fasttrack: [paste your specs]
+```
+or
+```
+workflow:fasttrack path/to/specs.md
+```
+or
+```
+Here's my complete design. Just build it.
+[specs content]
+```
+
+#### Required Spec Sections
+- Overview - What we're building
+- Requirements - Functional requirements
+- Technical Design - Architecture/approach
+- API/Interfaces - Endpoints or component APIs
+- Data Model - Database/state structure
+- Acceptance Criteria - Definition of done
+
+#### Execution Flow
+```
+Spec Validation → Phase 4 (Test Plan) → Phase 5a (RED) →
+Phase 5b (GREEN) → Phase 5c (REFACTOR) → Phase 6 (Review) →
+Phase 7 (Verify) → Phase 8 (Document) → Phase 9 (Notify)
+```
+
+#### Stop Conditions
+- Tests unexpectedly pass in Phase 5a (RED phase should fail)
+- Tests fail after 3 implementation attempts
+- Critical security vulnerability found
+- Coverage below 80%
+- Token limit warning
+
+#### Stats
+- **Skills:** 35 (was 34) - 24 auto-invoking + 11 reference
+
+---
+
 ## [1.6.0] - 2025-12-26
 
 ### Godot Game Development Support

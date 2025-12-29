@@ -12,14 +12,18 @@
 
 ---
 
-**Version:** 1.6.0
-**Total Skills:** 34 (23 auto-invoking + 11 reference)
+**Version:** 1.7.0
+**Total Skills:** 35 (24 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
 
 ---
+
+## 🆕 New in 1.7.0
+
+- **workflow-fasttrack** - Fast-track workflow for pre-approved specs. Skips phases 1-3, auto-executes 4-9 without approval gates
 
 ## 🆕 New in 1.6.0
 
@@ -63,7 +67,27 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 2. **agent-detector** (Priority: HIGHEST - ALWAYS RUNS)
+### 2. **workflow-fasttrack** (Priority: HIGH)
+
+**Auto-invokes when:** User provides complete design/specs and wants execution without approvals
+
+**Triggers:**
+- "fasttrack:", "fast-track", "workflow:fasttrack"
+- "specs ready", "just build it", "execute from specs"
+- Complete specs provided with "just build" intent
+
+**What it does:**
+- Validates specs contain required sections
+- Skips phases 1-3 (requirements already done)
+- Auto-executes phases 4-9 without approval gates
+- Only stops on errors (test failures, security issues)
+- TDD still enforced (RED → GREEN → REFACTOR)
+
+**Use when:** Design is complete and you want uninterrupted execution
+
+---
+
+### 3. **agent-detector** (Priority: HIGHEST - ALWAYS RUNS)
 
 **Auto-invokes when:** EVERY single user message
 
@@ -351,9 +375,10 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## 📊 Skill Priorities (TOON)
 
 ```toon
-skills[24]{name,priority,trigger}:
+skills[25]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
+  workflow-fasttrack,high,Pre-approved specs / fast execution
   project-context-loader,high,Before code generation
   design-system-library,high,UI components + design system
   code-reviewer,high,After implementation
@@ -693,7 +718,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.6.0
+**Version:** 1.7.0
 **Last Updated:** 2025-12-26
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 34 (23 auto-invoking + 11 reference)
+**Total Skills:** 35 (24 auto-invoking + 11 reference)
