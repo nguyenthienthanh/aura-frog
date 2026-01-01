@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.4.1
+**Aura Frog Version:** 1.8.0
 
 ---
 
@@ -30,7 +30,6 @@ Bundled MCP servers auto-invoke based on context:
 | MCP | Triggers |
 |-----|----------|
 | **context7** | Library names (React, MUI, Tailwind) |
-| **atlassian** | Ticket IDs (PROJ-123) |
 | **figma** | Figma URLs |
 | **playwright** | E2E test requests |
 | **vitest** | Unit test requests |
@@ -76,4 +75,4 @@ context_files[4]{file,purpose}:
 
 ---
 
-**Version:** 1.4.1 | **Generated:** [DATE]
+**Version:** 1.8.0 | **Generated:** [DATE]

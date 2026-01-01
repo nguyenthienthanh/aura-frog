@@ -216,11 +216,13 @@ Continuing to Phase 8...
 
 ## Approval Gate Integration
 
-Include navigation in every approval gate:
+**Only 2 approval gates in the workflow:** Phase 2 (Design) and Phase 5b (Implementation).
+
+Include navigation in approval gates:
 
 ```markdown
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏗️ Phase 2: Design - Approval Needed
+🏗️ Phase 2: Design - Approval Needed (Gate 1 of 2)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [Deliverables...]
@@ -228,16 +230,16 @@ Include navigation in every approval gate:
 ---
 
 📍 **Where we are:**
-Progress: ████░░░░░░░░░░░░ 25% (2/8 phases)
+Progress: ████░░░░░░░░░░░░ 25% (2/9 phases)
 
-⏭️ **After approval:**
-→ Phase 3: UI Breakdown (or skip if no UI)
-→ Then: Phase 4 (Test Plan)
+⏭️ **After approval (AUTO-CONTINUE):**
+→ Phase 3: UI Breakdown → Phase 4: Test Plan → Phase 5a: TDD RED
+→ Next approval gate: Phase 5b (Implementation)
 
 ---
 
 **Options:**
-- `approve` → Continue to Phase 3
+- `approve` → Auto-continue through Phases 3-5a
 - `reject: <reason>` → Brainstorm & redo Phase 2
 - `modify: <changes>` → Adjust deliverables
 - `stop` → Save and exit

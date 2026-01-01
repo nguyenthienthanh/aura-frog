@@ -4,6 +4,35 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.8.0] - 2026-01-01
+
+### Streamlined Workflow with 2 Approval Gates
+
+Reduced approval gates from 8 to 2 for faster workflow execution while maintaining quality.
+
+#### Updated
+- **`skills/workflow-orchestrator/SKILL.md`** - Streamlined workflow
+  - Only 2 approval gates: Phase 2 (Design) and Phase 5b (Implementation)
+  - All other phases auto-continue unless blockers hit
+  - Auto-stop triggers: test failures, security issues, coverage < 80%
+  - Flow: `START → Phase 1 (auto) → Phase 2 ✋ → Phases 3-5a (auto) → Phase 5b ✋ → Phases 5c-9 (auto) → DONE`
+
+- **`rules/workflow-navigation.md`** - Updated approval gate documentation
+  - Reflects new 2-gate workflow
+  - Updated example showing auto-continue paths
+
+- **`templates/project-claude.md`** - Updated template
+  - Version 1.8.0
+  - Removed atlassian MCP (replaced with bash scripts in 1.6.0)
+
+#### Why This Change
+- Faster feature delivery with fewer interruptions
+- Critical decisions (architecture, implementation) still require approval
+- Auto-stop on errors ensures quality is maintained
+- TDD still enforced throughout
+
+---
+
 ## [1.7.0] - 2025-12-26
 
 ### Fast-Track Workflow for Pre-Approved Specs
