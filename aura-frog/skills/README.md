@@ -12,7 +12,7 @@
 
 ---
 
-**Version:** 1.8.0
+**Version:** 1.8.1
 **Total Skills:** 35 (24 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
@@ -21,7 +21,7 @@
 
 ---
 
-## 🆕 New in 1.8.0
+## 🆕 New in 1.8.1
 
 - **workflow-orchestrator** - Streamlined workflow with only 2 approval gates (Phase 2 Design, Phase 5b Implementation). Other phases auto-continue unless blockers hit.
 
@@ -722,7 +722,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.8.0
+**Version:** 1.8.1
 **Last Updated:** 2025-12-26
 **Format:** TOON (Token-Optimized)
 **Total Skills:** 35 (24 auto-invoking + 11 reference)

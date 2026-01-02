@@ -1,8 +1,9 @@
 # Execution Rules
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Priority:** CRITICAL - Behavioral constraints for all operations
 **Type:** Rule (Behavioral Constraints)
+**Updated:** v1.8.0 - Aligned with 2-gate workflow
 
 ---
 
@@ -47,18 +48,31 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 10 | **Show approval gate** | Human oversight required |
-| 11 | **Wait for explicit approval** | No auto-progression |
-| 12 | **Save workflow state** | Enable resume if interrupted |
-| 13 | **Show next step guidance** | User knows available actions |
+| 10 | **Show deliverables** | User sees what was accomplished |
+| 11 | **Save workflow state** | Enable resume if interrupted |
+| 12 | **Show next step guidance** | User knows what happens next |
 
-### After User Approval
+#### For Approval Phases (Phase 2 & 5b only)
+| # | Rule | Why |
+|---|------|-----|
+| A1 | **Show approval gate** | Human oversight for critical decisions |
+| A2 | **Wait for explicit approval** | Architecture & implementation review |
+
+#### For Auto-Continue Phases (1, 3, 4, 5a, 5c, 6, 7, 8, 9)
+| # | Rule | Why |
+|---|------|-----|
+| AC1 | **Execute phase fully** | Phase is NOT skipped |
+| AC2 | **Show deliverables** | User sees what was done |
+| AC3 | **Continue automatically** | No wait for approval |
+| AC4 | **Stop on blockers** | Auto-stop if issues found |
+
+### After User Approval (Phase 2 & 5b)
 
 | # | Rule | Why |
 |---|------|-----|
 | 13 | **IMMEDIATELY execute next phase** | Auto-continue flow |
 | 14 | **Show token usage** | Monitor consumption |
-| 15 | **Continue until blocking event** | Efficient execution |
+| 15 | **Continue until next approval gate or blocker** | Efficient execution |
 
 ---
 
@@ -76,8 +90,8 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 4 | **Ignore approval gates** | Human oversight required |
-| 5 | **Auto-approve without user** | User must confirm |
+| 4 | **Ignore approval gates (Phase 2 & 5b)** | Critical decisions need user review |
+| 5 | **Skip auto-continue phases entirely** | Phases must execute and show deliverables |
 | 6 | **Skip confirmation for destructive actions** | Safety first |
 
 ### External Systems
@@ -247,9 +261,10 @@ At 150K tokens (75% of 200K):
 □ Run lint after implementation (eslint/tslint)
 □ Run TypeScript check (tsc --noEmit)
 □ Fix ALL lint issues before proceeding
-□ Show approval gates
+□ Show deliverables at each phase completion
 □ Show next step guidance (commands & suggestions)
-□ Wait for approval
+□ Wait for approval at Phase 2 & 5b only
+□ Auto-continue through other phases
 □ Save state
 □ Run tests
 □ Check coverage
@@ -258,15 +273,23 @@ At 150K tokens (75% of 200K):
 ### NEVER Checklist
 ```
 □ Skip context loading
-□ Auto-approve
+□ Skip auto-continue phases (must execute & show deliverables)
+□ Ignore approval gates at Phase 2 & 5b
 □ Skip tests
 □ Ignore linter
 □ Commit secrets
 □ Push to main without approval
-□ Continue on failures
+□ Continue on blockers (tests fail, coverage low, security issues)
+```
+
+### Phase Behavior Summary
+```
+Approval Phases (2, 5b):     Execute → Show → WAIT → User approves → Continue
+Auto-Continue Phases:        Execute → Show → Continue automatically
+Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
 ```
 
 ---
 
-**Version:** 1.3.0
-**Last Updated:** 2025-12-17
+**Version:** 2.0.0
+**Last Updated:** 2026-01-02

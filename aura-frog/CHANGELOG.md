@@ -4,6 +4,49 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.8.1] - 2026-01-02
+
+### Fix: Auto-Continue Phases Being Skipped
+
+Fixed documentation inconsistency where auto-continue phases were being skipped entirely instead of executing and showing deliverables.
+
+#### Fixed
+- **`rules/approval-gates.md`** - Updated to v2.0.0
+  - Clarified 2-gate workflow (Phase 2 & 5b only)
+  - Auto-continue phases now clearly defined: Execute → Show → Continue
+  - Added "Common Mistakes to Avoid" section
+  - Removed old 9-gate language
+
+- **`rules/execution-rules.md`** - Updated to v2.0.0
+  - Split phase completion rules into Approval vs Auto-Continue
+  - Clarified NEVER rules: "Skip auto-continue phases entirely" is forbidden
+  - Added Phase Behavior Summary quick reference
+
+- **`rules/safety-rules.md`** - Updated approval gates section
+  - Shows 2-gate model with auto-continue phases
+  - Added auto-stop conditions explanation
+
+- **`README.md`** - Updated quality gates description
+  - "Only 2 approval gates (Phase 2 & 5b)"
+
+- **`CLAUDE.md`** - Updated execution rules
+  - Added 2-Gate Workflow note
+  - Clarified NEVER rules
+
+- **`commands/workflow/phase-1.md`** - Fixed step 10
+  - Changed "Wait for user approval" to "Auto-continue to Phase 2"
+
+#### Key Clarification
+```
+Auto-continue ≠ Skip!
+
+Approval Phases (2, 5b):     Execute → Show → WAIT → User approves → Continue
+Auto-Continue Phases:        Execute → Show → Continue automatically
+Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
+```
+
+---
+
 ## [1.8.0] - 2026-01-01
 
 ### Streamlined Workflow with 2 Approval Gates

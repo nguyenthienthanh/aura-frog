@@ -251,7 +251,7 @@ Auto-invokes:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Quality Gates:** Human approval required after every phase — no auto-progression!
+**Quality Gates:** Only 2 approval gates (Phase 2 & 5b) — other phases auto-continue after showing deliverables!
 
 ---
 

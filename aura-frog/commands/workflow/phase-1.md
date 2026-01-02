@@ -134,9 +134,9 @@ Phase 1 is where we understand the task requirements, goals, and success criteri
    ↓
 8. Finalize requirements document
    ↓
-9. Show approval gate
+9. Show deliverables summary
    ↓
-10. Wait for user approval
+10. Auto-continue to Phase 2 (no approval wait)
 ```
 
 ---

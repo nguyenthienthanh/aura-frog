@@ -1,20 +1,33 @@
 # Approval Gates - Phase Transition Control
 
-**Version:** 1.0.0  
-**Purpose:** Enforce mandatory user approval at each workflow phase  
+**Version:** 2.0.0
+**Purpose:** Streamlined 2-gate approval workflow (v1.8.0)
 **Priority:** CRITICAL - Core workflow mechanism
 
 ---
 
-## 🎯 Core Principle
+## 🎯 Core Principle (v1.8.0 Update)
 
-**RULE:** Every phase transition REQUIRES explicit user approval.
+**RULE:** Only **2 approval gates** - Phase 2 (Design) and Phase 5b (Implementation).
+
+### Two Types of Phase Transitions
+
+| Type | Phases | Behavior |
+|------|--------|----------|
+| **✋ Approval Gate** | Phase 2, 5b | Execute → Show deliverables → **WAIT for approval** |
+| **⚡ Auto-Continue** | 1, 3, 4, 5a, 5c, 6, 7, 8, 9 | Execute → Show deliverables → **Continue automatically** |
+
+### Flow Diagram
 
 ```
-Phase N Complete → Show Summary → Wait for Approval → Phase N+1 Start
+Approval Gate:     Execute → Deliverables → STOP → Wait → User approves → Continue
+Auto-Continue:     Execute → Deliverables → Continue (no wait)
 ```
 
-**No automatic progression** - User must actively approve each step.
+**IMPORTANT:** Auto-continue phases are NOT skipped. They:
+1. ✅ Execute fully
+2. ✅ Show deliverables/summary
+3. ✅ Continue automatically (no user action needed)
 
 ---
 
@@ -83,81 +96,75 @@ Your response:
 
 ---
 
-## 🔒 Mandatory Approval Gates
+## 🔒 Phase Transition Details
 
-### Phase 1: Requirements Analysis → APPROVAL GATE
+### ⚡ Phase 1: Requirements Analysis → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (no approval needed)
 Must show:
   - Parsed requirements
   - Identified scope
   - Edge cases
   - Success criteria
 
-User confirms:
-  - Requirements understood correctly
-  - Nothing missing
-  - Scope is clear
+Then: Continues automatically to Phase 2
 ```
 
-### Phase 2: Technical Planning → APPROVAL GATE
+### ✋ Phase 2: Technical Planning → APPROVAL GATE (1 of 2)
 ```yaml
+Type: APPROVAL REQUIRED
 Must show:
   - Architecture diagram
   - Component breakdown
   - File changes list
   - Technology decisions
-  - Estimated effort
 
 User confirms:
   - Approach is correct
   - No better alternatives
   - Acceptable complexity
+
+After approval: Auto-continues through Phase 3, 4, 5a
 ```
 
-### Phase 3: Design Review → APPROVAL GATE
+### ⚡ Phase 3: Design Review → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (no approval needed)
+Skip if: Backend-only task (no UI)
 Must show:
   - UI/UX analysis
   - Component structure
   - Design alignment
-  - Responsive considerations
 
-User confirms:
-  - Design matches requirements
-  - UI won't break
-  - Acceptable for users
+Then: Continues automatically to Phase 4
 ```
 
-### Phase 4: Test Planning → APPROVAL GATE
+### ⚡ Phase 4: Test Planning → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (no approval needed)
 Must show:
   - Test strategy
   - Test cases list
   - Coverage plan
-  - Testing approach
 
-User confirms:
-  - Tests cover all scenarios
-  - Coverage threshold acceptable
-  - Test quality sufficient
+Then: Continues automatically to Phase 5a
 ```
 
-### Phase 5a: Write Tests (RED) → APPROVAL GATE
+### ⚡ Phase 5a: Write Tests (RED) → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (with auto-stop condition)
 Must show:
   - Test files created
   - Test execution report (all failing)
   - Coverage report
-  - Test code quality
 
-User confirms:
-  - Tests are correct
-  - Failures are expected
-  - Ready to implement
+AUTO-STOP if: Tests pass (they should fail!) → Fix tests first
+Then: Continues automatically to Phase 5b
 ```
 
-### Phase 5b: Implementation (GREEN) → APPROVAL GATE
+### ✋ Phase 5b: Implementation (GREEN) → APPROVAL GATE (2 of 2)
 ```yaml
+Type: APPROVAL REQUIRED
 Must show:
   - Implementation complete
   - Test execution report (all passing)
@@ -170,74 +177,67 @@ User confirms:
   - Tests pass
   - Coverage acceptable
   - Ready to refactor
+
+After approval: Auto-continues through Phase 5c, 6, 7, 8, 9
 ```
 
-### Phase 5c: Refactor (REFACTOR) → APPROVAL GATE
+### ⚡ Phase 5c: Refactor (REFACTOR) → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (with auto-stop condition)
 Must show:
   - Refactored code
   - Test execution report (still passing)
   - Code quality improvements
-  - Performance impact
 
-User confirms:
-  - Code quality improved
-  - No behavior changes
-  - Tests still pass
-  - Ready for review
+AUTO-STOP if: Tests fail → Revert refactor
+Then: Continues automatically to Phase 6
 ```
 
-### Phase 6: Code Review → APPROVAL GATE
+### ⚡ Phase 6: Code Review → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (with auto-stop condition)
 Must show:
   - Code review checklist
   - Issues found (if any)
-  - Recommendations
+  - Security findings
   - Quality score
 
-User confirms:
-  - Review findings addressed
-  - Code quality acceptable
-  - Ready for QA
+AUTO-STOP if: Critical security issues found → Fix first
+Then: Continues automatically to Phase 7
 ```
 
-### Phase 7: QA Validation → APPROVAL GATE
+### ⚡ Phase 7: QA Validation → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (with auto-stop condition)
 Must show:
   - Test execution results
   - Coverage report
-  - Manual test results
   - Bug report (if any)
 
-User confirms:
-  - All tests pass
-  - No critical bugs
-  - Ready to document
+AUTO-STOP if: Tests fail OR coverage < 80% → Fix first
+Then: Continues automatically to Phase 8
 ```
 
-### Phase 8: Documentation → APPROVAL GATE
+### ⚡ Phase 8: Documentation → AUTO-CONTINUE
 ```yaml
+Type: Auto-continue (no approval needed)
 Must show:
   - Documentation created
-  - Confluence page preview
   - Changes documented
   - Migration notes (if needed)
 
-User confirms:
-  - Documentation complete
-  - Accurate and clear
-  - Ready to notify
+Then: Continues automatically to Phase 9
 ```
 
-### Phase 9: Notification → AUTO (Read-only)
+### ⚡ Phase 9: Notification → AUTO-CONTINUE
 ```yaml
-No approval needed:
-  - Send notifications
-  - Update JIRA
-  - Post to Slack
+Type: Auto-continue (read-only)
+Skip if: No Slack configured
+Actions:
+  - Send Slack notifications
   - Mark workflow complete
 
-(Read-only operations only)
+End of workflow ✅
 ```
 
 ---
@@ -525,22 +525,34 @@ After user approves:
 
 ## 🎯 Success Criteria
 
-Approval gates are working correctly if:
+Workflow gates are working correctly if:
 
-1. ✅ User MUST approve every phase (no auto-progression)
-2. ✅ Clear summary shown before approval
-3. ✅ User can reject/modify/cancel at any point
-4. ✅ State saved and recoverable
-5. ✅ Transitions logged for audit
-6. ✅ Safe rollback mechanism exists
-
----
-
-**Version:** 1.0.0  
-**Status:** ✅ PRODUCTION READY  
-**Last Updated:** 2025-11-24
+1. ✅ Only 2 approval gates exist (Phase 2 & 5b)
+2. ✅ Auto-continue phases EXECUTE fully (not skipped)
+3. ✅ Auto-continue phases SHOW deliverables before continuing
+4. ✅ Auto-stop conditions halt workflow when issues found
+5. ✅ User can reject/modify/cancel at approval gates
+6. ✅ State saved and recoverable
+7. ✅ Transitions logged for audit
 
 ---
 
-**Remember:** Approval gates are the HEART of Aura Frog workflow. Without them, it's just automation - with them, it's collaboration! 🤝
+## ❌ Common Mistakes to Avoid
+
+| Mistake | Correct Behavior |
+|---------|------------------|
+| Skipping auto-continue phases entirely | Execute phase, show deliverables, then continue |
+| Waiting for approval on all phases | Only wait at Phase 2 & 5b |
+| Ignoring auto-stop conditions | Stop and fix issues before continuing |
+| Not showing deliverables on auto phases | Always show what was done |
+
+---
+
+**Version:** 2.0.0
+**Status:** ✅ PRODUCTION READY
+**Last Updated:** 2026-01-02
+
+---
+
+**Remember:** Auto-continue ≠ Skip! Every phase executes and shows its work. We just don't stop for approval except at the 2 critical gates. 🚀
 

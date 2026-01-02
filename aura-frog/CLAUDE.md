@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.8.0
+**System:** Aura Frog v1.8.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.8.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.8.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -97,9 +97,11 @@ skills[24]{name,trigger,file}:
 
 ## Execution Rules
 
-**ALWAYS:** Show banner → Load context → Follow TDD
+**ALWAYS:** Show banner → Load context → Follow TDD → Show deliverables
 
-**NEVER:** Skip banner, auto-approve, skip tests
+**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests
+
+**2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue (execute → show → continue).
 
 **Details:** `rules/execution-rules.md`
 
@@ -123,4 +125,4 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.8.0
+**Version:** 1.8.1
