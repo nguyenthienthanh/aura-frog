@@ -4,6 +4,31 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.9.3] - 2026-01-07
+
+### Version Sync & Learn Command Execution Fixes
+
+#### Fixed
+- **Learn commands not executing** - All `/learn:*` commands now have CRITICAL execution notes
+  - Commands were showing documentation but Claude wasn't executing the curl commands
+  - Added explicit "MUST Execute" sections to ensure data is sent to Supabase
+  - Created `scripts/learn/submit-feedback.sh` as standalone backup
+
+- **Version sync script** - Improved `scripts/sync-version.sh`:
+  - Added more files to update list (global CLAUDE.md, docs with banners)
+  - Improved pattern matching for different version string formats
+  - Now handles: `System: Aura Frog vX.Y.Z`, `Plugin: Aura Frog vX.Y.Z`, banner headers
+
+#### Updated
+- **`/learn:feedback`** - Added CRITICAL execution note
+- **`/learn:status`** - Added CRITICAL execution note
+- **`/learn:analyze`** - Added CRITICAL execution note
+- **`/learn:apply`** - Added CRITICAL execution note
+- **`/learn:setup`** - Added CRITICAL execution note
+- **All version references** - Updated to v1.9.3 across all files
+
+---
+
 ## [1.9.2] - 2026-01-07
 
 ### Auto-Check Environment at Session Start

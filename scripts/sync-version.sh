@@ -38,17 +38,33 @@ declare -a JSON_FILES=(
 )
 
 declare -a MD_FILES=(
+  # Core plugin files
   "$PLUGIN_DIR/CLAUDE.md"
   "$PLUGIN_DIR/README.md"
   "$PLUGIN_DIR/GET_STARTED.md"
   "$PLUGIN_DIR/TODO.md"
+  # Index files
   "$PLUGIN_DIR/rules/README.md"
   "$PLUGIN_DIR/skills/README.md"
   "$PLUGIN_DIR/hooks/README.md"
   "$PLUGIN_DIR/commands/README.md"
+  "$PLUGIN_DIR/agents/README.md"
+  # Docs
   "$PLUGIN_DIR/docs/MCP_GUIDE.md"
+  "$PLUGIN_DIR/docs/STYLING_DETECTION_GUIDE.md"
+  "$PLUGIN_DIR/docs/AGENT_SELECTION_GUIDE.md"
+  # Rules with banner examples
   "$PLUGIN_DIR/rules/agent-identification-banner.md"
+  "$PLUGIN_DIR/rules/next-step-guidance.md"
+  # Commands with banner examples
+  "$PLUGIN_DIR/commands/setup/activate.md"
+  "$PLUGIN_DIR/commands/workflow/phase-1.md"
+  # Root README
   "$PROJECT_ROOT/README.md"
+  # Global CLAUDE.md (user home)
+  "$HOME/.claude/CLAUDE.md"
+  # Project CLAUDE.md
+  "$PROJECT_ROOT/.claude/CLAUDE.md"
 )
 
 declare -a YAML_FILES=(
@@ -156,10 +172,18 @@ update_md_version() {
   cp "$file" "$file.bak"
 
   # Update various version patterns in markdown
+  # **Version:** X.Y.Z
   sed -i '' "s/\*\*Version:\*\* [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*Version:\*\* $new_version/g" "$file"
+  # Version: X.Y.Z (without bold)
   sed -i '' "s/Version: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/Version: $new_version/g" "$file"
-  sed -i '' "s/v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/v$new_version/g" "$file"
+  # **System:** Aura Frog vX.Y.Z
+  sed -i '' "s/\*\*System:\*\* Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*System:\*\* Aura Frog v$new_version/g" "$file"
+  # **Plugin:** Aura Frog vX.Y.Z
+  sed -i '' "s/\*\*Plugin:\*\* Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*Plugin:\*\* Aura Frog v$new_version/g" "$file"
+  # AURA FROG vX.Y.Z (banner)
   sed -i '' "s/AURA FROG v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/AURA FROG v$new_version/g" "$file"
+  # Aura Frog vX.Y.Z (general reference)
+  sed -i '' "s/Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/Aura Frog v$new_version/g" "$file"
 
   if diff -q "$file" "$file.bak" > /dev/null; then
     print_warning "No changes: $(basename "$file")"
