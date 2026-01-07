@@ -16,6 +16,19 @@
 
 ---
 
+## CRITICAL: Claude MUST Execute
+
+When user runs `/learn:apply`, Claude **MUST actually query Supabase for pending improvements**.
+
+**DO NOT** just show example suggestions. **DO** run the curl commands and show REAL pending improvements.
+
+```bash
+# ALWAYS source env first
+source .envrc 2>/dev/null || source .claude/.envrc 2>/dev/null || true
+```
+
+---
+
 ## Execution Steps
 
 When user runs `/learn:apply`, Claude should:

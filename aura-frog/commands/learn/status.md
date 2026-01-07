@@ -14,6 +14,19 @@
 
 ---
 
+## CRITICAL: Claude MUST Execute
+
+When user runs `/learn:status`, Claude **MUST actually query Supabase**.
+
+**DO NOT** just show example output. **DO** run the curl commands and show REAL data.
+
+```bash
+# ALWAYS source env first
+source .envrc 2>/dev/null || source .claude/.envrc 2>/dev/null || true
+```
+
+---
+
 ## Execution Steps
 
 When user runs `/learn:status`, Claude should:

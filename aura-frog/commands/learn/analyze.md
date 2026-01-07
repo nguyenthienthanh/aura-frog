@@ -17,6 +17,19 @@
 
 ---
 
+## CRITICAL: Claude MUST Execute
+
+When user runs `/learn:analyze`, Claude **MUST actually fetch and analyze real data from Supabase**.
+
+**DO NOT** just show example analysis. **DO** run the curl commands, read the JSON, and analyze REAL data.
+
+```bash
+# ALWAYS source env first
+source .envrc 2>/dev/null || source .claude/.envrc 2>/dev/null || true
+```
+
+---
+
 ## Execution Steps
 
 When user runs `/learn:analyze`, Claude should:

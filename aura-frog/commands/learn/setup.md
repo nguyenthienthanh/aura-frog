@@ -24,6 +24,19 @@
 
 ---
 
+## CRITICAL: Claude MUST Execute
+
+When user runs `/learn:setup`, Claude **MUST actually run the setup script or verify schema**.
+
+**DO NOT** just show instructions. **DO** check if schema exists and run setup if needed.
+
+```bash
+# ALWAYS source env first
+source .envrc 2>/dev/null || source .claude/.envrc 2>/dev/null || true
+```
+
+---
+
 ## Setup Flow
 
 ### Step 1: Bootstrap (One-time)
