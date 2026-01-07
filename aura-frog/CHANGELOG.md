@@ -24,9 +24,10 @@ Aura Frog can now learn and improve over time by collecting feedback, tracking m
   - `skills/learning-analyzer/` - Analyze patterns and generate insights
   - `skills/self-improve/` - Apply learned improvements to plugin
 
-- **New Commands** (4)
+- **New Commands** (5)
   - `/learn:setup` - Automatic schema setup via API
   - `/learn:status` - Display learning system status
+  - `/learn:feedback` - Manually submit feedback (success, correction, agent issue)
   - `/learn:analyze` - Run pattern analysis
   - `/learn:apply` - Apply learned improvements
 
@@ -78,7 +79,7 @@ Aura Frog can now learn and improve over time by collecting feedback, tracking m
 
 #### Stats
 - Skills: 37 (was 35)
-- Commands: 77 (was 73)
+- Commands: 79 (was 73)
 - Hooks: 14 (was 11)
 
 ---

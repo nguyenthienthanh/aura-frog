@@ -20,6 +20,7 @@ The learning system enables Aura Frog to improve over time by:
 |---------|---------|-------------|
 | `/learn:setup` | Create database schema | First time setup |
 | `/learn:status` | Show status and stats | Check if working |
+| `/learn:feedback` | Submit manual feedback | Report issues or successes |
 | `/learn:analyze` | Generate insights | Weekly or on-demand |
 | `/learn:apply` | Apply improvements | After analysis |
 
@@ -53,6 +54,31 @@ Shows learning system status and statistics.
 - Workflow metrics count
 - Agent success rates
 - Pending improvements
+
+---
+
+### `/learn:feedback`
+
+Manually submit feedback to the learning system.
+
+**Feedback types:**
+- **Success** - Report what worked well
+- **Correction** - Report when you had to fix something
+- **Agent Issue** - Report wrong agent selection
+- **Workflow Issue** - Report workflow problems
+- **Suggestion** - General improvement ideas
+
+**Options:**
+- `--type <type>` - Skip type selection (success, correction, agent-issue, workflow-issue, suggestion)
+- `--message <msg>` - Quick feedback message
+- `--severity <1-5>` - Issue severity (for corrections)
+
+**Examples:**
+```bash
+/learn:feedback                                    # Interactive
+/learn:feedback --type success --message "Great!" # Quick positive
+/learn:feedback --type correction --severity 3    # Report fix
+```
 
 ---
 
@@ -116,6 +142,7 @@ Reviews and applies learned improvements.
 |------|-----|------|
 | Data collection | **Automatic** (hooks) | Every session |
 | Send to Supabase | **Automatic** (on session end) | Every session |
+| Manual feedback | **Manual** (`/learn:feedback`) | Anytime (optional) |
 | Analysis | **Manual** (`/learn:analyze`) | Weekly recommended |
 | Apply changes | **Manual** (`/learn:apply`) | After analysis |
 

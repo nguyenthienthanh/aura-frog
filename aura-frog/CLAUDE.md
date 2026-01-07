@@ -114,7 +114,7 @@ skills[26]{name,trigger,file}:
 ```toon
 resources[11]{name,location}:
   Agents (15),agents/
-  Commands (77),commands/
+  Commands (79),commands/
   Rules (44),rules/
   Skills (37),skills/
   MCP Servers (5),.mcp.json
@@ -134,6 +134,7 @@ Self-improvement through feedback collection and pattern analysis.
 
 ```bash
 /learn:status       # Check learning system status
+/learn:feedback     # Submit manual feedback (optional)
 /learn:analyze      # Analyze patterns and generate insights
 /learn:apply        # Apply learned improvements
 ```

@@ -43,7 +43,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[77]{category,command,file,description}:
+commands[79]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -53,7 +53,9 @@ commands[77]{category,command,file,description}:
   bugfix,bugfix:hotfix,bugfix/hotfix.md,Emergency production hotfix
   design,design:stitch,design/stitch.md,Generate Stitch AI design prompts
   design,design:stitch-review,design/stitch-review.md,Review Stitch export and integrate
+  learn,learn:setup,learn/setup.md,Set up learning database schema
   learn,learn:status,learn/status.md,Show learning system status
+  learn,learn:feedback,learn/feedback.md,Submit manual feedback
   learn,learn:analyze,learn/analyze.md,Run pattern analysis
   learn,learn:apply,learn/apply.md,Apply learned improvements
   planning,planning,planning/plan.md,Create execution plan
@@ -112,7 +114,7 @@ stats[21]{category,count}:
   perf,4
   bugfix,3
   deploy,3
-  learn,3
+  learn,5
   planning,3
   quality,3
   security,3
@@ -126,7 +128,7 @@ stats[21]{category,count}:
   review,1
   skill,1
   standalone,4
-  total,77
+  total,79
 ```
 
 ---
