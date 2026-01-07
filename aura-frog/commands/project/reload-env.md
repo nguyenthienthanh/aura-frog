@@ -89,18 +89,30 @@ echo ""
 echo "📋 Environment Status:"
 echo ""
 
-# Integrations
-echo "🔗 Integration Credentials:"
-[ -n "$JIRA_URL" ] && echo "   ✅ JIRA (configured)" || echo "   ⚪ JIRA (not configured)"
+# Atlassian Integrations
+echo "🔗 Atlassian Integration:"
+[ -n "$JIRA_BASE_URL" ] && echo "   ✅ JIRA (configured)" || echo "   ⚪ JIRA (not configured)"
+[ -n "$CONFLUENCE_SPACE_KEY" ] && echo "   ✅ Confluence (configured)" || echo "   ⚪ Confluence (not configured)"
+
+# MCP Integrations
+echo ""
+echo "🔌 MCP Server Credentials:"
 [ -n "$FIGMA_API_TOKEN" ] && echo "   ✅ Figma (configured)" || echo "   ⚪ Figma (not configured)"
 [ -n "$SLACK_BOT_TOKEN" ] && echo "   ✅ Slack (configured)" || echo "   ⚪ Slack (not configured)"
-[ -n "$CONFLUENCE_URL" ] && echo "   ✅ Confluence (configured)" || echo "   ⚪ Confluence (not configured)"
+
+# Supabase Learning System
+echo ""
+echo "🧠 Learning System:"
+[ -n "$SUPABASE_URL" ] && echo "   ✅ Supabase URL (configured)" || echo "   ⚪ Supabase URL (not configured)"
+[ -n "$SUPABASE_SECRET_KEY" ] && echo "   ✅ Supabase Secret Key (configured)" || echo "   ⚪ Supabase Secret Key (not configured)"
+[ "$AF_LEARNING_ENABLED" = "true" ] && echo "   ✅ Learning: enabled" || echo "   ⚪ Learning: disabled"
 
 # Workflow Settings
 echo ""
 echo "⚙️  Workflow Settings:"
 [ -n "$AURA_FROG_DEFAULT_COVERAGE" ] && echo "   Coverage: $AURA_FROG_DEFAULT_COVERAGE%" || echo "   Coverage: 80% (default)"
 [ -n "$AURA_FROG_TDD_ENFORCE" ] && echo "   TDD: $AURA_FROG_TDD_ENFORCE" || echo "   TDD: true (default)"
+[ -n "$AURA_FROG_TOKEN_WARNING" ] && echo "   Token Warning: $AURA_FROG_TOKEN_WARNING" || echo "   Token Warning: 150000 (default)"
 ```
 
 ---
