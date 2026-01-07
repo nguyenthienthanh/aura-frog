@@ -4,6 +4,29 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.9.1] - 2026-01-07
+
+### Version Consistency & Manual Feedback
+
+#### Added
+- **`/learn:feedback`** - Manual feedback submission command
+  - Report successes, corrections, agent issues, workflow problems
+  - Quick feedback mode with `--type` and `--message` flags
+  - Interactive mode for detailed feedback
+
+#### Fixed
+- **Version references** - Updated all v1.0.0 references to v1.9.1
+  - Fixed global `~/.claude/CLAUDE.md`
+  - Fixed banner examples in `setup/activate.md`
+  - Fixed docs: STYLING_DETECTION_GUIDE.md, AGENT_SELECTION_GUIDE.md
+  - Fixed workflow/phase-1.md examples
+
+#### Updated
+- **Commands count** - Now 79 (was 77)
+  - Added: `/learn:setup`, `/learn:feedback`
+
+---
+
 ## [1.9.0] - 2026-01-07
 
 ### Learning System - Self-Improvement via Supabase

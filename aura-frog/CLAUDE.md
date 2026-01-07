@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.9.0
+**System:** Aura Frog v1.9.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -144,4 +144,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.9.0
+**Version:** 1.9.1
