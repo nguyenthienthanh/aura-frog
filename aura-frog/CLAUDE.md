@@ -10,16 +10,19 @@
 
 ```toon
 session_start[5]{step,action,file}:
-  1,Show agent banner,rules/agent-identification-banner.md
-  2,Load .envrc,rules/env-loading.md
+  1,Check & load .envrc (AUTO-RUN if not loaded),rules/env-loading.md
+  2,Show agent banner,rules/agent-identification-banner.md
   3,Detect agent,skills/agent-detector/SKILL.md
   4,Load project context,skills/project-context-loader/SKILL.md
   5,Verify MCP servers,commands/mcp/status.md
 ```
 
-**MCP Verification:** Show loaded MCP servers in first response:
+**CRITICAL: Always check env FIRST.** If env vars not loaded → run `project:reload-env` before continuing.
+
+**Show status in first response:**
 ```
-🔌 MCP: context7 ✓ | atlassian ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
+🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
+🧠 Learning: enabled ✓
 ```
 
 ---
@@ -27,7 +30,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.9.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.9.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
