@@ -374,7 +374,7 @@ For non-workflow tasks, still provide guidance:
 The guidance block should appear AFTER the agent banner:
 
 ```markdown
-⚡ 🐸 AURA FROG v1.9.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.9.2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: backend-nodejs │ Phase: 4 - Test Plan          ┃
 ┃ Model: claude │ 🔥 Planning comprehensive tests       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

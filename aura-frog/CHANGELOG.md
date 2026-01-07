@@ -4,6 +4,21 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.9.2] - 2026-01-07
+
+### Auto-Check Environment at Session Start
+
+#### Added
+- **Mandatory env check** - Always check env vars FIRST before responding
+- **Auto-reload** - Run `project:reload-env` automatically if not configured
+- **Status display** - Show MCP and Learning status in first response
+
+#### Updated
+- **Session start order** - Env check is now step 1 (was step 2)
+- **`rules/env-loading.md`** - Added mandatory check section
+
+---
+
 ## [1.9.1] - 2026-01-07
 
 ### Version Consistency & Manual Feedback
