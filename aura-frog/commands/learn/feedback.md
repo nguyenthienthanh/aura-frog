@@ -15,18 +15,32 @@
 /learn:feedback --type workflow-issue     # Report workflow issue
 ```
 
+**Script:** `./scripts/learn/submit-feedback.sh`
+
+---
+
+## CRITICAL: Claude MUST Execute
+
+When user runs `/learn:feedback`, Claude **MUST actually submit to Supabase**.
+
+**DO NOT** just show documentation. **DO** run the curl command to store feedback.
+
 ---
 
 ## Execution Steps
 
 When user runs `/learn:feedback`, Claude should:
 
-### Step 1: Check Environment
+### Step 1: Load Environment & Check
 
 ```bash
+# Source .envrc first
+source .envrc 2>/dev/null || source .claude/.envrc 2>/dev/null || true
+
+# Verify
 if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SECRET_KEY" ]; then
   echo "❌ Learning system not configured"
-  echo "Set SUPABASE_URL and SUPABASE_SECRET_KEY in .envrc"
+  echo "Run: source .envrc"
   exit 1
 fi
 ```
