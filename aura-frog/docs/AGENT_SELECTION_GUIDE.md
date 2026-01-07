@@ -8,7 +8,7 @@
 
 ## 🎯 Overview
 
-Aura Frog v1.0.0 includes an advanced **Smart Agent Detector** that automatically selects the most appropriate agents for any task based on natural language understanding, project context, and conversation history.
+Aura Frog v1.9.0 includes an advanced **Smart Agent Detector** that automatically selects the most appropriate agents for any task based on natural language understanding, project context, and conversation history.
 
 ---
 
