@@ -1,11 +1,11 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.8.1
+**Version:** 1.9.0
 
 ---
 
-## 📋 hooks.json Structure
+## hooks.json Structure
 
 Aura Frog uses Claude Code hooks to enhance workflow automation and safety.
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## 🎯 Active Hooks (11 Total)
+## Active Hooks (14 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -249,7 +249,46 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-## 🔧 Hook Types
+### 11. UserPromptSubmit - Feedback Capture (NEW in 1.9.0)
+**When:** User provides corrections or feedback
+
+**Actions:**
+- ✅ Detect user corrections (e.g., "no, that's wrong", "actually...")
+- ✅ Capture approval/rejection reasons at gates
+- ✅ Send feedback to Supabase for learning
+- ✅ Enable learning-analyzer skill
+
+**Script:** `hooks/feedback-capture.cjs`
+**Requires:** `AF_LEARNING_ENABLED=true`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`
+
+---
+
+### 12. PostToolUse - Workflow Metrics (NEW in 1.9.0)
+**When:** After workflow phase completion
+
+**Actions:**
+- ✅ Track workflow success/failure rates
+- ✅ Measure token usage per phase
+- ✅ Monitor agent performance
+- ✅ Send metrics to Supabase
+
+**Script:** `hooks/workflow-metrics.cjs`
+**Requires:** `AF_METRICS_COLLECTION=true`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`
+
+---
+
+### 13. Learning System Library (NEW in 1.9.0)
+**Location:** `hooks/lib/af-learning.cjs`
+
+**Provides:**
+- ✅ Supabase client initialization
+- ✅ Feedback submission functions
+- ✅ Metrics tracking functions
+- ✅ Pattern analysis utilities
+
+---
+
+## Hook Types
 
 ### Type: "command"
 Executes bash command, uses exit code:
@@ -316,10 +355,10 @@ Response to User
 
 ---
 
-## 📊 Hook Summary Table
+## Hook Summary Table
 
 ```toon
-hooks[11]{event,name,purpose}:
+hooks[14]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
@@ -327,14 +366,17 @@ hooks[11]{event,name,purpose}:
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
+  PostToolUse,Workflow Metrics,Send metrics to Supabase (NEW)
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
+  UserPromptSubmit,Feedback Capture,Capture corrections for learning (NEW)
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   Stop,Voice Notification,Alert user for approval needed
   Notification,Critical Alert,Voice alert for errors/critical issues
+  Library,af-learning.cjs,Learning system utilities (NEW)
 ```
 
 ---
 
-**Version:** 1.8.1
-**Last Updated:** 2025-12-23
-**Status:** Active hooks system (11 hooks)
+**Version:** 1.9.0
+**Last Updated:** 2026-01-07
+**Status:** Active hooks system (14 hooks)

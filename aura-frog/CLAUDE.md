@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.8.1
+**System:** Aura Frog v1.9.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -27,7 +27,7 @@ session_start[5]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.8.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.9.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -64,7 +64,7 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[24]{name,trigger,file}:
+skills[26]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -77,6 +77,8 @@ skills[24]{name,trigger,file}:
   session-continuation,Token limit/handoff,skills/session-continuation/SKILL.md
   lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
+  learning-analyzer,/learn:analyze,skills/learning-analyzer/SKILL.md
+  self-improve,/learn:apply,skills/self-improve/SKILL.md
   typescript-expert,TypeScript/ESLint,skills/typescript-expert/SKILL.md
   react-expert,React/hooks,skills/react-expert/SKILL.md
   react-native-expert,React Native/mobile,skills/react-native-expert/SKILL.md
@@ -110,13 +112,14 @@ skills[24]{name,trigger,file}:
 ## Resources
 
 ```toon
-resources[10]{name,location}:
+resources[11]{name,location}:
   Agents (15),agents/
-  Commands (73),commands/
+  Commands (77),commands/
   Rules (44),rules/
-  Skills (35),skills/
+  Skills (37),skills/
   MCP Servers (5),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
+  Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
   Getting Started,GET_STARTED.md
@@ -125,4 +128,19 @@ resources[10]{name,location}:
 
 ---
 
-**Version:** 1.8.1
+## Learning System (NEW)
+
+Self-improvement through feedback collection and pattern analysis.
+
+```bash
+/learn:status       # Check learning system status
+/learn:analyze      # Analyze patterns and generate insights
+/learn:apply        # Apply learned improvements
+```
+
+**Requirements:** Supabase (free tier works)
+**Setup:** `docs/LEARNING_SYSTEM.md`
+
+---
+
+**Version:** 1.9.0

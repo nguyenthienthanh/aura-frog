@@ -60,3 +60,20 @@ export AURA_FROG_DEFAULT_COVERAGE="80"
 export AURA_FROG_TDD_ENFORCE="true"
 export AURA_FROG_AUTO_NOTIFY="true"
 export AURA_FROG_TOKEN_WARNING="150000"
+
+# ============================================
+# Supabase Learning System
+# ============================================
+# Used by: Learning hooks, skills/learning-analyzer, skills/self-improve
+# Setup: https://supabase.com/dashboard → Project Settings → Data API
+# Schema: Run scripts/supabase/schema.sql in SQL Editor
+
+export SUPABASE_URL="{{SUPABASE_URL}}"  # e.g., https://your-project.supabase.co
+export SUPABASE_PUBLISHABLE_KEY="{{SUPABASE_PUBLISHABLE_KEY}}"  # Public key (safe for client)
+export SUPABASE_SECRET_KEY="{{SUPABASE_SECRET_KEY}}"  # Secret key (keep private!)
+
+# Learning System Settings
+export AF_LEARNING_ENABLED="true"  # Enable/disable learning system
+export AF_FEEDBACK_COLLECTION="true"  # Collect user feedback
+export AF_METRICS_COLLECTION="true"  # Collect workflow metrics
+export AF_AUTO_ANALYZE="weekly"  # disabled, daily, weekly, monthly

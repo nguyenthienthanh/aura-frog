@@ -61,6 +61,15 @@
             "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"📄 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/feedback-capture.cjs\" 2>&1 || true"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -90,6 +99,10 @@
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/stop-voice-notify.sh\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-metrics.cjs\" 2>&1 || true"
           }
         ]
       }

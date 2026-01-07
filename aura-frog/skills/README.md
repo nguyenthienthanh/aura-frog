@@ -1,58 +1,53 @@
-<div align="center">
+# Aura Frog Skills
 
-![Aura Frog Skills](../../assets/logo/logo_icon.png)
-
-# 🐸 Aura Frog Skills
-
-### For [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-
-> **Auto-invoking capabilities that give you main character energy** ✨
-
-</div>
-
----
-
-**Version:** 1.8.1
-**Total Skills:** 35 (24 auto-invoking + 11 reference)
+**Version:** 1.9.0
+**Total Skills:** 37 (26 auto-invoking + 11 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
-**Purpose:** Auto-invoking capabilities that extend Claude Code's Aura Frog functionality
+**Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
 
 ---
 
-## 🆕 New in 1.8.1
+## New in 1.9.0
 
-- **workflow-orchestrator** - Streamlined workflow with only 2 approval gates (Phase 2 Design, Phase 5b Implementation). Other phases auto-continue unless blockers hit.
-
-## 🆕 New in 1.7.0
-
-- **workflow-fasttrack** - Fast-track workflow for pre-approved specs. Skips phases 1-3, auto-executes 4-9 without approval gates
-
-## 🆕 New in 1.6.0
-
-- **godot-expert** - Godot game development expert for HTML5, Android, iOS, and desktop exports with GDScript best practices
-
-## 🆕 New in 1.5.0
-
-- **stitch-design** - Generate UI designs using Google Stitch AI with optimized prompts, review docs, and code integration
-
-## 🆕 New in 1.4.0
-
-- **git-workflow** - Token-efficient git operations with security scanning and auto-split commits
-- **debugging** - Systematic debugging with root cause investigation (now with reference docs)
-- **sequential-thinking** - Structured thinking process for complex analysis with revision and branching
-- **problem-solving** - 5 techniques for different problem types (Simplification, Collision-Zone, Meta-Pattern, Inversion, Scale Game)
+- **learning-analyzer** - Analyze feedback patterns and generate insights from Supabase
+- **self-improve** - Apply learned improvements to plugin configuration and rules
 
 ---
 
-## 🎯 What Are Skills?
+## New in 1.8.1
+
+- **workflow-orchestrator** - Streamlined workflow with only 2 approval gates (Phase 2 Design, Phase 5b Implementation). Other phases auto-continue unless blockers hit.
+
+## New in 1.7.0
+
+- **workflow-fasttrack** - Fast-track workflow for pre-approved specs. Skips phases 1-3, auto-executes 4-9 without approval gates
+
+## New in 1.6.0
+
+- **godot-expert** - Godot game development expert for HTML5, Android, iOS, and desktop exports with GDScript best practices
+
+## New in 1.5.0
+
+- **stitch-design** - Generate UI designs using Google Stitch AI with optimized prompts
+
+## New in 1.4.0
+
+- **git-workflow** - Token-efficient git operations with security scanning
+- **debugging** - Systematic debugging with root cause investigation
+- **sequential-thinking** - Structured thinking process for complex analysis
+- **problem-solving** - 5 techniques for different problem types
+
+---
+
+## What Are Skills?
 
 Skills are **model-invoked** capabilities that Claude automatically activates based on context matching. Unlike commands (which you explicitly call), Skills are discovered and used by Claude when your message matches their description.
 
 ---
 
-## 📚 Available Skills
+## Available Skills
 
 ### 1. **workflow-orchestrator** (Priority: CRITICAL)
 
@@ -239,7 +234,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-## 🎭 Skill Invocation Flow
+## Skill Invocation Flow
 
 ```
 1. User sends message
@@ -265,7 +260,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-## 🔧 How Skills Work
+## How Skills Work
 
 ### Auto-Invocation
 
@@ -304,7 +299,7 @@ Auto-invokes:
 
 ---
 
-## 📂 Skill File Structure
+## Skill File Structure
 
 Each skill follows this structure:
 
@@ -341,7 +336,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ---
 
-## 🎯 Skill Descriptions - The Key to Auto-Invocation
+## Skill Descriptions - The Key to Auto-Invocation
 
 **Good descriptions (80%+ success rate):**
 - ✅ Use action words: "PROACTIVELY use when..."
@@ -358,7 +353,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ---
 
-## 🔗 Skill Dependencies
+## Skill Dependencies
 
 **Skill usage patterns:**
 
@@ -376,10 +371,10 @@ MCP tools: atlassian / figma / slack (When mentioned)
 
 ---
 
-## 📊 Skill Priorities (TOON)
+## Skill Priorities (TOON)
 
 ```toon
-skills[25]{name,priority,trigger}:
+skills[27]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   workflow-fasttrack,high,Pre-approved specs / fast execution
@@ -390,6 +385,8 @@ skills[25]{name,priority,trigger}:
   lazy-agent-loader,high,Agent loading optimization
   sequential-thinking,high,Complex analysis / step by step
   problem-solving,high,Stuck / need breakthrough
+  learning-analyzer,high,Pattern analysis / insights
+  self-improve,high,Apply learned improvements
   typescript-expert,high,TypeScript/ESLint/type errors
   react-expert,high,React components/hooks
   react-native-expert,high,React Native/Expo/mobile
@@ -411,7 +408,7 @@ skills[25]{name,priority,trigger}:
 > **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
 ---
 
-## 🚀 Using Skills
+## Using Skills
 
 **You don't need to call skills explicitly!** Just describe what you want in natural language:
 
@@ -429,7 +426,7 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **Skills Overview:** `skills/README.md` (this file)
 - **Individual Skills:** `skills/[skill-name]/SKILL.md`
@@ -438,7 +435,7 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 
 ---
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **agent-detector ALWAYS runs first** - No exceptions
 2. **Multiple skills can activate** for a single message
@@ -448,7 +445,7 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 
 ---
 
-## 📖 Reference Skills (Non-Auto-Invoking)
+## Reference Skills (Non-Auto-Invoking)
 
 These skills provide guidance documents that agents reference during workflows:
 
@@ -528,7 +525,7 @@ reference_skills[8]{name,purpose,location}:
 
 ---
 
-## 🧠 Expert Skills (Framework-Specific)
+## Expert Skills (Framework-Specific)
 
 Expert skills provide comprehensive best practices for specific frameworks. They auto-invoke when working with the respective technology:
 
@@ -722,7 +719,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.8.1
-**Last Updated:** 2025-12-26
+**Version:** 1.9.0
+**Last Updated:** 2026-01-07
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 35 (24 auto-invoking + 11 reference)
+**Total Skills:** 37 (26 auto-invoking + 11 reference)

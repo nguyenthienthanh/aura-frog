@@ -4,6 +4,85 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.9.0] - 2026-01-07
+
+### Learning System - Self-Improvement via Supabase
+
+Aura Frog can now learn and improve over time by collecting feedback, tracking metrics, and applying learned patterns.
+
+#### Added
+
+- **Learning System** - Cloud-based learning with Supabase
+  - `docs/LEARNING_SYSTEM.md` - Full setup and usage guide
+  - `scripts/supabase/schema.sql` - Database schema for learning tables
+  - Feedback collection (corrections, approvals, rejections)
+  - Workflow metrics tracking
+  - Agent performance monitoring
+  - Pattern recognition and insights
+
+- **New Skills**
+  - `skills/learning-analyzer/` - Analyze patterns and generate insights
+  - `skills/self-improve/` - Apply learned improvements to plugin
+
+- **New Commands** (4)
+  - `/learn:setup` - Automatic schema setup via API
+  - `/learn:status` - Display learning system status
+  - `/learn:analyze` - Run pattern analysis
+  - `/learn:apply` - Apply learned improvements
+
+- **Setup Script**
+  - `scripts/supabase/setup-schema.cjs` - Automated schema creation
+
+- **New Hooks**
+  - `hooks/feedback-capture.cjs` - Capture user corrections (auto on Write/Edit)
+  - `hooks/workflow-metrics.cjs` - Send metrics to Supabase
+  - `hooks/session-metrics.cjs` - Auto-send metrics on session end
+  - `hooks/lib/af-learning.cjs` - Learning system utilities
+
+- **Updated Hooks**
+  - `hooks/subagent-init.cjs` - Now tracks agent usage for learning
+  - `hooks/hooks.json` - Added session-metrics to Stop event
+
+- **Environment Variables**
+  - `SUPABASE_URL` - Supabase project URL
+  - `SUPABASE_PUBLISHABLE_KEY` - Public key (safe for client)
+  - `SUPABASE_SECRET_KEY` - Secret key (server-side only)
+  - `AF_LEARNING_ENABLED` - Enable/disable learning
+  - `AF_FEEDBACK_COLLECTION` - Enable feedback capture
+  - `AF_METRICS_COLLECTION` - Enable metrics tracking
+  - `AF_AUTO_ANALYZE` - Auto-analysis schedule
+
+#### Features
+
+1. **Feedback Collection**
+   - Detects user corrections to AI output
+   - Captures approval/rejection reasons at gates
+   - Optional quality ratings
+
+2. **Metrics Tracking**
+   - Workflow success/failure rates
+   - Token usage per phase
+   - Agent performance by task type
+   - Test coverage trends
+
+3. **Pattern Analysis**
+   - Success patterns (what works)
+   - Failure patterns (common issues)
+   - Optimization opportunities
+   - Agent routing recommendations
+
+4. **Self-Improvement**
+   - Review and apply suggestions
+   - Auto-apply high-confidence improvements
+   - Rollback support with backups
+
+#### Stats
+- Skills: 37 (was 35)
+- Commands: 77 (was 73)
+- Hooks: 14 (was 11)
+
+---
+
 ## [1.8.1] - 2026-01-02
 
 ### Fix: Auto-Continue Phases Being Skipped

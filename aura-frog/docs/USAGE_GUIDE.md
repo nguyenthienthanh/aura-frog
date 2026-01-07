@@ -1,11 +1,11 @@
-# 📘 Aura Frog Usage Guide - Clarifications & Best Practices
+# Aura Frog Usage Guide - Clarifications & Best Practices
 
-**Version:** 1.0.0  
-**Date:** 2025-11-25
+**Version:** 1.9.0
+**Date:** 2026-01-07
 
 ---
 
-## 🎯 Key Clarifications
+## Key Clarifications
 
 ### 1. Hooks Are Conceptual Documentation (Not Runtime Code)
 
@@ -51,7 +51,7 @@ Claude reads this and **does these steps** - no script execution!
 
 ---
 
-## 🔄 Workflow Modes: When to Use What
+## Workflow Modes: When to Use What
 
 ### Mode 1: Full 9-Phase Workflow
 
@@ -180,7 +180,7 @@ bugfix:quick "Add authentication"  # Will warn you!
 
 ---
 
-## 📂 Logs & State Management
+## Logs & State Management
 
 ### Folder Structure (Auto-Created at Runtime)
 
@@ -226,7 +226,7 @@ bugfix:quick "Add authentication"  # Will warn you!
 
 ---
 
-## 🔄 Session Continuation: When You Actually Need It
+## Session Continuation: When You Actually Need It
 
 ### You DON'T Need handoff/resume For:
 
@@ -289,7 +289,7 @@ Afternoon (New session):
 
 ---
 
-## 🎨 Phase Grouping for Small Tasks
+## Phase Grouping for Small Tasks
 
 ### For Simple Tasks, Phases Merge:
 
@@ -337,7 +337,7 @@ Total: 1 approval gate! ✅
 
 ---
 
-## 🚀 Quick Decision Tree
+## Quick Decision Tree
 
 **Need to decide which command to use?**
 
@@ -366,7 +366,7 @@ Other needs:
 
 ---
 
-## 💡 Pro Tips
+## Pro Tips
 
 ### 1. Start Small, Scale Up
 ```bash
@@ -414,7 +414,7 @@ Claude: "Suggest workflow:start for complete implementation with full TDD"
 
 ---
 
-## ✅ Summary
+## Summary
 
 ### Remember:
 
@@ -439,5 +439,5 @@ Claude: "Suggest workflow:start for complete implementation with full TDD"
 
 ---
 
-**🎉 You're ready to use Aura Frog efficiently! Choose the right tool for the job! 🚀**
+**You're ready to use Aura Frog efficiently! Choose the right tool for the job!**
 

@@ -1,7 +1,7 @@
 {
   "name": "aurafrog",
-  "description": "Official Aura Frog marketplace - AI-powered development with specialized agents and structured workflows",
-  "version": "1.4.1",
+  "description": "Official Aura Frog marketplace - AI-powered development with specialized agents, structured workflows, and self-improving learning system",
+  "version": "1.9.0",
   "owner": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -14,8 +14,8 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "14 specialized agents, 9-phase TDD workflow, 40 rules, 32 skills, bundled MCP. Main character energy for your codebase 🐸✨",
-      "version": "1.4.1",
+      "description": "15 specialized agents, 9-phase TDD workflow, 44 rules, 37 skills, 77 commands, learning system",
+      "version": "1.9.0",
       "author": {
         "name": "Nguyen Thien Thanh",
         "url": "https://github.com/nguyenthienthanh"
@@ -33,7 +33,8 @@
         "vue",
         "laravel",
         "nextjs",
-        "flutter"
+        "flutter",
+        "godot"
       ],
       "strict": true
     }

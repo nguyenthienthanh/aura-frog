@@ -103,11 +103,46 @@ function getProjectName() {
   return path.basename(process.cwd());
 }
 
+// Track agent usage for learning system
+function trackAgentUsage(state, agentType) {
+  if (!state.agentUsage) {
+    state.agentUsage = [];
+  }
+
+  // Parse agent type from stdin if available
+  let agentName = agentType || 'unknown';
+  let taskType = null;
+
+  try {
+    const stdin = require('fs').readFileSync(0, 'utf-8').trim();
+    if (stdin) {
+      const data = JSON.parse(stdin);
+      agentName = data.subagent_type || data.agent_type || agentName;
+      taskType = data.task_type || data.description;
+    }
+  } catch (e) { /* ignore */ }
+
+  state.agentUsage.push({
+    name: agentName,
+    taskType,
+    timestamp: Date.now(),
+    metricsSent: false
+  });
+
+  // Keep only last 50 entries
+  if (state.agentUsage.length > 50) {
+    state.agentUsage = state.agentUsage.slice(-50);
+  }
+}
+
 // Main execution
 function main() {
   const state = loadSessionState();
   const phase = detectPhase();
   const projectName = getProjectName();
+
+  // Track agent usage for learning
+  trackAgentUsage(state);
 
   // Update state
   if (phase) state.phase = phase;

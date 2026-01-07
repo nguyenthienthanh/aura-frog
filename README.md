@@ -8,14 +8,14 @@
 
 > **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 14 specialized agents, 9-phase TDD workflow, and bundled MCP servers.
+AI-powered development plugin for **Claude Code** with 15 specialized agents, 9-phase TDD workflow, self-improving learning system, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.4.1-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.9.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Quick Start](#-quick-start) • [Features](#-key-features) • [Documentation](#-documentation) • [Contributing](#-contributing)
+[Quick Start](#quick-start) | [Features](#key-features) | [Documentation](#documentation) | [Contributing](#contributing)
 
 </div>
 
@@ -27,18 +27,18 @@ AI-powered development plugin for **Claude Code** with 14 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** | **MCP Servers** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|:---------------:|
-| **14** | **32** | **40** | **9** | **70+** | **6** |
+| **15** | **37** | **44** | **9** | **77** | **5** |
 
 </div>
 
 **What's Inside:**
-- **14 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps experts
-- **32 Skills** — 21 auto-invoking + 11 reference skills for specialized tasks
-- **6 Bundled MCP Servers** — Context7, Playwright, Vitest, Atlassian, Figma, Slack
-- **40 Quality Rules** — System, code quality, architecture, workflow, documentation
+- **15 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, Game Dev experts
+- **37 Skills** — 26 auto-invoking + 11 reference skills for specialized tasks
+- **5 Bundled MCP Servers** — Context7, Playwright, Vitest, Figma, Slack
+- **44 Quality Rules** — System, code quality, architecture, workflow, documentation
 - **9-Phase Workflow** — From requirements to deployment with quality gates
-- **70+ Commands** — Full workflow control at your fingertips
-- **Multi-Model Support** — Use Gemini, OpenAI, DeepSeek per phase
+- **77 Commands** — Full workflow control at your fingertips
+- **Learning System** — Self-improvement via Supabase (NEW)
 
 ---
 
@@ -90,7 +90,7 @@ At each phase, review and respond:
 - `reject: <reason>` — Restart current phase
 - `modify: <changes>` — Adjust deliverables
 
-**See:** [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) for complete guide
+**See:** [aura-frog/QUICKSTART.md](aura-frog/QUICKSTART.md) for quickstart | [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) for full guide
 
 ---
 
@@ -105,12 +105,12 @@ At each phase, review and respond:
 | Traditional Development | With Aura Frog |
 |------------------------|----------------|
 | Manual task management | AI-powered 9-phase workflow |
-| Generic AI responses | 14 specialized agents auto-selected |
+| Generic AI responses | 15 specialized agents auto-selected |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 70 commands |
+| Context switching | CLI-first with 77 commands |
 | Manual documentation | Auto-generated docs |
-| Manual integrations | Bundled MCP servers (JIRA, Figma, Slack) |
+| Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 
 **Result:** 60-70% reduction in PM overhead while improving code quality.
 
@@ -118,18 +118,19 @@ At each phase, review and respond:
 
 ## Key Features
 
-### 14 Specialized Agents
+### 15 Specialized Agents
 
 Agents auto-activate based on your prompt context:
 
 <details>
-<summary><b>Expert Agents (3)</b></summary>
+<summary><b>Development (4)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
 | `backend-expert` | Node.js, Python, Laravel, Go — Express, Django, FastAPI, Gin |
 | `web-expert` | React, Vue, Angular, Next.js — SSR, SSG, state management |
 | `mobile-expert` | React Native, Flutter — Expo, cross-platform, NativeWind |
+| `game-developer` | Godot game development, multi-platform export |
 
 </details>
 
@@ -145,7 +146,7 @@ Agents auto-activate based on your prompt context:
 </details>
 
 <details>
-<summary><b>Operations (3)</b></summary>
+<summary><b>Infrastructure (3)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
@@ -156,7 +157,7 @@ Agents auto-activate based on your prompt context:
 </details>
 
 <details>
-<summary><b>Infrastructure (5)</b></summary>
+<summary><b>System (5)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
@@ -170,16 +171,15 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### 6 Bundled MCP Servers
+### 5 Bundled MCP Servers
 
-MCP (Model Context Protocol) servers auto-invoke based on context — no setup required:
+MCP (Model Context Protocol) servers auto-invoke based on context:
 
 | MCP Server | Purpose | Auto-Triggers |
 |------------|---------|---------------|
 | **context7** | Library documentation | "Build with MUI", "Tailwind", library names |
 | **playwright** | Browser automation, E2E | "Test the login page", browser automation |
 | **vitest** | Test execution, coverage | "Run tests", "Check coverage" |
-| **atlassian** | JIRA + Confluence | Ticket IDs (PROJ-123) |
 | **figma** | Design file fetching | Figma URLs |
 | **slack** | Notifications | Phase 9 completion |
 
@@ -187,45 +187,40 @@ MCP (Model Context Protocol) servers auto-invoke based on context — no setup r
 # Context7 auto-fetches React docs
 "Build a form with Material UI"
 
-# Atlassian MCP auto-fetches ticket
-"Implement PROJ-1234"
-
 # Playwright runs E2E test
 "Test the checkout flow in browser"
 ```
 
-**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for setup and creating custom MCP servers
+**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for setup
 
 ---
 
-### 35 Skills (22 Auto-Invoking + 13 Reference)
+### 37 Skills (26 Auto-Invoking + 11 Reference)
 
-Skills activate automatically based on your message context — no commands needed:
+Skills activate automatically based on your message context:
 
 ```
-User: "Implement user profile from PROJ-1234"
+User: "Implement user profile screen"
          ↓
 Auto-invokes:
-  1. agent-detector      → Selects mobile-expert agent
-  2. atlassian MCP       → Fetches PROJ-1234 requirements
-  3. project-context-loader → Loads your conventions
-  4. workflow-orchestrator  → Executes 9-phase workflow
+  1. agent-detector         → Selects mobile-expert agent
+  2. project-context-loader → Loads your conventions
+  3. workflow-orchestrator  → Executes 9-phase workflow
 ```
 
 | Skill | Triggers | Purpose |
 |-------|----------|---------|
 | `agent-detector` | **Every message** | Select appropriate agent |
 | `workflow-orchestrator` | "implement", "build", "create" | Execute 9-phase workflow |
+| `workflow-fasttrack` | Pre-approved specs | Skip phases 1-3, auto-execute |
 | `project-context-loader` | Before code generation | Load project conventions |
-| `session-continuation` | Token limit (150K+) | Workflow state & handoff |
 | `bugfix-quick` | "fix", "error", "broken" | Fast TDD bug fixes |
 | `test-writer` | "add tests", "coverage" | Generate comprehensive tests |
 | `code-reviewer` | After implementation | Multi-agent quality review |
-| `lazy-agent-loader` | Agent loading | 94% token savings on agent defs |
-| `response-analyzer` | Large outputs | Save verbose output to temp |
-| `state-persistence` | Session handoff | File-based state management |
+| `learning-analyzer` | Pattern analysis | Analyze feedback patterns (NEW) |
+| `self-improve` | Apply learnings | Apply learned improvements (NEW) |
 
-**Expert Skills:** typescript-expert, react-expert, vue-expert, nextjs-expert, nodejs-expert, python-expert, laravel-expert, go-expert, flutter-expert, angular-expert, react-native-expert
+**Expert Skills:** typescript, react, react-native, vue, nextjs, nodejs, python, laravel, go, flutter, angular, godot
 
 **See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
 
@@ -275,12 +270,12 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 39 Quality Rules
+### 44 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 
 <details>
-<summary><b>System & Session Rules (8)</b></summary>
+<summary><b>System Rules (9)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -292,11 +287,12 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `token-time-awareness` | Monitor token usage |
 | `project-linting-precedence` | Merge project + Aura Frog rules |
 | `codebase-consistency` | Learn patterns before writing code |
+| `mcp-response-logging` | Save MCP responses to logs |
 
 </details>
 
 <details>
-<summary><b>Code Quality Rules (9)</b></summary>
+<summary><b>Code Quality Rules (10)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -308,12 +304,13 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `code-quality` | TypeScript strict, no any |
 | `naming-conventions` | Consistent naming |
 | `smart-commenting` | Why, not what |
-| `prefer-established-libraries` | Use lodash/es-toolkit over custom utils |
+| `prefer-established-libraries` | Use lodash/es-toolkit over custom |
+| `post-implementation-linting` | Run lint after implementation |
 
 </details>
 
 <details>
-<summary><b>Workflow Rules (10)</b></summary>
+<summary><b>Workflow Rules (11)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -327,10 +324,39 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `feedback-brainstorming` | Brainstorm before feedback |
 | `impact-analysis` | Analyze usages before modifying |
 | `workflow-deliverables` | Verify all phase docs created |
+| `verification` | Fresh verification before done |
 
 </details>
 
 **See:** [aura-frog/rules/](aura-frog/rules/) for all rule definitions
+
+---
+
+### Learning System (NEW in 1.9.0)
+
+Aura Frog can now learn and improve over time via Supabase:
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Collect Data   │ →   │ Analyze Patterns │ →   │ Apply Learnings │
+│  (feedback,     │     │  (success/fail   │     │  (auto-improve  │
+│   metrics)      │     │   patterns)      │     │   plugin)       │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+| Command | Description |
+|---------|-------------|
+| `learn:status` | Show learning system status |
+| `learn:analyze` | Run pattern analysis |
+| `learn:apply` | Apply learned improvements |
+
+**Features:**
+- Feedback collection (corrections, approvals, rejections)
+- Workflow metrics tracking
+- Agent performance monitoring
+- Pattern recognition and insights
+
+**See:** [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) for setup
 
 ---
 
@@ -412,20 +438,19 @@ document "API endpoints"           # Generate docs
 
 </details>
 
-**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 70+ commands
+**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 77 commands
 
 ---
 
 ## MCP Integrations
 
-Aura Frog bundles 6 MCP servers that auto-invoke based on context:
+Aura Frog bundles 5 MCP servers that auto-invoke based on context:
 
 | MCP | Purpose | Setup Required |
 |-----|---------|----------------|
 | **context7** | Library docs (React, MUI, Tailwind) | None (public) |
 | **playwright** | E2E browser testing | `npx playwright install` |
 | **vitest** | Unit test execution | Project with vitest |
-| **atlassian** | JIRA + Confluence | `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` |
 | **figma** | Design extraction | `FIGMA_API_TOKEN` |
 | **slack** | Team notifications | `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` |
 
@@ -434,11 +459,6 @@ Aura Frog bundles 6 MCP servers that auto-invoke based on context:
 Copy `.envrc.template` and set your tokens:
 
 ```bash
-# Atlassian (JIRA + Confluence)
-export JIRA_URL="https://company.atlassian.net"
-export JIRA_EMAIL="your-email@company.com"
-export JIRA_API_TOKEN="your-api-token"
-
 # Figma
 export FIGMA_API_TOKEN="your-figma-token"
 
@@ -447,7 +467,7 @@ export SLACK_BOT_TOKEN="xoxb-your-bot-token"
 export SLACK_CHANNEL_ID="C0123456789"
 ```
 
-**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for complete setup and custom MCP creation
+**See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for complete setup
 
 ---
 
@@ -457,9 +477,9 @@ export SLACK_CHANNEL_ID="C0123456789"
 
 | Document | Description |
 |----------|-------------|
-| [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) | Quick start guide (5 minutes) |
-| [aura-frog/docs/PLUGIN_INSTALLATION.md](aura-frog/docs/PLUGIN_INSTALLATION.md) | Official installation guide |
-| [aura-frog/TESTING_GUIDE.md](aura-frog/TESTING_GUIDE.md) | Testing workflows |
+| [aura-frog/QUICKSTART.md](aura-frog/QUICKSTART.md) | 2-minute quickstart |
+| [aura-frog/GET_STARTED.md](aura-frog/GET_STARTED.md) | Complete getting started guide |
+| [aura-frog/docs/USAGE_GUIDE.md](aura-frog/docs/USAGE_GUIDE.md) | Best practices & clarifications |
 
 ### Core Documentation
 
@@ -475,7 +495,7 @@ export SLACK_CHANNEL_ID="C0123456789"
 
 | Document | Description |
 |----------|-------------|
-| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 70 commands |
+| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 77 commands |
 | [aura-frog/agents/](aura-frog/agents/) | All agent definitions |
 | [aura-frog/rules/](aura-frog/rules/) | Core quality rules |
 
@@ -487,14 +507,13 @@ export SLACK_CHANNEL_ID="C0123456789"
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
-│   ├── agents/                      # 14 specialized agents
-│   ├── skills/                      # 35 skills (22 auto + 13 reference)
-│   ├── commands/                    # 70+ workflow commands
-│   ├── rules/                       # 39 quality rules
+│   ├── agents/                      # 15 specialized agents
+│   ├── skills/                      # 37 skills (26 auto + 11 reference)
+│   ├── commands/                    # 77 workflow commands
+│   ├── rules/                       # 44 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
-│   │   ├── MCP_GUIDE.md             # MCP setup & custom servers
-│   │   └── WORKFLOW_DIAGRAMS.md     # 10 Mermaid diagrams
+│   │   └── MCP_GUIDE.md             # MCP setup guide
 │   ├── hooks/                       # Lifecycle hooks
 │   ├── scripts/                     # Utility scripts
 │   └── templates/                   # Document templates

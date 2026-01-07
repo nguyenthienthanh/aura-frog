@@ -1,12 +1,12 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.8.1
+**Version:** 1.9.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2025-12-26
+**Last Updated:** 2026-01-07
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 Commands are organized by category with naming convention: `category/action.md`
 
@@ -17,7 +17,8 @@ commands/
 ├── bugfix/             # Bug fixing workflows (3 commands)
 ├── db/                 # Database operations (2 commands)
 ├── deploy/             # Deployment & CI/CD (3 commands)
-├── design/             # Design workflows (2 commands) - NEW
+├── design/             # Design workflows (2 commands)
+├── learn/              # Learning system (3 commands) - NEW
 ├── logs/               # Log analysis (1 command)
 ├── mcp/                # MCP server management (1 command)
 ├── monitor/            # Monitoring setup (2 commands)
@@ -39,10 +40,10 @@ commands/
 
 ---
 
-## 📊 Commands Index (TOON)
+## Commands Index (TOON)
 
 ```toon
-commands[74]{category,command,file,description}:
+commands[77]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -52,6 +53,9 @@ commands[74]{category,command,file,description}:
   bugfix,bugfix:hotfix,bugfix/hotfix.md,Emergency production hotfix
   design,design:stitch,design/stitch.md,Generate Stitch AI design prompts
   design,design:stitch-review,design/stitch-review.md,Review Stitch export and integrate
+  learn,learn:status,learn/status.md,Show learning system status
+  learn,learn:analyze,learn/analyze.md,Run pattern analysis
+  learn,learn:apply,learn/apply.md,Apply learned improvements
   planning,planning,planning/plan.md,Create execution plan
   planning,planning:list,planning/list.md,List all saved plans
   planning,planning:refine,planning/refine.md,Update existing plan
@@ -97,10 +101,10 @@ commands[74]{category,command,file,description}:
 
 ---
 
-## 📈 Statistics (TOON)
+## Statistics (TOON)
 
 ```toon
-stats[20]{category,count}:
+stats[21]{category,count}:
   workflow,23
   project,6
   agent,4
@@ -108,6 +112,7 @@ stats[20]{category,count}:
   perf,4
   bugfix,3
   deploy,3
+  learn,3
   planning,3
   quality,3
   security,3
@@ -121,7 +126,7 @@ stats[20]{category,count}:
   review,1
   skill,1
   standalone,4
-  total,74
+  total,77
 ```
 
 ---
@@ -172,4 +177,4 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-**Version:** 1.4.1 | **Format:** TOON
+**Version:** 1.9.0 | **Format:** TOON

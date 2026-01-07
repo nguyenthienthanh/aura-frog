@@ -155,6 +155,33 @@ fi
 
 If direnv installed, create `.envrc` for auto-loading.
 
+### 7. Setup Learning System (Optional)
+
+If Supabase credentials are configured:
+
+```bash
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+
+if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SECRET_KEY" ]; then
+  echo ""
+  echo "🧠 Learning System detected. Setup now? [y/N]"
+  read -r setup_learning
+
+  if [ "$setup_learning" = "y" ] || [ "$setup_learning" = "Y" ]; then
+    # Check if bootstrap is needed
+    if ! bash "$PLUGIN_DIR/scripts/supabase/setup.sh" --check 2>/dev/null; then
+      echo ""
+      echo "⚠️  First, run bootstrap.sql in Supabase SQL Editor:"
+      echo "   File: $PLUGIN_DIR/scripts/supabase/bootstrap.sql"
+      echo ""
+      echo "Then run: ./scripts/supabase/setup.sh"
+    else
+      bash "$PLUGIN_DIR/scripts/supabase/setup.sh"
+    fi
+  fi
+fi
+```
+
 ---
 
 ## Interactive Prompts
@@ -163,6 +190,7 @@ If direnv installed, create `.envrc` for auto-loading.
 2. Primary agent to use
 3. Enable JIRA/Figma integration?
 4. Team conventions (if not detected)
+5. **Setup learning system?** (if Supabase configured)
 
 ---
 
@@ -171,6 +199,7 @@ If direnv installed, create `.envrc` for auto-loading.
 - Run `project:reload-env` to load integrations
 - Review generated `project-config.yaml`
 - Customize `conventions.md` if needed
+- Run `/learn:status` to verify learning system (if enabled)
 
 ---
 

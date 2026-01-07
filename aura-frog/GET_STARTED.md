@@ -2,11 +2,11 @@
 
 ![Welcome to Aura Frog](../assets/logo/mascot_full.png)
 
-# 🚀 Get Started with Aura Frog
+# Get Started with Aura Frog
 
 ### A Plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 
-> **Code with main character energy** ✨
+> **Code with main character energy**
 
 </div>
 
@@ -16,12 +16,12 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **15 Agents** | **35 Skills** | **44 Rules** | **9 Phases** | **73 Commands** | **5 MCP Servers** |
+| **15 Agents** | **37 Skills** | **44 Rules** | **9 Phases** | **77 Commands** | **5 MCP Servers** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|:----------------:|
 
 ---
 
-## ⚡ Quick Setup (2 minutes)
+## Quick Setup (2 minutes)
 
 ### Prerequisites
 
@@ -82,7 +82,7 @@ This will:
 
 ---
 
-## 🧪 Test Your Setup
+## Test Your Setup
 
 ### Test 1: Check Status
 ```
@@ -95,7 +95,7 @@ workflow:status
 
 ### Test 2: Start Simple Task
 
-**🆕 Using Skills (Natural Language):**
+**Using Natural Language:**
 ```
 Analyze the current component structure
 ```
@@ -126,7 +126,7 @@ workflow:approve
 
 ---
 
-## 📚 What's Next?
+## What's Next?
 
 ### Learn the Workflow
 
@@ -149,15 +149,14 @@ workflow:start Add [feature] to [component]
 
 ### Configure Integrations
 
-Edit `ccpm-config.yaml` to add:
-- JIRA integration (ticket management)
-- Confluence integration (documentation)
+Set environment variables in `.envrc` for:
+- Figma integration (design extraction)
 - Slack integration (notifications)
-- Team reviewers
+- Custom MCP servers
 
 ---
 
-## 🎯 Common Commands
+## Common Commands
 
 ### Workflow Commands
 - `workflow:start <task>` - Start new workflow
@@ -186,7 +185,7 @@ Edit `ccpm-config.yaml` to add:
 
 ---
 
-## 🛠️ Advanced Setup
+## Advanced Setup
 
 ### Add to .gitignore
 
@@ -226,16 +225,15 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
 ---
 
-## 🔌 MCP Servers (Auto-Configured)
+## MCP Servers (Auto-Configured)
 
-Aura Frog bundles 6 MCP servers for external integrations:
+Aura Frog bundles 5 MCP servers for external integrations:
 
 | MCP | Purpose | Auto-Triggers On |
 |-----|---------|------------------|
 | **context7** | Library docs | "Build with MUI", "Tailwind", library names |
 | **playwright** | E2E testing | "Test the login page", browser automation |
 | **vitest** | Unit tests | "Run tests", "Check coverage" |
-| **atlassian** | JIRA/Confluence | Ticket IDs (PROJ-123) |
 | **figma** | Design files | Figma URLs |
 | **slack** | Notifications | Phase 9 completion |
 
@@ -245,7 +243,7 @@ Aura Frog bundles 6 MCP servers for external integrations:
 
 ---
 
-## 💡 How It Works
+## How It Works
 
 ### 1. You Give a Command
 ```
@@ -279,7 +277,7 @@ At each approval gate:
 
 ---
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 ### Claude doesn't recognize commands?
 
@@ -306,7 +304,7 @@ agent:list
 
 ---
 
-## 🎉 You're Ready!
+## You're Ready!
 
 **Start building with AI-powered project management:**
 
@@ -322,19 +320,24 @@ workflow:start <your-task-description>
 
 ---
 
-## 📞 Support
+## Support
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
 - **MCP Guide:** `docs/MCP_GUIDE.md` (create custom integrations)
-- **Skills:** `skills/README.md` (33 skills)
-- **Rules:** `rules/README.md` (40 quality rules)
-- **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md` (10 Mermaid diagrams)
+- **Learning System:** `docs/LEARNING_SYSTEM.md` (self-improvement)
+- **Skills:** `skills/README.md` (37 skills)
+- **Rules:** `rules/README.md` (44 quality rules)
+- **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`
 - **Phase Guides:** `docs/phases/`
 
 ---
 
-**Happy Coding! 🚀**
+**Happy Coding!**
 
 Type `workflow:start <task>` to begin your first workflow.
+
+---
+
+**Version:** 1.9.0
 
