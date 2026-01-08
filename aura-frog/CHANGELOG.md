@@ -4,6 +4,18 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.11.1] - 2026-01-08
+
+### Auto-Learn v2.0: Deduplication & Pattern Detection
+
+Enhanced auto-learn hook with smart deduplication and pattern detection.
+
+#### Updated
+- **`hooks/auto-learn.cjs`** v2.0.0 - Added deduplication, pattern detection, local cache
+- **`hooks/README.md`** - Updated auto-learn documentation
+
+---
+
 ## [1.11.0] - 2026-01-08
 
 ### Auto-Learn: Automatic Feedback Detection with Deduplication & Patterns
