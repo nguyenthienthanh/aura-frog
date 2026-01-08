@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (14 Total)
+## Active Hooks (15 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -203,7 +203,36 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 8. SubagentStart - Context Injection (NEW in 1.4.0)
+### 8. UserPromptSubmit - Auto-Learn (NEW in 1.10.0)
+**When:** Every user prompt submission
+
+**Actions:**
+- ✅ Detect correction patterns in user messages (e.g., "no", "wrong", "actually", "don't do that")
+- ✅ Detect approval patterns (e.g., "good", "great", "perfect")
+- ✅ Categorize feedback (code_style, testing, security, etc.)
+- ✅ Automatically submit to Supabase - no manual `/learn:feedback` needed
+- ✅ Non-blocking - never interrupts user flow
+
+**Detection Patterns:**
+- Direct negations: "no", "nope", "wrong", "incorrect"
+- Corrections: "actually", "should be", "shouldn't", "instead of"
+- Modifications: "change that", "fix that", "don't do that", "remove that"
+- Preferences: "I prefer", "always use", "never use", "don't add"
+- Approvals: "good job", "great", "perfect", "looks good"
+
+**Example:**
+```
+User: "Don't add comments everywhere, only when needed"
+Hook: 🧠 Learning: Captured correction (90% confidence)
+→ Records to Supabase: category=code_style, rule=minimal_comments
+```
+
+**Script:** `hooks/auto-learn.cjs`
+**Requires:** `AF_LEARNING_ENABLED=true`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`
+
+---
+
+### 10. SubagentStart - Context Injection (NEW in 1.4.0)
 **When:** Any subagent starts
 
 **Actions:**
@@ -227,7 +256,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 9. Stop - Voice Notification
+### 11. Stop - Voice Notification
 **When:** Claude stops for user approval
 
 **Actions:**
@@ -239,7 +268,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 10. Notification - Critical Alert Voice
+### 12. Notification - Critical Alert Voice
 **When:** Critical notifications occur
 
 **Actions:**
@@ -249,7 +278,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 11. UserPromptSubmit - Feedback Capture (NEW in 1.9.0)
+### 13. PostToolUse - Feedback Capture (NEW in 1.9.0)
 **When:** User provides corrections or feedback
 
 **Actions:**
@@ -263,7 +292,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 12. PostToolUse - Workflow Metrics (NEW in 1.9.0)
+### 14. PostToolUse - Workflow Metrics (NEW in 1.9.0)
 **When:** After workflow phase completion
 
 **Actions:**
@@ -277,7 +306,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 13. Learning System Library (NEW in 1.9.0)
+### 15. Learning System Library (NEW in 1.9.0)
 **Location:** `hooks/lib/af-learning.cjs`
 
 **Provides:**
@@ -358,7 +387,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[14]{event,name,purpose}:
+hooks[15]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
@@ -366,17 +395,18 @@ hooks[14]{event,name,purpose}:
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
-  PostToolUse,Workflow Metrics,Send metrics to Supabase (NEW)
+  PostToolUse,Workflow Metrics,Send metrics to Supabase
+  PostToolUse,Feedback Capture,Capture file edit corrections
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
-  UserPromptSubmit,Feedback Capture,Capture corrections for learning (NEW)
+  UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages (NEW)
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   Stop,Voice Notification,Alert user for approval needed
   Notification,Critical Alert,Voice alert for errors/critical issues
-  Library,af-learning.cjs,Learning system utilities (NEW)
+  Library,af-learning.cjs,Learning system utilities
 ```
 
 ---
 
-**Version:** 1.9.0
-**Last Updated:** 2026-01-07
-**Status:** Active hooks system (14 hooks)
+**Version:** 1.10.0
+**Last Updated:** 2026-01-08
+**Status:** Active hooks system (15 hooks)

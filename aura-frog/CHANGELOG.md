@@ -4,6 +4,45 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.11.0] - 2026-01-08
+
+### Auto-Learn: Automatic Feedback Detection
+
+Learning system now automatically detects corrections and approvals from your messages - no need to run `/learn:feedback` manually!
+
+#### Added
+- **Auto-learn hook** - `hooks/auto-learn.cjs`
+  - Fires on every UserPromptSubmit
+  - Detects correction patterns: "no", "wrong", "actually", "don't do that", "should be"
+  - Detects approval patterns: "good", "great", "perfect", "looks good"
+  - Auto-categorizes: code_style, testing, security, code_quality
+  - Confidence scoring (50-90%) to filter noise
+  - Non-blocking - never interrupts your flow
+
+#### Updated
+- **`hooks.json`** - Added auto-learn hook to UserPromptSubmit
+- **`hooks/README.md`** - Documented auto-learn hook (hook #8), updated count to 15 hooks
+
+#### How It Works
+```
+User: "Don't add comments everywhere"
+         ↓
+   [Auto-Learn Hook]
+         ↓
+   Pattern matched: "don't add" (90% confidence)
+         ↓
+   Category: code_style, rule: minimal_comments
+         ↓
+   🧠 Learning: Captured correction (90% confidence)
+         ↓
+   → Recorded to Supabase af_feedback table
+```
+
+#### Stats
+- Hooks: 15 (was 14)
+
+---
+
 ## [1.10.1] - 2026-01-08
 
 ### Bug Fix: Session Hooks Not Loading Environment Variables
