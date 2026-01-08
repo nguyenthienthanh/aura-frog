@@ -203,14 +203,16 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 8. UserPromptSubmit - Auto-Learn (NEW in 1.10.0)
+### 8. UserPromptSubmit - Auto-Learn (NEW in 1.11.0)
 **When:** Every user prompt submission
 
 **Actions:**
 - ✅ Detect correction patterns in user messages (e.g., "no", "wrong", "actually", "don't do that")
 - ✅ Detect approval patterns (e.g., "good", "great", "perfect")
 - ✅ Categorize feedback (code_style, testing, security, etc.)
-- ✅ Automatically submit to Supabase - no manual `/learn:feedback` needed
+- ✅ **Deduplication** - Skips identical feedback within 24 hours
+- ✅ **Pattern detection** - Auto-creates learned patterns after 3+ similar corrections
+- ✅ **Local cache** - Saves to `.claude/cache/learned-patterns.md` + Supabase
 - ✅ Non-blocking - never interrupts user flow
 
 **Detection Patterns:**
@@ -223,11 +225,18 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 **Example:**
 ```
 User: "Don't add comments everywhere, only when needed"
-Hook: 🧠 Learning: Captured correction (90% confidence)
-→ Records to Supabase: category=code_style, rule=minimal_comments
+Hook: 🧠 Learning: Captured correction [code_style:minimal_comments] (1x)
+
+# After 3 similar corrections about comments:
+Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurrences)
+→ Auto-creates learned pattern in Supabase + local cache
 ```
 
-**Script:** `hooks/auto-learn.cjs`
+**Local Files:**
+- `.claude/cache/auto-learn-cache.json` - Deduplication cache (24h window)
+- `.claude/cache/learned-patterns.md` - Human-readable patterns file
+
+**Script:** `hooks/auto-learn.cjs` (v2.0.0)
 **Requires:** `AF_LEARNING_ENABLED=true`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`
 
 ---

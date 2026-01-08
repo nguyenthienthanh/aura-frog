@@ -6,17 +6,20 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [1.11.0] - 2026-01-08
 
-### Auto-Learn: Automatic Feedback Detection
+### Auto-Learn: Automatic Feedback Detection with Deduplication & Patterns
 
 Learning system now automatically detects corrections and approvals from your messages - no need to run `/learn:feedback` manually!
 
 #### Added
-- **Auto-learn hook** - `hooks/auto-learn.cjs`
+- **Auto-learn hook v2.0** - `hooks/auto-learn.cjs`
   - Fires on every UserPromptSubmit
   - Detects correction patterns: "no", "wrong", "actually", "don't do that", "should be"
   - Detects approval patterns: "good", "great", "perfect", "looks good"
   - Auto-categorizes: code_style, testing, security, code_quality
-  - Confidence scoring (50-90%) to filter noise
+  - **Deduplication** - Skips identical feedback within 24 hours (MD5 hash)
+  - **Pattern detection** - Auto-creates learned patterns after 3+ similar corrections
+  - **Local cache** - `.claude/cache/auto-learn-cache.json` for deduplication
+  - **Local patterns** - `.claude/cache/learned-patterns.md` human-readable file
   - Non-blocking - never interrupts your flow
 
 #### Updated
@@ -29,13 +32,18 @@ User: "Don't add comments everywhere"
          ↓
    [Auto-Learn Hook]
          ↓
-   Pattern matched: "don't add" (90% confidence)
+   Hash: abc123... (check dedup cache)
          ↓
-   Category: code_style, rule: minimal_comments
+   Not duplicate → increment pattern count
          ↓
-   🧠 Learning: Captured correction (90% confidence)
+   🧠 Learning: Captured correction [code_style:minimal_comments] (2x)
          ↓
-   → Recorded to Supabase af_feedback table
+   → Recorded to Supabase + local cache
+
+# After 3rd correction about comments:
+   🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurrences)
+         ↓
+   → Auto-creates learned pattern in Supabase
 ```
 
 #### Stats
