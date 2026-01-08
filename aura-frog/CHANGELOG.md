@@ -4,6 +4,27 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.10.1] - 2026-01-08
+
+### Bug Fix: Session Hooks Not Loading Environment Variables
+
+#### Fixed
+- **Session hooks not loading .envrc** - Hooks that use Supabase (session-start, feedback-capture, session-metrics) now properly source `.envrc` before executing
+  - Root cause: Node.js hooks ran as separate processes without inheriting environment variables
+  - Memory auto-load was failing silently with "Learning disabled" or "Missing Supabase config"
+  - Added `source .envrc` to SessionStart, PostToolUse (Write|Edit), and Stop hooks
+
+#### How It Works Now
+```bash
+# Before (broken)
+node "hooks/session-start.cjs"  # No env vars!
+
+# After (fixed)
+if [ -f .envrc ]; then set -a; source .envrc; set +a; fi; node "hooks/session-start.cjs"
+```
+
+---
+
 ## [1.10.0] - 2026-01-08
 
 ### Memory Auto-Load from Supabase

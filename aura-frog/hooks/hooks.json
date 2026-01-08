@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-start.cjs\" 2>&1 || true"
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-start.cjs\" 2>&1 || true"
           }
         ]
       }
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/feedback-capture.cjs\" 2>&1 || true"
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/feedback-capture.cjs\" 2>&1 || true"
           }
         ]
       }
@@ -102,7 +102,7 @@
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-metrics.cjs\" 2>&1 || true"
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-metrics.cjs\" 2>&1 || true"
           }
         ]
       }
