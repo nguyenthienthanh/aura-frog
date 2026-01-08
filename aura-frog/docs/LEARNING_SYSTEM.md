@@ -1,9 +1,11 @@
 # Aura Frog Learning System
 
-**Version:** 1.9.0
+**Version:** 1.10.0
 **Status:** Experimental
 
 The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights stored in Supabase.
+
+**NEW in v1.10:** Memory auto-loads at session start! Learned patterns are fetched from Supabase and cached locally for Claude to apply.
 
 ---
 
@@ -15,9 +17,11 @@ The Learning System enables Aura Frog to improve over time by collecting feedbac
 ├─────────────────────────────────────────────────────────────────┤
 │  Hooks (Data Collection)        │  Skills (Analysis)             │
 │  ├── feedback-capture.cjs      │  ├── learning-analyzer/        │
-│  ├── post-phase.md (metrics)   │  └── self-improve/             │
-│  └── session-end.cjs           │                                 │
+│  ├── session-metrics.cjs       │  └── self-improve/             │
+│  └── subagent-init.cjs         │                                 │
 ├─────────────────────────────────┴─────────────────────────────────┤
+│  session-start.cjs → af-memory-loader.cjs → Auto-load patterns   │
+├─────────────────────────────────────────────────────────────────┤
 │  Commands: /learn:analyze, /learn:status, /learn:apply           │
 └─────────────────────┬───────────────────────────────────────────┘
                       │ REST API
@@ -114,6 +118,33 @@ The learning system collects data **automatically** via hooks - no manual comman
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Memory Auto-Load (NEW in v1.10)
+
+At session start, the `session-start.cjs` hook automatically:
+
+1. **Queries Supabase** for learned patterns, insights, and corrections
+2. **Caches locally** to `.claude/cache/memory-context.md`
+3. **Sets env vars** for status display:
+   - `AF_MEMORY_LOADED` - true/false
+   - `AF_MEMORY_COUNT` - number of items
+   - `AF_MEMORY_ERROR` - error message (if any)
+
+**What's loaded:**
+- Learned patterns (confidence ≥70%)
+- Agent success rates
+- Recent corrections (last 30 days)
+- Recent insights (last 7 days)
+
+**Cache behavior:**
+- Cache refreshes if older than 1 hour
+- Force refresh: Delete `.claude/cache/memory-context.md`
+- Cache location: `.claude/cache/memory-context.md`
+
+**Claude uses memory by:**
+1. Reading the cache file at session start
+2. Applying patterns to current task
+3. Avoiding past mistakes (corrections)
 
 ### What's Collected Automatically
 
@@ -257,4 +288,4 @@ The system identifies:
 
 ---
 
-**Version:** 1.9.0 | **Last Updated:** 2026-01-07
+**Version:** 1.10.0 | **Last Updated:** 2026-01-08

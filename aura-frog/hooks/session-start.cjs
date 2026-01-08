@@ -28,11 +28,14 @@
  *   AF_PLAN_NAMING       - Plan naming format
  *   AF_PLAN_DATE_FORMAT  - Date format for plans
  *   AF_PROJECT_ROOT      - Absolute path to project root
+ *   AF_MEMORY_LOADED     - Whether memory was loaded (true/false)
+ *   AF_MEMORY_COUNT      - Number of memory items loaded
+ *   AF_MEMORY_ERROR      - Error message if memory loading failed
  *
  * Exit Codes:
  *   0 - Success (non-blocking, allows continuation)
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 const fs = require('fs');
@@ -57,10 +60,12 @@ const {
   writeEnv
 } = require('./lib/af-config-utils.cjs');
 
+const { loadMemory } = require('./lib/af-memory-loader.cjs');
+
 /**
  * Build context summary for output (compact, single line)
  */
-function buildContextOutput(config, detections, resolved) {
+function buildContextOutput(config, detections, resolved, memoryResult) {
   const parts = [];
 
   // Project info
@@ -75,6 +80,12 @@ function buildContextOutput(config, detections, resolved) {
     } else if (resolved.resolvedBy === 'branch') {
       parts.push(`Suggested: ${path.basename(resolved.path)}`);
     }
+  }
+
+  // Memory status
+  if (memoryResult?.loaded) {
+    const cached = memoryResult.cached ? ' (cached)' : '';
+    parts.push(`Memory: ${memoryResult.count} items${cached}`);
   }
 
   return parts.join(' | ');
@@ -125,6 +136,14 @@ async function main() {
 
     // Calculate reports path
     const reportsPath = getReportsPath(resolved.path, resolved.resolvedBy, config);
+
+    // Load memory from Supabase (non-blocking)
+    let memoryResult = { loaded: false, count: 0, error: null };
+    try {
+      memoryResult = await loadMemory();
+    } catch (e) {
+      memoryResult.error = e.message;
+    }
 
     // Collect static environment info
     const staticEnv = {
@@ -186,10 +205,17 @@ async function main() {
       if (config.locale?.responseLanguage) {
         writeEnv(envFile, 'AF_RESPONSE_LANGUAGE', config.locale.responseLanguage);
       }
+
+      // Memory status
+      writeEnv(envFile, 'AF_MEMORY_LOADED', memoryResult.loaded ? 'true' : 'false');
+      writeEnv(envFile, 'AF_MEMORY_COUNT', memoryResult.count.toString());
+      if (memoryResult.error) {
+        writeEnv(envFile, 'AF_MEMORY_ERROR', memoryResult.error);
+      }
     }
 
     // Output context summary
-    const contextSummary = buildContextOutput(config, detections, resolved);
+    const contextSummary = buildContextOutput(config, detections, resolved, memoryResult);
     if (contextSummary) {
       console.log(`🐸 Session ${source}. ${contextSummary}`);
     } else {

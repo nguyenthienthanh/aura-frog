@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.9.3
+**System:** Aura Frog v1.10.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -9,12 +9,13 @@
 ## Session Start (MANDATORY)
 
 ```toon
-session_start[5]{step,action,file}:
+session_start[6]{step,action,file}:
   1,Check & load .envrc (AUTO-RUN if not loaded),rules/env-loading.md
-  2,Show agent banner,rules/agent-identification-banner.md
-  3,Detect agent,skills/agent-detector/SKILL.md
-  4,Load project context,skills/project-context-loader/SKILL.md
-  5,Verify MCP servers,commands/mcp/status.md
+  2,Load memory from Supabase (auto via hook),hooks/lib/af-memory-loader.cjs
+  3,Show agent banner,rules/agent-identification-banner.md
+  4,Detect agent,skills/agent-detector/SKILL.md
+  5,Load project context,skills/project-context-loader/SKILL.md
+  6,Verify MCP servers,commands/mcp/status.md
 ```
 
 **CRITICAL: Always check env FIRST.** If env vars not loaded → run `project:reload-env` before continuing.
@@ -22,15 +23,17 @@ session_start[5]{step,action,file}:
 **Show status in first response:**
 ```
 🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
-🧠 Learning: enabled ✓
+🧠 Learning: enabled ✓ | Memory: 15 items loaded
 ```
+
+**Memory Auto-Load:** Session hook queries Supabase for learned patterns, caches to `.claude/cache/memory-context.md`. Read this file to apply learned insights.
 
 ---
 
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.9.3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -147,4 +150,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.9.3
+**Version:** 1.10.0

@@ -4,6 +4,53 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.10.0] - 2026-01-08
+
+### Memory Auto-Load from Supabase
+
+Learned patterns and insights now automatically load at session start!
+
+#### Added
+- **Memory auto-loader** - `hooks/lib/af-memory-loader.cjs`
+  - Queries Supabase for learned patterns at session start
+  - Caches results to `.claude/cache/memory-context.md`
+  - 1-hour cache TTL, auto-refreshes when stale
+  - Non-blocking (fails gracefully if Supabase unavailable)
+
+- **Memory environment variables**
+  - `AF_MEMORY_LOADED` - true/false
+  - `AF_MEMORY_COUNT` - number of items loaded
+  - `AF_MEMORY_ERROR` - error message if failed
+
+- **Memory status in banner**
+  - Shows `Memory: X items loaded` in first response
+  - Shows `Memory: X items (cached)` when using cache
+
+#### Updated
+- **`session-start.cjs`** v1.1.0 - Now calls memory loader
+- **`agent-identification-banner.md`** v1.10.0 - Added memory status section
+- **`LEARNING_SYSTEM.md`** v1.10.0 - Documented auto-load feature
+- **`CLAUDE.md`** - Added memory loading to session start steps
+
+#### How It Works
+```
+Session Start
+    │
+    ├── 1. Check env vars
+    ├── 2. Load memory from Supabase (NEW!)
+    │      └── Caches to .claude/cache/memory-context.md
+    ├── 3. Show banner with memory status
+    └── ... rest of session start
+```
+
+#### What's Loaded
+- Learned patterns (confidence ≥70%)
+- Agent success rates (last 15 agents)
+- Recent corrections (last 30 days)
+- Recent insights (last 7 days)
+
+---
+
 ## [1.9.3] - 2026-01-07
 
 ### Version Sync & Learn Command Execution Fixes
