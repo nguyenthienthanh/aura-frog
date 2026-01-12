@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (16 Total)
+## Active Hooks (15 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -333,21 +333,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 14. PostToolUse - Workflow Metrics
-**When:** After workflow phase completion
-
-**Actions:**
-- ✅ Track workflow success/failure rates
-- ✅ Measure token usage per phase
-- ✅ Monitor agent performance
-- ✅ Send metrics to Supabase
-
-**Script:** `hooks/workflow-metrics.cjs`
-**Requires:** `AF_METRICS_COLLECTION=true`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`
-
----
-
-### 15. Learning System Library
+### 14. Learning System Library
 **Location:** `hooks/lib/af-learning.cjs`
 
 **Provides:**
@@ -428,7 +414,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[16]{event,name,purpose}:
+hooks[15]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
@@ -436,13 +422,12 @@ hooks[16]{event,name,purpose}:
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
-  PostToolUse,Lint Auto-Fix,Auto-run linters after file changes (NEW)
-  PostToolUse,Workflow Metrics,Send metrics to Supabase
+  PostToolUse,Lint Auto-Fix,Auto-run linters after file changes
   PostToolUse,Feedback Capture,Capture file edit corrections
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
-  Stop,Voice Notification,Alert user for approval needed
+  Stop,Voice+Metrics,Voice notification + session metrics
   Notification,Critical Alert,Voice alert for errors/critical issues
   Library,af-learning.cjs,Learning system utilities
 ```
@@ -451,4 +436,4 @@ hooks[16]{event,name,purpose}:
 
 **Version:** 1.12.0
 **Last Updated:** 2026-01-12
-**Status:** Active hooks system (16 hooks)
+**Status:** Active hooks system (15 hooks)

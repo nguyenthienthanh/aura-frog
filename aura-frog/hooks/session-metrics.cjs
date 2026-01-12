@@ -18,7 +18,8 @@ const path = require('path');
 const {
   isMetricsEnabled,
   recordWorkflowMetrics,
-  recordAgentPerformance
+  recordAgentPerformance,
+  recordPattern
 } = require('./lib/af-learning.cjs');
 
 /**
@@ -58,6 +59,51 @@ function findActiveWorkflow() {
   }
 
   return null;
+}
+
+/**
+ * Extract patterns from workflow execution (merged from workflow-metrics.cjs)
+ */
+function extractPatterns(state, metrics) {
+  const patterns = [];
+
+  // Pattern: Workflow completed successfully
+  if (metrics.success) {
+    patterns.push({
+      type: 'success',
+      category: 'workflow',
+      description: `Successful ${state.workflowType || 'full'} workflow for ${state.framework || 'unknown'} project`,
+      evidence: [{
+        workflowId: metrics.workflowId,
+        coverage: state.codeCoverage,
+        testPassRate: state.testPassRate
+      }]
+    });
+  }
+
+  // Pattern: Auto-stop triggered
+  if (state.autoStopPhase) {
+    patterns.push({
+      type: 'failure',
+      category: 'workflow',
+      description: `Auto-stop at ${state.autoStopPhase}: ${state.autoStopReason}`,
+      evidence: [{ workflowId: metrics.workflowId, phase: state.autoStopPhase }]
+    });
+  }
+
+  // Pattern: High token usage phase (>50k tokens)
+  for (const [phase, tokens] of Object.entries(metrics.tokensByPhase || {})) {
+    if (tokens > 50000) {
+      patterns.push({
+        type: 'optimization',
+        category: 'phase',
+        description: `High token usage in ${phase}: ${tokens} tokens`,
+        evidence: [{ workflowId: metrics.workflowId, phase, tokens }]
+      });
+    }
+  }
+
+  return patterns;
 }
 
 /**
@@ -113,11 +159,17 @@ async function sendWorkflowMetrics(workflowId, stateFile) {
 
     await recordWorkflowMetrics(metrics);
 
+    // Extract and record patterns
+    const patterns = extractPatterns(state, metrics);
+    for (const pattern of patterns) {
+      await recordPattern(pattern);
+    }
+
     // Mark as sent
     state.metricsSent = true;
     fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
 
-    return true;
+    return { sent: true, patterns: patterns.length };
   } catch (error) {
     console.error(`Learning: Failed to send workflow metrics: ${error.message}`);
     return false;
@@ -180,9 +232,10 @@ async function main() {
     // Send workflow metrics
     const workflow = findActiveWorkflow();
     if (workflow) {
-      const workflowSent = await sendWorkflowMetrics(workflow.workflowId, workflow.stateFile);
-      if (workflowSent) {
-        console.log('🐸 Learning: Session metrics recorded');
+      const result = await sendWorkflowMetrics(workflow.workflowId, workflow.stateFile);
+      if (result && result.sent) {
+        const patternMsg = result.patterns > 0 ? ` + ${result.patterns} patterns` : '';
+        console.log(`🐸 Learning: Session metrics recorded${patternMsg}`);
         sent = true;
       }
     }

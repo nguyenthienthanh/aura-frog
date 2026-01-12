@@ -6,9 +6,14 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [1.12.0] - 2026-01-12
 
-### Lint Auto-Fix: Automatic Code Formatting After Every Change
+### Lint Auto-Fix + Hooks Cleanup
 
 Every file change now automatically runs the appropriate linter/formatter!
+
+#### Cleanup
+- **Merged `workflow-metrics.cjs` into `session-metrics.cjs`** - Pattern extraction now happens on session stop
+- **Removed unused `workflow-metrics.cjs`** - Was documented but never registered in hooks.json
+- **Fixed hooks count** - Accurate count now: 15 hooks (was incorrectly 16)
 
 #### Added
 - **Lint auto-fix hook** - `hooks/lint-autofix.cjs`
@@ -35,7 +40,7 @@ Every file change now automatically runs the appropriate linter/formatter!
 | Dart | dart format |
 
 #### Stats
-- Hooks: 16 (was 15)
+- Hooks: 15 (was 14, +1 new, -1 removed duplicate)
 
 ---
 
