@@ -1,6 +1,6 @@
 {
   "name": "aura-frog",
-  "version": "1.11.1",
+  "version": "1.12.0",
   "description": "15 specialized agents, 9-phase TDD workflow, 44 rules, 37 skills, 79 commands, learning system. Main character energy for your codebase 🐸✨",
   "author": {
     "name": "Nguyen Thien Thanh",

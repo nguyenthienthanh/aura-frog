@@ -68,6 +68,10 @@
           {
             "type": "command",
             "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/feedback-capture.cjs\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/lint-autofix.cjs\" 2>&1 || true"
           }
         ]
       }

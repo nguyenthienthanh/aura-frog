@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (15 Total)
+## Active Hooks (16 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -186,7 +186,39 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 7. UserPromptSubmit - Prompt Reminder (NEW in 1.4.0)
+### 7. PostToolUse - Lint Auto-Fix (NEW in 1.11.1)
+**When:** After Write or Edit tool completes
+
+**Actions:**
+- ✅ Detect file type and available linters
+- ✅ Auto-run appropriate linter with --fix flag
+- ✅ Non-blocking - reports results but doesn't fail
+
+**Supported Linters:**
+| Language | Linters |
+|----------|---------|
+| JS/TS/Vue | ESLint, Prettier |
+| CSS/SCSS | Prettier, Stylelint |
+| PHP | PHP CS Fixer, Laravel Pint |
+| Python | Ruff, Black |
+| Go | gofmt, goimports |
+| Ruby | Rubocop |
+| Rust | rustfmt |
+| Dart | dart format |
+
+**Example:**
+```
+User edits: src/components/Button.tsx
+Hook: 🔧 Auto-fixed: eslint, prettier
+```
+
+**Disable:** Set `AF_LINT_AUTOFIX=false` in environment
+
+**Script:** `hooks/lint-autofix.cjs`
+
+---
+
+### 8. UserPromptSubmit - Prompt Reminder
 **When:** Every user prompt submission
 
 **Actions:**
@@ -203,7 +235,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 8. UserPromptSubmit - Auto-Learn (NEW in 1.11.0)
+### 9. UserPromptSubmit - Auto-Learn (NEW in 1.11.0)
 **When:** Every user prompt submission
 
 **Actions:**
@@ -241,7 +273,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10. SubagentStart - Context Injection (NEW in 1.4.0)
+### 10. SubagentStart - Context Injection
 **When:** Any subagent starts
 
 **Actions:**
@@ -277,7 +309,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 12. Notification - Critical Alert Voice
+### 12. Notification - Critical Alert
 **When:** Critical notifications occur
 
 **Actions:**
@@ -287,7 +319,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 13. PostToolUse - Feedback Capture (NEW in 1.9.0)
+### 13. PostToolUse - Feedback Capture
 **When:** User provides corrections or feedback
 
 **Actions:**
@@ -301,7 +333,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 14. PostToolUse - Workflow Metrics (NEW in 1.9.0)
+### 14. PostToolUse - Workflow Metrics
 **When:** After workflow phase completion
 
 **Actions:**
@@ -315,7 +347,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 15. Learning System Library (NEW in 1.9.0)
+### 15. Learning System Library
 **Location:** `hooks/lib/af-learning.cjs`
 
 **Provides:**
@@ -396,7 +428,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[15]{event,name,purpose}:
+hooks[16]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
@@ -404,10 +436,11 @@ hooks[15]{event,name,purpose}:
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
+  PostToolUse,Lint Auto-Fix,Auto-run linters after file changes (NEW)
   PostToolUse,Workflow Metrics,Send metrics to Supabase
   PostToolUse,Feedback Capture,Capture file edit corrections
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
-  UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages (NEW)
+  UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   Stop,Voice Notification,Alert user for approval needed
   Notification,Critical Alert,Voice alert for errors/critical issues
@@ -416,6 +449,6 @@ hooks[15]{event,name,purpose}:
 
 ---
 
-**Version:** 1.10.0
-**Last Updated:** 2026-01-08
-**Status:** Active hooks system (15 hooks)
+**Version:** 1.12.0
+**Last Updated:** 2026-01-12
+**Status:** Active hooks system (16 hooks)

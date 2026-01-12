@@ -4,6 +4,41 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.12.0] - 2026-01-12
+
+### Lint Auto-Fix: Automatic Code Formatting After Every Change
+
+Every file change now automatically runs the appropriate linter/formatter!
+
+#### Added
+- **Lint auto-fix hook** - `hooks/lint-autofix.cjs`
+  - Auto-detects file type and available linters
+  - Runs linter with --fix flag after Write/Edit
+  - Supports: ESLint, Prettier, PHP CS Fixer, Pint, Ruff, Black, gofmt, Rubocop, rustfmt, dart format
+  - Non-blocking - reports results but doesn't fail operations
+  - Disable with `AF_LINT_AUTOFIX=false`
+
+#### Updated
+- **`hooks.json`** - Added lint-autofix to PostToolUse (Write|Edit)
+- **`hooks/README.md`** - Documented lint-autofix hook (#7), count: 15 → 16
+
+#### Supported Linters
+| Language | Linters |
+|----------|---------|
+| JS/TS/Vue | ESLint, Prettier |
+| CSS/SCSS | Prettier, Stylelint |
+| PHP | PHP CS Fixer, Laravel Pint |
+| Python | Ruff, Black |
+| Go | gofmt, goimports |
+| Ruby | Rubocop |
+| Rust | rustfmt |
+| Dart | dart format |
+
+#### Stats
+- Hooks: 16 (was 15)
+
+---
+
 ## [1.11.1] - 2026-01-08
 
 ### Auto-Learn v2.0: Deduplication & Pattern Detection
