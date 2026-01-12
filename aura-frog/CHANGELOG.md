@@ -16,6 +16,11 @@ Every file change now automatically runs the appropriate linter/formatter!
 - **Fixed hooks count** - Accurate count now: 15 hooks (was incorrectly 16)
 
 #### Added
+- **code-simplifier skill** - `skills/code-simplifier/SKILL.md`
+  - Auto-invokes on "simplify", "too complex", "KISS", "over-engineered"
+  - References `rules/kiss-avoid-over-engineering.md` (avoids duplication)
+  - Quick reference for complexity targets and checklist
+  - Links to `quality:complexity` command
 - **Lint auto-fix hook** - `hooks/lint-autofix.cjs`
   - Auto-detects file type and available linters
   - Runs linter with --fix flag after Write/Edit
@@ -24,6 +29,8 @@ Every file change now automatically runs the appropriate linter/formatter!
   - Disable with `AF_LINT_AUTOFIX=false`
 
 #### Updated
+- **`skills/README.md`** - Added code-simplifier skill, count: 37 → 38
+- **`CLAUDE.md`** - Added code-simplifier to auto-invoke skills list
 - **`hooks.json`** - Added lint-autofix to PostToolUse (Write|Edit)
 - **`hooks/README.md`** - Documented lint-autofix hook (#7), count: 15 → 16
 
@@ -40,6 +47,7 @@ Every file change now automatically runs the appropriate linter/formatter!
 | Dart | dart format |
 
 #### Stats
+- Skills: 38 (was 37)
 - Hooks: 15 (was 14, +1 new, -1 removed duplicate)
 
 ---

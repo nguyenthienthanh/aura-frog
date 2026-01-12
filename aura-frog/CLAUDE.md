@@ -70,7 +70,7 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[26]{name,trigger,file}:
+skills[27]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
@@ -80,6 +80,7 @@ skills[26]{name,trigger,file}:
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
   code-reviewer,Code review,skills/code-reviewer/SKILL.md
+  code-simplifier,Simplify/KISS/complexity,skills/code-simplifier/SKILL.md
   session-continuation,Token limit/handoff,skills/session-continuation/SKILL.md
   lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
@@ -122,7 +123,7 @@ resources[11]{name,location}:
   Agents (15),agents/
   Commands (79),commands/
   Rules (44),rules/
-  Skills (37),skills/
+  Skills (38),skills/
   MCP Servers (5),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md

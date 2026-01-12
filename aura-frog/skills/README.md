@@ -1,11 +1,17 @@
 # Aura Frog Skills
 
-**Version:** 1.9.0
-**Total Skills:** 37 (26 auto-invoking + 11 reference)
+**Version:** 1.12.0
+**Total Skills:** 38 (26 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
+
+---
+
+## New in 1.12.0
+
+- **code-simplifier** - Detect and simplify overly complex code. Apply KISS principle - less is more.
 
 ---
 
@@ -450,7 +456,7 @@ Claude will automatically invoke the `workflow-orchestrator` skill.
 These skills provide guidance documents that agents reference during workflows:
 
 ```toon
-reference_skills[8]{name,purpose,location}:
+reference_skills[9]{name,purpose,location}:
   design-system-library,Design system patterns (MUI Ant Tailwind),skills/design-system-library/
   refactor-expert,Safe refactoring patterns,skills/refactor-expert/
   api-designer,RESTful API design,skills/api-designer/
@@ -459,6 +465,7 @@ reference_skills[8]{name,purpose,location}:
   phase-skipping,Smart phase skip rules,skills/workflow-orchestrator/
   estimation,Effort estimation techniques,skills/pm-expert/
   documentation,ADR + Runbook templates,skills/documentation/
+  code-simplifier,KISS principle + complexity reduction,skills/code-simplifier/
 ```
 
 ### 11. **design-system-library** (Priority: HIGH)
@@ -719,7 +726,24 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.9.0
-**Last Updated:** 2026-01-07
+### 26. **code-simplifier** (Priority: HIGH)
+
+**Auto-invokes when:** Code is overly complex, deep nesting, or user asks to simplify
+
+**Triggers:** simplify, too complex, make simpler, reduce complexity, KISS, over-engineered
+
+**What it does:**
+- Quick reference for KISS principle application
+- References comprehensive `rules/kiss-avoid-over-engineering.md`
+- Provides complexity targets checklist
+- Links to `quality:complexity` command for analysis
+
+**📚 Details:** `skills/code-simplifier/SKILL.md`
+**📚 Full KISS Guide:** `rules/kiss-avoid-over-engineering.md`
+
+---
+
+**Version:** 1.12.0
+**Last Updated:** 2026-01-12
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 37 (26 auto-invoking + 11 reference)
+**Total Skills:** 38 (26 auto-invoking + 12 reference)
