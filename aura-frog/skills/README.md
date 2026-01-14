@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Version:** 1.12.0
+**Version:** 1.13.0
 **Total Skills:** 38 (26 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
@@ -743,7 +743,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.12.0
+**Version:** 1.13.0
 **Last Updated:** 2026-01-12
 **Format:** TOON (Token-Optimized)
 **Total Skills:** 38 (26 auto-invoking + 12 reference)

@@ -4,11 +4,11 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [1.12.0] - 2026-01-12
+## [1.13.0] - 2026-01-14
 
-### Lint Auto-Fix + Hooks Cleanup
+### Frontend Excellence + Lint Auto-Fix + Hooks Cleanup
 
-Every file change now automatically runs the appropriate linter/formatter!
+Major frontend optimization with actionable UX/UI guidance, plus automatic linting!
 
 #### Cleanup
 - **Merged `workflow-metrics.cjs` into `session-metrics.cjs`** - Pattern extraction now happens on session stop
@@ -16,6 +16,14 @@ Every file change now automatically runs the appropriate linter/formatter!
 - **Fixed hooks count** - Accurate count now: 15 hooks (was incorrectly 16)
 
 #### Added
+- **frontend-excellence rule** - `rules/frontend-excellence.md` (CRITICAL)
+  - **UX Laws**: Fitts' (touch targets), Jakob's (standard patterns), Hick's (limit choices), Miller's (chunking)
+  - **Performance Targets**: LCP <2.5s, CLS <0.1, INP <200ms, 60fps mobile, Lighthouse 90+
+  - **Accessibility Checklist**: 4.5:1 contrast, 48dp touch targets, keyboard nav, ARIA patterns
+  - **Mobile UX**: Thumb zones, one-handed use (49% users), iOS/Android conventions
+  - **Loading States**: Skeleton screens, optimistic updates, timing guidelines
+  - **Form UX**: Validation timing, error messages, autofill support
+  - **Decision Trees**: Button styling, action placement, loading indicators
 - **code-simplifier skill** - `skills/code-simplifier/SKILL.md`
   - Auto-invokes on "simplify", "too complex", "KISS", "over-engineered"
   - References `rules/kiss-avoid-over-engineering.md` (avoids duplication)
@@ -29,6 +37,10 @@ Every file change now automatically runs the appropriate linter/formatter!
   - Disable with `AF_LINT_AUTOFIX=false`
 
 #### Updated
+- **`agents/web-expert.md`** v3.0 - Added performance targets, UX laws, accessibility checklist, loading/error patterns
+- **`agents/mobile-expert.md`** v3.0 - Added touch targets, thumb zones, iOS/Android conventions, FlashList, haptics
+- **`agents/ui-designer.md`** v2.0 - Added UX laws application, accessibility checks in analysis
+- **`rules/README.md`** - Added frontend-excellence rule, count: 44 → 45
 - **`skills/README.md`** - Added code-simplifier skill, count: 37 → 38
 - **`CLAUDE.md`** - Added code-simplifier to auto-invoke skills list
 - **`hooks.json`** - Added lint-autofix to PostToolUse (Write|Edit)
@@ -47,6 +59,7 @@ Every file change now automatically runs the appropriate linter/formatter!
 | Dart | dart format |
 
 #### Stats
+- Rules: 45 (was 44)
 - Skills: 38 (was 37)
 - Hooks: 15 (was 14, +1 new, -1 removed duplicate)
 
