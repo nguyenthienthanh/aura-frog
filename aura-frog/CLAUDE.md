@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.13.0
+**System:** Aura Frog v1.14.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -33,7 +33,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.13.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.14.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -70,9 +70,10 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[27]{name,trigger,file}:
+skills[28]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
+  visual-pixel-perfect,Visual test/pixel perfect,skills/visual-pixel-perfect/SKILL.md
   design-system-library,UI/design system,skills/design-system-library/SKILL.md
   stitch-design,AI design/Stitch,skills/stitch-design/SKILL.md
   workflow-orchestrator,Complex feature,skills/workflow-orchestrator/SKILL.md
@@ -122,8 +123,8 @@ skills[27]{name,trigger,file}:
 resources[11]{name,location}:
   Agents (15),agents/
   Commands (79),commands/
-  Rules (45),rules/
-  Skills (38),skills/
+  Rules (46),rules/
+  Skills (39),skills/
   MCP Servers (5),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
@@ -151,4 +152,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.13.0
+**Version:** 1.14.0

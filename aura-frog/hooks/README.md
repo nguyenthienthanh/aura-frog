@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.13.0
+**Version:** 1.14.0
 
 ---
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (15 Total)
+## Active Hooks (16 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -65,6 +65,33 @@ env_vars[16]{var,description}:
 
 **Script:** `hooks/session-start.cjs`
 **Config Utils:** `hooks/lib/af-config-utils.cjs`
+
+---
+
+### 0b. SessionStart - Visual Testing Detection (NEW in 1.14.0)
+**When:** Once per session (after environment injection)
+
+**Actions:**
+- ✅ Detect `.claude/visual/` folder in project
+- ✅ Load visual testing configuration
+- ✅ Set environment variables for visual testing
+- ✅ Display visual testing status
+
+**Injected Environment Variables:**
+```toon
+env_vars[4]{var,description}:
+  AF_VISUAL_TESTING,true if visual testing configured
+  AF_VISUAL_PATH,Path to .claude/visual folder
+  AF_VISUAL_WEB_THRESHOLD,Web diff threshold (default 0.5%)
+  AF_VISUAL_PDF_THRESHOLD,PDF diff threshold (default 1.0%)
+```
+
+**Example Output:**
+```
+🎨 Visual Testing: enabled | Thresholds: web 0.5% / pdf 1.0% | Specs: 5 | Baselines: 3
+```
+
+**Script:** `hooks/visual-pixel-init.cjs`
 
 ---
 
@@ -434,6 +461,6 @@ hooks[15]{event,name,purpose}:
 
 ---
 
-**Version:** 1.13.0
+**Version:** 1.14.0
 **Last Updated:** 2026-01-14
 **Status:** Active hooks system (15 hooks)

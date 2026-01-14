@@ -4,6 +4,61 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.14.0] - 2026-01-14
+
+### Visual Pixel-Perfect Testing
+
+New skill for automated visual regression testing with implement → render → snapshot → compare → fix loop.
+
+#### Added
+- **visual-pixel-perfect skill** - `skills/visual-pixel-perfect/SKILL.md`
+  - Auto-invokes on "visual test", "pixel perfect", "design match", "visual regression"
+  - Implement → Render → Snapshot → Compare → Fix loop (max 5 attempts)
+  - Thresholds: web <0.5%, PDF <1.0%
+  - References: design-spec-schema, design-tokens-contract, diff-engine-config, render-configs, ci-integration
+- **visual-pixel-accuracy rule** - `rules/visual-pixel-accuracy.md` (CRITICAL)
+  - No guessing (use tokens only)
+  - Pixel accuracy over code style
+  - No success without diff pass
+  - Frozen regions immutable
+- **visual-pixel-init hook** - `hooks/visual-pixel-init.cjs`
+  - Detects `.claude/visual/` folder on session start
+  - Injects AF_VISUAL_TESTING, AF_VISUAL_PATH, AF_VISUAL_WEB_THRESHOLD, AF_VISUAL_PDF_THRESHOLD
+- **Visual scripts** - `scripts/visual/`
+  - `init-claude-visual.sh` - Initialize .claude/visual/ folder structure
+  - `pdf-render.sh` - Puppeteer PDF rendering
+  - `snapshot-compare.sh` - Pixelmatch diff comparison
+  - `visual-test.sh` - Main test runner (npm run claude:visual-test)
+
+#### Updated
+- **`hooks/hooks.json`** - Added visual-pixel-init to SessionStart
+- **`hooks/README.md`** - Documented visual-pixel-init hook, count: 15 → 16
+- **`rules/README.md`** - Added visual-pixel-accuracy rule, count: 45 → 46
+- **`skills/README.md`** - Added visual-pixel-perfect skill, count: 38 → 39
+- **`CLAUDE.md`** - Added visual-pixel-perfect to auto-invoke skills list
+
+#### Project Folder Structure
+```
+.claude/visual/
+├── design/           # Reference images
+├── spec/             # DesignSpec JSON files
+├── tokens/           # Design tokens
+├── snapshots/
+│   ├── baseline/     # Approved snapshots
+│   ├── current/      # Test run snapshots
+│   └── diff/         # Diff images
+├── tests/            # Visual test files
+└── config.json       # Visual testing config
+```
+
+#### Stats
+- Rules: 46 (was 45)
+- Skills: 39 (was 38)
+- Hooks: 16 (was 15)
+- Scripts: +4 new visual scripts
+
+---
+
 ## [1.13.0] - 2026-01-14
 
 ### Frontend Excellence + Lint Auto-Fix + Hooks Cleanup

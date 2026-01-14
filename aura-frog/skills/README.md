@@ -1,11 +1,17 @@
 # Aura Frog Skills
 
-**Version:** 1.13.0
-**Total Skills:** 38 (26 auto-invoking + 12 reference)
+**Version:** 1.14.0
+**Total Skills:** 39 (27 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
+
+---
+
+## New in 1.14.0
+
+- **visual-pixel-perfect** - Pixel-perfect visual testing with auto-fix loop. Implement → Render → Snapshot → Compare → Fix until pass.
 
 ---
 

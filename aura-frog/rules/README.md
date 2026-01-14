@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.13.0
-**Total Rules:** 45
+**Version:** 1.14.0
+**Total Rules:** 46
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[45]{category,rule,priority,purpose}:
+rules[46]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -49,6 +49,7 @@ rules[45]{category,rule,priority,purpose}:
   documentation,diagram-requirements,medium,Mermaid diagrams for complex features
   ui,accessibility-rules,high,WCAG compliance + ARIA
   ui,frontend-excellence,critical,UX laws + performance + mobile patterns
+  ui,visual-pixel-accuracy,critical,Pixel-perfect visual testing hard rules
   ui,correct-file-extensions,medium,Proper file naming
   ui,direct-hook-access,medium,Lifecycle hooks
   workflow,estimation,high,Story points + time + risk assessment
@@ -80,7 +81,7 @@ categories[8]{name,count,critical_rules}:
   security,1,1
   workflow,10,6
   documentation,1,0
-  ui,4,1
+  ui,5,2
   godot,2,0
 ```
 
