@@ -208,7 +208,7 @@ export JIRA_EMAIL="your.email@example.com"
 export JIRA_API_TOKEN="your-jira-api-token"
 
 # Figma Integration
-export FIGMA_API_TOKEN="your-figma-token"
+export FIGMA_API_KEY="your-figma-token"
 
 # Confluence Integration
 export CONFLUENCE_URL="https://your-company.atlassian.net/wiki"

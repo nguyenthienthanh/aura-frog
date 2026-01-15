@@ -58,7 +58,7 @@ Create `.envrc` in your project root:
 
 ```bash
 # Figma
-export FIGMA_API_TOKEN="your-figma-token"
+export FIGMA_API_KEY="your-figma-token"
 
 # Slack
 export SLACK_BOT_TOKEN="xoxb-your-bot-token"

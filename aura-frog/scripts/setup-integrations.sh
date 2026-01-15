@@ -154,7 +154,7 @@ CONFLUENCE_SPACE_KEY=""
 SLACK_BOT_TOKEN=""
 SLACK_CHANNEL_ID=""
 SLACK_WEBHOOK_URL=""
-FIGMA_API_TOKEN=""
+FIGMA_API_KEY=""
 FIGMA_FILE_KEY=""
 
 # 3.1: Jira Configuration
@@ -240,7 +240,7 @@ echo ""
 read -p "Configure Figma? (yes/skip): " SETUP_FIGMA
 
 if [ "$SETUP_FIGMA" = "yes" ]; then
-  read -sp "Figma Personal Access Token (starts with figd_): " FIGMA_API_TOKEN
+  read -sp "Figma Personal Access Token (starts with figd_): " FIGMA_API_KEY
   echo ""
   read -p "Default Figma File Key (optional, press Enter to skip): " FIGMA_FILE_KEY
   echo -e "${GREEN}✅ Figma configured!${NC}"
@@ -291,7 +291,7 @@ export SLACK_MENTION_PM="@pm-team"
 # ============================================
 # Figma Integration
 # ============================================
-export FIGMA_API_TOKEN="$FIGMA_API_TOKEN"
+export FIGMA_API_KEY="$FIGMA_API_KEY"
 export FIGMA_FILE_KEY="$FIGMA_FILE_KEY"
 export FIGMA_MCP_ENABLED="true"
 
@@ -392,7 +392,7 @@ echo "Configured integrations:"
 [ -n "$JIRA_URL" ] && echo "  ✅ Jira ($JIRA_PROJECT_KEY)"
 [ -n "$CONFLUENCE_URL" ] && echo "  ✅ Confluence ($CONFLUENCE_SPACE_KEY)"
 [ -n "$SLACK_BOT_TOKEN" ] || [ -n "$SLACK_WEBHOOK_URL" ] && echo "  ✅ Slack"
-[ -n "$FIGMA_API_TOKEN" ] && echo "  ✅ Figma"
+[ -n "$FIGMA_API_KEY" ] && echo "  ✅ Figma"
 echo ""
 echo "Next steps:"
 echo "  1. Restart your terminal or run: source ~/.${CURRENT_SHELL}rc"

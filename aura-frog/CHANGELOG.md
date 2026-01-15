@@ -707,7 +707,7 @@ Code quality improvements and documentation fixes.
 - **Fixed duplicate section numbering** - hooks/README.md had two section "3"s
 - **Fixed MCP package names** - Replaced non-existent `@anthropic/*` packages with real packages:
   - `atlassian`: `@anthropic/atlassian-mcp` → Official Atlassian Remote MCP (OAuth, no env vars needed)
-  - `figma`: `@anthropic/figma-mcp` → `figma-developer-mcp` (maps `FIGMA_API_TOKEN` internally)
+  - `figma`: `@anthropic/figma-mcp` → `figma-developer-mcp` (maps `FIGMA_API_KEY` internally)
   - `slack`: `@anthropic/slack-mcp` → `@modelcontextprotocol/server-slack` (added `SLACK_TEAM_ID`)
 
 #### Updated
@@ -998,7 +998,7 @@ Streamlined the plugin by replacing custom integration scripts with bundled MCP 
 #### Migration
 - Set env vars in `.envrc` for MCP servers:
   - `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`
-  - `FIGMA_API_TOKEN`
+  - `FIGMA_API_KEY`
   - `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID`
 
 ---

@@ -20,7 +20,7 @@ Before responding to the user's first message, you MUST:
 1. **Check if key env vars are set:**
    ```bash
    # Check critical variables
-   [ -n "$SUPABASE_URL" ] && [ -n "$FIGMA_API_TOKEN" ] || echo "ENV NOT LOADED"
+   [ -n "$SUPABASE_URL" ] && [ -n "$FIGMA_API_KEY" ] || echo "ENV NOT LOADED"
    ```
 
 2. **If NOT configured → Auto-run reload:**
@@ -61,7 +61,7 @@ Before responding to the user's first message, you MUST:
 ### Integration Credentials
 ```bash
 JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
-FIGMA_API_TOKEN
+FIGMA_API_KEY
 SLACK_BOT_TOKEN, SLACK_CHANNEL_ID, SLACK_WEBHOOK_URL
 CONFLUENCE_URL, CONFLUENCE_EMAIL, CONFLUENCE_API_TOKEN
 ```

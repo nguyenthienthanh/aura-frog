@@ -37,8 +37,9 @@ export CONFLUENCE_SPACE_KEY="{{CONFLUENCE_SPACE_KEY}}"  # Optional: default spac
 # --------------------------------------------
 # Figma MCP (figma-developer-mcp)
 # --------------------------------------------
-# Get API token: https://www.figma.com/developers/api#access-tokens
-export FIGMA_API_TOKEN="{{FIGMA_API_TOKEN}}"
+# Get API key: https://www.figma.com/developers/api#access-tokens
+# Required by figma-developer-mcp package
+export FIGMA_API_KEY="{{FIGMA_API_KEY}}"
 
 # --------------------------------------------
 # Slack MCP (@modelcontextprotocol/server-slack)
