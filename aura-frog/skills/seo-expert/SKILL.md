@@ -438,15 +438,67 @@ image_seo[5]{aspect,requirement}:
 
 ---
 
+## 9. Testing & Validation (REQUIRED)
+
+### Google Rich Results Test
+
+**URL:** https://search.google.com/test/rich-results
+
+```toon
+testing_workflow[4]{step,action,tool}:
+  1,Test structured data,Google Rich Results Test
+  2,Validate schema syntax,Schema.org Validator
+  3,Check mobile usability,Google Mobile-Friendly Test
+  4,Audit performance,Google PageSpeed Insights
+```
+
+### How to Test
+
+```bash
+# 1. Test live URL
+https://search.google.com/test/rich-results?url=YOUR_URL
+
+# 2. Or paste code snippet directly in the tool
+# - Go to Rich Results Test
+# - Click "Code" tab
+# - Paste your JSON-LD
+# - Click "Test Code"
+```
+
+### What to Verify
+
+```toon
+rich_results_checklist[6]{check,expected}:
+  Page is eligible for rich results,Green checkmark
+  No errors in structured data,0 errors
+  Warnings addressed,Review and fix if critical
+  All schema types detected,Article/Product/FAQ/etc
+  Preview looks correct,Check rich result preview
+  Mobile rendering works,Test on mobile view
+```
+
+### Validation Loop
+
+```
+Implement Schema → Test in Rich Results → Fix Errors → Re-test → Deploy
+       ↑                                      |
+       └──────────────────────────────────────┘
+```
+
+**CRITICAL:** Never deploy structured data without passing Rich Results Test.
+
+---
+
 ## Quick Reference Checklist
 
 ```toon
-seo_checklist[12]{check,priority}:
+seo_checklist[13]{check,priority}:
   Unique title per page (50-60 chars),Critical
   Meta description (150-160 chars),Critical
   Canonical URL on every page,Critical
   H1 tag (one per page),Critical
   Structured data (JSON-LD),High
+  Rich Results Test passing,Critical
   Open Graph + Twitter cards,High
   XML sitemap submitted,High
   Robots.txt configured,High

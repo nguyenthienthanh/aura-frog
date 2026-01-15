@@ -330,16 +330,52 @@ export default function BlogPost({ post }) {
 
 ---
 
-## Validation Requirements
+## Validation Requirements (MANDATORY)
 
-### Before Deployment
+### Google Rich Results Test
+
+**URL:** https://search.google.com/test/rich-results
+
+**CRITICAL:** All structured data MUST pass Rich Results Test before deployment.
+
+### Testing Workflow
 
 ```toon
-validation_checklist[4]{step,tool}:
-  Test with Rich Results,Google Rich Results Test
-  Validate JSON-LD syntax,Schema.org Validator
-  Check for errors,Google Search Console
-  Monitor rich snippets,Search Console Enhancements
+validation_workflow[5]{step,action,url}:
+  1,Test structured data,https://search.google.com/test/rich-results
+  2,Validate JSON-LD syntax,https://validator.schema.org
+  3,Check mobile rendering,https://search.google.com/test/mobile-friendly
+  4,Audit performance,https://pagespeed.web.dev
+  5,Monitor in production,Google Search Console
+```
+
+### How to Use Rich Results Test
+
+```markdown
+**Option 1: Test Live URL**
+1. Go to https://search.google.com/test/rich-results
+2. Enter your page URL
+3. Click "Test URL"
+4. Review results for errors/warnings
+
+**Option 2: Test Code Snippet**
+1. Go to https://search.google.com/test/rich-results
+2. Click "Code" tab
+3. Paste your JSON-LD script
+4. Click "Test Code"
+5. Fix any errors and re-test
+```
+
+### Validation Checklist
+
+```toon
+validation_checklist[6]{check,requirement}:
+  Rich Results Test,Must pass with 0 errors
+  Schema types detected,All intended types shown
+  Preview renders correctly,Visual check of rich result
+  Mobile compatible,Works on mobile view
+  No critical warnings,Address yellow warnings
+  Search Console clean,No schema errors reported
 ```
 
 ### Common Errors to Avoid

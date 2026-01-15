@@ -206,13 +206,35 @@ social_images[2]{platform,dimensions}:
 
 ---
 
-## Validation Tools
+## Validation Tools (MANDATORY)
+
+### Google Rich Results Test (Required Before Deploy)
+
+**URL:** https://search.google.com/test/rich-results
+
+```toon
+testing_workflow[5]{step,tool,url}:
+  1,Rich Results Test,https://search.google.com/test/rich-results
+  2,Mobile-Friendly Test,https://search.google.com/test/mobile-friendly
+  3,PageSpeed Insights,https://pagespeed.web.dev
+  4,Schema Validator,https://validator.schema.org
+  5,Search Console,https://search.google.com/search-console
+```
+
+### Testing Protocol
+
+```markdown
+1. **Before deployment:** Test structured data in Rich Results Test
+2. **Fix all errors:** 0 errors required before going live
+3. **Check preview:** Verify rich result appearance
+4. **Monitor post-launch:** Check Search Console for issues
+```
 
 ```toon
 seo_tools[5]{tool,purpose}:
+  Google Rich Results Test,Structured data validation (REQUIRED)
   Google Search Console,Index coverage + performance
   Lighthouse,Core Web Vitals + SEO audit
-  Schema Validator,Structured data validation
   Mobile-Friendly Test,Mobile responsiveness
   PageSpeed Insights,Performance metrics
 ```
@@ -227,7 +249,8 @@ Before any site launch:
 - [ ] Canonical URLs set correctly
 - [ ] sitemap.xml generated and submitted
 - [ ] robots.txt configured
-- [ ] Structured data validated
+- [ ] **Rich Results Test passing** (https://search.google.com/test/rich-results)
+- [ ] Structured data validated with 0 errors
 - [ ] Core Web Vitals passing
 - [ ] Mobile responsive verified
 - [ ] HTTPS enforced
