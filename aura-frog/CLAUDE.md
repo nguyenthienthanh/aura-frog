@@ -22,7 +22,7 @@ session_start[6]{step,action,file}:
 
 **Show status in first response:**
 ```
-🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗ | firebase ✗
+🔌 MCP: context7 ✓ | playwright ✓ | vitest ✓ | firebase ✗
 🧠 Learning: enabled ✓ | Memory: 15 items loaded
 ```
 
@@ -46,19 +46,20 @@ session_start[6]{step,action,file}:
 ## Bundled MCP Servers
 
 ```toon
-mcp_servers[6]{name,package,purpose}:
+mcp_servers[4]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
   playwright,@playwright/mcp,Browser automation + E2E tests
   vitest,@djankies/vitest-mcp,Test execution + coverage
-  figma,figma-developer-mcp,Figma design fetch
-  slack,@modelcontextprotocol/server-slack,Slack notifications
   firebase,firebase-tools,Firebase project management + Firestore + Auth
 ```
+
+**Optional (require API tokens):** See `.mcp.optional.json`
+- figma (requires `FIGMA_API_TOKEN`)
+- slack (requires `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID`)
 
 **Auto-invocation:** Claude uses these automatically based on context:
 - "Build with MUI" → context7 fetches docs
 - "Run tests" → vitest executes
-- "Get Figma design" → figma fetches components
 - "Query Firestore" → firebase manages data
 
 **Atlassian (Jira/Confluence):** Use bash scripts instead (simpler):
@@ -129,7 +130,7 @@ resources[11]{name,location}:
   Commands (82),commands/
   Rules (49),rules/
   Skills (41),skills/
-  MCP Servers (6),.mcp.json
+  MCP Servers (4 + 2 optional),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/
