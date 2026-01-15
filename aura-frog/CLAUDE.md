@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.14.0
+**System:** Aura Frog v1.15.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -22,7 +22,7 @@ session_start[6]{step,action,file}:
 
 **Show status in first response:**
 ```
-🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
+🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗ | firebase ✗
 🧠 Learning: enabled ✓ | Memory: 15 items loaded
 ```
 
@@ -33,7 +33,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.14.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.15.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -46,18 +46,20 @@ session_start[6]{step,action,file}:
 ## Bundled MCP Servers
 
 ```toon
-mcp_servers[5]{name,package,purpose}:
+mcp_servers[6]{name,package,purpose}:
   context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
   playwright,@playwright/mcp,Browser automation + E2E tests
   vitest,@djankies/vitest-mcp,Test execution + coverage
   figma,figma-developer-mcp,Figma design fetch
   slack,@modelcontextprotocol/server-slack,Slack notifications
+  firebase,firebase-tools,Firebase project management + Firestore + Auth
 ```
 
 **Auto-invocation:** Claude uses these automatically based on context:
 - "Build with MUI" → context7 fetches docs
 - "Run tests" → vitest executes
 - "Get Figma design" → figma fetches components
+- "Query Firestore" → firebase manages data
 
 **Atlassian (Jira/Confluence):** Use bash scripts instead (simpler):
 - `./scripts/jira-fetch.sh PROJ-123`
@@ -70,7 +72,7 @@ mcp_servers[5]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[28]{name,trigger,file}:
+skills[30]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   visual-pixel-perfect,Visual test/pixel perfect,skills/visual-pixel-perfect/SKILL.md
@@ -99,6 +101,8 @@ skills[28]{name,trigger,file}:
   flutter-expert,Flutter/Dart,skills/flutter-expert/SKILL.md
   angular-expert,Angular/NgRx,skills/angular-expert/SKILL.md
   godot-expert,Godot/GDScript/game,skills/godot-expert/SKILL.md
+  seo-expert,SEO/meta tags/schema,skills/seo-expert/SKILL.md
+  ai-discovery-expert,Perplexity/ChatGPT/AI crawlers,skills/ai-discovery-expert/SKILL.md
 ```
 
 **All skills:** `skills/README.md`
@@ -123,9 +127,9 @@ skills[28]{name,trigger,file}:
 resources[11]{name,location}:
   Agents (15),agents/
   Commands (79),commands/
-  Rules (46),rules/
-  Skills (39),skills/
-  MCP Servers (5),.mcp.json
+  Rules (49),rules/
+  Skills (41),skills/
+  MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/
@@ -152,4 +156,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.14.0
+**Version:** 1.15.0

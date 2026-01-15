@@ -1,11 +1,18 @@
 # Aura Frog Skills
 
-**Version:** 1.14.0
-**Total Skills:** 39 (27 auto-invoking + 12 reference)
+**Version:** 1.15.0
+**Total Skills:** 41 (29 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
+
+---
+
+## New in 1.15.0
+
+- **seo-expert** - SEO and search engine optimization (meta tags, structured data, Core Web Vitals, sitemaps)
+- **ai-discovery-expert** - AI Discovery optimization for Perplexity, ChatGPT Search, Gemini, and LLM citation
 
 ---
 
@@ -386,7 +393,7 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## Skill Priorities (TOON)
 
 ```toon
-skills[27]{name,priority,trigger}:
+skills[29]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   workflow-fasttrack,high,Pre-approved specs / fast execution
@@ -411,6 +418,8 @@ skills[27]{name,priority,trigger}:
   flutter-expert,high,Flutter/Dart/Bloc/Riverpod
   angular-expert,high,Angular/NgRx/RxJS
   godot-expert,high,Godot/GDScript/game development
+  seo-expert,high,SEO/meta tags/schema/Core Web Vitals
+  ai-discovery-expert,high,Perplexity/ChatGPT Search/AI crawlers
   stitch-design,medium,AI design / Stitch prompts
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
@@ -749,7 +758,43 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.13.0
-**Last Updated:** 2026-01-12
+### 27. **seo-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Working with SEO, meta tags, schema markup, sitemaps
+
+**Triggers:** SEO, search engine, meta tags, structured data, schema markup, sitemap, robots.txt, canonical, google search
+
+**What it does:**
+- Technical SEO implementation (meta tags, canonical URLs, hreflang)
+- Core Web Vitals optimization (LCP, INP, CLS)
+- Schema.org structured data (JSON-LD)
+- Open Graph and Twitter Cards
+- Sitemap and robots.txt configuration
+- Image SEO and internal linking
+
+**📚 Details:** `skills/seo-expert/SKILL.md`
+
+---
+
+### 28. **ai-discovery-expert** (Priority: HIGH)
+
+**Auto-invokes when:** Optimizing for AI search engines like Perplexity, ChatGPT, Gemini
+
+**Triggers:** AI search, Perplexity, ChatGPT search, Gemini, AI discovery, LLM citation, AI crawler
+
+**What it does:**
+- Answer-first content structure for AI citation
+- AI crawler configuration (GPTBot, PerplexityBot, ClaudeBot)
+- Entity optimization for E-E-A-T
+- Semantic HTML for AI parsing
+- LLM.txt standard implementation
+- Citation-worthy content patterns
+
+**📚 Details:** `skills/ai-discovery-expert/SKILL.md`
+
+---
+
+**Version:** 1.15.0
+**Last Updated:** 2026-01-15
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 38 (26 auto-invoking + 12 reference)
+**Total Skills:** 41 (29 auto-invoking + 12 reference)

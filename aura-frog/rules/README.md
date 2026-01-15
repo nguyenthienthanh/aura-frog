@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.14.0
-**Total Rules:** 46
+**Version:** 1.15.0
+**Total Rules:** 49
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[46]{category,rule,priority,purpose}:
+rules[49]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -29,6 +29,9 @@ rules[46]{category,rule,priority,purpose}:
   quality,smart-commenting,medium,Comment why not what
   quality,prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
   quality,post-implementation-linting,high,Run lint and fix issues after every implementation
+  quality,seo-technical-requirements,high,Meta tags + Core Web Vitals + crawlability
+  quality,structured-data-schema,high,JSON-LD Schema.org implementation
+  quality,ai-discovery-optimization,high,AI search engine + LLM citation optimization
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -75,8 +78,8 @@ priorities[3]{level,meaning,enforcement}:
 
 ```toon
 categories[8]{name,count,critical_rules}:
-  system,7,5
-  quality,10,4
+  system,9,5
+  quality,13,4
   architecture,6,0
   security,1,1
   workflow,10,6
@@ -134,6 +137,11 @@ See: `project-linting-precedence.md`
 - [ ] Follow `state-management` - Proper state patterns
 - [ ] Follow `accessibility-rules` - WCAG compliance
 
+### For SEO & AI Discovery
+- [ ] Follow `seo-technical-requirements` - Meta tags, Core Web Vitals, crawlability
+- [ ] Follow `structured-data-schema` - JSON-LD Schema.org markup
+- [ ] Follow `ai-discovery-optimization` - AI search engines, LLM citation
+
 ### For Testing
 - [ ] Follow `tdd-workflow` - Tests first
 
@@ -160,7 +168,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.9.0 | **Last Updated:** 2026-01-07 | **Format:** TOON
+**Version:** 1.15.0 | **Last Updated:** 2026-01-15 | **Format:** TOON
 
 ---
 
@@ -175,5 +183,7 @@ Framework-specific rules have been migrated to **Expert Skills** for on-demand l
 | `react-native-expert` | RN, Expo, mobile | Lists, navigation, platform code |
 | `vue-expert` | Vue, Composition API | Script setup, Pinia, reactivity |
 | `nextjs-expert` | Next.js, App Router | Server Components, caching |
+| `seo-expert` | SEO, meta tags, schema | Technical SEO, Core Web Vitals |
+| `ai-discovery-expert` | Perplexity, ChatGPT | AI search optimization |
 
 These skills auto-invoke when working with the respective framework.

@@ -112,7 +112,7 @@ form_rules[5]{rule,implementation}:
 ## Core Competencies
 
 ```toon
-competencies[10]{area,technologies}:
+competencies[12]{area,technologies}:
   TypeScript,"Strict mode, generics, utility types"
   State,"Redux Toolkit, Zustand, Jotai, TanStack Query"
   Routing,"React Router, Vue Router, Next.js App Router"
@@ -123,6 +123,8 @@ competencies[10]{area,technologies}:
   Performance,"Code splitting, lazy loading, memoization"
   Accessibility,"ARIA, semantic HTML, screen readers"
   Forms,"React Hook Form, Formik, Zod validation"
+  SEO,"Meta tags, Schema.org, Core Web Vitals, sitemaps"
+  AI Discovery,"LLM optimization, Perplexity, ChatGPT Search"
 ```
 
 ---
@@ -134,6 +136,41 @@ Detects framework from:
 - **Vue:** `package.json` with vue, `*.vue` files
 - **Angular:** `angular.json`, `*.component.ts` files
 - **Next.js:** `next.config.js`, `app/` directory
+
+---
+
+## SEO Requirements (Every Project)
+
+```toon
+seo_requirements[8]{requirement,implementation}:
+  Meta tags,Unique title + description per page
+  Canonical URLs,Prevent duplicate content
+  Structured data,JSON-LD Schema.org markup
+  Core Web Vitals,LCP <2.5s - INP <200ms - CLS <0.1
+  Semantic HTML,Proper heading hierarchy (H1→H2→H3)
+  Image optimization,Alt text + WebP + lazy loading
+  Sitemap,XML sitemap + robots.txt
+  Mobile-first,Responsive design + touch targets
+```
+
+**Skills:** `seo-expert`, `ai-discovery-expert`
+**Rules:** `seo-technical-requirements.md`, `structured-data-schema.md`
+
+---
+
+## AI Discovery Optimization
+
+```toon
+ai_discovery[6]{aspect,requirement}:
+  Content structure,Answer-first paragraphs
+  AI crawlers,Allow GPTBot + PerplexityBot + ClaudeBot
+  Semantic HTML,Clear article + section + aside structure
+  Author authority,Author pages with credentials + schema
+  Freshness signals,Visible update dates + revision history
+  FAQ sections,Schema.org FAQPage markup
+```
+
+**Rule:** `ai-discovery-optimization.md`
 
 ---
 
