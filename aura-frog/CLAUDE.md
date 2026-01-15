@@ -73,7 +73,7 @@ mcp_servers[4]{name,package,purpose}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[30]{name,trigger,file}:
+skills[33]{name,trigger,file}:
   agent-detector,Every message,skills/agent-detector/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   visual-pixel-perfect,Visual test/pixel perfect,skills/visual-pixel-perfect/SKILL.md
@@ -104,6 +104,9 @@ skills[30]{name,trigger,file}:
   godot-expert,Godot/GDScript/game,skills/godot-expert/SKILL.md
   seo-expert,SEO/meta tags/schema,skills/seo-expert/SKILL.md
   ai-discovery-expert,Perplexity/ChatGPT/AI crawlers,skills/ai-discovery-expert/SKILL.md
+  seo-check,/seo:check command,skills/seo-check/SKILL.md
+  seo-schema,/seo:schema command,skills/seo-schema/SKILL.md
+  seo-geo,/seo:geo command,skills/seo-geo/SKILL.md
 ```
 
 **All skills:** `skills/README.md`
@@ -129,7 +132,7 @@ resources[11]{name,location}:
   Agents (15),agents/
   Commands (82),commands/
   Rules (49),rules/
-  Skills (41),skills/
+  Skills (44),skills/
   MCP Servers (4 + 2 optional),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md

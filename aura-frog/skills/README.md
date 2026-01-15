@@ -1,7 +1,7 @@
 # Aura Frog Skills
 
 **Version:** 1.15.0
-**Total Skills:** 41 (29 auto-invoking + 12 reference)
+**Total Skills:** 44 (32 auto-invoking + 12 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -13,6 +13,9 @@
 
 - **seo-expert** - SEO and search engine optimization (meta tags, structured data, Core Web Vitals, sitemaps)
 - **ai-discovery-expert** - AI Discovery optimization for Perplexity, ChatGPT Search, Gemini, and LLM citation
+- **seo-check** - Invokable command: `/seo:check` - Full SEO/GEO audit
+- **seo-schema** - Invokable command: `/seo:schema` - Validate structured data with Rich Results Test
+- **seo-geo** - Invokable command: `/seo:geo` - AI discovery (GEO) audit
 
 ---
 
@@ -393,7 +396,7 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## Skill Priorities (TOON)
 
 ```toon
-skills[29]{name,priority,trigger}:
+skills[32]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%)
   workflow-orchestrator,critical,Complex tasks
   workflow-fasttrack,high,Pre-approved specs / fast execution
@@ -420,6 +423,9 @@ skills[29]{name,priority,trigger}:
   godot-expert,high,Godot/GDScript/game development
   seo-expert,high,SEO/meta tags/schema/Core Web Vitals
   ai-discovery-expert,high,Perplexity/ChatGPT Search/AI crawlers
+  seo-check,high,/seo:check command - Full SEO audit
+  seo-schema,high,/seo:schema command - Schema validation
+  seo-geo,high,/seo:geo command - AI discovery audit
   stitch-design,medium,AI design / Stitch prompts
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
@@ -794,7 +800,57 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
+### 29. **seo-check** (Priority: HIGH) - Invokable Command
+
+**Invoke with:** `/seo:check [url]`
+
+**Triggers:** seo:check, seo check, seo audit, check seo
+
+**What it does:**
+- Comprehensive SEO and GEO audit
+- Meta tags validation
+- Structured data checking
+- Core Web Vitals analysis
+- AI discovery readiness
+
+**📚 Details:** `skills/seo-check/SKILL.md`
+
+---
+
+### 30. **seo-schema** (Priority: HIGH) - Invokable Command
+
+**Invoke with:** `/seo:schema [url]`
+
+**Triggers:** seo:schema, schema validation, validate schema, rich results, json-ld validation
+
+**What it does:**
+- Validate Schema.org JSON-LD
+- Google Rich Results Test integration
+- Common error detection and fixes
+- Schema type guidance
+
+**📚 Details:** `skills/seo-schema/SKILL.md`
+
+---
+
+### 31. **seo-geo** (Priority: HIGH) - Invokable Command
+
+**Invoke with:** `/seo:geo [url]`
+
+**Triggers:** seo:geo, geo audit, ai discovery, perplexity optimization, chatgpt search
+
+**What it does:**
+- AI crawler access audit (GPTBot, PerplexityBot, ClaudeBot)
+- Content structure analysis
+- E-E-A-T entity signals check
+- Freshness signals verification
+- FAQ implementation review
+
+**📚 Details:** `skills/seo-geo/SKILL.md`
+
+---
+
 **Version:** 1.15.0
 **Last Updated:** 2026-01-15
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 41 (29 auto-invoking + 12 reference)
+**Total Skills:** 44 (32 auto-invoking + 12 reference)
