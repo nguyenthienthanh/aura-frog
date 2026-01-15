@@ -10,7 +10,7 @@
 
 AI-powered development plugin for **Claude Code** with 15 specialized agents, 9-phase TDD workflow, self-improving learning system, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.9.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.15.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)

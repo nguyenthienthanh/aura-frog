@@ -1,6 +1,6 @@
 # Aura Frog Learning System
 
-**Version:** 1.14.0
+**Version:** 1.15.0
 **Status:** Experimental
 
 The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights stored in Supabase.
@@ -288,4 +288,4 @@ The system identifies:
 
 ---
 
-**Version:** 1.14.0 | **Last Updated:** 2026-01-08
+**Version:** 1.15.0 | **Last Updated:** 2026-01-08
