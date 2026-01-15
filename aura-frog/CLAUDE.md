@@ -126,7 +126,7 @@ skills[30]{name,trigger,file}:
 ```toon
 resources[11]{name,location}:
   Agents (15),agents/
-  Commands (79),commands/
+  Commands (82),commands/
   Rules (49),rules/
   Skills (41),skills/
   MCP Servers (6),.mcp.json
