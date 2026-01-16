@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **15 Agents** | **44 Skills** | **49 Rules** | **9 Phases** | **82 Commands** | **6 MCP Servers** |
+| **15 Agents** | **48 Skills** | **49 Rules** | **9 Phases** | **82 Commands** | **6 MCP Servers** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|:----------------:|
 
 ---
@@ -225,21 +225,135 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
 ---
 
+## Learning System (Works Out of the Box!)
+
+Aura Frog **learns and improves** automatically - no setup required. It uses **local storage by default** and optionally syncs to Supabase for cross-machine memory.
+
+### What It Learns (Automatically)
+
+| Feature | How It Works |
+|---------|--------------|
+| **Smart Learn** | Detects successful code patterns (arrow functions, const usage, async/await) without feedback |
+| **Auto-Learn** | Captures corrections when you say "no", "wrong", "actually", "don't do that" |
+| **Workflow Edit Detection** | Learns from your direct edits to workflow MD files |
+| **Pattern Creation** | After 3+ similar corrections, creates a learned pattern |
+
+### Local Learning (Default - No Setup)
+
+Learning works immediately with **local file storage**:
+
+```
+.claude/learning/
+├── feedback.json      # All feedback entries
+├── patterns.json      # Learned patterns
+├── metrics.json       # Workflow metrics
+└── learned-rules.md   # Human-readable rules (auto-linked to Claude)
+```
+
+**Benefits:**
+- ✅ Works instantly - no configuration
+- ✅ Persists across sessions (within same project)
+- ✅ Human-readable learned-rules.md
+- ✅ Automatically linked to main instructions
+
+### Cloud Learning (Optional - Supabase)
+
+For **cross-machine memory** and **team sync**, add Supabase:
+
+**1. Create Supabase Project:**
+- Go to [supabase.com](https://supabase.com) and sign up (free)
+- Create a new project
+- Go to **Project Settings → Data API** to get your keys
+
+**2. Add Environment Variables:**
+
+```bash
+# Add to .envrc
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_SECRET_KEY="eyJ..."       # Secret key (service_role)
+export AF_LEARNING_ENABLED="true"
+```
+
+**3. Set Up Database Schema:**
+
+```bash
+./scripts/supabase/setup.sh
+```
+
+**4. Verify Setup:**
+
+```bash
+learn:status
+```
+
+Should show: `Learning: enabled ✓ | Mode: supabase | Memory: X items loaded`
+
+### Learning Commands
+
+| Command | Description |
+|---------|-------------|
+| `learn:status` | Check learning system status (local or Supabase) |
+| `learn:analyze` | Analyze patterns and generate insights |
+| `learn:apply` | Apply learned improvements |
+| `learn:feedback` | Submit manual feedback (optional) |
+
+### Disable Learning
+
+If you don't want any learning:
+```bash
+export AF_LOCAL_LEARNING="false"
+```
+
+**Full documentation:** `docs/LEARNING_SYSTEM.md`
+
+---
+
 ## MCP Servers (Auto-Configured)
 
-Aura Frog bundles 5 MCP servers for external integrations:
+Aura Frog includes **6 MCP servers** in `.mcp.json`:
 
-| MCP | Purpose | Auto-Triggers On |
-|-----|---------|------------------|
-| **context7** | Library docs | "Build with MUI", "Tailwind", library names |
-| **playwright** | E2E testing | "Test the login page", browser automation |
-| **vitest** | Unit tests | "Run tests", "Check coverage" |
-| **figma** | Design files | Figma URLs |
-| **slack** | Notifications | Phase 9 completion |
+| MCP | Purpose | Auto-Triggers On | Setup |
+|-----|---------|------------------|-------|
+| **context7** | Library docs | "Build with MUI", "Tailwind" | None |
+| **playwright** | E2E testing | "Test the login page" | None |
+| **vitest** | Unit tests | "Run tests", "Check coverage" | None |
+| **firebase** | Firebase services | "Set up Firestore", "Firebase Auth" | `firebase login` |
+| **figma** | Design files | Figma URLs | `FIGMA_API_TOKEN` in `.envrc` |
+| **slack** | Notifications | Phase 9 completion | `SLACK_BOT_TOKEN` in `.envrc` |
+
+**No manual configuration needed** - MCPs requiring tokens will silently skip if not set.
 
 **No explicit commands needed** - Claude auto-detects context and uses appropriate MCP.
 
 **Create your own MCP:** See `docs/MCP_GUIDE.md` for a complete guide.
+
+---
+
+## Scripts (Utility Tools)
+
+Aura Frog includes utility scripts for common operations:
+
+| Category | Scripts | Purpose |
+|----------|---------|---------|
+| **Integration** | `jira-fetch.sh`, `confluence-fetch.sh` | Fetch Atlassian data |
+| **Workflow** | `workflow-manager.sh`, `track-tokens.sh` | Manage workflows |
+| **Learning** | `submit-feedback.sh`, `supabase/setup.sh` | Learning system |
+| **Visual** | `visual-test.sh`, `snapshot-compare.sh` | Visual testing |
+
+**Full documentation:** `scripts/README.md`
+
+### Quick Examples
+
+```bash
+# Fetch Jira ticket
+./scripts/jira-fetch.sh PROJ-123
+
+# Set up integrations interactively
+./scripts/setup-integrations.sh
+
+# Set up Supabase for learning system
+./scripts/supabase/setup.sh
+```
 
 ---
 
@@ -324,10 +438,12 @@ workflow:start <your-task-description>
 
 - **Documentation:** `README.md`
 - **Testing Guide:** `TESTING_GUIDE.md`
-- **MCP Guide:** `docs/MCP_GUIDE.md` (create custom integrations)
-- **Learning System:** `docs/LEARNING_SYSTEM.md` (self-improvement)
-- **Skills:** `skills/README.md` (37 skills)
-- **Rules:** `rules/README.md` (44 quality rules)
+- **MCP Guide:** `docs/MCP_GUIDE.md` (6 MCP servers)
+- **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
+- **Learning System:** `docs/LEARNING_SYSTEM.md` (Supabase self-improvement)
+- **Skills:** `skills/README.md` (48 skills)
+- **Rules:** `rules/README.md` (49 quality rules)
+- **Commands:** `commands/README.md` (82 commands)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`
 - **Phase Guides:** `docs/phases/`
 

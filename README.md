@@ -27,17 +27,17 @@ AI-powered development plugin for **Claude Code** with 15 specialized agents, 9-
 
 | **Agents** | **Skills** | **Rules** | **Phases** | **Commands** | **MCP Servers** |
 |:----------:|:----------:|:---------:|:----------:|:------------:|:---------------:|
-| **15** | **37** | **44** | **9** | **77** | **5** |
+| **15** | **48** | **49** | **9** | **82** | **6** |
 
 </div>
 
 **What's Inside:**
 - **15 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, Game Dev experts
-- **37 Skills** — 26 auto-invoking + 11 reference skills for specialized tasks
-- **5 Bundled MCP Servers** — Context7, Playwright, Vitest, Figma, Slack
-- **44 Quality Rules** — System, code quality, architecture, workflow, documentation
+- **48 Skills** — 28 auto-invoking + 20 reference/command skills for specialized tasks
+- **6 Bundled MCP Servers** — Context7, Playwright, Vitest, Firebase + 2 optional (Figma, Slack)
+- **49 Quality Rules** — System, code quality, architecture, workflow, documentation
 - **9-Phase Workflow** — From requirements to deployment with quality gates
-- **77 Commands** — Full workflow control at your fingertips
+- **82 Commands** — Full workflow control at your fingertips
 - **Learning System** — Self-improvement via Supabase (NEW)
 
 ---
@@ -108,7 +108,7 @@ At each phase, review and respond:
 | Generic AI responses | 15 specialized agents auto-selected |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 77 commands |
+| Context switching | CLI-first with 82 commands |
 | Manual documentation | Auto-generated docs |
 | Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 
@@ -171,31 +171,34 @@ Agents auto-activate based on your prompt context:
 
 ---
 
-### 5 Bundled MCP Servers
+### 6 MCP Servers
 
 MCP (Model Context Protocol) servers auto-invoke based on context:
 
-| MCP Server | Purpose | Auto-Triggers |
-|------------|---------|---------------|
-| **context7** | Library documentation | "Build with MUI", "Tailwind", library names |
-| **playwright** | Browser automation, E2E | "Test the login page", browser automation |
-| **vitest** | Test execution, coverage | "Run tests", "Check coverage" |
-| **figma** | Design file fetching | Figma URLs |
-| **slack** | Notifications | Phase 9 completion |
+| MCP Server | Purpose | Auto-Triggers | Setup |
+|------------|---------|---------------|-------|
+| **context7** | Library documentation | "Build with MUI", library names | None |
+| **playwright** | Browser automation, E2E | "Test the login page" | None |
+| **vitest** | Test execution, coverage | "Run tests", "Check coverage" | None |
+| **firebase** | Firebase services | "Set up Firestore", "Firebase Auth" | `firebase login` |
+| **figma** | Design file fetching | Figma URLs | `FIGMA_API_TOKEN` |
+| **slack** | Notifications | Phase 9 completion | `SLACK_BOT_TOKEN` |
+
+MCPs requiring tokens will silently skip if not configured.
 
 ```bash
 # Context7 auto-fetches React docs
 "Build a form with Material UI"
 
-# Playwright runs E2E test
-"Test the checkout flow in browser"
+# Firebase manages your project
+"Set up Firestore for my app"
 ```
 
 **See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for setup
 
 ---
 
-### 37 Skills (26 Auto-Invoking + 11 Reference)
+### 48 Skills (28 Auto-Invoking + 20 Reference/Command)
 
 Skills activate automatically based on your message context:
 
@@ -270,7 +273,7 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 44 Quality Rules
+### 49 Quality Rules
 
 Aura Frog enforces consistent quality through comprehensive rules:
 
@@ -438,36 +441,80 @@ document "API endpoints"           # Generate docs
 
 </details>
 
-**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 77 commands
+**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 82 commands
 
 ---
 
 ## MCP Integrations
 
-Aura Frog bundles 5 MCP servers that auto-invoke based on context:
+All 6 MCP servers are configured in `.mcp.json` and auto-invoke based on context:
 
 | MCP | Purpose | Setup Required |
 |-----|---------|----------------|
-| **context7** | Library docs (React, MUI, Tailwind) | None (public) |
-| **playwright** | E2E browser testing | `npx playwright install` |
+| **context7** | Library docs (React, MUI, Tailwind) | None |
+| **playwright** | E2E browser testing | None (auto-installs) |
 | **vitest** | Unit test execution | Project with vitest |
-| **figma** | Design extraction | `FIGMA_API_TOKEN` |
-| **slack** | Team notifications | `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_ID` |
+| **firebase** | Firebase project management | `firebase login` |
+| **figma** | Design extraction | `FIGMA_API_TOKEN` in `.envrc` |
+| **slack** | Team notifications | `SLACK_BOT_TOKEN` + `SLACK_TEAM_ID` in `.envrc` |
 
-### Environment Setup
+MCPs requiring tokens will silently skip if not configured - no errors.
+
+### Environment Setup (for Figma & Slack)
 
 Copy `.envrc.template` and set your tokens:
 
 ```bash
-# Figma
 export FIGMA_API_TOKEN="your-figma-token"
-
-# Slack
 export SLACK_BOT_TOKEN="xoxb-your-bot-token"
-export SLACK_CHANNEL_ID="C0123456789"
+export SLACK_TEAM_ID="T0123456789"
 ```
 
 **See:** [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) for complete setup
+
+---
+
+## Learning System (Supabase)
+
+Aura Frog can **learn and improve** over time using Supabase as a persistent memory store.
+
+### What It Does
+
+| Feature | Description |
+|---------|-------------|
+| **Auto-Collect Feedback** | Captures corrections, approvals, rejections |
+| **Pattern Analysis** | Identifies what works and what doesn't |
+| **Memory Across Sessions** | Remembers patterns for future sessions |
+| **Self-Improvement** | Applies insights to improve responses |
+
+### Quick Setup
+
+```bash
+# 1. Create free Supabase project at supabase.com
+# 2. Add to .envrc:
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_PUBLISHABLE_KEY="eyJ..."
+export SUPABASE_SECRET_KEY="eyJ..."
+export AF_LEARNING_ENABLED="true"
+
+# 3. Run setup script:
+./scripts/supabase/setup.sh
+
+# 4. Verify:
+learn:status
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `learn:status` | Check learning system status |
+| `learn:analyze` | Analyze patterns and generate insights |
+| `learn:apply` | Apply learned improvements |
+
+**Optional feature** - Aura Frog works fine without Supabase.
+
+**See:** [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) for complete setup
 
 ---
 
@@ -495,9 +542,11 @@ export SLACK_CHANNEL_ID="C0123456789"
 
 | Document | Description |
 |----------|-------------|
-| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 77 commands |
+| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 82 commands |
 | [aura-frog/agents/](aura-frog/agents/) | All agent definitions |
 | [aura-frog/rules/](aura-frog/rules/) | Core quality rules |
+| [aura-frog/scripts/README.md](aura-frog/scripts/README.md) | Utility scripts (integrations, workflows) |
+| [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) | Supabase learning system |
 
 ---
 
@@ -508,9 +557,9 @@ aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
 │   ├── agents/                      # 15 specialized agents
-│   ├── skills/                      # 37 skills (26 auto + 11 reference)
-│   ├── commands/                    # 77 workflow commands
-│   ├── rules/                       # 44 quality rules
+│   ├── skills/                      # 48 skills (28 auto + 20 reference)
+│   ├── commands/                    # 82 workflow commands
+│   ├── rules/                       # 49 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
 │   │   └── MCP_GUIDE.md             # MCP setup guide

@@ -19,18 +19,21 @@ User Message → Claude → MCP Server → External Service
 
 ---
 
-## Bundled MCP Servers
+## MCP Servers
 
-Aura Frog bundles 5 MCP servers in `.mcp.json`:
+All 6 MCP servers are configured in `.mcp.json`:
 
 ```toon
-servers[5]{name,package,purpose}:
-  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc)
-  playwright,@playwright/mcp,Browser automation + E2E testing
-  vitest,@djankies/vitest-mcp,Test execution + coverage
-  figma,figma-developer-mcp,Design file fetching
-  slack,@modelcontextprotocol/server-slack,Notifications
+servers[6]{name,package,purpose,requires}:
+  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc),None
+  playwright,@playwright/mcp,Browser automation + E2E testing,None
+  vitest,@djankies/vitest-mcp,Test execution + coverage,None
+  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login
+  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN
+  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN + SLACK_TEAM_ID
 ```
+
+**No manual copying needed** - MCPs requiring tokens will silently skip if tokens aren't set.
 
 ---
 
@@ -43,8 +46,12 @@ Claude detects context and uses appropriate MCP:
 | "Build with Material UI" | context7 | Fetches MUI docs |
 | "Test the login page" | playwright | Opens browser, runs E2E |
 | "Run unit tests" | vitest | Executes tests, shows results |
-| "Get the Figma design" | figma | Fetches design tokens |
-| "Notify the team" | slack | Sends message |
+| "Set up Firebase Auth" | firebase | Manages Firebase project |
+| "Query Firestore" | firebase | Reads/writes Firestore data |
+| "Get the Figma design" | figma* | Fetches design tokens |
+| "Notify the team" | slack* | Sends message |
+
+*Requires API token setup (optional MCP)
 
 **No explicit command needed** - Claude uses them automatically.
 
@@ -52,25 +59,56 @@ Claude detects context and uses appropriate MCP:
 
 ## Setup Requirements
 
-### Environment Variables
+| MCP | Requirement | How to Set Up |
+|-----|-------------|---------------|
+| context7 | None | Works out of the box |
+| playwright | None | Auto-installs browser on first use |
+| vitest | None | Uses project's vitest config |
+| firebase | Google login | Run `firebase login` in terminal |
+| figma | API token | Set `FIGMA_API_TOKEN` in `.envrc` |
+| slack | Bot token | Set `SLACK_BOT_TOKEN` + `SLACK_TEAM_ID` in `.envrc` |
+
+### Environment Variables (for Figma & Slack)
 
 Create `.envrc` in your project root:
 
 ```bash
-# Figma
-export FIGMA_API_KEY="your-figma-token"
+# Figma - Get from https://www.figma.com/developers/api#access-tokens
+export FIGMA_API_TOKEN="your-figma-token"
 
-# Slack
+# Slack - Get from https://api.slack.com/apps → OAuth & Permissions
 export SLACK_BOT_TOKEN="xoxb-your-bot-token"
 export SLACK_TEAM_ID="T0123456789"
 ```
 
-### How to Get Tokens
+Then run `direnv allow` or `source .envrc` to load them.
 
-| Service | Token URL |
-|---------|-----------|
-| Figma | https://www.figma.com/developers/api#access-tokens |
-| Slack | https://api.slack.com/apps → OAuth & Permissions |
+---
+
+## Firebase MCP
+
+The Firebase MCP provides direct access to Firebase services:
+
+**Capabilities:**
+- Project management (create, list, switch projects)
+- Firestore database operations
+- Authentication setup
+- Hosting deployment
+- Security rules management
+
+**Usage:**
+```bash
+# Login (one-time)
+firebase login
+
+# In Claude Code, Claude auto-uses Firebase MCP for:
+> "Create a new Firebase project"
+> "Set up Firestore for my app"
+> "Deploy to Firebase Hosting"
+> "Get my Firebase config"
+```
+
+**No environment variables needed** - uses Firebase CLI authentication.
 
 ---
 

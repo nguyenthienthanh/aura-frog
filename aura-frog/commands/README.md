@@ -32,7 +32,7 @@ commands/
 ├── setup/              # Setup & configuration (2 commands)
 ├── skill/              # Skill management (1 command)
 ├── test/               # Testing commands (4 commands)
-├── workflow/           # Core workflow commands (23 commands)
+├── workflow/           # Core workflow commands (22 commands)
 ├── document.md         # document (standalone)
 ├── execute.md          # execute (standalone)
 ├── help.md             # help (standalone)
@@ -86,7 +86,6 @@ commands[82]{category,command,file,description}:
   workflow,workflow:modify,workflow/modify.md,Modify deliverables
   workflow,workflow:handoff,workflow/handoff.md,Save for session continuation
   workflow,workflow:resume,workflow/resume.md,Resume workflow
-  workflow,workflow:tokens,workflow/tokens.md,Show token usage
   workflow,workflow:progress,workflow/progress.md,Show progress
   workflow,workflow:metrics,workflow/metrics.md,Show metrics
   workflow,workflow:predict,workflow/predict.md,Predict token usage
@@ -111,7 +110,7 @@ commands[82]{category,command,file,description}:
 
 ```toon
 stats[22]{category,count}:
-  workflow,23
+  workflow,22
   project,6
   agent,4
   test,4

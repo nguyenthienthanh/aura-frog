@@ -43,24 +43,23 @@ session_start[6]{step,action,file}:
 
 ---
 
-## Bundled MCP Servers
+## MCP Servers
 
 ```toon
-mcp_servers[4]{name,package,purpose}:
-  context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc)
-  playwright,@playwright/mcp,Browser automation + E2E tests
-  vitest,@djankies/vitest-mcp,Test execution + coverage
-  firebase,firebase-tools,Firebase project management + Firestore + Auth
+mcp_servers[6]{name,package,purpose,requires}:
+  context7,@upstash/context7-mcp,Library docs (MUI Tailwind etc),None
+  playwright,@playwright/mcp,Browser automation + E2E tests,None
+  vitest,@djankies/vitest-mcp,Test execution + coverage,None
+  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login
+  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN
+  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN
 ```
-
-**Optional (require API tokens):** See `.mcp.optional.json`
-- figma (requires `FIGMA_API_TOKEN`)
-- slack (requires `SLACK_BOT_TOKEN`, `SLACK_TEAM_ID`)
 
 **Auto-invocation:** Claude uses these automatically based on context:
 - "Build with MUI" → context7 fetches docs
 - "Run tests" → vitest executes
 - "Query Firestore" → firebase manages data
+- "Get Figma design" → figma fetches design (if token set)
 
 **Atlassian (Jira/Confluence):** Use bash scripts instead (simpler):
 - `./scripts/jira-fetch.sh PROJ-123`
@@ -132,8 +131,8 @@ resources[11]{name,location}:
   Agents (15),agents/
   Commands (82),commands/
   Rules (49),rules/
-  Skills (44),skills/
-  MCP Servers (4 + 2 optional),.mcp.json
+  Skills (48),skills/
+  MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/

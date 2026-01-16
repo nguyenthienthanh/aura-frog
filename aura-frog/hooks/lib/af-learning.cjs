@@ -2,26 +2,64 @@
 /**
  * Aura Frog - Learning System Utilities
  *
- * Handles Supabase interactions for the learning system:
+ * Handles learning storage with dual-mode support:
+ * - Supabase: Cloud storage for cross-session memory
+ * - Local: File-based storage when Supabase not configured
+ *
+ * Features:
  * - Feedback collection
  * - Workflow metrics
  * - Agent performance tracking
  * - Pattern queries
+ * - Local fallback with MD file generation
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+// Local storage paths
+const LEARNING_DIR = path.join(process.cwd(), '.claude', 'learning');
+const LOCAL_FEEDBACK_FILE = path.join(LEARNING_DIR, 'feedback.json');
+const LOCAL_PATTERNS_FILE = path.join(LEARNING_DIR, 'patterns.json');
+const LOCAL_METRICS_FILE = path.join(LEARNING_DIR, 'metrics.json');
+const LEARNED_RULES_MD = path.join(LEARNING_DIR, 'learned-rules.md');
+const MAIN_INSTRUCTION_LINK = path.join(process.cwd(), '.claude', 'LEARNED_PATTERNS.md');
 
 /**
- * Check if learning system is enabled
+ * Check if Supabase is configured
+ * @returns {boolean}
+ */
+function isSupabaseConfigured() {
+  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY);
+}
+
+/**
+ * Check if learning system is enabled (either Supabase or local)
  * @returns {boolean}
  */
 function isLearningEnabled() {
-  return process.env.AF_LEARNING_ENABLED === 'true' &&
-         process.env.SUPABASE_URL &&
-         process.env.SUPABASE_SECRET_KEY;
+  // Learning is enabled if AF_LEARNING_ENABLED is true OR if we have local learning
+  // Local learning is always available as a fallback
+  if (process.env.AF_LEARNING_ENABLED === 'true') {
+    return true;
+  }
+  // Auto-enable local learning if Supabase not configured
+  if (!isSupabaseConfigured() && process.env.AF_LOCAL_LEARNING !== 'false') {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Check if using local storage mode
+ * @returns {boolean}
+ */
+function isLocalMode() {
+  return !isSupabaseConfigured() || process.env.AF_FORCE_LOCAL === 'true';
 }
 
 /**
@@ -38,6 +76,128 @@ function isFeedbackEnabled() {
  */
 function isMetricsEnabled() {
   return isLearningEnabled() && process.env.AF_METRICS_COLLECTION !== 'false';
+}
+
+/**
+ * Ensure learning directory exists
+ */
+function ensureLearningDir() {
+  try {
+    if (!fs.existsSync(LEARNING_DIR)) {
+      fs.mkdirSync(LEARNING_DIR, { recursive: true });
+    }
+  } catch { /* ignore */ }
+}
+
+/**
+ * Load local JSON file
+ * @param {string} filePath
+ * @returns {Array|object}
+ */
+function loadLocalFile(filePath) {
+  try {
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
+/**
+ * Save to local JSON file
+ * @param {string} filePath
+ * @param {Array|object} data
+ */
+function saveLocalFile(filePath, data) {
+  try {
+    ensureLearningDir();
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch { /* ignore */ }
+}
+
+/**
+ * Update the learned rules MD file and link to main instruction
+ */
+function updateLearnedRulesMD() {
+  try {
+    ensureLearningDir();
+
+    const patterns = loadLocalFile(LOCAL_PATTERNS_FILE);
+    const feedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
+
+    // Group patterns by category
+    const groupedPatterns = {};
+    patterns.forEach(p => {
+      const cat = p.category || 'general';
+      if (!groupedPatterns[cat]) groupedPatterns[cat] = [];
+      groupedPatterns[cat].push(p);
+    });
+
+    // Count corrections by category
+    const correctionCounts = {};
+    feedback.filter(f => f.feedback_type === 'correction').forEach(f => {
+      const cat = f.metadata?.category || 'general';
+      correctionCounts[cat] = (correctionCounts[cat] || 0) + 1;
+    });
+
+    let content = `# Learned Patterns & Rules\n\n`;
+    content += `**Auto-generated from user corrections and feedback**\n`;
+    content += `**Last Updated:** ${new Date().toISOString()}\n\n`;
+    content += `---\n\n`;
+    content += `## Summary\n\n`;
+    content += `- **Total Patterns:** ${patterns.length}\n`;
+    content += `- **Total Feedback:** ${feedback.length}\n\n`;
+
+    // Add patterns by category
+    for (const [category, categoryPatterns] of Object.entries(groupedPatterns)) {
+      content += `## ${category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, ' ')}\n\n`;
+      content += `*${correctionCounts[category] || 0} corrections in this category*\n\n`;
+
+      categoryPatterns.forEach(p => {
+        content += `### ${p.description || p.rule || 'Pattern'}\n\n`;
+        if (p.evidence && p.evidence.length > 0) {
+          content += `**Examples:**\n`;
+          p.evidence.slice(0, 3).forEach(e => {
+            content += `- ${e.substring(0, 100)}${e.length > 100 ? '...' : ''}\n`;
+          });
+          content += `\n`;
+        }
+        content += `**Frequency:** ${p.frequency || 1} occurrences\n\n`;
+      });
+    }
+
+    // Add recent corrections as examples
+    const recentCorrections = feedback
+      .filter(f => f.feedback_type === 'correction')
+      .slice(-10);
+
+    if (recentCorrections.length > 0) {
+      content += `---\n\n## Recent Corrections\n\n`;
+      content += `*Things the user has corrected recently - avoid repeating these mistakes*\n\n`;
+
+      recentCorrections.forEach(c => {
+        content += `- **${c.metadata?.category || 'general'}:** ${(c.reason || '').substring(0, 150)}${(c.reason || '').length > 150 ? '...' : ''}\n`;
+      });
+      content += `\n`;
+    }
+
+    content += `---\n\n`;
+    content += `*This file is auto-updated. Do not edit manually.*\n`;
+
+    // Write the learned rules file
+    fs.writeFileSync(LEARNED_RULES_MD, content);
+
+    // Create symlink/reference in main .claude directory
+    const linkContent = `# Learned Patterns\n\n`;
+    const linkRef = `**IMPORTANT:** Read and apply the patterns from:\n\n`;
+    const linkPath = `\`\`\`\n.claude/learning/learned-rules.md\n\`\`\`\n\n`;
+    const linkNote = `These are patterns learned from user corrections. Apply them to avoid repeating mistakes.\n`;
+
+    fs.writeFileSync(MAIN_INSTRUCTION_LINK, linkContent + linkRef + linkPath + linkNote);
+
+  } catch (error) {
+    console.error(`Failed to update learned rules MD: ${error.message}`);
+  }
 }
 
 /**
@@ -101,7 +261,7 @@ async function supabaseRequest(table, method = 'POST', data = null, params = {})
 }
 
 /**
- * Record user feedback to Supabase
+ * Record user feedback (to Supabase or local storage)
  * @param {object} feedback
  * @param {string} feedback.type - 'correction' | 'approval' | 'rejection' | 'rating' | 'agent_switch'
  * @param {string} [feedback.sessionId]
@@ -120,20 +280,39 @@ async function recordFeedback(feedback) {
     return null;
   }
 
-  try {
-    const data = {
-      session_id: feedback.sessionId || process.env.AF_SESSION_ID,
-      workflow_id: feedback.workflowId,
-      project_name: feedback.projectName || process.env.PROJECT_NAME,
-      phase: feedback.phase,
-      feedback_type: feedback.type,
-      original_response: feedback.original,
-      corrected_response: feedback.corrected,
-      reason: feedback.reason,
-      rating: feedback.rating,
-      metadata: feedback.metadata || {}
-    };
+  const data = {
+    session_id: feedback.sessionId || process.env.AF_SESSION_ID,
+    workflow_id: feedback.workflowId,
+    project_name: feedback.projectName || process.env.PROJECT_NAME,
+    phase: feedback.phase,
+    feedback_type: feedback.type,
+    original_response: feedback.original,
+    corrected_response: feedback.corrected,
+    reason: feedback.reason,
+    rating: feedback.rating,
+    metadata: feedback.metadata || {},
+    created_at: new Date().toISOString()
+  };
 
+  // Use local storage if Supabase not configured
+  if (isLocalMode()) {
+    try {
+      const allFeedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
+      allFeedback.push(data);
+      // Keep only last 500 entries
+      const trimmed = allFeedback.slice(-500);
+      saveLocalFile(LOCAL_FEEDBACK_FILE, trimmed);
+      // Update the MD file
+      updateLearnedRulesMD();
+      return data;
+    } catch (error) {
+      console.error(`Learning: Failed to record local feedback: ${error.message}`);
+      return null;
+    }
+  }
+
+  // Use Supabase
+  try {
     return await supabaseRequest('af_feedback', 'POST', data);
   } catch (error) {
     console.error(`Learning: Failed to record feedback: ${error.message}`);
@@ -219,7 +398,7 @@ async function recordAgentPerformance(performance) {
 }
 
 /**
- * Update or create a learned pattern
+ * Update or create a learned pattern (to Supabase or local storage)
  * @param {object} pattern
  * @returns {Promise<object|null>}
  */
@@ -228,6 +407,54 @@ async function recordPattern(pattern) {
     return null;
   }
 
+  const patternData = {
+    type: pattern.type,
+    category: pattern.category,
+    description: pattern.description,
+    evidence: pattern.evidence || [],
+    rule: pattern.rule,
+    frequency: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  // Use local storage if Supabase not configured
+  if (isLocalMode()) {
+    try {
+      const allPatterns = loadLocalFile(LOCAL_PATTERNS_FILE);
+
+      // Check if pattern exists (by category + description or rule)
+      const existingIndex = allPatterns.findIndex(p =>
+        p.category === pattern.category &&
+        (p.description === pattern.description || p.rule === pattern.rule)
+      );
+
+      if (existingIndex >= 0) {
+        // Update existing pattern
+        allPatterns[existingIndex].frequency = (allPatterns[existingIndex].frequency || 0) + 1;
+        allPatterns[existingIndex].updated_at = new Date().toISOString();
+        if (pattern.evidence && pattern.evidence.length > 0) {
+          allPatterns[existingIndex].evidence = [
+            ...(allPatterns[existingIndex].evidence || []),
+            ...pattern.evidence
+          ].slice(-10); // Keep last 10 evidence items
+        }
+      } else {
+        // Add new pattern
+        allPatterns.push(patternData);
+      }
+
+      saveLocalFile(LOCAL_PATTERNS_FILE, allPatterns);
+      // Update the MD file
+      updateLearnedRulesMD();
+      return patternData;
+    } catch (error) {
+      console.error(`Learning: Failed to record local pattern: ${error.message}`);
+      return null;
+    }
+  }
+
+  // Use Supabase
   try {
     // Use RPC function to update frequency or create new
     const url = new URL(`${process.env.SUPABASE_URL}/rest/v1/rpc/update_pattern_frequency`);
@@ -327,35 +554,73 @@ async function getLearningStatus() {
     enabled: isLearningEnabled(),
     feedbackEnabled: isFeedbackEnabled(),
     metricsEnabled: isMetricsEnabled(),
-    supabaseConfigured: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY),
+    supabaseConfigured: isSupabaseConfigured(),
+    localMode: isLocalMode(),
     autoAnalyze: process.env.AF_AUTO_ANALYZE || 'disabled'
   };
 
   if (status.enabled) {
-    try {
-      // Get counts from views
-      const feedbackSummary = await supabaseRequest('v_feedback_summary', 'GET', null, { select: '*' });
-      const patternCount = await supabaseRequest('af_learned_patterns', 'GET', null, {
-        select: 'count',
-        active: 'eq.true'
-      });
+    if (status.localMode) {
+      // Get counts from local files
+      try {
+        const feedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
+        const patterns = loadLocalFile(LOCAL_PATTERNS_FILE);
+        status.stats = {
+          feedbackCount: feedback.length,
+          activePatterns: patterns.length,
+          storageMode: 'local',
+          learningDir: LEARNING_DIR
+        };
+      } catch {
+        status.stats = { error: 'Could not read local files' };
+      }
+    } else {
+      // Get counts from Supabase
+      try {
+        const feedbackSummary = await supabaseRequest('v_feedback_summary', 'GET', null, { select: '*' });
+        const patternCount = await supabaseRequest('af_learned_patterns', 'GET', null, {
+          select: 'count',
+          active: 'eq.true'
+        });
 
-      status.stats = {
-        feedbackCount: feedbackSummary?.reduce((sum, f) => sum + (f.total_count || 0), 0) || 0,
-        activePatterns: patternCount?.[0]?.count || 0
-      };
-    } catch {
-      status.stats = { error: 'Could not fetch stats' };
+        status.stats = {
+          feedbackCount: feedbackSummary?.reduce((sum, f) => sum + (f.total_count || 0), 0) || 0,
+          activePatterns: patternCount?.[0]?.count || 0,
+          storageMode: 'supabase'
+        };
+      } catch {
+        status.stats = { error: 'Could not fetch stats' };
+      }
     }
   }
 
   return status;
 }
 
+/**
+ * Get local learned patterns for session context
+ * @returns {Array}
+ */
+function getLocalPatterns() {
+  return loadLocalFile(LOCAL_PATTERNS_FILE);
+}
+
+/**
+ * Get recent feedback for context
+ * @param {number} limit
+ * @returns {Array}
+ */
+function getRecentFeedback(limit = 20) {
+  const feedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
+  return feedback.slice(-limit);
+}
+
 module.exports = {
   isLearningEnabled,
   isFeedbackEnabled,
   isMetricsEnabled,
+  isSupabaseConfigured,
+  isLocalMode,
   supabaseRequest,
   recordFeedback,
   recordWorkflowMetrics,
@@ -363,5 +628,11 @@ module.exports = {
   recordPattern,
   getAgentSuccessRates,
   getImprovementSuggestions,
-  getLearningStatus
+  getLearningStatus,
+  getLocalPatterns,
+  getRecentFeedback,
+  updateLearnedRulesMD,
+  LEARNING_DIR,
+  LEARNED_RULES_MD,
+  MAIN_INSTRUCTION_LINK
 };

@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (16 Total)
+## Active Hooks (19 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -92,6 +92,53 @@ env_vars[4]{var,description}:
 ```
 
 **Script:** `hooks/visual-pixel-init.cjs`
+
+---
+
+### 0c. SessionStart - Firebase Cleanup (NEW in 1.15.1)
+**When:** Once per session (after environment injection)
+
+**Actions:**
+- ✅ Check if Firebase is configured (firebase.json, login, or ENV vars)
+- ✅ Clean up auto-created firebase-debug.log if Firebase not configured
+- ✅ Prevent cluttering project with unused debug logs
+- ✅ Non-blocking - silent cleanup
+
+**Example:**
+```
+🧹 Cleaned up unused firebase-debug.log (Firebase not configured)
+```
+
+**Script:** `hooks/firebase-cleanup.cjs`
+
+---
+
+### 0d. SessionStart - Workflow Edit Detection (NEW in 1.15.1)
+**When:** Once per session (after environment injection)
+
+**Actions:**
+- ✅ Scan workflow MD files for user edits
+- ✅ Detect changes made outside of Claude sessions
+- ✅ Extract patterns from user modifications
+- ✅ Record learnings automatically
+
+**Monitored Paths:**
+- `.claude/cache/workflow-state.json`
+- `.claude/logs/workflows/*.md`
+- `docs/workflow/*.md`
+- Any `phase-*.md`, `plan.md`, `spec.md`, `requirements.md`
+
+**What It Learns:**
+- User preferences for formatting (headers, bullet points)
+- Verbosity preferences (content added/removed)
+- Documentation style preferences
+
+**Example:**
+```
+🧠 Workflow Edit: Detected 2 pattern(s) from user edits to plan.md
+```
+
+**Script:** `hooks/workflow-edit-learn.cjs`
 
 ---
 
@@ -245,6 +292,40 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 ---
 
+### 7b. PostToolUse - Smart Learn (NEW in 1.15.1)
+**When:** After Write, Edit, or Bash tool completes successfully
+
+**Actions:**
+- ✅ Track successful code patterns (arrow functions, const usage, async/await)
+- ✅ Detect file modification patterns by extension
+- ✅ Learn from successful bash commands
+- ✅ Auto-create patterns after 3+ successful operations
+
+**What It Learns (automatically, no user feedback needed):**
+- Code style patterns (arrow functions, prefer const, explicit types)
+- Framework patterns (React hooks, async/await)
+- Successful command patterns
+
+**Pattern Detection:**
+| Language | Patterns Detected |
+|----------|-------------------|
+| TypeScript/JS | arrow_functions, prefer_const, async_await, explicit_types, react_hooks, error_handling |
+| Python | python_type_hints, python_async |
+| Bash | Command patterns, pipe usage, chaining |
+
+**Example:**
+```
+🧠 Smart Learn: Pattern detected! "prefer_const" in .ts files
+🧠 Smart Learn: Bash pattern! "npm" is frequently used
+```
+
+**Local Files:**
+- `.claude/cache/smart-learn-cache.json` - Success tracking cache
+
+**Script:** `hooks/smart-learn.cjs`
+
+---
+
 ### 8. UserPromptSubmit - Prompt Reminder
 **When:** Every user prompt submission
 
@@ -360,14 +441,38 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 14. Learning System Library
+### 14. Learning System Library (Updated in 1.15.1)
 **Location:** `hooks/lib/af-learning.cjs`
 
 **Provides:**
-- ✅ Supabase client initialization
+- ✅ **Dual-mode storage** - Supabase OR local files
+- ✅ Local storage fallback when Supabase not configured
 - ✅ Feedback submission functions
 - ✅ Metrics tracking functions
 - ✅ Pattern analysis utilities
+- ✅ Auto-generated learned-rules.md file
+
+**Storage Modes:**
+| Mode | When Used | Location |
+|------|-----------|----------|
+| **Local** | No Supabase config | `.claude/learning/*.json` + `.claude/learning/learned-rules.md` |
+| **Supabase** | SUPABASE_URL + SUPABASE_SECRET_KEY set | Cloud (cross-session, cross-machine) |
+
+**Local Files Generated:**
+- `.claude/learning/feedback.json` - All feedback entries
+- `.claude/learning/patterns.json` - Learned patterns
+- `.claude/learning/metrics.json` - Workflow metrics
+- `.claude/learning/learned-rules.md` - Human-readable rules (**linked to main instructions**)
+- `.claude/LEARNED_PATTERNS.md` - Reference link for Claude
+
+**Key Functions:**
+```javascript
+isLearningEnabled()      // Returns true if learning available (local or Supabase)
+isLocalMode()            // Returns true if using local storage
+recordFeedback(feedback) // Store feedback (auto-routes to local or Supabase)
+recordPattern(pattern)   // Store learned pattern
+updateLearnedRulesMD()   // Regenerate the learned-rules.md file
+```
 
 ---
 
@@ -441,8 +546,11 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[15]{event,name,purpose}:
+hooks[19]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
+  SessionStart,Visual Testing Init,Detect and configure visual testing
+  SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
+  SessionStart,Workflow Edit Detection,Detect user edits to workflow files
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
   PreToolUse,Project Context,Remind to initialize project context
@@ -451,16 +559,17 @@ hooks[15]{event,name,purpose}:
   PostToolUse,Large File Warning,Warn about context consumption
   PostToolUse,Lint Auto-Fix,Auto-run linters after file changes
   PostToolUse,Feedback Capture,Capture file edit corrections
+  PostToolUse,Smart Learn,Auto-learn from successful operations
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   Stop,Voice+Metrics,Voice notification + session metrics
   Notification,Critical Alert,Voice alert for errors/critical issues
-  Library,af-learning.cjs,Learning system utilities
+  Library,af-learning.cjs,Learning system utilities (dual-mode)
 ```
 
 ---
 
-**Version:** 1.15.0
-**Last Updated:** 2026-01-14
-**Status:** Active hooks system (15 hooks)
+**Version:** 1.15.1
+**Last Updated:** 2026-01-16
+**Status:** Active hooks system (19 hooks)

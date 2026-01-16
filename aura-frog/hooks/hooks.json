@@ -10,6 +10,14 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/visual-pixel-init.cjs\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/firebase-cleanup.cjs\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/workflow-edit-learn.cjs\" 2>&1 || true"
           }
         ]
       }
@@ -54,6 +62,10 @@
           {
             "type": "command",
             "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/smart-learn.cjs\" 2>&1 || true"
           }
         ]
       },
@@ -76,6 +88,10 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/lint-autofix.cjs\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/smart-learn.cjs\" 2>&1 || true"
           }
         ]
       }

@@ -14,7 +14,7 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "15 specialized agents, 9-phase TDD workflow, 44 rules, 37 skills, 77 commands, learning system",
+      "description": "15 specialized agents, 9-phase TDD workflow, 49 rules, 48 skills, 82 commands, learning system",
       "version": "1.15.0",
       "author": {
         "name": "Nguyen Thien Thanh",
