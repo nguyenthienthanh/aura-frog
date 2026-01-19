@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (19 Total)
+## Active Hooks (21 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -139,6 +139,48 @@ env_vars[4]{var,description}:
 ```
 
 **Script:** `hooks/workflow-edit-learn.cjs`
+
+---
+
+### 0e. SessionStart - Compact Resume (NEW in 1.15.1)
+**When:** Once per session (after compact)
+
+**Actions:**
+- ✅ Check for saved handoff state from previous session
+- ✅ Inject resume context if workflow was in progress
+- ✅ Display workflow status and resume instructions
+- ✅ Restore environment variables for continuity
+
+**What It Restores:**
+- Workflow ID and current phase
+- Task description and agents
+- Project context (name, framework, branch)
+- Active plan reference
+
+**Example Output:**
+```
+═══════════════════════════════════════════════════════════
+🔄 SESSION RESUMED AFTER COMPACT
+═══════════════════════════════════════════════════════════
+
+📋 **Workflow:** feature-auth-20251129-143022
+📝 **Task:** Implement user authentication with JWT
+📍 **Phase:** 5a
+🤖 **Agent:** backend-nodejs
+
+📦 **Project:** my-api
+🛠️ **Framework:** nextjs
+🌿 **Branch:** feature/auth
+
+───────────────────────────────────────────────────────────
+📥 **To fully resume workflow:**
+   workflow:resume feature-auth-20251129-143022
+
+💡 Context has been restored. Type "continue" to proceed.
+═══════════════════════════════════════════════════════════
+```
+
+**Script:** `hooks/compact-handoff.cjs --resume`
 
 ---
 
@@ -405,7 +447,29 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11. Stop - Voice Notification
+### 11. Stop - Compact Handoff Save (NEW in 1.15.1)
+**When:** Session stops (including before compact)
+
+**Actions:**
+- ✅ Auto-save current workflow state
+- ✅ Capture session context (project, agent, phase)
+- ✅ Save to handoff file for resume after compact
+- ✅ Non-blocking - runs silently in background
+
+**Files Saved:**
+- `.claude/cache/compact-handoff.json` - Quick resume state
+- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+
+**Example:**
+```
+💾 Workflow state saved for compact handoff
+```
+
+**Script:** `hooks/compact-handoff.cjs`
+
+---
+
+### 11b. Stop - Voice Notification
 **When:** Claude stops for user approval
 
 **Actions:**
@@ -546,11 +610,12 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[19]{event,name,purpose}:
+hooks[21]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
+  SessionStart,Compact Resume,Restore workflow context after compact
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
   PreToolUse,Bash Safety,Block destructive system commands
   PreToolUse,Project Context,Remind to initialize project context
@@ -563,6 +628,7 @@ hooks[19]{event,name,purpose}:
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
+  Stop,Compact Handoff,Auto-save workflow state before compact
   Stop,Voice+Metrics,Voice notification + session metrics
   Notification,Critical Alert,Voice alert for errors/critical issues
   Library,af-learning.cjs,Learning system utilities (dual-mode)
@@ -571,5 +637,5 @@ hooks[19]{event,name,purpose}:
 ---
 
 **Version:** 1.15.1
-**Last Updated:** 2026-01-16
-**Status:** Active hooks system (19 hooks)
+**Last Updated:** 2026-01-19
+**Status:** Active hooks system (21 hooks)

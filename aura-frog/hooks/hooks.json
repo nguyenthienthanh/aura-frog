@@ -18,6 +18,10 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/workflow-edit-learn.cjs\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/compact-handoff.cjs\" --resume 2>&1 || true"
           }
         ]
       }
@@ -124,6 +128,10 @@
     "Stop": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/compact-handoff.cjs\" 2>&1 || true"
+          },
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/stop-voice-notify.sh\" 2>&1 || true"
