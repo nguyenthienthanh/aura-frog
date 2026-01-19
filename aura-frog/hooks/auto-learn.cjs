@@ -8,19 +8,20 @@
  * Features:
  * - Deduplication: Skips similar feedback within 24h
  * - Pattern detection: Auto-creates patterns after 3+ similar corrections
+ * - Task-specific filtering: Skips feedback too specific to current task
  * - Local cache: Stores feedback locally + Supabase
  * - Combines with project context
  *
  * Exit Codes:
  *   0 - Success (non-blocking)
  *
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { recordFeedback, recordPattern, isFeedbackEnabled } = require('./lib/af-learning.cjs');
+const { recordFeedback, recordPattern, isLearningEnabled } = require('./lib/af-learning.cjs');
 
 // Cache file paths
 const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
@@ -79,6 +80,58 @@ const CORRECTION_KEYWORDS = [
   'too much', 'too many', 'unnecessary', 'overkill', 'verbose',
   'not like', 'not what', 'prefer', 'want you to', 'need you to'
 ];
+
+// Patterns that indicate GENERAL/REUSABLE feedback (good for learning)
+const GENERAL_FEEDBACK_INDICATORS = [
+  /\balways\b/i,
+  /\bnever\b/i,
+  /\bprefer\b/i,
+  /\bstyle\b/i,
+  /\bpattern\b/i,
+  /\bconvention\b/i,
+  /\bin general\b/i,
+  /\bby default\b/i,
+  /\btoo (verbose|complex|simple|long|short)\b/i,
+  /\bkeep it\b/i,
+  /\bdon't add\b.*\b(comments?|jsdoc|docstrings?|emojis?)\b/i,
+  /\buse (const|let|var|arrow|async)\b/i,
+  /\bavoid\b/i,
+];
+
+// Patterns that indicate TASK-SPECIFIC feedback (skip for learning)
+const TASK_SPECIFIC_INDICATORS = [
+  // Specific file paths
+  /\b(src|lib|components?|pages?|utils?|hooks?|services?)\/\w+/i,
+  /\.\w{2,4}\b/,  // File extensions like .tsx, .js, .css
+
+  // Specific values/colors/numbers
+  /\b(change|set|make|use)\b.{0,20}\b(to|=)\s*(["']?\w+["']?|\d+|#[0-9a-f]+)/i,
+  /\b(red|blue|green|yellow|black|white|gray|#[0-9a-f]{3,6})\b/i,
+  /\b\d{2,}\b/,  // Specific numbers (2+ digits)
+
+  // Specific identifiers (camelCase, snake_case, PascalCase)
+  /\b[a-z]+[A-Z][a-zA-Z]*\b/,  // camelCase
+  /\b[a-z]+_[a-z]+\b/,  // snake_case
+  /\b[A-Z][a-z]+[A-Z][a-zA-Z]*\b/,  // PascalCase (but not all caps)
+
+  // Specific UI references
+  /\b(this|that|the)\s+(button|modal|dialog|form|input|field|page|component|element)\b/i,
+
+  // Specific function/method calls
+  /\b(call|invoke|run|execute)\s+\w+\(/i,
+
+  // Line numbers or positions
+  /\b(line|row|column)\s*\d+/i,
+  /\bat\s+(the\s+)?(top|bottom|left|right|start|end)\b/i,
+
+  // Very specific instructions
+  /\b(rename|move|copy)\s+\w+\s+to\s+\w+/i,
+];
+
+// Minimum length for general feedback (very short = likely task-specific)
+const MIN_GENERAL_FEEDBACK_LENGTH = 15;
+// Maximum length for learnable feedback (very long = likely task-specific instructions)
+const MAX_LEARNABLE_LENGTH = 200;
 
 /**
  * Ensure cache directory exists
@@ -186,6 +239,67 @@ function updateLocalPatternsFile(category, rule, reason, count) {
 }
 
 /**
+ * Check if feedback is general/reusable (vs task-specific)
+ * Returns: { isLearnable: boolean, reason: string }
+ */
+function isLearnableFeedback(userInput) {
+  const input = userInput.trim();
+
+  // Too short - likely just "no" or "wrong" without context
+  if (input.length < MIN_GENERAL_FEEDBACK_LENGTH) {
+    return { isLearnable: false, reason: 'too_short' };
+  }
+
+  // Too long - likely detailed task-specific instructions
+  if (input.length > MAX_LEARNABLE_LENGTH) {
+    return { isLearnable: false, reason: 'too_long' };
+  }
+
+  // Check for general feedback indicators (positive signal)
+  let hasGeneralIndicator = false;
+  for (const pattern of GENERAL_FEEDBACK_INDICATORS) {
+    if (pattern.test(input)) {
+      hasGeneralIndicator = true;
+      break;
+    }
+  }
+
+  // Check for task-specific indicators (negative signal)
+  let taskSpecificCount = 0;
+  const taskSpecificMatches = [];
+  for (const pattern of TASK_SPECIFIC_INDICATORS) {
+    if (pattern.test(input)) {
+      taskSpecificCount++;
+      taskSpecificMatches.push(pattern.toString().substring(0, 30));
+      if (taskSpecificCount >= 2) {
+        return {
+          isLearnable: false,
+          reason: 'task_specific',
+          matches: taskSpecificMatches
+        };
+      }
+    }
+  }
+
+  // If has general indicator and no/few task-specific, it's learnable
+  if (hasGeneralIndicator) {
+    return { isLearnable: true, reason: 'general_indicator' };
+  }
+
+  // If has one task-specific indicator without general, skip
+  if (taskSpecificCount === 1 && !hasGeneralIndicator) {
+    return {
+      isLearnable: false,
+      reason: 'likely_task_specific',
+      matches: taskSpecificMatches
+    };
+  }
+
+  // Default: learnable if no task-specific indicators
+  return { isLearnable: true, reason: 'no_specific_indicators' };
+}
+
+/**
  * Analyze user input for correction patterns
  */
 function analyzeInput(userInput) {
@@ -219,44 +333,124 @@ function analyzeInput(userInput) {
 }
 
 /**
- * Categorize the feedback
+ * Categorize the feedback and extract the specific rule
  */
 function categorizeCorrection(userInput) {
   const inputLower = userInput.toLowerCase();
 
-  if (/comment|jsdoc|docstring|annotation/i.test(inputLower)) {
-    return { category: 'code_style', rule: 'minimal_comments' };
-  }
-  if (/type|typescript|any\b/i.test(inputLower)) {
-    return { category: 'code_style', rule: 'type_safety' };
-  }
-  if (/test|spec|coverage/i.test(inputLower)) {
-    return { category: 'testing', rule: 'test_quality' };
-  }
-  if (/import|export|module/i.test(inputLower)) {
-    return { category: 'code_style', rule: 'imports' };
-  }
-  if (/naming|name|variable|function/i.test(inputLower)) {
-    return { category: 'code_style', rule: 'naming' };
-  }
-  if (/complex|simple|refactor|clean/i.test(inputLower)) {
-    return { category: 'code_quality', rule: 'complexity' };
-  }
-  if (/error|exception|catch|throw/i.test(inputLower)) {
-    return { category: 'error_handling', rule: 'error_handling' };
-  }
-  if (/security|auth|password|token/i.test(inputLower)) {
-    return { category: 'security', rule: 'security' };
+  // Comments/documentation related
+  if (/\b(comment|jsdoc|docstring|annotation|documentation)\b/i.test(inputLower)) {
+    if (/\b(don't|dont|no|remove|stop|avoid|unnecessary|too many)\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'no_excessive_comments' };
+    }
+    if (/\b(add|include|need|want|missing)\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'add_comments' };
+    }
+    return { category: 'code_style', rule: 'comments' };
   }
 
-  return { category: 'general', rule: 'general' };
+  // Emojis
+  if (/\b(emoji|emojis)\b/i.test(inputLower)) {
+    if (/\b(don't|dont|no|remove|stop|avoid)\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'no_emojis' };
+    }
+    return { category: 'code_style', rule: 'emojis' };
+  }
+
+  // Verbosity
+  if (/\b(verbose|wordy|long|lengthy|too much)\b/i.test(inputLower)) {
+    return { category: 'code_style', rule: 'be_concise' };
+  }
+  if (/\b(brief|short|concise|simple|minimal)\b/i.test(inputLower)) {
+    return { category: 'code_style', rule: 'keep_it_simple' };
+  }
+
+  // TypeScript/types
+  if (/\b(type|typescript|any\b|interface|generics?)\b/i.test(inputLower)) {
+    if (/\b(strict|explicit|proper|specific)\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'strict_types' };
+    }
+    if (/\b(avoid|no|don't)\b.*\bany\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'no_any_type' };
+    }
+    return { category: 'code_style', rule: 'type_safety' };
+  }
+
+  // Functions/syntax
+  if (/\b(arrow|arrow function)\b/i.test(inputLower)) {
+    return { category: 'code_style', rule: 'prefer_arrow_functions' };
+  }
+  if (/\b(const|let|var)\b/i.test(inputLower)) {
+    if (/\bconst\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'prefer_const' };
+    }
+    return { category: 'code_style', rule: 'variable_declaration' };
+  }
+  if (/\b(async|await|promise)\b/i.test(inputLower)) {
+    return { category: 'code_style', rule: 'async_await' };
+  }
+
+  // Testing
+  if (/\b(test|spec|coverage|jest|vitest|mocha)\b/i.test(inputLower)) {
+    if (/\b(describe|it|expect|assert)\b/i.test(inputLower)) {
+      return { category: 'testing', rule: 'test_structure' };
+    }
+    return { category: 'testing', rule: 'test_quality' };
+  }
+
+  // Imports/modules
+  if (/\b(import|export|module|require)\b/i.test(inputLower)) {
+    if (/\borganiz/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'organize_imports' };
+    }
+    return { category: 'code_style', rule: 'imports' };
+  }
+
+  // Naming
+  if (/\b(naming|name|variable|rename)\b/i.test(inputLower)) {
+    if (/\b(camel|pascal|snake|kebab)\b/i.test(inputLower)) {
+      return { category: 'code_style', rule: 'naming_convention' };
+    }
+    return { category: 'code_style', rule: 'naming' };
+  }
+
+  // Complexity
+  if (/\b(complex|simple|refactor|clean|readable)\b/i.test(inputLower)) {
+    return { category: 'code_quality', rule: 'simplicity' };
+  }
+
+  // Error handling
+  if (/\b(error|exception|catch|throw|try)\b/i.test(inputLower)) {
+    return { category: 'error_handling', rule: 'error_handling' };
+  }
+
+  // Security
+  if (/\b(security|auth|password|token|secret|credential)\b/i.test(inputLower)) {
+    return { category: 'security', rule: 'security_practice' };
+  }
+
+  // Formatting
+  if (/\b(format|indent|spacing|whitespace|prettier|eslint)\b/i.test(inputLower)) {
+    return { category: 'formatting', rule: 'code_formatting' };
+  }
+
+  // React/hooks specific
+  if (/\b(hook|useState|useEffect|useMemo|useCallback)\b/i.test(inputLower)) {
+    return { category: 'react', rule: 'hooks_usage' };
+  }
+  if (/\b(component|prop|props|state)\b/i.test(inputLower)) {
+    return { category: 'react', rule: 'component_design' };
+  }
+
+  return { category: 'general', rule: 'preference' };
 }
 
 /**
  * Main hook execution
  */
 async function main() {
-  if (!isFeedbackEnabled()) {
+  // Check if learning is enabled (local or Supabase)
+  if (!isLearningEnabled()) {
     process.exit(0);
   }
 
@@ -272,9 +466,19 @@ async function main() {
       process.exit(0);
     }
 
+    // First, check if this is a correction/feedback
     const analysis = analyzeInput(userInput);
 
     if (!analysis.type || analysis.confidence < 0.5) {
+      process.exit(0);
+    }
+
+    // Second, check if feedback is learnable (general vs task-specific)
+    const learnableCheck = isLearnableFeedback(userInput);
+
+    if (!learnableCheck.isLearnable) {
+      // Skip task-specific feedback silently
+      // console.log(`🧠 Learning: Skipped (${learnableCheck.reason})`);
       process.exit(0);
     }
 
@@ -287,7 +491,7 @@ async function main() {
 
     // Check for duplicate
     if (isDuplicate(cache, hash)) {
-      // Skip duplicate, but still count for pattern detection
+      // Skip duplicate
       process.exit(0);
     }
 
@@ -300,13 +504,14 @@ async function main() {
       type: analysis.type,
       category,
       rule,
+      learnableReason: learnableCheck.reason,
       timestamp: Date.now()
     });
 
     // Save cache
     saveCache(cache);
 
-    // Record to Supabase
+    // Record feedback (to local storage or Supabase)
     const feedbackData = {
       type: analysis.type,
       projectName: process.env.PROJECT_NAME || process.env.AF_PROJECT_NAME,
@@ -319,6 +524,7 @@ async function main() {
         rule,
         hash,
         patternCount,
+        learnableReason: learnableCheck.reason,
         matchedPattern: analysis.matchedPattern,
         matchedKeywords: analysis.matchedKeywords,
         agent: process.env.AF_CURRENT_AGENT || 'unknown'
@@ -336,20 +542,22 @@ async function main() {
         type: 'preference',
         category,
         description: `User prefers: ${rule} (auto-detected from ${patternCount} corrections)`,
+        rule,
         evidence: [reason.substring(0, 200)]
       });
-      console.log(`🧠 Learning: Pattern detected! "${category}:${rule}" (${patternCount} occurrences)`);
+      console.log(`🧠 Learning: Pattern created! "${category}:${rule}" (${patternCount} occurrences)`);
     } else if (analysis.type === 'correction' && analysis.confidence >= 0.7) {
-      console.log(`🧠 Learning: Captured ${analysis.type} [${category}:${rule}] (${patternCount}x)`);
+      console.log(`🧠 Learning: Captured [${category}:${rule}] (${patternCount}/${PATTERN_THRESHOLD})`);
     }
 
     process.exit(0);
   } catch (error) {
+    // Silent fail - non-blocking
     process.exit(0);
   }
 }
 
-module.exports = { analyzeInput, categorizeCorrection, generateHash, loadCache };
+module.exports = { analyzeInput, categorizeCorrection, isLearnableFeedback, generateHash, loadCache };
 
 if (require.main === module) {
   main();
