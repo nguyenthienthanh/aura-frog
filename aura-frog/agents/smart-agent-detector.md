@@ -17,11 +17,80 @@ Advanced intelligent agent selection system using multi-layer analysis of natura
 
 | Layer | Name | Description |
 |-------|------|-------------|
+| 0 | **Task Content Analysis** | **NEW:** Analyze task itself, not just repo - highest priority |
 | 1 | Natural Language | Analyze user message for intent, domain, complexity |
 | 2 | Context Analysis | CWD, recent files, project structure, conversation history |
 | 3 | Domain Patterns | Match task patterns against agent capabilities |
 | 4 | Confidence Scoring | Weighted multi-criteria algorithm |
 | 5 | Recommendation | Primary, secondary, optional agents with reasoning |
+
+**Layer 0 Override:** Task content can override repo-based selection. A backend repo may have frontend tasks (templates, PDFs, emails).
+
+---
+
+## Task Content Analysis (Layer 0)
+
+**Analyze the actual task, not just the repo type.** This is the highest priority layer.
+
+### Task Content Triggers
+
+| Category | Example Patterns | Activates | Score |
+|----------|------------------|-----------|-------|
+| Frontend | html template, blade, twig, email template, pdf styling, css | web-expert, ui-designer | +50-60 |
+| Backend | api endpoint, controller, middleware, queue job, webhook | backend-* agents | +50-55 |
+| Database | migration, schema, query optimization, slow query, n+1 | database-specialist | +55-60 |
+| Security | xss, sql injection, csrf, vulnerability, auth bypass | security-expert | +55-60 |
+| DevOps | docker, kubernetes, ci-cd, terraform, deployment | devops-cicd | +50-55 |
+| Testing | unit test, e2e test, coverage, mock, fixture | qa-automation | +45-55 |
+| Design | figma, wireframe, design system, accessibility | ui-designer | +50-60 |
+
+### Frontend Task Patterns (Detailed)
+
+```toon
+frontend_tasks[12]{pattern,score,description}:
+  html template/blade/twig/jinja/ejs,+55,Server-side template work
+  email template,+55,Email HTML/CSS design
+  pdf styling/pdf layout,+50,PDF generation with HTML/CSS
+  css/scss/tailwind,+55,Stylesheet modifications
+  responsive design,+50,Mobile responsiveness
+  form layout/ui component,+50,UI element work
+  admin panel ui,+50,Dashboard interface
+  modal/dialog/toast,+45,UI overlay components
+  svg/icon work,+45,Vector graphics
+```
+
+### Backend Task Patterns (Detailed)
+
+```toon
+backend_tasks[12]{pattern,score,description}:
+  api endpoint/route,+55,API implementation
+  controller logic,+55,Business logic in controller
+  middleware,+50,Request/response middleware
+  authentication/authorization,+50,Auth logic (not UI)
+  queue job/background,+50,Async processing
+  webhook handler,+50,External integrations
+  caching/redis,+45,Cache layer work
+  file upload/storage,+45,File handling
+  email sending,+45,Mail dispatch logic
+```
+
+### Cross-Domain Override Examples
+
+```
+Backend Repo + Frontend Task:
+  "Fix email template styling" → web-expert PRIMARY, backend SECONDARY
+
+Frontend Repo + Backend Task:
+  "Add rate limiting to API" → backend PRIMARY, frontend SECONDARY
+
+Any Repo + Database Task:
+  "Optimize slow query" → database-specialist PRIMARY, dev agent SECONDARY
+
+Any Repo + Security Task:
+  "Fix XSS vulnerability" → security-expert PRIMARY, dev agent SECONDARY
+```
+
+**Full patterns:** `skills/agent-detector/task-based-agent-selection.md`
 
 ---
 
@@ -31,6 +100,7 @@ Advanced intelligent agent selection system using multi-layer analysis of natura
 
 | Criterion | Points | Description |
 |-----------|--------|-------------|
+| **Task Content Match** | **+50-60** | **Task-based patterns (Layer 0) - HIGHEST PRIORITY** |
 | Explicit Mention | +60 | User directly mentions technology |
 | Keyword Exact Match | +50 | Direct keyword match to intent |
 | Project Context | +40 | CWD, file structure, package files |
@@ -38,6 +108,8 @@ Advanced intelligent agent selection system using multi-layer analysis of natura
 | Task Complexity | +30 | Inferred complexity level |
 | Conversation History | +25 | Previous context, active agents |
 | File Patterns | +20 | Recent files, naming conventions |
+
+**Task Content Override:** When task content score ≥50 for a domain different from repo, that agent becomes PRIMARY or co-PRIMARY.
 
 ### Thresholds
 
@@ -256,6 +328,68 @@ Result:
 ❌ qa-automation: 0 pts (SKIPPED - user request)
 ```
 
+### Example 7: Backend Repo, Frontend Task (Task-Based Override)
+```
+User: "Fix the invoice email template - button styling is broken"
+
+Repo Context: Laravel API backend
+Task Content Analysis (Layer 0):
+- "email template" → frontend_tasks (+55)
+- "styling" → frontend (+40)
+- "button" → frontend (+30)
+→ Frontend score: 125 pts → OVERRIDE
+
+Result:
+✅ web-expert: 125 pts (Primary) - leads template work
+✅ backend-laravel: 40 pts (Secondary) - Blade context
+```
+
+### Example 8: Any Repo, PDF Generation Task
+```
+User: "Invoice PDF layout is broken - table splits incorrectly across pages"
+
+Repo Context: Node.js API
+Task Content Analysis (Layer 0):
+- "PDF" → frontend_tasks (+50)
+- "layout" → frontend (+40)
+- "table" → frontend (+30)
+→ Frontend score: 120 pts → OVERRIDE
+
+Result:
+✅ web-expert: 120 pts (Primary) - HTML/CSS for PDF
+✅ backend-nodejs: 40 pts (Secondary) - PDF library
+```
+
+### Example 9: Frontend Repo, Database Task
+```
+User: "User list is slow - need to optimize the query"
+
+Repo Context: Next.js frontend
+Task Content Analysis (Layer 0):
+- "slow" → database (+50)
+- "optimize" + "query" → database (+50)
+→ Database score: 100 pts → OVERRIDE
+
+Result:
+✅ database-specialist: 100 pts (Primary) - query optimization
+✅ web-nextjs: 40 pts (Secondary) - API route context
+```
+
+### Example 10: Frontend Repo, Backend API Task
+```
+User: "Add rate limiting to the /api/users endpoint"
+
+Repo Context: Next.js frontend
+Task Content Analysis (Layer 0):
+- "rate limiting" → backend (+45)
+- "api endpoint" → backend (+55)
+→ Backend score: 100 pts → OVERRIDE
+
+Result:
+✅ backend-nodejs: 100 pts (Primary) - API logic
+✅ web-nextjs: 40 pts (Secondary) - Next.js API routes
+```
+
 ---
 
 ## Always Active Agents
@@ -300,9 +434,10 @@ These agents don't require scoring:
 
 ## Related Documentation
 
-- **Skill:** `skills/agent-detector/agent-selection.md`
+- **Task-Based Selection:** `skills/agent-detector/task-based-agent-selection.md`
+- **Skill:** `skills/agent-detector/SKILL.md`
 - **Guide:** `docs/AGENT_SELECTION_GUIDE.md`
-- **Agent Catalog:** `README.md`
+- **Agent Catalog:** `agents/README.md`
 
 ---
 

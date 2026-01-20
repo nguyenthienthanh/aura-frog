@@ -152,6 +152,40 @@ Task(subagent_type="backend-nodejs", model="sonnet", ...)
 
 ## Multi-Layer Detection System
 
+### Layer 0: Task Content Analysis (NEW - Highest Priority)
+
+**Analyze the actual task, not just the repo.** A backend repo may have frontend tasks (templates, PDFs, emails).
+
+**Full patterns:** `task-based-agent-selection.md`
+
+```toon
+task_content_triggers[7]{category,example_patterns,activates,score_boost}:
+  Frontend,html template/blade/twig/email template/pdf styling/css,web-expert + ui-designer,+50 to +60
+  Backend,api endpoint/controller/middleware/queue job/webhook,backend-* agents,+50 to +55
+  Database,migration/schema/query optimization/slow query/n+1,database-specialist,+55 to +60
+  Security,xss/sql injection/csrf/vulnerability/auth bypass,security-expert,+55 to +60
+  DevOps,docker/kubernetes/ci-cd/terraform/deployment,devops-cicd,+50 to +55
+  Testing,unit test/e2e test/coverage/mock/fixture,qa-automation,+45 to +55
+  Design,figma/wireframe/design system/accessibility,ui-designer,+50 to +60
+```
+
+**Key insight:** Task content score ≥50 → Override or co-lead with repo-based agent.
+
+**Examples:**
+```
+# Backend repo, but frontend task
+Repo: Laravel API
+Task: "Fix email template styling"
+→ web-expert (PRIMARY) + backend-laravel (SECONDARY)
+
+# Frontend repo, but backend task
+Repo: Next.js
+Task: "Add rate limiting to API route"
+→ backend-nodejs (PRIMARY) + web-nextjs (SECONDARY)
+```
+
+---
+
 ### Layer 1: Explicit Technology Detection
 
 Check if user **directly mentions** a technology:
@@ -226,7 +260,8 @@ file_patterns[9]{pattern,agent,score}:
 ## Scoring Weights
 
 ```toon
-weights[8]{criterion,weight,description}:
+weights[9]{criterion,weight,description}:
+  Task Content Match,+50-60,Task-based patterns override repo (Layer 0) - HIGHEST PRIORITY
   Explicit Mention,+60,User directly mentions technology
   Keyword Exact Match,+50,Direct keyword match to intent
   Project Context,+40,CWD/file structure/package files
@@ -236,6 +271,8 @@ weights[8]{criterion,weight,description}:
   File Patterns,+20,Recent files/naming conventions
   Project Priority Bonus,+25,Agent in project-config.yaml priority list
 ```
+
+**Task Content Override Rule:** When task content score ≥50 for a different domain than the repo, that domain's agent becomes PRIMARY or co-PRIMARY.
 
 ---
 
@@ -273,6 +310,24 @@ thresholds[4]{level,score,role}:
 
 ## Detection Process
 
+### Step 0: Task Content Analysis (NEW - Do This First!)
+
+**Analyze the task itself before checking the repo.**
+
+```
+User: "Update the invoice PDF layout - table breaks across pages"
+
+Task Analysis:
+- "PDF" → Frontend task pattern (+50)
+- "layout" → Frontend keyword (+40)
+- "table" → Frontend keyword (+30)
+→ Total frontend score: 120 pts → web-expert is PRIMARY
+
+Even if repo is pure backend, web-expert leads this task!
+```
+
+**Apply patterns from:** `task-based-agent-selection.md`
+
 ### Step 1: Extract Keywords
 ```
 User: "Fix the login button not working on iOS"
@@ -292,7 +347,7 @@ Extracted:
 3. Check CWD path for project hints
 ```
 
-### Step 3: Score All Agents
+### Step 3: Score All Agents (Combine Task + Repo)
 ```
 mobile-react-native:
   - "iOS" keyword: +35 (semantic)
@@ -405,6 +460,60 @@ Detection Result:
   ✅ Agent: pm-operations-orchestrator
   ✅ Model: haiku
   ✅ Complexity: Quick
+```
+
+### Example 5: Backend Repo, Frontend Task (Task-Based Override)
+```
+User: "Fix the password reset email template - the button styling is broken"
+
+Repo Context: Laravel API (backend)
+Task Content Analysis:
+- "email template" → frontend_task_patterns (+55)
+- "styling" → frontend_keywords (+40)
+- "button" → frontend_keywords (+30)
+→ Frontend score: 125 pts (OVERRIDE)
+
+Detection Result:
+  ✅ Agent: web-expert (PRIMARY, 125 pts) - leads template fix
+  ✅ Agent: backend-laravel (SECONDARY, 40 pts) - Blade context
+  ✅ Model: sonnet
+  ✅ Complexity: Standard
+```
+
+### Example 6: Frontend Repo, Database Task (Task-Based Override)
+```
+User: "The user list page is slow - optimize the query"
+
+Repo Context: Next.js frontend
+Task Content Analysis:
+- "slow" → database_task_patterns (+50)
+- "optimize" → database context
+- "query" → database_task_patterns (+40)
+→ Database score: 90 pts (OVERRIDE)
+
+Detection Result:
+  ✅ Agent: database-specialist (PRIMARY, 90 pts)
+  ✅ Agent: web-nextjs (SECONDARY, 40 pts) - API route context
+  ✅ Model: sonnet
+  ✅ Complexity: Standard
+```
+
+### Example 7: Backend Repo, PDF Generation (Task-Based Override)
+```
+User: "Invoice PDF has layout issues - table breaks across pages incorrectly"
+
+Repo Context: Node.js API
+Task Content Analysis:
+- "PDF" → frontend_task_patterns (+50)
+- "layout" → frontend_keywords (+40)
+- "table" → frontend_keywords (+30)
+→ Frontend score: 120 pts (OVERRIDE)
+
+Detection Result:
+  ✅ Agent: web-expert (PRIMARY, 120 pts) - HTML/CSS for PDF
+  ✅ Agent: backend-nodejs (SECONDARY, 40 pts) - PDF library integration
+  ✅ Model: sonnet
+  ✅ Complexity: Standard
 ```
 
 ---
