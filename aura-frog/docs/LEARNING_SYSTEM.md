@@ -1,11 +1,11 @@
 # Aura Frog Learning System
 
-**Version:** 1.15.1
+**Version:** 1.16.0
 **Status:** Production Ready
 
 The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights. **Works out of the box with local storage**, optionally syncs to Supabase for cross-machine memory.
 
-**NEW in v1.15.1:**
+**NEW in v1.16.0:**
 - **Local storage by default** - No setup required!
 - **Smart Learn** - Auto-detect patterns from successful operations (no feedback needed)
 - **Workflow Edit Detection** - Learn from your direct edits to workflow files
@@ -290,4 +290,4 @@ rm -rf .claude/learning/
 
 ---
 
-**Version:** 1.15.1 | **Last Updated:** 2026-01-16
+**Version:** 1.16.0 | **Last Updated:** 2026-01-20

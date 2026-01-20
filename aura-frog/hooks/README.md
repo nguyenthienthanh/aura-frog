@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.15.0
+**Version:** 1.16.0
 
 ---
 
@@ -95,7 +95,7 @@ env_vars[4]{var,description}:
 
 ---
 
-### 0c. SessionStart - Firebase Cleanup (NEW in 1.15.1)
+### 0c. SessionStart - Firebase Cleanup (NEW in 1.16.0)
 **When:** Once per session (after environment injection)
 
 **Actions:**
@@ -113,7 +113,7 @@ env_vars[4]{var,description}:
 
 ---
 
-### 0d. SessionStart - Workflow Edit Detection (NEW in 1.15.1)
+### 0d. SessionStart - Workflow Edit Detection (NEW in 1.16.0)
 **When:** Once per session (after environment injection)
 
 **Actions:**
@@ -142,7 +142,7 @@ env_vars[4]{var,description}:
 
 ---
 
-### 0e. SessionStart - Compact Resume (NEW in 1.15.1)
+### 0e. SessionStart - Compact Resume (NEW in 1.16.0)
 **When:** Once per session (after compact)
 
 **Actions:**
@@ -334,7 +334,7 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 ---
 
-### 7b. PostToolUse - Smart Learn (NEW in 1.15.1)
+### 7b. PostToolUse - Smart Learn (NEW in 1.16.0)
 **When:** After Write, Edit, or Bash tool completes successfully
 
 **Actions:**
@@ -447,7 +447,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11. Stop - Compact Handoff Save (NEW in 1.15.1)
+### 11. Stop - Compact Handoff Save (NEW in 1.16.0)
 **When:** Session stops (including before compact)
 
 **Actions:**
@@ -505,7 +505,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 14. Learning System Library (Updated in 1.15.1)
+### 14. Learning System Library (Updated in 1.16.0)
 **Location:** `hooks/lib/af-learning.cjs`
 
 **Provides:**
@@ -636,6 +636,6 @@ hooks[21]{event,name,purpose}:
 
 ---
 
-**Version:** 1.15.1
-**Last Updated:** 2026-01-19
+**Version:** 1.16.0
+**Last Updated:** 2026-01-20
 **Status:** Active hooks system (21 hooks)

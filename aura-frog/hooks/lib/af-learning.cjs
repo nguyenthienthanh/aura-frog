@@ -38,28 +38,33 @@ function isSupabaseConfigured() {
 }
 
 /**
- * Check if learning system is enabled (either Supabase or local)
+ * Check if learning system is enabled
+ * Learning is ALWAYS enabled by default (uses local storage)
+ * Set AF_LEARNING_DISABLED=true to disable completely
  * @returns {boolean}
  */
 function isLearningEnabled() {
-  // Learning is enabled if AF_LEARNING_ENABLED is true OR if we have local learning
-  // Local learning is always available as a fallback
-  if (process.env.AF_LEARNING_ENABLED === 'true') {
-    return true;
+  // User can explicitly disable all learning
+  if (process.env.AF_LEARNING_DISABLED === 'true') {
+    return false;
   }
-  // Auto-enable local learning if Supabase not configured
-  if (!isSupabaseConfigured() && process.env.AF_LOCAL_LEARNING !== 'false') {
-    return true;
-  }
-  return false;
+  // Otherwise, learning is always enabled (local or Supabase)
+  return true;
 }
 
 /**
  * Check if using local storage mode
+ * Local mode when: Supabase NOT configured
+ * Supabase mode when: Supabase IS configured
  * @returns {boolean}
  */
 function isLocalMode() {
-  return !isSupabaseConfigured() || process.env.AF_FORCE_LOCAL === 'true';
+  // If Supabase is configured, use Supabase (not local)
+  if (isSupabaseConfigured()) {
+    return false;
+  }
+  // No Supabase = use local storage
+  return true;
 }
 
 /**

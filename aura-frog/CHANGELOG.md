@@ -4,6 +4,54 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.16.0] - 2026-01-20
+
+### Learning System v2.0: Local Storage & Smart Learning
+
+Major improvements to the learning system with local-first storage and automatic pattern detection.
+
+#### Added
+- **Local storage by default** - Learning works without Supabase setup
+  - Files stored in `.claude/learning/` directory
+  - `feedback.json`, `patterns.json`, `metrics.json`, `learned-rules.md`
+  - Supabase still supported for cross-machine sync
+- **Smart Learn hook** - `hooks/smart-learn.cjs`
+  - Auto-learns from successful Write/Edit/Bash operations
+  - Detects patterns: arrow_functions, prefer_const, async_await, explicit_types
+  - No user feedback required - learns from success
+- **Workflow Edit Detection** - `hooks/workflow-edit-learn.cjs`
+  - Detects when users edit workflow MD files directly
+  - Extracts formatting/verbosity preferences from changes
+- **Firebase Cleanup hook** - `hooks/firebase-cleanup.cjs`
+  - Cleans up auto-created firebase-debug.log when Firebase not configured
+- **Compact Handoff hook** - `hooks/compact-handoff.cjs`
+  - Auto-saves workflow state before compact
+  - Auto-resumes workflow context after compact
+  - 30-minute window for resume
+
+#### Updated
+- **`hooks/lib/af-learning.cjs`** v2.0.0 - Dual-mode storage (local/Supabase)
+  - `isLearningEnabled()` - Always true unless explicitly disabled
+  - `isLocalMode()` - True when Supabase not configured
+  - Auto-generates `learned-rules.md` for human-readable rules
+- **`hooks/auto-learn.cjs`** v2.1.0 - Fixed task-specific filtering
+  - Now properly detects corrections without requiring Supabase
+  - Added `isLearnableFeedback()` to filter task-specific feedback
+  - Skips feedback with file paths, specific values, camelCase identifiers
+- **`hooks/hooks.json`** - Added new hooks (17 → 21)
+
+#### Storage Modes
+| Mode | When Used | Location |
+|------|-----------|----------|
+| **Local** | No Supabase config | `.claude/learning/` |
+| **Supabase** | SUPABASE_URL + SUPABASE_SECRET_KEY set | Cloud |
+
+#### Stats
+- Hooks: 21 (was 17)
+- New hooks: smart-learn, workflow-edit-learn, firebase-cleanup, compact-handoff
+
+---
+
 ## [1.14.0] - 2026-01-14
 
 ### Visual Pixel-Perfect Testing
