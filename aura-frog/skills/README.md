@@ -1,7 +1,7 @@
 # Aura Frog Skills
 
 **Version:** 1.17.0
-**Total Skills:** 45 (13 auto-invoking + 32 reference)
+**Total Skills:** 46 (13 auto-invoking + 33 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -427,12 +427,12 @@ auto_invoke_skills[13]{name,priority,trigger}:
   response-analyzer,medium,Large output handling
 ```
 
-**Reference Skills (32)** - Loaded on-demand by bundles or commands:
+**Reference Skills (33)** - Loaded on-demand by bundles or commands:
 - Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (11)
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
 - Design: design-system-library, stitch-design, visual-pixel-perfect (3)
 - Learning: learning-analyzer, self-improve (2)
-- Workflow: workflow-fasttrack, lazy-agent-loader (2)
+- Workflow: workflow-fasttrack, lazy-agent-loader, phase1-lite (3)
 - Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, design-expert, documentation, git-workflow, nativewind-generator (9)
 
 > **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
@@ -854,6 +854,6 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 ---
 
 **Version:** 1.17.0
-**Last Updated:** 2026-01-21
+**Last Updated:** 2026-01-22
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 45 (13 auto-invoking + 32 reference)
+**Total Skills:** 46 (13 auto-invoking + 33 reference)

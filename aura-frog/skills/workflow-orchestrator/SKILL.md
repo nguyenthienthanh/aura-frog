@@ -45,11 +45,32 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ---
 
+## Token Budget Per Phase
+
+**CRITICAL:** Stay within budget to avoid context explosion.
+
+```toon
+token_budget[9]{phase,max_tokens,format}:
+  1,500,TOON summary only - NO prose
+  2,1500,Technical design in TOON + minimal prose
+  3,800,Component list in TOON
+  4,600,Test cases in TOON table
+  5a,1000,Test code only - no explanations
+  5b,2000,Implementation code - minimal comments
+  5c,500,Refactor summary in TOON
+  6,800,Review findings in TOON table
+  7-9,300 each,Status only
+```
+
+**Phase 1 HARD CAP: 500 tokens.** Use `/workflow:phase1-lite` format.
+
+---
+
 ## 9-Phase Workflow
 
 | Phase | Name | Lead Agent | Deliverable | Gate |
 |-------|------|------------|-------------|------|
-| 1 | Understand 🎯 | pm-operations-orchestrator | Requirements document | ⚡ Auto |
+| 1 | Understand 🎯 | pm-operations-orchestrator | Requirements (TOON, ≤500 tokens) | ⚡ Auto |
 | 2 | Design 🏗️ | Dev agent | Technical design | ✋ **Approval** |
 | 3 | UI Breakdown 🎨 | ui-designer | Component breakdown | ⚡ Auto |
 | 4 | Plan Tests 🧪 | qa-automation | Test strategy | ⚡ Auto |
@@ -324,35 +345,37 @@ User: "skip phase 3, this is backend only"
 
 ---
 
-## Files to Load
+## Files to Load (ON-DEMAND ONLY)
 
-### Phase Guides
-```
-docs/phases/phase-1-understand.md
-docs/phases/phase-2-design.md
-docs/phases/phase-3-ui.md
-docs/phases/phase-4-test-planning.md
-docs/phases/phase-5-implementation.md
-docs/phases/phase-6-review.md
-docs/phases/phase-7-verification.md
-docs/phases/phase-8-documentation.md
-docs/phases/phase-9-notification.md
+**TOKEN OPTIMIZATION:** Do NOT pre-load all files. Load only when entering that phase.
+
+### Phase Guides (Load ONE at a time)
+```toon
+phase_files[9]{phase,file,load_when}:
+  1,docs/phases/phase-1-understand.md,Entering Phase 1
+  2,docs/phases/phase-2-design.md,Entering Phase 2
+  3,docs/phases/phase-3-ui.md,Entering Phase 3 (skip if no UI)
+  4,docs/phases/phase-4-test-planning.md,Entering Phase 4
+  5,docs/phases/phase-5-implementation.md,Entering Phase 5a/5b/5c
+  6,docs/phases/phase-6-review.md,Entering Phase 6
+  7,docs/phases/phase-7-verification.md,Entering Phase 7
+  8,docs/phases/phase-8-documentation.md,Entering Phase 8
+  9,docs/phases/phase-9-notification.md,Entering Phase 9
 ```
 
-### Project Context
+### Project Context (Load ONCE at workflow start)
 ```
 .claude/project-contexts/[project]/project-config.yaml
-.claude/project-contexts/[project]/conventions.md
-.claude/project-contexts/[project]/rules.md
 ```
+**Skip:** conventions.md and rules.md unless explicitly needed.
 
-### Rules
-```
-rules/tdd-workflow.md
-rules/kiss-principle.md
-rules/code-quality.md
-rules/feedback-brainstorming.md
-rules/workflow-navigation.md
+### Rules (Load only if referenced)
+```toon
+rules[4]{rule,load_when}:
+  tdd-workflow.md,Phase 5 only
+  kiss-principle.md,Never (principle is inline above)
+  feedback-brainstorming.md,Only on reject/modify response
+  workflow-navigation.md,Only if navigation unclear
 ```
 
 ---

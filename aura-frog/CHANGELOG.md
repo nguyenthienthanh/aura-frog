@@ -4,13 +4,30 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [1.17.0] - 2026-01-21
+## [1.17.0] - 2026-01-22
 
 ### Context Optimization & Agent Consolidation
 
 Major refactoring for cost savings, better quality, and improved reasoning based on community best practices research.
 
+#### Token Optimization Patches (NEW)
+
+Critical patches to reduce token usage from ~200k to ~40k per workflow:
+
+| Patch | Change | Impact |
+|-------|--------|--------|
+| 1. Agent Detector | `allowed-tools: NONE` (was Read, Grep, Glob) | -10-30k tokens/message |
+| 2. Project Context Loader | `autoInvoke: false` (was true) | -15-25k tokens/session |
+| 3. Phase 1 Token Cap | 500 token hard cap with TOON format | -5-15k tokens |
+| 4. Workflow Orchestrator | Load files on-demand, not all 9+ upfront | -20-40k tokens |
+| 5. Token Budget in CLAUDE.md | Phase-by-phase budget enforcement | Governance |
+| 6. Phase 1 LITE skill | Ultra-compact requirements template | -10-20k tokens |
+
+**Expected Result:** Workflow completion in ~40k tokens (was ~200k).
+
 #### Added
+- **phase1-lite skill** - Ultra-compact Phase 1 output (500 token cap, TOON only)
+- **Token Budget section** in CLAUDE.md - Phase-by-phase token limits
 - **model-router skill** - Auto-select Haiku/Sonnet/Opus based on task complexity (30-50% cost savings on trivial tasks)
 - **framework-expert skill** - Lazy-load framework patterns on demand (~80% token reduction)
 - **seo-bundle skill** - Consolidated SEO/GEO skills with lazy loading
@@ -41,8 +58,8 @@ Major refactoring for cost savings, better quality, and improved reasoning based
 #### Stats
 - **Agents:** 11 (was 15) - 4 consolidated
 - **Auto-invoke Skills:** 13 (was 28) - 15 moved to reference/bundles
-- **Reference Skills:** 32 - framework experts, SEO experts, design, learning
-- **Total Skills:** 45 (was 48)
+- **Reference Skills:** 33 - framework experts, SEO experts, design, learning, workflow (+phase1-lite)
+- **Total Skills:** 46 (was 48)
 - **Rules:** 50 (was 49) - +1 context-management
 - **Bundled Commands:** 6 entry points (replaces 41 individual commands)
 

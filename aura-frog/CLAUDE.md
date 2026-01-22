@@ -144,7 +144,7 @@ resources[12]{name,location}:
   Agents (11),agents/
   Commands (88),commands/
   Rules (50),rules/
-  Skills (20 auto-invoke + 32 reference),skills/
+  Skills (13 auto-invoke + 33 reference),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Refactor Analysis,docs/REFACTOR_ANALYSIS.md
@@ -168,6 +168,30 @@ context_rules[4]{rule,action}:
 ```
 
 **Details:** `rules/context-management.md`
+
+---
+
+## Token Budget (CRITICAL)
+
+**Target:** Phase 1-9 complete workflow ≤ 40k tokens (down from ~200k).
+
+```toon
+token_budget[5]{phase_group,budget,notes}:
+  Phase 1 (Understand),500 tokens MAX,TOON format only - NO prose
+  Phase 2-4 (Design/UI/Test Plan),3000 tokens total,TOON tables + minimal prose
+  Phase 5a-5c (TDD),4000 tokens total,Code only - minimal comments
+  Phase 6-7 (Review/Verify),1500 tokens total,Findings in TOON tables
+  Phase 8-9 (Doc/Notify),800 tokens total,Summary only
+```
+
+**Enforcement Rules:**
+1. **Agent Detector:** NO file scanning tools (patterns only)
+2. **Project Context:** Load explicitly, not auto-invoke
+3. **Phase Guides:** Load ONE at a time, not all 9 upfront
+4. **Output Format:** TOON for all phase deliverables
+5. **No Re-summarization:** Don't repeat previous phase outputs
+
+**If over budget:** Compress with TOON, don't expand with prose.
 
 ---
 
