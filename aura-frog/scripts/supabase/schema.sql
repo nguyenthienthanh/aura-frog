@@ -1,5 +1,5 @@
 -- Aura Frog Learning System - Supabase Schema
--- Version: 1.9.0
+-- Version: 1.17.0
 -- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
 
 -- ============================================================================
@@ -68,6 +68,20 @@ CREATE TABLE IF NOT EXISTS af_agent_performance (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Workflow events (approve/reject/modify/cancel tracking)
+CREATE TABLE IF NOT EXISTS af_workflow_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workflow_id TEXT NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('APPROVED', 'REJECTED', 'MODIFIED', 'CANCELLED', 'PHASE_START', 'WORKFLOW_COMPLETE')),
+  phase INT NOT NULL CHECK (phase >= 1 AND phase <= 9),
+  reason TEXT,
+  attempt_count INT DEFAULT 1,
+  project_name TEXT,
+  session_id TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Learned patterns (AI-generated insights)
 CREATE TABLE IF NOT EXISTS af_learned_patterns (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -123,6 +137,11 @@ CREATE INDEX IF NOT EXISTS idx_agent_name ON af_agent_performance(agent_name);
 CREATE INDEX IF NOT EXISTS idx_agent_task ON af_agent_performance(task_type);
 CREATE INDEX IF NOT EXISTS idx_agent_success ON af_agent_performance(success);
 CREATE INDEX IF NOT EXISTS idx_agent_created ON af_agent_performance(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_workflow_events_workflow ON af_workflow_events(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_events_type ON af_workflow_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_workflow_events_phase ON af_workflow_events(phase);
+CREATE INDEX IF NOT EXISTS idx_workflow_events_created ON af_workflow_events(created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_pattern_type ON af_learned_patterns(pattern_type);
 CREATE INDEX IF NOT EXISTS idx_pattern_active ON af_learned_patterns(active);
@@ -221,6 +240,37 @@ FROM af_feedback
 WHERE created_at > NOW() - INTERVAL '90 days'
 GROUP BY feedback_type
 ORDER BY total_count DESC;
+
+-- Workflow events summary (rejections/modifications per phase)
+CREATE OR REPLACE VIEW v_workflow_events_summary AS
+SELECT
+  phase,
+  event_type,
+  COUNT(*) as total_count,
+  COUNT(DISTINCT workflow_id) as unique_workflows,
+  AVG(attempt_count) as avg_attempts,
+  MAX(created_at) as last_event
+FROM af_workflow_events
+WHERE created_at > NOW() - INTERVAL '90 days'
+GROUP BY phase, event_type
+ORDER BY phase, total_count DESC;
+
+-- Phase rejection rates
+CREATE OR REPLACE VIEW v_phase_rejection_rates AS
+SELECT
+  phase,
+  COUNT(*) FILTER (WHERE event_type = 'APPROVED') as approved_count,
+  COUNT(*) FILTER (WHERE event_type = 'REJECTED') as rejected_count,
+  COUNT(*) FILTER (WHERE event_type = 'MODIFIED') as modified_count,
+  ROUND(
+    (100.0 * COUNT(*) FILTER (WHERE event_type = 'REJECTED') /
+    NULLIF(COUNT(*) FILTER (WHERE event_type IN ('APPROVED', 'REJECTED')), 0))::numeric, 2
+  ) as rejection_rate,
+  ROUND(AVG(attempt_count) FILTER (WHERE event_type = 'REJECTED')::numeric, 2) as avg_rejection_attempts
+FROM af_workflow_events
+WHERE created_at > NOW() - INTERVAL '90 days'
+GROUP BY phase
+ORDER BY phase;
 
 -- ============================================================================
 -- FUNCTIONS
@@ -333,6 +383,7 @@ $$ LANGUAGE plpgsql;
 ALTER TABLE af_feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE af_workflow_metrics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE af_agent_performance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE af_workflow_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE af_learned_patterns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE af_knowledge_base ENABLE ROW LEVEL SECURITY;
 
@@ -347,6 +398,9 @@ CREATE POLICY "Service role full access on af_agent_performance" ON af_agent_per
   FOR ALL USING (TRUE) WITH CHECK (TRUE);
 
 CREATE POLICY "Service role full access on af_learned_patterns" ON af_learned_patterns
+  FOR ALL USING (TRUE) WITH CHECK (TRUE);
+
+CREATE POLICY "Service role full access on af_workflow_events" ON af_workflow_events
   FOR ALL USING (TRUE) WITH CHECK (TRUE);
 
 CREATE POLICY "Service role full access on af_knowledge_base" ON af_knowledge_base

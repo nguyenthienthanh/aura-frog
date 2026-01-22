@@ -26,6 +26,7 @@ const LEARNING_DIR = path.join(process.cwd(), '.claude', 'learning');
 const LOCAL_FEEDBACK_FILE = path.join(LEARNING_DIR, 'feedback.json');
 const LOCAL_PATTERNS_FILE = path.join(LEARNING_DIR, 'patterns.json');
 const LOCAL_METRICS_FILE = path.join(LEARNING_DIR, 'metrics.json');
+const LOCAL_WORKFLOW_EVENTS_FILE = path.join(LEARNING_DIR, 'workflow-events.json');
 const LEARNED_RULES_MD = path.join(LEARNING_DIR, 'learned-rules.md');
 const MAIN_INSTRUCTION_LINK = path.join(process.cwd(), '.claude', 'LEARNED_PATTERNS.md');
 
@@ -403,6 +404,115 @@ async function recordAgentPerformance(performance) {
 }
 
 /**
+ * Record workflow event (approve/reject/modify/cancel) to Supabase and local storage
+ * @param {object} event
+ * @param {string} event.workflowId - Workflow identifier
+ * @param {string} event.eventType - 'APPROVED' | 'REJECTED' | 'MODIFIED' | 'CANCELLED' | 'PHASE_START' | 'WORKFLOW_COMPLETE'
+ * @param {number} event.phase - Phase number (1-9)
+ * @param {string} [event.reason] - Reason for rejection/modification
+ * @param {number} [event.attemptCount] - Rejection/modification count for this phase
+ * @param {object} [event.metadata] - Additional metadata
+ * @returns {Promise<object|null>}
+ */
+async function recordWorkflowEvent(event) {
+  if (!isLearningEnabled()) {
+    return null;
+  }
+
+  const eventData = {
+    workflow_id: event.workflowId,
+    event_type: event.eventType,
+    phase: event.phase,
+    reason: event.reason,
+    attempt_count: event.attemptCount || 1,
+    project_name: event.projectName || process.env.PROJECT_NAME,
+    session_id: event.sessionId || process.env.AF_SESSION_ID,
+    metadata: event.metadata || {},
+    created_at: new Date().toISOString()
+  };
+
+  // Always save to local storage
+  try {
+    const allEvents = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
+    allEvents.push(eventData);
+    // Keep only last 1000 events
+    const trimmed = allEvents.slice(-1000);
+    saveLocalFile(LOCAL_WORKFLOW_EVENTS_FILE, trimmed);
+  } catch (error) {
+    console.error(`Learning: Failed to record local workflow event: ${error.message}`);
+  }
+
+  // Also save to Supabase if configured
+  if (!isLocalMode()) {
+    try {
+      await supabaseRequest('af_workflow_events', 'POST', eventData);
+    } catch (error) {
+      console.error(`Learning: Failed to record Supabase workflow event: ${error.message}`);
+    }
+  }
+
+  // If rejection or modification, also record as feedback for learning
+  if (event.eventType === 'REJECTED' || event.eventType === 'MODIFIED') {
+    await recordFeedback({
+      type: event.eventType.toLowerCase(),
+      workflowId: event.workflowId,
+      phase: event.phase.toString(),
+      reason: event.reason,
+      metadata: {
+        event_type: event.eventType,
+        attempt_count: event.attemptCount,
+        ...event.metadata
+      }
+    });
+  }
+
+  return eventData;
+}
+
+/**
+ * Get workflow events for a specific workflow
+ * @param {string} workflowId
+ * @returns {Array}
+ */
+function getWorkflowEvents(workflowId) {
+  const allEvents = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
+  return allEvents.filter(e => e.workflow_id === workflowId);
+}
+
+/**
+ * Get workflow event statistics
+ * @param {string} [workflowId] - Optional filter by workflow
+ * @returns {object}
+ */
+function getWorkflowEventStats(workflowId = null) {
+  let events = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
+
+  if (workflowId) {
+    events = events.filter(e => e.workflow_id === workflowId);
+  }
+
+  const stats = {
+    total: events.length,
+    byType: {},
+    byPhase: {},
+    recentEvents: events.slice(-10)
+  };
+
+  events.forEach(e => {
+    stats.byType[e.event_type] = (stats.byType[e.event_type] || 0) + 1;
+    const phaseKey = `phase_${e.phase}`;
+    if (!stats.byPhase[phaseKey]) {
+      stats.byPhase[phaseKey] = { approved: 0, rejected: 0, modified: 0 };
+    }
+    if (e.event_type === 'APPROVED') stats.byPhase[phaseKey].approved++;
+    if (e.event_type === 'REJECTED') stats.byPhase[phaseKey].rejected++;
+    if (e.event_type === 'MODIFIED') stats.byPhase[phaseKey].modified++;
+  });
+
+  return stats;
+}
+
+/**
  * Update or create a learned pattern (to Supabase or local storage)
  * @param {object} pattern
  * @returns {Promise<object|null>}
@@ -630,6 +740,9 @@ module.exports = {
   recordFeedback,
   recordWorkflowMetrics,
   recordAgentPerformance,
+  recordWorkflowEvent,
+  getWorkflowEvents,
+  getWorkflowEventStats,
   recordPattern,
   getAgentSuccessRates,
   getImprovementSuggestions,
@@ -639,5 +752,6 @@ module.exports = {
   updateLearnedRulesMD,
   LEARNING_DIR,
   LEARNED_RULES_MD,
-  MAIN_INSTRUCTION_LINK
+  MAIN_INSTRUCTION_LINK,
+  LOCAL_WORKFLOW_EVENTS_FILE
 };

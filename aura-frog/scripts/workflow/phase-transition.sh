@@ -8,6 +8,78 @@ set -euo pipefail
 
 CLAUDE_DIR="."
 WORKFLOW_STATE_FILE="${CLAUDE_DIR}/workflow-state.json"
+LOGS_DIR="${CLAUDE_DIR}/logs/workflows"
+ACTIVE_WORKFLOW_FILE="${CLAUDE_DIR}/active-workflow.txt"
+
+# Get active workflow ID
+get_active_workflow_id() {
+    if [[ -f "${ACTIVE_WORKFLOW_FILE}" ]]; then
+        cat "${ACTIVE_WORKFLOW_FILE}"
+    else
+        echo ""
+    fi
+}
+
+# Get execution log path
+get_execution_log() {
+    local workflow_id=$(get_active_workflow_id)
+    if [[ -n "$workflow_id" ]]; then
+        echo "${LOGS_DIR}/${workflow_id}/execution.log"
+    else
+        echo ""
+    fi
+}
+
+# Log workflow event (append to execution.log + sync to Supabase)
+log_workflow_event() {
+    local event_type="$1"
+    local phase="$2"
+    local details="${3:-}"
+    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    local log_file=$(get_execution_log)
+    local workflow_id=$(get_active_workflow_id)
+
+    # Append to local execution.log
+    if [[ -n "$log_file" && -d "$(dirname "$log_file")" ]]; then
+        echo "[${timestamp}] ${event_type} phase=${phase} ${details}" >> "$log_file"
+    fi
+
+    # Sync to learning system (local + Supabase if configured)
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local record_script="${script_dir}/../../hooks/lib/record-workflow-event.cjs"
+
+    if [[ -f "$record_script" ]]; then
+        # Extract attempt count from details if present
+        local attempt_count=$(echo "$details" | grep -oE 'attempt=[0-9]+' | cut -d= -f2 || echo "1")
+        local revision=$(echo "$details" | grep -oE 'revision=[0-9]+' | cut -d= -f2 || echo "")
+        [[ -n "$revision" ]] && attempt_count="$revision"
+
+        # Call Node.js script (non-blocking)
+        node "$record_script" "$event_type" "$phase" "$workflow_id" "" "$attempt_count" 2>/dev/null &
+    fi
+}
+
+# Increment phase counter (rejection_count or modification_count)
+increment_phase_counter() {
+    local phase="$1"
+    local counter_name="$2"  # rejection_count or modification_count
+    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+    # Get current count (default 0)
+    local current_count=$(jq -r ".phases[\"$phase\"].${counter_name} // 0" "${WORKFLOW_STATE_FILE}" 2>/dev/null || echo "0")
+    local new_count=$((current_count + 1))
+
+    # Update state with new count
+    jq --arg phase "$phase" \
+       --arg counter "$counter_name" \
+       --argjson count "$new_count" \
+       --arg timestamp "$timestamp" \
+       ".phases[\$phase][\$counter] = \$count |
+        .phases[\$phase].last_updated = \$timestamp" \
+       "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+
+    echo "$new_count"
+}
 
 # Colors
 RED='\033[0;31m'
@@ -277,14 +349,16 @@ process_approval() {
             echo ""
             echo -e "${GREEN}✅ Phase $phase approved${NC}"
             update_phase_status "$phase" "approved"
-            
+            log_workflow_event "APPROVED" "$phase" "status=approved"
+
             # Move to next phase
             if [[ $phase -lt 9 ]]; then
                 local next_phase=$((phase + 1))
                 jq --argjson next_phase "$next_phase" \
                    '.current_phase = $next_phase' \
                    "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
-                
+
+                log_workflow_event "PHASE_START" "$next_phase" "status=in_progress"
                 echo -e "${BLUE}⏭️  Proceeding to Phase $next_phase...${NC}"
                 echo ""
                 return 0
@@ -292,18 +366,23 @@ process_approval() {
                 echo -e "${GREEN}🎉 Workflow complete!${NC}"
                 jq '.status = "completed"' \
                    "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+                log_workflow_event "WORKFLOW_COMPLETE" "9" "status=completed"
                 return 0
             fi
             ;;
         1) # Rejected
             echo ""
-            echo -e "${YELLOW}🔄 Phase $phase rejected - restarting...${NC}"
+            local reject_count=$(increment_phase_counter "$phase" "rejection_count")
+            echo -e "${YELLOW}🔄 Phase $phase rejected (attempt #${reject_count}) - restarting...${NC}"
             update_phase_status "$phase" "rejected"
+            log_workflow_event "REJECTED" "$phase" "status=rejected action=restart attempt=${reject_count}"
             return 1
             ;;
         2) # Modify
             echo ""
-            echo -e "${BLUE}✏️  Modifications requested...${NC}"
+            local modify_count=$(increment_phase_counter "$phase" "modification_count")
+            echo -e "${BLUE}✏️  Modifications requested (revision #${modify_count})...${NC}"
+            log_workflow_event "MODIFIED" "$phase" "status=in_progress action=modify revision=${modify_count}"
             return 2
             ;;
         3) # Cancel
@@ -311,6 +390,7 @@ process_approval() {
             echo -e "${RED}❌ Workflow cancelled${NC}"
             jq '.status = "cancelled"' \
                "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+            log_workflow_event "CANCELLED" "$phase" "status=cancelled"
             return 3
             ;;
     esac

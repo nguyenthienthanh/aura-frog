@@ -137,13 +137,27 @@ for i in {1..9}; do
     if [[ -n "$DURATION" && "$DURATION" != "null" ]]; then
         echo "     Duration: $(format_duration $DURATION)"
     fi
-    
+
     # Show deliverables count
     DELIVERABLES_COUNT=$(jq -r ".phases[\"$i\"].deliverables | length" "${WORKFLOW_STATE_FILE}" 2>/dev/null || echo "0")
     if [[ $DELIVERABLES_COUNT -gt 0 ]]; then
         echo "     Deliverables: ${DELIVERABLES_COUNT} file(s)"
     fi
-    
+
+    # Show rejection/modification counts if any
+    REJECTION_COUNT=$(jq -r ".phases[\"$i\"].rejection_count // 0" "${WORKFLOW_STATE_FILE}" 2>/dev/null || echo "0")
+    MODIFICATION_COUNT=$(jq -r ".phases[\"$i\"].modification_count // 0" "${WORKFLOW_STATE_FILE}" 2>/dev/null || echo "0")
+    if [[ $REJECTION_COUNT -gt 0 || $MODIFICATION_COUNT -gt 0 ]]; then
+        local history_parts=()
+        if [[ $REJECTION_COUNT -gt 0 ]]; then
+            history_parts+=("${REJECTION_COUNT} rejection(s)")
+        fi
+        if [[ $MODIFICATION_COUNT -gt 0 ]]; then
+            history_parts+=("${MODIFICATION_COUNT} revision(s)")
+        fi
+        echo -e "     ${YELLOW}History: ${history_parts[*]}${NC}"
+    fi
+
     echo ""
 done
 

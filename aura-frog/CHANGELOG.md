@@ -55,6 +55,12 @@ Major refactoring for cost savings, better quality, and improved reasoning based
 
 #### Fixed
 - **Workflow ID naming** - Now uses ticket number (JIRA-123) or short term + date (fix-payment-0122) instead of long format with full timestamp
+- **Workflow logging after modify/reject** - Now logs all workflow events (approve/reject/modify) to execution.log with timestamps, tracks rejection and modification counts per phase, and displays history in workflow status. Also syncs to Supabase `af_workflow_events` table when configured.
+
+#### Added (Supabase Schema)
+- **af_workflow_events table** - Tracks all workflow events (approve/reject/modify/cancel) with phase, attempt count, and reason
+- **v_workflow_events_summary view** - Summarizes events per phase
+- **v_phase_rejection_rates view** - Shows rejection/modification rates per phase
 
 ---
 

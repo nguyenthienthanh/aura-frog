@@ -310,7 +310,7 @@ EXAMPLES:
     bash $0 list
 
     # Switch workflow
-    bash $0 switch add-auth-20251124-120000
+    bash $0 switch AUTH-456
 
     # Save a deliverable
     bash $0 save 1 requirements.md "# Requirements\n- Feature 1"
@@ -330,7 +330,7 @@ EXAMPLES:
     bash $0 mcp-get jira PROJ-123
 
     # Archive completed workflow
-    bash $0 archive add-auth-20251124-120000
+    bash $0 archive AUTH-456
 
 LOCATION:
     Workflows: logs/workflows/
