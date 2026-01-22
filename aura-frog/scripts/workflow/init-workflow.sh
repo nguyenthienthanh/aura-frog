@@ -19,46 +19,89 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Parse meaningful workflow name from user prompt
+# Extract ticket number from task (JIRA-123, PROJ-456, ABC-789, etc.)
+extract_ticket_number() {
+    local task="$1"
+
+    # Match common ticket patterns: JIRA-123, PROJ-456, ABC-789, etc.
+    # Pattern: 2-10 uppercase letters followed by hyphen and 1-6 digits
+    if [[ "$task" =~ ([A-Z]{2,10}-[0-9]{1,6}) ]]; then
+        echo "${BASH_REMATCH[1]}"
+        return 0
+    fi
+
+    # Also match lowercase tickets: jira-123
+    if [[ "$task" =~ ([a-z]{2,10}-[0-9]{1,6}) ]]; then
+        echo "${BASH_REMATCH[1]}" | tr '[:lower:]' '[:upper:]'
+        return 0
+    fi
+
+    return 1
+}
+
+# Parse short meaningful workflow name from user prompt
 parse_workflow_name() {
     local task="$1"
     local name=""
-    
-    # Extract action verb and main subject
-    # Remove special chars, keep spaces initially
-    local cleaned=$(echo "$task" | sed 's/[^a-zA-Z0-9 ]//g')
-    
-    # Common patterns to extract meaningful name
-    if [[ "$cleaned" =~ [Rr]efactor[[:space:]]+([a-zA-Z0-9]+) ]]; then
-        name="refactor-${BASH_REMATCH[1]}"
-    elif [[ "$cleaned" =~ [Aa]dd[[:space:]]+([a-zA-Z0-9 ]+) ]]; then
-        name="add-$(echo "${BASH_REMATCH[1]}" | tr ' ' '-' | cut -c1-30)"
-    elif [[ "$cleaned" =~ [Ff]ix[[:space:]]+([a-zA-Z0-9 ]+) ]]; then
-        name="fix-$(echo "${BASH_REMATCH[1]}" | tr ' ' '-' | cut -c1-30)"
-    elif [[ "$cleaned" =~ [Ii]mplement[[:space:]]+([a-zA-Z0-9 ]+) ]]; then
-        name="implement-$(echo "${BASH_REMATCH[1]}" | tr ' ' '-' | cut -c1-30)"
-    elif [[ "$cleaned" =~ [Cc]reate[[:space:]]+([a-zA-Z0-9 ]+) ]]; then
-        name="create-$(echo "${BASH_REMATCH[1]}" | tr ' ' '-' | cut -c1-30)"
-    elif [[ "$cleaned" =~ [Uu]pdate[[:space:]]+([a-zA-Z0-9 ]+) ]]; then
-        name="update-$(echo "${BASH_REMATCH[1]}" | tr ' ' '-' | cut -c1-30)"
-    else
-        # Fallback: use first 3-4 words
-        name=$(echo "$cleaned" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | cut -c1-40)
+
+    # First try to extract ticket number
+    local ticket=$(extract_ticket_number "$task")
+    if [[ -n "$ticket" ]]; then
+        echo "$ticket"
+        return
     fi
-    
-    # Clean up multiple dashes
-    name=$(echo "$name" | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
-    
+
+    # Extract action verb and main subject (shortened)
+    local cleaned=$(echo "$task" | sed 's/[^a-zA-Z0-9 ]//g')
+
+    # Common patterns - extract just key noun (max 15 chars)
+    if [[ "$cleaned" =~ [Rr]efactor[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="refactor-${BASH_REMATCH[1]:0:15}"
+    elif [[ "$cleaned" =~ [Aa]dd[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="add-${BASH_REMATCH[1]:0:15}"
+    elif [[ "$cleaned" =~ [Ff]ix[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="fix-${BASH_REMATCH[1]:0:15}"
+    elif [[ "$cleaned" =~ [Ii]mplement[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="impl-${BASH_REMATCH[1]:0:15}"
+    elif [[ "$cleaned" =~ [Cc]reate[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="create-${BASH_REMATCH[1]:0:15}"
+    elif [[ "$cleaned" =~ [Uu]pdate[[:space:]]+([a-zA-Z0-9]+) ]]; then
+        name="update-${BASH_REMATCH[1]:0:15}"
+    else
+        # Fallback: first 2 words, max 20 chars
+        name=$(echo "$cleaned" | awk '{print $1"-"$2}' | tr '[:upper:]' '[:lower:]' | cut -c1-20)
+    fi
+
+    # Clean up and lowercase
+    name=$(echo "$name" | tr '[:upper:]' '[:lower:]' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
+
     echo "$name"
 }
 
-# Generate unique workflow ID with meaningful name
+# Generate unique workflow ID - prioritizes ticket number, otherwise short name + counter
 generate_workflow_id() {
     local task="$1"
     local workflow_name=$(parse_workflow_name "$task")
-    local timestamp=$(date +%Y%m%d-%H%M%S)
-    
-    echo "${workflow_name}-${timestamp}"
+
+    # If it's a ticket number, use as-is (already unique)
+    if [[ "$workflow_name" =~ ^[A-Z]{2,10}-[0-9]+$ ]]; then
+        echo "$workflow_name"
+        return
+    fi
+
+    # Otherwise add short date suffix (MMDD) to ensure uniqueness
+    local date_suffix=$(date +%m%d)
+
+    # Check if workflow with this name already exists today, add counter if needed
+    local counter=1
+    local candidate="${workflow_name}-${date_suffix}"
+
+    while [[ -d "${WORKFLOWS_DIR}/${candidate}" ]]; do
+        counter=$((counter + 1))
+        candidate="${workflow_name}-${date_suffix}-${counter}"
+    done
+
+    echo "$candidate"
 }
 
 # Parse phase name from phase number and task

@@ -67,7 +67,7 @@ Auto-prompt:
 **State Content:**
 ```json
 {
-  "workflow_id": "feature-auth-20251129-143022",
+  "workflow_id": "AUTH-123",
   "version": "1.0.0",
   "created_at": "2025-11-29T14:30:22Z",
   "updated_at": "2025-11-29T16:45:30Z",
@@ -144,7 +144,7 @@ Auto-prompt:
 🔄 WORKFLOW HANDOFF COMPLETE
 ═══════════════════════════════════════════════════════════
 
-📋 **Workflow ID:** feature-auth-20251129-143022
+📋 **Workflow ID:** AUTH-123
 
 📊 **Progress:**
 - ✅ Phase 1: Requirements Analysis - Approved
@@ -154,7 +154,7 @@ Auto-prompt:
 - 🔄 Phase 5a: Write Tests - In Progress
 
 📁 **State Saved:**
-`.claude/logs/workflows/feature-auth-20251129-143022/workflow-state.json`
+`.claude/logs/workflows/AUTH-123/workflow-state.json`
 
 📦 **Deliverables Created:**
 - requirements.md
@@ -170,11 +170,11 @@ Auto-prompt:
 ───────────────────────────────────────────────────────────
 📥 **TO RESUME IN NEW SESSION:**
 
-Type: `workflow:resume feature-auth-20251129-143022`
+Type: `workflow:resume AUTH-123`
 
 Or copy this command:
 ```
-workflow:resume feature-auth-20251129-143022
+workflow:resume AUTH-123
 ```
 ═══════════════════════════════════════════════════════════
 ```
@@ -186,11 +186,11 @@ workflow:resume feature-auth-20251129-143022
 ### Step 1: Parse Resume Command
 
 ```yaml
-Input: "workflow:resume feature-auth-20251129-143022"
-       "resume feature-auth-20251129-143022"
-       "continue workflow feature-auth-20251129-143022"
+Input: "workflow:resume AUTH-123"
+       "resume AUTH-123"
+       "continue workflow AUTH-123"
 
-Extract: workflow_id = "feature-auth-20251129-143022"
+Extract: workflow_id = "AUTH-123"
 ```
 
 ### Step 2: Load Workflow State
@@ -223,7 +223,7 @@ Actions:
 🔄 WORKFLOW RESUMED
 ═══════════════════════════════════════════════════════════
 
-📋 **Workflow:** feature-auth-20251129-143022
+📋 **Workflow:** AUTH-123
 📝 **Task:** Implement user authentication with JWT
 
 📊 **Restored State:**
@@ -289,9 +289,9 @@ On "continue":
 
 | ID | Task | Phase | Status | Last Updated |
 |----|------|-------|--------|--------------|
-| feature-auth-20251129 | JWT Auth | 5a | paused | 2h ago |
-| bugfix-login-20251128 | Login fix | 7 | waiting | 1d ago |
-| refactor-api-20251127 | API refactor | complete | done | 3d ago |
+| AUTH-123 | JWT Auth | 5a | paused | 2h ago |
+| fix-login-0128 | Login fix | 7 | waiting | 1d ago |
+| REFACTOR-789 | API refactor | complete | done | 3d ago |
 
 To resume: `workflow:resume <id>`
 ```
@@ -327,12 +327,12 @@ Behavior:
 
 ```
 .claude/logs/workflows/
-├── feature-auth-20251129-143022/
+├── AUTH-123/
 │   ├── workflow-state.json      # Current state
 │   ├── requirements.md          # Phase 1 deliverable
 │   ├── tech-spec.md            # Phase 2 deliverable
 │   └── test-plan.md            # Phase 4 deliverable
-├── bugfix-login-20251128-091500/
+├── fix-login-0128/
 │   └── ...
 └── README.md                    # Index of workflows
 ```
@@ -357,7 +357,7 @@ Manual cleanup:
 ### State File Not Found
 
 ```markdown
-❌ Workflow not found: feature-auth-20251129-143022
+❌ Workflow not found: AUTH-123
 
 Possible reasons:
 - Workflow ID is incorrect
@@ -419,7 +419,7 @@ Continue? (yes/no)
 ```toon
 # .claude/workflow-state.toon
 workflow:
-  id: auth-feature-20251216
+  id: AUTH-1234
   phase: 5
   status: in_progress
 

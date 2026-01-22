@@ -1,8 +1,27 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.16.0
+**System:** Aura Frog v1.17.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
+
+---
+
+## New in 1.17.0 - Context Optimization
+
+**Cost Reduction:**
+- `model-router` - Auto-select Haiku/Sonnet/Opus (30-50% savings on trivial tasks)
+- `framework-expert` - Lazy-load framework patterns (~80% token reduction)
+- `seo-bundle` - Consolidated SEO/GEO skills
+- `testing-patterns` - Unified testing patterns
+
+**Consolidated Agents (15 → 11):**
+- `project-manager` ← project-detector + project-config-loader + project-context-manager
+- `architect` ← backend-expert + database-specialist
+- `ui-expert` ← web-expert + ui-designer
+
+**Bundled Commands:** `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo`
+
+**Docs:** `docs/REFACTOR_ANALYSIS.md`
 
 ---
 
@@ -13,7 +32,7 @@ session_start[6]{step,action,file}:
   1,Check & load .envrc (AUTO-RUN if not loaded),rules/env-loading.md
   2,Load memory from Supabase (auto via hook),hooks/lib/af-memory-loader.cjs
   3,Show agent banner,rules/agent-identification-banner.md
-  4,Detect agent,skills/agent-detector/SKILL.md
+  4,Detect agent + model,skills/agent-detector/SKILL.md
   5,Load project context,skills/project-context-loader/SKILL.md
   6,Verify MCP servers,commands/mcp/status.md
 ```
@@ -26,14 +45,12 @@ session_start[6]{step,action,file}:
 🧠 Learning: enabled ✓ | Memory: 15 items loaded
 ```
 
-**Memory Auto-Load:** Session hook queries Supabase for learned patterns, caches to `.claude/cache/memory-context.md`. Read this file to apply learned insights.
-
 ---
 
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.16.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.17.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -55,15 +72,7 @@ mcp_servers[6]{name,package,purpose,requires}:
   slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN
 ```
 
-**Auto-invocation:** Claude uses these automatically based on context:
-- "Build with MUI" → context7 fetches docs
-- "Run tests" → vitest executes
-- "Query Firestore" → firebase manages data
-- "Get Figma design" → figma fetches design (if token set)
-
-**Atlassian (Jira/Confluence):** Use bash scripts instead (simpler):
-- `./scripts/jira-fetch.sh PROJ-123`
-- `./scripts/confluence-fetch.sh 123456789`
+**Auto-invocation:** Claude uses these automatically based on context.
 
 **Configuration:** `.mcp.json` | **Guide:** `docs/MCP_GUIDE.md`
 
@@ -72,41 +81,29 @@ mcp_servers[6]{name,package,purpose,requires}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[33]{name,trigger,file}:
-  agent-detector,Every message,skills/agent-detector/SKILL.md
+skills[13]{name,trigger,file}:
+  agent-detector,Every message (includes lazy-agent-loader),skills/agent-detector/SKILL.md
+  model-router,After agent detection,skills/model-router/SKILL.md
   project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
-  visual-pixel-perfect,Visual test/pixel perfect,skills/visual-pixel-perfect/SKILL.md
-  design-system-library,UI/design system,skills/design-system-library/SKILL.md
-  stitch-design,AI design/Stitch,skills/stitch-design/SKILL.md
-  workflow-orchestrator,Complex feature,skills/workflow-orchestrator/SKILL.md
-  workflow-fasttrack,Pre-approved specs,skills/workflow-fasttrack/SKILL.md
+  framework-expert,Framework task (lazy-loads specific patterns),skills/framework-expert/SKILL.md
+  seo-bundle,SEO/GEO task,skills/seo-bundle/SKILL.md
+  testing-patterns,Test task,skills/testing-patterns/SKILL.md
+  workflow-orchestrator,Complex feature (includes fasttrack mode),skills/workflow-orchestrator/SKILL.md
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
   code-reviewer,Code review,skills/code-reviewer/SKILL.md
   code-simplifier,Simplify/KISS/complexity,skills/code-simplifier/SKILL.md
   session-continuation,Token limit/handoff,skills/session-continuation/SKILL.md
-  lazy-agent-loader,Agent loading,skills/lazy-agent-loader/SKILL.md
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
-  learning-analyzer,/learn:analyze,skills/learning-analyzer/SKILL.md
-  self-improve,/learn:apply,skills/self-improve/SKILL.md
-  typescript-expert,TypeScript/ESLint,skills/typescript-expert/SKILL.md
-  react-expert,React/hooks,skills/react-expert/SKILL.md
-  react-native-expert,React Native/mobile,skills/react-native-expert/SKILL.md
-  vue-expert,Vue/Composition API,skills/vue-expert/SKILL.md
-  nextjs-expert,Next.js/App Router,skills/nextjs-expert/SKILL.md
-  nodejs-expert,Node.js/Express/NestJS,skills/nodejs-expert/SKILL.md
-  python-expert,Python/Django/FastAPI,skills/python-expert/SKILL.md
-  laravel-expert,Laravel/PHP,skills/laravel-expert/SKILL.md
-  go-expert,Go/Gin/Echo,skills/go-expert/SKILL.md
-  flutter-expert,Flutter/Dart,skills/flutter-expert/SKILL.md
-  angular-expert,Angular/NgRx,skills/angular-expert/SKILL.md
-  godot-expert,Godot/GDScript/game,skills/godot-expert/SKILL.md
-  seo-expert,SEO/meta tags/schema,skills/seo-expert/SKILL.md
-  ai-discovery-expert,Perplexity/ChatGPT/AI crawlers,skills/ai-discovery-expert/SKILL.md
-  seo-check,/seo:check command,skills/seo-check/SKILL.md
-  seo-schema,/seo:schema command,skills/seo-schema/SKILL.md
-  seo-geo,/seo:geo command,skills/seo-geo/SKILL.md
 ```
+
+**Reference Skills (32 - loaded on-demand by bundles or commands):**
+- Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (11)
+- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
+- Design: design-system-library, stitch-design, visual-pixel-perfect (3)
+- Learning: learning-analyzer, self-improve (2)
+- Workflow: workflow-fasttrack, lazy-agent-loader (2)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, etc. (9)
 
 **All skills:** `skills/README.md`
 
@@ -118,22 +115,39 @@ skills[33]{name,trigger,file}:
 
 **NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests
 
-**2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue (execute → show → continue).
+**2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue.
 
 **Details:** `rules/execution-rules.md`
+
+---
+
+## Bundled Commands
+
+```toon
+bundled_commands[6]{command,subcommands,replaces}:
+  /workflow,"start/status/phase/next/approve/handoff/resume",22 workflow commands
+  /test,"unit/e2e/coverage/watch/docs",4 test commands
+  /project,"status/refresh/init/switch/list/config",6 project commands
+  /quality,"lint/complexity/review/fix",3 quality commands
+  /bugfix,"quick/full/hotfix",3 bugfix commands
+  /seo,"check/schema/geo",3 seo commands
+```
+
+**Usage:** `/workflow` shows menu, `/workflow start "task"` uses direct subcommand.
 
 ---
 
 ## Resources
 
 ```toon
-resources[11]{name,location}:
-  Agents (15),agents/
-  Commands (82),commands/
-  Rules (49),rules/
-  Skills (48),skills/
+resources[12]{name,location}:
+  Agents (11),agents/
+  Commands (88),commands/
+  Rules (50),rules/
+  Skills (20 auto-invoke + 32 reference),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
+  Refactor Analysis,docs/REFACTOR_ANALYSIS.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/
   Design Systems,skills/design-system-library/
@@ -143,7 +157,21 @@ resources[11]{name,location}:
 
 ---
 
-## Learning System (NEW)
+## Context Management
+
+```toon
+context_rules[4]{rule,action}:
+  Trivial tasks,Use Haiku (typo fix/rename/format)
+  Standard tasks,Use Sonnet (bug fix/feature/refactor)
+  Architecture tasks,Use Opus (system design/security audit)
+  High context (>70%),Use /compact with focus instructions
+```
+
+**Details:** `rules/context-management.md`
+
+---
+
+## Learning System
 
 Self-improvement through feedback collection and pattern analysis.
 
@@ -154,9 +182,8 @@ Self-improvement through feedback collection and pattern analysis.
 /learn:apply        # Apply learned improvements
 ```
 
-**Requirements:** Supabase (free tier works)
 **Setup:** `docs/LEARNING_SYSTEM.md`
 
 ---
 
-**Version:** 1.16.0
+**Version:** 1.17.0

@@ -36,13 +36,13 @@ Advanced intelligent agent selection system using multi-layer analysis of natura
 
 | Category | Example Patterns | Activates | Score |
 |----------|------------------|-----------|-------|
-| Frontend | html template, blade, twig, email template, pdf styling, css | web-expert, ui-designer | +50-60 |
-| Backend | api endpoint, controller, middleware, queue job, webhook | backend-* agents | +50-55 |
-| Database | migration, schema, query optimization, slow query, n+1 | database-specialist | +55-60 |
+| Frontend | html template, blade, twig, email template, pdf styling, css | ui-expert | +50-60 |
+| Backend | api endpoint, controller, middleware, queue job, webhook | architect (+ framework skill) | +50-55 |
+| Database | migration, schema, query optimization, slow query, n+1 | architect | +55-60 |
 | Security | xss, sql injection, csrf, vulnerability, auth bypass | security-expert | +55-60 |
 | DevOps | docker, kubernetes, ci-cd, terraform, deployment | devops-cicd | +50-55 |
 | Testing | unit test, e2e test, coverage, mock, fixture | qa-automation | +45-55 |
-| Design | figma, wireframe, design system, accessibility | ui-designer | +50-60 |
+| Design | figma, wireframe, design system, accessibility | ui-expert | +50-60 |
 
 ### Frontend Task Patterns (Detailed)
 
@@ -78,13 +78,13 @@ backend_tasks[12]{pattern,score,description}:
 
 ```
 Backend Repo + Frontend Task:
-  "Fix email template styling" → web-expert PRIMARY, backend SECONDARY
+  "Fix email template styling" → ui-expert PRIMARY, architect SECONDARY
 
 Frontend Repo + Backend Task:
-  "Add rate limiting to API" → backend PRIMARY, frontend SECONDARY
+  "Add rate limiting to API" → architect PRIMARY, ui-expert SECONDARY
 
 Any Repo + Database Task:
-  "Optimize slow query" → database-specialist PRIMARY, dev agent SECONDARY
+  "Optimize slow query" → architect PRIMARY, dev agent SECONDARY
 
 Any Repo + Security Task:
   "Fix XSS vulnerability" → security-expert PRIMARY, dev agent SECONDARY
@@ -171,11 +171,11 @@ Any Repo + Security Task:
 
 | Agent | Keywords | Files/Patterns |
 |-------|----------|----------------|
-| database-specialist | `database`, `schema`, `migration`, `SQL`, `postgres` | `migrations/`, `schema.sql` |
+| architect | `database`, `schema`, `migration`, `SQL`, `postgres`, `architecture` | `migrations/`, `schema.sql` |
 | security-expert | `security`, `vulnerability`, `OWASP`, `XSS`, `pentest` | - |
 | devops-cicd | `docker`, `kubernetes`, `terraform`, `pipeline` | `Dockerfile`, `.github/workflows/` |
 | qa-automation | `test`, `testing`, `coverage`, `jest`, `pytest` | `*.test.ts`, `__tests__/` |
-| ui-designer | `design`, `UI`, `UX`, `figma`, `wireframe` | `design/`, Figma URLs |
+| ui-expert | `design`, `UI`, `UX`, `figma`, `wireframe`, `frontend` | `design/`, Figma URLs |
 
 ---
 
@@ -209,7 +209,24 @@ Any Repo + Security Task:
 
 ## Context Analysis
 
-### Project Detection Logic
+### Project Detection (Use First!)
+
+**IMPORTANT:** Always check stored detection before scanning.
+
+```
+0. Check detection first (FAST PATH):
+   .claude/project-contexts/[project-name]/project-detection.json
+
+   If valid (< 24h, config files unchanged):
+   → Use stored: framework, agents, testInfra, filePatterns
+   → Skip steps 1-3 below
+
+   Commands:
+   - /project:status  → Show project detection
+   - /project:refresh → Force re-scan
+```
+
+### Project Detection Logic (If Cache Miss)
 
 ```
 1. Check package.json dependencies:
@@ -397,8 +414,7 @@ Result:
 These agents don't require scoring:
 
 - `pm-operations-orchestrator` - Workflow coordination
-- `project-detector` - Auto-detect project type
-- `project-context-manager` - Context tracking
+- `project-manager` - Project detection, config loading, and context management
 
 ---
 
@@ -435,10 +451,12 @@ These agents don't require scoring:
 ## Related Documentation
 
 - **Task-Based Selection:** `skills/agent-detector/task-based-agent-selection.md`
+- **Project Cache:** `docs/PROJECT_CACHE.md`
 - **Skill:** `skills/agent-detector/SKILL.md`
 - **Guide:** `docs/AGENT_SELECTION_GUIDE.md`
 - **Agent Catalog:** `agents/README.md`
+- **Cache Library:** `hooks/lib/af-project-cache.cjs`
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28
+**Version:** 1.17.0 | **Last Updated:** 2026-01-21

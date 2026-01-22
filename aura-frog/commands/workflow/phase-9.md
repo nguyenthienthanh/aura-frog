@@ -153,7 +153,7 @@ Type "confirm" to proceed or "skip" to skip
 # Workflow Completion Report
 
 ## Workflow Summary
-**ID:** refactor-socialmarketingcompos-20251124-112323
+**ID:** PROJ-1234
 **Task:** Refactor SocialMarketingCompositePost - split into components
 **Status:** ✅ COMPLETE
 **Created:** 2025-11-24 11:23:23
@@ -273,7 +273,7 @@ Refactoring completed successfully with:
 ```typescript
 // Update workflow state to complete
 const finalState = {
-  workflow_id: "refactor-socialmarketingcompos-20251124-112323",
+  workflow_id: "PROJ-1234",
   status: "completed",
   completed_at: "2025-11-24T17:53:45Z",
   duration_seconds: 23422, // 6h 30m 22s
@@ -359,7 +359,7 @@ Thank you for using Aura Frog Team Agents! 🚀
 ───────────────────────────────────────────────────────────
 
 Workflow closed automatically.
-All files saved in: .claude/logs/workflows/refactor-socialmarketingcompos-20251124-112323/
+All files saved in: .claude/logs/workflows/PROJ-1234/
 
 To start a new workflow: /workflow:start <task>
 To view this workflow: /workflow:status
@@ -387,7 +387,7 @@ logs/contexts/{workflow-id}/
 
 Workflow data preserved in:
 ```
-logs/contexts/refactor-socialmarketingcompos-20251124-112323/
+logs/contexts/PROJ-1234/
 ├── workflow-state.json (final state)
 ├── deliverables/ (all 12 files)
 ├── .claude/logs/ (execution logs)

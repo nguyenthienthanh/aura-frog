@@ -37,7 +37,7 @@ Shows comprehensive workflow status including:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📋 Workflow Information:
-   ID: refactor-socialmarketing-20251124-112323
+   ID: PROJ-1234
    Task: Refactor SocialMarketingCompositePost - split into components
    Status: In Progress
    Created: 2025-11-24 11:23:23

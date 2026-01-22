@@ -7,11 +7,14 @@
 
 ## Usage
 
-```
-workflow:start Refactor UserProfile component
-workflow:start Add social media sharing feature
-workflow:start Fix bug in payment API
-workflow:start Implement JWT authentication
+```bash
+# With ticket number (recommended) - uses ticket as workflow ID
+workflow:start "JIRA-123 Refactor UserProfile component"
+workflow:start "PROJ-456 Add social media sharing"
+
+# Without ticket - generates short name + date
+workflow:start "Fix bug in payment API"       # → fix-bug-0122
+workflow:start "Implement JWT authentication" # → impl-jwt-0122
 ```
 
 ---
@@ -52,6 +55,15 @@ detection[6]{keywords,agent}:
 - Story points + time estimate
 
 ---
+
+## Workflow ID Format
+
+```toon
+naming[3]{input,output}:
+  "JIRA-123 Fix login bug",JIRA-123
+  "PROJ-456 Add feature",PROJ-456
+  "Fix payment API",fix-payment-0122
+```
 
 ## Files Created
 

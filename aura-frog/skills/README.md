@@ -1,11 +1,26 @@
 # Aura Frog Skills
 
-**Version:** 1.16.0
-**Total Skills:** 48 (28 auto-invoking + 20 reference/command)
+**Version:** 1.17.0
+**Total Skills:** 45 (13 auto-invoking + 32 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 > **Note:** Integration skills (JIRA, Figma, Confluence, Slack) have been replaced with bundled MCP servers. See `.mcp.json` for configuration.
+
+---
+
+## New in 1.17.0 - Context Optimization
+
+**Auto-invoke reduced from 28 → 13** through consolidation:
+
+- **model-router** - Auto-select optimal Claude model (Haiku/Sonnet/Opus) based on task complexity. Reduces costs by 30-50% on simple tasks.
+- **framework-expert** - Unified framework bundle with lazy loading. Replaces 12 individual framework skills in auto-invoke (~80% token reduction).
+- **seo-bundle** - Consolidated SEO/GEO skills. Replaces 5 individual SEO skills in auto-invoke.
+- **testing-patterns** - Unified testing patterns across all frameworks.
+
+**Note:** Individual framework and SEO skills remain as reference documentation, loaded on-demand by the bundle skills.
+
+**Docs:** `docs/REFACTOR_ANALYSIS.md` for full optimization guide.
 
 ---
 
@@ -396,41 +411,29 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## Skill Priorities (TOON)
 
 ```toon
-skills[32]{name,priority,trigger}:
-  agent-detector,highest,ALWAYS (100%)
-  workflow-orchestrator,critical,Complex tasks
-  workflow-fasttrack,high,Pre-approved specs / fast execution
+auto_invoke_skills[13]{name,priority,trigger}:
+  agent-detector,highest,ALWAYS (100%) - includes lazy-agent-loader
+  model-router,highest,After agent detection - selects optimal model
+  workflow-orchestrator,critical,Complex tasks - includes fasttrack mode
   project-context-loader,high,Before code generation
-  design-system-library,high,UI components + design system
+  framework-expert,high,Framework task - lazy loads specific patterns
+  seo-bundle,high,SEO/GEO task - lazy loads relevant patterns
+  testing-patterns,high,Test task - unified testing patterns
   code-reviewer,high,After implementation
   session-continuation,high,Token limit warning + handoff/resume
-  lazy-agent-loader,high,Agent loading optimization
-  sequential-thinking,high,Complex analysis / step by step
-  problem-solving,high,Stuck / need breakthrough
-  learning-analyzer,high,Pattern analysis / insights
-  self-improve,high,Apply learned improvements
-  typescript-expert,high,TypeScript/ESLint/type errors
-  react-expert,high,React components/hooks
-  react-native-expert,high,React Native/Expo/mobile
-  vue-expert,high,Vue 3/Composition API/Pinia
-  nextjs-expert,high,Next.js/App Router/Server Components
-  nodejs-expert,high,Node.js/Express/NestJS/Fastify
-  python-expert,high,Python/Django/FastAPI/Flask
-  laravel-expert,high,Laravel/PHP/Eloquent
-  go-expert,high,Go/Gin/Echo/Fiber
-  flutter-expert,high,Flutter/Dart/Bloc/Riverpod
-  angular-expert,high,Angular/NgRx/RxJS
-  godot-expert,high,Godot/GDScript/game development
-  seo-expert,high,SEO/meta tags/schema/Core Web Vitals
-  ai-discovery-expert,high,Perplexity/ChatGPT Search/AI crawlers
-  seo-check,high,/seo:check command - Full SEO audit
-  seo-schema,high,/seo:schema command - Schema validation
-  seo-geo,high,/seo:geo command - AI discovery audit
-  stitch-design,medium,AI design / Stitch prompts
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
+  code-simplifier,medium,Simplify/KISS/complexity
   response-analyzer,medium,Large output handling
 ```
+
+**Reference Skills (32)** - Loaded on-demand by bundles or commands:
+- Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (11)
+- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
+- Design: design-system-library, stitch-design, visual-pixel-perfect (3)
+- Learning: learning-analyzer, self-improve (2)
+- Workflow: workflow-fasttrack, lazy-agent-loader (2)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, design-expert, documentation, git-workflow, nativewind-generator (9)
 
 > **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
 ---
@@ -850,7 +853,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.16.0
-**Last Updated:** 2026-01-15
+**Version:** 1.17.0
+**Last Updated:** 2026-01-21
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 48 (28 auto-invoking + 20 reference/command)
+**Total Skills:** 45 (13 auto-invoking + 32 reference)

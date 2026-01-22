@@ -110,25 +110,18 @@ task_model[8]{task_type,model,reason}:
 ### Agent Default Models
 
 ```toon
-agent_models[14]{agent,default_model,opus_when}:
+agent_models[11]{agent,default_model,opus_when}:
   pm-operations-orchestrator,haiku,Never (orchestration only)
-  project-detector,haiku,Never (detection only)
-  project-context-manager,haiku,Never (context loading)
-  mobile-react-native,sonnet,Architecture decisions
-  mobile-flutter,sonnet,Architecture decisions
-  web-angular,sonnet,Architecture decisions
-  web-vuejs,sonnet,Architecture decisions
-  web-reactjs,sonnet,Architecture decisions
-  web-nextjs,sonnet,Architecture decisions
-  backend-nodejs,sonnet,Architecture decisions
-  backend-python,sonnet,Architecture decisions
-  backend-go,sonnet,Architecture decisions
-  backend-laravel,sonnet,Architecture decisions
-  database-specialist,sonnet,Schema design / migration planning
+  project-manager,haiku,Never (detection/context loading)
+  smart-agent-detector,haiku,Never (routing only)
+  architect,sonnet,Schema design / migration planning / system architecture
+  ui-expert,sonnet,Design system architecture
+  mobile-expert,sonnet,Architecture decisions
+  game-developer,sonnet,Game architecture decisions
   security-expert,sonnet,opus for full audits
   qa-automation,sonnet,Never
-  ui-designer,sonnet,Design system architecture
   devops-cicd,sonnet,Infrastructure architecture
+  voice-operations,haiku,Never (notifications only)
 ```
 
 ### Model Selection Output
@@ -160,13 +153,13 @@ Task(subagent_type="backend-nodejs", model="sonnet", ...)
 
 ```toon
 task_content_triggers[7]{category,example_patterns,activates,score_boost}:
-  Frontend,html template/blade/twig/email template/pdf styling/css,web-expert + ui-designer,+50 to +60
-  Backend,api endpoint/controller/middleware/queue job/webhook,backend-* agents,+50 to +55
-  Database,migration/schema/query optimization/slow query/n+1,database-specialist,+55 to +60
+  Frontend,html template/blade/twig/email template/pdf styling/css,ui-expert,+50 to +60
+  Backend,api endpoint/controller/middleware/queue job/webhook,architect (+ framework skill),+50 to +55
+  Database,migration/schema/query optimization/slow query/n+1,architect,+55 to +60
   Security,xss/sql injection/csrf/vulnerability/auth bypass,security-expert,+55 to +60
   DevOps,docker/kubernetes/ci-cd/terraform/deployment,devops-cicd,+50 to +55
   Testing,unit test/e2e test/coverage/mock/fixture,qa-automation,+45 to +55
-  Design,figma/wireframe/design system/accessibility,ui-designer,+50 to +60
+  Design,figma/wireframe/design system/accessibility,ui-expert,+50 to +60
 ```
 
 **Key insight:** Task content score ≥50 → Override or co-lead with repo-based agent.
@@ -176,12 +169,12 @@ task_content_triggers[7]{category,example_patterns,activates,score_boost}:
 # Backend repo, but frontend task
 Repo: Laravel API
 Task: "Fix email template styling"
-→ web-expert (PRIMARY) + backend-laravel (SECONDARY)
+→ ui-expert (PRIMARY) + architect (SECONDARY)
 
 # Frontend repo, but backend task
 Repo: Next.js
 Task: "Add rate limiting to API route"
-→ backend-nodejs (PRIMARY) + web-nextjs (SECONDARY)
+→ architect (PRIMARY) + ui-expert (SECONDARY)
 ```
 
 ---
@@ -339,13 +332,34 @@ Extracted:
 - Issue: "not working" → Bug context
 ```
 
-### Step 2: Check Project Context
+### Step 2: Check Project Context (Use Cached Detection!)
+
+**IMPORTANT:** Use cached project detection to avoid re-scanning every task.
+
 ```bash
-# Read these files in order:
-1. .claude/project-contexts/[project]/project-config.yaml
-2. package.json / composer.json / pubspec.yaml / go.mod
-3. Check CWD path for project hints
+# 1. Check detection first (fast path):
+.claude/project-contexts/[project-name]/project-detection.json
+
+# 2. If detection valid (< 24h, key files unchanged):
+   → Use cached: framework, agents, testInfra, filePatterns
+
+# 3. If detection invalid or missing:
+   → Run full detection (reads package.json, etc.)
+   → Save to project-contexts for next task
+
+# 4. Load project-specific overrides:
+.claude/project-contexts/[project]/project-config.yaml
+.claude/project-contexts/[project]/conventions.md
 ```
+
+**Detection invalidation triggers:**
+- Key config files changed (package.json mtime/size)
+- Detection older than 24 hours
+- User runs `/project:refresh`
+
+**Commands:**
+- `/project:status` - Show project detection
+- `/project:refresh` - Force fresh scan
 
 ### Step 3: Score All Agents (Combine Task + Repo)
 ```
@@ -396,10 +410,10 @@ ui-designer:
 
 ```toon
 agents[4]{category,count,list}:
-  Development,11,mobile-react-native/mobile-flutter/web-angular/web-vuejs/web-reactjs/web-nextjs/backend-nodejs/backend-python/backend-go/backend-laravel/database-specialist
-  Quality & Security,3,security-expert/qa-automation/ui-designer
-  DevOps & Operations,5,devops-cicd/jira-operations/confluence-operations/slack-operations/voice-operations
-  Infrastructure,5,smart-agent-detector/pm-operations-orchestrator/project-detector/project-config-loader/project-context-manager
+  Development,4,architect/ui-expert/mobile-expert/game-developer
+  Quality & Security,2,security-expert/qa-automation
+  DevOps & Operations,2,devops-cicd/voice-operations
+  Infrastructure,3,smart-agent-detector/pm-operations-orchestrator/project-manager
 ```
 
 ---
@@ -415,10 +429,10 @@ Layer 2 (Intent): "create" → Implementation
 Layer 4 (Files): *.phone.tsx present → +20
 
 Detection Result:
-  ✅ Agent: mobile-react-native (PRIMARY, 80 pts)
+  ✅ Agent: mobile-expert (PRIMARY, 80 pts)
   ✅ Model: sonnet
   ✅ Complexity: Standard
-  ✅ Secondary: ui-designer (35), qa-automation (30)
+  ✅ Secondary: ui-expert (35), qa-automation (30)
 ```
 
 ### Example 2: Context-Based Detection (No Tech Mention)
@@ -430,7 +444,7 @@ Layer 3 (Context): CWD=/backend-api, composer.json has laravel → +40
 Layer 4 (Files): AuthController.php recent → +20
 
 Detection Result:
-  ✅ Agent: backend-laravel (PRIMARY, 95 pts)
+  ✅ Agent: architect (PRIMARY, 95 pts) + laravel-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
   ✅ Secondary: qa-automation (35)
@@ -444,10 +458,10 @@ Layer 2 (Intent): "design", "architecture" → Architecture intent
 Complexity: Deep (architecture keyword)
 
 Detection Result:
-  ✅ Agent: backend-nodejs (PRIMARY)
+  ✅ Agent: architect (PRIMARY)
   ✅ Model: opus (architecture task)
   ✅ Complexity: Deep
-  ✅ Secondary: security-expert (55), database-specialist (45)
+  ✅ Secondary: security-expert (55)
 ```
 
 ### Example 4: Quick Fix (Uses Haiku)
@@ -474,8 +488,8 @@ Task Content Analysis:
 → Frontend score: 125 pts (OVERRIDE)
 
 Detection Result:
-  ✅ Agent: web-expert (PRIMARY, 125 pts) - leads template fix
-  ✅ Agent: backend-laravel (SECONDARY, 40 pts) - Blade context
+  ✅ Agent: ui-expert (PRIMARY, 125 pts) - leads template fix
+  ✅ Agent: architect (SECONDARY, 40 pts) - Blade context + laravel-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
 ```
@@ -492,8 +506,8 @@ Task Content Analysis:
 → Database score: 90 pts (OVERRIDE)
 
 Detection Result:
-  ✅ Agent: database-specialist (PRIMARY, 90 pts)
-  ✅ Agent: web-nextjs (SECONDARY, 40 pts) - API route context
+  ✅ Agent: architect (PRIMARY, 90 pts) - database optimization
+  ✅ Agent: ui-expert (SECONDARY, 40 pts) - API route context + nextjs-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
 ```
@@ -510,8 +524,8 @@ Task Content Analysis:
 → Frontend score: 120 pts (OVERRIDE)
 
 Detection Result:
-  ✅ Agent: web-expert (PRIMARY, 120 pts) - HTML/CSS for PDF
-  ✅ Agent: backend-nodejs (SECONDARY, 40 pts) - PDF library integration
+  ✅ Agent: ui-expert (PRIMARY, 120 pts) - HTML/CSS for PDF
+  ✅ Agent: architect (SECONDARY, 40 pts) - PDF library integration + nodejs-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
 ```

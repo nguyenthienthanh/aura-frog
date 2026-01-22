@@ -1,8 +1,27 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.16.0
+**Version:** 1.17.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-21
+
+---
+
+## New in 1.17.0 - Bundled Commands
+
+Individual commands are now bundled into unified entry points with subcommand menus:
+
+| Bundled Command | Replaces | Subcommands |
+|-----------------|----------|-------------|
+| `/workflow` | 22 workflow commands | start, status, phase, next, approve, handoff, resume |
+| `/test` | 4 test commands | unit, e2e, coverage, watch, docs |
+| `/project` | 6 project commands | status, refresh, init, switch, list, config |
+| `/quality` | 3 quality commands | lint, complexity, review, fix |
+| `/bugfix` | 3 bugfix commands | quick, full, hotfix |
+| `/seo` | 3 seo commands | check, schema, geo |
+
+**Benefits:** Interactive menus, auto-detection, reduced command memorization.
+
+**Usage:** `/workflow` shows interactive menu, `/workflow start "task"` uses direct subcommand.
 
 ---
 
@@ -183,4 +202,4 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-**Version:** 1.16.0 | **Format:** TOON
+**Version:** 1.17.0 | **Format:** TOON

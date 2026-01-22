@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.16.0
+**Version:** 1.17.0
 
 ---
 
@@ -163,7 +163,7 @@ env_vars[4]{var,description}:
 🔄 SESSION RESUMED AFTER COMPACT
 ═══════════════════════════════════════════════════════════
 
-📋 **Workflow:** feature-auth-20251129-143022
+📋 **Workflow:** AUTH-123
 📝 **Task:** Implement user authentication with JWT
 📍 **Phase:** 5a
 🤖 **Agent:** backend-nodejs
@@ -174,7 +174,7 @@ env_vars[4]{var,description}:
 
 ───────────────────────────────────────────────────────────
 📥 **To fully resume workflow:**
-   workflow:resume feature-auth-20251129-143022
+   workflow:resume AUTH-123
 
 💡 Context has been restored. Type "continue" to proceed.
 ═══════════════════════════════════════════════════════════
@@ -636,6 +636,6 @@ hooks[21]{event,name,purpose}:
 
 ---
 
-**Version:** 1.16.0
+**Version:** 1.17.0
 **Last Updated:** 2026-01-20
 **Status:** Active hooks system (21 hooks)

@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.16.0
-**Total Rules:** 49
+**Version:** 1.17.0
+**Total Rules:** 50
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[49]{category,rule,priority,purpose}:
+rules[50]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -19,6 +19,7 @@ rules[49]{category,rule,priority,purpose}:
   system,dual-file-architecture,high,Plugin + project structure
   system,token-time-awareness,high,Monitor token usage
   system,project-linting-precedence,critical,Merge project + Aura Frog rules
+  system,context-management,high,Token optimization + model selection + lazy loading
   quality,yagni-principle,critical,Only implement what's needed now
   quality,dry-with-caution,high,Rule of Three before abstracting
   quality,kiss-avoid-over-engineering,critical,Keep implementations simple
@@ -78,7 +79,7 @@ priorities[3]{level,meaning,enforcement}:
 
 ```toon
 categories[8]{name,count,critical_rules}:
-  system,9,5
+  system,10,5
   quality,13,4
   architecture,6,0
   security,1,1
@@ -168,7 +169,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.16.0 | **Last Updated:** 2026-01-15 | **Format:** TOON
+**Version:** 1.17.0 | **Last Updated:** 2026-01-21 | **Format:** TOON
 
 ---
 

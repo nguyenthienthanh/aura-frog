@@ -9,7 +9,7 @@
 
 ```
 workflow:resume <workflow-id>
-workflow:resume add-user-authentication-20251124-120000
+workflow:resume AUTH-456
 "Resume the authentication workflow"
 ```
 

@@ -4,6 +4,60 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.17.0] - 2026-01-21
+
+### Context Optimization & Agent Consolidation
+
+Major refactoring for cost savings, better quality, and improved reasoning based on community best practices research.
+
+#### Added
+- **model-router skill** - Auto-select Haiku/Sonnet/Opus based on task complexity (30-50% cost savings on trivial tasks)
+- **framework-expert skill** - Lazy-load framework patterns on demand (~80% token reduction)
+- **seo-bundle skill** - Consolidated SEO/GEO skills with lazy loading
+- **testing-patterns skill** - Universal testing patterns across all frameworks
+- **context-management rule** - Token awareness and model selection guidelines
+
+#### Consolidated Agents (15 → 11)
+| New Agent | Replaces | Purpose |
+|-----------|----------|---------|
+| **project-manager** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
+| **architect** | backend-expert, database-specialist | System design + database architecture |
+| **ui-expert** | web-expert, ui-designer | Frontend + design systems |
+
+#### Bundled Commands (6 new unified commands)
+| Command | Replaces | Subcommands |
+|---------|----------|-------------|
+| `/workflow` | 22 workflow commands | start, status, phase, next, approve, handoff, resume |
+| `/test` | 4 test commands | unit, e2e, coverage, watch, docs |
+| `/project` | 6 project commands | status, refresh, init, switch, list, config |
+| `/quality` | 3 quality commands | lint, complexity, review, fix |
+| `/bugfix` | 3 bugfix commands | quick, full, hotfix |
+| `/seo` | 3 seo commands | check, schema, geo |
+
+#### Removed (Consolidated)
+- **Agent files:** backend-expert.md, database-specialist.md, web-expert.md, ui-designer.md, project-detector.md, project-config-loader.md, project-context-manager.md
+- **Auto-invoke skills reduced:** Individual framework experts moved to reference skills (lazy-loaded by framework-expert)
+
+#### Stats
+- **Agents:** 11 (was 15) - 4 consolidated
+- **Auto-invoke Skills:** 13 (was 28) - 15 moved to reference/bundles
+- **Reference Skills:** 32 - framework experts, SEO experts, design, learning
+- **Total Skills:** 45 (was 48)
+- **Rules:** 50 (was 49) - +1 context-management
+- **Bundled Commands:** 6 entry points (replaces 41 individual commands)
+
+#### Cost Impact
+| Optimization | Savings |
+|--------------|---------|
+| Model routing (Haiku for trivial) | 30-50% on simple tasks |
+| Framework skill bundles | ~80% framework token reduction |
+| Reduced auto-invoke skills (13 vs 28) | ~50% context reduction |
+
+#### Fixed
+- **Workflow ID naming** - Now uses ticket number (JIRA-123) or short term + date (fix-payment-0122) instead of long format with full timestamp
+
+---
+
 ## [1.16.0] - 2026-01-20
 
 ### Learning System v2.0: Local Storage & Smart Learning

@@ -1,36 +1,42 @@
 # Aura Frog Agents Directory
 
-**Version:** 1.16.0
+**Version:** 1.17.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-21
 
 ---
 
 ## Overview
 
-Aura Frog provides **15 specialized agents** that are automatically selected based on task context. Each agent has domain expertise and specific capabilities.
+Aura Frog provides **11 specialized agents** (reduced from 15 in v1.16.0 through consolidation).
+
+---
+
+## New in 1.17.0 - Consolidated Agents
+
+| New Agent | Replaces | Purpose |
+|-----------|----------|---------|
+| **project-manager** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
+| **architect** | backend-expert, database-specialist | System design + database architecture |
+| **ui-expert** | web-expert, ui-designer | Frontend + design systems |
 
 ---
 
 ## Agents Index (TOON)
 
 ```toon
-agents[15]{name,file,expertise}:
-  backend-expert,backend-expert.md,Backend APIs + databases + server logic
-  database-specialist,database-specialist.md,Database design + queries + migrations
-  devops-cicd,devops-cicd.md,CI/CD pipelines + deployment + infrastructure
-  game-developer,game-developer.md,Godot game development + multi-platform export
+agents[11]{name,file,expertise}:
+  project-manager,project-manager.md,Project detection + config + context (NEW)
+  architect,architect.md,System design + database + backend architecture (NEW)
+  ui-expert,ui-expert.md,Frontend frameworks + design systems + accessibility (NEW)
   mobile-expert,mobile-expert.md,React Native + Flutter + mobile platforms
-  pm-operations-orchestrator,pm-operations-orchestrator.md,Project management + workflow coordination
-  project-config-loader,project-config-loader.md,Project configuration + context loading
-  project-context-manager,project-context-manager.md,Project context + session management
-  project-detector,project-detector.md,Project type detection + tech stack analysis
+  game-developer,game-developer.md,Godot game development + multi-platform export
+  devops-cicd,devops-cicd.md,CI/CD pipelines + deployment + infrastructure
   qa-automation,qa-automation.md,Testing strategies + QA automation
   security-expert,security-expert.md,Security audits + vulnerability assessment
+  pm-operations-orchestrator,pm-operations-orchestrator.md,Project management + workflow coordination
   smart-agent-detector,smart-agent-detector.md,Agent selection + routing logic
-  ui-designer,ui-designer.md,UI/UX design + component architecture
   voice-operations,voice-operations.md,Voice notifications + audio feedback
-  web-expert,web-expert.md,Frontend web + React + Vue + Angular
 ```
 
 ---
@@ -39,9 +45,9 @@ agents[15]{name,file,expertise}:
 
 Agents are automatically selected by the `agent-detector` skill based on:
 - Task keywords and context
-- Project tech stack
+- Project tech stack (from cache)
 - File types being modified
-- Phase requirements
+- Task content analysis (Layer 0)
 
 **Manual activation:**
 ```
@@ -59,13 +65,40 @@ agent:list
 
 | Category | Agents | Purpose |
 |----------|--------|---------|
-| **Development** | web-expert, mobile-expert, backend-expert, game-developer | Code implementation |
-| **Infrastructure** | devops-cicd, database-specialist | Deployment + data |
+| **Development** | ui-expert, mobile-expert, architect, game-developer | Code implementation |
+| **Infrastructure** | devops-cicd | Deployment + CI/CD |
 | **Quality** | qa-automation, security-expert | Testing + security |
-| **Design** | ui-designer | UI/UX decisions |
 | **Management** | pm-operations-orchestrator | Workflow coordination |
-| **System** | project-detector, project-config-loader, project-context-manager, smart-agent-detector, voice-operations | Internal operations |
+| **System** | project-manager, smart-agent-detector, voice-operations | Internal operations |
 
 ---
 
-**Version:** 1.16.0
+## Reduction Summary
+
+| Version | Agents | Change |
+|---------|--------|--------|
+| v1.16.0 | 15 | - |
+| v1.17.0 | 11 | -4 (consolidated) |
+
+**Removed files (consolidated):**
+- backend-expert.md → architect
+- database-specialist.md → architect
+- web-expert.md → ui-expert
+- ui-designer.md → ui-expert
+- project-detector.md → project-manager
+- project-config-loader.md → project-manager
+- project-context-manager.md → project-manager
+
+---
+
+## Related Files
+
+- **Agent Detector:** `skills/agent-detector/SKILL.md`
+- **Lazy Agent Loader:** `skills/lazy-agent-loader/SKILL.md`
+- **Model Router:** `skills/model-router/SKILL.md`
+- **Agent Selection Guide:** `docs/AGENT_SELECTION_GUIDE.md`
+- **Refactor Analysis:** `docs/REFACTOR_ANALYSIS.md`
+
+---
+
+**Version:** 1.17.0 | **Last Updated:** 2026-01-21

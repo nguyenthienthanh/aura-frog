@@ -8,9 +8,9 @@
 
 > **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 15 specialized agents, 9-phase TDD workflow, self-improving learning system, and bundled MCP servers.
+AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), self-improving learning system, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.15.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.17.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -25,20 +25,22 @@ AI-powered development plugin for **Claude Code** with 15 specialized agents, 9-
 
 <div align="center">
 
-| **Agents** | **Skills** | **Rules** | **Phases** | **Commands** | **MCP Servers** |
-|:----------:|:----------:|:---------:|:----------:|:------------:|:---------------:|
-| **15** | **48** | **49** | **9** | **82** | **6** |
+| **Agents** | **Bundled Commands** | **Auto Skills** | **Rules** | **MCP Servers** |
+|:----------:|:--------------------:|:---------------:|:---------:|:---------------:|
+| **11** | **6** | **13** | **50** | **6** |
 
 </div>
 
 **What's Inside:**
-- **15 Specialized Agents** — Mobile, Web, Backend, QA, Security, DevOps, Game Dev experts
-- **48 Skills** — 28 auto-invoking + 20 reference/command skills for specialized tasks
-- **6 Bundled MCP Servers** — Context7, Playwright, Vitest, Firebase + 2 optional (Figma, Slack)
-- **49 Quality Rules** — System, code quality, architecture, workflow, documentation
-- **9-Phase Workflow** — From requirements to deployment with quality gates
-- **82 Commands** — Full workflow control at your fingertips
-- **Learning System** — Self-improvement via Supabase (NEW)
+- **11 Specialized Agents** — Consolidated: architect, ui-expert, mobile-expert, game-developer, qa, security, devops
+- **6 Bundled Commands** — `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo` (each with submenus)
+- **13 Auto-Invoking Skills** — Agent detection, model routing, workflow, testing, SEO bundles
+- **32 Reference Skills** — Framework experts, SEO experts, loaded on-demand by bundles
+- **6 MCP Servers** — Context7, Playwright, Vitest, Firebase, Figma, Slack
+- **50 Quality Rules** — System, code quality, architecture, workflow, UI, SEO
+- **9-Phase Workflow** — From requirements to deployment with only 2 approval gates
+- **Model Routing** — Auto-select Haiku/Sonnet/Opus for 30-50% cost savings
+- **Learning System** — Self-improvement via local storage or Supabase
 
 ---
 
@@ -118,54 +120,50 @@ At each phase, review and respond:
 
 ## Key Features
 
-### 15 Specialized Agents
+### 11 Specialized Agents (Consolidated in v1.17.0)
 
-Agents auto-activate based on your prompt context:
+Agents auto-activate based on your prompt context. v1.17.0 consolidated 15 agents into 11 for better routing:
 
 <details>
 <summary><b>Development (4)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
-| `backend-expert` | Node.js, Python, Laravel, Go — Express, Django, FastAPI, Gin |
-| `web-expert` | React, Vue, Angular, Next.js — SSR, SSG, state management |
+| `architect` | System design, database, backend (Node.js, Python, Laravel, Go) — **NEW: replaces backend-expert + database-specialist** |
+| `ui-expert` | Frontend (React, Vue, Angular, Next.js) + design systems — **NEW: replaces web-expert + ui-designer** |
 | `mobile-expert` | React Native, Flutter — Expo, cross-platform, NativeWind |
 | `game-developer` | Godot game development, multi-platform export |
 
 </details>
 
 <details>
-<summary><b>Quality & Security (3)</b></summary>
+<summary><b>Quality & Security (2)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
 | `security-expert` | OWASP audits, vulnerability scanning |
 | `qa-automation` | Jest, Cypress, Detox, testing strategies |
-| `ui-designer` | UI/UX, Figma integration, accessibility |
 
 </details>
 
 <details>
-<summary><b>Infrastructure (3)</b></summary>
+<summary><b>Infrastructure (2)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
 | `devops-cicd` | Docker, K8s, CI/CD, monitoring |
-| `database-specialist` | Schema design, query optimization |
 | `voice-operations` | ElevenLabs AI narration |
 
 </details>
 
 <details>
-<summary><b>System (5)</b></summary>
+<summary><b>System (3)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
-| `smart-agent-detector` | Intelligent agent selection |
+| `project-manager` | Project detection, config loading, context — **NEW: replaces 3 agents** |
+| `smart-agent-detector` | Intelligent agent + model selection |
 | `pm-operations-orchestrator` | Workflow coordination |
-| `project-detector` | Auto-detect project type |
-| `project-config-loader` | Load configurations |
-| `project-context-manager` | Context persistence |
 
 </details>
 
@@ -198,32 +196,42 @@ MCPs requiring tokens will silently skip if not configured.
 
 ---
 
-### 48 Skills (28 Auto-Invoking + 20 Reference/Command)
+### Skills System (Optimized in v1.17.0)
 
-Skills activate automatically based on your message context:
+Skills activate automatically based on your message context. v1.17.0 introduced **skill bundles** that lazy-load patterns on-demand:
 
 ```
 User: "Implement user profile screen"
          ↓
 Auto-invokes:
-  1. agent-detector         → Selects mobile-expert agent
-  2. project-context-loader → Loads your conventions
-  3. workflow-orchestrator  → Executes 9-phase workflow
+  1. agent-detector         → Selects mobile-expert + model
+  2. model-router           → Picks Sonnet (standard task)
+  3. project-context-loader → Loads your conventions
+  4. workflow-orchestrator  → Executes 9-phase workflow
 ```
+
+**13 Auto-Invoking Skills:**
 
 | Skill | Triggers | Purpose |
 |-------|----------|---------|
-| `agent-detector` | **Every message** | Select appropriate agent |
-| `workflow-orchestrator` | "implement", "build", "create" | Execute 9-phase workflow |
-| `workflow-fasttrack` | Pre-approved specs | Skip phases 1-3, auto-execute |
-| `project-context-loader` | Before code generation | Load project conventions |
+| `agent-detector` | **Every message** | Select agent + complexity |
+| `model-router` | After agent detection | Select Haiku/Sonnet/Opus |
+| `workflow-orchestrator` | "implement", "build", "create" | 9-phase workflow |
+| `project-context-loader` | Before code generation | Load conventions |
+| `framework-expert` | Framework tasks | Lazy-load React/Vue/etc patterns |
+| `seo-bundle` | SEO/GEO tasks | Lazy-load SEO patterns |
+| `testing-patterns` | Test tasks | Universal testing patterns |
 | `bugfix-quick` | "fix", "error", "broken" | Fast TDD bug fixes |
-| `test-writer` | "add tests", "coverage" | Generate comprehensive tests |
-| `code-reviewer` | After implementation | Multi-agent quality review |
-| `learning-analyzer` | Pattern analysis | Analyze feedback patterns (NEW) |
-| `self-improve` | Apply learnings | Apply learned improvements (NEW) |
+| `test-writer` | "add tests", "coverage" | Generate tests |
+| `code-reviewer` | After implementation | Multi-agent review |
+| `session-continuation` | Token warning | Handoff/resume |
+| `response-analyzer` | Large outputs | Token optimization |
+| `code-simplifier` | "simplify", "too complex" | KISS enforcement |
 
-**Expert Skills:** typescript, react, react-native, vue, nextjs, nodejs, python, laravel, go, flutter, angular, godot
+**32 Reference Skills** — Loaded on-demand by bundles:
+- Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript
+- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo
+- Others: api-designer, debugging, migration-helper, performance-optimizer, etc.
 
 **See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
 
@@ -273,12 +281,12 @@ TDD is **non-negotiable** in Aura Frog:
 
 ---
 
-### 49 Quality Rules
+### 50 Quality Rules
 
-Aura Frog enforces consistent quality through comprehensive rules:
+Aura Frog enforces consistent quality through comprehensive rules organized by category:
 
 <details>
-<summary><b>System Rules (9)</b></summary>
+<summary><b>System Rules (10)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -286,6 +294,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `env-loading` | Load .envrc at session start |
 | `execution-rules` | ALWAYS/NEVER execution rules |
 | `priority-hierarchy` | Config priority order |
+| `context-management` | **NEW:** Token optimization + model selection |
 | `dual-file-architecture` | Plugin + project structure |
 | `token-time-awareness` | Monitor token usage |
 | `project-linting-precedence` | Merge project + Aura Frog rules |
@@ -295,7 +304,7 @@ Aura Frog enforces consistent quality through comprehensive rules:
 </details>
 
 <details>
-<summary><b>Code Quality Rules (10)</b></summary>
+<summary><b>Code Quality Rules (13)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
@@ -309,24 +318,26 @@ Aura Frog enforces consistent quality through comprehensive rules:
 | `smart-commenting` | Why, not what |
 | `prefer-established-libraries` | Use lodash/es-toolkit over custom |
 | `post-implementation-linting` | Run lint after implementation |
+| `seo-technical-requirements` | Meta tags, Core Web Vitals |
+| `structured-data-schema` | JSON-LD Schema.org |
+| `ai-discovery-optimization` | AI search optimization |
 
 </details>
 
 <details>
-<summary><b>Workflow Rules (11)</b></summary>
+<summary><b>Workflow Rules (10)</b></summary>
 
 | Rule | Purpose |
 |------|---------|
 | `tdd-workflow` | RED → GREEN → REFACTOR |
 | `cross-review-workflow` | Multi-agent review |
-| `approval-gates` | Human approval required |
+| `approval-gates` | Only Phase 2 & 5b require approval |
 | `git-workflow` | Commit conventions |
 | `safety-rules` | Security guidelines |
 | `next-step-guidance` | Always show next steps |
 | `workflow-navigation` | Progress tracking |
 | `feedback-brainstorming` | Brainstorm before feedback |
 | `impact-analysis` | Analyze usages before modifying |
-| `workflow-deliverables` | Verify all phase docs created |
 | `verification` | Fresh verification before done |
 
 </details>
@@ -335,29 +346,29 @@ Aura Frog enforces consistent quality through comprehensive rules:
 
 ---
 
-### Learning System (NEW in 1.9.0)
+### Learning System (Enhanced in v1.16.0)
 
-Aura Frog can now learn and improve over time via Supabase:
+Aura Frog learns and improves over time. **Works out of the box with local storage**, optionally syncs to Supabase:
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │  Collect Data   │ →   │ Analyze Patterns │ →   │ Apply Learnings │
-│  (feedback,     │     │  (success/fail   │     │  (auto-improve  │
-│   metrics)      │     │   patterns)      │     │   plugin)       │
+│  (auto-detect   │     │  (success/fail   │     │  (auto-improve  │
+│   patterns)     │     │   patterns)      │     │   plugin)       │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
 | Command | Description |
 |---------|-------------|
-| `learn:status` | Show learning system status |
-| `learn:analyze` | Run pattern analysis |
-| `learn:apply` | Apply learned improvements |
+| `/learn:status` | Show learning system status |
+| `/learn:analyze` | Run pattern analysis |
+| `/learn:apply` | Apply learned improvements |
 
-**Features:**
-- Feedback collection (corrections, approvals, rejections)
-- Workflow metrics tracking
-- Agent performance monitoring
-- Pattern recognition and insights
+**Features (v1.16.0):**
+- **Local storage by default** — No setup required!
+- **Smart Learn** — Auto-detect patterns from successful operations
+- **Workflow Edit Detection** — Learn from your direct edits
+- **Learned Rules MD** — Human-readable file auto-linked
 
 **See:** [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) for setup
 
@@ -387,61 +398,41 @@ document "API endpoints"           # Generate docs
 
 ---
 
-## Commands Reference
+## Commands Reference (Bundled in v1.17.0)
+
+v1.17.0 introduces **6 bundled commands** with interactive submenus. Each bundled command replaces multiple individual commands:
 
 <details>
-<summary><b>Workflow Commands</b></summary>
+<summary><b>Bundled Commands (6 entry points)</b></summary>
 
-| Command | Description |
-|---------|-------------|
-| `workflow:start <task>` | Start full 9-phase workflow |
-| `workflow:status` | Show current progress |
-| `workflow:approve` | Approve current phase |
-| `workflow:reject <reason>` | Reject and restart phase |
-| `workflow:handoff` | Save for session continuation |
-| `workflow:resume [id]` | Resume saved workflow |
+| Command | Subcommands | Replaces |
+|---------|-------------|----------|
+| `/workflow` | start, status, phase, next, approve, handoff, resume | 22 workflow commands |
+| `/test` | unit, e2e, coverage, watch, docs | 4 test commands |
+| `/project` | status, refresh, init, switch, list, config | 6 project commands |
+| `/quality` | lint, complexity, review, fix | 3 quality commands |
+| `/bugfix` | quick, full, hotfix | 3 bugfix commands |
+| `/seo` | check, schema, geo | 3 seo commands |
+
+**Usage:** `/workflow` shows menu, `/workflow start "task"` uses direct subcommand.
 
 </details>
 
 <details>
-<summary><b>Quick Commands</b></summary>
+<summary><b>Common Standalone Commands</b></summary>
 
 | Command | Description |
 |---------|-------------|
-| `bugfix:quick <desc>` | Quick bug fix with TDD |
-| `bugfix:hotfix <desc>` | Emergency hotfix |
 | `refactor <file>` | Code refactoring |
 | `planning <task>` | Create execution plan |
 | `document <feature>` | Generate documentation |
-
-</details>
-
-<details>
-<summary><b>Testing Commands</b></summary>
-
-| Command | Description |
-|---------|-------------|
-| `test:unit <file>` | Generate unit tests |
-| `test:e2e <flow>` | Generate E2E tests |
-| `test:coverage` | Check coverage |
-
-</details>
-
-<details>
-<summary><b>Project Commands</b></summary>
-
-| Command | Description |
-|---------|-------------|
-| `project:init` | Initialize Aura Frog for project |
-| `project:detect` | Auto-detect project type |
-| `project:regen` | Re-generate context |
-| `project:reload-env` | Load/reload .envrc variables |
 | `agent:list` | Show all agents |
 | `agent:info <name>` | Show agent details |
+| `/learn:status` | Learning system status |
 
 </details>
 
-**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for all 82 commands
+**See:** [aura-frog/commands/README.md](aura-frog/commands/README.md) for complete command reference
 
 ---
 
@@ -542,11 +533,12 @@ learn:status
 
 | Document | Description |
 |----------|-------------|
-| [aura-frog/commands/README.md](aura-frog/commands/README.md) | All 82 commands |
-| [aura-frog/agents/](aura-frog/agents/) | All agent definitions |
-| [aura-frog/rules/](aura-frog/rules/) | Core quality rules |
+| [aura-frog/commands/README.md](aura-frog/commands/README.md) | 6 bundled commands + reference |
+| [aura-frog/agents/](aura-frog/agents/) | 11 agent definitions |
+| [aura-frog/rules/](aura-frog/rules/) | 50 quality rules |
 | [aura-frog/scripts/README.md](aura-frog/scripts/README.md) | Utility scripts (integrations, workflows) |
-| [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) | Supabase learning system |
+| [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) | Learning system (local + Supabase) |
+| [aura-frog/docs/REFACTOR_ANALYSIS.md](aura-frog/docs/REFACTOR_ANALYSIS.md) | Optimization guide (NEW) |
 
 ---
 
@@ -556,18 +548,27 @@ learn:status
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
-│   ├── agents/                      # 15 specialized agents
-│   ├── skills/                      # 48 skills (28 auto + 20 reference)
-│   ├── commands/                    # 82 workflow commands
-│   ├── rules/                       # 49 quality rules
+│   ├── agents/                      # 11 specialized agents (consolidated)
+│   ├── skills/                      # 45 skills (13 auto + 32 reference)
+│   ├── commands/                    # 6 bundled + standalone commands
+│   ├── rules/                       # 50 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
-│   │   └── MCP_GUIDE.md             # MCP setup guide
+│   │   ├── MCP_GUIDE.md             # MCP setup guide
+│   │   └── REFACTOR_ANALYSIS.md     # Optimization guide (NEW)
 │   ├── hooks/                       # Lifecycle hooks
 │   ├── scripts/                     # Utility scripts
 │   └── templates/                   # Document templates
 ├── assets/                          # Logo and images
 └── README.md                        # This file
+```
+
+### Model Routing (NEW in v1.17.0)
+
+```
+Trivial tasks → Haiku (30-50% cost savings)
+Standard tasks → Sonnet (default)
+Architecture/Security → Opus (when needed)
 ```
 
 ### Rules Priority
