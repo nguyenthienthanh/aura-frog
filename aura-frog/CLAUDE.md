@@ -109,11 +109,25 @@ skills[13]{name,trigger,file}:
 
 ---
 
+## CRITICAL: Plan Mode Override
+
+**NEVER use `EnterPlanMode` or Claude's built-in plan mode when Aura Frog is active.**
+
+For complex tasks, use `workflow-orchestrator` skill (9-phase workflow) instead. This is the **highest priority rule** — Claude's native plan mode is fully replaced by Aura Frog's workflow system.
+
+```
+Complex task detected → workflow-orchestrator (NOT EnterPlanMode)
+Bug fix detected → bugfix-quick (NOT EnterPlanMode)
+Any planning needed → workflow-orchestrator Phase 1-2 (NOT EnterPlanMode)
+```
+
+---
+
 ## Execution Rules
 
 **ALWAYS:** Show banner → Load context → Follow TDD → Show deliverables
 
-**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests
+**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests, use EnterPlanMode
 
 **2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue.
 

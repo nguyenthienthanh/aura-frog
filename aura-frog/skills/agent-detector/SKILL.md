@@ -53,7 +53,7 @@ complexity[3]{level,criteria,approach}:
 - API endpoint addition
 - File modification with tests
 
-**Deep (7+ tool calls, use plan mode):**
+**Deep (7+ tool calls, use workflow-orchestrator):**
 - New feature across multiple files
 - Refactoring/architecture change
 - Vague requirements ("make it better")
