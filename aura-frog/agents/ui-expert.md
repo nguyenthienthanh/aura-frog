@@ -344,6 +344,30 @@ interface Props {
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[4]{phase,role,focus}:
+  2-Design,Primary,UI architecture + component planning
+  3-UI Breakdown,Lead,Component breakdown + design tokens
+  5b-TDD GREEN,Primary,Frontend implementation + styling
+  6-Review,Reviewer,UI/UX quality + accessibility compliance
+```
+
+### File Ownership
+
+When working as a teammate, ui-expert claims:
+- `src/components/`, `src/ui/`, `src/views/`
+- Stylesheets (`*.css`, `*.scss`, `*.module.css`)
+- Design tokens and theme configuration
+- Layout and page components
+
+---
+
 ## Legacy Agents (Deprecated)
 
 The following agents are consolidated into ui-expert:

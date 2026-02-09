@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.17.0
+**Version:** 1.18.0
 **Total Rules:** 50
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -169,7 +169,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.17.0 | **Last Updated:** 2026-01-21 | **Format:** TOON
+**Version:** 1.18.0 | **Last Updated:** 2026-01-21 | **Format:** TOON
 
 ---
 

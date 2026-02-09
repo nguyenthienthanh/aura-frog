@@ -883,13 +883,39 @@ For each test phase, ensure:
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[6]{phase,role,focus}:
+  1-Understand,Primary,Testability assessment + acceptance criteria
+  4-Test Plan,Lead,Test strategy + case definition
+  5a-TDD RED,Lead,Write failing tests
+  5b-TDD GREEN,Primary,Validate tests pass + edge cases
+  6-Review,Primary,Test coverage review + quality gates
+  7-Verify,Lead,Final validation + coverage report
+```
+
+### File Ownership
+
+When working as a teammate, qa-automation claims:
+- `tests/`, `__tests__/`, `spec/`
+- Test configuration files (`jest.config.*`, `vitest.config.*`, `playwright.config.*`)
+- Test fixtures and mocks
+
+---
+
 ## 🔄 Version History
 
+- **1.1.0** (2026-02-09) - Added Agent Teams support
 - **1.0.0** (2025-11-23) - Initial QA Automation agent definition
 
 ---
 
-**Agent Status:** ✅ Ready  
-**Last Updated:** 2025-11-23  
+**Agent Status:** ✅ Ready
+**Last Updated:** 2026-02-09
 **Maintainer:** Aura Frog Team
 

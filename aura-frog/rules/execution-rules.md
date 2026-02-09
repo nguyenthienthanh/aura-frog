@@ -297,5 +297,36 @@ Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
 
 ---
 
-**Version:** 2.0.0
-**Last Updated:** 2026-01-02
+## Team Mode Rules (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### ALWAYS (Team Mode)
+
+| # | Rule | Why |
+|---|------|-----|
+| T1 | **Max 3 teammates per phase** | Prevent coordination overhead |
+| T2 | **Pass complete context to teammates** | They don't share conversation history |
+| T3 | **Use shared task list for work distribution** | Prevents duplicate work |
+| T4 | **Claim files before editing** | Prevents merge conflicts |
+| T5 | **Message teammates for handoffs** | Explicit coordination |
+
+### NEVER (Team Mode)
+
+| # | Rule | Why |
+|---|------|-----|
+| T6 | **Teammates commit independently** | Only lead manages git operations |
+| T7 | **Skip file claiming** | Causes merge conflicts |
+| T8 | **Create more than 3 teammates per phase** | Coordination overhead exceeds benefit |
+| T9 | **Let teammates advance phases** | Only lead manages phase transitions |
+
+### Team Mode Quick Reference
+```
+Lead: Creates teammates → Distributes tasks → Manages phases → Commits
+Teammate: Claims tasks → Works on files → Messages for review → Reports done
+```
+
+---
+
+**Version:** 2.1.0
+**Last Updated:** 2026-02-09

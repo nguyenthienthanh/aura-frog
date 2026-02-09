@@ -581,7 +581,29 @@ app.get('/user/:id', authenticate, (req, res) => {
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[2]{phase,role,focus}:
+  6-Review,Lead,Security audit + vulnerability scanning + OWASP compliance
+  5b-TDD GREEN,Reviewer,Security review of auth/crypto implementations
+```
+
+### File Ownership
+
+When working as a teammate, security-expert reviews (does not own):
+- Authentication and authorization files
+- Cryptography implementations
+- Input validation logic
+- Security configuration files
+
+---
+
 **Agent:** security-expert
 **Version:** 1.0.0
-**Last Updated:** 2024-11-26
+**Last Updated:** 2026-02-09
 **Status:** ✅ Active

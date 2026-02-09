@@ -480,6 +480,35 @@ function getReportsPath(planPath, resolvedBy, config) {
 }
 
 // ============================================
+// AGENT TEAMS UTILITIES
+// ============================================
+
+/**
+ * Check if Claude Agent Teams feature is enabled
+ * Checks both process.env and settings.json env config
+ */
+function isAgentTeamsEnabled() {
+  // Direct env var check
+  if (process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS === '1') return true;
+
+  // Check settings.json
+  const settingsPaths = [
+    path.join(os.homedir(), '.claude', 'settings.json'),
+    path.join(process.cwd(), '.claude', 'settings.json')
+  ];
+
+  for (const sp of settingsPaths) {
+    try {
+      if (!fs.existsSync(sp)) continue;
+      const settings = JSON.parse(fs.readFileSync(sp, 'utf8'));
+      if (settings?.env?.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS === '1') return true;
+    } catch (e) { /* ignore */ }
+  }
+
+  return false;
+}
+
+// ============================================
 // ENV FILE UTILITIES
 // ============================================
 
@@ -538,5 +567,8 @@ module.exports = {
 
   // Env utilities
   escapeShellValue,
-  writeEnv
+  writeEnv,
+
+  // Agent Teams
+  isAgentTeamsEnabled
 };

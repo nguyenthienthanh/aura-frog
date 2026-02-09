@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "1.17.0",
-  "description": "11 specialized agents, 9-phase TDD workflow, 50 rules, 45 skills (13 auto-invoke + 32 reference), 6 bundled commands, model routing, visual pixel-perfect testing. Main character energy for your codebase 🐸✨",
+  "version": "1.18.0",
+  "description": "11 specialized agents, 9-phase TDD workflow, 50 rules, 46 skills (13 auto-invoke + 33 reference), 23 hooks, Agent Teams support, model routing, visual pixel-perfect testing. Main character energy for your codebase 🐸✨",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

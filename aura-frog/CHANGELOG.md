@@ -4,6 +4,43 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.18.0] - 2026-02-09
+
+### Agent Teams Support (Experimental)
+
+Full Claude Agent Teams integration for real multi-agent orchestration with persistent teammates, peer-to-peer messaging, and shared task lists.
+
+#### Added
+- **Agent Teams integration** - Real multi-agent orchestration via Claude's experimental Agent Teams feature
+- **`isAgentTeamsEnabled()` utility** - Detection function in `af-config-utils.cjs` checking settings.json + env
+- **`teammate-idle.cjs` hook** - TeammateIdle lifecycle hook for assigning cross-review work to idle teammates
+- **`task-completed.cjs` hook** - TaskCompleted lifecycle hook for validating teammate task completion quality gates
+- **Team mode detection** in agent-detector skill - Decision matrix for team vs subagent mode
+- **Phase team composition** in workflow-orchestrator - Per-phase lead/primary/secondary teammate assignments
+- **Team task patterns** in task-based-agent-selection - Multi-domain task triggers for team activation
+- **Team Lead Mode** for pm-operations-orchestrator - Team creation, task distribution, cross-review coordination
+- **Team Mode Behavior** sections for architect, ui-expert, qa-automation, security-expert, mobile-expert agents
+- **Team mode cross-review** in cross-review-workflow rule - Parallel reviews via teammate messaging (~59% faster)
+- **Team context management** in context-management rule - Explicit context passing for independent teammates
+- **Team execution rules** in execution-rules - ALWAYS/NEVER rules for team mode
+- **Team banners** in agent-identification-banner - Lead + teammate banner formats
+- **AGENT_TEAMS_GUIDE.md** - Complete setup and usage documentation
+
+#### Updated
+- **`subagent-init.cjs`** - Teammate awareness via `CLAUDE_TEAMMATE_NAME` env var, team context injection
+- **`hooks.json`** - Added TeammateIdle and TaskCompleted hook events (Hooks: 21 → 23)
+- **Session state schema** - Added `teamMode` and `activeTeammates` fields
+- **smart-agent-detector** - Team mode output format and team vs subagent decision matrix
+- **plugin.json** - Version 1.18.0, updated description
+
+#### Stats
+- Hooks: 21 → 23 (+2: TeammateIdle, TaskCompleted)
+- Agents: 11 (unchanged)
+- Skills: 46 (unchanged)
+- Rules: 50 (unchanged)
+
+---
+
 ## [1.17.0] - 2026-01-22
 
 ### Context Optimization & Agent Consolidation

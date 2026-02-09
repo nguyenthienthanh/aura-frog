@@ -1,5 +1,5 @@
 -- Aura Frog Learning System - Supabase Schema
--- Version: 1.17.0
+-- Version: 1.18.0
 -- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
 
 -- ============================================================================

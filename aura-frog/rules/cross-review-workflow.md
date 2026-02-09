@@ -519,5 +519,56 @@ Cross-reviews add time but improve quality:
 
 ---
 
+---
+
+## Team Mode Cross-Review (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+In team mode, cross-reviews happen **in parallel** via teammate messaging instead of sequential simulation.
+
+### Team Review Process
+
+```toon
+team_review[4]{phase,reviewers,mechanism,time_savings}:
+  Phase 1,Dev + QA + UI teammates,Parallel teammate messages,~60% faster
+  Phase 2,Secondary Dev + QA teammates,Parallel teammate messages,~60% faster
+  Phase 4,Dev teammate(s),Direct teammate message,~50% faster
+  Phase 6,All active teammates,Broadcast to team,~70% faster
+```
+
+### Teammate Review Message Format
+
+```
+From: [reviewer-teammate]
+To: [author-teammate]
+Subject: Phase [N] Review
+
+**Verdict:** Approve / Request Changes / Comment
+
+**Findings:**
+1. [finding-1]
+2. [finding-2]
+
+**Suggestions:**
+- [suggestion-1]
+```
+
+### Time Savings (Team vs Sequential)
+
+| Phase | Sequential | Team Mode | Savings |
+|-------|-----------|-----------|---------|
+| Phase 1 | 70 min | 30 min | 57% |
+| Phase 2 | 115 min | 50 min | 57% |
+| Phase 4 | 75 min | 35 min | 53% |
+| Phase 6 | 90 min | 30 min | 67% |
+| **Total** | **350 min** | **145 min** | **59%** |
+
+### Fallback
+
+When Agent Teams is not enabled, standard sequential cross-review applies (no change).
+
+---
+
 **Applied in:** Phase 1, Phase 2, Phase 4, and Code Review (Phase 6)
 

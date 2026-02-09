@@ -407,4 +407,37 @@ This task-based analysis **enhances** existing detection:
 
 ---
 
+---
+
+## Team Task Patterns (Agent Teams Mode)
+
+**When Agent Teams is enabled**, certain task patterns trigger full team composition instead of single-agent selection.
+
+### Multi-Domain Team Patterns
+
+```toon
+team_task_patterns[6]{pattern,team_composition,reason}:
+  Full feature (frontend+backend+tests),architect(lead)+ui-expert+qa-automation,Cross-domain implementation
+  Security audit,security-expert(lead)+architect+qa-automation,Deep analysis + remediation + verification
+  Performance optimization,architect(lead)+devops-cicd+qa-automation,Backend + infra + benchmarks
+  Design system implementation,ui-expert(lead)+architect+qa-automation,Components + API + tests
+  Database migration + UI,architect(lead)+ui-expert+qa-automation,Schema + views + validation
+  Mobile feature (cross-platform),mobile-expert(lead)+architect+qa-automation,App + API + tests
+```
+
+### Team Activation Threshold
+
+```
+TEAM_ACTIVATION(scores):
+  domain_count = count(scores where score ≥ 50)
+  IF domain_count >= 2 AND isAgentTeamsEnabled():
+    mode = "team"
+    lead = agent with highest score
+    primary = agents with score 50-79
+  ELSE:
+    mode = "subagent" (standard)
+```
+
+---
+
 **Related:** `agent-detector/SKILL.md`, `agents/smart-agent-detector.md`

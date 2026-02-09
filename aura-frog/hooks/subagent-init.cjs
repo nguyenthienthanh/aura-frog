@@ -15,7 +15,8 @@ const path = require('path');
 
 const {
   readSessionState,
-  writeSessionState
+  writeSessionState,
+  isAgentTeamsEnabled
 } = require('./lib/af-config-utils.cjs');
 
 // Default state (used when no session exists)
@@ -30,7 +31,9 @@ const DEFAULT_STATE = {
   complexity: null,
   projectType: null,
   packageManager: null,
-  framework: null
+  framework: null,
+  teamMode: false,
+  activeTeammates: []
 };
 
 // Load or create session state
@@ -140,6 +143,8 @@ function main() {
   const state = loadSessionState();
   const phase = detectPhase();
   const projectName = getProjectName();
+  const isTeammate = !!process.env.CLAUDE_TEAMMATE_NAME;
+  const teammateName = process.env.CLAUDE_TEAMMATE_NAME;
 
   // Track agent usage for learning
   trackAgentUsage(state);
@@ -147,8 +152,26 @@ function main() {
   // Update state
   if (phase) state.phase = phase;
 
+  // Track teammate in session state
+  if (isTeammate && isAgentTeamsEnabled()) {
+    state.teamMode = true;
+    if (!state.activeTeammates) state.activeTeammates = [];
+    if (!state.activeTeammates.includes(teammateName)) {
+      state.activeTeammates.push(teammateName);
+    }
+  }
+
   // Build context injection
   const context = [];
+
+  // Team mode header
+  if (isTeammate && isAgentTeamsEnabled()) {
+    context.push(`👥 Team Mode: Active | Role: ${teammateName}`);
+    if (state.activeTeammates && state.activeTeammates.length > 1) {
+      const otherTeammates = state.activeTeammates.filter(t => t !== teammateName);
+      context.push(`🤝 Teammates: ${otherTeammates.join(', ')}`);
+    }
+  }
 
   // Phase info
   if (state.phase) {
@@ -181,16 +204,22 @@ function main() {
     context.push(`📦 Project: ${projectInfo.join(' | ')}`);
   }
 
-  // Active agents
-  if (state.agents && state.agents.length > 0) {
+  // Active agents (skip in team mode - teammates shown separately)
+  if (!isTeammate && state.agents && state.agents.length > 0) {
     context.push(`🤖 Agents: ${state.agents.join(', ')}`);
+  }
+
+  // Team-specific instructions for teammates
+  if (isTeammate && isAgentTeamsEnabled()) {
+    context.push('📌 Team Rules: Use shared task list, claim before working, message teammates for handoffs');
   }
 
   // Output context if any
   if (context.length > 0) {
-    console.error('\n--- Aura Frog Context ---');
+    const header = isTeammate ? '--- Aura Frog Team Context ---' : '--- Aura Frog Context ---';
+    console.error(`\n${header}`);
     context.forEach(c => console.error(c));
-    console.error('-------------------------\n');
+    console.error('-------------------------------\n');
   }
 
   // Save updated state

@@ -73,8 +73,9 @@ At approval gates:
 - **Usage Guide:** [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
 - **Commands:** [commands/README.md](commands/README.md)
 - **MCP Setup:** [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md)
-- **Learning System:** [docs/LEARNING_SYSTEM.md](docs/LEARNING_SYSTEM.md) (NEW)
+- **Learning System:** [docs/LEARNING_SYSTEM.md](docs/LEARNING_SYSTEM.md)
+- **Agent Teams:** [docs/AGENT_TEAMS_GUIDE.md](docs/AGENT_TEAMS_GUIDE.md) (NEW)
 
 ---
 
-**Version:** 1.17.0
+**Version:** 1.18.0

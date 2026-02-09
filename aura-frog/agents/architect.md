@@ -277,6 +277,35 @@ When providing architectural guidance:
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[7]{phase,role,focus}:
+  1-Understand,Primary,Technical feasibility assessment
+  2-Design,Lead,Architecture decisions + API contracts
+  4-Test Plan,Primary,Test architecture + integration points
+  5a-TDD RED,Primary,Test structure + fixtures
+  5b-TDD GREEN,Lead,Implementation + backend logic
+  5c-TDD REFACTOR,Lead,Code quality + patterns
+  6-Review,Primary,Architecture + performance review
+```
+
+### File Claiming Conventions
+
+When working as a teammate, architect claims:
+- `src/api/`, `src/services/`, `src/repositories/`
+- Database migrations, schema files
+- Backend configuration, middleware
+- API route definitions
+
+Other teammates should not modify these files without messaging architect first.
+
+---
+
 ## Legacy Agents (Deprecated)
 
 The following agents are consolidated into architect:

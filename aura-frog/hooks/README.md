@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.17.0
+**Version:** 1.18.0
 
 ---
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (21 Total)
+## Active Hooks (23 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -447,6 +447,35 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
+### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.18.0)
+**When:** A teammate has no remaining tasks (Agent Teams mode only)
+
+**Actions:**
+- ✅ Check for unclaimed tasks matching teammate's specialization
+- ✅ Assign cross-review work from completed phases
+- ✅ Check pending quality gates needing validation
+- ✅ Exit 2 = keep alive (assign work), Exit 0 = let exit
+
+**Agent Teams Required:** Only fires when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+**Script:** `hooks/teammate-idle.cjs`
+
+---
+
+### 10c. TaskCompleted - Task Completion Validator (NEW in 1.18.0)
+**When:** A teammate marks a task as done (Agent Teams mode only)
+
+**Actions:**
+- ✅ Validate TDD phase test references
+- ✅ Check approval gate status
+- ✅ Exit 2 = reject (needs revision), Exit 0 = accept
+
+**Agent Teams Required:** Only fires when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+**Script:** `hooks/task-completed.cjs`
+
+---
+
 ### 11. Stop - Compact Handoff Save (NEW in 1.16.0)
 **When:** Session stops (including before compact)
 
@@ -610,7 +639,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[21]{event,name,purpose}:
+hooks[23]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
@@ -628,6 +657,8 @@ hooks[21]{event,name,purpose}:
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
+  TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
+  TaskCompleted,Task Completion Validator,Validate teammate task completion (Agent Teams)
   Stop,Compact Handoff,Auto-save workflow state before compact
   Stop,Voice+Metrics,Voice notification + session metrics
   Notification,Critical Alert,Voice alert for errors/critical issues
@@ -636,6 +667,6 @@ hooks[21]{event,name,purpose}:
 
 ---
 
-**Version:** 1.17.0
-**Last Updated:** 2026-01-20
-**Status:** Active hooks system (21 hooks)
+**Version:** 1.18.0
+**Last Updated:** 2026-02-09
+**Status:** Active hooks system (23 hooks)

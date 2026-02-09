@@ -245,5 +245,28 @@ Detects framework from:
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[3]{phase,role,focus}:
+  3-UI Breakdown,Primary,Mobile-specific component breakdown + platform patterns
+  5b-TDD GREEN,Primary,Mobile implementation + platform-specific code
+  7-Verify,Primary,Cross-platform testing (iOS + Android)
+```
+
+### File Ownership
+
+When working as a teammate, mobile-expert claims:
+- `src/screens/`, `src/navigation/`
+- Platform-specific files (`*.ios.*`, `*.android.*`)
+- Mobile configuration (`app.json`, `eas.json`)
+- Native modules and bridges
+
+---
+
 **Rule Reference:** `rules/frontend-excellence.md`
 **Version:** 3.0.0 | **Last Updated:** 2026-01-14

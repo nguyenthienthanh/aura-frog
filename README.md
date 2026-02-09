@@ -8,9 +8,9 @@
 
 > **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), self-improving learning system, and bundled MCP servers.
+AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), Agent Teams orchestration, self-improving learning system, and bundled MCP servers.
 
-[![Version](https://img.shields.io/badge/version-1.17.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.18.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -25,9 +25,9 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-
 
 <div align="center">
 
-| **Agents** | **Bundled Commands** | **Auto Skills** | **Rules** | **MCP Servers** |
-|:----------:|:--------------------:|:---------------:|:---------:|:---------------:|
-| **11** | **6** | **13** | **50** | **6** |
+| **Agents** | **Bundled Commands** | **Auto Skills** | **Rules** | **Hooks** | **MCP Servers** |
+|:----------:|:--------------------:|:---------------:|:---------:|:---------:|:---------------:|
+| **11** | **6** | **13** | **50** | **23** | **6** |
 
 </div>
 
@@ -38,7 +38,9 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-
 - **32 Reference Skills** — Framework experts, SEO experts, loaded on-demand by bundles
 - **6 MCP Servers** — Context7, Playwright, Vitest, Firebase, Figma, Slack
 - **50 Quality Rules** — System, code quality, architecture, workflow, UI, SEO
+- **23 Lifecycle Hooks** — Safety guards, auto-learning, teammate orchestration
 - **9-Phase Workflow** — From requirements to deployment with only 2 approval gates
+- **Agent Teams** — Real multi-agent orchestration with persistent teammates (experimental)
 - **Model Routing** — Auto-select Haiku/Sonnet/Opus for 30-50% cost savings
 - **Learning System** — Self-improvement via local storage or Supabase
 
@@ -107,10 +109,11 @@ At each phase, review and respond:
 | Traditional Development | With Aura Frog |
 |------------------------|----------------|
 | Manual task management | AI-powered 9-phase workflow |
-| Generic AI responses | 15 specialized agents auto-selected |
+| Generic AI responses | 11 specialized agents auto-selected |
+| Single AI session | Agent Teams with persistent teammates |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 82 commands |
+| Context switching | CLI-first with 88 commands |
 | Manual documentation | Auto-generated docs |
 | Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 
@@ -374,6 +377,46 @@ Aura Frog learns and improves over time. **Works out of the box with local stora
 
 ---
 
+### Agent Teams (NEW in v1.18.0)
+
+When enabled, Aura Frog uses Claude's **Agent Teams** feature for real multi-agent orchestration with persistent teammates, peer-to-peer messaging, and shared task lists.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  pm-operations-orchestrator (Team Lead)                  │
+│                                                          │
+│  Creates teammates per phase:                            │
+│  ├── architect      — System design, backend, DB         │
+│  ├── ui-expert      — Frontend, design systems           │
+│  ├── qa-automation   — Testing, quality gates             │
+│  └── security-expert — Security review                   │
+│                                                          │
+│  Shared task list + peer messaging + cross-review        │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Key features:**
+- **Phase-based teams** — Each workflow phase gets the right team composition (2-3 agents)
+- **Parallel work** — Teammates work concurrently on separate files
+- **Cross-review via messaging** — Real peer reviews between teammates
+- **Quality hooks** — `TeammateIdle` assigns work, `TaskCompleted` validates output
+
+**Enable:**
+```json
+// .claude/settings.local.json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+**Backward compatible:** When disabled, standard subagent behavior applies (no change from v1.17.0).
+
+**See:** [aura-frog/docs/AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) for full guide
+
+---
+
 ## Workflow Modes
 
 ### Full 9-Phase Workflow
@@ -528,6 +571,7 @@ learn:status
 | [aura-frog/docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) | MCP servers guide |
 | [aura-frog/skills/README.md](aura-frog/skills/README.md) | Skills system guide |
 | [aura-frog/docs/WORKFLOW_DIAGRAMS.md](aura-frog/docs/WORKFLOW_DIAGRAMS.md) | 10 visual workflow diagrams |
+| [aura-frog/docs/AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) | Agent Teams guide (NEW) |
 
 ### Reference
 
@@ -538,7 +582,8 @@ learn:status
 | [aura-frog/rules/](aura-frog/rules/) | 50 quality rules |
 | [aura-frog/scripts/README.md](aura-frog/scripts/README.md) | Utility scripts (integrations, workflows) |
 | [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) | Learning system (local + Supabase) |
-| [aura-frog/docs/REFACTOR_ANALYSIS.md](aura-frog/docs/REFACTOR_ANALYSIS.md) | Optimization guide (NEW) |
+| [aura-frog/hooks/README.md](aura-frog/hooks/README.md) | 23 lifecycle hooks |
+| [aura-frog/docs/REFACTOR_ANALYSIS.md](aura-frog/docs/REFACTOR_ANALYSIS.md) | Optimization guide |
 
 ---
 
@@ -556,7 +601,7 @@ aura-frog/                           # Repository root
 │   │   ├── phases/                  # 9 phase guides
 │   │   ├── MCP_GUIDE.md             # MCP setup guide
 │   │   └── REFACTOR_ANALYSIS.md     # Optimization guide (NEW)
-│   ├── hooks/                       # Lifecycle hooks
+│   ├── hooks/                       # 23 lifecycle hooks (safety, learning, teams)
 │   ├── scripts/                     # Utility scripts
 │   └── templates/                   # Document templates
 ├── assets/                          # Logo and images

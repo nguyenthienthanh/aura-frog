@@ -188,13 +188,51 @@ antipatterns[5]{pattern,problem,solution}:
 
 ---
 
+## Team Context Management (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+Teammates are independent Claude Code instances with **separate context windows**. This has critical implications:
+
+### Key Differences
+
+```toon
+team_context_rules[4]{rule,detail}:
+  No shared history,Teammates do NOT see the lead's conversation history
+  Explicit context passing,Lead must send all relevant context via messages or shared files
+  File-based sharing,Use shared task descriptions and file paths for context
+  Independent loading,Each teammate loads its own project context independently
+```
+
+### Context Passing Best Practices
+
+```toon
+context_passing[4]{method,when,example}:
+  Task description,Creating tasks,Include file paths + requirements + constraints
+  Teammate message,Handoff or clarification,Send specific decisions/changes made
+  Shared files,Phase deliverables,Write to plan directory then reference path
+  Task dependencies,Sequential work,blockedBy ensures ordering
+```
+
+### Anti-Patterns in Team Mode
+
+```toon
+team_antipatterns[3]{pattern,problem,solution}:
+  Assume teammate knows context,They have empty context,Include all relevant info in task/message
+  Send entire codebase as context,Overwhelms teammate context,Send only relevant file paths and summaries
+  Multiple teammates editing same file,Merge conflicts,Use file claiming conventions from agent docs
+```
+
+---
+
 ## Related Files
 
 - `skills/model-router/SKILL.md` - Automatic model selection
 - `skills/framework-expert/SKILL.md` - Lazy framework loading
 - `docs/REFACTOR_ANALYSIS.md` - Full optimization analysis
 - `hooks/lib/af-project-cache.cjs` - Project detection caching
+- `docs/AGENT_TEAMS_GUIDE.md` - Agent Teams setup guide
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21
+**Version:** 1.1.0 | **Last Updated:** 2026-02-09

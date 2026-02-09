@@ -481,6 +481,63 @@ TOTAL APPROVALS NEEDED: 2
 
 ---
 
+## Agent Teams Mode (Experimental)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+In team mode, teammates are persistent Claude Code instances with separate context windows, shared task lists, and peer-to-peer messaging. This replaces the sequential single-agent execution with parallel collaborative work.
+
+### Phase Team Composition
+
+```toon
+phase_teams[11]{phase,lead,primary,secondary,team_size}:
+  1-Understand,pm-operations-orchestrator,architect,qa-automation,3
+  2-Design,architect,ui-expert,qa-automation,3
+  3-UI,ui-expert,mobile-expert,-,2
+  4-Test Plan,qa-automation,architect,-,2
+  5a-TDD RED,qa-automation,architect,-,2
+  5b-TDD GREEN,architect,ui-expert+qa-automation,-,3
+  5c-TDD REFACTOR,architect,-,qa-automation(reviewer),2
+  6-Review,security-expert,architect+qa-automation,-,3
+  7-Verify,qa-automation,-,-,1
+  8-Document,pm-operations-orchestrator,-,-,1
+  9-Share,voice-operations,-,-,1
+```
+
+### Team Orchestration
+
+**Team Lead (pm-operations-orchestrator) responsibilities:**
+1. Create teammates at phase start using agent roster
+2. Distribute tasks via shared task list with dependencies
+3. Coordinate cross-review via teammate messaging
+4. Manage phase transitions (only lead advances phases)
+
+**Teammate responsibilities:**
+1. Claim tasks from shared task list matching their specialization
+2. Message teammates directly for handoffs and clarifications
+3. Mark tasks complete when done (validated by TaskCompleted hook)
+4. Stay alive via TeammateIdle hook for cross-review work
+
+### Team Token Budgets
+
+```toon
+team_token_budget[5]{phase_group,per_teammate,total_budget,notes}:
+  Phase 1 (Understand),300,900,Lead summarizes + teammates validate
+  Phase 2-4 (Design/UI/Test),1500,4500,Parallel design work
+  Phase 5a-5c (TDD),2000,6000,Parallel test writing + implementation
+  Phase 6-7 (Review/Verify),1000,3000,Parallel reviews
+  Phase 8-9 (Doc/Notify),500,500,Single agent phases
+```
+
+### Team vs Subagent Fallback
+
+If Agent Teams is not enabled, the workflow uses standard subagent mode:
+- Sequential execution (current behavior)
+- Single context window
+- Hub-spoke communication via Task tool
+
+---
+
 **Remember:**
 - Follow phases in order
 - Only 2 approval gates: Phase 2 (Design) and Phase 5b (Implementation)

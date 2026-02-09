@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.17.0
+**System:** Aura Frog v1.18.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
 
@@ -50,7 +50,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.17.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ 🔥 [aura-message]                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -171,6 +171,23 @@ resources[12]{name,location}:
 
 ---
 
+## Agent Teams (Experimental)
+
+When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled, Aura Frog uses real multi-agent orchestration via Claude's Agent Teams feature.
+
+```toon
+team_mode[3]{aspect,detail}:
+  Detection,agent-detector scores multi-domain tasks → team mode if 2+ domains ≥50
+  Hooks,TeammateIdle (assign cross-review) + TaskCompleted (validate quality)
+  Orchestration,pm-operations-orchestrator as lead → creates teammates per phase
+```
+
+**Backward Compatible:** When disabled, standard subagent behavior applies.
+
+**Guide:** `docs/AGENT_TEAMS_GUIDE.md`
+
+---
+
 ## Context Management
 
 ```toon
@@ -224,4 +241,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.17.0
+**Version:** 1.18.0

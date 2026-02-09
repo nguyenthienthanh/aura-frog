@@ -287,6 +287,71 @@ When agents disagree on approach:
 
 ---
 
+## Team Lead Mode (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+In team mode, pm-operations-orchestrator acts as the **team lead** - the persistent coordinator that creates teammates, distributes work, and manages phase transitions.
+
+### Team Lead Responsibilities
+
+```toon
+team_lead_duties[6]{duty,description}:
+  Create teammates,Spawn teammates matching phase requirements from phase_teams table
+  Distribute tasks,Create shared tasks with dependencies and assign to teammates
+  Cross-review,Route completed work to appropriate reviewers via messaging
+  Phase transitions,Only the lead advances phases and manages approval gates
+  Conflict resolution,Mediate when teammates disagree on approach
+  Context sharing,Pass essential context to teammates (they don't share conversation history)
+```
+
+### Consolidated Team Roster (v1.17.0)
+
+```toon
+active_agents[11]{agent,role,phases}:
+  pm-operations-orchestrator,Lead/Coordinator,1+8+9
+  architect,System design + backend + database,2+4+5a+5b+5c+6
+  ui-expert,Frontend + design systems,2+3+5b
+  mobile-expert,React Native + Flutter,3+5b (mobile projects)
+  game-developer,Godot game dev,All phases (game projects)
+  qa-automation,Testing + QA,1+4+5a+5b+6+7
+  security-expert,Security audits,6
+  devops-cicd,CI/CD + infrastructure,5b+6
+  voice-operations,Voice notifications,9
+  smart-agent-detector,Agent selection,N/A (detection only)
+  project-manager,Project context,N/A (context only)
+```
+
+### Team Task Distribution Format
+
+```markdown
+📋 **Team Task**
+
+**Task ID:** [auto-generated]
+**Assigned To:** [teammate-name]
+**Phase:** [N] - [name]
+**Description:** [what to do]
+**Files:** [specific files to work on]
+**Depends On:** [task-ids] (optional)
+**Review By:** [teammate-name] (optional)
+```
+
+### Cross-Review via Messaging
+
+In team mode, cross-review happens through direct teammate messaging instead of sequential simulation:
+
+```
+Lead → Teammate A: "Review Phase 2 design deliverables, focus on API contracts"
+Teammate A → Lead: "Design approved with 2 minor suggestions: [details]"
+Lead → Teammate B: "Incorporate feedback: [details]"
+```
+
+### Fallback
+
+When Agent Teams is not enabled, standard subagent orchestration applies (no change from v1.17.0 behavior).
+
+---
+
 ## Related Documentation
 
 - **Phase Guides:** `docs/phases/phase-1-understand.md` through `phase-9-notification.md`
@@ -296,8 +361,9 @@ When agents disagree on approach:
 - **Phase Skipping:** `skills/workflow-orchestrator/phase-skipping.md`
 - **Estimation:** `skills/pm-expert/estimation.md`
 - **Documentation (ADR/Runbook):** `skills/documentation/adr-runbook.md`
-- **Quality Rules:** `rules/README.md` (25 rules)
+- **Quality Rules:** `rules/README.md` (50 rules)
+- **Agent Teams Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28
+**Version:** 1.1.0 | **Last Updated:** 2026-02-09

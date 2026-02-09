@@ -125,6 +125,28 @@
         ]
       }
     ],
+    "TeammateIdle": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/teammate-idle.cjs\" 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/task-completed.cjs\" 2>&1 || true"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

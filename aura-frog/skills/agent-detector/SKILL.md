@@ -551,6 +551,54 @@ Detection Result:
 
 ---
 
+## Team Mode Detection
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+Team mode spawns multiple Claude Code instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **subagents** (fire-and-forget, hub-spoke).
+
+### Team vs Subagent Decision Matrix
+
+```toon
+team_decision[5]{condition,mode,reason}:
+  Complexity=Quick,subagent,Single agent sufficient
+  Complexity=Standard + 1 domain,subagent,One agent can handle
+  Complexity=Standard + 2+ domains,team (if enabled),Cross-domain collaboration
+  Complexity=Deep + cross-review needed,team (if enabled),Parallel reviews + handoffs
+  Complexity=Deep + single domain,subagent,Deep focus single agent
+```
+
+**Gate:** If `isAgentTeamsEnabled()` returns false, always use subagent mode regardless of complexity.
+
+### Team Mode Output Format
+
+When team mode is selected, output:
+
+```markdown
+## Detection Result
+- **Agent:** architect (LEAD)
+- **Mode:** team
+- **Model:** sonnet
+- **Complexity:** Deep
+- **Team Composition:**
+  - architect (lead) - system design, API endpoints
+  - ui-expert (primary) - frontend components
+  - qa-automation (primary) - test strategy + TDD
+- **Reason:** Multi-domain feature requiring parallel work
+```
+
+### Team Composition Rules
+
+```toon
+team_rules[4]{rule,detail}:
+  Max teammates per phase,3 (lead + 2 primary)
+  Lead selection,Highest scoring agent from detection
+  Primary selection,Score 50-79 agents become teammates
+  Minimum for team mode,2+ domains with score ≥50 each
+```
+
+---
+
 ## Manual Override
 
 User can force specific agent:

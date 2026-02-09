@@ -448,6 +448,38 @@ These agents don't require scoring:
 
 ---
 
+## Team Mode Output (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Team vs Subagent Decision
+
+```toon
+team_decision[4]{condition,mode}:
+  Single domain + Quick/Standard complexity,subagent
+  Multi-domain (2+ scores ≥50) + Agent Teams enabled,team
+  Deep complexity + cross-review + Agent Teams enabled,team
+  Agent Teams disabled (any complexity),subagent
+```
+
+### Team Mode Output Format
+
+```markdown
+🧠 **Agent Selection Complete (Team Mode)**
+
+**Mode:** Team
+**Lead:** 🤖 [agent-name] (Score: XX)
+
+**Teammates:**
+- 🏗️ [agent-name] (Score: XX) - [file focus]
+- 🎨 [agent-name] (Score: XX) - [file focus]
+
+**Team Size:** [N]
+**Confidence:** [High/Medium/Low] (XX%)
+```
+
+---
+
 ## Related Documentation
 
 - **Task-Based Selection:** `skills/agent-detector/task-based-agent-selection.md`
@@ -459,4 +491,4 @@ These agents don't require scoring:
 
 ---
 
-**Version:** 1.17.0 | **Last Updated:** 2026-01-21
+**Version:** 1.18.0 | **Last Updated:** 2026-02-09
