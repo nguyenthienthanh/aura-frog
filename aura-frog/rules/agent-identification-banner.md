@@ -14,7 +14,8 @@
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ Model: [model] │ 🔥 [aura-message]                      ┃
+┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
+┃ 🔥 [aura-message]                                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -22,7 +23,7 @@
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ Model: [model] │ 🔌 MCP: [mcp-name]                     ┃
+┃ Model: [model] │ Teams: [✓/✗] │ 🔌 MCP: [mcp-name]     ┃
 ┃ 🔥 [aura-message]                                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -31,7 +32,7 @@
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ Model: [model] │ 🔌 MCP: [mcp1], [mcp2], [mcp3]         ┃
+┃ Model: [model] │ Teams: [✓/✗] │ 🔌 MCP: [mcp1], [mcp2]  ┃
 ┃ 🔥 [aura-message]                                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -40,8 +41,8 @@
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: [primary] + [secondary], [tertiary]            ┃
-┃ Phase: [phase] - [name] │ 🔥 [aura-message]            ┃
-┃ Model: [model]                                         ┃
+┃ Phase: [phase] - [name] │ Teams: [✓/✗]                  ┃
+┃ Model: [model] │ 🔥 [aura-message]                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -62,10 +63,21 @@
   - Secondary/supporting agents after `+`
   - Comma-separated if more than 2
 
-### Line 3: Model & Aura (or MCP)
+### Line 3: Model, Teams & Aura (or MCP)
 - **Model:** AI model with version (e.g., Sonnet 4.5, Opus 4.5, Gemini 2.0 Flash, GPT-4o, DeepSeek V3)
+- **Teams:** ALWAYS show Agent Teams status — `Teams: ✓ enabled` or `Teams: ✗ off`
 - **Aura message:** Short, fun, contextual phrase (2-4 words)
-- **MCP indicator:** When using MCP server, show `🔌 MCP: [name]` instead of aura on line 2
+- **MCP indicator:** When using MCP server, show `🔌 MCP: [name]` alongside Teams status
+
+### Teams Status (MANDATORY)
+
+**ALWAYS show Teams status in EVERY banner.** This is not optional.
+
+| Condition | Display |
+|-----------|---------|
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | `Teams: ✓ enabled` or `Teams: ✓` |
+| Not enabled / not set | `Teams: ✗ off` or `Teams: ✗` |
+| Team active with teammates | `Teams: ✓ (3 active)` |
 
 ---
 
@@ -86,8 +98,8 @@
 **Fetching library docs:**
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: web-expert │ Phase: -                           ┃
-┃ Model: Opus 4.5 │ 🔌 MCP: context7                      ┃
+┃ Agent: ui-expert │ Phase: -                            ┃
+┃ Model: Opus 4.5 │ Teams: ✓ │ 🔌 MCP: context7           ┃
 ┃ 🔥 Fetching React docs                                 ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -96,7 +108,7 @@
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: 7 - Verify               ┃
-┃ Model: Opus 4.5 │ 🔌 MCP: playwright                    ┃
+┃ Model: Opus 4.5 │ Teams: ✓ │ 🔌 MCP: playwright          ┃
 ┃ 🔥 Testing login flow                                  ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -104,8 +116,8 @@
 **Multiple MCPs (docs + testing):**
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: web-expert │ Phase: 5b - TDD GREEN              ┃
-┃ Model: Sonnet 4.5 │ 🔌 MCP: context7, vitest            ┃
+┃ Agent: ui-expert │ Phase: 5b - TDD GREEN               ┃
+┃ Model: Sonnet 4.5 │ Teams: ✗ │ 🔌 MCP: context7, vitest  ┃
 ┃ 🔥 Building with tests                                 ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -119,6 +131,7 @@
 ```
 🔌 MCP: context7 ✓ | figma ✗ | playwright ✓ | vitest ✓ | slack ✗
 🧠 Learning: enabled ✓ | Memory: 15 items loaded
+👥 Teams: ✓ enabled | Mode: ready
 ```
 
 ### Memory Status Values
@@ -244,8 +257,9 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
-┃ Model: Gemini 2.0 Flash │ 🔥 Architecting greatness     ┃
+┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
+┃ Model: Gemini 2.0 Flash │ Teams: ✓ enabled              ┃
+┃ 🔥 Architecting greatness                               ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -254,7 +268,8 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
-┃ Model: Sonnet 4.5 │ 🔥 Ready to rock                    ┃
+┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
+┃ 🔥 Ready to rock                                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -263,8 +278,8 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: qa-automation + security-expert                ┃
-┃ Phase: 6 - Review │ 🔥 Eagle eyes on                   ┃
-┃ Model: Opus 4.5                                        ┃
+┃ Phase: 6 - Review │ Teams: ✓ enabled                    ┃
+┃ Model: Opus 4.5 │ 🔥 Eagle eyes on                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -272,9 +287,9 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agents: mobile-react-native + ui-designer, qa-automation┃
-┃ Phase: 5b - TDD GREEN │ 🔥 Squad goals                  ┃
-┃ Model: Sonnet 4.5                                       ┃
+┃ Agents: mobile-expert + ui-expert, qa-automation       ┃
+┃ Phase: 5b - TDD GREEN │ Teams: ✓ (3 active)             ┃
+┃ Model: Sonnet 4.5 │ 🔥 Squad goals                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -282,9 +297,9 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agents: backend-nodejs + qa-automation                 ┃
-┃ Phase: - │ 🔥 Bug hunter squad                         ┃
-┃ Model: DeepSeek V3                                     ┃
+┃ Agents: architect + qa-automation                      ┃
+┃ Phase: - │ Teams: ✗ off                                 ┃
+┃ Model: DeepSeek V3 │ 🔥 Bug hunter squad                ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -292,8 +307,9 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: backend-nodejs │ Phase: 5a - TDD RED            ┃
-┃ Model: DeepSeek V3 │ 🔥 Tests first, always             ┃
+┃ Agent: architect │ Phase: 5a - TDD RED                 ┃
+┃ Model: DeepSeek V3 │ Teams: ✓ enabled                   ┃
+┃ 🔥 Tests first, always                                  ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -307,7 +323,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [lead-agent] │ Phase: [phase] - [name]           ┃
-┃ Team: [teammate-1], [teammate-2] (3 active)             ┃
+┃ Teams: ✓ ([N] active) │ [teammate-1], [teammate-2]      ┃
 ┃ Model: [model] │ 🔥 [aura-message]                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -317,7 +333,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Teammate: [agent-name] │ Lead: [lead-name]              ┃
 ┃ Phase: [phase] - [name] │ Role: [Lead/Primary/Reviewer] ┃
-┃ Model: [model] │ 🔥 [aura-message]                       ┃
+┃ Teams: ✓ │ Model: [model] │ 🔥 [aura-message]            ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -327,7 +343,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: architect │ Phase: 2 - Design                    ┃
-┃ Team: ui-expert, qa-automation (3 active)               ┃
+┃ Teams: ✓ (3 active) │ ui-expert, qa-automation          ┃
 ┃ Model: Opus 4.6 │ 🔥 Team assemble                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -337,7 +353,7 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Teammate: qa-automation │ Lead: architect               ┃
 ┃ Phase: 5a - TDD RED │ Role: Lead                        ┃
-┃ Model: Sonnet 4.5 │ 🔥 Tests first always                ┃
+┃ Teams: ✓ │ Model: Sonnet 4.5 │ 🔥 Tests first always     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -376,8 +392,9 @@ Gen-Z slang, gaming culture, anime protagonist energy, developer humor
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: mobile-react-native │ Phase: 2 - Design         ┃
-┃ Model: Sonnet 4.5 │ 🔥 Architecting greatness           ┃
+┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
+┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
+┃ 🔥 Architecting greatness                               ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Phase 2: Technical Planning
@@ -389,9 +406,9 @@ Starting technical design for [feature]...
 
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agents: backend-nodejs + qa-automation                 ┃
-┃ Phase: 5b - TDD GREEN │ 🔥 Make it pass                ┃
-┃ Model: Opus 4.5                                        ┃
+┃ Agents: architect + qa-automation                      ┃
+┃ Phase: 5b - TDD GREEN │ Teams: ✓ (2 active)             ┃
+┃ Model: Opus 4.5 │ 🔥 Make it pass                        ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Phase 5b: Implementation (TDD GREEN)

@@ -43,6 +43,7 @@ session_start[6]{step,action,file}:
 ```
 🔌 MCP: context7 ✓ | playwright ✓ | vitest ✓ | firebase ✗
 🧠 Learning: enabled ✓ | Memory: 15 items loaded
+👥 Teams: ✓ enabled | Mode: ready
 ```
 
 ---
@@ -52,9 +53,12 @@ session_start[6]{step,action,file}:
 ```
 ⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ Model: [model] │ 🔥 [aura-message]                      ┃
+┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
+┃ 🔥 [aura-message]                                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+**Teams status is MANDATORY in every banner.** Show `✓ enabled` or `✗ off`.
 
 **Details:** `rules/agent-identification-banner.md`
 
