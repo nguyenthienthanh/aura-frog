@@ -8,7 +8,7 @@
  * Usage:
  *   node record-workflow-event.cjs <event_type> <phase> [workflow_id] [reason] [attempt_count]
  *
- * Event types: APPROVED, REJECTED, MODIFIED, CANCELLED, PHASE_START, WORKFLOW_COMPLETE
+ * Event types: APPROVED, REJECTED, MODIFIED, CANCELLED, PHASE_START, WORKFLOW_COMPLETE, TEAM_CREATED, TEAM_TEARDOWN, TEAM_LOG_MERGED
  *
  * @version 1.0.0
  */
@@ -24,7 +24,7 @@ async function main() {
 
   if (args.length < 2) {
     console.error('Usage: node record-workflow-event.cjs <event_type> <phase> [workflow_id] [reason] [attempt_count]');
-    console.error('Event types: APPROVED, REJECTED, MODIFIED, CANCELLED, PHASE_START, WORKFLOW_COMPLETE');
+    console.error('Event types: APPROVED, REJECTED, MODIFIED, CANCELLED, PHASE_START, WORKFLOW_COMPLETE, TEAM_CREATED, TEAM_TEARDOWN, TEAM_LOG_MERGED');
     process.exit(1);
   }
 
@@ -39,7 +39,7 @@ async function main() {
     process.exit(1);
   }
 
-  const validEventTypes = ['APPROVED', 'REJECTED', 'MODIFIED', 'CANCELLED', 'PHASE_START', 'WORKFLOW_COMPLETE'];
+  const validEventTypes = ['APPROVED', 'REJECTED', 'MODIFIED', 'CANCELLED', 'PHASE_START', 'WORKFLOW_COMPLETE', 'TEAM_CREATED', 'TEAM_TEARDOWN', 'TEAM_LOG_MERGED'];
   if (!validEventTypes.includes(eventType)) {
     console.error(`Error: Invalid event type "${eventType}". Valid types: ${validEventTypes.join(', ')}`);
     process.exit(1);

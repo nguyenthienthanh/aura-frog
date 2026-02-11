@@ -33,7 +33,11 @@ function createDefaultState() {
     complexity: null,
     projectType: null,
     packageManager: null,
-    framework: null
+    framework: null,
+    activeTeam: null,
+    activeTeamPhase: null,
+    teamLogDir: null,
+    teamHistory: []
   };
 }
 
@@ -92,6 +96,46 @@ function addAgent(agentName) {
   return true;
 }
 
+// Set active team
+function setActiveTeam(name, phase, logDir) {
+  const state = loadState();
+  state.activeTeam = name;
+  state.activeTeamPhase = phase;
+  state.teamLogDir = logDir;
+  state.updatedAt = new Date().toISOString();
+  return saveState(state);
+}
+
+// Clear active team (move to history)
+function clearActiveTeam() {
+  const state = loadState();
+  if (state.activeTeam) {
+    if (!state.teamHistory) state.teamHistory = [];
+    state.teamHistory.push({
+      name: state.activeTeam,
+      phase: state.activeTeamPhase,
+      logDir: state.teamLogDir,
+      clearedAt: new Date().toISOString()
+    });
+  }
+  state.activeTeam = null;
+  state.activeTeamPhase = null;
+  state.teamLogDir = null;
+  state.updatedAt = new Date().toISOString();
+  return saveState(state);
+}
+
+// Get active team info
+function getActiveTeamInfo() {
+  const state = loadState();
+  if (!state.activeTeam) return null;
+  return {
+    name: state.activeTeam,
+    phase: state.activeTeamPhase,
+    logDir: state.teamLogDir
+  };
+}
+
 // Clear session
 function clearSession() {
   const file = getSessionFile();
@@ -115,6 +159,9 @@ module.exports = {
   setActivePlan,
   setApproval,
   addAgent,
+  setActiveTeam,
+  clearActiveTeam,
+  getActiveTeamInfo,
   clearSession,
   getSessionFile
 };

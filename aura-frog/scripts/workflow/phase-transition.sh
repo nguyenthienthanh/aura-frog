@@ -233,10 +233,21 @@ execute_pre_phase_hook() {
     
     # Initialize phase state
     echo "   ✓ Phase state initialized"
-    
+
+    # Team bridge: create team if conditions met
+    if [[ "${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-0}" == "1" ]]; then
+        local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        local team_bridge="${script_dir}/../../hooks/lib/team-bridge.cjs"
+        local workflow_id=$(get_active_workflow_id)
+        if [[ -f "$team_bridge" && -n "$workflow_id" ]]; then
+            echo "   🔗 Team bridge: checking team creation..."
+            node "$team_bridge" create-if-needed "$phase" "$workflow_id" 2>&1 | sed 's/^/   /'
+        fi
+    fi
+
     # Show phase info
     echo "   ✓ Phase info displayed"
-    
+
     echo -e "${GREEN}✅ Pre-phase hook complete${NC}"
     echo ""
 }
@@ -262,9 +273,23 @@ execute_post_phase_hook() {
     # Generate summary
     echo "   ✓ Summary generated"
     
+    # Team bridge: teardown + merge logs
+    if [[ "${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-0}" == "1" ]]; then
+        local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        local team_bridge="${script_dir}/../../hooks/lib/team-bridge.cjs"
+        local merge_script="${script_dir}/merge-team-logs.sh"
+        local workflow_id=$(get_active_workflow_id)
+        if [[ -f "$team_bridge" && -n "$workflow_id" ]]; then
+            node "$team_bridge" teardown "$phase" "$workflow_id" 2>/dev/null | sed 's/^/   /' || true
+        fi
+        if [[ -f "$merge_script" && -n "$workflow_id" ]]; then
+            bash "$merge_script" "$workflow_id" --phase "$phase" 2>/dev/null | sed 's/^/   /' || true
+        fi
+    fi
+
     # Save state
     echo "   ✓ State saved"
-    
+
     echo -e "${GREEN}✅ Post-phase hook complete${NC}"
 }
 
@@ -376,6 +401,16 @@ process_approval() {
             echo -e "${YELLOW}🔄 Phase $phase rejected (attempt #${reject_count}) - restarting...${NC}"
             update_phase_status "$phase" "rejected"
             log_workflow_event "REJECTED" "$phase" "status=rejected action=restart attempt=${reject_count}"
+
+            # Team bridge: handle rejection (archive logs, prep next attempt)
+            if [[ "${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-0}" == "1" ]]; then
+                local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                local team_bridge="${script_dir}/../../hooks/lib/team-bridge.cjs"
+                local workflow_id=$(get_active_workflow_id)
+                if [[ -f "$team_bridge" && -n "$workflow_id" ]]; then
+                    node "$team_bridge" handle-rejection "$phase" "$workflow_id" 2>/dev/null || true
+                fi
+            fi
             return 1
             ;;
         2) # Modify

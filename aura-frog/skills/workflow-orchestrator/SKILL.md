@@ -582,6 +582,32 @@ team_token_budget[5]{phase_group,per_teammate,total_budget,notes}:
   Phase 8-9 (Doc/Notify),500,500,Single agent phases
 ```
 
+### Auto Team Lifecycle (Team-Workflow Bridge)
+
+When teams are active, phase transitions automatically manage team lifecycle:
+
+```
+Phase start (pre-phase hook):
+  -> team-bridge.cjs create-if-needed
+  -> Creates teams/ log dir, registers in workflow-state.json
+  -> Lead uses returned team name with TeamCreate()
+
+Phase end (post-phase hook):
+  -> team-bridge.cjs teardown (marks team completed)
+  -> merge-team-logs.sh --phase N (merges JSONL logs)
+
+Phase rejected:
+  -> team-bridge.cjs handle-rejection
+  -> Archives logs to -attempt-N, fresh dir for retry
+
+Workflow complete:
+  -> merge-team-logs.sh (all phases -> unified-timeline.jsonl)
+```
+
+Per-team logs are stored in `teams/phase-{slug}/` as JSONL files (one per agent + combined). Teammates log actions automatically when `AF_TEAM_LOG_DIR` is set in their environment.
+
+**Full docs:** `docs/TEAM_WORKFLOW_BRIDGE.md`
+
 ### Team vs Subagent Fallback
 
 If Agent Teams is not enabled OR complexity is not Deep + multi-domain:

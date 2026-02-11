@@ -149,6 +149,7 @@ create_workflow_state() {
   "current_phase": 1,
   "current_phase_name": "requirements-analysis",
   "phases": {},
+  "teams": {},
   "context": {
     "task": "${task}",
     "agents": $(printf '%s\n' "${agents[@]}" | jq -R . | jq -s .),
@@ -206,7 +207,8 @@ create_context_dir() {
     
     # Workflow logs (execution logs, timing, etc.)
     mkdir -p "${WORKFLOWS_DIR}/${workflow_id}"
-    
+    mkdir -p "${WORKFLOWS_DIR}/${workflow_id}/teams"
+
     # Context (deliverables, documents, artifacts)
     mkdir -p "${CONTEXTS_DIR}/${workflow_id}"
     mkdir -p "${CONTEXTS_DIR}/${workflow_id}/deliverables"

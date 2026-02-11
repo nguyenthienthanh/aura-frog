@@ -300,6 +300,46 @@ Fires when a teammate marks a task done. Validates:
 
 ---
 
+## Team-Workflow Bridge
+
+When using teams with the 9-phase workflow, the **Team-Workflow Bridge** automates team lifecycle:
+
+- **Phase start:** `team-bridge.cjs create-if-needed` creates a team + per-phase log directory
+- **Phase end:** `team-bridge.cjs teardown` marks team completed, `merge-team-logs.sh` merges logs
+- **Phase rejected:** `team-bridge.cjs handle-rejection` archives logs to `-attempt-N`, preps retry
+- **Workflow end:** `merge-team-logs.sh` merges all team logs into `unified-timeline.jsonl`
+
+### Per-Team Logging
+
+Each team gets its own JSONL log directory:
+
+```
+teams/phase-02-technical-planning/
+  team-log.jsonl        # Combined timeline
+  architect.jsonl       # Per-agent log
+  ui-expert.jsonl
+  qa-automation.jsonl
+```
+
+Teammates log actions automatically via `team-log-writer.cjs` when `AF_TEAM_LOG_DIR` is set.
+
+### Merge Commands
+
+```bash
+# Merge all team logs into unified timeline
+merge-team-logs.sh <workflow-id>
+
+# Merge single phase + append to execution.log
+merge-team-logs.sh <workflow-id> --phase 2
+
+# Generate readable markdown table
+merge-team-logs.sh <workflow-id> --readable
+```
+
+**Full docs:** `docs/TEAM_WORKFLOW_BRIDGE.md`
+
+---
+
 ## Backward Compatibility
 
 All Agent Teams features are gated on `isAgentTeamsEnabled()` + complexity check:
@@ -307,7 +347,8 @@ All Agent Teams features are gated on `isAgentTeamsEnabled()` + complexity check
 - When enabled but task is Quick/Standard: subagent behavior (no team overhead)
 - New hooks (TeammateIdle, TaskCompleted) never fire when off
 - All skill/agent/rule changes add new sections without modifying existing ones
+- Team-workflow bridge is no-op when Agent Teams is disabled
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-09
+**Version:** 1.18.0 | **Last Updated:** 2026-02-11

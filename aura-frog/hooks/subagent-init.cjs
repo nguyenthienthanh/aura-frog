@@ -159,6 +159,29 @@ function main() {
     if (!state.activeTeammates.includes(teammateName)) {
       state.activeTeammates.push(teammateName);
     }
+
+    // Inject team log directory from workflow state
+    try {
+      const teamBridge = require('./lib/team-bridge.cjs');
+      const workflowStatePaths = [
+        path.join(process.cwd(), '.claude', 'active-workflow.txt'),
+        path.join(process.cwd(), 'active-workflow.txt')
+      ];
+      let workflowId = null;
+      for (const wp of workflowStatePaths) {
+        if (fs.existsSync(wp)) {
+          workflowId = fs.readFileSync(wp, 'utf-8').trim();
+          break;
+        }
+      }
+      if (workflowId) {
+        const stateFile = teamBridge.resolveStateFile(workflowId);
+        const activeTeam = teamBridge.getActiveTeam(stateFile);
+        if (activeTeam && activeTeam.log_dir) {
+          state.teamLogDir = activeTeam.log_dir;
+        }
+      }
+    } catch { /* team-bridge not available */ }
   }
 
   // Build context injection
@@ -212,6 +235,11 @@ function main() {
   // Team-specific instructions for teammates
   if (isTeammate && isAgentTeamsEnabled()) {
     context.push('📌 Team Rules: Use shared task list, claim before working, message teammates for handoffs');
+
+    // Show team log directory if available
+    if (state.teamLogDir) {
+      context.push(`📂 Team Log: ${state.teamLogDir}`);
+    }
   }
 
   // Output context if any

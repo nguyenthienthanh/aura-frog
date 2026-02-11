@@ -91,6 +91,19 @@ function main() {
     }
   }
 
+  // Record completion in team log if available
+  if (process.env.AF_TEAM_LOG_DIR) {
+    try {
+      const teamLogWriter = require('./lib/team-log-writer.cjs');
+      const taskId = taskData.taskId || taskData.id || 'unknown';
+      const subject = taskData.subject || taskData.description || '';
+      teamLogWriter.logTaskCompleted(taskId, subject, {
+        phase: currentPhase,
+        validation: 'passed'
+      });
+    } catch { /* non-fatal */ }
+  }
+
   // Accept completion
   process.exit(0);
 }

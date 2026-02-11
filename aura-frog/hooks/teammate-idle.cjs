@@ -82,6 +82,17 @@ function main() {
   if (currentPhase && CROSS_REVIEW_PHASES[currentPhase]) {
     const reviewers = CROSS_REVIEW_PHASES[currentPhase];
     if (role && reviewers.includes(role)) {
+      // Record cross-review assignment in team log
+      if (process.env.AF_TEAM_LOG_DIR) {
+        try {
+          const teamLogWriter = require('./lib/team-log-writer.cjs');
+          teamLogWriter.logAction('cross_review_assigned', `${role} assigned cross-review for Phase ${currentPhase}`, {
+            phase: currentPhase,
+            reviewer: role
+          });
+        } catch { /* non-fatal */ }
+      }
+
       console.error(`🔍 Cross-review needed: Phase ${currentPhase} output requires ${role} review`);
       console.error(`Action: Review the Phase ${currentPhase} deliverables and provide feedback`);
       process.exit(2); // Keep alive - send feedback
