@@ -483,9 +483,60 @@ TOTAL APPROVALS NEEDED: 2
 
 ## Agent Teams Mode (Experimental)
 
-**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled AND complexity = Deep + 2+ domains.
 
-In team mode, teammates are persistent Claude Code instances with separate context windows, shared task lists, and peer-to-peer messaging. This replaces the sequential single-agent execution with parallel collaborative work.
+**Gate:** Team mode ONLY activates for Deep complexity with 2+ domains scoring ≥50 each. All Quick and Standard tasks use single-agent or subagent mode to save tokens (~3x cost reduction).
+
+### Parallel Startup Sequence
+
+**This is the concrete sequence the lead agent executes:**
+
+```
+Step 1: CREATE TEAM
+────────────────────
+TeamCreate(team_name="[ticket-or-feature-slug]", description="[task summary]")
+
+Step 2: CREATE TASKS (all in one message)
+──────────────────────────────────────────
+TaskCreate(subject="[task-1]", description="[full context + files + acceptance criteria]")
+TaskCreate(subject="[task-2]", description="[full context + files + acceptance criteria]")
+TaskCreate(subject="[task-3]", description="[full context + files + acceptance criteria]")
+
+Step 3: SPAWN TEAMMATES IN PARALLEL (all in one message — this is the key)
+───────────────────────────────────────────────────────────────────────────
+Task(team_name="[slug]", name="architect", subagent_type="aura-frog:architect",
+     prompt="You are architect on team [slug]. Your role: [phase role].
+             Read team config: ~/.claude/teams/[slug]/config.json
+             Check TaskList for unclaimed tasks matching your expertise.
+             Claim with TaskUpdate(taskId, owner='architect', status='in_progress').
+             When done: TaskUpdate(taskId, status='completed') then
+             SendMessage(recipient='pm-operations-orchestrator', content='Done: [summary]')
+             Files you own: src/api/, src/services/, migrations/")
+
+Task(team_name="[slug]", name="ui-expert", subagent_type="aura-frog:ui-expert",
+     prompt="You are ui-expert on team [slug]. Your role: [phase role].
+             [same pattern as above]
+             Files you own: src/components/, src/ui/, *.css")
+
+Task(team_name="[slug]", name="qa-automation", subagent_type="aura-frog:qa-automation",
+     prompt="You are qa-automation on team [slug]. Your role: [phase role].
+             [same pattern as above]
+             Files you own: tests/, __tests__/, *.test.*")
+
+Step 4: MONITOR + COORDINATE
+─────────────────────────────
+- Teammates work in parallel on claimed tasks
+- Lead receives completion messages via SendMessage
+- Lead sends cross-review requests: SendMessage(recipient="qa-automation", content="Review architect's API design")
+- TeammateIdle hook auto-assigns idle teammates to cross-review
+
+Step 5: PHASE TRANSITION
+─────────────────────────
+- Lead validates all phase tasks complete
+- Lead shuts down current teammates: SendMessage(type="shutdown_request", recipient="architect")
+- Lead spawns new teammate set for next phase (repeat Steps 2-4)
+- Single-agent phases (7, 8, 9): lead works alone, no teammates
+```
 
 ### Phase Team Composition
 
@@ -504,19 +555,21 @@ phase_teams[11]{phase,lead,primary,secondary,team_size}:
   9-Share,voice-operations,-,-,1
 ```
 
-### Team Orchestration
+### Teammate Operation Pattern
 
-**Team Lead (pm-operations-orchestrator) responsibilities:**
-1. Create teammates at phase start using agent roster
-2. Distribute tasks via shared task list with dependencies
-3. Coordinate cross-review via teammate messaging
-4. Manage phase transitions (only lead advances phases)
+Each teammate follows this pattern after being spawned:
 
-**Teammate responsibilities:**
-1. Claim tasks from shared task list matching their specialization
-2. Message teammates directly for handoffs and clarifications
-3. Mark tasks complete when done (validated by TaskCompleted hook)
-4. Stay alive via TeammateIdle hook for cross-review work
+```
+1. Read ~/.claude/teams/[team-name]/config.json → discover team members
+2. TaskList → find unclaimed tasks matching specialization
+3. TaskUpdate(taskId, owner="[my-name]", status="in_progress") → claim task
+4. Do the work (read files, edit code, run tests)
+5. TaskUpdate(taskId, status="completed") → mark done
+6. SendMessage(type="message", recipient="[lead]",
+     summary="Task completed", content="Completed [task]. Summary: [what was done]")
+7. TaskList → check for more unclaimed tasks (repeat from step 3)
+8. If no tasks: TeammateIdle hook assigns cross-review or shutdown
+```
 
 ### Team Token Budgets
 
@@ -531,10 +584,11 @@ team_token_budget[5]{phase_group,per_teammate,total_budget,notes}:
 
 ### Team vs Subagent Fallback
 
-If Agent Teams is not enabled, the workflow uses standard subagent mode:
-- Sequential execution (current behavior)
+If Agent Teams is not enabled OR complexity is not Deep + multi-domain:
+- Sequential execution (standard subagent behavior)
 - Single context window
 - Hub-spoke communication via Task tool
+- No additional token overhead
 
 ---
 

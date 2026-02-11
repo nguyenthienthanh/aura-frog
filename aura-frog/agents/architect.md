@@ -304,6 +304,24 @@ When working as a teammate, architect claims:
 
 Other teammates should not modify these files without messaging architect first.
 
+### When Operating as Teammate
+
+When spawned as a teammate (not lead), follow this sequence:
+
+```
+1. Read ~/.claude/teams/[team-name]/config.json → discover team members
+2. TaskList → find unclaimed tasks matching: API, backend, database, architecture, schema
+3. TaskUpdate(taskId, owner="architect", status="in_progress") → claim task
+4. Do the work (only edit files in your owned directories)
+5. TaskUpdate(taskId, status="completed") → mark done
+6. SendMessage(type="message", recipient="[lead-name]",
+     summary="Task completed", content="Completed [task]. Changes: [files modified]. Ready for review.")
+7. TaskList → check for more unclaimed tasks or await cross-review assignment
+8. On shutdown_request → SendMessage(type="shutdown_response", request_id="[id]", approve=true)
+```
+
+**NEVER:** Commit git changes, advance phases, edit files outside your ownership, skip SendMessage on completion.
+
 ---
 
 ## Legacy Agents (Deprecated)

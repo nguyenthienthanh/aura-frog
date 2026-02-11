@@ -301,29 +301,58 @@ Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
 
 **When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
 
+### Complexity Gate (CRITICAL — Token Savings)
+
+```toon
+team_gate[4]{complexity,domains,mode,token_cost}:
+  Quick,any,single agent,1x (baseline)
+  Standard,any,subagent,1x (baseline)
+  Deep,1 domain,subagent,1x (baseline)
+  Deep,2+ domains (≥50 each),team,~3x (parallel contexts)
+```
+
+**Team mode ONLY activates for Deep + multi-domain tasks.** This saves ~3x tokens for all Quick and Standard tasks. The complexity gate is enforced by agent-detector — if it returns `Mode: subagent`, do NOT create a team.
+
+### Parallel Startup Sequence
+
+```
+1. TeamCreate(team_name, description)               ← create team + task list
+2. TaskCreate × N (all in one message)              ← create all phase tasks upfront
+3. Task × N with team_name (all in one message)     ← spawn teammates in PARALLEL
+4. Teammates: TaskList → claim → work → complete    ← independent parallel work
+5. Lead: monitor messages → assign cross-review     ← coordinate
+6. Lead: shutdown teammates → advance phase         ← transition
+```
+
 ### ALWAYS (Team Mode)
 
 | # | Rule | Why |
 |---|------|-----|
 | T1 | **Max 3 teammates per phase** | Prevent coordination overhead |
 | T2 | **Pass complete context to teammates** | They don't share conversation history |
-| T3 | **Use shared task list for work distribution** | Prevents duplicate work |
-| T4 | **Claim files before editing** | Prevents merge conflicts |
-| T5 | **Message teammates for handoffs** | Explicit coordination |
+| T3 | **Use TaskCreate for all work items** | Shared task list prevents duplicate work |
+| T4 | **Claim files before editing via TaskUpdate** | Prevents merge conflicts |
+| T5 | **Use SendMessage for all handoffs** | Explicit coordination, lead has visibility |
+| T6 | **Spawn teammates in parallel (one message)** | Multiple Task calls = parallel start |
 
 ### NEVER (Team Mode)
 
 | # | Rule | Why |
 |---|------|-----|
-| T6 | **Teammates commit independently** | Only lead manages git operations |
-| T7 | **Skip file claiming** | Causes merge conflicts |
-| T8 | **Create more than 3 teammates per phase** | Coordination overhead exceeds benefit |
-| T9 | **Let teammates advance phases** | Only lead manages phase transitions |
+| T7 | **Use team mode for Quick/Standard tasks** | Wastes ~3x tokens with no benefit |
+| T8 | **Teammates commit independently** | Only lead manages git operations |
+| T9 | **Skip file claiming** | Causes merge conflicts |
+| T10 | **Create more than 3 teammates per phase** | Coordination overhead exceeds benefit |
+| T11 | **Let teammates advance phases** | Only lead manages phase transitions |
 
 ### Team Mode Quick Reference
+
 ```
-Lead: Creates teammates → Distributes tasks → Manages phases → Commits
-Teammate: Claims tasks → Works on files → Messages for review → Reports done
+GATE:    Deep complexity + 2+ domains + Agent Teams enabled → team mode
+STARTUP: TeamCreate → TaskCreate × N → Task × N (parallel) → teammates work
+LEAD:    Creates teammates → Distributes tasks → Manages phases → Commits
+MATE:    TaskList → claim → work → TaskUpdate(completed) → SendMessage(lead)
+CLOSE:   Lead sends shutdown_request → teammates approve → next phase
 ```
 
 ---

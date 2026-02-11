@@ -2,7 +2,7 @@
 
 **Version:** 1.18.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2026-01-21
+**Last Updated:** 2026-02-09
 
 ---
 
@@ -14,7 +14,7 @@ Individual commands are now bundled into unified entry points with subcommand me
 |-----------------|----------|-------------|
 | `/workflow` | 22 workflow commands | start, status, phase, next, approve, handoff, resume |
 | `/test` | 4 test commands | unit, e2e, coverage, watch, docs |
-| `/project` | 6 project commands | status, refresh, init, switch, list, config |
+| `/project` | 7 project commands | status, refresh, init, switch, list, config, sync-settings |
 | `/quality` | 3 quality commands | lint, complexity, review, fix |
 | `/bugfix` | 3 bugfix commands | quick, full, hotfix |
 | `/seo` | 3 seo commands | check, schema, geo |
@@ -43,7 +43,7 @@ commands/
 ├── monitor/            # Monitoring setup (2 commands)
 ├── perf/               # Performance optimization (4 commands)
 ├── planning/           # Planning & execution (3 commands)
-├── project/            # Project operations (6 commands)
+├── project/            # Project operations (7 commands)
 ├── quality/            # Code quality (3 commands)
 ├── review/             # Code review (1 command)
 ├── security/           # Security scanning (3 commands)
@@ -63,7 +63,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[82]{category,command,file,description}:
+commands[83]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -87,6 +87,7 @@ commands[82]{category,command,file,description}:
   project,project:regen,project/regen.md,Re-generate project context
   project,project:reload-env,project/reload-env.md,Load/reload .envrc variables
   project,project:switch,project/switch.md,Switch between projects
+  project,project:sync-settings,project/sync-settings.md,Sync plugin settings to project
   review,review:fix,review/fix.md,Auto-fix review issues
   seo,seo:check,seo/check.md,Full SEO/GEO audit
   seo,seo:schema,seo/schema.md,Validate structured data (Rich Results Test)
@@ -130,7 +131,7 @@ commands[82]{category,command,file,description}:
 ```toon
 stats[22]{category,count}:
   workflow,22
-  project,6
+  project,7
   agent,4
   test,4
   perf,4
@@ -151,7 +152,7 @@ stats[22]{category,count}:
   review,1
   skill,1
   standalone,4
-  total,82
+  total,83
 ```
 
 ---

@@ -601,6 +601,24 @@ When working as a teammate, security-expert reviews (does not own):
 - Input validation logic
 - Security configuration files
 
+### When Operating as Teammate
+
+When spawned as a teammate (reviewer role), follow this sequence:
+
+```
+1. Read ~/.claude/teams/[team-name]/config.json → discover team members
+2. TaskList → find unclaimed tasks matching: security, audit, review, auth, OWASP, vulnerability
+3. TaskUpdate(taskId, owner="security-expert", status="in_progress") → claim task
+4. Review code (READ only — security-expert does not own files)
+5. TaskUpdate(taskId, status="completed") → mark done
+6. SendMessage(type="message", recipient="[lead-name]",
+     summary="Security review done", content="Review of [scope]. Findings: [critical/high/medium/low counts]. Details: [findings].")
+7. TaskList → check for more review tasks or await assignment
+8. On shutdown_request → SendMessage(type="shutdown_response", request_id="[id]", approve=true)
+```
+
+**NEVER:** Commit git changes, advance phases, modify production code (review only), skip reporting findings.
+
 ---
 
 **Agent:** security-expert

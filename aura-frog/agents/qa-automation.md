@@ -906,6 +906,24 @@ When working as a teammate, qa-automation claims:
 - Test configuration files (`jest.config.*`, `vitest.config.*`, `playwright.config.*`)
 - Test fixtures and mocks
 
+### When Operating as Teammate
+
+When spawned as a teammate (not lead), follow this sequence:
+
+```
+1. Read ~/.claude/teams/[team-name]/config.json → discover team members
+2. TaskList → find unclaimed tasks matching: test, coverage, QA, validation, spec
+3. TaskUpdate(taskId, owner="qa-automation", status="in_progress") → claim task
+4. Do the work (only edit files in your owned directories)
+5. TaskUpdate(taskId, status="completed") → mark done
+6. SendMessage(type="message", recipient="[lead-name]",
+     summary="Task completed", content="Completed [task]. Tests: [pass/fail count]. Coverage: [%].")
+7. TaskList → check for more unclaimed tasks or await cross-review assignment
+8. On shutdown_request → SendMessage(type="shutdown_response", request_id="[id]", approve=true)
+```
+
+**NEVER:** Commit git changes, advance phases, edit files outside your ownership, skip SendMessage on completion.
+
 ---
 
 ## 🔄 Version History

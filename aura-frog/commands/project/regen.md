@@ -107,7 +107,40 @@ Choice [1]:
 - Update test examples
 - Update API examples
 
-### 5. Update `.claude/CLAUDE.md` (CRITICAL)
+### 5. Sync Plugin Settings
+
+**Merge latest plugin settings into project** (picks up new env vars, permissions):
+
+```bash
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
+PROJECT_SETTINGS=".claude/settings.local.json"
+
+if [ -f "$PLUGIN_SETTINGS" ] && [ -f "$PROJECT_SETTINGS" ]; then
+  jq -s '
+    .[1] as $project |
+    .[0] as $plugin |
+    ($plugin.env // {}) + ($project.env // {}) as $merged_env |
+    (($plugin.permissions.allow // []) + ($project.permissions.allow // []) | unique) as $merged_allow |
+    (($plugin.permissions.deny // []) + ($project.permissions.deny // []) | unique) as $merged_deny |
+    $project * {
+      env: $merged_env,
+      permissions: { allow: $merged_allow, deny: $merged_deny }
+    }
+  ' "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS" > /tmp/af-merged-settings.json
+  mv /tmp/af-merged-settings.json "$PROJECT_SETTINGS"
+  echo "✅ Settings synced from plugin (env + permissions)"
+elif [ -f "$PLUGIN_SETTINGS" ]; then
+  cp "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS"
+  echo "✅ Created settings from plugin defaults"
+fi
+```
+
+**What gets synced:**
+- New env vars (e.g., Agent Teams) — plugin defaults, project overrides win
+- New permission rules — added without removing project rules
+
+### 6. Update `.claude/CLAUDE.md` (CRITICAL)
 
 **⚠️ CRITICAL:** This file is required for Claude Code to load Aura Frog instructions!
 
@@ -152,7 +185,7 @@ fi
 - ✅ Auto-syncs with plugin updates via `project:regen`
 - ✅ Without it, Aura Frog won't activate!
 
-### 6. Update ccpm-config.yaml (If Needed)
+### 7. Update ccpm-config.yaml (If Needed)
 
 **Check if updates needed:**
 - Primary agent changed?
@@ -164,7 +197,7 @@ fi
 - Update `ccpm-config.yaml`
 - Show diff of changes
 
-### 7. Validate Updates
+### 8. Validate Updates
 
 **Run validation:**
 - ✅ All context files updated

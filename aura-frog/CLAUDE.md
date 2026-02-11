@@ -145,7 +145,7 @@ Any planning needed → workflow-orchestrator Phase 1-2 (NOT EnterPlanMode)
 bundled_commands[6]{command,subcommands,replaces}:
   /workflow,"start/status/phase/next/approve/handoff/resume",22 workflow commands
   /test,"unit/e2e/coverage/watch/docs",4 test commands
-  /project,"status/refresh/init/switch/list/config",6 project commands
+  /project,"status/refresh/init/switch/list/config/sync-settings",7 project commands
   /quality,"lint/complexity/review/fix",3 quality commands
   /bugfix,"quick/full/hotfix",3 bugfix commands
   /seo,"check/schema/geo",3 seo commands
@@ -160,7 +160,7 @@ bundled_commands[6]{command,subcommands,replaces}:
 ```toon
 resources[12]{name,location}:
   Agents (11),agents/
-  Commands (88),commands/
+  Commands (89),commands/
   Rules (50),rules/
   Skills (13 auto-invoke + 33 reference),skills/
   MCP Servers (6),.mcp.json
@@ -179,14 +179,17 @@ resources[12]{name,location}:
 
 When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled, Aura Frog uses real multi-agent orchestration via Claude's Agent Teams feature.
 
+**Complexity Gate:** Team mode ONLY for Deep complexity + 2+ domains. Quick/Standard tasks always use single-agent or subagent (saves ~3x tokens).
+
 ```toon
-team_mode[3]{aspect,detail}:
-  Detection,agent-detector scores multi-domain tasks → team mode if 2+ domains ≥50
+team_mode[4]{aspect,detail}:
+  Gate,Deep + 2+ domains ≥50 each → team. Quick/Standard → always subagent
+  Startup,TeamCreate → TaskCreate × N → parallel Task × N (one message)
   Hooks,TeammateIdle (assign cross-review) + TaskCompleted (validate quality)
   Orchestration,pm-operations-orchestrator as lead → creates teammates per phase
 ```
 
-**Backward Compatible:** When disabled, standard subagent behavior applies.
+**Backward Compatible:** When disabled OR Quick/Standard tasks, standard subagent behavior applies.
 
 **Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 

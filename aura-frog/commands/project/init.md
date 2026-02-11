@@ -118,38 +118,45 @@ fi
 
 ### 5. Merge Plugin Settings
 
-Copy and merge plugin permissions to project:
+Copy and merge plugin settings (permissions + env) to project:
 
 ```bash
 PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
 PROJECT_SETTINGS=".claude/settings.local.json"
 
-if [ -f "$PLUGIN_DIR/settings.example.json" ]; then
+if [ -f "$PLUGIN_SETTINGS" ]; then
   if [ -f "$PROJECT_SETTINGS" ]; then
-    # Merge: combine allow arrays, keep deny from both
-    jq -s '.[0].permissions.allow + .[1].permissions.allow | unique' \
-      "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS" > /tmp/merged_allow.json
-
-    jq -s '.[0].permissions.deny + .[1].permissions.deny | unique' \
-      "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS" > /tmp/merged_deny.json
-
-    jq --slurpfile allow /tmp/merged_allow.json \
-       --slurpfile deny /tmp/merged_deny.json \
-       '{permissions: {allow: $allow[0], deny: $deny[0]}}' \
-       <<< '{}' > "$PROJECT_SETTINGS"
+    # Full merge: env + permissions.allow + permissions.deny
+    # Project values override plugin defaults for env
+    jq -s '
+      .[1] as $project |
+      .[0] as $plugin |
+      ($plugin.env // {}) + ($project.env // {}) as $merged_env |
+      (($plugin.permissions.allow // []) + ($project.permissions.allow // []) | unique) as $merged_allow |
+      (($plugin.permissions.deny // []) + ($project.permissions.deny // []) | unique) as $merged_deny |
+      $project * {
+        env: $merged_env,
+        permissions: { allow: $merged_allow, deny: $merged_deny }
+      }
+    ' "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS" > /tmp/af-merged-settings.json
+    mv /tmp/af-merged-settings.json "$PROJECT_SETTINGS"
   else
     # Copy plugin settings as base
-    cp "$PLUGIN_DIR/settings.example.json" "$PROJECT_SETTINGS"
+    cp "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS"
   fi
   echo "✅ Created/merged .claude/settings.local.json"
 fi
 ```
 
 **Settings include:**
+- **Environment variables** — Agent Teams enabled, custom env vars
 - Script execution permissions
 - Linting/testing commands
 - Git read-only commands
 - Dangerous operation denials
+
+**Re-sync after plugin update:** Run `project:sync-settings`
 
 ### 6. Generate .envrc (Optional)
 

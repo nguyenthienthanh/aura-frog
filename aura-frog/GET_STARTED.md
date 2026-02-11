@@ -443,7 +443,7 @@ workflow:start <your-task-description>
 - **Learning System:** `docs/LEARNING_SYSTEM.md` (Supabase self-improvement)
 - **Skills:** `skills/README.md` (46 skills)
 - **Rules:** `rules/README.md` (50 quality rules)
-- **Commands:** `commands/README.md` (88 commands)
+- **Commands:** `commands/README.md` (89 commands)
 - **Hooks:** `hooks/README.md` (23 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`

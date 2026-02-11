@@ -25,6 +25,11 @@ Full Claude Agent Teams integration for real multi-agent orchestration with pers
 - **Team execution rules** in execution-rules - ALWAYS/NEVER rules for team mode
 - **Team banners** in agent-identification-banner - Lead + teammate banner formats
 - **AGENT_TEAMS_GUIDE.md** - Complete setup and usage documentation
+- **`project:sync-settings` command** - Auto-merge plugin settings (env + permissions) into project settings
+- **Mandatory Teams banner** - Every banner now shows `Teams: [✓ enabled / ✗ off]` status
+- **Complexity gate for teams** - Team mode ONLY for Deep + multi-domain tasks (~3x token savings on Quick/Standard)
+- **Concrete parallel startup patterns** - TeamCreate → TaskCreate × N → parallel Task × N with real tool examples
+- **Teammate operation guide** - Each agent now has "When Operating as Teammate" section (TaskList → claim → work → SendMessage)
 
 #### Updated
 - **`subagent-init.cjs`** - Teammate awareness via `CLAUDE_TEAMMATE_NAME` env var, team context injection
@@ -32,12 +37,17 @@ Full Claude Agent Teams integration for real multi-agent orchestration with pers
 - **Session state schema** - Added `teamMode` and `activeTeammates` fields
 - **smart-agent-detector** - Team mode output format and team vs subagent decision matrix
 - **plugin.json** - Version 1.18.0, updated description
+- **`project:init`** - Settings merge now includes env vars (not just permissions)
+- **`project:regen`** - Added Step 5: Sync Plugin Settings (auto-merges latest plugin defaults)
+- **`settings.example.json`** - Added `env` section with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` default
+- **Banner format** - All 4 templates + all examples updated with Teams status line
 
 #### Stats
 - Hooks: 21 → 23 (+2: TeammateIdle, TaskCompleted)
 - Agents: 11 (unchanged)
 - Skills: 46 (unchanged)
 - Rules: 50 (unchanged)
+- Commands: 82 → 83 (+1: project:sync-settings)
 
 ---
 

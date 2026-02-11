@@ -113,7 +113,7 @@ At each phase, review and respond:
 | Single AI session | Agent Teams with persistent teammates |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 88 commands |
+| Context switching | CLI-first with 89 commands |
 | Manual documentation | Auto-generated docs |
 | Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 

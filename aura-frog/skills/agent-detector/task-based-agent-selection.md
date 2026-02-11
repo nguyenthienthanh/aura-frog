@@ -411,7 +411,9 @@ This task-based analysis **enhances** existing detection:
 
 ## Team Task Patterns (Agent Teams Mode)
 
-**When Agent Teams is enabled**, certain task patterns trigger full team composition instead of single-agent selection.
+**When Agent Teams is enabled AND complexity = Deep**, certain task patterns trigger full team composition instead of single-agent selection.
+
+**Complexity Gate:** Team mode ONLY for Deep complexity + 2+ domains. Quick/Standard tasks NEVER trigger team mode regardless of domain count — this saves ~3x tokens.
 
 ### Multi-Domain Team Patterns
 
@@ -428,12 +430,20 @@ team_task_patterns[6]{pattern,team_composition,reason}:
 ### Team Activation Threshold
 
 ```
-TEAM_ACTIVATION(scores):
+TEAM_ACTIVATION(complexity, scores):
+  // Gate 1: Complexity must be Deep
+  IF complexity != "Deep":
+    mode = "subagent"  // Quick/Standard NEVER use teams
+    RETURN
+
+  // Gate 2: Multiple domains required
   domain_count = count(scores where score ≥ 50)
   IF domain_count >= 2 AND isAgentTeamsEnabled():
     mode = "team"
     lead = agent with highest score
     primary = agents with score 50-79
+    // Handoff to workflow-orchestrator for parallel startup:
+    // TeamCreate → TaskCreate × N → Task × N (parallel spawn)
   ELSE:
     mode = "subagent" (standard)
 ```

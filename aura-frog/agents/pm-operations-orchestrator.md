@@ -289,9 +289,73 @@ When agents disagree on approach:
 
 ## Team Lead Mode (Agent Teams)
 
-**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled AND agent-detector returns `Mode: team`.
+
+**Gate:** Team mode ONLY activates for Deep complexity + 2+ domains. Quick/Standard tasks always use single-agent or subagent mode.
 
 In team mode, pm-operations-orchestrator acts as the **team lead** - the persistent coordinator that creates teammates, distributes work, and manages phase transitions.
+
+### Parallel Startup Sequence (Concrete)
+
+**Step 1 — Create Team:**
+```
+TeamCreate(team_name="[ticket-slug]", description="[feature summary]")
+```
+
+**Step 2 — Create Tasks (all in one message):**
+```
+TaskCreate(subject="Design API endpoints for [feature]",
+  description="Create REST API design for... Files: src/api/. Acceptance: OpenAPI spec complete.")
+TaskCreate(subject="Design UI components for [feature]",
+  description="Create component breakdown for... Files: src/components/. Acceptance: All components spec'd.")
+TaskCreate(subject="Write test plan for [feature]",
+  description="Create test strategy for... Files: tests/. Acceptance: Unit + E2E cases defined.")
+```
+
+**Step 3 — Spawn Teammates in Parallel (all in one message):**
+```
+Task(team_name="[slug]", name="architect", subagent_type="aura-frog:architect",
+  prompt="You are architect on team [slug]. Phase: [N]-[name].
+    1. Read team config: ~/.claude/teams/[slug]/config.json
+    2. TaskList → claim tasks matching your expertise (src/api/, src/services/, migrations/)
+    3. TaskUpdate(taskId, owner='architect', status='in_progress') to claim
+    4. Do the work
+    5. TaskUpdate(taskId, status='completed') when done
+    6. SendMessage(recipient='pm-operations-orchestrator', summary='Task done', content='Completed: [summary]')
+    7. Check TaskList for more work or await cross-review assignment
+    CONTEXT: [paste relevant requirements, file paths, conventions]")
+
+Task(team_name="[slug]", name="ui-expert", subagent_type="aura-frog:ui-expert",
+  prompt="[same pattern, different files/expertise]")
+
+Task(team_name="[slug]", name="qa-automation", subagent_type="aura-frog:qa-automation",
+  prompt="[same pattern, different files/expertise]")
+```
+
+**Step 4 — Monitor + Cross-Review:**
+```
+// Receive completion messages from teammates (auto-delivered)
+// Assign cross-review:
+SendMessage(type="message", recipient="qa-automation",
+  summary="Cross-review request",
+  content="Review architect's API design in src/api/. Check: error handling, validation, test coverage gaps.")
+
+// Receive review feedback, forward to original author:
+SendMessage(type="message", recipient="architect",
+  summary="Review feedback",
+  content="qa-automation found: [feedback]. Please address and update.")
+```
+
+**Step 5 — Phase Transition:**
+```
+// All phase tasks complete → shutdown current teammates:
+SendMessage(type="shutdown_request", recipient="architect", content="Phase [N] complete")
+SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase [N] complete")
+SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase [N] complete")
+
+// Spawn new teammate set for next phase (repeat Steps 2-4)
+// Single-agent phases (7, 8, 9): lead works alone, no teammates needed
+```
 
 ### Team Lead Responsibilities
 
@@ -305,7 +369,7 @@ team_lead_duties[6]{duty,description}:
   Context sharing,Pass essential context to teammates (they don't share conversation history)
 ```
 
-### Consolidated Team Roster (v1.17.0)
+### Consolidated Team Roster
 
 ```toon
 active_agents[11]{agent,role,phases}:
@@ -322,33 +386,9 @@ active_agents[11]{agent,role,phases}:
   project-manager,Project context,N/A (context only)
 ```
 
-### Team Task Distribution Format
-
-```markdown
-📋 **Team Task**
-
-**Task ID:** [auto-generated]
-**Assigned To:** [teammate-name]
-**Phase:** [N] - [name]
-**Description:** [what to do]
-**Files:** [specific files to work on]
-**Depends On:** [task-ids] (optional)
-**Review By:** [teammate-name] (optional)
-```
-
-### Cross-Review via Messaging
-
-In team mode, cross-review happens through direct teammate messaging instead of sequential simulation:
-
-```
-Lead → Teammate A: "Review Phase 2 design deliverables, focus on API contracts"
-Teammate A → Lead: "Design approved with 2 minor suggestions: [details]"
-Lead → Teammate B: "Incorporate feedback: [details]"
-```
-
 ### Fallback
 
-When Agent Teams is not enabled, standard subagent orchestration applies (no change from v1.17.0 behavior).
+When Agent Teams is not enabled OR task is Quick/Standard complexity, standard subagent orchestration applies (no change from v1.17.0 behavior).
 
 ---
 

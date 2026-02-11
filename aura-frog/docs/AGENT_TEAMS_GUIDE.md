@@ -44,31 +44,137 @@ The `isAgentTeamsEnabled()` utility in `hooks/lib/af-config-utils.cjs` checks bo
 
 ---
 
-## How It Works with Aura Frog
+## Complexity Gate (CRITICAL — Token Savings)
 
-### Team vs Subagent Mode
+**Team mode ONLY activates for Deep complexity + multi-domain tasks.** This saves ~3x tokens for all other task types.
 
 ```toon
-mode_decision[4]{condition,mode}:
-  Agent Teams disabled,subagent (standard Task tool)
-  Quick/Standard + single domain,subagent
-  Standard + 2+ domains + Agent Teams enabled,team
-  Deep complexity + Agent Teams enabled,team
+team_gate[4]{complexity,domains,mode,token_cost}:
+  Quick,any,single agent,1x (baseline)
+  Standard,any,subagent,1x (baseline)
+  Deep,1 domain,subagent,1x (baseline)
+  Deep,2+ domains (≥50 each),team,~3x (parallel contexts)
 ```
 
-### Team Lifecycle
+**Why this gate?** Each teammate is an independent Claude instance with its own context window. Spawning 3 teammates costs ~3x tokens. Only justified when:
+- Task requires parallel cross-domain work (backend + frontend + tests)
+- Sequential execution would take 3x longer
+- Multiple file ownership domains need simultaneous editing
+
+**Examples:**
+
+| Task | Complexity | Domains | Mode |
+|------|-----------|---------|------|
+| Fix typo in README | Quick | 1 | single agent |
+| Add form validation | Standard | 1 | subagent |
+| Add API endpoint + tests | Standard | 2 | subagent |
+| Build full auth system (API + UI + tests + security) | Deep | 4 | **team** |
+| Redesign database schema + migrate + update all APIs | Deep | 3 | **team** |
+| Deep refactor of single service | Deep | 1 | subagent |
+
+---
+
+## Quick Start — Parallel Team Startup
+
+Here's the complete sequence when team mode activates:
+
+### Step 1: Create Team
 
 ```
-1. agent-detector detects multi-domain task
-2. Selects team mode (if enabled)
-3. pm-operations-orchestrator becomes team lead
-4. Lead creates teammates matching phase requirements
-5. Lead distributes work via shared task list
-6. Teammates work in parallel on claimed tasks
-7. TeammateIdle hook assigns cross-review work
-8. TaskCompleted hook validates quality gates
-9. Lead manages phase transitions
-10. Teammates exit when phase work complete
+TeamCreate(team_name="auth-system", description="Build JWT authentication with login UI and test coverage")
+```
+
+### Step 2: Create Tasks (all in one message)
+
+```
+TaskCreate(
+  subject="Design and implement auth API endpoints",
+  description="Create POST /auth/login, POST /auth/register, POST /auth/refresh.
+    Use JWT with refresh tokens. Files: src/api/auth/, src/services/auth/.
+    Acceptance: All endpoints working with validation and error handling.")
+
+TaskCreate(
+  subject="Build login and register UI components",
+  description="Create LoginForm, RegisterForm, AuthLayout components.
+    Use existing design system tokens. Files: src/components/auth/.
+    Acceptance: Forms with validation, loading states, error display.")
+
+TaskCreate(
+  subject="Write auth test suite",
+  description="Unit tests for auth service, integration tests for endpoints,
+    component tests for forms. Files: tests/auth/.
+    Acceptance: >80% coverage, all edge cases covered.")
+```
+
+### Step 3: Spawn Teammates in Parallel (all in one message)
+
+```
+Task(team_name="auth-system", name="architect", subagent_type="aura-frog:architect",
+  prompt="You are architect on team auth-system. Phase: 5b-TDD GREEN.
+    1. Read team config: ~/.claude/teams/auth-system/config.json
+    2. TaskList → claim tasks matching: API, backend, auth, service
+    3. TaskUpdate(taskId, owner='architect', status='in_progress')
+    4. Implement the auth endpoints and service
+    5. TaskUpdate(taskId, status='completed')
+    6. SendMessage(recipient='pm-operations-orchestrator', summary='Auth API done',
+         content='Implemented login/register/refresh endpoints. Files changed: [list]')
+    Files you own: src/api/, src/services/, migrations/
+    CONTEXT: [project conventions, tech stack, existing patterns]")
+
+Task(team_name="auth-system", name="ui-expert", subagent_type="aura-frog:ui-expert",
+  prompt="You are ui-expert on team auth-system. Phase: 5b-TDD GREEN.
+    [same pattern — claim UI tasks, own src/components/]
+    CONTEXT: [design system, component patterns]")
+
+Task(team_name="auth-system", name="qa-automation", subagent_type="aura-frog:qa-automation",
+  prompt="You are qa-automation on team auth-system. Phase: 5b-TDD GREEN.
+    [same pattern — claim test tasks, own tests/]
+    CONTEXT: [testing framework, coverage requirements]")
+```
+
+All 3 teammates start **simultaneously** and work in parallel.
+
+### Step 4: Monitor + Cross-Review
+
+```
+// Teammates send completion messages (auto-delivered to lead)
+// Lead assigns cross-review:
+SendMessage(type="message", recipient="qa-automation",
+  summary="Review auth API", content="Review architect's auth endpoints. Focus: input validation, error handling.")
+
+// Lead forwards feedback:
+SendMessage(type="message", recipient="architect",
+  summary="Review feedback", content="qa-automation found: [issues]. Please fix.")
+```
+
+### Step 5: Shutdown + Next Phase
+
+```
+// All tasks complete → shutdown teammates:
+SendMessage(type="shutdown_request", recipient="architect", content="Phase 5b complete")
+SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase 5b complete")
+SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase 5b complete")
+
+// Advance to Phase 5c, spawn new teammates if needed
+```
+
+---
+
+## Teammate Operation Pattern
+
+Every teammate follows this pattern after being spawned:
+
+```
+1. Read ~/.claude/teams/[team-name]/config.json → discover team members
+2. TaskList → find unclaimed tasks matching your specialization
+3. TaskUpdate(taskId, owner="[my-name]", status="in_progress") → claim task
+4. Do the work (only edit files in your owned directories)
+5. TaskUpdate(taskId, status="completed") → mark done
+6. SendMessage(type="message", recipient="[lead-name]",
+     summary="Task completed", content="Completed [task]. Summary: [what was done]")
+7. TaskList → check for more unclaimed tasks (repeat from step 3)
+8. If no tasks: TeammateIdle hook assigns cross-review or lead sends shutdown_request
+9. On shutdown_request → SendMessage(type="shutdown_response", request_id="[id]", approve=true)
 ```
 
 ---
@@ -96,18 +202,22 @@ phase_teams[11]{phase,lead,primary,secondary,team_size}:
 
 ### ALWAYS
 
-1. **Max 3 teammates per phase** - Prevents coordination overhead
-2. **Pass complete context** - Teammates don't share conversation history
-3. **Use shared task list** - Prevents duplicate work
-4. **Claim files before editing** - Prevents merge conflicts
-5. **Only lead manages phases** - Single source of truth for workflow state
+1. **Only use teams for Deep + multi-domain tasks** - Saves ~3x tokens on all other tasks
+2. **Max 3 teammates per phase** - Prevents coordination overhead
+3. **Spawn teammates in parallel** - Multiple Task calls in one message
+4. **Pass complete context in prompts** - Teammates don't share conversation history
+5. **Use TaskCreate/TaskList for work distribution** - Shared task list prevents duplicate work
+6. **Claim files before editing** - Prevents merge conflicts
+7. **Only lead manages phases** - Single source of truth for workflow state
 
 ### NEVER
 
-1. **Teammates commit independently** - Only lead manages git
-2. **Skip file claiming** - Causes merge conflicts
-3. **Create more than 3 teammates** - Diminishing returns
-4. **Let teammates advance phases** - Lead-only responsibility
+1. **Use team mode for Quick or Standard tasks** - Wastes tokens with no benefit
+2. **Teammates commit independently** - Only lead manages git
+3. **Skip file claiming** - Causes merge conflicts
+4. **Create more than 3 teammates per phase** - Diminishing returns
+5. **Let teammates advance phases** - Lead-only responsibility
+6. **Spawn teammates sequentially** - Always use parallel Task calls
 
 ---
 
@@ -166,27 +276,35 @@ Fires when a teammate marks a task done. Validates:
 ### Agent Teams not activating
 
 1. Check `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings or env
-2. Verify complexity is Deep or multi-domain Standard
-3. Check agent-detector output for `Mode: team`
+2. Verify complexity is **Deep** (Quick/Standard never trigger team mode)
+3. Verify 2+ domains score ≥50 each in agent-detector output
+4. Check agent-detector output for `Mode: team`
 
 ### Teammates not seeing context
 
 - Teammates have empty conversation history
-- Include all relevant info in task descriptions
-- Use teammate messages for specific context
+- Include all relevant info in task descriptions and prompts
+- Use SendMessage for specific context during execution
 
 ### File conflicts
 
 - Ensure agents follow file ownership conventions
-- Use teammate messaging before editing shared files
+- Use SendMessage before editing shared files
 - Only lead should commit changes
+
+### Token usage too high
+
+- Verify complexity gate is working (Quick/Standard should never use teams)
+- Reduce teammate count per phase (2 instead of 3)
+- Use more specific task descriptions to reduce teammate exploration
 
 ---
 
 ## Backward Compatibility
 
-All Agent Teams features are gated on `isAgentTeamsEnabled()`:
+All Agent Teams features are gated on `isAgentTeamsEnabled()` + complexity check:
 - When disabled: identical to v1.17.0 subagent behavior
+- When enabled but task is Quick/Standard: subagent behavior (no team overhead)
 - New hooks (TeammateIdle, TaskCompleted) never fire when off
 - All skill/agent/rule changes add new sections without modifying existing ones
 
