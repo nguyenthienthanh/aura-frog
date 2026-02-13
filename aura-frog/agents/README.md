@@ -2,13 +2,13 @@
 
 **Version:** 1.18.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Last Updated:** 2026-01-21
+**Last Updated:** 2026-02-09
 
 ---
 
 ## Overview
 
-Aura Frog provides **11 specialized agents** (reduced from 15 in v1.16.0 through consolidation).
+Aura Frog provides **11 specialized agents** (reduced from 15 in v1.17.0 through consolidation).
 
 ---
 
@@ -101,4 +101,4 @@ agent:list
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-01-21
+**Version:** 1.18.0 | **Last Updated:** 2026-02-09

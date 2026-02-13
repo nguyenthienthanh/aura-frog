@@ -116,7 +116,7 @@ When user runs `mcp:status`:
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| No figma tools | Missing FIGMA_API_KEY | Add to .envrc |
+| No figma tools | Missing FIGMA_API_TOKEN | Add to .envrc |
 | No slack tools | Missing SLACK_BOT_TOKEN | Add to .envrc |
 | context7 missing | Package not installed | Check .mcp.json |
 

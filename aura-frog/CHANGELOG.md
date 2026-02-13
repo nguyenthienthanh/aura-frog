@@ -45,7 +45,7 @@ Full Claude Agent Teams integration for real multi-agent orchestration with pers
 #### Stats
 - Hooks: 21 → 23 (+2: TeammateIdle, TaskCompleted)
 - Agents: 11 (unchanged)
-- Skills: 46 (unchanged)
+- Skills: 53 (corrected count: 13 auto-invoke + 40 reference)
 - Rules: 50 (unchanged)
 - Commands: 82 → 83 (+1: project:sync-settings)
 
@@ -105,8 +105,8 @@ Critical patches to reduce token usage from ~200k to ~40k per workflow:
 #### Stats
 - **Agents:** 11 (was 15) - 4 consolidated
 - **Auto-invoke Skills:** 13 (was 28) - 15 moved to reference/bundles
-- **Reference Skills:** 33 - framework experts, SEO experts, design, learning, workflow (+phase1-lite)
-- **Total Skills:** 46 (was 48)
+- **Reference Skills:** 40 - framework experts (12), SEO experts (5), design (4), learning (2), workflow (3), others (14)
+- **Total Skills:** 53 (was 48)
 - **Rules:** 50 (was 49) - +1 context-management
 - **Bundled Commands:** 6 entry points (replaces 41 individual commands)
 

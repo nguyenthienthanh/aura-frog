@@ -91,15 +91,14 @@ cp .envrc.template .envrc
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── CLAUDE.md                    # Core AI instructions
-│   ├── README.md                    # User documentation
-│   ├── ccpm-config.yaml             # Configuration file
-│   ├── agents/                      # 24 specialized agents
-│   ├── commands/                    # 67+ workflow commands
-│   ├── docs/                        # Documentation
-│   ├── rules/                       # Quality rules
-│   ├── skills/                      # Reusable skills
+│   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
+│   ├── agents/                      # 11 specialized agents (consolidated)
+│   ├── commands/                    # 83 workflow commands (6 bundled entry points)
+│   ├── skills/                      # 53 skills (13 auto-invoke + 40 reference)
+│   ├── rules/                       # 50 quality rules
+│   ├── hooks/                       # 23 lifecycle hooks (.cjs scripts)
+│   ├── docs/                        # Documentation & phase guides
 │   ├── templates/                   # Document templates
-│   ├── hooks/                       # Workflow hooks
 │   ├── scripts/                     # Bash integration scripts
 │   └── project-contexts/            # Project templates
 ├── assets/                          # Logo and images
@@ -180,15 +179,15 @@ git commit -am "chore: Bump version to 1.0.0"
 ### Files with Version Numbers
 
 The sync script updates:
+- `aura-frog/.claude-plugin/plugin.json`
 - `aura-frog/CLAUDE.md`
-- `aura-frog/README.md`
-- `aura-frog/ccpm-config.yaml`
 - `aura-frog/GET_STARTED.md`
-- `aura-frog/TODO.md`
+- `aura-frog/QUICKSTART.md`
 - `README.md`
 
 **Manual Update:**
 - `aura-frog/CHANGELOG.md` - Add release notes
+- `aura-frog/agents/README.md`, `aura-frog/skills/README.md`, `aura-frog/commands/README.md`, etc. - Update version footers
 
 ---
 
@@ -456,6 +455,6 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-**Thank you for contributing to Aura Frog Team Agents!** 🚀
+**Thank you for contributing to Aura Frog!**
 
 Your contributions help make AI-powered project management better for everyone.

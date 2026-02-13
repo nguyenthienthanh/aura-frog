@@ -97,7 +97,7 @@ echo "🔗 Atlassian Integration:"
 # MCP Integrations
 echo ""
 echo "🔌 MCP Server Credentials:"
-[ -n "$FIGMA_API_KEY" ] && echo "   ✅ Figma (configured)" || echo "   ⚪ Figma (not configured)"
+[ -n "$FIGMA_API_TOKEN" ] && echo "   ✅ Figma (configured)" || echo "   ⚪ Figma (not configured)"
 [ -n "$SLACK_BOT_TOKEN" ] && echo "   ✅ Slack (configured)" || echo "   ⚪ Slack (not configured)"
 
 # Supabase Learning System
@@ -159,7 +159,7 @@ Loaded variables:
    ✅ JIRA_URL
    ✅ JIRA_EMAIL
    ✅ JIRA_API_TOKEN
-   ✅ FIGMA_API_KEY
+   ✅ FIGMA_API_TOKEN
    ✅ CONFLUENCE_URL
 
 📋 Environment Status:

@@ -2,7 +2,19 @@
 
 **System:** Aura Frog v1.18.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** Specialized agents + 9-phase workflow + auto-invoking skills + bundled MCP
+**Purpose:** 11 agents + 53 skills + 9-phase workflow + auto-invoking skills + bundled MCP
+
+---
+
+## New in 1.18.0 - Agent Teams
+
+- **Agent Teams** - Real multi-agent orchestration via Claude's experimental Agent Teams feature
+- **Complexity gate** - Team mode ONLY for Deep + multi-domain tasks (~3x token savings on Quick/Standard)
+- **TeammateIdle + TaskCompleted hooks** - Assign work to idle teammates, validate task completion
+- **project:sync-settings command** - Auto-merge plugin settings into project settings
+- **Mandatory Teams banner** - Every banner shows `Teams: [✓ enabled / ✗ off]` status
+
+**Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 
 ---
 
@@ -101,13 +113,13 @@ skills[13]{name,trigger,file}:
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
 ```
 
-**Reference Skills (33 - loaded on-demand by bundles or commands):**
-- Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (11)
+**Reference Skills (40 - loaded on-demand by bundles or commands):**
+- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
-- Design: design-system-library, stitch-design, visual-pixel-perfect (3)
+- Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
 - Learning: learning-analyzer, self-improve (2)
-- Workflow: workflow-fasttrack, lazy-agent-loader (2)
-- Others: api-designer, debugging, migration-helper, performance-optimizer, etc. (9)
+- Workflow: workflow-fasttrack, lazy-agent-loader, phase1-lite (3)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, nativewind-generator, pm-expert, qa-expert, refactor-expert (14)
 
 **All skills:** `skills/README.md`
 
@@ -162,7 +174,7 @@ resources[12]{name,location}:
   Agents (11),agents/
   Commands (89),commands/
   Rules (50),rules/
-  Skills (13 auto-invoke + 33 reference),skills/
+  Skills (13 auto-invoke + 40 reference),skills/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Refactor Analysis,docs/REFACTOR_ANALYSIS.md
