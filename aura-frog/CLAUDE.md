@@ -101,7 +101,7 @@ skills[13]{name,trigger,file}:
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
 ```
 
-**Reference Skills (32 - loaded on-demand by bundles or commands):**
+**Reference Skills (33 - loaded on-demand by bundles or commands):**
 - Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (11)
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
 - Design: design-system-library, stitch-design, visual-pixel-perfect (3)

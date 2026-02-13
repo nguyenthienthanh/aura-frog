@@ -35,7 +35,7 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-
 - **11 Specialized Agents** — Consolidated: architect, ui-expert, mobile-expert, game-developer, qa, security, devops
 - **6 Bundled Commands** — `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo` (each with submenus)
 - **13 Auto-Invoking Skills** — Agent detection, model routing, workflow, testing, SEO bundles
-- **32 Reference Skills** — Framework experts, SEO experts, loaded on-demand by bundles
+- **33 Reference Skills** — Framework experts, SEO experts, loaded on-demand by bundles
 - **6 MCP Servers** — Context7, Playwright, Vitest, Firebase, Figma, Slack
 - **50 Quality Rules** — System, code quality, architecture, workflow, UI, SEO
 - **23 Lifecycle Hooks** — Safety guards, auto-learning, teammate orchestration
@@ -231,7 +231,7 @@ Auto-invokes:
 | `response-analyzer` | Large outputs | Token optimization |
 | `code-simplifier` | "simplify", "too complex" | KISS enforcement |
 
-**32 Reference Skills** — Loaded on-demand by bundles:
+**33 Reference Skills** — Loaded on-demand by bundles:
 - Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo
 - Others: api-designer, debugging, migration-helper, performance-optimizer, etc.
@@ -594,7 +594,7 @@ aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
 │   ├── agents/                      # 11 specialized agents (consolidated)
-│   ├── skills/                      # 45 skills (13 auto + 32 reference)
+│   ├── skills/                      # 46 skills (13 auto + 33 reference)
 │   ├── commands/                    # 6 bundled + standalone commands
 │   ├── rules/                       # 50 quality rules
 │   ├── docs/                        # Comprehensive documentation
