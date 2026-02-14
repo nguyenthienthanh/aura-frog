@@ -26,7 +26,7 @@ Similarly, a frontend repo may require:
 
 ## Task Content Analysis Patterns
 
-### Frontend Tasks (Activate: web-expert, ui-designer)
+### Frontend Tasks (Activate: ui-expert)
 
 **Triggers regardless of repo type:**
 
@@ -93,7 +93,7 @@ frontend_keywords[15]{keyword,context,score}:
 
 ---
 
-### Backend Tasks (Activate: backend-*, database-specialist)
+### Backend Tasks (Activate: backend-*, architect)
 
 **Triggers regardless of repo type:**
 
@@ -144,7 +144,7 @@ backend_keywords[15]{keyword,context,score}:
 
 ---
 
-### Database Tasks (Activate: database-specialist)
+### Database Tasks (Activate: architect)
 
 **Triggers regardless of repo type:**
 
@@ -262,7 +262,7 @@ testing_task_patterns[12]{pattern,description,score}:
 
 ---
 
-### UI/Design Tasks (Activate: ui-designer)
+### UI/Design Tasks (Activate: ui-expert)
 
 **Triggers regardless of repo type:**
 
@@ -334,9 +334,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "password reset" → backend context, but task is frontend
 
 **Result:**
-- **Primary:** web-expert (95 pts) - handles template styling
+- **Primary:** ui-expert (95 pts) - handles template styling
 - **Secondary:** backend-laravel (40 pts) - repo context
-- **Approach:** web-expert leads, backend-laravel advises on Laravel Blade
+- **Approach:** ui-expert leads, backend-laravel advises on Laravel Blade
 
 ---
 
@@ -352,9 +352,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "breaking across pages" → CSS/layout issue
 
 **Result:**
-- **Primary:** web-expert (120 pts) - CSS/HTML for PDF
+- **Primary:** ui-expert (120 pts) - CSS/HTML for PDF
 - **Secondary:** backend-nodejs (40 pts) - integration
-- **Approach:** web-expert fixes HTML/CSS, backend handles PDF library
+- **Approach:** ui-expert fixes HTML/CSS, backend handles PDF library
 
 ---
 
@@ -385,9 +385,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "report page" → slight frontend context
 
 **Result:**
-- **Primary:** database-specialist (90 pts) - query optimization
+- **Primary:** architect (90 pts) - query optimization
 - **Secondary:** backend-laravel (40 pts), web-vuejs (20 pts)
-- **Approach:** database-specialist leads, backend assists
+- **Approach:** architect leads, backend assists
 
 ---
 

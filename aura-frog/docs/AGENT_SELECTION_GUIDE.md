@@ -51,7 +51,7 @@ Keywords: "implement", "create", "add", "build", "develop"
 
 Selected:
   Primary: Relevant dev agent (mobile, web, backend)
-  Secondary: ui-designer, qa-automation
+  Secondary: ui-expert, qa-automation
 ```
 
 ### Bug Fix Intent
@@ -61,7 +61,7 @@ Keywords: "fix", "bug", "error", "issue", "broken"
 Selected:
   Primary: Relevant dev agent
   Secondary: qa-automation
-  Skip: ui-designer (unless UI bug)
+  Skip: ui-expert (unless UI bug)
 ```
 
 ### Testing Intent
@@ -78,7 +78,7 @@ Selected:
 Keywords: "design", "UI", "UX", "layout", "figma"
 
 Selected:
-  Primary: ui-designer
+  Primary: ui-expert
   Secondary: Relevant dev agent
 ```
 
@@ -87,7 +87,7 @@ Selected:
 Keywords: "database", "schema", "query", "migration"
 
 Selected:
-  Primary: database-specialist
+  Primary: architect
   Secondary: Relevant backend agent
 ```
 
@@ -193,7 +193,7 @@ Analysis:
 
 Selected:
   ✅ mobile-react-native (85) - Primary
-  ✅ ui-designer (50) - Secondary
+  ✅ ui-expert (50) - Secondary
   ✅ qa-automation (30) - Optional
 
 Reasoning:
@@ -214,7 +214,7 @@ Analysis:
 Selected:
   ✅ web-reactjs (55) - Primary (Frontend)
   ✅ backend-nodejs (55) - Primary (Backend)
-  ✅ ui-designer (45) - Secondary
+  ✅ ui-expert (45) - Secondary
   ✅ qa-automation (30) - Optional
 
 Reasoning:
@@ -253,7 +253,7 @@ Analysis:
   - Intent: Database design
 
 Selected:
-  ✅ database-specialist (85) - Primary
+  ✅ architect (85) - Primary
   ✅ backend-nodejs (40) - Secondary
 
 Reasoning:
@@ -328,7 +328,7 @@ System: ✅ Manual override
 # .claude/project-contexts/my-project/project-config.yaml
 agents_priority:
   - mobile-react-native
-  - ui-designer
+  - ui-expert
   - qa-automation
 
 # These get +25 bonus in scoring
@@ -357,7 +357,7 @@ web-reactjs:
   - Base priority: +90
   → Total: 90 (not selected)
 
-ui-designer:
+ui-expert:
   - Task type (UI implied): +30
   - Base priority: +85
   → Total: 115 ✅ SECONDARY
@@ -367,7 +367,7 @@ qa-automation:
   - Base priority: +85
   → Total: 115 ✅ SECONDARY
 
-Selected: mobile-react-native (primary), ui-designer, qa-automation
+Selected: mobile-react-native (primary), ui-expert, qa-automation
 Confidence: 85% (High)
 ```
 

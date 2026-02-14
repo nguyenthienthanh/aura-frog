@@ -171,9 +171,9 @@ When memory is loaded, Claude should:
 |----------|-------------|---------|
 | Simple coding task | Single | `Agent: backend-nodejs` |
 | Code review | Multi | `Agents: qa-automation + security-expert` |
-| Full feature workflow | Multi | `Agents: mobile-react-native + ui-designer, qa-automation` |
+| Full feature workflow | Multi | `Agents: mobile-react-native + ui-expert, qa-automation` |
 | Bug fix with testing | Multi | `Agents: backend-python + qa-automation` |
-| API design | Multi | `Agents: backend-nodejs + database-specialist` |
+| API design | Multi | `Agents: backend-nodejs + architect` |
 | Security audit | Multi | `Agents: security-expert + qa-automation` |
 | General question | Single | `Agent: pm-operations-orchestrator` |
 
@@ -194,10 +194,10 @@ When memory is loaded, Claude should:
 | Python | `backend-python` |
 | Laravel | `backend-laravel` |
 | Go | `backend-go` |
-| Database | `database-specialist` |
+| Database | `architect` |
 | Security | `security-expert` |
 | QA/Testing | `qa-automation` |
-| UI/Design | `ui-designer` |
+| UI/Design | `ui-expert` |
 | DevOps | `devops-cicd` |
 
 **Full logic:** See `agents/smart-agent-detector.md`

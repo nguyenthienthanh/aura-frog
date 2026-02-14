@@ -15,7 +15,7 @@ Manually activate a specific agent for the current workflow.
 
 ```
 agent:activate qa-automation
-agent:activate ui-designer
+agent:activate ui-expert
 ```
 
 ---

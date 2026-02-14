@@ -53,10 +53,6 @@ scripts[24]{category,script,purpose}:
   utility,discover-agents.sh,Discover available agents
   utility,generate-report.sh,Generate workflow reports
   utility,claude-md-update.sh,Update CLAUDE.md files
-  voice,setup-voice.sh,Set up voice commands
-  voice,voice-notify.sh,Voice notifications
-  voice,test-voice.sh,Test voice setup
-  voice,debug-voice.sh,Debug voice issues
 ```
 
 ---
@@ -219,28 +215,6 @@ export AF_LEARNING_ENABLED="true"
 
 ```bash
 ./scripts/detect-design-system.sh
-```
-
----
-
-## Voice Commands (macOS)
-
-### Setup Voice
-
-```bash
-./scripts/setup-voice.sh
-```
-
-### Test Voice
-
-```bash
-./scripts/test-voice.sh
-```
-
-### Voice Notifications
-
-```bash
-./scripts/voice-notify.sh "Workflow complete"
 ```
 
 ---

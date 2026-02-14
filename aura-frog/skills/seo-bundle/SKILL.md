@@ -1,3 +1,20 @@
+---
+name: seo-bundle
+description: "Unified SEO and AI Discovery expertise bundle. Lazy-loads technical SEO, schema markup, Core Web Vitals, and GEO/AI search patterns based on task type."
+autoInvoke: true
+priority: 50
+triggers:
+  - "seo"
+  - "meta tags"
+  - "sitemap"
+  - "schema"
+  - "JSON-LD"
+  - "structured data"
+  - "core web vitals"
+  - "AI discovery"
+  - "GEO"
+---
+
 # Skill: SEO Bundle
 
 **Skill ID:** seo-bundle

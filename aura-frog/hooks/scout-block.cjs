@@ -63,10 +63,11 @@ function loadCustomPatterns(projectRoot) {
  * Check if a path contains blocked directories
  */
 function isBlocked(targetPath, patterns) {
-  const normalized = targetPath.replace(/\\/g, '/');
+  const normalized = targetPath.replace(/\\/g, '/').toLowerCase();
+  const segments = normalized.split('/');
   return patterns.some(pattern => {
-    const regex = new RegExp(`(^|/)${pattern}(/|$)`, 'i');
-    return regex.test(normalized);
+    const lowerPattern = pattern.toLowerCase();
+    return segments.some(segment => segment === lowerPattern);
   });
 }
 

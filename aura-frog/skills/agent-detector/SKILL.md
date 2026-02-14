@@ -81,8 +81,8 @@ complexity[3]{level,criteria,approach}:
 
 ```toon
 model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Simple queries/Orchestration,pm-operations-orchestrator/project-detector/voice-operations
-  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/qa-automation/ui-designer
+  haiku,Quick tasks/Simple queries/Orchestration,pm-operations-orchestrator/project-manager
+  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/qa-automation/ui-expert
   opus,Architecture/Deep analysis/Security audits/Complex planning,security-expert (audits)/Any agent (architecture mode)
 ```
 
@@ -123,7 +123,6 @@ agent_models[11]{agent,default_model,opus_when}:
   security-expert,sonnet,opus for full audits
   qa-automation,sonnet,Never
   devops-cicd,sonnet,Infrastructure architecture
-  voice-operations,haiku,Never (notifications only)
 ```
 
 ### Model Selection Output
@@ -205,11 +204,11 @@ Detect user **intent** from action keywords:
 
 ```toon
 intent_detection[8]{intent,keywords,primary,secondary}:
-  Implementation,implement/create/add/build/develop,Dev agent,ui-designer/qa-automation
+  Implementation,implement/create/add/build/develop,Dev agent,ui-expert/qa-automation
   Bug Fix,fix/bug/error/issue/broken/crash,Dev agent,qa-automation
   Testing,test/testing/coverage/QA/spec,qa-automation,Dev agent
-  Design/UI,design/UI/UX/layout/figma/style,ui-designer,Dev agent
-  Database,database/schema/query/migration/SQL,database-specialist,Backend agent
+  Design/UI,design/UI/UX/layout/figma/style,ui-expert,Dev agent
+  Database,database/schema/query/migration/SQL,architect,Backend agent
   Security,security/vulnerability/audit/owasp/secure,security-expert,Dev agent
   Performance,performance/slow/optimize/speed/memory,devops-cicd,Dev agent
   Deployment,deploy/docker/kubernetes/CI-CD/pipeline,devops-cicd,-
@@ -316,9 +315,9 @@ Task Analysis:
 - "PDF" → Frontend task pattern (+50)
 - "layout" → Frontend keyword (+40)
 - "table" → Frontend keyword (+30)
-→ Total frontend score: 120 pts → web-expert is PRIMARY
+→ Total frontend score: 120 pts → ui-expert is PRIMARY
 
-Even if repo is pure backend, web-expert leads this task!
+Even if repo is pure backend, ui-expert leads this task!
 ```
 
 **Apply patterns from:** `task-based-agent-selection.md`
@@ -375,7 +374,7 @@ qa-automation:
   - Bug fix intent: +35 (secondary for bugs)
   → Total: 35 pts ✅ OPTIONAL
 
-ui-designer:
+ui-expert:
   - "button" keyword: +20 (UI element)
   → Total: 20 pts ❌ NOT SELECTED
 ```
@@ -414,7 +413,7 @@ ui-designer:
 agents[4]{category,count,list}:
   Development,4,architect/ui-expert/mobile-expert/game-developer
   Quality & Security,2,security-expert/qa-automation
-  DevOps & Operations,2,devops-cicd/voice-operations
+  DevOps & Operations,1,devops-cicd
   Infrastructure,3,smart-agent-detector/pm-operations-orchestrator/project-manager
 ```
 

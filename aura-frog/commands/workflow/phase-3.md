@@ -26,7 +26,7 @@ Review design specifications and break down UI into components.
 - Initialize Phase 3 state
 
 ### Step 2: Request Design Assets
-**Agent:** ui-designer
+**Agent:** ui-expert
 
 Prompt user:
 ```
@@ -41,7 +41,7 @@ Upload images or paste Figma link (screenshots will be taken)
 ```
 
 ### Step 3: Analyze Design
-**Agents:** ui-designer + dev agent
+**Agents:** ui-expert + dev agent
 
 Analyze:
 - Layout structure (header, body, footer)

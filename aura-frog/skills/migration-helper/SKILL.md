@@ -13,7 +13,7 @@ triggers:
 
 **Category:** Dev Expert
 **Version:** 1.0.0
-**Used By:** database-specialist, backend agents
+**Used By:** architect, backend agents
 
 ---
 

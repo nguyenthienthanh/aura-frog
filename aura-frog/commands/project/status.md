@@ -31,7 +31,7 @@ Show the current project detection status from cache. Displays detected tech sta
 **Framework:** laravel
 **Package Manager:** composer
 **Primary Agent:** backend-laravel
-**Secondary Agents:** web-expert (templates detected)
+**Secondary Agents:** ui-expert (templates detected)
 **Test Framework:** phpunit
 **Templates:** blade
 **Styles:** tailwind, scss

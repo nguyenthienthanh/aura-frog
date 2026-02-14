@@ -1,7 +1,7 @@
 # Command: seo:geo
 
 **Command:** `seo:geo [url]`
-**Agent:** web-expert
+**Agent:** ui-expert
 **Version:** 1.0.0
 
 ---
@@ -116,7 +116,7 @@ faq_checks[3]{check,requirement}:
 
 **URL:** https://myapp.com
 **Date:** 2025-01-15
-**Agent:** web-expert
+**Agent:** ui-expert
 
 ---
 

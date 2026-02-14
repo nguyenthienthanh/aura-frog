@@ -185,7 +185,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-### UI Design Review (ui-designer)
+### UI Design Review (ui-expert)
 **Status:** ⚠️ Approved with notes  
 **Key Points:**
 - Figma designs available

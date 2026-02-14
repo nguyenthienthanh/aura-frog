@@ -8,7 +8,7 @@
 
 > **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 11 specialized agents, 53 skills, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), Agent Teams orchestration, self-improving learning system, and bundled MCP servers.
+AI-powered development plugin for **Claude Code** with 10 specialized agents, 53 skills, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), Agent Teams orchestration, self-improving learning system, and bundled MCP servers.
 
 [![Version](https://img.shields.io/badge/version-1.18.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -25,20 +25,20 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 53
 
 <div align="center">
 
-| **Agents** | **Skills** | **Bundled Commands** | **Rules** | **Hooks** | **MCP Servers** |
+| **Agents** | **Skills** | **Commands** | **Rules** | **Hooks** | **MCP Servers** |
 |:----------:|:----------:|:--------------------:|:---------:|:---------:|:---------------:|
-| **11** | **53** | **6** | **50** | **23** | **6** |
+| **10** | **53** | **91** | **50** | **20** | **6** |
 
 </div>
 
 **What's Inside:**
-- **11 Specialized Agents** — Consolidated: architect, ui-expert, mobile-expert, game-developer, qa, security, devops
-- **6 Bundled Commands** — `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo` (each with submenus)
+- **10 Specialized Agents** — Consolidated: architect, ui-expert, mobile-expert, game-developer, qa, security, devops
+- **91 Commands** — 6 bundled (`/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo`) + 85 individual commands
 - **13 Auto-Invoking Skills** — Agent detection, model routing, workflow, testing, SEO bundles
 - **40 Reference Skills** — Framework experts, SEO experts, design, loaded on-demand by bundles
 - **6 MCP Servers** — Context7, Playwright, Vitest, Firebase, Figma, Slack
 - **50 Quality Rules** — System, code quality, architecture, workflow, UI, SEO
-- **23 Lifecycle Hooks** — Safety guards, auto-learning, teammate orchestration
+- **20 Lifecycle Hooks** — Safety guards, auto-learning, teammate orchestration
 - **9-Phase Workflow** — From requirements to deployment with only 2 approval gates
 - **Agent Teams** — Real multi-agent orchestration with persistent teammates (experimental)
 - **Model Routing** — Auto-select Haiku/Sonnet/Opus for 30-50% cost savings
@@ -109,11 +109,11 @@ At each phase, review and respond:
 | Traditional Development | With Aura Frog |
 |------------------------|----------------|
 | Manual task management | AI-powered 9-phase workflow |
-| Generic AI responses | 11 specialized agents auto-selected |
+| Generic AI responses | 10 specialized agents auto-selected |
 | Single AI session | Agent Teams with persistent teammates |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 83 commands |
+| Context switching | CLI-first with 91 commands |
 | Manual documentation | Auto-generated docs |
 | Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 
@@ -123,9 +123,9 @@ At each phase, review and respond:
 
 ## Key Features
 
-### 11 Specialized Agents (Consolidated in v1.17.0)
+### 10 Specialized Agents (Consolidated in v1.17.0)
 
-Agents auto-activate based on your prompt context. v1.17.0 consolidated 15 agents into 11 for better routing:
+Agents auto-activate based on your prompt context. v1.17.0 consolidated 15 agents into 10 for better routing:
 
 <details>
 <summary><b>Development (4)</b></summary>
@@ -150,12 +150,11 @@ Agents auto-activate based on your prompt context. v1.17.0 consolidated 15 agent
 </details>
 
 <details>
-<summary><b>Infrastructure (2)</b></summary>
+<summary><b>Infrastructure (1)</b></summary>
 
 | Agent | Specialization |
 |-------|---------------|
 | `devops-cicd` | Docker, K8s, CI/CD, monitoring |
-| `voice-operations` | ElevenLabs AI narration |
 
 </details>
 
@@ -588,12 +587,12 @@ learn:status
 
 | Document | Description |
 |----------|-------------|
-| [aura-frog/commands/README.md](aura-frog/commands/README.md) | 6 bundled commands + reference |
-| [aura-frog/agents/](aura-frog/agents/) | 11 agent definitions |
+| [aura-frog/commands/README.md](aura-frog/commands/README.md) | 91 commands (6 bundled + 85 individual) |
+| [aura-frog/agents/](aura-frog/agents/) | 10 agent definitions |
 | [aura-frog/rules/](aura-frog/rules/) | 50 quality rules |
 | [aura-frog/scripts/README.md](aura-frog/scripts/README.md) | Utility scripts (integrations, workflows) |
 | [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) | Learning system (local + Supabase) |
-| [aura-frog/hooks/README.md](aura-frog/hooks/README.md) | 23 lifecycle hooks |
+| [aura-frog/hooks/README.md](aura-frog/hooks/README.md) | 20 lifecycle hooks |
 | [aura-frog/docs/REFACTOR_ANALYSIS.md](aura-frog/docs/REFACTOR_ANALYSIS.md) | Optimization guide |
 
 ---
@@ -604,15 +603,15 @@ learn:status
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
-│   ├── agents/                      # 11 specialized agents (consolidated)
+│   ├── agents/                      # 10 specialized agents (consolidated)
 │   ├── skills/                      # 53 skills (13 auto + 40 reference)
-│   ├── commands/                    # 6 bundled + standalone commands
+│   ├── commands/                    # 91 commands (6 bundled + 85 individual)
 │   ├── rules/                       # 50 quality rules
 │   ├── docs/                        # Comprehensive documentation
 │   │   ├── phases/                  # 9 phase guides
 │   │   ├── MCP_GUIDE.md             # MCP setup guide
 │   │   └── REFACTOR_ANALYSIS.md     # Optimization guide (NEW)
-│   ├── hooks/                       # 23 lifecycle hooks (safety, learning, teams)
+│   ├── hooks/                       # 20 lifecycle hooks (safety, learning, teams)
 │   ├── scripts/                     # Utility scripts
 │   └── templates/                   # Document templates
 ├── assets/                          # Logo and images

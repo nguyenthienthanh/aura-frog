@@ -1,5 +1,3 @@
-# Godot Expert Skill
-
 ---
 name: godot-expert
 description: "Godot game development expert. PROACTIVELY use when working with Godot, GDScript, game projects. Triggers: godot, gdscript, .gd, .tscn, game, scene, node"

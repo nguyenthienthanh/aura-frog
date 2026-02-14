@@ -1,3 +1,21 @@
+---
+name: framework-expert
+description: "Unified framework expertise bundle. Lazy-loads relevant framework patterns (React, Vue, Angular, Next.js, Node.js, Python, Laravel, Go, Flutter, Godot) based on detected tech stack."
+autoInvoke: true
+priority: 50
+triggers:
+  - "framework"
+  - "react"
+  - "vue"
+  - "angular"
+  - "nextjs"
+  - "nodejs"
+  - "python"
+  - "laravel"
+  - "go"
+  - "flutter"
+---
+
 # Skill: Framework Expert (Bundle)
 
 **Skill ID:** framework-expert

@@ -323,7 +323,7 @@ detect_agents() {
     fi
 
     if [[ "$task" =~ (design|ui|ux|figma|component|layout) ]]; then
-        agents+=("ui-designer")
+        agents+=("ui-expert")
     fi
 
     # Always add orchestrator and context manager

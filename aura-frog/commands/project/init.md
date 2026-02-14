@@ -85,7 +85,7 @@ integrations:
 **Use sectioned template with auto-update support:**
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 PROJECT_ROOT=$(pwd)
 PROJECT_NAME="[DETECTED_PROJECT_NAME]"
 TECH_STACK="[DETECTED_TECH_STACK]"
@@ -121,7 +121,7 @@ fi
 Copy and merge plugin settings (permissions + env) to project:
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
 PROJECT_SETTINGS=".claude/settings.local.json"
 
@@ -167,7 +167,7 @@ If direnv installed, create `.envrc` for auto-loading.
 If Supabase credentials are configured:
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 
 if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SECRET_KEY" ]; then
   echo ""

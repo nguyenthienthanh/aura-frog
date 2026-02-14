@@ -224,7 +224,7 @@ Data Points: 123 workflows, 47 feedback items
 **2. react-expert for component tasks**
 - Confidence: 92%
 - Frequency: 28 tasks
-- Evidence: 96% success rate vs 78% for web-expert
+- Evidence: 96% success rate vs 78% for ui-expert
 - Recommendation: Update agent routing
 
 ---
@@ -252,7 +252,7 @@ Data Points: 123 workflows, 47 feedback items
 
 | Task Type | Current | Recommended | Expected Gain |
 |-----------|---------|-------------|---------------|
-| React UI | web-expert | react-expert | +18% success |
+| React UI | ui-expert | react-expert | +18% success |
 | API routes | general | nodejs-expert | +10% success |
 
 ---

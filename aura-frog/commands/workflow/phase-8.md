@@ -136,7 +136,7 @@ Create comprehensive documentation for implementation and deployment.
 ## Contributors
 - mobile-react-native agent (primary)
 - qa-automation agent (testing)
-- ui-designer agent (design review)
+- ui-expert agent (design review)
 - pm-operations-orchestrator (coordination)
 ```
 
@@ -354,19 +354,6 @@ Documentation complete and ready for sharing
    ✅ Confluence format ready
    ✅ Deployment steps clear
    ✅ Change log complete
-
-🎙️  VOICE NARRATION AVAILABLE (Optional)
-
-Generate audio narration for documentation?
-Benefits:
-- Accessibility for team members
-- Hands-free documentation review
-- Easier onboarding
-
-Options:
-  "narrate all" → Generate audio for all documents (~23 min)
-  "narrate summary" → Only implementation summary (~8 min)
-  "skip narration" → No audio generation
 
 ⏭️  Next Phase: Phase 9 - Notification
    Notify stakeholders and close workflow

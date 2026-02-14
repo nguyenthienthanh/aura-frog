@@ -2,7 +2,7 @@
 
 **System:** Aura Frog v1.18.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 11 agents + 53 skills + 9-phase workflow + auto-invoking skills + bundled MCP
+**Purpose:** 10 agents + 53 skills + 91 commands + 9-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
@@ -26,7 +26,7 @@
 - `seo-bundle` - Consolidated SEO/GEO skills
 - `testing-patterns` - Unified testing patterns
 
-**Consolidated Agents (15 → 11):**
+**Consolidated Agents (15 → 10):**
 - `project-manager` ← project-detector + project-config-loader + project-context-manager
 - `architect` ← backend-expert + database-specialist
 - `ui-expert` ← web-expert + ui-designer

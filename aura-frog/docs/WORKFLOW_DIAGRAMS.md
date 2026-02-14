@@ -47,13 +47,13 @@ graph TB
             PY[backend-python]
             GO[backend-go]
             LA[backend-laravel]
-            DB[database-specialist]
+            DB[architect]
         end
 
         subgraph "Quality Agents"
             QA[qa-automation]
             SE[security-expert]
-            UI[ui-designer]
+            UI[ui-expert]
         end
 
         subgraph "Operations Agents"

@@ -172,7 +172,7 @@ subtasks[2]{key,summary,status}:
 2. MCP figma → fetches design tokens and components
 3. MCP context7 → fetches React/MUI docs
 4. Skill react-expert → applies React patterns
-5. Agent web-expert → executes implementation
+5. Agent ui-expert → executes implementation
 ```
 
 ---

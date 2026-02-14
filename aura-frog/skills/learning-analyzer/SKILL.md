@@ -1,3 +1,14 @@
+---
+name: learning-analyzer
+description: "Analyze collected learning data from Supabase to identify success patterns, failure patterns, optimization opportunities, and agent performance trends."
+autoInvoke: false
+priority: 30
+triggers:
+  - "/learn:analyze"
+  - "learning analysis"
+  - "pattern analysis"
+---
+
 # Learning Analyzer Skill
 
 **Type:** Analysis
@@ -233,7 +244,7 @@ Period: Last 30 days
 |-----------|-------|--------------|---------------|
 | React UI | react-expert | 96% | 2% |
 | API routes | nodejs-expert | 88% | 8% |
-| Database | database-specialist | 91% | 5% |
+| Database | architect | 91% | 5% |
 
 ### Suggested Improvements
 

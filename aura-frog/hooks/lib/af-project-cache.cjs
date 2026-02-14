@@ -428,10 +428,10 @@ function detectAgentMapping(framework, patterns) {
 
   // Add secondary agents based on patterns
   if (patterns.templates.length > 0) {
-    agents.secondary.push('web-expert');
+    agents.secondary.push('ui-expert');
   }
   if (patterns.frontend.length > 0 && !agents.primary?.startsWith('web-')) {
-    agents.secondary.push('web-expert');
+    agents.secondary.push('ui-expert');
   }
   if (patterns.backend.length > 0 && !agents.primary?.startsWith('backend-')) {
     // Determine backend agent from file patterns
@@ -442,10 +442,10 @@ function detectAgentMapping(framework, patterns) {
 
   // Always available agents
   agents.available = [
-    'database-specialist',
+    'architect',
     'security-expert',
     'qa-automation',
-    'ui-designer',
+    'ui-expert',
     'devops-cicd'
   ];
 

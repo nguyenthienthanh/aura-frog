@@ -446,7 +446,31 @@ resource "aws_instance" "web" {
 
 ---
 
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[4]{phase,role,focus}:
+  2-Design,Support,Deployment architecture + infrastructure planning
+  5c-TDD REFACTOR,Support,Dockerfile + CI/CD pipeline creation
+  8-Docs,Support,Deployment guides + runbooks
+  9-Share,Lead,Deploy to staging/production + notifications
+```
+
+### File Claiming Conventions
+
+When working as a teammate, devops-cicd claims:
+- `Dockerfile`, `docker-compose.yml`
+- `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`
+- `terraform/`, `k8s/`, `helm/`
+- `scripts/deploy*`, `scripts/ci*`
+
+---
+
 **Agent:** devops-cicd
-**Version:** 1.0.0
-**Last Updated:** 2024-11-26
+**Version:** 1.18.0
+**Last Updated:** 2026-02-14
 **Status:** ✅ Active

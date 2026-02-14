@@ -72,7 +72,7 @@ token_budget[9]{phase,max_tokens,format}:
 |-------|------|------------|-------------|------|
 | 1 | Understand 🎯 | pm-operations-orchestrator | Requirements (TOON, ≤500 tokens) | ⚡ Auto |
 | 2 | Design 🏗️ | Dev agent | Technical design | ✋ **Approval** |
-| 3 | UI Breakdown 🎨 | ui-designer | Component breakdown | ⚡ Auto |
+| 3 | UI Breakdown 🎨 | ui-expert | Component breakdown | ⚡ Auto |
 | 4 | Plan Tests 🧪 | qa-automation | Test strategy | ⚡ Auto |
 | 5a | Write Tests 🔴 | qa-automation + Dev | Failing tests (TDD RED) | ⚡ Auto |
 | 5b | Build 🟢 | Dev agent | Implementation (TDD GREEN) | ✋ **Approval** |
@@ -552,7 +552,7 @@ phase_teams[11]{phase,lead,primary,secondary,team_size}:
   6-Review,security-expert,architect+qa-automation,-,3
   7-Verify,qa-automation,-,-,1
   8-Document,pm-operations-orchestrator,-,-,1
-  9-Share,voice-operations,-,-,1
+  9-Share,pm-operations-orchestrator,-,-,1
 ```
 
 ### Teammate Operation Pattern

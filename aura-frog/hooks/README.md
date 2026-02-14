@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (23 Total)
+## Active Hooks (20 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -498,29 +498,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11b. Stop - Voice Notification
-**When:** Claude stops for user approval
-
-**Actions:**
-- ✅ Play context-aware voiceover notification
-- ✅ Alert user that approval is needed
-- ✅ Uses macOS `say` command
-
-**Script:** `hooks/stop-voice-notify.sh`
-
----
-
-### 12. Notification - Critical Alert
-**When:** Critical notifications occur
-
-**Actions:**
-- ✅ Detect critical notifications (error, critical, failed)
-- ✅ Play voice alert for urgent issues
-- ✅ Uses `scripts/voice-notify.sh`
-
----
-
-### 13. PostToolUse - Feedback Capture
+### 12. PostToolUse - Feedback Capture
 **When:** User provides corrections or feedback
 
 **Actions:**
@@ -631,7 +609,7 @@ Tool Execution
   ↓
 Response to User
   ↓
-[Stop Hook] - Voice notification if approval needed
+[Stop Hook] - Save state + session metrics
 ```
 
 ---
@@ -639,7 +617,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[23]{event,name,purpose}:
+hooks[20]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
@@ -659,14 +637,11 @@ hooks[23]{event,name,purpose}:
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
   TaskCompleted,Task Completion Validator,Validate teammate task completion (Agent Teams)
-  Stop,Compact Handoff,Auto-save workflow state before compact
-  Stop,Voice+Metrics,Voice notification + session metrics
-  Notification,Critical Alert,Voice alert for errors/critical issues
-  Library,af-learning.cjs,Learning system utilities (dual-mode)
+  Stop,Compact Handoff + Metrics,Auto-save workflow state + session metrics
 ```
 
 ---
 
 **Version:** 1.18.0
 **Last Updated:** 2026-02-09
-**Status:** Active hooks system (23 hooks)
+**Status:** Active hooks system (20 hooks)

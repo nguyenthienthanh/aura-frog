@@ -218,7 +218,7 @@ if (!detection) {
   "agents": {
     "primary": "web-nextjs",
     "secondary": ["backend-nodejs"],
-    "available": ["database-specialist", "security-expert", "qa-automation"]
+    "available": ["architect", "security-expert", "qa-automation"]
   },
   "cwd": "/path/to/project",
   "detectedAt": "2026-01-21T10:30:00.000Z",
@@ -250,7 +250,7 @@ if (!detection) {
       "absolutePath": "/path/to/workspace/backend-api",
       "framework": "laravel",
       "packageManager": "composer",
-      "agents": { "primary": "backend-laravel", "secondary": ["web-expert"] },
+      "agents": { "primary": "backend-laravel", "secondary": ["ui-expert"] },
       "testInfra": "phpunit"
     },
     {

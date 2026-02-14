@@ -205,8 +205,10 @@ function runLinter(linter, filePath) {
   if (!config) return { success: true, skipped: true };
 
   try {
-    const fixCmd = `${config.fix} "${filePath}"`;
-    const result = spawnSync('sh', ['-c', fixCmd], {
+    const parts = config.fix.split(' ');
+    const cmd = parts[0];
+    const args = [...parts.slice(1), filePath];
+    const result = spawnSync(cmd, args, {
       cwd: process.cwd(),
       timeout: 30000,
       encoding: 'utf-8',

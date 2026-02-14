@@ -1,3 +1,16 @@
+---
+name: model-router
+description: "Automatically select optimal Claude model (Haiku/Sonnet/Opus) based on task complexity to reduce costs while maintaining quality."
+autoInvoke: true
+priority: 95
+triggers:
+  - "every task"
+  - "use opus"
+  - "use haiku"
+  - "cheap model"
+  - "minimize cost"
+---
+
 # Skill: Model Router
 
 **Skill ID:** model-router

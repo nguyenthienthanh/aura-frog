@@ -73,9 +73,9 @@ triggers[8]{type,pattern}:
 
 | Agent | Collaboration |
 |-------|---------------|
-| ui-designer | Game UI/HUD design, menu layouts |
+| ui-expert | Game UI/HUD design, menu layouts |
 | qa-automation | Game testing with GDUnit |
-| web-expert | HTML5 hosting, WebGL optimization |
+| architect | HTML5 hosting, WebGL optimization |
 | mobile-expert | Mobile platform conventions, touch patterns |
 | devops-cicd | Export automation, CI/CD pipelines |
 
@@ -133,5 +133,32 @@ exports[6]{platform,format,use_case}:
 
 ---
 
+---
+
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[6]{phase,role,focus}:
+  1-Understand,Lead,Game design document + mechanics breakdown
+  2-Design,Lead,Scene hierarchy + node composition + state machines
+  5a-TDD RED,Lead,GDUnit tests for game mechanics
+  5b-TDD GREEN,Lead,Game implementation + scene scripts
+  5c-TDD REFACTOR,Lead,Performance profiling + code optimization
+  8-Docs,Support,Game docs + export guide
+```
+
+### File Claiming Conventions
+
+When working as a teammate, game-developer claims:
+- `*.gd`, `*.tscn`, `*.scn`, `*.tres`
+- `project.godot`, `export_presets.cfg`
+- `scripts/`, `scenes/`, `assets/`
+
+---
+
 **Load detailed patterns:** `skills/godot-expert/SKILL.md`
-**Version:** 1.6.0 | **Last Updated:** 2025-12-26
+**Version:** 1.18.0 | **Last Updated:** 2026-02-14

@@ -39,20 +39,12 @@ agent_index[24]{id,category,specialty,keywords}:
   backend-python,dev,Python backend,python/django/fastapi/flask/api
   backend-go,dev,Go backend,go/golang/gin/fiber/api
   backend-laravel,dev,Laravel/PHP backend,laravel/php/eloquent/artisan
-  database-specialist,dev,Database/SQL,database/schema/query/migration/sql/postgres/mysql
   security-expert,quality,Security auditing,security/vulnerability/audit/owasp/penetration
   qa-automation,quality,Testing/QA,test/testing/coverage/qa/jest/cypress
-  ui-designer,quality,UI/UX design,design/ui/ux/layout/figma/style/component
   devops-cicd,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline/terraform
-  jira-operations,ops,JIRA integration,jira/ticket/issue/sprint/backlog
-  confluence-operations,ops,Confluence docs,confluence/wiki/documentation/page
-  slack-operations,ops,Slack notifications,slack/notification/channel/message
-  voice-operations,ops,Voice/TTS,voice/speak/tts/audio/notification
   smart-agent-detector,infra,Agent detection,detect/agent/select/route
   pm-operations-orchestrator,infra,PM/orchestration,pm/project/orchestrate/manage
-  project-detector,infra,Project detection,project/detect/identify/config
-  project-config-loader,infra,Config loading,config/load/settings/yaml
-  project-context-manager,infra,Context management,context/manage/state/session
+  project-manager,infra,Project management,project/detect/identify/config/context
 ```
 
 ---
@@ -144,11 +136,11 @@ User: "Create a React Native screen for login"
 
 1. Agent Detector scores all agents using keywords from agent_index
    - mobile-react-native: +60 (react-native) +20 (context) = 80 ✅ PRIMARY
-   - ui-designer: +35 (screen/login implies UI) → OPTIONAL
+   - ui-expert: +35 (screen/login implies UI) → OPTIONAL
 
 2. Lazy Loader activates:
    - Load: agents/mobile-react-native.md (~1500 tokens)
-   - Skip: ui-designer (score < 50)
+   - Skip: ui-expert (score < 50)
 
 3. Context loaded:
    - Agent index: ~1200 tokens

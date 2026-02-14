@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.9.0
+**Aura Frog Version:** 1.18.0
 
 ---
 
@@ -11,7 +11,7 @@
 
 ## Load Aura Frog Plugin
 
-**Read and follow:** `~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md`
+**Read and follow:** Aura Frog plugin's `CLAUDE.md` (auto-loaded by plugin system)
 
 This plugin provides rules and skills that auto-load:
 - **Banner:** Follow `rules/agent-identification-banner.md` (includes MCP display)
@@ -75,4 +75,4 @@ context_files[4]{file,purpose}:
 
 ---
 
-**Version:** 1.9.0 | **Generated:** [DATE]
+**Version:** 1.18.0 | **Generated:** [DATE]

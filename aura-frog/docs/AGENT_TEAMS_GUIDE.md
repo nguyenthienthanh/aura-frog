@@ -193,7 +193,7 @@ phase_teams[11]{phase,lead,primary,secondary,team_size}:
   6-Review,security-expert,architect+qa-automation,-,3
   7-Verify,qa-automation,-,-,1
   8-Document,pm-operations-orchestrator,-,-,1
-  9-Share,voice-operations,-,-,1
+  9-Share,pm-operations-orchestrator,-,-,1
 ```
 
 ---

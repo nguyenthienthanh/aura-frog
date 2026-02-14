@@ -363,7 +363,7 @@ Message:
   },
   "context": {
     "task": "Refactor SocialMarketingCompositePost.phone.tsx",
-    "agents": ["mobile-react-native", "qa-automation", "ui-designer"]
+    "agents": ["mobile-react-native", "qa-automation", "ui-expert"]
   }
 }
 ```

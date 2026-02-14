@@ -1,3 +1,14 @@
+---
+name: self-improve
+description: "Apply learned improvements to the Aura Frog plugin. Updates rules, adjusts agent routing, modifies workflow configurations, and generates knowledge base entries."
+autoInvoke: false
+priority: 30
+triggers:
+  - "/learn:apply"
+  - "self improve"
+  - "apply improvements"
+---
+
 # Self-Improve Skill
 
 **Type:** Meta
@@ -201,12 +212,12 @@ Confidence: 92% | Frequency: 28
 **Evidence:**
 - 28 workflows with React component tasks
 - react-expert success rate: 96%
-- Current default (web-expert) success rate: 78%
+- Current default (ui-expert) success rate: 78%
 
 **Change to:** `agents/smart-agent-detector.md`
 ```diff
 react_patterns:
-- default_agent: web-expert
+- default_agent: ui-expert
 + default_agent: react-expert
 + file_extensions: [.tsx, .jsx]
 ```

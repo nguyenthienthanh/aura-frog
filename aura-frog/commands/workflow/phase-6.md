@@ -28,7 +28,7 @@ Cross-agent code review to ensure quality and best practices.
 ### Step 2: Multi-Agent Review
 
 **Primary Reviewer:** Dev agent (mobile-react-native/web-*/backend-laravel)  
-**Secondary Reviewers:** qa-automation, ui-designer, pm-orchestrator
+**Secondary Reviewers:** qa-automation, ui-expert, pm-orchestrator
 
 Each agent reviews from their perspective:
 

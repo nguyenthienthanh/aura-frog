@@ -2,7 +2,7 @@
 
 **Category:** Design Expert  
 **Priority:** High  
-**Used By:** ui-designer agent
+**Used By:** ui-expert agent
 
 ---
 
@@ -97,5 +97,5 @@ breakpoints: {
 
 ---
 
-**Used by ui-designer agent for Figma design analysis and component extraction.**
+**Used by ui-expert agent for Figma design analysis and component extraction.**
 

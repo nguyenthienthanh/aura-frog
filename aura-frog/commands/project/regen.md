@@ -112,7 +112,7 @@ Choice [1]:
 **Merge latest plugin settings into project** (picks up new env vars, permissions):
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
 PROJECT_SETTINGS=".claude/settings.local.json"
 
@@ -147,7 +147,7 @@ fi
 **Use the auto-update script to refresh AURA-FROG section:**
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 PROJECT_ROOT=$(pwd)
 PROJECT_NAME="[DETECTED_PROJECT_NAME]"
 TECH_STACK="[DETECTED_TECH_STACK]"

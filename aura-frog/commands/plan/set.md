@@ -20,7 +20,7 @@ Set the active plan for the current session. This affects:
 ## Execution
 
 ```bash
-node "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/set-active-plan.cjs" "$ARGUMENTS"
+node "${CLAUDE_PLUGIN_ROOT}/hooks/set-active-plan.cjs" "$ARGUMENTS"
 ```
 
 ## Clear Active Plan

@@ -1,7 +1,7 @@
 # Command: design:stitch-review
 
 **Command:** `design:stitch-review [code/figma-link]`
-**Agents:** ui-designer
+**Agents:** ui-expert
 **Skill:** stitch-design
 **Version:** 1.0.0
 

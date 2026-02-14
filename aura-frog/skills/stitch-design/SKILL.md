@@ -15,7 +15,7 @@ triggers:
 
 **Category:** Design Skill
 **Version:** 1.0.0
-**Used By:** ui-designer
+**Used By:** ui-expert
 
 ---
 

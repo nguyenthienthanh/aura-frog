@@ -14,7 +14,7 @@ Deactivate a specific agent from the current workflow.
 ## Usage
 
 ```
-agent:deactivate ui-designer
+agent:deactivate ui-expert
 ```
 
 ---
@@ -22,12 +22,12 @@ agent:deactivate ui-designer
 ## Output
 
 ```markdown
-⏸️  Agent Deactivated: ui-designer
+⏸️  Agent Deactivated: ui-expert
 
-The UI Designer agent has been deactivated and will no longer participate in the current workflow.
+The UI Expert agent has been deactivated and will no longer participate in the current workflow.
 
 You can reactivate it anytime with:
-agent:activate ui-designer
+agent:activate ui-expert
 ```
 
 ---

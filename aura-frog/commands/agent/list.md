@@ -46,7 +46,7 @@ List all available agents or filter by criteria.
 
 ### Quality & Design (2 agents)
 - qa-automation (Priority: 85) ⭐ Active
-- ui-designer (Priority: 85) ⭐ Active
+- ui-expert (Priority: 85) ⭐ Active
 
 ### Operations (4 agents)
 - jira-operations (Priority: 80)

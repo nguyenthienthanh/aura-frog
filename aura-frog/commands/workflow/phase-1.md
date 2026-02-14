@@ -49,7 +49,7 @@ Phase 1 is where we understand the task requirements, goals, and success criteri
   - Identifies test scenarios
   - Suggests test coverage approach
 
-- **ui-designer** (if UI/UX involved)
+- **ui-expert** (if UI/UX involved)
   - Reviews design requirements
   - Identifies UI/UX considerations
   - Suggests design patterns
@@ -183,7 +183,7 @@ After completing Phase 1, show this approval gate:
 - 🎯 **Primary:** pm-operations-orchestrator (Requirements Lead)
 - 🤝 **Cross-Review:** [dev-agent] (Technical Feasibility)
 - ✅ **Cross-Review:** qa-automation (Testability Check)
-- 🎨 **Cross-Review:** ui-designer (Design Review) [if applicable]
+- 🎨 **Cross-Review:** ui-expert (Design Review) [if applicable]
 
 **🤖 System:** Aura Frog Team Agents v1.0.0
 **📋 Mode:** Workflow Phase Execution

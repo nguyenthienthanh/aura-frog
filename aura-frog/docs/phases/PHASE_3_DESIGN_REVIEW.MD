@@ -2,7 +2,7 @@
 
 **Phase:** 3/9 - Design Review & Component Breakdown  
 **Duration:** 3-6 hours  
-**Agents:** ui-designer, mobile-react-native, web-*  
+**Agents:** ui-expert, mobile-react-native, web-*  
 **Prerequisites:** Phase 2 approved + Figma screenshots  
 **Deliverables:** component_breakdown.md, design_tokens.md, ui_flow.md
 
