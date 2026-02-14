@@ -1,25 +1,35 @@
 # Aura Frog Usage Guide - Clarifications & Best Practices
 
 **Version:** 1.18.0
-**Date:** 2026-01-07
+**Last Updated:** 2026-02-09
 
 ---
 
 ## Key Clarifications
 
-### 1. Hooks Are Conceptual Documentation (Not Runtime Code)
+### 1. Hooks Are Two Types: Runtime Scripts + Conceptual Documentation
 
-**What hooks are:**
-- ✅ Markdown files describing behavior logic
-- ✅ Instructions for Claude to follow
-- ✅ Conceptual guides (pseudo-code)
+Aura Frog uses both **runtime hooks** (`.cjs` files executed by Claude Code) and **conceptual hooks** (`.md` files as instructions):
 
-**What hooks are NOT:**
-- ❌ JavaScript/TypeScript runtime files
-- ❌ Executed as separate processes
-- ❌ Plugin hooks that run in Cursor
+**Runtime Hooks (.cjs files):**
+- ✅ Real Node.js scripts executed by Claude Code's hook system
+- ✅ Configured in `hooks/hooks.json`
+- ✅ Run automatically on lifecycle events (SessionStart, PreToolUse, PostToolUse, etc.)
+- ✅ Examples: `session-start.cjs`, `auto-learn.cjs`, `lint-autofix.cjs`, `scout-block.cjs`
 
-**How they work:**
+**Conceptual Hooks (.md files):**
+- ✅ Markdown files describing behavior logic for Claude to follow
+- ✅ Instructions Claude reads and implements during workflows
+- ✅ Examples: `pre-phase.md`, `post-phase.md`, `pre-approval.md`
+
+**How runtime hooks work:**
+```
+Session starts → hooks.json triggers session-start.cjs → Injects environment variables
+User edits file → hooks.json triggers lint-autofix.cjs → Auto-runs linter
+User writes code → hooks.json triggers smart-learn.cjs → Detects patterns
+```
+
+**How conceptual hooks work:**
 ```
 User: workflow:start "Task"
   ↓
@@ -33,21 +43,6 @@ Claude reads: hooks/post-phase.md
   ↓
 Claude implements logic: Save state, generate summary, show approval gate
 ```
-
-**Example: pre-phase.md**
-```markdown
-# Pre-Phase Hook
-
-**Execute before starting any phase:**
-
-1. Load workflow state from .claude/logs/workflows/[id]/workflow-state.json
-2. Check current phase number
-3. Verify prerequisites completed
-4. Activate required agents
-5. Load project context
-```
-
-Claude reads this and **does these steps** - no script execution!
 
 ---
 
@@ -418,12 +413,13 @@ Claude: "Suggest workflow:start for complete implementation with full TDD"
 
 ### Remember:
 
-1. **Hooks are conceptual** - No runtime execution
+1. **Hooks are two types** - Runtime `.cjs` scripts (auto-executed) + conceptual `.md` instructions
 2. **Two modes** - Full workflow (quality) vs Lightweight (speed)
 3. **Logs auto-create** - No setup needed, git-ignored
 4. **handoff/resume optional** - Only for long workflows near token limit
 5. **Phase grouping** - Simple tasks merge phases for speed
 6. **Claude helps** - Suggests appropriate mode automatically
+7. **Only 2 approval gates** - Phase 2 (Design) and Phase 5b (Implementation)
 
 ### Quick Commands Reference:
 

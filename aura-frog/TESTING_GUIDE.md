@@ -1,19 +1,24 @@
-# 🧪 Aura Frog Workflow Testing Guide
+# Aura Frog Workflow Testing Guide
 
-**Date:** 2025-11-24  
+**Version:** 1.18.0
+**Last Updated:** 2026-02-09
 **Purpose:** How to test the command-based Aura Frog workflow system
 
 ---
 
-## ⚠️ IMPORTANT: How Commands Work
+## IMPORTANT: How Commands Work
 
-**Commands are plain text, NOT slash commands:**
+**Commands are plain text in Claude Code chat:**
 
 ```
 You: workflow:status
 ```
 
-NOT: `workflow:status` ❌ (This is Cursor IDE syntax)
+Or use bundled slash commands:
+```
+/workflow → Shows interactive submenu
+/workflow start "task" → Direct subcommand
+```
 
 Claude AI reads the command text and executes the workflow.
 
@@ -120,40 +125,28 @@ You: workflow:start Refactor SocialMarketingCompositePost.phone.tsx - split into
 ### Expected Flow:
 
 ```
-Phase 1: Analyzes 713-line component
-→ You: workflow:approve
+Phase 1: Analyzes 713-line component → [Auto-continues]
 
 Phase 2: Creates tech spec with architecture
-→ You: workflow:approve
+→ You: workflow:approve  ← [APPROVAL GATE]
 
-Phase 3: Reviews UI component structure
-→ You: workflow:approve
-
-Phase 4: Plans 70+ test cases
-→ You: workflow:approve
-
-Phase 5a: Writes failing tests (RED)
-→ You: workflow:approve
+Phase 3: Reviews UI component structure → [Auto-continues]
+Phase 4: Plans 70+ test cases → [Auto-continues]
+Phase 5a: Writes failing tests (RED) → [Auto-continues]
 
 Phase 5b: Implements components (GREEN)
-→ You: workflow:approve
+→ You: workflow:approve  ← [APPROVAL GATE]
 
-Phase 5c: Refactors code (REFACTOR)
-→ You: workflow:approve
-
-Phase 6: Cross-agent code review
-→ You: workflow:approve
-
-Phase 7: QA validation with coverage report
-→ You: workflow:approve
-
-Phase 8: Generates documentation
-→ You: workflow:approve
-
-Phase 9: Sends notifications (auto-complete)
+Phase 5c: Refactors code (REFACTOR) → [Auto-continues]
+Phase 6: Cross-agent code review → [Auto-continues]
+Phase 7: QA validation with coverage report → [Auto-continues]
+Phase 8: Generates documentation → [Auto-continues]
+Phase 9: Sends notifications → [Auto-complete]
 
 🎉 WORKFLOW COMPLETE!
 ```
+
+**Note:** Only 2 approval gates (Phase 2 & 5b). Other phases auto-continue after showing deliverables.
 
 ---
 

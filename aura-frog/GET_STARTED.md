@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **11 Agents** | **46 Skills** | **50 Rules** | **9 Phases** | **88 Commands** | **23 Hooks** | **6 MCP Servers** |
+| **11 Agents** | **53 Skills** | **50 Rules** | **9 Phases** | **83 Commands** | **23 Hooks** | **6 MCP Servers** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|:-------------:|:----------------:|
 
 ---
@@ -208,7 +208,7 @@ export JIRA_EMAIL="your.email@example.com"
 export JIRA_API_TOKEN="your-jira-api-token"
 
 # Figma Integration
-export FIGMA_API_KEY="your-figma-token"
+export FIGMA_API_TOKEN="your-figma-token"
 
 # Confluence Integration
 export CONFLUENCE_URL="https://your-company.atlassian.net/wiki"
@@ -335,10 +335,10 @@ Aura Frog includes utility scripts for common operations:
 
 | Category | Scripts | Purpose |
 |----------|---------|---------|
-| **Integration** | `jira-fetch.sh`, `confluence-fetch.sh` | Fetch Atlassian data |
-| **Workflow** | `workflow-manager.sh`, `track-tokens.sh` | Manage workflows |
-| **Learning** | `submit-feedback.sh`, `supabase/setup.sh` | Learning system |
-| **Visual** | `visual-test.sh`, `snapshot-compare.sh` | Visual testing |
+| **Integration** | `jira-fetch.sh`, `confluence-fetch.sh`, `setup-integrations.sh` | Fetch Atlassian data, configure integrations |
+| **Workflow** | `workflow/workflow-manager.sh`, `workflow/track-tokens.sh` | Manage workflows |
+| **Learning** | `learn/submit-feedback.sh`, `supabase/setup.sh` | Learning system |
+| **Visual** | `visual/visual-test.sh`, `visual/snapshot-compare.sh` | Visual testing |
 
 **Full documentation:** `scripts/README.md`
 
@@ -371,21 +371,25 @@ workflow:start Refactor MyComponent
 
 ### 3. Executes 9-Phase Workflow
 ```
-Phase 1: Requirements Analysis → [Approval Gate]
-Phase 2: Technical Planning → [Approval Gate]
-Phase 3: Design Review → [Approval Gate]
-Phase 4: Test Planning → [Approval Gate]
-Phase 5: Implementation (TDD: RED → GREEN → REFACTOR) → [Approval Gates]
-Phase 6: Code Review → [Approval Gate]
-Phase 7: QA Validation → [Approval Gate]
-Phase 8: Documentation → [Approval Gate]
+Phase 1: Requirements Analysis → [Auto-continue]
+Phase 2: Technical Planning → [APPROVAL GATE]
+Phase 3: Design Review → [Auto-continue]
+Phase 4: Test Planning → [Auto-continue]
+Phase 5a: Write Tests (TDD RED) → [Auto-continue]
+Phase 5b: Implementation (TDD GREEN) → [APPROVAL GATE]
+Phase 5c: Refactor (TDD REFACTOR) → [Auto-continue]
+Phase 6: Code Review → [Auto-continue]
+Phase 7: QA Validation → [Auto-continue]
+Phase 8: Documentation → [Auto-continue]
 Phase 9: Notification → [Auto-complete]
 ```
 
+**Only 2 approval gates** (Phase 2 & 5b) — other phases auto-continue after showing deliverables.
+
 ### 4. You Control Every Step
-At each approval gate:
+At approval gates:
 - Review deliverables
-- Type `workflow:approve` to continue
+- Type `workflow:approve` or `approve` to continue
 - Type `workflow:reject <reason>` to redo
 - Type `workflow:modify <changes>` to adjust
 
@@ -440,10 +444,10 @@ workflow:start <your-task-description>
 - **Testing Guide:** `TESTING_GUIDE.md`
 - **MCP Guide:** `docs/MCP_GUIDE.md` (6 MCP servers)
 - **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
-- **Learning System:** `docs/LEARNING_SYSTEM.md` (Supabase self-improvement)
-- **Skills:** `skills/README.md` (46 skills)
+- **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
+- **Skills:** `skills/README.md` (53 skills)
 - **Rules:** `rules/README.md` (50 quality rules)
-- **Commands:** `commands/README.md` (89 commands)
+- **Commands:** `commands/README.md` (83 commands)
 - **Hooks:** `hooks/README.md` (23 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`

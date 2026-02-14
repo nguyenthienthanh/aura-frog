@@ -8,7 +8,7 @@
 
 > **Code with main character energy**
 
-AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), Agent Teams orchestration, self-improving learning system, and bundled MCP servers.
+AI-powered development plugin for **Claude Code** with 11 specialized agents, 53 skills, 9-phase TDD workflow, auto model routing (Haiku/Sonnet/Opus), Agent Teams orchestration, self-improving learning system, and bundled MCP servers.
 
 [![Version](https://img.shields.io/badge/version-1.18.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -25,9 +25,9 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-
 
 <div align="center">
 
-| **Agents** | **Bundled Commands** | **Auto Skills** | **Rules** | **Hooks** | **MCP Servers** |
-|:----------:|:--------------------:|:---------------:|:---------:|:---------:|:---------------:|
-| **11** | **6** | **13** | **50** | **23** | **6** |
+| **Agents** | **Skills** | **Bundled Commands** | **Rules** | **Hooks** | **MCP Servers** |
+|:----------:|:----------:|:--------------------:|:---------:|:---------:|:---------------:|
+| **11** | **53** | **6** | **50** | **23** | **6** |
 
 </div>
 
@@ -35,7 +35,7 @@ AI-powered development plugin for **Claude Code** with 11 specialized agents, 9-
 - **11 Specialized Agents** — Consolidated: architect, ui-expert, mobile-expert, game-developer, qa, security, devops
 - **6 Bundled Commands** — `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo` (each with submenus)
 - **13 Auto-Invoking Skills** — Agent detection, model routing, workflow, testing, SEO bundles
-- **33 Reference Skills** — Framework experts, SEO experts, loaded on-demand by bundles
+- **40 Reference Skills** — Framework experts, SEO experts, design, loaded on-demand by bundles
 - **6 MCP Servers** — Context7, Playwright, Vitest, Firebase, Figma, Slack
 - **50 Quality Rules** — System, code quality, architecture, workflow, UI, SEO
 - **23 Lifecycle Hooks** — Safety guards, auto-learning, teammate orchestration
@@ -113,7 +113,7 @@ At each phase, review and respond:
 | Single AI session | Agent Teams with persistent teammates |
 | Testing as afterthought | TDD enforced (RED → GREEN → REFACTOR) |
 | Ad-hoc code review | Multi-agent cross-review built-in |
-| Context switching | CLI-first with 89 commands |
+| Context switching | CLI-first with 83 commands |
 | Manual documentation | Auto-generated docs |
 | Manual integrations | Bundled MCP servers (Figma, Slack, etc.) |
 
@@ -201,7 +201,7 @@ MCPs requiring tokens will silently skip if not configured.
 
 ### Skills System (Optimized in v1.17.0)
 
-Skills activate automatically based on your message context. v1.17.0 introduced **skill bundles** that lazy-load patterns on-demand:
+**53 skills** (13 auto-invoke + 40 reference) activate automatically based on your message context. v1.17.0 introduced **skill bundles** that lazy-load patterns on-demand:
 
 ```
 User: "Implement user profile screen"
@@ -231,10 +231,11 @@ Auto-invokes:
 | `response-analyzer` | Large outputs | Token optimization |
 | `code-simplifier` | "simplify", "too complex" | KISS enforcement |
 
-**33 Reference Skills** — Loaded on-demand by bundles:
-- Framework experts: react, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript
-- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo
-- Others: api-designer, debugging, migration-helper, performance-optimizer, etc.
+**40 Reference Skills** — Loaded on-demand by bundles:
+- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
+- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
+- Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, etc. (19)
 
 **See:** [aura-frog/skills/README.md](aura-frog/skills/README.md) for complete documentation
 
@@ -508,26 +509,38 @@ export SLACK_TEAM_ID="T0123456789"
 
 ---
 
-## Learning System (Supabase)
+## Learning System
 
-Aura Frog can **learn and improve** over time using Supabase as a persistent memory store.
+Aura Frog **learns and improves** over time. Works out of the box with **local storage** (no setup required), optionally syncs to Supabase for cross-machine memory.
 
 ### What It Does
 
 | Feature | Description |
 |---------|-------------|
-| **Auto-Collect Feedback** | Captures corrections, approvals, rejections |
-| **Pattern Analysis** | Identifies what works and what doesn't |
-| **Memory Across Sessions** | Remembers patterns for future sessions |
-| **Self-Improvement** | Applies insights to improve responses |
+| **Smart Learn** | Auto-detects successful code patterns (no feedback needed) |
+| **Auto-Learn** | Captures corrections from user messages |
+| **Workflow Edit Detection** | Learns from your direct edits to workflow files |
+| **Pattern Creation** | After 3+ similar corrections, creates a learned pattern |
+| **Memory Across Sessions** | Remembers patterns for future sessions (local or cloud) |
 
-### Quick Setup
+### Local Learning (Default - No Setup)
 
+Learning works immediately with local file storage:
+```
+.claude/learning/
+├── feedback.json      # All feedback entries
+├── patterns.json      # Learned patterns
+├── metrics.json       # Workflow metrics
+└── learned-rules.md   # Human-readable rules
+```
+
+### Cloud Learning (Optional - Supabase)
+
+For cross-machine memory, add Supabase:
 ```bash
 # 1. Create free Supabase project at supabase.com
 # 2. Add to .envrc:
 export SUPABASE_URL="https://your-project.supabase.co"
-export SUPABASE_PUBLISHABLE_KEY="eyJ..."
 export SUPABASE_SECRET_KEY="eyJ..."
 export AF_LEARNING_ENABLED="true"
 
@@ -545,8 +558,6 @@ learn:status
 | `learn:status` | Check learning system status |
 | `learn:analyze` | Analyze patterns and generate insights |
 | `learn:apply` | Apply learned improvements |
-
-**Optional feature** - Aura Frog works fine without Supabase.
 
 **See:** [aura-frog/docs/LEARNING_SYSTEM.md](aura-frog/docs/LEARNING_SYSTEM.md) for complete setup
 
@@ -594,7 +605,7 @@ aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── .mcp.json                    # Bundled MCP servers config
 │   ├── agents/                      # 11 specialized agents (consolidated)
-│   ├── skills/                      # 46 skills (13 auto + 33 reference)
+│   ├── skills/                      # 53 skills (13 auto + 40 reference)
 │   ├── commands/                    # 6 bundled + standalone commands
 │   ├── rules/                       # 50 quality rules
 │   ├── docs/                        # Comprehensive documentation

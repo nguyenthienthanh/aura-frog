@@ -169,7 +169,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-01-21 | **Format:** TOON
+**Version:** 1.18.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
 
 ---
 
