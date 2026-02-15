@@ -1,7 +1,7 @@
 # Aura Frog Skills
 
-**Version:** 1.18.0
-**Total Skills:** 53 (13 auto-invoking + 40 reference)
+**Version:** 1.19.0
+**Total Skills:** 52 (13 auto-invoking + 39 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -59,7 +59,7 @@
 
 ## New in 1.7.0
 
-- **workflow-fasttrack** - Fast-track workflow for pre-approved specs. Skips phases 1-3, auto-executes 4-9 without approval gates
+- **workflow-orchestrator** now includes fast-track mode for pre-approved specs (merged from workflow-fasttrack)
 
 ## New in 1.6.0
 
@@ -103,27 +103,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 2. **workflow-fasttrack** (Priority: HIGH)
-
-**Auto-invokes when:** User provides complete design/specs and wants execution without approvals
-
-**Triggers:**
-- "fasttrack:", "fast-track", "workflow:fasttrack"
-- "specs ready", "just build it", "execute from specs"
-- Complete specs provided with "just build" intent
-
-**What it does:**
-- Validates specs contain required sections
-- Skips phases 1-3 (requirements already done)
-- Auto-executes phases 4-9 without approval gates
-- Only stops on errors (test failures, security issues)
-- TDD still enforced (RED → GREEN → REFACTOR)
-
-**Use when:** Design is complete and you want uninterrupted execution
-
----
-
-### 3. **agent-detector** (Priority: HIGHEST - ALWAYS RUNS)
+### 2. **agent-detector** (Priority: HIGHEST - ALWAYS RUNS)
 
 **Auto-invokes when:** EVERY single user message
 
@@ -140,7 +120,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 4. **project-context-loader** (Priority: HIGH)
+### 3. **project-context-loader** (Priority: HIGH)
 
 **Auto-invokes when:** Before workflows, implementations, or code generation
 
@@ -157,7 +137,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 5. **bugfix-quick** (Priority: MEDIUM)
+### 4. **bugfix-quick** (Priority: MEDIUM)
 
 **Auto-invokes when:** Bug fixes and issues mentioned
 
@@ -174,7 +154,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 6. **test-writer** (Priority: MEDIUM)
+### 5. **test-writer** (Priority: MEDIUM)
 
 **Auto-invokes when:** Test-related requests
 
@@ -191,7 +171,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 7. **code-reviewer** (Priority: HIGH)
+### 6. **code-reviewer** (Priority: HIGH)
 
 **Auto-invokes when:** After code implementation or review requested
 
@@ -209,7 +189,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 8. **session-continuation** (Priority: HIGH)
+### 7. **session-continuation** (Priority: HIGH)
 
 **Auto-invokes when:** Token limit warning triggered
 
@@ -235,7 +215,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 9. **lazy-agent-loader** (Priority: HIGH)
+### 8. **lazy-agent-loader** (Priority: HIGH)
 
 **Auto-invokes when:** Agent detection runs (integrated with agent-detector)
 
@@ -252,7 +232,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 ---
 
-### 10. **response-analyzer** (Priority: MEDIUM)
+### 9. **response-analyzer** (Priority: MEDIUM)
 
 **Auto-invokes when:** Large command outputs or API responses
 
@@ -427,12 +407,12 @@ auto_invoke_skills[13]{name,priority,trigger}:
   response-analyzer,medium,Large output handling
 ```
 
-**Reference Skills (40)** - Loaded on-demand by bundles or commands:
+**Reference Skills (39)** - Loaded on-demand by bundles or commands:
 - Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
 - Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
 - Learning: learning-analyzer, self-improve (2)
-- Workflow: workflow-fasttrack, lazy-agent-loader, phase1-lite (3)
+- Workflow: lazy-agent-loader, phase1-lite (2)
 - Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, nativewind-generator (14)
 
 > **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
@@ -758,12 +738,12 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 **What it does:**
 - Quick reference for KISS principle application
-- References comprehensive `rules/kiss-avoid-over-engineering.md`
+- References comprehensive `rules/simplicity-over-complexity.md`
 - Provides complexity targets checklist
 - Links to `quality:complexity` command for analysis
 
 **📚 Details:** `skills/code-simplifier/SKILL.md`
-**📚 Full KISS Guide:** `rules/kiss-avoid-over-engineering.md`
+**📚 Full Guide:** `rules/simplicity-over-complexity.md`
 
 ---
 
@@ -853,7 +833,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Last Updated:** 2026-02-09
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 53 (13 auto-invoking + 40 reference)
+**Total Skills:** 52 (13 auto-invoking + 39 reference)

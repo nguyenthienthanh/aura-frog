@@ -166,6 +166,16 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" --pre-compact 2>&1"
+          }
+        ]
+      }
     ]
   }
 }

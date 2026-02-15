@@ -1,6 +1,6 @@
 ---
 name: workflow-orchestrator
-description: "Execute 9-phase workflow for complex features. DO NOT use for simple bug fixes."
+description: "Execute 9-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
 autoInvoke: true
 priority: high
 triggers:
@@ -9,13 +9,17 @@ triggers:
   - "create feature"
   - "workflow:start"
   - "complex task"
+  - "fasttrack:"
+  - "fast-track"
+  - "just build it"
+  - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
 # Aura Frog Workflow Orchestrator
 
 **Priority:** CRITICAL - Use for complex feature implementations
-**Version:** 1.0.0
+**Version:** 1.19.0
 
 ---
 
@@ -477,6 +481,52 @@ Phase 9: Share 🔔 [AUTO]
 └── Workflow complete ✅
 
 TOTAL APPROVALS NEEDED: 2
+```
+
+---
+
+## Fast-Track Mode
+
+**When to use:** User provides complete specs/design. Skips phases 1-3, auto-executes 4-9 without approval gates.
+
+**Triggers:** `fasttrack: <specs>` | `workflow:fasttrack <file>` | "just build it"
+
+### Spec Validation (Required Before Start)
+
+```toon
+required_sections[6]{section,purpose}:
+  Overview,What we're building
+  Requirements,Functional requirements
+  Technical Design,Architecture/approach
+  API/Interfaces,Endpoints or component APIs
+  Data Model,Database/state structure
+  Acceptance Criteria,Definition of done
+```
+
+**If missing sections:** Ask user to provide them.
+
+### Fast-Track Execution
+
+```
+Phase 4 → Phase 5a → Phase 5b → Phase 5c → Phase 6 → Phase 7 → Phase 8 → Phase 9
+(No approval gates — only stops on errors)
+```
+
+### Stop Conditions
+
+| Condition | Phase | Action |
+|-----------|-------|--------|
+| Tests pass in RED | 5a | Stop — specs may be incomplete |
+| Tests fail after 3 attempts | 5b | Stop — ask user for clarification |
+| Critical security issue | 6 | Stop — fix before proceeding |
+| Coverage below 80% | 7 | Add tests, retry twice, then ask |
+| Token limit warning | Any | Save state and handoff |
+
+### Switching Modes
+
+```
+standard → fasttrack: "approve phase 3, then fasttrack the rest"
+fasttrack → standard: On error, auto-switches to standard mode
 ```
 
 ---

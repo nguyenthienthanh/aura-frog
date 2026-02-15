@@ -1,6 +1,6 @@
 # Team-Workflow Bridge
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Purpose:** Automatic team lifecycle management across workflow phases
 
 ---
@@ -200,4 +200,4 @@ All bridge code is gated on `isAgentTeamsEnabled()`:
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-11
+**Version:** 1.19.0 | **Last Updated:** 2026-02-11

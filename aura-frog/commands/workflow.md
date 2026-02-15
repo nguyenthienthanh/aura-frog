@@ -156,8 +156,7 @@ phases[9]{phase,name,approval,auto_continue}:
 
 ## Related Files
 
-- **Workflow Orchestrator:** `skills/workflow-orchestrator/SKILL.md`
-- **Fast Track:** `skills/workflow-fasttrack/SKILL.md`
+- **Workflow Orchestrator:** `skills/workflow-orchestrator/SKILL.md` (includes fast-track mode)
 - **Session Continuation:** `skills/session-continuation/SKILL.md`
 - **Phase Docs:** `docs/phases/`
 - **Legacy Commands:** `commands/workflow/` (individual phase commands)

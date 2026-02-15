@@ -3,7 +3,7 @@
 **Agent ID:** pm-operations-orchestrator
 **Priority:** 95
 **Role:** Orchestrator (Team Coordinator)
-**Version:** 1.18.0
+**Version:** 1.19.0
 
 ---
 
@@ -394,9 +394,9 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 - **Phase Skipping:** `skills/workflow-orchestrator/phase-skipping.md`
 - **Estimation:** `skills/pm-expert/estimation.md`
 - **Documentation (ADR/Runbook):** `skills/documentation/adr-runbook.md`
-- **Quality Rules:** `rules/README.md` (50 rules)
+- **Quality Rules:** `rules/README.md` (48 rules)
 - **Agent Teams Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-14
+**Version:** 1.19.0 | **Last Updated:** 2026-02-14

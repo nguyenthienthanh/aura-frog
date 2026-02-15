@@ -1,8 +1,20 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.18.0
+**System:** Aura Frog v1.19.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 10 agents + 53 skills + 91 commands + 9-phase workflow + auto-invoking skills + bundled MCP
+**Purpose:** 10 agents + 52 skills + 91 commands + 9-phase workflow + auto-invoking skills + bundled MCP
+
+---
+
+## New in 1.19.0 - Optimization
+
+- **Banner rule optimized** (19KB -> 5KB) — Examples moved to `docs/BANNER_EXAMPLES.md`
+- **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 48 rules)
+- **Fasttrack merged** — Now a mode inside `workflow-orchestrator` (53 -> 52 skills)
+- **Approval gates slimmed** (558 -> 96 lines) — Points to orchestrator for details
+- **PreCompact hook** — Auto-save workflow state before context compaction
+- **`context: fork`** — Heavy skills (framework-expert, seo-bundle, testing-patterns, learning-analyzer) run in forked context
+- **plugin.json** — New `engines`, `capabilities`, `stats` fields
 
 ---
 
@@ -10,9 +22,6 @@
 
 - **Agent Teams** - Real multi-agent orchestration via Claude's experimental Agent Teams feature
 - **Complexity gate** - Team mode ONLY for Deep + multi-domain tasks (~3x token savings on Quick/Standard)
-- **TeammateIdle + TaskCompleted hooks** - Assign work to idle teammates, validate task completion
-- **project:sync-settings command** - Auto-merge plugin settings into project settings
-- **Mandatory Teams banner** - Every banner shows `Teams: [✓ enabled / ✗ off]` status
 
 **Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 
@@ -63,7 +72,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.18.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.19.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -113,29 +122,30 @@ skills[13]{name,trigger,file}:
   response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
 ```
 
-**Reference Skills (40 - loaded on-demand by bundles or commands):**
+**Reference Skills (39 - loaded on-demand by bundles or commands):**
 - Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
 - SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
 - Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
 - Learning: learning-analyzer, self-improve (2)
-- Workflow: workflow-fasttrack, lazy-agent-loader, phase1-lite (3)
+- Workflow: lazy-agent-loader, phase1-lite (2)
 - Others: api-designer, debugging, migration-helper, performance-optimizer, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, nativewind-generator, pm-expert, qa-expert, refactor-expert (14)
 
 **All skills:** `skills/README.md`
 
 ---
 
-## CRITICAL: Plan Mode Override
+## Plan Mode Integration
 
-**NEVER use `EnterPlanMode` or Claude's built-in plan mode when Aura Frog is active.**
+**Use Claude Code's native plan mode for Quick/Standard tasks** (brainstorm, design, compare options). For Deep implementation tasks, use Aura Frog's 9-phase workflow.
 
-For complex tasks, use `workflow-orchestrator` skill (9-phase workflow) instead. This is the **highest priority rule** — Claude's native plan mode is fully replaced by Aura Frog's workflow system.
-
+```toon
+plan_routing[3]{complexity,approach}:
+  Quick (typo/config),Native plan mode or direct edit
+  Standard (feature/bugfix),Native plan mode → then workflow:start or bugfix:quick
+  Deep (multi-file architecture),workflow-orchestrator 9-phase workflow
 ```
-Complex task detected → workflow-orchestrator (NOT EnterPlanMode)
-Bug fix detected → bugfix-quick (NOT EnterPlanMode)
-Any planning needed → workflow-orchestrator Phase 1-2 (NOT EnterPlanMode)
-```
+
+**Details:** `rules/execution-rules.md`
 
 ---
 
@@ -143,7 +153,7 @@ Any planning needed → workflow-orchestrator Phase 1-2 (NOT EnterPlanMode)
 
 **ALWAYS:** Show banner → Load context → Follow TDD → Show deliverables
 
-**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests, use EnterPlanMode
+**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests
 
 **2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue.
 
@@ -171,16 +181,16 @@ bundled_commands[6]{command,subcommands,replaces}:
 
 ```toon
 resources[12]{name,location}:
-  Agents (11),agents/
-  Commands (89),commands/
-  Rules (50),rules/
-  Skills (13 auto-invoke + 40 reference),skills/
+  Agents (10),agents/
+  Commands (91),commands/
+  Rules (48),rules/
+  Skills (13 auto-invoke + 39 reference),skills/
+  Hooks (21),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
-  Refactor Analysis,docs/REFACTOR_ANALYSIS.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (9),docs/phases/
-  Design Systems,skills/design-system-library/
+  Banner Examples,docs/BANNER_EXAMPLES.md
   Getting Started,GET_STARTED.md
   Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
 ```
@@ -260,4 +270,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.18.0
+**Version:** 1.19.0

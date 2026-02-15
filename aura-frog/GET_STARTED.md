@@ -16,7 +16,7 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
 
-| **10 Agents** | **53 Skills** | **50 Rules** | **9 Phases** | **91 Commands** | **20 Hooks** | **6 MCP Servers** |
+| **10 Agents** | **52 Skills** | **48 Rules** | **9 Phases** | **91 Commands** | **21 Hooks** | **6 MCP Servers** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|:-------------:|:----------------:|
 
 ---
@@ -445,10 +445,10 @@ workflow:start <your-task-description>
 - **MCP Guide:** `docs/MCP_GUIDE.md` (6 MCP servers)
 - **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
 - **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
-- **Skills:** `skills/README.md` (53 skills)
-- **Rules:** `rules/README.md` (50 quality rules)
+- **Skills:** `skills/README.md` (52 skills)
+- **Rules:** `rules/README.md` (48 quality rules)
 - **Commands:** `commands/README.md` (91 commands)
-- **Hooks:** `hooks/README.md` (20 lifecycle hooks)
+- **Hooks:** `hooks/README.md` (21 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`
 - **Phase Guides:** `docs/phases/`
@@ -461,5 +461,5 @@ Type `workflow:start <task>` to begin your first workflow.
 
 ---
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 

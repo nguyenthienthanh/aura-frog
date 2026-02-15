@@ -13,6 +13,7 @@ triggers:
   - "core web vitals"
   - "AI discovery"
   - "GEO"
+context: fork
 ---
 
 # Skill: SEO Bundle

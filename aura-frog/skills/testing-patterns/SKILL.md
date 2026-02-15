@@ -12,6 +12,7 @@ triggers:
   - "TDD"
   - "unit test"
   - "e2e"
+context: fork
 ---
 
 # Skill: Testing Patterns

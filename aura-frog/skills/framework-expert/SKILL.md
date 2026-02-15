@@ -14,6 +14,7 @@ triggers:
   - "laravel"
   - "go"
   - "flutter"
+context: fork
 ---
 
 # Skill: Framework Expert (Bundle)

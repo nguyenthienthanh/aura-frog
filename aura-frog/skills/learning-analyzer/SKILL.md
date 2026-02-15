@@ -7,6 +7,7 @@ triggers:
   - "/learn:analyze"
   - "learning analysis"
   - "pattern analysis"
+context: fork
 ---
 
 # Learning Analyzer Skill

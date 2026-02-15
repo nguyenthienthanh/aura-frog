@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.18.0
-**Total Rules:** 50
+**Version:** 1.19.0
+**Total Rules:** 48
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[50]{category,rule,priority,purpose}:
+rules[48]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -20,9 +20,7 @@ rules[50]{category,rule,priority,purpose}:
   system,token-time-awareness,high,Monitor token usage
   system,project-linting-precedence,critical,Merge project + Aura Frog rules
   system,context-management,high,Token optimization + model selection + lazy loading
-  quality,yagni-principle,critical,Only implement what's needed now
-  quality,dry-with-caution,high,Rule of Three before abstracting
-  quality,kiss-avoid-over-engineering,critical,Keep implementations simple
+  quality,simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated - keep implementations simple
   quality,error-handling-standard,critical,Typed errors + structured responses
   quality,logging-standards,high,Structured logging + sanitization
   quality,code-quality,high,TypeScript strict + no any
@@ -80,7 +78,7 @@ priorities[3]{level,meaning,enforcement}:
 ```toon
 categories[8]{name,count,critical_rules}:
   system,10,5
-  quality,13,4
+  quality,11,3
   architecture,6,0
   security,1,1
   workflow,10,6
@@ -120,9 +118,7 @@ See: `project-linting-precedence.md`
 
 ### Before Coding
 - [ ] Check `project-linting-precedence` - Merge project config with Aura Frog rules
-- [ ] Read `yagni-principle` - Don't add unused features
-- [ ] Read `dry-with-caution` - Don't abstract prematurely
-- [ ] Read `kiss-avoid-over-engineering` - Keep it simple
+- [ ] Read `simplicity-over-complexity` - YAGNI + DRY + KISS (keep it simple, don't add unused features, don't abstract prematurely)
 - [ ] Read `prefer-established-libraries` - Use lodash/es-toolkit first
 
 ### During Coding
@@ -169,7 +165,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
+**Version:** 1.19.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
 
 ---
 

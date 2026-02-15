@@ -94,9 +94,9 @@ aura-frog/                           # Repository root
 │   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
 │   ├── agents/                      # 10 specialized agents (consolidated)
 │   ├── commands/                    # 91 commands (6 bundled entry points)
-│   ├── skills/                      # 53 skills (13 auto-invoke + 40 reference)
-│   ├── rules/                       # 50 quality rules
-│   ├── hooks/                       # 20 lifecycle hooks (.cjs scripts)
+│   ├── skills/                      # 52 skills (13 auto-invoke + 39 reference)
+│   ├── rules/                       # 48 quality rules
+│   ├── hooks/                       # 21 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # Documentation & phase guides
 │   ├── templates/                   # Document templates
 │   ├── scripts/                     # Bash integration scripts

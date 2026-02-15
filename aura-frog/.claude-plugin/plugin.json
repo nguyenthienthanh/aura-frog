@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "1.18.0",
-  "description": "10 specialized agents, 9-phase TDD workflow, 50 rules, 53 skills (13 auto-invoke + 40 reference), 91 commands, 20 hooks, Agent Teams support, model routing, visual pixel-perfect testing. Main character energy for your codebase 🐸✨",
+  "version": "1.19.0",
+  "description": "10 specialized agents, 9-phase TDD workflow, 48 rules, 52 skills (13 auto-invoke + 39 reference), 91 commands, 21 hooks, Agent Teams support, model routing, visual pixel-perfect testing. Main character energy for your codebase",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -10,6 +10,41 @@
   "homepage": "https://github.com/nguyenthienthanh/aura-frog",
   "repository": "https://github.com/nguyenthienthanh/aura-frog",
   "license": "MIT",
+  "engines": {
+    "claude-code": ">=2.1.0"
+  },
+  "capabilities": {
+    "hooks": [
+      "SessionStart",
+      "PreToolUse",
+      "PostToolUse",
+      "UserPromptSubmit",
+      "SubagentStart",
+      "TeammateIdle",
+      "TaskCompleted",
+      "Stop",
+      "PreCompact"
+    ],
+    "mcp": [
+      "context7",
+      "playwright",
+      "vitest",
+      "firebase",
+      "figma",
+      "slack"
+    ],
+    "agentTeams": true,
+    "modelRouting": true,
+    "learningSystem": true
+  },
+  "stats": {
+    "agents": 10,
+    "skills": 52,
+    "commands": 91,
+    "rules": 48,
+    "hooks": 21,
+    "mcpServers": 6
+  },
   "keywords": [
     "claude-code",
     "claude-code-plugin",

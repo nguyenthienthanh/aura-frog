@@ -1,6 +1,6 @@
 # Agent Teams Guide
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Purpose:** Enable and use Claude Agent Teams with Aura Frog
 
 ---
@@ -351,4 +351,4 @@ All Agent Teams features are gated on `isAgentTeamsEnabled()` + complexity check
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-11
+**Version:** 1.19.0 | **Last Updated:** 2026-02-11
