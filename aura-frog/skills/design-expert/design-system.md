@@ -2,7 +2,7 @@
 
 **Category:** Design Expert
 **Version:** 1.0.0
-**Used By:** ui-designer, mobile-react-native, web-reactjs, web-vuejs, web-nextjs
+**Used By:** ui-expert, mobile-react-native, web-reactjs, web-vuejs, web-nextjs
 
 ---
 

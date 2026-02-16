@@ -1,6 +1,6 @@
 # MCP Integration Guide
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Purpose:** How to use bundled MCP servers and create your own
 
 ---
@@ -172,7 +172,7 @@ subtasks[2]{key,summary,status}:
 2. MCP figma → fetches design tokens and components
 3. MCP context7 → fetches React/MUI docs
 4. Skill react-expert → applies React patterns
-5. Agent web-expert → executes implementation
+5. Agent ui-expert → executes implementation
 ```
 
 ---
@@ -469,4 +469,4 @@ async function getCachedData(key: string) {
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-01-07
+**Version:** 1.19.0 | **Last Updated:** 2026-01-07

@@ -1,7 +1,7 @@
 # Command: db:optimize
 
 **Command:** `db:optimize [target]`
-**Agent:** database-specialist
+**Agent:** architect
 **Version:** 1.0.0
 
 ---

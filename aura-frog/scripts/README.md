@@ -1,6 +1,6 @@
 # Aura Frog Scripts
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Purpose:** Utility scripts for integrations, workflows, and automation
 
 ---
@@ -53,10 +53,6 @@ scripts[24]{category,script,purpose}:
   utility,discover-agents.sh,Discover available agents
   utility,generate-report.sh,Generate workflow reports
   utility,claude-md-update.sh,Update CLAUDE.md files
-  voice,setup-voice.sh,Set up voice commands
-  voice,voice-notify.sh,Voice notifications
-  voice,test-voice.sh,Test voice setup
-  voice,debug-voice.sh,Debug voice issues
 ```
 
 ---
@@ -223,28 +219,6 @@ export AF_LEARNING_ENABLED="true"
 
 ---
 
-## Voice Commands (macOS)
-
-### Setup Voice
-
-```bash
-./scripts/setup-voice.sh
-```
-
-### Test Voice
-
-```bash
-./scripts/test-voice.sh
-```
-
-### Voice Notifications
-
-```bash
-./scripts/voice-notify.sh "Workflow complete"
-```
-
----
-
 ## Environment Variables Summary
 
 ```bash
@@ -277,4 +251,4 @@ export SLACK_TEAM_ID="T0123456789"
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-01-16
+**Version:** 1.19.0 | **Last Updated:** 2026-01-16

@@ -214,8 +214,8 @@ Detects framework from:
 
 | Agent | Collaboration |
 |-------|---------------|
-| ui-designer | Platform-specific design specs, touch zones |
-| backend-expert | API contracts, offline-first patterns |
+| ui-expert | Platform-specific design specs, touch zones |
+| architect | API contracts, offline-first patterns |
 | qa-automation | E2E testing with Detox/Maestro |
 
 ---

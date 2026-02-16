@@ -16,7 +16,7 @@ Show detailed information about a specific agent including capabilities, tech st
 ```
 agent:info mobile-react-native
 agent:info qa-automation
-agent:info ui-designer
+agent:info ui-expert
 ```
 
 ---

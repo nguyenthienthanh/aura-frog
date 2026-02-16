@@ -1,6 +1,6 @@
 # Agent Teams Guide
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Purpose:** Enable and use Claude Agent Teams with Aura Frog
 
 ---
@@ -193,7 +193,7 @@ phase_teams[11]{phase,lead,primary,secondary,team_size}:
   6-Review,security-expert,architect+qa-automation,-,3
   7-Verify,qa-automation,-,-,1
   8-Document,pm-operations-orchestrator,-,-,1
-  9-Share,voice-operations,-,-,1
+  9-Share,pm-operations-orchestrator,-,-,1
 ```
 
 ---
@@ -351,4 +351,4 @@ All Agent Teams features are gated on `isAgentTeamsEnabled()` + complexity check
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-11
+**Version:** 1.19.0 | **Last Updated:** 2026-02-11

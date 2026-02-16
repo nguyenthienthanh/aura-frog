@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.18.0
+**Version:** 1.19.0
 
 ---
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (23 Total)
+## Active Hooks (21 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -447,7 +447,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.18.0)
+### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.19.0)
 **When:** A teammate has no remaining tasks (Agent Teams mode only)
 
 **Actions:**
@@ -462,7 +462,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10c. TaskCompleted - Task Completion Validator (NEW in 1.18.0)
+### 10c. TaskCompleted - Task Completion Validator (NEW in 1.19.0)
 **When:** A teammate marks a task as done (Agent Teams mode only)
 
 **Actions:**
@@ -498,29 +498,29 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11b. Stop - Voice Notification
-**When:** Claude stops for user approval
+### 11b. PreCompact - Pre-Compact State Save (NEW in 1.19.0)
+**When:** Before Claude auto-compacts context
 
 **Actions:**
-- ✅ Play context-aware voiceover notification
-- ✅ Alert user that approval is needed
-- ✅ Uses macOS `say` command
+- Saves workflow state and transcript summary before context compaction
+- Captures current phase, task, and agent information
+- Ensures continuity across compact boundaries
+- Complements the Stop hook and SessionStart Compact Resume hook
 
-**Script:** `hooks/stop-voice-notify.sh`
+**Files Saved:**
+- `.claude/cache/compact-handoff.json` - Pre-compact state snapshot
+- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+
+**Example:**
+```
+Pre-compact: Workflow state saved for compact handoff
+```
+
+**Script:** `hooks/compact-handoff.cjs --pre-compact`
 
 ---
 
-### 12. Notification - Critical Alert
-**When:** Critical notifications occur
-
-**Actions:**
-- ✅ Detect critical notifications (error, critical, failed)
-- ✅ Play voice alert for urgent issues
-- ✅ Uses `scripts/voice-notify.sh`
-
----
-
-### 13. PostToolUse - Feedback Capture
+### 12. PostToolUse - Feedback Capture
 **When:** User provides corrections or feedback
 
 **Actions:**
@@ -631,7 +631,9 @@ Tool Execution
   ↓
 Response to User
   ↓
-[Stop Hook] - Voice notification if approval needed
+[PreCompact Hook] - Save workflow state before auto-compact
+  ↓
+[Stop Hook] - Save state + session metrics
 ```
 
 ---
@@ -639,7 +641,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[23]{event,name,purpose}:
+hooks[21]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
@@ -659,14 +661,12 @@ hooks[23]{event,name,purpose}:
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
   TaskCompleted,Task Completion Validator,Validate teammate task completion (Agent Teams)
-  Stop,Compact Handoff,Auto-save workflow state before compact
-  Stop,Voice+Metrics,Voice notification + session metrics
-  Notification,Critical Alert,Voice alert for errors/critical issues
-  Library,af-learning.cjs,Learning system utilities (dual-mode)
+  Stop,Compact Handoff + Metrics,Auto-save workflow state + session metrics
+  PreCompact,Pre-Compact State Save,Save workflow state before auto-compact
 ```
 
 ---
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Last Updated:** 2026-02-09
-**Status:** Active hooks system (23 hooks)
+**Status:** Active hooks system (21 hooks)

@@ -1,3 +1,18 @@
+---
+name: design-system-library
+description: "Design system selection and implementation helper. Detects and recommends UI libraries (MUI, Tailwind, shadcn/ui, etc.) based on project context."
+autoInvoke: false
+priority: 50
+triggers:
+  - "design system"
+  - "component library"
+  - "Material UI"
+  - "Tailwind"
+  - "shadcn"
+  - "Chakra UI"
+  - "Ant Design"
+---
+
 # Skill: Design System Library
 
 **Category:** Implementation Skill

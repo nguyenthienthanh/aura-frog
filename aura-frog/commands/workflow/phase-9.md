@@ -231,7 +231,7 @@ Type "confirm" to proceed or "skip" to skip
 ## Agents Involved
 - **mobile-react-native** (primary) - 5h 15m
 - **qa-automation** (testing) - 1h 30m
-- **ui-designer** (design) - 25m
+- **ui-expert** (design) - 25m
 - **pm-operations-orchestrator** (coordination) - 6h 30m
 
 ## Notifications Sent

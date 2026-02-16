@@ -2,7 +2,7 @@
 
 **Category:** QA Expert  
 **Priority:** High  
-**Used By:** qa-automation, ui-designer
+**Used By:** qa-automation, ui-expert
 
 ---
 

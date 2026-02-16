@@ -103,7 +103,7 @@ mkdir -p "$PROJECT_ROOT/.claude"
 **Get plugin template and replace placeholders:**
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 CURRENT_DATE=$(date +%Y-%m-%d)
 
 # Check if CLAUDE.md exists

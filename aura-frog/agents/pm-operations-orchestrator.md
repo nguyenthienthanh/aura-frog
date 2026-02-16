@@ -3,7 +3,7 @@
 **Agent ID:** pm-operations-orchestrator
 **Priority:** 95
 **Role:** Orchestrator (Team Coordinator)
-**Version:** 1.0.0
+**Version:** 1.19.0
 
 ---
 
@@ -43,7 +43,7 @@ Central coordinator managing the entire development workflow from ticket intake 
 | backend-python | 90 | Django, FastAPI |
 | backend-laravel | 90 | Laravel PHP |
 | backend-go | 85 | Go, Gin, Fiber |
-| database-specialist | 85 | Schema, query optimization |
+| architect | 85 | System design + schema + query optimization |
 
 ### Quality, Security & Design
 
@@ -51,28 +51,22 @@ Central coordinator managing the entire development workflow from ticket intake 
 |-------|----------|----------------|
 | security-expert | 95 | OWASP, vulnerability scanning |
 | qa-automation | 85 | Jest, Cypress, Detox |
-| ui-designer | 85 | UI/UX, Figma integration |
+| ui-expert | 85 | UI/UX, Figma integration |
 
 ### DevOps & Operations
 
 | Agent | Priority | Specialization |
 |-------|----------|----------------|
 | devops-cicd | 90 | Docker, K8s, CI/CD |
-| jira-operations | 80 | JIRA integration |
-| confluence-operations | 80 | Documentation |
-| slack-operations | 70 | Team notifications |
-| voice-operations | 70 | AI narration |
+| project-manager | 100 | Project detection + context management |
 
-### Infrastructure
+### System
 
 | Agent | Priority | Specialization |
 |-------|----------|----------------|
-| smart-agent-detector | 100 | Agent selection |
-| project-detector | 100 | Auto-detect project type |
-| project-config-loader | 95 | Load configurations |
-| project-context-manager | 95 | Context persistence |
+| smart-agent-detector | 100 | Agent selection + routing |
 
-**Note:** Agent roster may expand. Use `agent:list` for current list.
+**Note:** Use `agent:list` for current agent roster.
 
 ---
 
@@ -80,17 +74,17 @@ Central coordinator managing the entire development workflow from ticket intake 
 
 | Phase | Name | Lead Agent | Deliverables |
 |-------|------|------------|--------------|
-| 1 | Requirement Analysis 📋 | jira-operations | requirements.md, user_stories.md, acceptance_criteria.md |
-| 2 | Technical Planning 🏗️ | Dev agent | tech_spec.md, architecture_diagram, data_models.md |
-| 3 | Design Review 🎨 | ui-designer | component_breakdown.md, design_tokens.md, ui_flow.md |
+| 1 | Requirement Analysis 📋 | pm-operations-orchestrator | requirements.md, user_stories.md, acceptance_criteria.md |
+| 2 | Technical Planning 🏗️ | architect | tech_spec.md, architecture_diagram, data_models.md |
+| 3 | Design Review 🎨 | ui-expert | component_breakdown.md, design_tokens.md, ui_flow.md |
 | 4 | Test Planning 🧪 | qa-automation | test_plan.md, test_cases.md, automation_strategy.md |
 | 5a | Write Tests 🔴 | qa-automation + Dev | Failing tests (TDD RED) |
 | 5b | Implement 🟢 | Dev agent | Source code (TDD GREEN) |
 | 5c | Refactor ♻️ | Dev agent | Optimized code (TDD REFACTOR) |
 | 6 | Code Review 👀 | All reviewers | code_review_report.md |
 | 7 | QA Validation ✅ | qa-automation | test_execution_report.md, coverage_report |
-| 8 | Documentation 📚 | confluence-operations | implementation_summary.md, deployment_guide.md |
-| 9 | Notification 🔔 | slack-operations | Slack notifications, JIRA update |
+| 8 | Documentation 📚 | pm-operations-orchestrator | implementation_summary.md, deployment_guide.md |
+| 9 | Notification 🔔 | pm-operations-orchestrator | Slack notifications, JIRA update |
 
 **Full Phase Details:** See `docs/phases/` for detailed phase guides
 
@@ -372,7 +366,7 @@ team_lead_duties[6]{duty,description}:
 ### Consolidated Team Roster
 
 ```toon
-active_agents[11]{agent,role,phases}:
+active_agents[10]{agent,role,phases}:
   pm-operations-orchestrator,Lead/Coordinator,1+8+9
   architect,System design + backend + database,2+4+5a+5b+5c+6
   ui-expert,Frontend + design systems,2+3+5b
@@ -380,8 +374,7 @@ active_agents[11]{agent,role,phases}:
   game-developer,Godot game dev,All phases (game projects)
   qa-automation,Testing + QA,1+4+5a+5b+6+7
   security-expert,Security audits,6
-  devops-cicd,CI/CD + infrastructure,5b+6
-  voice-operations,Voice notifications,9
+  devops-cicd,CI/CD + infrastructure,5b+5c+8+9
   smart-agent-detector,Agent selection,N/A (detection only)
   project-manager,Project context,N/A (context only)
 ```
@@ -401,9 +394,9 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 - **Phase Skipping:** `skills/workflow-orchestrator/phase-skipping.md`
 - **Estimation:** `skills/pm-expert/estimation.md`
 - **Documentation (ADR/Runbook):** `skills/documentation/adr-runbook.md`
-- **Quality Rules:** `rules/README.md` (50 rules)
+- **Quality Rules:** `rules/README.md` (48 rules)
 - **Agent Teams Guide:** `docs/AGENT_TEAMS_GUIDE.md`
 
 ---
 
-**Version:** 1.1.0 | **Last Updated:** 2026-02-09
+**Version:** 1.19.0 | **Last Updated:** 2026-02-14

@@ -1,6 +1,6 @@
 # Aura Frog Agents Directory
 
-**Version:** 1.18.0
+**Version:** 1.19.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2026-02-09
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Aura Frog provides **11 specialized agents** (reduced from 15 in v1.17.0 through consolidation).
+Aura Frog provides **10 specialized agents** (reduced from 15 in v1.17.0 through consolidation, voice-operations removed in v1.18.1).
 
 ---
 
@@ -25,10 +25,10 @@ Aura Frog provides **11 specialized agents** (reduced from 15 in v1.17.0 through
 ## Agents Index (TOON)
 
 ```toon
-agents[11]{name,file,expertise}:
-  project-manager,project-manager.md,Project detection + config + context (NEW)
-  architect,architect.md,System design + database + backend architecture (NEW)
-  ui-expert,ui-expert.md,Frontend frameworks + design systems + accessibility (NEW)
+agents[10]{name,file,expertise}:
+  project-manager,project-manager.md,Project detection + config + context
+  architect,architect.md,System design + database + backend architecture
+  ui-expert,ui-expert.md,Frontend frameworks + design systems + accessibility
   mobile-expert,mobile-expert.md,React Native + Flutter + mobile platforms
   game-developer,game-developer.md,Godot game development + multi-platform export
   devops-cicd,devops-cicd.md,CI/CD pipelines + deployment + infrastructure
@@ -36,7 +36,6 @@ agents[11]{name,file,expertise}:
   security-expert,security-expert.md,Security audits + vulnerability assessment
   pm-operations-orchestrator,pm-operations-orchestrator.md,Project management + workflow coordination
   smart-agent-detector,smart-agent-detector.md,Agent selection + routing logic
-  voice-operations,voice-operations.md,Voice notifications + audio feedback
 ```
 
 ---
@@ -69,7 +68,7 @@ agent:list
 | **Infrastructure** | devops-cicd | Deployment + CI/CD |
 | **Quality** | qa-automation, security-expert | Testing + security |
 | **Management** | pm-operations-orchestrator | Workflow coordination |
-| **System** | project-manager, smart-agent-detector, voice-operations | Internal operations |
+| **System** | project-manager, smart-agent-detector | Internal operations |
 
 ---
 
@@ -79,6 +78,7 @@ agent:list
 |---------|--------|--------|
 | v1.16.0 | 15 | - |
 | v1.17.0 | 11 | -4 (consolidated) |
+| v1.18.1 | 10 | -1 (voice-operations removed) |
 
 **Removed files (consolidated):**
 - backend-expert.md → architect
@@ -101,4 +101,4 @@ agent:list
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-09
+**Version:** 1.19.0 | **Last Updated:** 2026-02-09

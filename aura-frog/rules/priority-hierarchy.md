@@ -164,10 +164,10 @@ Claude Defaults ─┘
 agents: [mobile-react-native, qa-automation]
 
 # Project (adds to list)
-agents: [ui-designer]
+agents: [ui-expert]
 
 # Result
-agents: [mobile-react-native, qa-automation, ui-designer]
+agents: [mobile-react-native, qa-automation, ui-expert]
 ```
 
 **Override:** Values are replaced

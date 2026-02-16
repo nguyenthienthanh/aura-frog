@@ -46,7 +46,7 @@ Shows comprehensive workflow status including:
 🤖 Active Agents:
    - mobile-react-native (primary)
    - qa-automation (secondary)
-   - ui-designer (secondary)
+   - ui-expert (secondary)
    - pm-operations-orchestrator (coordinator)
 
 📍 Current Phase: Phase 3 - Design Review
@@ -142,7 +142,7 @@ DETAILED WORKFLOW STATUS
    
    Agents Involved:
    - mobile-react-native (primary)
-   - ui-designer (secondary)
+   - ui-expert (secondary)
    - pm-operations-orchestrator (coordinator)
 
 📋 Phase 2: Technical Planning
@@ -159,7 +159,7 @@ DETAILED WORKFLOW STATUS
    - Mapping component hierarchy
    
    Agents Working:
-   - ui-designer (active)
+   - ui-expert (active)
    - mobile-react-native (supporting)
 ```
 

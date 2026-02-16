@@ -49,7 +49,7 @@ Switch to a different project configuration.
 **Active Agents:**
 - mobile-react-native (+25 project bonus)
 - qa-automation
-- ui-designer
+- ui-expert
 ```
 
 ---

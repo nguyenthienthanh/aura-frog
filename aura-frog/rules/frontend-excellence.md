@@ -2,7 +2,7 @@
 
 **Category:** Frontend Development
 **Priority:** Critical
-**Applies To:** web-expert, mobile-expert, ui-designer, all frontend skills
+**Applies To:** ui-expert, mobile-expert, all frontend skills
 **Version:** 1.0.0
 
 ---

@@ -5,23 +5,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-start.cjs\" 2>&1 || true"
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/visual-pixel-init.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/visual-pixel-init.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/firebase-cleanup.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/firebase-cleanup.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/workflow-edit-learn.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/workflow-edit-learn.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/compact-handoff.cjs\" --resume 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" --resume 2>&1"
           }
         ]
       }
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/scout-block.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\" 2>&1"
           }
         ]
       },
@@ -65,11 +65,13 @@
         "hooks": [
           {
             "type": "command",
+            "async": true,
             "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
           },
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/smart-learn.cjs\" 2>&1 || true"
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -87,15 +89,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/feedback-capture.cjs\" 2>&1 || true"
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/lint-autofix.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/lint-autofix.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/smart-learn.cjs\" 2>&1 || true"
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       }
@@ -105,11 +109,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/prompt-reminder.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-reminder.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/auto-learn.cjs\" 2>&1 || true"
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
           }
         ]
       }
@@ -120,7 +125,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/subagent-init.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent-init.cjs\" 2>&1"
           }
         ]
       }
@@ -131,7 +136,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/teammate-idle.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/teammate-idle.cjs\" 2>&1"
           }
         ]
       }
@@ -142,7 +147,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/task-completed.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/task-completed.cjs\" 2>&1"
           }
         ]
       }
@@ -152,25 +157,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/compact-handoff.cjs\" 2>&1 || true"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" 2>&1"
           },
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/stop-voice-notify.sh\" 2>&1 || true"
-          },
-          {
-            "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/session-metrics.cjs\" 2>&1 || true"
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
           }
         ]
       }
     ],
-    "Notification": [
+    "PreCompact": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "PLUGIN_DIR=\"$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog\"; if [ -f \"$PLUGIN_DIR/scripts/voice-notify.sh\" ] && echo \"$CLAUDE_NOTIFICATION\" | grep -qiE '(error|critical|failed)'; then bash \"$PLUGIN_DIR/scripts/voice-notify.sh\" 'Alert: Please check the notification' 'error' 2>&1 || true; fi"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" --pre-compact 2>&1"
           }
         ]
       }

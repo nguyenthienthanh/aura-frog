@@ -44,7 +44,7 @@ Rules:
 ### 1. Locate Files
 
 ```bash
-PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
 PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
 PROJECT_SETTINGS=".claude/settings.local.json"
 ```

@@ -104,7 +104,7 @@ qa-automation
 ├── Jest + React Testing Library
 └── Detox E2E testing
 
-ui-designer
+ui-expert
 ├── Design analysis (Figma)
 ├── Component breakdown
 ├── Design token extraction
@@ -197,7 +197,7 @@ Phase 2: Technical Planning
    ↓
 Phase 3: Design Review
    │
-   ├─→ Agents: ui-designer, dev agents
+   ├─→ Agents: ui-expert, dev agents
    ├─→ Input: Figma screenshots/links
    ├─→ Output: component_breakdown.md, design_tokens.md
    ├─→ Approval Gate ✋

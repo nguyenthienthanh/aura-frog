@@ -1,7 +1,7 @@
 # Command: seo:check
 
 **Command:** `seo:check [url]`
-**Agent:** web-expert
+**Agent:** ui-expert
 **Version:** 1.0.0
 
 ---
@@ -116,7 +116,7 @@ technical_checks[8]{check,tool}:
 
 **URL:** https://myapp.com
 **Date:** 2025-01-15
-**Agent:** web-expert
+**Agent:** ui-expert
 
 ---
 

@@ -1,3 +1,20 @@
+---
+name: testing-patterns
+description: "Unified testing patterns across all frameworks. Provides consistent test structure, naming, and best practices for Jest, Vitest, Pytest, PHPUnit, Go testing, and more."
+autoInvoke: true
+priority: 50
+triggers:
+  - "test"
+  - "spec"
+  - "coverage"
+  - "mock"
+  - "fixture"
+  - "TDD"
+  - "unit test"
+  - "e2e"
+context: fork
+---
+
 # Skill: Testing Patterns
 
 **Skill ID:** testing-patterns

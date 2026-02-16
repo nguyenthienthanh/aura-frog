@@ -1,7 +1,7 @@
 # Command: seo:schema
 
 **Command:** `seo:schema [url]`
-**Agent:** web-expert
+**Agent:** ui-expert
 **Version:** 1.0.0
 
 ---

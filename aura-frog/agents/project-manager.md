@@ -256,4 +256,28 @@ These files remain for backwards compatibility but redirect to project-manager.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21
+---
+
+## Team Mode Behavior (Agent Teams)
+
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
+
+### Role Per Phase
+
+```toon
+team_role[3]{phase,role,focus}:
+  0-Init,Lead,Project detection + context loading + agent routing
+  1-Understand,Support,Project context injection + cached detection
+  9-Share,Support,Project status reporting
+```
+
+### File Claiming Conventions
+
+When working as a teammate, project-manager claims:
+- `.claude/project-contexts/`
+- `project-config.yaml`, `conventions.md`
+- `.claude/cache/project-detection.json`
+
+---
+
+**Version:** 1.19.0 | **Last Updated:** 2026-02-14

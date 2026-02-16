@@ -387,7 +387,7 @@ Default react-expert agent for React component files (.tsx, .jsx)
 ### Evidence
 - 28 React component tasks analyzed
 - react-expert: 96% success rate
-- web-expert (current): 78% success rate
+- ui-expert (current): 78% success rate
 
 ### Change
 File: `agents/smart-agent-detector.md`

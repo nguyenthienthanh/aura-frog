@@ -101,7 +101,7 @@ Select [1-8] or type command:
 
 - **Code Reviewer Skill:** `skills/code-reviewer/SKILL.md`
 - **Code Simplifier:** `skills/code-simplifier/SKILL.md`
-- **Quality Rules:** `rules/code-quality.md`, `rules/kiss-avoid-over-engineering.md`
+- **Quality Rules:** `rules/code-quality.md`, `rules/simplicity-over-complexity.md`
 - **Legacy Commands:** `commands/quality/*.md`
 
 ---

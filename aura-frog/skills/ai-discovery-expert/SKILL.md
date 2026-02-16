@@ -455,7 +455,7 @@ ai_discovery_checklist[12]{check,priority}:
 ## Related Skills
 
 - `seo-expert` - Traditional search engine optimization
-- `web-expert` - Frontend implementation
+- `ui-expert` - Frontend implementation
 - `nextjs-expert` - Next.js metadata implementation
 
 ---

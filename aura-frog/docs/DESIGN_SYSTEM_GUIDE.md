@@ -387,7 +387,7 @@ Which should I use as the primary?
 
 - **Skills:** `skills/design-system-library/`
 - **Rules:** `rules/design-system-usage.md`, `rules/theme-consistency.md`
-- **Agent:** `agents/ui-designer.md`
+- **Agent:** `agents/ui-expert.md`
 - **Detection:** `docs/STYLING_DETECTION_GUIDE.md`
 
 ---

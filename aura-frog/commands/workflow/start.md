@@ -39,7 +39,7 @@ detection[6]{keywords,agent}:
   web/react/vue,web-frontend
   api/backend/server,backend-*
   test/qa/cypress,qa-automation
-  ui/design/figma,ui-designer
+  ui/design/figma,ui-expert
   always,pm-operations-orchestrator
 ```
 

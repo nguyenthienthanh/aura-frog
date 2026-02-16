@@ -513,7 +513,7 @@ seo_checklist[13]{check,priority}:
 ## Related Skills
 
 - `ai-discovery-expert` - AI search engine optimization
-- `web-expert` - Frontend performance
+- `ui-expert` - Frontend performance
 - `nextjs-expert` - Next.js SEO implementation
 
 ---

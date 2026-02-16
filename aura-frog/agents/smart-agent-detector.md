@@ -126,13 +126,13 @@ Any Repo + Security Task:
 
 | Intent | Keywords | Primary Agent | Secondary |
 |--------|----------|---------------|-----------|
-| Implementation | `implement`, `create`, `add`, `build`, `develop` | Dev agent | qa-automation, ui-designer |
+| Implementation | `implement`, `create`, `add`, `build`, `develop` | Dev agent | qa-automation, ui-expert |
 | Bug Fix | `fix`, `bug`, `error`, `issue`, `broken`, `debug` | Dev agent | qa-automation |
 | Refactoring | `refactor`, `improve`, `optimize`, `clean up` | Dev agent | qa-automation |
 | Testing | `test`, `testing`, `QA`, `coverage`, `spec` | qa-automation | Dev agent |
-| Design/UI | `design`, `UI`, `UX`, `figma`, `layout`, `styling` | ui-designer | Dev agent |
+| Design/UI | `design`, `UI`, `UX`, `figma`, `layout`, `styling` | ui-expert | Dev agent |
 | Documentation | `document`, `docs`, `README`, `explain` | pm-operations-orchestrator | - |
-| Database | `database`, `schema`, `migration`, `query`, `SQL` | database-specialist | Backend agent |
+| Database | `database`, `schema`, `migration`, `query`, `SQL` | architect | Backend agent |
 | Security | `security`, `vulnerability`, `audit`, `OWASP` | security-expert | Dev agent |
 | Performance | `performance`, `slow`, `optimize`, `lighthouse` | devops-cicd | Dev agent |
 | Deployment | `deploy`, `docker`, `kubernetes`, `CI/CD`, `pipeline` | devops-cicd | - |
@@ -270,7 +270,7 @@ Analysis:
 
 Result:
 ✅ mobile-react-native: 95 pts (Primary)
-✅ ui-designer: 50 pts (Secondary) - "button" UI
+✅ ui-expert: 50 pts (Secondary) - "button" UI
 ✅ qa-automation: 30 pts (Optional) - if test infra exists
 ```
 
@@ -286,7 +286,7 @@ Analysis:
 Result:
 ✅ web-reactjs: 55 pts (Primary - Frontend)
 ✅ backend-nodejs: 55 pts (Primary - Backend)
-✅ ui-designer: 45 pts (Secondary)
+✅ ui-expert: 45 pts (Secondary)
 ```
 
 ### Example 3: Vague Request
@@ -301,7 +301,7 @@ Analysis:
 Result:
 ✅ backend-laravel: 90 pts (Primary)
 ✅ qa-automation: 35 pts (Optional) - bug validation
-❌ ui-designer: skipped - backend context
+❌ ui-expert: skipped - backend context
 ```
 
 ### Example 4: Security Audit
@@ -328,7 +328,7 @@ Analysis:
 
 Result:
 ✅ web-nextjs: 85 pts (Primary)
-✅ ui-designer: 50 pts (Secondary)
+✅ ui-expert: 50 pts (Secondary)
 ❌ qa-automation: 0 pts (SKIPPED - no test infra)
 ```
 
@@ -357,7 +357,7 @@ Task Content Analysis (Layer 0):
 → Frontend score: 125 pts → OVERRIDE
 
 Result:
-✅ web-expert: 125 pts (Primary) - leads template work
+✅ ui-expert: 125 pts (Primary) - leads template work
 ✅ backend-laravel: 40 pts (Secondary) - Blade context
 ```
 
@@ -373,7 +373,7 @@ Task Content Analysis (Layer 0):
 → Frontend score: 120 pts → OVERRIDE
 
 Result:
-✅ web-expert: 120 pts (Primary) - HTML/CSS for PDF
+✅ ui-expert: 120 pts (Primary) - HTML/CSS for PDF
 ✅ backend-nodejs: 40 pts (Secondary) - PDF library
 ```
 
@@ -388,7 +388,7 @@ Task Content Analysis (Layer 0):
 → Database score: 100 pts → OVERRIDE
 
 Result:
-✅ database-specialist: 100 pts (Primary) - query optimization
+✅ architect: 100 pts (Primary) - query optimization
 ✅ web-nextjs: 40 pts (Secondary) - API route context
 ```
 
@@ -491,4 +491,4 @@ team_decision[4]{condition,mode}:
 
 ---
 
-**Version:** 1.18.0 | **Last Updated:** 2026-02-09
+**Version:** 1.19.0 | **Last Updated:** 2026-02-09

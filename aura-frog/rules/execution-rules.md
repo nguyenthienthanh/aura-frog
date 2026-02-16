@@ -78,11 +78,11 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 ## NEVER Do
 
-### Plan Mode Override (CRITICAL)
+### Plan Mode Integration
 
 | # | Rule | Why |
 |---|------|-----|
-| 0 | **NEVER use EnterPlanMode or Claude's built-in plan mode** | Aura Frog has its own 9-phase workflow that replaces plan mode entirely. Use `workflow-orchestrator` skill instead. |
+| 0 | **Use Claude Code's native plan mode for planning tasks** (brainstorm, design, evaluate options). For full implementation, use Aura Frog's 9-phase workflow via `workflow:start`. The `planning` command creates a plan file that can be set as active plan with `plan:set` before starting a workflow. | Native plan mode is ideal for Quick/Standard tasks. The 9-phase workflow is for Deep complexity tasks requiring structured TDD. |
 
 ### Context & Loading
 

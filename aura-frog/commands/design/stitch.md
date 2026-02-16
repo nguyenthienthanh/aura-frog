@@ -1,7 +1,7 @@
 # Command: design:stitch
 
 **Command:** `design:stitch "<requirements>"`
-**Agents:** ui-designer
+**Agents:** ui-expert
 **Skill:** stitch-design
 **Version:** 1.0.0
 

@@ -701,7 +701,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-### 3. UI Design Review (ui-designer)
+### 3. UI Design Review (ui-expert)
 **Status:** ⚠️ Approved with notes  
 **Key Points:**
 - Design requirements are clear

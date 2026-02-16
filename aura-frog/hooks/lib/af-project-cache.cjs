@@ -28,8 +28,6 @@ const DETECTION_FILE = 'project-detection.json';
 const WORKSPACE_DETECTION_FILE = 'workspace-detection.json';
 const MONOREPO_DETECTION_FILE = 'monorepo-detection.json';
 
-// Cache directory (temporary session data)
-const CACHE_DIR = '.claude/cache';
 
 const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -116,22 +114,6 @@ function ensureProjectContextsDir(projectName = null) {
     fs.mkdirSync(dir, { recursive: true });
   }
   return dir;
-}
-
-/**
- * Get cache file path (legacy - for backwards compatibility)
- * @deprecated Use getDetectionPath instead
- */
-function getCachePath() {
-  return getDetectionPath();
-}
-
-/**
- * Ensure cache directory exists (legacy)
- * @deprecated Use ensureProjectContextsDir instead
- */
-function ensureCacheDir() {
-  return ensureProjectContextsDir();
 }
 
 /**
@@ -428,10 +410,10 @@ function detectAgentMapping(framework, patterns) {
 
   // Add secondary agents based on patterns
   if (patterns.templates.length > 0) {
-    agents.secondary.push('web-expert');
+    agents.secondary.push('ui-expert');
   }
   if (patterns.frontend.length > 0 && !agents.primary?.startsWith('web-')) {
-    agents.secondary.push('web-expert');
+    agents.secondary.push('ui-expert');
   }
   if (patterns.backend.length > 0 && !agents.primary?.startsWith('backend-')) {
     // Determine backend agent from file patterns
@@ -442,10 +424,10 @@ function detectAgentMapping(framework, patterns) {
 
   // Always available agents
   agents.available = [
-    'database-specialist',
+    'architect',
     'security-expert',
     'qa-automation',
-    'ui-designer',
+    'ui-expert',
     'devops-cicd'
   ];
 

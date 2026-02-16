@@ -259,5 +259,5 @@ Before any site launch:
 
 ---
 
-**Related Skills:** `seo-expert`, `ai-discovery-expert`, `web-expert`
+**Related Skills:** `seo-expert`, `ai-discovery-expert`, `ui-expert`
 **Version:** 1.0.0

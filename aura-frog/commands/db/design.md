@@ -1,7 +1,7 @@
 # Command: db:design
 
 **Command:** `db:design [feature]`
-**Agent:** database-specialist
+**Agent:** architect
 **Version:** 1.0.0
 
 ---
