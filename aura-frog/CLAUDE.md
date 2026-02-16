@@ -14,7 +14,7 @@
 - **Approval gates slimmed** (558 -> 96 lines) — Points to orchestrator for details
 - **PreCompact hook** — Auto-save workflow state before context compaction
 - **`context: fork`** — Heavy skills (framework-expert, seo-bundle, testing-patterns, learning-analyzer) run in forked context
-- **plugin.json** — New `engines`, `capabilities`, `stats` fields
+- **plugin.json** — Removed invalid `engines`, `capabilities`, `stats` fields
 
 ---
 

@@ -10,41 +10,6 @@
   "homepage": "https://github.com/nguyenthienthanh/aura-frog",
   "repository": "https://github.com/nguyenthienthanh/aura-frog",
   "license": "MIT",
-  "engines": {
-    "claude-code": ">=2.1.0"
-  },
-  "capabilities": {
-    "hooks": [
-      "SessionStart",
-      "PreToolUse",
-      "PostToolUse",
-      "UserPromptSubmit",
-      "SubagentStart",
-      "TeammateIdle",
-      "TaskCompleted",
-      "Stop",
-      "PreCompact"
-    ],
-    "mcp": [
-      "context7",
-      "playwright",
-      "vitest",
-      "firebase",
-      "figma",
-      "slack"
-    ],
-    "agentTeams": true,
-    "modelRouting": true,
-    "learningSystem": true
-  },
-  "stats": {
-    "agents": 10,
-    "skills": 52,
-    "commands": 91,
-    "rules": 48,
-    "hooks": 21,
-    "mcpServers": 6
-  },
   "keywords": [
     "claude-code",
     "claude-code-plugin",
