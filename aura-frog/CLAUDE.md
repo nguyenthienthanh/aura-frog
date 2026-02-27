@@ -6,7 +6,16 @@
 
 ---
 
-## New in 1.20.0 - Optimization
+## New in 1.20.0 - Best Practices Enforcement
+
+- **6 new hooks** — Security scan, commit attribution, security-critical warnings, auto test runner, token tracker, scope drift detection
+- **PR template** — AI-specific review checklist (`templates/pull_request_template.md`)
+- **Stderr fix** — 5 hooks had `2>&1` suppressing block/warning messages
+- **Hooks: 21 → 27**
+
+---
+
+## New in 1.19.0 - Optimization
 
 - **Banner rule optimized** (19KB -> 5KB) — Examples moved to `docs/BANNER_EXAMPLES.md`
 - **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 48 rules)

@@ -234,7 +234,7 @@ Auto-invoke based on context — zero config for most:
 
 ---
 
-### 21 Lifecycle Hooks
+### 27 Lifecycle Hooks
 
 | Hook Type | Count | Purpose |
 |-----------|-------|---------|
@@ -300,7 +300,7 @@ aura-frog/
 ├── skills/                52 skills (13 auto + 39 reference)
 ├── commands/              91 commands (6 bundled + 85 individual)
 ├── rules/                 48 quality rules (TOON-optimized)
-├── hooks/                 21 lifecycle hooks
+├── hooks/                 27 lifecycle hooks
 ├── docs/                  Phase guides, MCP guide, team guide
 ├── scripts/               Utility scripts (integrations, workflows)
 ├── templates/             Document templates
@@ -339,7 +339,7 @@ aura-frog/
 | [skills/README.md](aura-frog/skills/README.md) | 52 skills reference |
 | [commands/README.md](aura-frog/commands/README.md) | 91 commands reference |
 | [rules/README.md](aura-frog/rules/README.md) | 48 quality rules |
-| [hooks/README.md](aura-frog/hooks/README.md) | 21 lifecycle hooks |
+| [hooks/README.md](aura-frog/hooks/README.md) | 27 lifecycle hooks |
 
 ---
 
@@ -354,7 +354,7 @@ aura-frog/
 | Model routing | Yes | - | - | - |
 | MCP servers | 6 bundled | - | - | - |
 | Learning system | Yes | - | - | - |
-| Lifecycle hooks | 21 | - | - | - |
+| Lifecycle hooks | 27 | - | - | - |
 | Context optimization | TOON + fork | - | - | - |
 | Game development | Godot agent | - | - | - |
 

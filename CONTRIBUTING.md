@@ -96,7 +96,7 @@ aura-frog/                           # Repository root
 │   ├── commands/                    # 91 commands (6 bundled entry points)
 │   ├── skills/                      # 52 skills (13 auto-invoke + 39 reference)
 │   ├── rules/                       # 48 quality rules
-│   ├── hooks/                       # 21 lifecycle hooks (.cjs scripts)
+│   ├── hooks/                       # 27 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # Documentation & phase guides
 │   ├── templates/                   # Document templates
 │   ├── scripts/                     # Bash integration scripts
