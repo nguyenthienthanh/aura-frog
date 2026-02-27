@@ -19,7 +19,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 # Aura Frog Workflow Orchestrator
 
 **Priority:** CRITICAL - Use for complex feature implementations
-**Version:** 1.19.0
+**Version:** 1.20.0
 
 ---
 

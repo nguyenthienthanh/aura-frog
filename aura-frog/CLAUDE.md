@@ -1,12 +1,12 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.19.0
+**System:** Aura Frog v1.20.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 52 skills + 91 commands + 9-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
-## New in 1.19.0 - Optimization
+## New in 1.20.0 - Optimization
 
 - **Banner rule optimized** (19KB -> 5KB) — Examples moved to `docs/BANNER_EXAMPLES.md`
 - **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 48 rules)
@@ -72,7 +72,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.19.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -185,7 +185,7 @@ resources[12]{name,location}:
   Commands (91),commands/
   Rules (48),rules/
   Skills (13 auto-invoke + 39 reference),skills/
-  Hooks (21),hooks/
+  Hooks (27),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
@@ -270,4 +270,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.19.0
+**Version:** 1.20.0

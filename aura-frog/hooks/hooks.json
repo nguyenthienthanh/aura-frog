@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\""
           }
         ]
       },
@@ -42,6 +42,10 @@
           {
             "type": "command",
             "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '⚠️ Blocked: Potentially destructive command detected' >&2; exit 2; fi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-attribution.cjs\""
           }
         ]
       },
@@ -54,7 +58,7 @@
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -qE '(\\.env$|\\.env\\.|credentials|secrets|tokens\\.json|api[_-]?keys)'; then if git ls-files --error-unmatch \"$CLAUDE_FILE_PATHS\" 2>/dev/null; then echo '🔒 Warning: This file may contain secrets and is tracked by git. Consider adding to .gitignore' >&2; fi; fi"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/security-critical-warn.cjs\""
           }
         ]
       }
@@ -99,7 +103,27 @@
           {
             "type": "command",
             "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/security-scan.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
             "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Read|Write|Edit|Glob|Grep|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/token-tracker.cjs\""
           }
         ]
       }
@@ -109,12 +133,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-reminder.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-reminder.cjs\""
           },
           {
             "type": "command",
             "async": true,
             "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scope-drift.cjs\""
           }
         ]
       }
@@ -125,7 +154,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent-init.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent-init.cjs\""
           }
         ]
       }
@@ -136,7 +165,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/teammate-idle.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/teammate-idle.cjs\""
           }
         ]
       }
@@ -147,7 +176,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/task-completed.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/task-completed.cjs\""
           }
         ]
       }

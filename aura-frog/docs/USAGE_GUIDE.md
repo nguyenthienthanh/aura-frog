@@ -1,6 +1,6 @@
 # Aura Frog Usage Guide - Clarifications & Best Practices
 
-**Version:** 1.19.0
+**Version:** 1.20.0
 **Last Updated:** 2026-02-09
 
 ---

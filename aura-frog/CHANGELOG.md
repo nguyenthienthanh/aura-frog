@@ -4,6 +4,45 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.20.0] - 2026-02-27
+
+### Best Practices Enforcement & Hook Optimizations
+
+6 new hooks that automate best practices from the [AI Vibe Coding wiki](https://github.com/nguyenthienthanh/aura-frog/wiki/AI-Vibe-Coding-Best-Practices), plus critical stderr fixes and a PR template.
+
+#### Added
+- **`security-scan.cjs` hook** - PostToolUse hook that scans written files for vulnerability patterns (secrets, SQL injection, XSS, weak crypto) without requiring external tools
+- **`commit-attribution.cjs` hook** - PreToolUse hook that warns when `git commit` is missing `Co-Authored-By:` AI attribution
+- **`security-critical-warn.cjs` hook** - PreToolUse hook with tiered warnings (CRITICAL/HIGH/MEDIUM) for security-sensitive files (auth, payment, crypto paths)
+- **`auto-test-runner.cjs` hook** - PostToolUse hook that auto-runs detected test runner during TDD phases (5a/5b/5c). Supports Vitest, Jest, Pytest, Go, Cargo, PHPUnit, Laravel
+- **`token-tracker.cjs` hook** - PostToolUse hook that estimates cumulative token usage and warns at 50%/70%/85% thresholds
+- **`scope-drift.cjs` hook** - UserPromptSubmit hook that detects when conversation scope diverges from the original workflow task
+- **`templates/pull_request_template.md`** - PR template with AI-specific sections (attribution, security checklist, human review)
+- **AI Vibe Coding wiki page** - Comprehensive best practices guide published to GitHub wiki
+
+#### Fixed
+- **`hooks.json` stderr bug** - Removed `2>&1` from 5 hooks (scout-block, task-completed, teammate-idle, prompt-reminder, subagent-init) that suppressed stderr output. Claude Code uses stderr to display block/warning messages; `2>&1` redirected them to stdout making them invisible
+- **Old secrets hook replaced** - Inline bash secrets hook replaced with tiered `security-critical-warn.cjs` for graduated warnings
+
+#### Stats
+- Hooks: 21 → 27 (+6: security-scan, commit-attribution, security-critical-warn, auto-test-runner, token-tracker, scope-drift)
+
+---
+
+## [1.19.0] - 2026-02-09
+
+### Major Optimization
+
+- **Banner rule optimized** (19KB -> 5KB) — Examples moved to `docs/BANNER_EXAMPLES.md`
+- **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 48 rules)
+- **Fasttrack merged** — Now a mode inside `workflow-orchestrator` (53 -> 52 skills)
+- **Approval gates slimmed** (558 -> 96 lines) — Points to orchestrator for details
+- **PreCompact hook** — Auto-save workflow state before context compaction
+- **`context: fork`** — Heavy skills run in forked context
+- **plugin.json** — Removed invalid `engines`, `capabilities`, `stats` fields
+
+---
+
 ## [1.18.0] - 2026-02-09
 
 ### Agent Teams Support (Experimental)

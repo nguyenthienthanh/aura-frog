@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.19.0
+**Version:** 1.20.0
 
 ---
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (21 Total)
+## Active Hooks (27 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -218,6 +218,26 @@ ios/Pods
 
 ---
 
+### 1b. PreToolUse - Commit Attribution (NEW in 1.20.0)
+**When:** Before any Bash tool execution containing `git commit`
+
+**Actions:**
+- ✅ Detect git commit commands
+- ✅ Check for `Co-Authored-By:` in commit message
+- ✅ Warn if AI attribution is missing
+- ✅ Skip amend-only and file-based commits
+
+**Example:**
+```bash
+User: git commit -m "Add login feature"
+Hook: 💡 Missing AI attribution. Add to commit message:
+      Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**Script:** `hooks/commit-attribution.cjs`
+
+---
+
 ### 2. PreToolUse - Bash Safety
 **When:** Before any Bash tool execution
 
@@ -253,6 +273,30 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 ```
 💡 Reminder: Run project:init to create project context before generating code
 ```
+
+---
+
+### 3b. PreToolUse - Security-Critical Warnings (NEW in 1.20.0)
+**When:** Before Write or Edit to security-sensitive files
+
+**Actions:**
+- ✅ Tiered warnings based on file sensitivity level
+- ✅ CRITICAL: `.env`, `credentials`, `.aws`, `.ssh`, `.pem`, `.key`
+- ✅ HIGH: `auth/`, `payment/`, `crypto/`, `security/`, `jwt`, `oauth`
+- ✅ MEDIUM: `config.*`, `settings.*`, `database.*`, `cors`, `csrf`
+
+**Example:**
+```
+Writing: src/auth/jwt-handler.ts
+Hook: 🟠 [HIGH] Security-critical code. Consider human review before merging.
+      File: jwt-handler.ts
+
+Writing: .env.production
+Hook: 🔴 [CRITICAL] This file likely contains secrets. Verify it is NOT committed to git.
+      File: .env.production
+```
+
+**Script:** `hooks/security-critical-warn.cjs`
 
 ---
 
@@ -334,7 +378,96 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 ---
 
-### 7b. PostToolUse - Smart Learn (NEW in 1.16.0)
+### 7b. PostToolUse - Security Scan (NEW in 1.20.0)
+**When:** After Write or Edit tool completes (async)
+
+**Actions:**
+- ✅ Scan file content for common vulnerability patterns
+- ✅ Detect hardcoded secrets (AWS keys, GitHub tokens, private keys)
+- ✅ Detect injection risks (SQL, command, XSS)
+- ✅ Detect weak cryptography (MD5, SHA1, Math.random for security)
+- ✅ Non-blocking - reports findings as warnings
+- ✅ No external tools required (regex-based)
+
+**Vulnerability Categories:**
+| Category | Patterns Detected |
+|----------|-------------------|
+| Secrets | AWS keys, GitHub tokens, API keys, private keys, hardcoded passwords |
+| Injection | SQL injection (concat/template), command injection (exec) |
+| XSS | innerHTML, dangerouslySetInnerHTML, jQuery .html() |
+| Crypto | MD5/SHA1 hashing, Math.random() for security values |
+
+**Example:**
+```
+Writing: src/api/users.ts
+Hook: 🟡 Security scan: 2 issue(s) in users.ts
+      L23: [injection] Possible SQL injection (string concat)
+      L45: [crypto] Math.random() for security-sensitive value
+```
+
+**Script:** `hooks/security-scan.cjs`
+
+---
+
+### 7c. PostToolUse - Auto Test Runner (NEW in 1.20.0)
+**When:** After Write or Edit during TDD phases (5a, 5b, 5c) - async
+
+**Actions:**
+- ✅ Auto-detect test runner from project config
+- ✅ Run tests after implementation changes
+- ✅ Only activates during TDD workflow phases
+- ✅ Non-blocking with 30s timeout
+
+**Supported Test Runners:**
+| Project | Detection | Command |
+|---------|-----------|---------|
+| Vitest | devDependencies or test script | `npx vitest run` |
+| Jest | devDependencies or test script | `npx jest --passWithNoTests` |
+| npm test | package.json scripts.test | `npm test` |
+| Pytest | pyproject.toml | `python -m pytest -x -q` |
+| Go | go.mod | `go test ./...` |
+| Cargo | Cargo.toml | `cargo test` |
+| PHPUnit | phpunit.xml | `php vendor/bin/phpunit` |
+| Laravel | artisan | `php artisan test` |
+
+**Example:**
+```
+Writing: src/services/auth.ts (Phase 5b)
+Hook: ✅ Auto-test (vitest): Tests: 23 passed | Duration: 1.2s
+```
+
+**Script:** `hooks/auto-test-runner.cjs`
+
+---
+
+### 7d. PostToolUse - Token Tracker (NEW in 1.20.0)
+**When:** After any tool execution (async)
+
+**Actions:**
+- ✅ Estimate cumulative token usage per session
+- ✅ Track tool calls and file sizes
+- ✅ Warn at 50%, 70%, 85% of 200K context limit
+- ✅ Persist tracking across tool calls via cache file
+
+**Thresholds:**
+| Usage | Level | Action |
+|-------|-------|--------|
+| 50% (~100K) | 🟡 MODERATE | Stay focused |
+| 70% (~140K) | 🟠 HIGH | Consider /compact |
+| 85% (~170K) | 🔴 CRITICAL | Recommend handoff |
+
+**Example:**
+```
+Hook: 🟠 Token usage: ~145K / 200K (72%) [HIGH]
+      Consider /compact with focus instructions
+```
+
+**Cache:** `.claude/cache/token-tracker.json`
+**Script:** `hooks/token-tracker.cjs`
+
+---
+
+### 7f. PostToolUse - Smart Learn (NEW in 1.16.0)
 **When:** After Write, Edit, or Bash tool completes successfully
 
 **Actions:**
@@ -382,6 +515,34 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 ```
 
 **Script:** `hooks/prompt-reminder.cjs`
+
+---
+
+### 8b. UserPromptSubmit - Scope Drift Detection (NEW in 1.20.0)
+**When:** Every user prompt submission (async)
+
+**Actions:**
+- ✅ Compare user prompt keywords against initial workflow task
+- ✅ Detect feature-trigger phrases ("also add", "can you also", "new feature")
+- ✅ Calculate keyword overlap with original task scope
+- ✅ Warn when scope diverges significantly
+- ✅ Skip workflow commands and short prompts
+
+**Detection Logic:**
+- Extracts keywords from current prompt and original task
+- Checks for feature-trigger phrases indicating new scope
+- Warns when: feature trigger detected AND keyword overlap < 20%
+
+**Example:**
+```
+Workflow task: "Add user login with email/password"
+User: "Can you also add a shopping cart and checkout flow?"
+Hook: 🔀 Scope drift detected: This looks like a new feature outside the current workflow.
+      Current task: "Add user login with email/password"
+      Consider starting a separate workflow for better focus and token efficiency.
+```
+
+**Script:** `hooks/scope-drift.cjs`
 
 ---
 
@@ -447,7 +608,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.19.0)
+### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.20.0)
 **When:** A teammate has no remaining tasks (Agent Teams mode only)
 
 **Actions:**
@@ -462,7 +623,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10c. TaskCompleted - Task Completion Validator (NEW in 1.19.0)
+### 10c. TaskCompleted - Task Completion Validator (NEW in 1.20.0)
 **When:** A teammate marks a task as done (Agent Teams mode only)
 
 **Actions:**
@@ -498,7 +659,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11b. PreCompact - Pre-Compact State Save (NEW in 1.19.0)
+### 11b. PreCompact - Pre-Compact State Save (NEW in 1.20.0)
 **When:** Before Claude auto-compacts context
 
 **Actions:**
@@ -641,22 +802,28 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[21]{event,name,purpose}:
+hooks[27]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
   SessionStart,Compact Resume,Restore workflow context after compact
   PreToolUse,Scout Block,Block scanning of node_modules/dist/vendor
+  PreToolUse,Commit Attribution,Warn if git commit missing Co-Authored-By
   PreToolUse,Bash Safety,Block destructive system commands
   PreToolUse,Project Context,Remind to initialize project context
+  PreToolUse,Security-Critical Warnings,Tiered warnings for sensitive files
   PreToolUse,Secrets Protection,Warn about secrets in tracked files
   PostToolUse,Command Logging,Log bash commands for audit
   PostToolUse,Large File Warning,Warn about context consumption
   PostToolUse,Lint Auto-Fix,Auto-run linters after file changes
+  PostToolUse,Security Scan,Detect vulnerability patterns in written code
+  PostToolUse,Auto Test Runner,Auto-run tests during TDD phases
+  PostToolUse,Token Tracker,Estimate and warn on token usage thresholds
   PostToolUse,Feedback Capture,Capture file edit corrections
   PostToolUse,Smart Learn,Auto-learn from successful operations
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
+  UserPromptSubmit,Scope Drift Detection,Warn when conversation scope diverges
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
@@ -667,6 +834,6 @@ hooks[21]{event,name,purpose}:
 
 ---
 
-**Version:** 1.19.0
-**Last Updated:** 2026-02-09
-**Status:** Active hooks system (21 hooks)
+**Version:** 1.20.0
+**Last Updated:** 2026-02-27
+**Status:** Active hooks system (27 hooks)
