@@ -35,6 +35,20 @@ refactor/PROJID-9012-split-large-component
 
 ---
 
+## Commit & Push Confirmation (CRITICAL)
+
+**NEVER auto-commit or auto-push.** Always follow this sequence:
+
+1. Show `git diff --stat` (files to be committed)
+2. Show the proposed commit message
+3. Ask: "Ready to commit? Please confirm."
+4. **Wait for explicit user confirmation** before running `git commit`
+5. After commit, ask before `git push` separately
+
+This applies to ALL commits — workflow phases, bug fixes, documentation updates. No exceptions.
+
+---
+
 ## Commit Messages
 
 ### Format

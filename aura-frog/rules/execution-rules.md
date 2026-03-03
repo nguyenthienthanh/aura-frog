@@ -100,13 +100,20 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 | 5 | **Skip auto-continue phases entirely** | Phases must execute and show deliverables |
 | 6 | **Skip confirmation for destructive actions** | Safety first |
 
+### Git Operations (CRITICAL)
+
+| # | Rule | Why |
+|---|------|-----|
+| 7 | **Auto-commit without explicit user confirmation** | User must review staged changes and approve before `git commit` runs. Show files + message, then ask. |
+| 8 | **Auto-push without explicit user confirmation** | User must approve before `git push` runs. Never push silently. |
+| 9 | **Commit credentials/tokens** | Security risk |
+| 10 | **Push to main/master without approval** | Critical branch protection |
+
 ### External Systems
 
 | # | Rule | Why |
 |---|------|-----|
-| 7 | **Write to external systems without confirmation** | Side effects need approval |
-| 8 | **Commit credentials/tokens** | Security risk |
-| 9 | **Push to main/master without approval** | Critical branch protection |
+| 11 | **Write to external systems without confirmation** | Side effects need approval |
 
 ### Code Quality
 
@@ -278,6 +285,8 @@ At 150K tokens (75% of 200K):
 
 ### NEVER Checklist
 ```
+□ Auto-commit without user confirmation (show files + message, ask first)
+□ Auto-push without user confirmation (never push silently)
 □ Skip context loading
 □ Skip auto-continue phases (must execute & show deliverables)
 □ Ignore approval gates at Phase 2 & 5b
