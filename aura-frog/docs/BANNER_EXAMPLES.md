@@ -1,6 +1,6 @@
 # Banner Examples Reference
 
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Purpose:** Full banner examples for all scenarios. Core rule: `rules/agent-identification-banner.md`
 
 ---
@@ -8,7 +8,7 @@
 ## Single Agent (Default)
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Architecting greatness                               ┃
@@ -18,7 +18,7 @@
 ## General Conversation (No Workflow)
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Ready to rock                                       ┃
@@ -28,7 +28,7 @@
 ## With MCP Server (Single)
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: ui-expert │ Phase: -                            ┃
 ┃ Model: Opus 4.6 │ Teams: ✓ │ 🔌 MCP: context7           ┃
 ┃ 🔥 Fetching React docs                                 ┃
@@ -38,7 +38,7 @@
 ## With Multiple MCPs
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: ui-expert │ Phase: 5b - TDD GREEN               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✗ │ 🔌 MCP: context7, vitest  ┃
 ┃ 🔥 Building with tests                                 ┃
@@ -48,7 +48,7 @@
 ## Multi-Agent Collaboration
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agents: qa-automation + security-expert                ┃
 ┃ Phase: 6 - Review │ Teams: ✓ enabled                    ┃
 ┃ Model: Opus 4.6 │ 🔥 Eagle eyes on                      ┃
@@ -58,7 +58,7 @@
 ## Team Lead Banner (Agent Teams)
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: architect │ Phase: 2 - Design                    ┃
 ┃ Teams: ✓ (3 active) │ ui-expert, qa-automation          ┃
 ┃ Model: Opus 4.6 │ 🔥 Team assemble                       ┃
@@ -68,7 +68,7 @@
 ## Teammate Banner (Agent Teams)
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Teammate: qa-automation │ Lead: architect               ┃
 ┃ Phase: 5a - TDD RED │ Role: Lead                        ┃
 ┃ Teams: ✓ │ Model: Sonnet 4.5 │ 🔥 Tests first always     ┃
@@ -78,7 +78,7 @@
 ## Phase Transition
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Architecting greatness                               ┃
@@ -92,7 +92,7 @@ Starting technical design for [feature]...
 ## E2E Testing with Playwright MCP
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: qa-automation │ Phase: 7 - Verify               ┃
 ┃ Model: Opus 4.6 │ Teams: ✓ │ 🔌 MCP: playwright          ┃
 ┃ 🔥 Testing login flow                                  ┃
@@ -102,7 +102,7 @@ Starting technical design for [feature]...
 ## TDD Phase
 
 ```
-⚡ 🐸 AURA FROG v1.20.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: architect │ Phase: 5a - TDD RED                 ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                   ┃
 ┃ 🔥 Tests first, always                                  ┃
@@ -146,4 +146,4 @@ Starting technical design for [feature]...
 
 ---
 
-**Version:** 1.20.0
+**Version:** 1.20.1

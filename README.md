@@ -10,7 +10,7 @@
 
 Transform Claude Code into a **structured AI development platform** with specialized agents, enforced TDD workflows, real multi-agent orchestration, self-improving learning, and auto model routing.
 
-[![Version](https://img.shields.io/badge/version-1.20.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.20.1-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -215,7 +215,7 @@ User: "Implement user profile screen"
 4. workflow-orchestrator   → Executes 9-phase workflow
 ```
 
-**v1.20.0:** Heavy skills (`framework-expert`, `seo-bundle`, `testing-patterns`, `learning-analyzer`) now run with `context: fork` to protect main context window.
+**v1.20.1:** Heavy skills (`framework-expert`, `seo-bundle`, `testing-patterns`, `learning-analyzer`) now run with `context: fork` to protect main context window.
 
 ---
 
@@ -311,7 +311,7 @@ aura-frog/
 
 ---
 
-## What's New in v1.20.0
+## What's New in v1.20.1
 
 | Change | Impact |
 |--------|--------|

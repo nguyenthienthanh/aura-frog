@@ -1,6 +1,6 @@
 # MCP Integration Guide
 
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Purpose:** How to use bundled MCP servers and create your own
 
 ---
@@ -469,4 +469,4 @@ async function getCachedData(key: string) {
 
 ---
 
-**Version:** 1.20.0 | **Last Updated:** 2026-01-07
+**Version:** 1.20.1 | **Last Updated:** 2026-01-07

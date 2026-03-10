@@ -4,6 +4,18 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.20.1] - 2026-03-10
+
+### Log Cleanup Command
+
+#### Added
+- **`logs:cleanup` command** - Clean old log files, workflow data, and session artifacts older than X days. Supports `--dry-run` preview mode. Default threshold: 30 days
+
+#### Stats
+- Commands: 91 → 92 (+1: logs:cleanup)
+
+---
+
 ## [1.20.0] - 2026-02-27
 
 ### Best Practices Enforcement & Hook Optimizations

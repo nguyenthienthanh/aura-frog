@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.20.0
+**Version:** 1.20.1
 
 ---
 
@@ -218,7 +218,7 @@ ios/Pods
 
 ---
 
-### 1b. PreToolUse - Commit Attribution (NEW in 1.20.0)
+### 1b. PreToolUse - Commit Attribution (NEW in 1.20.1)
 **When:** Before any Bash tool execution containing `git commit`
 
 **Actions:**
@@ -276,7 +276,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 3b. PreToolUse - Security-Critical Warnings (NEW in 1.20.0)
+### 3b. PreToolUse - Security-Critical Warnings (NEW in 1.20.1)
 **When:** Before Write or Edit to security-sensitive files
 
 **Actions:**
@@ -378,7 +378,7 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 ---
 
-### 7b. PostToolUse - Security Scan (NEW in 1.20.0)
+### 7b. PostToolUse - Security Scan (NEW in 1.20.1)
 **When:** After Write or Edit tool completes (async)
 
 **Actions:**
@@ -409,7 +409,7 @@ Hook: 🟡 Security scan: 2 issue(s) in users.ts
 
 ---
 
-### 7c. PostToolUse - Auto Test Runner (NEW in 1.20.0)
+### 7c. PostToolUse - Auto Test Runner (NEW in 1.20.1)
 **When:** After Write or Edit during TDD phases (5a, 5b, 5c) - async
 
 **Actions:**
@@ -440,7 +440,7 @@ Hook: ✅ Auto-test (vitest): Tests: 23 passed | Duration: 1.2s
 
 ---
 
-### 7d. PostToolUse - Token Tracker (NEW in 1.20.0)
+### 7d. PostToolUse - Token Tracker (NEW in 1.20.1)
 **When:** After any tool execution (async)
 
 **Actions:**
@@ -518,7 +518,7 @@ Hook: 🟠 Token usage: ~145K / 200K (72%) [HIGH]
 
 ---
 
-### 8b. UserPromptSubmit - Scope Drift Detection (NEW in 1.20.0)
+### 8b. UserPromptSubmit - Scope Drift Detection (NEW in 1.20.1)
 **When:** Every user prompt submission (async)
 
 **Actions:**
@@ -608,7 +608,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.20.0)
+### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.20.1)
 **When:** A teammate has no remaining tasks (Agent Teams mode only)
 
 **Actions:**
@@ -623,7 +623,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10c. TaskCompleted - Task Completion Validator (NEW in 1.20.0)
+### 10c. TaskCompleted - Task Completion Validator (NEW in 1.20.1)
 **When:** A teammate marks a task as done (Agent Teams mode only)
 
 **Actions:**
@@ -659,7 +659,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11b. PreCompact - Pre-Compact State Save (NEW in 1.20.0)
+### 11b. PreCompact - Pre-Compact State Save (NEW in 1.20.1)
 **When:** Before Claude auto-compacts context
 
 **Actions:**
@@ -834,6 +834,6 @@ hooks[27]{event,name,purpose}:
 
 ---
 
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Last Updated:** 2026-02-27
 **Status:** Active hooks system (27 hooks)

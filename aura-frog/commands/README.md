@@ -1,6 +1,6 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2026-02-09
 
@@ -38,7 +38,7 @@ commands/
 ├── deploy/             # Deployment & CI/CD (3 commands)
 ├── design/             # Design workflows (2 commands)
 ├── learn/              # Learning system (5 commands)
-├── logs/               # Log analysis (1 command)
+├── logs/               # Log operations (2 commands)
 ├── mcp/                # MCP server management (1 command)
 ├── monitor/            # Monitoring setup (2 commands)
 ├── perf/               # Performance optimization (4 commands)
@@ -64,7 +64,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[91]{category,command,file,description}:
+commands[92]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -88,6 +88,7 @@ commands[91]{category,command,file,description}:
   learn,learn:analyze,learn/analyze.md,Run pattern analysis
   learn,learn:apply,learn/apply.md,Apply learned improvements
   logs,logs:analyze,logs/analyze.md,Analyze log files
+  logs,logs:cleanup,logs/cleanup.md,Clean old log files and workflow data
   mcp,mcp:status,mcp/status.md,Show MCP server status
   monitor,monitor:setup,monitor/setup.md,Setup monitoring
   monitor,monitor:errors,monitor/errors.md,Monitor error tracking
@@ -181,13 +182,13 @@ stats[22]{category,count}:
   design,2
   monitor,2
   setup,2
-  logs,1
+  logs,2
   mcp,1
   plan,1
   review,1
   skill,1
   standalone,4
-  total,91
+  total,92
 ```
 
 ---
@@ -238,4 +239,4 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-**Version:** 1.20.0 | **Format:** TOON
+**Version:** 1.20.1 | **Format:** TOON

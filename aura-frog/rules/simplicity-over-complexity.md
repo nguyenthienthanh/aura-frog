@@ -2,7 +2,7 @@
 
 **Category:** Code Quality & Architecture
 **Priority:** Critical
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Applies To:** All phases, especially Phase 2 (Design), Phase 5b (Implementation), Phase 5c (Refactor)
 
 ---
@@ -109,4 +109,4 @@ checklist[5]{question,if_no}:
 
 ---
 
-**Version:** 1.20.0 | **Replaces:** yagni-principle.md + dry-with-caution.md + kiss-avoid-over-engineering.md
+**Version:** 1.20.1 | **Replaces:** yagni-principle.md + dry-with-caution.md + kiss-avoid-over-engineering.md

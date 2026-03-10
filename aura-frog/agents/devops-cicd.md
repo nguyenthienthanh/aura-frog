@@ -471,6 +471,6 @@ When working as a teammate, devops-cicd claims:
 ---
 
 **Agent:** devops-cicd
-**Version:** 1.20.0
+**Version:** 1.20.1
 **Last Updated:** 2026-02-14
 **Status:** ✅ Active
