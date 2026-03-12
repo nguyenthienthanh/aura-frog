@@ -1,7 +1,7 @@
 # Skill: Smart Phase Skipping
 
 **Category:** Workflow Optimization
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Used By:** pm-operations-orchestrator, workflow-orchestrator
 
 ---
@@ -16,12 +16,12 @@ Intelligently skip workflow phases that don't apply to the current task context.
 
 | Condition | Skip Phases | Reason |
 |-----------|-------------|--------|
-| Backend-only task | Phase 3 (UI) | No UI to design |
-| Prototype/POC requested | Phase 4, 5a | Quick validation |
-| "No tests" explicitly stated | Phase 4, 5a | User preference |
-| Bug fix (small) | Phase 2, 3, 4 | Direct to implementation |
-| Documentation only | Phase 3, 4, 5 | No code changes |
-| Config change only | Phase 2, 3, 4, 5a | Simple update |
+| Backend-only task | (none - no UI phase to skip) | All 5 phases apply |
+| Prototype/POC requested | Phase 2, Phase 4 | Quick validation |
+| "No tests" explicitly stated | Phase 2 | User preference |
+| Bug fix (small) | Phase 4 | Direct fix + test |
+| Documentation only | Phase 2, 3, 4 | No code changes |
+| Config change only | Phase 2, 4 | Simple update |
 
 ---
 
@@ -60,12 +60,11 @@ Based on your task: **[task description]**
 **Detected context:** Backend-only API endpoint
 
 **Proposed workflow:**
-- Phase 1: Understand ✅
-- Phase 2: Design ✅
-- Phase 3: UI Breakdown ⏭️ *Skipped (no UI)*
-- Phase 4: Plan Tests ✅
-- Phase 5: Implementation ✅
-- Phase 6-9: Review → Document ✅
+- Phase 1: Understand + Design ✅
+- Phase 2: Test RED ✅
+- Phase 3: Build GREEN ✅
+- Phase 4: Refactor + Review ✅
+- Phase 5: Finalize ✅
 
 **Approve this workflow?** (or request changes)
 ```
@@ -75,36 +74,30 @@ Based on your task: **[task description]**
 ## 4. Skip Combinations
 
 ### Full Workflow (Default)
-All 9 phases - complex features with UI
-
-### Backend Feature
-```
-Phase 1 → Phase 2 → Phase 4 → Phase 5 → Phase 6-9
-Skip: Phase 3 (UI)
-```
+All 5 phases - complex features
 
 ### Quick Prototype
 ```
-Phase 1 → Phase 2 → Phase 5b → Phase 6
-Skip: Phase 3, 4, 5a, 5c, 7, 8, 9
+Phase 1 → Phase 3 → Phase 5
+Skip: Phase 2 (Tests), Phase 4 (Refactor + Review)
 ```
 
 ### Bug Fix
 ```
-Phase 1 (brief) → Phase 5b → Phase 6 → Phase 7
-Skip: Phase 2, 3, 4, 5a, 5c, 8, 9
+Phase 1 (brief) → Phase 2 → Phase 3 → Phase 5
+Skip: Phase 4 (Refactor + Review)
 ```
 
 ### Documentation Only
 ```
-Phase 1 → Phase 8 → Phase 9
-Skip: Phase 2-7
+Phase 1 → Phase 5
+Skip: Phase 2, 3, 4 (no code changes)
 ```
 
 ### Config/Environment
 ```
-Phase 1 → Phase 5b → Phase 7
-Skip: Phase 2, 3, 4, 5a, 5c, 6, 8, 9
+Phase 1 → Phase 3 → Phase 5
+Skip: Phase 2 (Tests), Phase 4 (Refactor + Review)
 ```
 
 ---
@@ -112,30 +105,26 @@ Skip: Phase 2, 3, 4, 5a, 5c, 6, 8, 9
 ## 5. Override Rules
 
 User can always override:
-- "Include tests" → Re-enable Phase 4, 5a
+- "Include tests" → Re-enable Phase 2
 - "Full workflow" → No skipping
-- "Skip review" → Skip Phase 6 (not recommended)
+- "Skip review" → Skip Phase 4 (not recommended)
 
 ---
 
 ## 6. Decision Tree
 
 ```
-Is there UI involved?
-├── No → Skip Phase 3
-└── Yes → Include Phase 3
-
 Is this a prototype/POC?
-├── Yes → Skip Phase 4, 5a
-└── No → Include tests
+├── Yes → Skip Phase 2, Phase 4
+└── No → Continue
 
 Is this a simple bug fix?
-├── Yes → Skip Phase 2, 3, 4
-└── No → Full planning
+├── Yes → Skip Phase 4
+└── No → Continue
 
 Is this documentation only?
-├── Yes → Jump to Phase 8
-└── No → Continue workflow
+├── Yes → Jump to Phase 5
+└── No → Full workflow
 ```
 
 ---
@@ -147,10 +136,9 @@ Is this documentation only?
 
 **Task:** Add user authentication API
 **Skipped Phases:**
-- Phase 3 (UI Breakdown): No UI components in scope
-- Phase 5c (Refactor): Deferred to tech debt sprint
+- Phase 4 (Refactor + Review): Deferred to tech debt sprint
 
-**Rationale:** Backend-only feature, clean implementation
+**Rationale:** Clean implementation, no refactoring needed
 ```
 
 ---
@@ -161,16 +149,16 @@ Is this documentation only?
 - Confirm skip decisions with user
 - Log skipped phases with reasons
 - Allow user override
-- Maintain minimum quality (Phase 6, 7)
+- Maintain minimum quality (Phase 4)
 - Re-evaluate if scope changes
 
 ### Don'ts
 - Skip Phase 1 (always understand first)
-- Skip Phase 6 for production code
+- Skip Phase 4 for production code
 - Auto-skip without user awareness
 - Skip tests without explicit request
 - Skip documentation for public APIs
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28
+**Version:** 2.0.0 | **Last Updated:** 2026-03-12

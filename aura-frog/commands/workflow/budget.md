@@ -30,7 +30,7 @@ workflow:budget
 📊 Token Budget - Workflow: "auth-jwt-implementation"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Current Phase: 5b (Build) - 65% complete
+Current Phase: 3 (Build GREEN) - 65% complete
 
 ┌─────────────────────────────────────────────────────────┐
 │  Token Usage Overview                                   │
@@ -53,17 +53,11 @@ Phase-by-Phase Breakdown:
 ┌──────┬──────────────┬────────────┬────────────┬────────┐
 │Phase │ Name         │ Predicted  │ Actual     │ Status │
 ├──────┼──────────────┼────────────┼────────────┼────────┤
-│  1   │ Understand   │ 7.0K       │ 6.8K       │ ✅ -3% │
-│  2   │ Design       │ 11.2K      │ 12.1K      │ ✅ +8% │
-│  3   │ UI Breakdown │ 8.4K       │ 8.0K       │ ✅ -5% │
-│  4   │ Plan Tests   │ 9.8K       │ 10.3K      │ ✅ +5% │
-│  5a  │ Write Tests  │ 16.8K      │ 17.5K      │ ✅ +4% │
-│ *5b  │ Build        │ 126.0K     │ 43.7K (est)│ 🔄 IP  │
-│  5c  │ Polish       │ 21.0K      │ -          │ ⏳ Pend│
-│  6   │ Review       │ 11.2K      │ -          │ ⏳ Pend│
-│  7   │ Verify       │ 8.4K       │ -          │ ⏳ Pend│
-│  8   │ Document     │ 14.0K      │ -          │ ⏳ Pend│
-│  9   │ Share        │ 2.8K       │ -          │ ⏳ Pend│
+│  1   │ Understand+Design │ 3.5K    │ 3.4K       │ ✅ -3% │
+│  2   │ Test RED          │ 1.5K    │ 1.6K       │ ✅ +7% │
+│ *3   │ Build GREEN       │ 126.0K  │ 43.7K (est)│ 🔄 IP  │
+│  4   │ Refactor+Review   │ 1.5K    │ -          │ ⏳ Pend│
+│  5   │ Finalize          │ 0.8K    │ -          │ ⏳ Pend│
 └──────┴──────────────┴────────────┴────────────┴────────┘
 
 * Currently in progress
@@ -73,8 +67,8 @@ Phase-by-Phase Breakdown:
 📈 Projection:
 
   Completed: 98,450 tokens
-  Phase 5b remaining (est): 39,000 tokens
-  Phases 5c-9 (predicted): 57,200 tokens
+  Phase 3 remaining (est): 39,000 tokens
+  Phases 4-5 (predicted): 2,300 tokens
   ────────────────────────────────────
   Total projected: 194,650 tokens
 
@@ -88,22 +82,21 @@ Phase-by-Phase Breakdown:
   ⚠️ WARNING: Projected to use 97% of session limit
 
   💡 Suggested Actions:
-     1. Continue current phase (Phase 5b)
-     2. Complete Phase 5c (Polish)
-     3. Run workflow:handoff after Phase 5c
-     4. Resume in new session for Phases 6-9
+     1. Continue current phase (Phase 3)
+     2. Complete Phase 4 (Refactor + Review)
+     3. Run workflow:handoff after Phase 4
+     4. Resume in new session for Phase 5
 
   Alternative:
-     • Skip Phase 5c polish (save ~21K tokens)
-     • Complete through Phase 9 in this session
+     • Complete through Phase 5 in this session
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📍 Checkpoints:
 
   ✅ checkpoint-1: Phase 2 complete (26K tokens)
-  ✅ checkpoint-2: Phase 4 complete (46K tokens)
-  ✅ checkpoint-3: Phase 5a complete (64K tokens)
+  ✅ checkpoint-2: Phase 2 complete (46K tokens)
+  ✅ checkpoint-3: Phase 3 start (64K tokens)
   🔄 checkpoint-4: Auto-save at 100K tokens (upcoming)
 
   Last checkpoint: 30 minutes ago

@@ -447,7 +447,7 @@ CREATE TRIGGER trigger_update_knowledge_usage
 -- Seed some baseline knowledge
 INSERT INTO af_knowledge_base (knowledge_type, title, content, context, tags, priority)
 VALUES
-  ('tip', 'Use TDD workflow for new features', 'The 9-phase TDD workflow ensures comprehensive test coverage and reduces bugs in production.', 'When starting a new feature implementation', ARRAY['workflow', 'tdd', 'testing'], 80),
+  ('tip', 'Use TDD workflow for new features', 'The 5-phase TDD workflow ensures comprehensive test coverage and reduces bugs in production.', 'When starting a new feature implementation', ARRAY['workflow', 'tdd', 'testing'], 80),
   ('tip', 'Agent detector runs first', 'The smart-agent-detector skill runs before any other processing to ensure the right agent handles the task.', 'Understanding skill priority', ARRAY['agents', 'skills', 'priority'], 70),
   ('warning', 'Avoid skipping approval gates', 'Skipping Phase 2 or 5b approval gates can lead to misaligned implementations and wasted effort.', 'During workflow execution', ARRAY['workflow', 'approval', 'gates'], 90),
   ('rule', 'Fresh verification before done', 'Always perform fresh verification before claiming a task is complete. Re-run tests, re-check requirements.', 'Before marking task complete', ARRAY['verification', 'quality', 'completion'], 85)

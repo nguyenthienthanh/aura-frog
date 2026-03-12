@@ -50,7 +50,7 @@ showApprovalPrompt({
   deliverables: phaseState.deliverables,
   successCriteria: phase.success_criteria,
   successCriteriaMet: phaseState.success_criteria_met,
-  nextPhase: currentPhase < 9 ? PHASES[currentPhase + 1] : null,
+  nextPhase: currentPhase < 5 ? PHASES[currentPhase + 1] : null,
   metrics: phaseState.summary.metrics,
 });
 ```
@@ -143,84 +143,37 @@ function showApprovalPrompt(data: ApprovalData) {
 
 ## 🎨 Phase-Specific Summaries
 
-### Phase 1: Requirements Analysis
+### Phase 1: Understand + Design
 ```typescript
 {
   description: `
-Analyzed requirements and identified scope. Key findings:
+Analyzed requirements, created architecture, and reviewed design:
 - {requirement_count} requirements identified
-- {edge_case_count} edge cases documented
-- {acceptance_criteria_count} acceptance criteria defined
-`,
-  highlights: [
-    'User stories mapped',
-    'Business rules documented',
-    'Technical constraints identified'
-  ]
-}
-```
-
-### Phase 2: Technical Planning
-```typescript
-{
-  description: `
-Created technical specification and architecture plan:
 - {component_count} components planned
 - {file_count} files to be created/modified
 - {integration_point_count} integration points identified
 `,
   highlights: [
+    'Requirements and scope defined',
     'Architecture diagram created',
     'Component hierarchy defined',
-    'API contracts specified'
+    'Design matches requirements'
   ]
 }
 ```
 
-### Phase 3: Design Review
+### Phase 2: Test RED
 ```typescript
 {
   description: `
-Reviewed design and verified alignment with requirements:
-- {design_element_count} design elements analyzed
-- {component_count} UI components mapped
-- {responsive_breakpoint_count} breakpoints considered
-`,
-  highlights: [
-    'Design matches requirements',
-    'Component library usage verified',
-    'Accessibility considerations noted'
-  ]
-}
-```
-
-### Phase 4: Test Planning
-```typescript
-{
-  description: `
-Created comprehensive test plan:
+Test plan created and failing tests written (TDD RED):
 - {test_case_count} test cases planned
-- {test_type_count} test types (unit, integration, E2E)
-- Target coverage: {coverage_target}%
-`,
-  highlights: [
-    'Happy path scenarios covered',
-    'Error cases identified',
-    'Edge cases planned'
-  ]
-}
-```
-
-### Phase 5a: Write Tests (RED)
-```typescript
-{
-  description: `
-Tests written following TDD RED phase:
 - {test_file_count} test files created
 - {test_count} tests written
 - {failed_count} tests failing (expected) 🔴
 `,
   highlights: [
+    'Test strategy defined',
     'Tests cover all requirements',
     'Tests are executable',
     'Ready for implementation'
@@ -228,7 +181,7 @@ Tests written following TDD RED phase:
 }
 ```
 
-### Phase 5b: Implementation (GREEN)
+### Phase 3: Build GREEN
 ```typescript
 {
   description: `
@@ -246,86 +199,37 @@ Implementation complete, tests passing:
 }
 ```
 
-### Phase 5c: Refactor (REFACTOR)
+### Phase 4: Refactor + Review
 ```typescript
 {
   description: `
-Code refactored and improved:
+Code refactored, reviewed, and validated:
 - Complexity reduced by {complexity_improvement}%
-- Duplication reduced by {duplication_improvement}%
-- {test_count} tests still passing ♻️
+- {file_count} files reviewed
+- {test_count} tests passed ✅
+- Coverage: {coverage}% (threshold: {threshold}%)
+- Code quality score: {quality_score}/10
 `,
   highlights: [
     'Code quality improved',
     'No behavior changes',
-    'Tests still pass'
+    'All tests still pass',
+    'Coverage meets threshold'
   ]
 }
 ```
 
-### Phase 6: Code Review
+### Phase 5: Finalize
 ```typescript
 {
   description: `
-Code review complete:
-- {file_count} files reviewed
-- {issue_count} issues found (all resolved)
-- Code quality score: {quality_score}/10
-`,
-  highlights: [
-    'Follows coding standards',
-    'No code smells',
-    'Documentation adequate'
-  ]
-}
-```
-
-### Phase 7: QA Validation
-```typescript
-{
-  description: `
-QA validation complete:
-- {test_count} tests passed ✅
-- Coverage: {coverage}% (threshold: {threshold}%)
-- {manual_test_count} manual tests passed
-- No critical bugs found
-`,
-  highlights: [
-    'All tests passing',
-    'Coverage meets threshold',
-    'Ready for deployment'
-  ]
-}
-```
-
-### Phase 8: Documentation
-```typescript
-{
-  description: `
-Documentation complete:
+Documentation complete and notifications sent:
 - {doc_count} documentation files created
-- Confluence page prepared
-- Change log updated
-- Migration guide (if needed)
-`,
-  highlights: [
-    'Implementation documented',
-    'API changes noted',
-    'Usage examples provided'
-  ]
-}
-```
-
-### Phase 9: Notification
-```typescript
-{
-  description: `
-Notifications sent and workflow complete:
 - JIRA ticket updated: {jira_ticket}
-- Confluence page created: {confluence_url}
 - Slack notifications sent: {channel_count} channel(s)
 `,
   highlights: [
+    'Implementation documented',
     'Stakeholders notified',
     'Documentation linked',
     'Workflow closed'

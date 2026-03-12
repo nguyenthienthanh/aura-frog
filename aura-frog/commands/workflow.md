@@ -34,7 +34,7 @@ Unified workflow command with interactive subcommand selection. Replaces 22+ ind
 
 | Subcommand | Description | Example |
 |------------|-------------|---------|
-| `start <task>` | Start new 9-phase workflow | `/workflow start "Add login"` |
+| `start <task>` | Start new 5-phase workflow | `/workflow start "Add login"` |
 | `fasttrack <specs>` | Fast-track with pre-approved specs | `/workflow fasttrack "See specs.md"` |
 | `status` | Show current workflow status | `/workflow status` |
 | `next` | Continue to next phase | `/workflow next` |
@@ -45,18 +45,12 @@ Unified workflow command with interactive subcommand selection. Replaces 22+ ind
 
 | Subcommand | Description | Example |
 |------------|-------------|---------|
-| `phase <n>` | Jump to specific phase | `/workflow phase 4` |
-| `phase:1` | Requirements gathering | `/workflow phase:1` |
-| `phase:2` | Design (approval gate) | `/workflow phase:2` |
-| `phase:3` | Test planning | `/workflow phase:3` |
-| `phase:4` | Implementation | `/workflow phase:4` |
-| `phase:5a` | RED tests | `/workflow phase:5a` |
-| `phase:5b` | GREEN implementation (approval gate) | `/workflow phase:5b` |
-| `phase:5c` | Code review | `/workflow phase:5c` |
-| `phase:6` | REFACTOR | `/workflow phase:6` |
-| `phase:7` | Documentation | `/workflow phase:7` |
-| `phase:8` | Integration | `/workflow phase:8` |
-| `phase:9` | Deployment | `/workflow phase:9` |
+| `phase <n>` | Jump to specific phase | `/workflow phase 3` |
+| `phase:1` | Understand + Design (approval gate) | `/workflow phase:1` |
+| `phase:2` | Test RED | `/workflow phase:2` |
+| `phase:3` | Build GREEN (approval gate) | `/workflow phase:3` |
+| `phase:4` | Refactor + Review | `/workflow phase:4` |
+| `phase:5` | Finalize | `/workflow phase:5` |
 
 ### Session Management
 
@@ -84,7 +78,7 @@ When called without subcommand, shows:
 ```
 🔄 Workflow Commands
 
-Current: Phase 4 - Implementation (65% complete)
+Current: Phase 3 - Build GREEN (65% complete)
 
 Quick Actions:
   [1] Continue to next phase
@@ -105,24 +99,18 @@ Select [1-8] or type command:
 
 ---
 
-## 9-Phase Workflow Summary
+## 5-Phase Workflow Summary
 
 ```toon
-phases[9]{phase,name,approval,auto_continue}:
-  1,Requirements,No,Yes
-  2,Design,YES (Gate 1),No - Wait for approval
-  3,Test Planning,No,Yes
-  4,Implementation,No,Yes
-  5a,RED Tests,No,Yes
-  5b,GREEN Code,YES (Gate 2),No - Wait for approval
-  5c,Code Review,No,Yes
-  6,REFACTOR,No,Yes
-  7,Documentation,No,Yes
-  8,Integration,No,Yes
-  9,Deployment,No,Yes
+phases[5]{phase,name,approval,auto_continue}:
+  1,Understand + Design,YES (Gate 1),No - Wait for approval
+  2,Test RED,No,Yes
+  3,Build GREEN,YES (Gate 2),No - Wait for approval
+  4,Refactor + Review,No,Yes
+  5,Finalize,No,Auto-complete
 ```
 
-**Only 2 Approval Gates:** Phase 2 (Design) and Phase 5b (Implementation)
+**Only 2 Approval Gates:** Phase 1 (Understand + Design) and Phase 3 (Build GREEN)
 
 ---
 
@@ -132,14 +120,13 @@ phases[9]{phase,name,approval,auto_continue}:
 ## 🔄 Workflow Status
 
 **Task:** Build user authentication
-**Phase:** 4 - Implementation
+**Phase:** 3 - Build GREEN
 **Progress:** ████████░░ 65%
 
 ### Phase History
-- ✅ Phase 1: Requirements (completed)
-- ✅ Phase 2: Design (approved)
-- ✅ Phase 3: Test Planning (completed)
-- 🔄 Phase 4: Implementation (in progress)
+- ✅ Phase 1: Understand + Design (approved)
+- ✅ Phase 2: Test RED (completed)
+- 🔄 Phase 3: Build GREEN (in progress)
 
 ### Current Deliverables
 - [ ] auth.service.ts

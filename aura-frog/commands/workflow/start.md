@@ -22,11 +22,12 @@ workflow:start "Implement JWT authentication" # → impl-jwt-0122
 ## Workflow
 
 ```toon
-steps[4]{step,action}:
+steps[5]{step,action}:
   1. Initialize,Generate workflow ID + create state file
   2. Detect,Identify project type + activate relevant agents
-  3. Analyze,Execute Phase 1 Requirements Analysis
-  4. Gate,Show approval prompt for Phase 2
+  3. Challenge,Question requirements before analysis (Standard/Deep only - see rules/requirement-challenger.md)
+  4. Analyze,Execute Phase 1 Requirements Analysis
+  5. Gate,Show approval prompt for Phase 2
 ```
 
 ---

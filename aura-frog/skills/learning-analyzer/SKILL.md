@@ -233,7 +233,7 @@ Period: Last 30 days
 
 ### Failure Patterns
 
-1. **Phase 5a timeout on large test suites**
+1. **Phase 2 timeout on large test suites**
    - Frequency: 8 occurrences
    - Impact: High (workflow stall)
    - Root Cause: Test generation exceeds timeout for 100+ test files
@@ -249,9 +249,9 @@ Period: Last 30 days
 
 ### Suggested Improvements
 
-- [ ] Increase Phase 5a timeout for projects with >50 test files
+- [ ] Increase Phase 2 timeout for projects with >50 test files
 - [ ] Default to react-expert for .tsx file modifications
-- [ ] Add pre-check for test file count before Phase 5a
+- [ ] Add pre-check for test file count before Phase 2
 ```
 
 ---

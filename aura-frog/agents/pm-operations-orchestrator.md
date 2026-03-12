@@ -17,7 +17,7 @@ Central coordinator managing the entire development workflow from ticket intake 
 
 | Responsibility | Description |
 |----------------|-------------|
-| Workflow Orchestration | Manage 9-phase development lifecycle |
+| Workflow Orchestration | Manage 5-phase development lifecycle |
 | Agent Coordination | Assign tasks, track progress, resolve conflicts |
 | Approval Gate Management | Enforce human review at each phase |
 | Context Management | Maintain conversation state, decisions, blockers |
@@ -70,21 +70,15 @@ Central coordinator managing the entire development workflow from ticket intake 
 
 ---
 
-## 9-Phase Workflow Overview
+## 5-Phase Workflow Overview
 
 | Phase | Name | Lead Agent | Deliverables |
 |-------|------|------------|--------------|
-| 1 | Requirement Analysis 📋 | pm-operations-orchestrator | requirements.md, user_stories.md, acceptance_criteria.md |
-| 2 | Technical Planning 🏗️ | architect | tech_spec.md, architecture_diagram, data_models.md |
-| 3 | Design Review 🎨 | ui-expert | component_breakdown.md, design_tokens.md, ui_flow.md |
-| 4 | Test Planning 🧪 | qa-automation | test_plan.md, test_cases.md, automation_strategy.md |
-| 5a | Write Tests 🔴 | qa-automation + Dev | Failing tests (TDD RED) |
-| 5b | Implement 🟢 | Dev agent | Source code (TDD GREEN) |
-| 5c | Refactor ♻️ | Dev agent | Optimized code (TDD REFACTOR) |
-| 6 | Code Review 👀 | All reviewers | code_review_report.md |
-| 7 | QA Validation ✅ | qa-automation | test_execution_report.md, coverage_report |
-| 8 | Documentation 📚 | pm-operations-orchestrator | implementation_summary.md, deployment_guide.md |
-| 9 | Notification 🔔 | pm-operations-orchestrator | Slack notifications, JIRA update |
+| 1 | Understand + Design 📋🏗️🎨 | pm-operations-orchestrator + architect + ui-expert | requirements.md, tech_spec.md, architecture_diagram, component_breakdown.md |
+| 2 | Test RED 🔴 | qa-automation + Dev | test_plan.md, test_cases.md, failing tests (TDD RED) |
+| 3 | Build GREEN 🟢 | Dev agent | Source code (TDD GREEN) |
+| 4 | Refactor + Review ♻️👀 | Dev agent + All reviewers | Optimized code, code_review_report.md, test_execution_report.md |
+| 5 | Finalize 📚🔔 | pm-operations-orchestrator | implementation_summary.md, deployment_guide.md, notifications |
 
 **Full Phase Details:** See `docs/phases/` for detailed phase guides
 
@@ -348,7 +342,7 @@ SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase [N] c
 SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase [N] complete")
 
 // Spawn new teammate set for next phase (repeat Steps 2-4)
-// Single-agent phases (7, 8, 9): lead works alone, no teammates needed
+// Single-agent phases (5): lead works alone, no teammates needed
 ```
 
 ### Team Lead Responsibilities
@@ -367,14 +361,14 @@ team_lead_duties[6]{duty,description}:
 
 ```toon
 active_agents[10]{agent,role,phases}:
-  pm-operations-orchestrator,Lead/Coordinator,1+8+9
-  architect,System design + backend + database,2+4+5a+5b+5c+6
-  ui-expert,Frontend + design systems,2+3+5b
-  mobile-expert,React Native + Flutter,3+5b (mobile projects)
+  pm-operations-orchestrator,Lead/Coordinator,1+5
+  architect,System design + backend + database,1+2+3+4
+  ui-expert,Frontend + design systems,1+3
+  mobile-expert,React Native + Flutter,1+3 (mobile projects)
   game-developer,Godot game dev,All phases (game projects)
-  qa-automation,Testing + QA,1+4+5a+5b+6+7
-  security-expert,Security audits,6
-  devops-cicd,CI/CD + infrastructure,5b+5c+8+9
+  qa-automation,Testing + QA,1+2+3+4
+  security-expert,Security audits,4
+  devops-cicd,CI/CD + infrastructure,3+4+5
   smart-agent-detector,Agent selection,N/A (detection only)
   project-manager,Project context,N/A (context only)
 ```
@@ -387,7 +381,7 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 
 ## Related Documentation
 
-- **Phase Guides:** `docs/phases/phase-1-understand.md` through `phase-9-notification.md`
+- **Phase Guides:** `docs/phases/` (Phase 1 through Phase 5)
 - **Approval Gates:** `docs/APPROVAL_GATES.md`
 - **Agent Selection:** `docs/AGENT_SELECTION_GUIDE.md`
 - **Workflow Skill:** `skills/workflow-orchestrator/workflow-execution.md`

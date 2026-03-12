@@ -140,7 +140,7 @@ saveApprovalData(approvalData);
 
 ## 📋 Phase-Specific Validation
 
-### Phase 1: Requirements Analysis
+### Phase 1: Understand + Design
 ```typescript
 // Validate requirements document
 const requirementsDoc = phaseState.deliverables.find(f => f.includes('requirements'));
@@ -153,10 +153,7 @@ const content = readFile(requirementsDoc);
 if (!content.includes('## Scope')) {
   throw new Error('Requirements missing scope section');
 }
-```
 
-### Phase 2: Technical Planning
-```typescript
 // Validate tech spec
 const techSpec = phaseState.deliverables.find(f => f.includes('tech-spec'));
 if (!techSpec) {
@@ -165,33 +162,23 @@ if (!techSpec) {
 
 // Check for required sections
 const requiredSections = ['Architecture', 'Components', 'File Changes'];
-const content = readFile(techSpec);
+const techContent = readFile(techSpec);
 
 for (const section of requiredSections) {
-  if (!content.includes(`## ${section}`)) {
+  if (!techContent.includes(`## ${section}`)) {
     throw new Error(`Tech spec missing section: ${section}`);
   }
 }
 
 // DIAGRAM REQUIREMENT: Check for Mermaid diagrams
-const hasDiagram = content.includes('```mermaid');
+const hasDiagram = techContent.includes('```mermaid');
 if (!hasDiagram) {
   console.warn('⚠️  DIAGRAM REQUIRED: Tech spec should include architecture diagram');
   console.warn('   See rules/diagram-requirements.md for requirements');
-  // Not blocking, but warning
 }
 ```
 
-### Phase 3: Design Review
-```typescript
-// Validate design analysis
-const designDoc = phaseState.deliverables.find(f => f.includes('design'));
-if (!designDoc) {
-  throw new Error('Design review document not generated');
-}
-```
-
-### Phase 4: Test Planning
+### Phase 2: Test RED
 ```typescript
 // Validate test plan
 const testPlan = phaseState.deliverables.find(f => f.includes('test-plan'));
@@ -208,10 +195,7 @@ if (testCasesCount === 0) {
 }
 
 console.log(`📝 ${testCasesCount} test case(s) planned`);
-```
 
-### Phase 5a: Write Tests (RED)
-```typescript
 // Run tests - they should FAIL
 const testResults = await runTests();
 
@@ -223,7 +207,7 @@ console.log(`🔴 ${testResults.failed} test(s) failing (expected)`);
 phaseState.test_results = testResults;
 ```
 
-### Phase 5b: Implementation (GREEN)
+### Phase 3: Build GREEN
 ```typescript
 // Run tests - they should PASS
 const testResults = await runTests();
@@ -247,9 +231,9 @@ phaseState.test_results = testResults;
 phaseState.coverage = coverage;
 ```
 
-### Phase 5c: Refactor (REFACTOR)
+### Phase 4: Refactor + Review
 ```typescript
-// Verify tests still pass
+// Verify tests still pass after refactoring
 const testResults = await runTests();
 
 if (testResults.failed > 0) {
@@ -267,10 +251,7 @@ console.log(`   - Duplication: ${improvements.duplication}`);
 console.log(`   - Maintainability: ${improvements.maintainability}`);
 
 phaseState.code_improvements = improvements;
-```
 
-### Phase 6: Code Review
-```typescript
 // Check lint results
 const lintResults = await runLinter();
 
@@ -282,35 +263,26 @@ if (lintResults.warnings > 0) {
   console.warn(`⚠️  ${lintResults.warnings} linter warning(s)`);
 }
 
-console.log(`✅ Code quality check passed`);
-phaseState.lint_results = lintResults;
-```
+// Final test run + coverage
+const finalTestResults = await runAllTests();
 
-### Phase 7: QA Validation
-```typescript
-// Final test run
-const testResults = await runAllTests();
-
-if (testResults.failed > 0) {
-  throw new Error(`QA validation failed: ${testResults.failed} test(s) failing`);
+if (finalTestResults.failed > 0) {
+  throw new Error(`QA validation failed: ${finalTestResults.failed} test(s) failing`);
 }
 
-// Final coverage check
-const coverage = await runCoverage();
-const threshold = state.context.coverage_threshold || 80;
-
-if (coverage.overall < threshold) {
-  throw new Error(`Coverage ${coverage.overall}% below threshold ${threshold}%`);
+const finalCoverage = await runCoverage();
+if (finalCoverage.overall < threshold) {
+  throw new Error(`Coverage ${finalCoverage.overall}% below threshold ${threshold}%`);
 }
 
-console.log(`✅ All tests passing (${testResults.passed})`);
-console.log(`✅ Coverage: ${coverage.overall}%`);
+console.log(`✅ All tests passing (${finalTestResults.passed})`);
+console.log(`✅ Coverage: ${finalCoverage.overall}%`);
 
-phaseState.final_test_results = testResults;
-phaseState.final_coverage = coverage;
+phaseState.final_test_results = finalTestResults;
+phaseState.final_coverage = finalCoverage;
 ```
 
-### Phase 8: Documentation
+### Phase 5: Finalize
 ```typescript
 // Validate documentation files
 const docs = phaseState.deliverables.filter(f => f.endsWith('.md'));
@@ -320,10 +292,7 @@ if (docs.length === 0) {
 }
 
 console.log(`📚 ${docs.length} documentation file(s) created`);
-```
 
-### Phase 9: Notification
-```typescript
 // Verify notifications sent
 if (state.context.jira_ticket) {
   console.log(`✅ JIRA ticket updated`);
@@ -450,7 +419,7 @@ try {
 - [ ] Timer stopped
 - [ ] Duration calculated
 - [ ] Deliverables validated
-- [ ] **Diagrams validated (Phase 2, 3, 4)** ← NEW
+- [ ] **Diagrams validated (Phase 1)** ← NEW
 - [ ] Phase-specific validation passed
 - [ ] Success criteria checked
 - [ ] Metrics collected
@@ -461,24 +430,16 @@ try {
 
 ---
 
-## 📊 Diagram Validation (Phase 2, 3, 4)
+## 📊 Diagram Validation (Phase 1)
 
 Complex phases MUST include Mermaid diagrams. See `rules/diagram-requirements.md`.
 
 ```typescript
 function validateDiagrams(phase: number, deliverables: string[]): DiagramValidation {
   const diagramRequirements = {
-    2: { // Technical Planning
-      required: ['architecture', 'sequence'],
-      message: 'Phase 2 requires architecture diagram and main flow sequence diagram'
-    },
-    3: { // UI Breakdown
-      required: ['component'],
-      message: 'Phase 3 should include component hierarchy diagram'
-    },
-    4: { // Test Planning
-      required: ['flowchart'],
-      message: 'Phase 4 should include test coverage flowchart'
+    1: { // Understand + Design
+      required: ['architecture', 'sequence', 'component'],
+      message: 'Phase 1 requires architecture diagram, sequence diagram, and component hierarchy'
     }
   };
 

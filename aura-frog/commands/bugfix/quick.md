@@ -25,17 +25,13 @@ bugfix:quick <file> <issue>
 ## 🔄 Simplified Phases
 
 ### Auto-Execute (No Approval)
-1. **Phase 1: Bug Analysis** - Auto-analyze, no approval
-2. **Phase 2: Fix Planning** - Auto-plan, no approval
+1. **Phase 1: Understand + Design** - Auto-analyze and plan, no approval
 
 ### Manual Approval Required
-3. **Phase 3: TDD RED** - Write tests → Show approval
-4. **Phase 4: TDD GREEN** - Implement → Show approval
-5. **Phase 5: TDD REFACTOR** - Refactor → Show approval
-6. **Phase 6: Code Review** - Review → Show approval
-7. **Phase 7: QA Validation** - Validate → Show approval
-8. **Phase 8: Documentation** - Document → Show approval
-9. **Phase 9: Notification** - Auto-execute
+2. **Phase 2: Test RED** - Write tests → Show approval
+3. **Phase 3: Build GREEN** - Implement → Show approval
+4. **Phase 4: Refactor + Review** - Refactor and review → Show approval
+5. **Phase 5: Finalize** - Document and notify → Auto-execute
 
 ---
 
@@ -66,11 +62,10 @@ User: bugfix:quick Login button not disabled during loading
 AI:
 🔄 Quick Bug Fix Mode
 
-Phase 1: Analyzing... ✅ (auto)
-Phase 2: Planning... ✅ (auto)
+Phase 1: Understand + Design... ✅ (auto)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ APPROVAL REQUIRED: TDD RED
+⚠️ APPROVAL REQUIRED: Test RED (Phase 2)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Tests Written
@@ -89,8 +84,7 @@ Options: "approve" → Implement fix
 | Phase | Full bugfix | Quick bugfix |
 |-------|-------------|--------------|
 | Phase 1 | 15-30 min + approval | 5-10 min (auto) |
-| Phase 2 | 20-40 min + approval | 10-15 min (auto) |
-| Phase 3-9 | Same | Same |
+| Phase 2-5 | Same | Same |
 | **Total** | 2-4 hours | 1-2 hours |
 
 **Time saved:** ~30-60 minutes ⚡

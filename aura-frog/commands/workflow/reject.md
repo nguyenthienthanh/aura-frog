@@ -161,7 +161,7 @@ Or just empty string handling?
 User: /workflow:reject Tests are not covering error scenarios properly
 
 Agent Response:
-🔄 Phase 5a rejected. Restarting with feedback...
+🔄 Phase 2 (Test RED) rejected. Restarting with feedback...
 
 Feedback: Tests are not covering error scenarios properly
 
@@ -211,7 +211,7 @@ Updates `workflow-state.json`:
 {
   "phases": {
     "2": {
-      "name": "Technical Planning",
+      "name": "Test RED",
       "status": "rejected",
       "rejected_at": "2025-11-24T15:30:00Z",
       "rejection_reason": "Should use Zustand instead of local state",

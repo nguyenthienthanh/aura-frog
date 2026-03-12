@@ -297,5 +297,5 @@ CREATE INDEX idx_post_user_id ON posts(user_id);
 
 ---
 
-**Applied in:** Phase 5c (Refactoring), Phase 6 (Code Review), Phase 7 (QA Validation)
+**Applied in:** Phase 4 (Refactor + Review)
 

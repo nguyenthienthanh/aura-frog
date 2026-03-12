@@ -127,7 +127,7 @@ saveWorkflowState(state);
 
 ## 📋 Phase-Specific Setup
 
-### Phase 1: Requirements Analysis
+### Phase 1: Understand + Design
 ```typescript
 // Load JIRA ticket if provided
 if (state.context.jira_ticket) {
@@ -140,10 +140,7 @@ if (state.context.confluence_pages) {
   const docs = await fetchConfluenceDocs(state.context.confluence_pages);
   state.context.related_docs = docs;
 }
-```
 
-### Phase 2: Technical Planning
-```typescript
 // Load codebase context
 const files = await analyzeCodebase(state.context.files_to_change);
 state.context.codebase_analysis = files;
@@ -151,10 +148,7 @@ state.context.codebase_analysis = files;
 // Load architecture patterns
 const patterns = await loadArchitecturePatterns();
 state.context.available_patterns = patterns;
-```
 
-### Phase 3: Design Review
-```typescript
 // Load Figma designs if provided
 if (state.context.figma_url) {
   const designs = await extractFigmaDesigns(state.context.figma_url);
@@ -166,7 +160,7 @@ const components = await loadUIComponentsLibrary();
 state.context.available_components = components;
 ```
 
-### Phase 4: Test Planning
+### Phase 2: Test RED
 ```typescript
 // Load existing tests
 const existingTests = await findExistingTests(state.context.files_to_change);
@@ -175,19 +169,16 @@ state.context.existing_tests = existingTests;
 // Load test patterns
 const testPatterns = await loadTestPatterns();
 state.context.test_patterns = testPatterns;
-```
 
-### Phase 5a: Write Tests (RED)
-```typescript
 // Verify no test files exist yet
-const testFiles = state.phases[4].deliverables.filter(f => f.includes('.test.'));
+const testFiles = state.phases[1].deliverables.filter(f => f.includes('.test.'));
 if (testFiles.length === 0) {
   console.warn('⚠️  No test files planned. Cannot proceed with TDD.');
   throw new Error('Test planning incomplete');
 }
 ```
 
-### Phase 5b: Implementation (GREEN)
+### Phase 3: Build GREEN
 ```typescript
 // Verify tests exist and are failing
 const testResults = await runTests();
@@ -196,7 +187,7 @@ if (testResults.passed > 0 && testResults.failed === 0) {
 }
 ```
 
-### Phase 5c: Refactor (REFACTOR)
+### Phase 4: Refactor + Review
 ```typescript
 // Verify tests pass before refactoring
 const testResults = await runTests();
@@ -206,10 +197,7 @@ if (testResults.failed > 0) {
 
 // Save baseline metrics
 state.context.baseline_metrics = await collectCodeMetrics();
-```
 
-### Phase 6: Code Review
-```typescript
 // Load code quality rules
 const rules = await loadCodeQualityRules();
 state.context.code_quality_rules = rules;
@@ -217,20 +205,15 @@ state.context.code_quality_rules = rules;
 // Run linter
 const lintResults = await runLinter();
 state.context.lint_results = lintResults;
-```
 
-### Phase 7: QA Validation
-```typescript
-// Run all tests
-const testResults = await runAllTests();
-state.context.test_results = testResults;
-
-// Run coverage
+// Run all tests + coverage
+const allTestResults = await runAllTests();
+state.context.test_results = allTestResults;
 const coverage = await runCoverage();
 state.context.coverage = coverage;
 ```
 
-### Phase 8: Documentation
+### Phase 5: Finalize
 ```typescript
 // Load documentation templates
 const templates = await loadDocTemplates();
@@ -239,14 +222,10 @@ state.context.doc_templates = templates;
 // Collect changes summary
 const changes = await collectChangesSummary();
 state.context.changes_summary = changes;
-```
 
-### Phase 9: Notification
-```typescript
 // Prepare notification data
 state.context.notification_data = {
   jira_ticket: state.context.jira_ticket,
-  confluence_page: state.phases[8].deliverables.find(f => f.includes('confluence')),
   slack_channels: state.context.slack_channels || [],
   summary: generateWorkflowSummary(state),
 };

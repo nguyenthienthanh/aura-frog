@@ -32,9 +32,8 @@ triggers:
 
 ## When to Use
 
-- Phase 4 (Test Planning) - Test strategy
-- Phase 5a (TDD Red) - Writing tests first
-- Phase 7 (Verify) - QA validation
+- Phase 2 (Test RED) - Test strategy + writing tests first
+- Phase 4 (Refactor + Review) - QA validation
 - Accessibility audits
 
 ---

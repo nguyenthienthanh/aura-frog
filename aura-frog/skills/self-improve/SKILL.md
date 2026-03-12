@@ -89,7 +89,7 @@ When workflow patterns suggest changes:
 ```yaml
 # Add auto-stop threshold adjustment
 workflow:
-  phase_5a:
+  phase_2:
     timeout: 300  # increased from 180
     batch_size: 50  # for large test suites
 ```
@@ -157,7 +157,7 @@ For each suggestion:
 ```markdown
 ## Pending Improvements
 
-### 1. Increase Phase 5a timeout (ID: abc123)
+### 1. Increase Phase 2 timeout (ID: abc123)
 **Confidence:** 85%
 **Frequency:** 8 occurrences
 **Impact:** Modifies `ccpm-config.yaml`
@@ -171,7 +171,7 @@ workflow:
 ```
 
 **Evidence:**
-- 8 workflows failed with timeout in Phase 5a
+- 8 workflows failed with timeout in Phase 2
 - Average test count: 127 files
 - Average completion time needed: 245s
 

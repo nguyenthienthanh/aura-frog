@@ -167,8 +167,8 @@ init_phase_structure() {
     local workflow_id="$1"
     local task="$2"
 
-    # Create 9 phases with meaningful names
-    for i in {1..9}; do
+    # Create 5 phases with meaningful names
+    for i in {1..5}; do
         local phase_name=$(parse_phase_name "$i" "$task")
         jq --arg phase "$i" \
            --arg name "$(get_phase_display_name $i)" \
@@ -188,15 +188,11 @@ init_phase_structure() {
 # Get phase display name
 get_phase_display_name() {
     case $1 in
-        1) echo "Requirements Analysis" ;;
-        2) echo "Technical Planning" ;;
-        3) echo "Design Review" ;;
-        4) echo "Test Planning" ;;
-        5) echo "TDD Implementation" ;;
-        6) echo "Code Review" ;;
-        7) echo "QA Validation" ;;
-        8) echo "Documentation" ;;
-        9) echo "Notification" ;;
+        1) echo "Understand + Design" ;;
+        2) echo "Test RED" ;;
+        3) echo "Build GREEN" ;;
+        4) echo "Refactor + Review" ;;
+        5) echo "Finalize" ;;
         *) echo "Unknown Phase" ;;
     esac
 }

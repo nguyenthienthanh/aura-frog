@@ -95,22 +95,22 @@ graph TB
 
 ## Phase-Specific Requirements
 
-### Phase 2: Technical Planning
+### Phase 2: Test RED
 **MUST include:**
 - Architecture diagram (component relationships)
 - Sequence diagram (main user flow)
 
-### Phase 3: UI Breakdown
+### Phase 3: Build GREEN
 **SHOULD include:**
 - Component hierarchy diagram
 - State flow diagram (if stateful)
 
-### Phase 4: Test Planning
+### Phase 4: Refactor + Review
 **SHOULD include:**
 - Test coverage flowchart
 - Integration test sequence
 
-### Phase 5: Implementation
+### Phase 5: Finalize
 **MUST update:**
 - Any diagrams that changed during implementation
 
@@ -150,15 +150,15 @@ location_rules[4]{diagram_scope,location,format}:
 
 ## Enforcement
 
-### During Phase 2 (Design)
+### During Phase 2 (Test RED)
 - Reviewer checks for required diagrams
 - Missing diagrams = approval blocked
 
-### During Phase 6 (Code Review)
+### During Phase 4 (Refactor + Review)
 - Verify diagrams match implementation
 - Update outdated diagrams
 
-### During Phase 8 (Documentation)
+### During Phase 5 (Finalize)
 - Final diagram review
 - Ensure all diagrams are accessible
 

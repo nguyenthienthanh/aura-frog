@@ -17,6 +17,19 @@ allowed-tools: NONE
 
 ---
 
+## Pre-Step: Challenge Requirements
+
+**Before generating output**, apply `rules/requirement-challenger.md`:
+- **Quick tasks:** Skip challenge, proceed directly
+- **Standard tasks:** Ask 1-2 clarifying questions, wait for answers
+- **Deep tasks:** Ask 3-5 questions across clarity/scope/assumptions/edge cases
+
+User's answers feed into the scope and acceptance tables below.
+
+**Skip with:** "just do it", "skip challenge", "no questions"
+
+---
+
 ## Output Template (COPY EXACTLY)
 
 ```toon
@@ -44,7 +57,7 @@ risks[0-2]{risk,mitigation}:
 
 ---
 
-# Phase 1 COMPLETE | Next: Phase 2 (Design) | Gate: APPROVAL
+# Phase 1 COMPLETE | Next: Phase 2 (Test RED) | Gate: APPROVAL
 ```
 
 ---
@@ -88,7 +101,7 @@ risks[1]{risk,mitigation}:
 
 ---
 
-# Phase 1 COMPLETE | Next: Phase 2 (Design) | Gate: APPROVAL
+# Phase 1 COMPLETE | Next: Phase 2 (Test RED) | Gate: APPROVAL
 ```
 
 **Token count:** ~180 tokens (well under 500 cap).

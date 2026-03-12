@@ -31,7 +31,7 @@ Unified bug fixing command with severity-based approach selection.
 | Subcommand | Description | When to Use |
 |------------|-------------|-------------|
 | `quick <desc>` | Lightweight 3-gate fix | Simple bugs, clear cause |
-| `full <desc>` | Full 9-phase workflow | Complex bugs, unclear cause |
+| `full <desc>` | Full 5-phase workflow | Complex bugs, unclear cause |
 | `hotfix <desc>` | Emergency fix for production | Critical production issues |
 
 ---
@@ -41,7 +41,7 @@ Unified bug fixing command with severity-based approach selection.
 ```toon
 approach_selection[3]{approach,when,phases}:
   quick,Clear scope + single file + known cause,Understand → Test → Fix → Verify
-  full,Multiple files + unclear cause + regression risk,Full 9-phase workflow
+  full,Multiple files + unclear cause + regression risk,Full 5-phase workflow
   hotfix,Production down + critical path + emergency,Fix → Deploy → Document later
 ```
 

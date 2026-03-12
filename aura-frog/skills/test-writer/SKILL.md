@@ -25,7 +25,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 - Adding tests to existing code
 - Improving test coverage
 - Creating test suites
-- TDD implementation (Phase 5a)
+- TDD implementation (Phase 2/3)
 - Writing specific test types (unit, integration, E2E)
 
 **DON'T use for:**
@@ -57,7 +57,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ### 3. Write Tests
 
-**For NEW code (TDD - Phase 5a):**
+**For NEW code (TDD - Phase 2):**
 ```
 1. Write failing tests (RED)
    → Tests MUST fail

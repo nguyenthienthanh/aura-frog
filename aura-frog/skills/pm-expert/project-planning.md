@@ -45,15 +45,15 @@ Plan, schedule, and coordinate project activities within scope, time, and qualit
 ├── 1.2 Documentation
 └── 1.3 Acceptance criteria
 
-## 2. Technical Planning (Phase 2)
-├── 2.1 Architecture design
-├── 2.2 Component breakdown
-└── 2.3 API planning
+## 2. Test RED (Phase 2)
+├── 2.1 Write failing tests
+├── 2.2 Define test cases
+└── 2.3 Verify tests fail
 
-## 3. Implementation (Phase 5)
-├── 5.1 TDD RED: Failing tests
-├── 5.2 TDD GREEN: Implementation
-└── 5.3 TDD REFACTOR: Optimization
+## 3. Build GREEN (Phase 3)
+├── 3.1 Implement to pass tests
+├── 3.2 Meet coverage threshold
+└── 3.3 Linter clean
 ```
 
 ---
@@ -73,18 +73,13 @@ Quick reference: Story Points (1-13), T-Shirt Sizing (XS-XL), Three-Point Estima
 
 | Phase | Task | Est | Start | End | Status |
 |-------|------|-----|-------|-----|--------|
-| 1 | Requirements | 4h | Day 1 | Day 1 | ✅ |
-| 2 | Design | 6h | Day 1 | Day 2 | ✅ |
-| 3 | UI Breakdown | 2h | Day 2 | Day 2 | ✅ |
-| 4 | Test Planning | 3h | Day 2 | Day 2 | 🔄 |
-| 5a | Write Tests | 8h | Day 3 | Day 4 | ⏳ |
-| 5b | Implementation | 16h | Day 4 | Day 6 | ⏳ |
-| 5c | Refactor | 4h | Day 6 | Day 6 | ⏳ |
-| 6 | Code Review | 2h | Day 7 | Day 7 | ⏳ |
-| 7 | QA Validation | 4h | Day 7 | Day 8 | ⏳ |
-| 8 | Documentation | 2h | Day 8 | Day 8 | ⏳ |
+| 1 | Understand + Design | 10h | Day 1 | Day 2 | ✅ |
+| 2 | Test RED | 8h | Day 3 | Day 4 | 🔄 |
+| 3 | Build GREEN | 16h | Day 4 | Day 6 | ⏳ |
+| 4 | Refactor + Review | 6h | Day 6 | Day 7 | ⏳ |
+| 5 | Finalize | 4h | Day 7 | Day 8 | ⏳ |
 
-**Total:** 51 hours (~7-8 days with buffer)
+**Total:** 44 hours (~7-8 days with buffer)
 ```
 
 ---

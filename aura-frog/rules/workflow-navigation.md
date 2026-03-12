@@ -26,23 +26,19 @@ After every phase completion, show:
 📍 WORKFLOW PROGRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ Completed: Phase 1 (Understand), Phase 2 (Design)
-🔄 Current: Phase 3 (UI Breakdown) - Awaiting approval
-⏭️ Next: Phase 4 (Test Plan)
-⏩ Will skip: Phase 3 (no UI components detected)
+✅ Completed: Phase 1 (Understand + Design)
+🔄 Current: Phase 2 (Test RED) - Auto-continuing
+⏭️ Next: Phase 3 (Build GREEN)
 
 **After approval:**
-→ Phase 4: Define test strategy and test cases
+→ Phase 2: Test plan + write failing tests
 → Estimated: ~10 min
 
 **Upcoming phases:**
-5a. TDD RED (write failing tests)
-5b. TDD GREEN (implement code)
-5c. TDD REFACTOR (clean up)
-6. Code Review
-7. Verification
-8. Documentation
-9. Share (Slack notification)
+2. Test RED (test plan + write failing tests)
+3. Build GREEN (implement code)
+4. Refactor + Review (polish + code review)
+5. Finalize (verify + document + share)
 ```
 
 ---
@@ -68,8 +64,8 @@ Detect and announce skips proactively:
 
 ```markdown
 ⏩ **Will skip:**
-- Phase 3 (UI Breakdown) - No UI components in task
-- Phase 9 (Share) - Slack not configured
+- Phase 1 UI Breakdown step - No UI components in task
+- Phase 5 Share step - Slack not configured
 
 💡 Tip: These can be unskipped with "include phase 3"
 ```
@@ -78,8 +74,8 @@ Detect and announce skips proactively:
 
 | Phase | Auto-Skip When |
 |-------|----------------|
-| Phase 3 (UI) | No UI components detected |
-| Phase 9 (Share) | Slack not configured |
+| Phase 1 (UI part) | No UI components detected |
+| Phase 5 (Share part) | Slack not configured |
 | Any phase | User explicitly skipped |
 
 ---
@@ -106,32 +102,28 @@ Progress: ████████░░░░░░░░ 50% (4/8 phases)
 
 ## Examples
 
-### Example 1: After Phase 2 Approval
+### Example 1: After Phase 1 Approval
 
 ```markdown
-✅ Phase 2 (Design) approved!
+✅ Phase 1 (Understand + Design) approved!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 WORKFLOW PROGRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Progress: ████░░░░░░░░░░░░ 25% (2/8 phases)
+Progress: ████░░░░░░░░░░░░ 20% (1/5 phases)
 
-✅ Phase 1: Understand - Done
-✅ Phase 2: Design - Done
-⏩ Phase 3: UI Breakdown - SKIPPING (backend-only task)
-🔄 Phase 4: Test Plan - UP NEXT
-⏳ Phase 5a-c: Implementation (TDD)
-⏳ Phase 6: Review
-⏳ Phase 7: Verify
-⏳ Phase 8: Document
-⏳ Phase 9: Share
+✅ Phase 1: Understand + Design - Done
+🔄 Phase 2: Test RED - UP NEXT
+⏳ Phase 3: Build GREEN
+⏳ Phase 4: Refactor + Review
+⏳ Phase 5: Finalize
 
-**Next up:** Phase 4 - Test Plan
-→ Define test strategy, identify test cases
+**Next up:** Phase 2 - Test RED
+→ Define test strategy, write failing tests
 → QA agent takes the lead
 
-Continuing to Phase 4...
+Continuing to Phase 2...
 ```
 
 ### Example 2: At Workflow Start
@@ -145,18 +137,11 @@ Task: "Add user authentication with JWT"
 
 **Phases to complete:**
 
-1. 🔄 Understand - Analyze requirements (NOW)
-2. ⏳ Design - Technical architecture
-3. ⏳ UI Breakdown - Login/register screens
-4. ⏳ Test Plan - Define test strategy
-5. ⏳ Implementation (TDD)
-   - 5a. Write failing tests (RED)
-   - 5b. Implement code (GREEN)
-   - 5c. Refactor (REFACTOR)
-6. ⏳ Review - Security & quality check
-7. ⏳ Verify - Run all tests
-8. ⏳ Document - Update docs
-9. ⏳ Share - Notify team
+1. 🔄 Understand + Design - Requirements, architecture, UI breakdown (NOW)
+2. ⏳ Test RED - Test plan + write failing tests
+3. ⏳ Build GREEN - Implement code
+4. ⏳ Refactor + Review - Polish code + security & quality check
+5. ⏳ Finalize - Verify, document, notify team
 
 **Detected skips:** None (full workflow)
 
@@ -166,63 +151,59 @@ Starting Phase 1...
 ### Example 3: After Rejection
 
 ```markdown
-❌ Phase 4 rejected: "Need more edge case tests"
+❌ Phase 1 rejected: "Need better architecture approach"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 WORKFLOW PROGRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Progress: ████████░░░░░░░░ 37% (3/8 phases)
+Progress: ░░░░░░░░░░░░░░░░ 0% (0/5 phases)
 
-✅ Phase 1: Understand - Done
-✅ Phase 2: Design - Done
-✅ Phase 3: UI Breakdown - Done
-❌ Phase 4: Test Plan - REJECTED (retry #1)
-⏳ Phase 5-9: Waiting...
+❌ Phase 1: Understand + Design - REJECTED (retry #1)
+⏳ Phase 2-5: Waiting...
 
 **What happens now:**
 → Brainstorming your feedback...
-→ Re-doing Phase 4 with improvements
+→ Re-doing Phase 1 with improvements
 → Will show new approval gate after rework
 
-Restarting Phase 4...
+Restarting Phase 1...
 ```
 
 ### Example 4: Nearing Completion
 
 ```markdown
-✅ Phase 7 (Verify) approved!
+✅ Phase 4 (Refactor + Review) complete!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 WORKFLOW PROGRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Progress: ██████████████░░ 87% (7/8 phases)
+Progress: ████████████████ 80% (4/5 phases)
 
-✅ Phase 1-7: All completed!
-🔄 Phase 8: Document - UP NEXT
-⏩ Phase 9: Share - SKIPPING (Slack not configured)
+✅ Phase 1-4: All completed!
+🔄 Phase 5: Finalize - UP NEXT
 
-**Almost done!** Just documentation left.
+**Almost done!** Just verification, documentation, and notifications left.
 
-**Next up:** Phase 8 - Documentation
-→ Generate/update docs, ADRs
+**Next up:** Phase 5 - Finalize
+→ Verify tests, generate docs, notify team
 → PM agent takes the lead
 
-Continuing to Phase 8...
+Continuing to Phase 5...
 ```
 
 ---
 
 ## Approval Gate Integration
 
-**Only 2 approval gates in the workflow:** Phase 2 (Design) and Phase 5b (Implementation).
+**Only 2 approval gates in the workflow:** Phase 1 (Understand + Design) and Phase 3 (Build GREEN).
 
 Include navigation in approval gates:
 
 ```markdown
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏗️ Phase 2: Design - Approval Needed (Gate 1 of 2)
+🏗️ Phase 1: Understand + Design - Approval Needed (Gate 1 of 2)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [Deliverables...]
@@ -230,17 +211,17 @@ Include navigation in approval gates:
 ---
 
 📍 **Where we are:**
-Progress: ████░░░░░░░░░░░░ 25% (2/9 phases)
+Progress: ████░░░░░░░░░░░░ 20% (1/5 phases)
 
 ⏭️ **After approval (AUTO-CONTINUE):**
-→ Phase 3: UI Breakdown → Phase 4: Test Plan → Phase 5a: TDD RED
-→ Next approval gate: Phase 5b (Implementation)
+→ Phase 2: Test RED (test plan + write failing tests)
+→ Next approval gate: Phase 3 (Build GREEN)
 
 ---
 
 **Options:**
-- `approve` → Auto-continue through Phases 3-5a
-- `reject: <reason>` → Brainstorm & redo Phase 2
+- `approve` → Auto-continue through Phase 2
+- `reject: <reason>` → Brainstorm & redo Phase 1
 - `modify: <changes>` → Adjust deliverables
 - `stop` → Save and exit
 ```
@@ -261,10 +242,10 @@ Include token status in navigation when relevant:
 📍 WORKFLOW PROGRESS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Progress: ██████████░░░░░░ 62% (5/8 phases)
+Progress: ██████████░░░░░░ 60% (3/5 phases)
 Tokens: ████████████░░░░ 75% (~150K used)
 
-⚠️ Token usage high. Consider `workflow:handoff` after Phase 6.
+⚠️ Token usage high. Consider `workflow:handoff` after Phase 4.
 ```
 
 ---

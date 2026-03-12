@@ -1,7 +1,7 @@
-# PHASE 5A: TDD RED - Write Failing Tests
+# PHASE 2: Test RED - Write Failing Tests
 
-**Phase:** 5a of 9  
-**Duration:** 4-8 hours  
+**Phase:** 2 of 5
+**Duration:** 4-8 hours
 **Goal:** Write comprehensive failing tests before implementation
 
 ---
@@ -120,7 +120,7 @@ Total: 53 tests
 
 ### 2. Test Report
 ```markdown
-# Phase 5a: Test Report
+# Phase 2: Test Report
 
 ## Tests Written: 53
 ## Tests Passing: 0 ❌ (Expected!)
@@ -135,7 +135,7 @@ Total: 53 tests
 - Target: 85%
 - Current: 0% (no code yet)
 
-## Ready for Phase 5b: ✅ YES
+## Ready for Phase 3 (Build GREEN): ✅ YES
 ```
 
 ---
@@ -144,7 +144,7 @@ Total: 53 tests
 
 ```
 ═══════════════════════════════════════════════════════════
-🔴 PHASE 5A COMPLETE: TDD RED - Tests Written & Failing
+🔴 PHASE 2 COMPLETE: Test RED - Tests Written & Failing
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
@@ -166,12 +166,12 @@ Total: 53 tests
    ✅ "Function undefined" - Good  
    ❌ "Expected X but got Y" - BAD (means you implemented!)
 
-⏭️  Next Phase: Phase 5b - TDD GREEN (Implementation)
+⏭️  Next Phase: Phase 3 - Build GREEN (Implementation)
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 5b
+Type "workflow:approve" → Proceed to Phase 3
 Type "workflow:reject <reason>" → Revise tests
 Type "workflow:modify <changes>" → Adjust tests
 
@@ -197,5 +197,5 @@ Your response:
 
 ---
 
-**Next:** Phase 5b - TDD GREEN (Implementation)
+**Next:** Phase 3 - Build GREEN (Implementation)
 

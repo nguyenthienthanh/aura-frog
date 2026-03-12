@@ -144,7 +144,7 @@ list_workflows() {
         
         echo -e "${status_icon} ${BLUE}${workflow_name}${NC}${active_marker}"
         echo "   ID: ${workflow_id}"
-        echo "   Phase: ${current_phase}/9 | Status: ${status}"
+        echo "   Phase: ${current_phase}/5 | Status: ${status}"
         echo "   Created: ${created_at}"
         echo ""
     done

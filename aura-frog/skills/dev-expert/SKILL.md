@@ -49,7 +49,7 @@ patterns[3]{file,purpose}:
 
 ## When to Use
 
-- Phase 5b (Implementation) - Generic coding patterns
+- Phase 3 (Build GREEN) - Generic coding patterns
 - State management decisions (cross-framework)
 - API integration patterns (cross-framework)
 - Form handling patterns (cross-framework)

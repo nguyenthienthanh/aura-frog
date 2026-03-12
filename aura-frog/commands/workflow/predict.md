@@ -64,22 +64,20 @@ function analyzeTask(description: string): TaskAnalysis {
 **Step 2: Calculate Base Tokens**
 ```typescript
 const BASE_TOKENS = {
-  // Planning phases (relatively consistent)
-  phase_1: 5000,   // Understand
-  phase_2: 8000,   // Design
-  phase_3: 6000,   // UI Breakdown
-  phase_4: 7000,   // Plan Tests
+  // Phase 1: Understand + Design
+  phase_1: 3500,   // Understand + Design
 
-  // Implementation (highly variable)
-  phase_5a: 12000, // Write Tests
-  phase_5b: 0,     // Build (calculated)
-  phase_5c: 15000, // Polish
+  // Phase 2: Test RED
+  phase_2: 1500,   // Write Tests
 
-  // Review phases
-  phase_6: 8000,   // Review
-  phase_7: 6000,   // Verify
-  phase_8: 10000,  // Document
-  phase_9: 2000    // Share
+  // Phase 3: Build GREEN (highly variable)
+  phase_3: 0,      // Build (calculated)
+
+  // Phase 4: Refactor + Review
+  phase_4: 1500,   // Refactor + Review
+
+  // Phase 5: Finalize
+  phase_5: 800     // Finalize
 };
 ```
 
@@ -88,17 +86,17 @@ const BASE_TOKENS = {
 const COMPLEXITY_MULTIPLIERS = {
   simple: {
     base: 1.0,
-    phase_5b: 40000,  // ~40K tokens for simple implementation
+    phase_3: 40000,  // ~40K tokens for simple implementation
     description: 'Single file, <100 LOC, straightforward logic'
   },
   medium: {
     base: 1.2,
-    phase_5b: 90000,  // ~90K tokens for medium implementation
+    phase_3: 90000,  // ~90K tokens for medium implementation
     description: 'Multiple files, 100-500 LOC, some complexity'
   },
   complex: {
     base: 1.5,
-    phase_5b: 140000, // ~140K tokens for complex implementation
+    phase_3: 140000, // ~140K tokens for complex implementation
     description: 'Many files, >500 LOC, intricate logic'
   }
 };
@@ -136,9 +134,9 @@ function predictTokens(task: string): TokenPrediction {
   // Calculate base tokens
   let tokens = { ...BASE_TOKENS };
 
-  // Phase 5b calculation
+  // Phase 3 (Build GREEN) calculation
   const complexity = COMPLEXITY_MULTIPLIERS[analysis.complexity];
-  tokens.phase_5b = complexity.phase_5b;
+  tokens.phase_3 = complexity.phase_3;
 
   // Apply scope multiplier
   const scopeMultiplier = SCOPE_MULTIPLIERS[analysis.scope] || 1.0;
@@ -205,25 +203,19 @@ Phase Breakdown:
 ┌─────────────┬─────────┬─────────┬─────────┬──────────┐
 │ Phase       │ Min     │ Max     │ Avg     │ % Total  │
 ├─────────────┼─────────┼─────────┼─────────┼──────────┤
-│ 1: Understand    │ 5.6K    │ 8.4K    │ 7.0K    │ 4%      │
-│ 2: Design        │ 9.0K    │ 13.4K   │ 11.2K   │ 7%      │
-│ 3: UI Breakdown  │ 6.7K    │ 10.1K   │ 8.4K    │ 5%      │
-│ 4: Plan Tests    │ 7.8K    │ 11.8K   │ 9.8K    │ 6%      │
-│ 5a: Write Tests  │ 13.4K   │ 20.2K   │ 16.8K   │ 10%     │
-│ 5b: Build        │ 100.8K  │ 151.2K  │ 126.0K  │ 77% ⚠️  │
-│ 5c: Polish       │ 16.8K   │ 25.2K   │ 21.0K   │ 13%     │
-│ 6: Review        │ 9.0K    │ 13.4K   │ 11.2K   │ 7%      │
-│ 7: Verify        │ 6.7K    │ 10.1K   │ 8.4K    │ 5%      │
-│ 8: Document      │ 11.2K   │ 16.8K   │ 14.0K   │ 9%      │
-│ 9: Share         │ 2.2K    │ 3.4K    │ 2.8K    │ 2%      │
-├─────────────┼─────────┼─────────┼─────────┼──────────┤
-│ **TOTAL**   │ **145K**│ **182K**│ **164K**│ **100%** │
+│ 1: Understand+Design │ 3.9K   │ 5.9K    │ 4.9K    │ 10%     │
+│ 2: Test RED          │ 1.7K   │ 2.5K    │ 2.1K    │ 4%      │
+│ 3: Build GREEN       │ 100.8K │ 151.2K  │ 126.0K  │ 77% ⚠️  │
+│ 4: Refactor+Review   │ 1.7K   │ 2.5K    │ 2.1K    │ 4%      │
+│ 5: Finalize          │ 0.9K   │ 1.3K    │ 1.1K    │ 2%      │
+├──────────────────────┼────────┼─────────┼─────────┼──────────┤
+│ **TOTAL**            │**109K**│ **163K**│ **136K**│ **100%** │
 └─────────────┴─────────┴─────────┴─────────┴──────────┘
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚠️ Warnings:
-  • Phase 5b will consume ~77% of total tokens
+  • Phase 3 (Build GREEN) will consume ~77% of total tokens
   • This is a full-stack task (+40% token usage)
   • Authentication features require security considerations
 
@@ -232,14 +224,14 @@ Phase Breakdown:
 💡 Recommendations:
   ✅ This workflow fits comfortably in one session
   ✅ Safety margin: 18K-55K tokens remaining
-  ⚠️ Consider handoff after Phase 5b if you need iterations
+  ⚠️ Consider handoff after Phase 3 if you need iterations
   💾 Auto-checkpoint will save progress every 25K tokens
 
   Optimal Strategy:
-  1. Complete Phases 1-4 (planning)
-  2. Complete Phase 5a-5b (implementation)
+  1. Complete Phase 1 (planning)
+  2. Complete Phase 2-3 (test + implementation)
   3. Checkpoint automatically created
-  4. Complete 5c-9 or handoff if needed
+  4. Complete Phase 4-5 or handoff if needed
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -279,13 +271,13 @@ function calculateConfidence(analysis: TaskAnalysis, phase: string): number {
   else if (historicalMatches.length > 10) confidence += 0.10;
   else if (historicalMatches.length > 5) confidence += 0.05;
 
-  // Planning phases are more predictable
-  if (['phase_1', 'phase_2', 'phase_3', 'phase_4'].includes(phase)) {
+  // Planning phase is more predictable
+  if (phase === 'phase_1') {
     confidence += 0.10;
   }
 
-  // Phase 5b (implementation) is least predictable
-  if (phase === 'phase_5b') {
+  // Phase 3 (Build GREEN) is least predictable
+  if (phase === 'phase_3') {
     confidence -= 0.15;
   }
 

@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
 **Version:** 1.20.1
-**Total Rules:** 48
+**Total Rules:** 49
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[48]{category,rule,priority,purpose}:
+rules[49]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -46,6 +46,7 @@ rules[48]{category,rule,priority,purpose}:
   workflow,next-step-guidance,critical,Always show next steps and commands
   workflow,workflow-navigation,high,Progress tracking and phase status
   workflow,feedback-brainstorming,high,Brainstorm before implementing feedback
+  workflow,requirement-challenger,high,Challenge requirements before accepting them
   workflow,impact-analysis,critical,Analyze all usages before modifying
   workflow,workflow-deliverables,critical,Verify all phase documents created
   documentation,diagram-requirements,medium,Mermaid diagrams for complex features
@@ -81,7 +82,7 @@ categories[8]{name,count,critical_rules}:
   quality,11,3
   architecture,6,0
   security,1,1
-  workflow,10,6
+  workflow,11,6
   documentation,1,0
   ui,5,2
   godot,2,0
@@ -160,7 +161,7 @@ See: `project-linting-precedence.md`
 ## Related Documentation
 
 - **Skills:** `skills/README.md` - Auto-invoking capabilities
-- **Phases:** `docs/phases/` - 9-phase workflow guides
+- **Phases:** `docs/phases/` - 5-phase workflow guides
 - **Agents:** `agents/` - Agent definitions
 
 ---

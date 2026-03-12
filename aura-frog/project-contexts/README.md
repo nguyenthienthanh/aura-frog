@@ -191,15 +191,15 @@ Project Context > Aura Frog Config > Aura Frog Defaults
 - Uses project ticket format (from examples.md)
 - Follows team structure (from team.md)
 
-**Phase 2 (Technical Planning):**
+**Phase 2 (Test RED):**
 - Applies naming conventions (from conventions.md)
 - Uses tech stack info (from project-config.yaml)
 
-**Phase 5 (Implementation):**
+**Phase 3 (Build GREEN):**
 - Follows file structure (from conventions.md)
 - Uses code patterns (from examples.md)
 
-**Phase 6 (Code Review):**
+**Phase 4 (Refactor + Review):**
 - Assigns reviewers (from team.md)
 - Checks conventions (from conventions.md)
 

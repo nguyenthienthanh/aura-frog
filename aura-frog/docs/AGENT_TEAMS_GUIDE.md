@@ -110,7 +110,7 @@ TaskCreate(
 
 ```
 Task(team_name="auth-system", name="architect", subagent_type="aura-frog:architect",
-  prompt="You are architect on team auth-system. Phase: 5b-TDD GREEN.
+  prompt="You are architect on team auth-system. Phase: 3-Build GREEN.
     1. Read team config: ~/.claude/teams/auth-system/config.json
     2. TaskList → claim tasks matching: API, backend, auth, service
     3. TaskUpdate(taskId, owner='architect', status='in_progress')
@@ -122,12 +122,12 @@ Task(team_name="auth-system", name="architect", subagent_type="aura-frog:archite
     CONTEXT: [project conventions, tech stack, existing patterns]")
 
 Task(team_name="auth-system", name="ui-expert", subagent_type="aura-frog:ui-expert",
-  prompt="You are ui-expert on team auth-system. Phase: 5b-TDD GREEN.
+  prompt="You are ui-expert on team auth-system. Phase: 3-Build GREEN.
     [same pattern — claim UI tasks, own src/components/]
     CONTEXT: [design system, component patterns]")
 
 Task(team_name="auth-system", name="qa-automation", subagent_type="aura-frog:qa-automation",
-  prompt="You are qa-automation on team auth-system. Phase: 5b-TDD GREEN.
+  prompt="You are qa-automation on team auth-system. Phase: 3-Build GREEN.
     [same pattern — claim test tasks, own tests/]
     CONTEXT: [testing framework, coverage requirements]")
 ```
@@ -151,11 +151,11 @@ SendMessage(type="message", recipient="architect",
 
 ```
 // All tasks complete → shutdown teammates:
-SendMessage(type="shutdown_request", recipient="architect", content="Phase 5b complete")
-SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase 5b complete")
-SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase 5b complete")
+SendMessage(type="shutdown_request", recipient="architect", content="Phase 3 complete")
+SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase 3 complete")
+SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase 3 complete")
 
-// Advance to Phase 5c, spawn new teammates if needed
+// Advance to Phase 4, spawn new teammates if needed
 ```
 
 ---
@@ -182,18 +182,12 @@ Every teammate follows this pattern after being spawned:
 ## Phase Team Composition
 
 ```toon
-phase_teams[11]{phase,lead,primary,secondary,team_size}:
-  1-Understand,pm-operations-orchestrator,architect,qa-automation,3
-  2-Design,architect,ui-expert,qa-automation,3
-  3-UI,ui-expert,mobile-expert,-,2
-  4-Test Plan,qa-automation,architect,-,2
-  5a-TDD RED,qa-automation,architect,-,2
-  5b-TDD GREEN,architect,ui-expert+qa-automation,-,3
-  5c-TDD REFACTOR,architect,-,qa-automation(reviewer),2
-  6-Review,security-expert,architect+qa-automation,-,3
-  7-Verify,qa-automation,-,-,1
-  8-Document,pm-operations-orchestrator,-,-,1
-  9-Share,pm-operations-orchestrator,-,-,1
+phase_teams[5]{phase,lead,primary,secondary,team_size}:
+  1-Understand + Design,pm-operations-orchestrator,architect+ui-expert,qa-automation,3
+  2-Test RED,qa-automation,architect,-,2
+  3-Build GREEN,architect,ui-expert+qa-automation,-,3
+  4-Refactor + Review,architect+security-expert,qa-automation,-,3
+  5-Finalize,pm-operations-orchestrator,-,-,1
 ```
 
 ---
@@ -302,7 +296,7 @@ Fires when a teammate marks a task done. Validates:
 
 ## Team-Workflow Bridge
 
-When using teams with the 9-phase workflow, the **Team-Workflow Bridge** automates team lifecycle:
+When using teams with the 5-phase workflow, the **Team-Workflow Bridge** automates team lifecycle:
 
 - **Phase start:** `team-bridge.cjs create-if-needed` creates a team + per-phase log directory
 - **Phase end:** `team-bridge.cjs teardown` marks team completed, `merge-team-logs.sh` merges logs

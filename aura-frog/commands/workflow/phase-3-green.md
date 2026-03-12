@@ -1,12 +1,12 @@
-# Command: workflow:phase:5b
+# Command: workflow:phase:3
 
-**Version:** 1.0.0  
-**Purpose:** Execute Phase 5b - Implementation (GREEN Phase of TDD)  
-**Trigger:** Auto-triggered after Phase 5a approval OR manual `/workflow:phase:5b`
+**Version:** 1.0.0
+**Purpose:** Execute Phase 3 - Build GREEN (Implementation Phase of TDD)
+**Trigger:** Auto-triggered after Phase 2 completion OR manual `/workflow:phase:3`
 
 ---
 
-## 🎯 Phase 5b Objectives (TDD GREEN Phase)
+## 🎯 Phase 3 Objectives (TDD GREEN Phase)
 
 **Write minimum code to make ALL tests pass.**
 
@@ -28,14 +28,14 @@
 - ❌ DO NOT skip tests
 - ❌ DO NOT over-engineer
 
-**Focus: Make it work, not perfect (refactor in Phase 5c)**
+**Focus: Make it work, not perfect (refactor in Phase 4)**
 
 ---
 
 ## 📋 Execution Steps
 
 ### Step 1: Load Test Files
-- Read Phase 5a test files
+- Read Phase 2 test files
 - Understand what tests expect
 - Check test failures
 
@@ -222,7 +222,7 @@ npm run lint
 
 ## ✅ Success Criteria
 
-Phase 5b complete when:
+Phase 3 complete when:
 - [ ] All components implemented
 - [ ] **ALL 73 TESTS PASS** ✅
 - [ ] Coverage ≥ 85% (target met)
@@ -273,13 +273,13 @@ Implemented 5 components + 1 custom hook, all tests passing!
    ✅ Linter clean
    ✅ No breaking changes
 
-⏭️  Next Phase: Phase 5c - Refactor
+⏭️  Next Phase: Phase 4 - Refactor
    Improve code quality while keeping tests green
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "/workflow:approve" → Proceed to Phase 5c (REFACTOR)
+Type "/workflow:approve" → Proceed to Phase 4 (REFACTOR)
 Type "/workflow:reject" → Fix implementation issues
 Type "/workflow:modify <feedback>" → Adjust implementation
 
@@ -327,7 +327,7 @@ src/features/socialMarketing/
             └── useSocialMarketingCompositePostLogic.ts ⭐
 
 logs/contexts/{workflow-id}/deliverables/
-├── PHASE_5B_IMPLEMENTATION_REPORT.md
+├── PHASE_3_IMPLEMENTATION_REPORT.md
 └── coverage-report.html
 ```
 
@@ -354,7 +354,7 @@ logs/contexts/{workflow-id}/deliverables/
 
 ## 🎯 What Happens Next
 
-After approval → `/workflow:phase:5c`:
+After approval → `/workflow:phase:4`:
 - Refactor code for better quality
 - Maintain all tests passing
 - Improve performance and readability
@@ -362,7 +362,7 @@ After approval → `/workflow:phase:5c`:
 ---
 
 **Status:** Active command  
-**Related:** workflow:phase:5a, workflow:phase:5c, workflow:approve
+**Related:** workflow:phase:2, workflow:phase:4, workflow:approve
 
 ---
 

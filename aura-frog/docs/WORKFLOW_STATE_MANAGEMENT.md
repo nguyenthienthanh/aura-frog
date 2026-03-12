@@ -120,17 +120,17 @@ bash scripts/workflow/workflow-manager.sh list
 
 ⏳ add-user-authentication [ACTIVE]
    ID: add-user-authentication-20251124-120000
-   Phase: 5/9 | Status: in_progress
+   Phase: 3/5 | Status: in_progress
    Created: 2025-11-24T12:00:00Z
 
 ✅ refactor-userprofile
    ID: refactor-userprofile-20251124-110000
-   Phase: 9/9 | Status: completed
+   Phase: 5/5 | Status: completed
    Created: 2025-11-24T11:00:00Z
 
 ⏸️  add-dark-mode
    ID: add-dark-mode-20251124-130000
-   Phase: 2/9 | Status: initialized
+   Phase: 2/5 | Status: initialized
    Created: 2025-11-24T13:00:00Z
 ```
 
@@ -209,7 +209,7 @@ workflow:switch add-user-auth-20251124-120000
 ### 4. Complete Workflow
 
 ```
-# After Phase 9 completion
+# After Phase 5 completion
 workflow-state.json → status: "completed"
 # Remains in .claude/logs/ for reference
 ```
@@ -324,8 +324,8 @@ writeFile('active-workflow.txt', newWorkflowId);
   "created_at": "2025-11-24T12:00:00Z",
   "updated_at": "2025-11-24T13:30:00Z",
   "status": "in_progress",
-  "current_phase": 5,
-  "current_phase_name": "05-tdd-implementation",
+  "current_phase": 3,
+  "current_phase_name": "03-build-green",
   "total_tokens_used": 155000,
   "total_tokens_remaining": 45000,
   "auto_continue": true,
@@ -416,7 +416,7 @@ writeFile('active-workflow.txt', newWorkflowId);
         "commit_after": "abc1234"
       }
     }
-    // ... phases 2-9 ...
+    // ... phases 2-5 ...
   },
 
   "context": {
@@ -465,9 +465,9 @@ writeFile('active-workflow.txt', newWorkflowId);
 When working on multiple workflows, each may be on a different branch:
 
 ```
-Workflow 1: feature/user-auth     (Phase 5)
-Workflow 2: feature/dark-mode     (Phase 2)
-Workflow 3: fix/login-crash       (Phase 7)
+Workflow 1: feature/user-auth     (Phase 3)
+Workflow 2: feature/dark-mode     (Phase 1)
+Workflow 3: fix/login-crash       (Phase 4)
 ```
 
 **Without branch tracking:**
@@ -680,7 +680,7 @@ git branch backup/[workflow-name]-[timestamp]
    ```
 
 3. **Regenerate from deliverables:**
-   - Phase 5 deliverables contain code specs
+   - Phase 3 deliverables contain code specs
    - Can regenerate implementation
 ```
 
@@ -710,7 +710,7 @@ git branch backup/[workflow-name]-[timestamp]
 
 3. **Partial Recovery:**
    - Requirements, specs, test plans preserved
-   - Can restart from Phase 5 with existing planning
+   - Can restart from Phase 3 with existing planning
 ```
 
 ---

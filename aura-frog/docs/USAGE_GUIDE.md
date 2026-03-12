@@ -37,7 +37,7 @@ Claude reads: hooks/pre-phase.md
   ↓
 Claude implements logic: Load workflow state, check prerequisites, activate agents
   ↓
-Claude executes: Phase 1 logic from docs/phases/PHASE_1_REQUIREMENTS_ANALYSIS.MD
+Claude executes: Phase 1 logic from docs/phases/PHASE_1_UNDERSTAND_DESIGN.MD
   ↓
 Claude reads: hooks/post-phase.md
   ↓
@@ -48,7 +48,7 @@ Claude implements logic: Save state, generate summary, show approval gate
 
 ## Workflow Modes: When to Use What
 
-### Mode 1: Full 9-Phase Workflow
+### Mode 1: Full 5-Phase Workflow
 
 **Command:** `workflow:start "Task description"`
 
@@ -60,14 +60,14 @@ Claude implements logic: Save state, generate summary, show approval gate
 - ✅ Multi-file changes
 - ✅ When you need complete documentation
 
-**Phases:** All 9 phases with approval gates
+**Phases:** All 5 phases with approval gates
 **Time:** 2-4 hours
 **Output:** Complete documentation + tested code + team notification
 
 **Example:**
 ```
 workflow:start "Add user authentication with JWT"
-→ 9 phases
+→ 5 phases
 → Requirements doc
 → Technical spec
 → Design review
@@ -246,21 +246,21 @@ bugfix:quick "Add authentication"  # Will warn you!
 ```
 Session 1 (Morning):
 → workflow:start "Build payment system"
-→ Phase 1-5 completed
+→ Phase 1-3 completed
 → Token count: 160K / 200K
 → workflow:handoff
 
 Claude saves:
 - Complete workflow state
 - All deliverables
-- Current phase: 5c
-- Next steps: Phase 6 Code Review
+- Current phase: 3
+- Next steps: Phase 4 Refactor + Review
 
 Session 2 (Afternoon - New Cursor window):
 → workflow:resume workflow-payment-system-20251125
 → Claude loads state
-→ "Resuming from Phase 5c..."
-→ Continue to Phase 6-9
+→ "Resuming from Phase 3..."
+→ Continue to Phase 4-5
 ```
 
 ### Alternative: Don't Need handoff/resume
@@ -290,43 +290,37 @@ Afternoon (New session):
 
 #### Example: Simple Bug Fix
 
-**Full workflow (overkill):**
+**Full workflow:**
 ```
-Phase 1: Requirements Analysis → Approval
-Phase 2: Technical Planning → Approval
-Phase 3: Design Review → Skip
-Phase 4: Test Planning → Approval
-Phase 5a: Write Tests → Approval
-Phase 5b: Implement → Approval
-Phase 5c: Refactor → Approval
-Phase 6: Code Review → Approval
-Phase 7: QA Validation → Approval
-Phase 8: Documentation → Approval
-Phase 9: Notification → Auto
+Phase 1: Understand + Design → APPROVAL
+Phase 2: Test RED → Auto-continue
+Phase 3: Build GREEN → APPROVAL
+Phase 4: Refactor + Review → Auto-continue
+Phase 5: Finalize → Auto-complete
 
-Total: 9 approval gates! 😰
+Total: 2 approval gates
 ```
 
 **Lightweight with `bugfix:quick`:**
 ```
-Phases 1-2: Analyze + Plan → Auto-executed (10 min)
-Phases 5-7: Test + Fix + Verify → 1 Approval (15 min)
-Phase 8-9: Optional → Skip for trivial
+Phase 1: Analyze + Plan → Auto-executed (10 min)
+Phase 2-3: Test + Fix → 1 Approval (15 min)
+Phase 4-5: Optional → Skip for trivial
 
-Total: 1 approval gate! ✅
+Total: 1 approval gate
 ```
 
 ### Phase Grouping Rules
 
-**Phases 1-4 (Planning):**
-- Simple tasks: Can execute together
-- Complex tasks: Individual approvals
+**Phase 1 (Understand + Design):**
+- Simple tasks: Can auto-continue
+- Complex tasks: Requires approval
 
-**Phases 5-7 (Implementation):**
-- Can merge: Write test → Implement → Verify
+**Phases 2-3 (Test RED + Build GREEN):**
+- Can merge: Write test + Implement + Verify
 - Show results together in one approval
 
-**Phases 8-9 (Documentation):**
+**Phases 4-5 (Refactor + Review / Finalize):**
 - Optional for trivial changes
 - Required for features/important fixes
 
@@ -419,18 +413,18 @@ Claude: "Suggest workflow:start for complete implementation with full TDD"
 4. **handoff/resume optional** - Only for long workflows near token limit
 5. **Phase grouping** - Simple tasks merge phases for speed
 6. **Claude helps** - Suggests appropriate mode automatically
-7. **Only 2 approval gates** - Phase 2 (Design) and Phase 5b (Implementation)
+7. **Only 2 approval gates** - Phase 1 (Understand + Design) and Phase 3 (Build GREEN)
 
 ### Quick Commands Reference:
 
 | Need | Command | Time | Phases |
 |------|---------|------|--------|
-| Feature | `workflow:start` | 2-4h | 9 full |
+| Feature | `workflow:start` | 2-4h | 5 full |
 | Simple bug | `bugfix:quick` | 30m | Grouped |
-| Complex bug | `bugfix` | 2h | 9 adapted |
+| Complex bug | `bugfix` | 2h | 5 adapted |
 | Refactor | `refactor` | 1-2h | Focused |
-| Just plan | `planning` | 30m | 1-4 only |
-| Just docs | `document` | 30m | 8 only |
+| Just plan | `planning` | 30m | 1 only |
+| Just docs | `document` | 30m | 5 only |
 | Just tests | `test:unit` | 30m | Test only |
 
 ---

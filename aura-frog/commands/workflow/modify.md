@@ -49,10 +49,14 @@ Examples:
 
 ## ⚙️ Execution Flow
 
-### Default Flow (Light Brainstorming)
+### Default Flow (Challenge + Light Brainstorming)
 
 ```
 User types /workflow:modify <instructions>
+    ↓
+Agent CHALLENGES scope impact (rules/requirement-challenger.md):
+  - Could this expand scope significantly?
+  - Should this be a separate workflow?
     ↓
 Agent does LIGHT brainstorming:
   - Quick consideration of alternatives
@@ -152,7 +156,7 @@ Impact:
 
 Would you like me to:
 a) Generate additional test cases now
-b) Update plan only (add tests in Phase 5a)
+b) Update plan only (add tests in Phase 2)
 
 Your choice: [Enter a or b]
 ```

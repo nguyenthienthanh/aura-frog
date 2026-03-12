@@ -2,7 +2,7 @@
 
 **System:** Aura Frog v1.20.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 10 agents + 52 skills + 92 commands + 9-phase workflow + auto-invoking skills + bundled MCP
+**Purpose:** 10 agents + 52 skills + 86 commands + 5-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
@@ -18,7 +18,7 @@
 ## New in 1.19.0 - Optimization
 
 - **Banner rule optimized** (19KB -> 5KB) — Examples moved to `docs/BANNER_EXAMPLES.md`
-- **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 48 rules)
+- **Rules consolidated** — YAGNI+DRY+KISS merged into `simplicity-over-complexity.md` (50 -> 49 rules)
 - **Fasttrack merged** — Now a mode inside `workflow-orchestrator` (53 -> 52 skills)
 - **Approval gates slimmed** (558 -> 96 lines) — Points to orchestrator for details
 - **PreCompact hook** — Auto-save workflow state before context compaction
@@ -145,13 +145,13 @@ skills[13]{name,trigger,file}:
 
 ## Plan Mode Integration
 
-**Use Claude Code's native plan mode for Quick/Standard tasks** (brainstorm, design, compare options). For Deep implementation tasks, use Aura Frog's 9-phase workflow.
+**Use Claude Code's native plan mode for Quick/Standard tasks** (brainstorm, design, compare options). For Deep implementation tasks, use Aura Frog's 5-phase workflow.
 
 ```toon
 plan_routing[3]{complexity,approach}:
   Quick (typo/config),Native plan mode or direct edit
   Standard (feature/bugfix),Native plan mode → then workflow:start or bugfix:quick
-  Deep (multi-file architecture),workflow-orchestrator 9-phase workflow
+  Deep (multi-file architecture),workflow-orchestrator 5-phase workflow
 ```
 
 **Details:** `rules/execution-rules.md`
@@ -162,9 +162,9 @@ plan_routing[3]{complexity,approach}:
 
 **ALWAYS:** Show banner → Load context → Follow TDD → Show deliverables
 
-**NEVER:** Skip banner, skip approval gates (Phase 2 & 5b), skip auto-continue phases, skip tests
+**NEVER:** Skip banner, skip approval gates (Phase 1 & 3), skip auto-continue phases, skip tests
 
-**2-Gate Workflow:** Only Phase 2 & 5b require approval. Other phases auto-continue.
+**2-Gate Workflow:** Only Phase 1 (Understand + Design) & Phase 3 (Build GREEN) require approval. Other phases auto-continue.
 
 **Details:** `rules/execution-rules.md`
 
@@ -174,7 +174,7 @@ plan_routing[3]{complexity,approach}:
 
 ```toon
 bundled_commands[6]{command,subcommands,replaces}:
-  /workflow,"start/status/phase/next/approve/handoff/resume",22 workflow commands
+  /workflow,"start/status/phase/next/approve/handoff/resume",16 workflow commands
   /test,"unit/e2e/coverage/watch/docs",4 test commands
   /project,"status/refresh/init/switch/list/config/sync-settings",7 project commands
   /quality,"lint/complexity/review/fix",3 quality commands
@@ -191,14 +191,14 @@ bundled_commands[6]{command,subcommands,replaces}:
 ```toon
 resources[12]{name,location}:
   Agents (10),agents/
-  Commands (91),commands/
-  Rules (48),rules/
+  Commands (86),commands/
+  Rules (49),rules/
   Skills (13 auto-invoke + 39 reference),skills/
   Hooks (27),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
-  Phases (9),docs/phases/
+  Phases (5),docs/phases/
   Banner Examples,docs/BANNER_EXAMPLES.md
   Getting Started,GET_STARTED.md
   Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
@@ -242,21 +242,21 @@ context_rules[4]{rule,action}:
 
 ## Token Budget (CRITICAL)
 
-**Target:** Phase 1-9 complete workflow ≤ 40k tokens (down from ~200k).
+**Target:** Phase 1-5 complete workflow ≤ 40k tokens (down from ~200k).
 
 ```toon
 token_budget[5]{phase_group,budget,notes}:
-  Phase 1 (Understand),500 tokens MAX,TOON format only - NO prose
-  Phase 2-4 (Design/UI/Test Plan),3000 tokens total,TOON tables + minimal prose
-  Phase 5a-5c (TDD),4000 tokens total,Code only - minimal comments
-  Phase 6-7 (Review/Verify),1500 tokens total,Findings in TOON tables
-  Phase 8-9 (Doc/Notify),800 tokens total,Summary only
+  Phase 1 (Understand + Design),3500 tokens MAX,TOON format + minimal prose
+  Phase 2 (Test RED),1500 tokens total,Test scaffolding only
+  Phase 3 (Build GREEN),4000 tokens total,Code only - minimal comments
+  Phase 4 (Refactor + Review),1500 tokens total,Findings in TOON tables
+  Phase 5 (Finalize),800 tokens total,Summary only
 ```
 
 **Enforcement Rules:**
 1. **Agent Detector:** NO file scanning tools (patterns only)
 2. **Project Context:** Load explicitly, not auto-invoke
-3. **Phase Guides:** Load ONE at a time, not all 9 upfront
+3. **Phase Guides:** Load ONE at a time, not all 5 upfront
 4. **Output Format:** TOON for all phase deliverables
 5. **No Re-summarization:** Don't repeat previous phase outputs
 

@@ -49,35 +49,28 @@ Shows comprehensive workflow status including:
    - ui-expert (secondary)
    - pm-operations-orchestrator (coordinator)
 
-📍 Current Phase: Phase 3 - Design Review
+📍 Current Phase: Phase 2 - Test RED
 
 📊 Phase Progress:
 
-  ✅ Phase 1: Requirements Analysis (approved)
-     Duration: 7m 0s
-     Deliverables: 1 file
+  ✅ Phase 1: Understand + Design (approved)
+     Duration: 19m 30s
+     Deliverables: 3 files
 
-  ✅ Phase 2: Technical Planning (approved)
-     Duration: 12m 30s
-     Deliverables: 2 files
-
-→ 🔄 Phase 3: Design Review (in_progress)
+→ 🔄 Phase 2: Test RED (in_progress)
      Started: 11:45:00
      Duration so far: 5m 15s
 
-  ⏸️ Phase 4: Test Planning (pending)
-  ⏸️ Phase 5: TDD Implementation (pending)
-  ⏸️ Phase 6: Code Review (pending)
-  ⏸️ Phase 7: QA Validation (pending)
-  ⏸️ Phase 8: Documentation (pending)
-  ⏸️ Phase 9: Notification (pending)
+  ⏸️ Phase 3: Build GREEN (pending)
+  ⏸️ Phase 4: Refactor + Review (pending)
+  ⏸️ Phase 5: Finalize (pending)
 
 ─────────────────────────────────────────────────────────────
 
-Progress: 2/9 phases complete (22%)
+Progress: 1/5 phases complete (20%)
 
 ⏭️  Next Action:
-   Wait for Phase 3 completion, then approve to proceed to Phase 4
+   Wait for Phase 2 completion, then proceed to Phase 3
 
 ───────────────────────────────────────────────────────────
 
@@ -110,7 +103,7 @@ Progress: 2/9 phases complete (22%)
 progress = (approved_phases / total_phases) * 100
 
 Example:
-2 approved / 9 total = 22% complete
+2 approved / 5 total = 40% complete
 ```
 
 ---
@@ -124,43 +117,39 @@ With `--detailed` flag, shows additional info:
 DETAILED WORKFLOW STATUS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 Phase 1: Requirements Analysis
+📋 Phase 1: Understand + Design
    Status: ✅ Approved
    Started: 2025-11-24 11:23:25
-   Completed: 2025-11-24 11:30:25
-   Approved: 2025-11-24 11:31:00
-   Duration: 7m 0s
-   
+   Completed: 2025-11-24 11:42:55
+   Approved: 2025-11-24 11:43:00
+   Duration: 19m 30s
+
    Deliverables:
-   - PHASE_1_REQUIREMENTS_ANALYSIS.md (350 lines)
-   
+   - PHASE_1_UNDERSTAND_DESIGN.md (350 lines)
+
    Success Criteria Met:
    ✅ Issues identified (6 issues)
    ✅ Strategy defined (5 components + 1 hook)
    ✅ Benefits quantified
    ✅ Risks mitigated
-   
+
    Agents Involved:
    - mobile-react-native (primary)
    - ui-expert (secondary)
    - pm-operations-orchestrator (coordinator)
 
-📋 Phase 2: Technical Planning
-   [Similar detailed breakdown...]
-
-📋 Phase 3: Design Review (CURRENT)
+📋 Phase 2: Test RED (CURRENT)
    Status: 🔄 In Progress
    Started: 2025-11-24 11:45:00
    Duration so far: 5m 15s
-   
+
    Current Activity:
-   - Analyzing UI component structure
-   - Extracting design tokens
-   - Mapping component hierarchy
-   
+   - Writing failing test cases
+   - Setting up test scaffolding
+
    Agents Working:
-   - ui-expert (active)
-   - mobile-react-native (supporting)
+   - mobile-react-native (active)
+   - qa-automation (supporting)
 ```
 
 ---
@@ -172,7 +161,7 @@ If workflow is blocked:
 ```
 ⚠️  WORKFLOW BLOCKED
 
-Blocking Issue: Tests failing in Phase 5b
+Blocking Issue: Tests failing in Phase 3 (Build GREEN)
 Reason: 3 tests not passing after implementation
 Action Required: Fix failing tests before proceeding
 
@@ -195,13 +184,11 @@ Shows all generated files:
 📦 Deliverables (3 files, 1,250 lines):
 
 Phase 1:
-├── PHASE_1_REQUIREMENTS_ANALYSIS.md (350 lines)
-
-Phase 2:
-├── PHASE_2_TECH_SPEC.md (650 lines)
+├── PHASE_1_UNDERSTAND_DESIGN.md (350 lines)
+├── PHASE_1_TECH_SPEC.md (650 lines)
 └── architecture-diagram.png (18 KB)
 
-Phase 3:
+Phase 2:
 └── [In progress...]
 
 Total size: 156 KB
@@ -214,13 +201,12 @@ Total size: 156 KB
 ```
 ⏱️  Time Breakdown:
 
-Phase 1: Requirements     7m 0s   (approved)
-Phase 2: Technical Plan   12m 30s (approved)
-Phase 3: Design Review    5m 15s  (in progress)
-Phase 4-9: [Not started]
+Phase 1: Understand + Design  19m 30s (approved)
+Phase 2: Test RED             5m 15s  (in progress)
+Phase 3-5: [Not started]
 
 Total elapsed: 24m 45s
-Estimated remaining: ~4h 45m
+Estimated remaining: ~1h 30m
 ```
 
 ---

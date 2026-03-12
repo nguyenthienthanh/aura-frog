@@ -130,19 +130,13 @@ Always redact:
 
 ### Phase Approval Gates
 ```markdown
-Only 2 approval gates (Phase 2 & 5b):
+Only 2 approval gates (Phase 1 & 3):
 
-Phase 1: Requirements    → ⚡ Auto-continue (shows deliverables)
-Phase 2: Technical Plan  → ✋ APPROVAL REQUIRED
-Phase 3: Design Review   → ⚡ Auto-continue (or skip if no UI)
-Phase 4: Test Planning   → ⚡ Auto-continue
-Phase 5a: Write Tests    → ⚡ Auto-continue (auto-stop if tests pass)
-Phase 5b: Implement      → ✋ APPROVAL REQUIRED
-Phase 5c: Refactor       → ⚡ Auto-continue (auto-stop if tests fail)
-Phase 6: Code Review     → ⚡ Auto-continue (auto-stop on security issues)
-Phase 7: QA Validation   → ⚡ Auto-continue (auto-stop if tests fail)
-Phase 8: Documentation   → ⚡ Auto-continue
-Phase 9: Notification    → ⚡ Auto (read-only)
+Phase 1: Understand + Design → ✋ APPROVAL REQUIRED
+Phase 2: Test RED            → ⚡ Auto-continue (auto-stop if tests pass)
+Phase 3: Build GREEN         → ✋ APPROVAL REQUIRED
+Phase 4: Refactor + Review   → ⚡ Auto-continue (auto-stop on security issues or test failures)
+Phase 5: Finalize            → ⚡ Auto (read-only)
 
 Auto-continue = Execute phase, show deliverables, continue (no wait)
 Auto-stop = Stop if issues found (tests fail, security issues, etc.)

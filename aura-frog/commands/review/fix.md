@@ -1,6 +1,6 @@
 # Command: review:fix
 
-**Purpose:** Auto-fix code review issues from Phase 6
+**Purpose:** Auto-fix code review issues from Phase 4 (Refactor + Review)
 **Aliases:** `fix review`, `auto fix`, `fix issues`
 
 ---
@@ -47,7 +47,7 @@ manual_fixes[3]{category,reason}:
 
 ```toon
 workflow[5]{step,action}:
-  1. Load,Read Phase 6 review report
+  1. Load,Read Phase 4 review report
   2. Analyze,Categorize issues as auto-fixable or manual
   3. Backup,Create backup before applying fixes
   4. Execute,Apply fixes by priority/category

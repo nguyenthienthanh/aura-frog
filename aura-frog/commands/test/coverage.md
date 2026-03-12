@@ -273,7 +273,7 @@ test:coverage
 ### With Workflow
 
 ```bash
-# During Phase 7 (QA Validation)
+# During Phase 4 (Refactor + Review)
 # Coverage is automatically checked
 # Reports shown in deliverables
 ```

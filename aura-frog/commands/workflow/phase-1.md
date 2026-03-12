@@ -1,8 +1,8 @@
-# Command: Phase 1 - Understand
+# Command: Phase 1 - Understand + Design
 
 **Version:** 1.0.0
-**Phase:** 1 of 9
-**Duration:** 20-45 minutes
+**Phase:** 1 of 5
+**Duration:** 15-30 minutes
 **Tagline:** "What are we building?"
 **Last Updated:** 2025-11-26
 
@@ -221,9 +221,9 @@ After completing Phase 1, show this approval gate:
 - Question 1?
 - Question 2?
 
-**Next Phase:** Phase 2: Design 🏗️
+**Next Phase:** Phase 2: Test RED 🔴
 **Next Agent:** [dev-agent] (Primary)
-We'll design the technical solution architecture.
+We'll write failing tests before implementation (TDD RED phase).
 
 **Token Usage:**
 - This phase: [X] tokens (~[Y]K)
@@ -233,7 +233,7 @@ We'll design the technical solution architecture.
 ---
 
 **Options:**
-- "approve" → Continue to Phase 2 (Design)
+- "approve" → Continue to Phase 2 (Test RED)
 - "reject: [reason]" → Re-analyze requirements
 - "modify: [changes]" → Adjust requirements
 - "answer: [responses]" → Answer clarifying questions
@@ -282,7 +282,7 @@ Phase 1 is complete when:
 
 ## 📚 Related Documentation
 
-- **Phase Guide:** `docs/phases/PHASE_1_REQUIREMENTS_ANALYSIS.MD`
+- **Phase Guide:** `docs/phases/PHASE_1_UNDERSTAND_DESIGN.MD`
 - **Approval Gates:** `docs/APPROVAL_GATES.md`
 - **Agent Identification:** `docs/AGENT_IDENTIFICATION.md`
 - **Next Phase:** `commands/workflow/phase-2.md`
@@ -312,9 +312,9 @@ Phase 1 is complete when:
 
 ---
 
-**Phase:** 1 of 9
+**Phase:** 1 of 5
 **Version:** 1.0.0
 **Status:** Active
-**Last Updated:** 2025-11-26
+**Last Updated:** 2026-03-12
 
 **Old Name:** Requirements Analysis (v4.x compatibility maintained)

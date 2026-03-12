@@ -89,5 +89,5 @@ modes[3]{mode,effect}:
 
 ---
 
-**Workflow:** 9 phases | **Duration:** 2-4 hours typical
+**Workflow:** 5 phases | **Duration:** 2-4 hours typical
 **Version:** 2.0.0

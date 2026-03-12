@@ -71,7 +71,7 @@ Agent:
 3. Incorporates into requirements
 ```
 
-### Phase 8: Generate Documentation
+### Phase 5: Generate Documentation (Finalize)
 ```
 Agent generates:
 - Technical Specification
@@ -149,7 +149,7 @@ Type "confirm" to create page
 [Coverage report]
 
 ## Deployment Notes
-[From Phase 8]
+[From Phase 5]
 
 ## Next Steps
 [Follow-up tasks]
@@ -188,14 +188,14 @@ code block
 4. Reference in requirements.md
 ```
 
-### Phase 2-7: Development
+### Phase 2-4: Development
 ```
 1. Generate local markdown files
 2. Store in .claude/logs/documents/ folder
 3. Track in git (optional)
 ```
 
-### Phase 8: Documentation
+### Phase 5: Finalize (Documentation)
 ```
 1. Compile all phase outputs
 2. Format for Confluence

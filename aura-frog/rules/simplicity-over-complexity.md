@@ -3,7 +3,7 @@
 **Category:** Code Quality & Architecture
 **Priority:** Critical
 **Version:** 1.20.1
-**Applies To:** All phases, especially Phase 2 (Design), Phase 5b (Implementation), Phase 5c (Refactor)
+**Applies To:** All phases, especially Phase 1 (Understand + Design), Phase 3 (Build GREEN), Phase 4 (Refactor + Review)
 
 ---
 
@@ -12,7 +12,7 @@
 ```toon
 principles[3]{principle,rule,when}:
   YAGNI,"Only implement what's needed RIGHT NOW. No speculative features.",Always
-  DRY,"Wait for Rule of Three (3 occurrences) before abstracting.",Phase 5c
+  DRY,"Wait for Rule of Three (3 occurrences) before abstracting.",Phase 4
   KISS,"Choose simplest solution that solves the problem. No over-engineering.",Always
 ```
 
@@ -87,10 +87,9 @@ checklist[5]{question,if_no}:
 
 | Phase | Focus |
 |-------|-------|
-| Phase 2 (Design) | Challenge every abstraction layer. Question "might need in future." |
-| Phase 5b (Build) | Start with naive implementation. Don't optimize until measured. |
-| Phase 5c (Refactor) | Apply Rule of Three. Only abstract proven patterns. |
-| Phase 6 (Review) | Flag over-engineering. Suggest simpler alternatives. |
+| Phase 1 (Understand + Design) | Challenge every abstraction layer. Question "might need in future." |
+| Phase 3 (Build GREEN) | Start with naive implementation. Don't optimize until measured. |
+| Phase 4 (Refactor + Review) | Apply Rule of Three. Only abstract proven patterns. Flag over-engineering. |
 
 ---
 

@@ -198,7 +198,7 @@ items[3]{name,type,required}:
 
 ---
 
-**Applied in:** All phases, enforced in Phase 6 (Code Review)
+**Applied in:** All phases, enforced in Phase 4 (Refactor + Review)
 
 ---
 

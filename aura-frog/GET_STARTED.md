@@ -14,9 +14,9 @@
 
 **Aura Frog** - A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that adds AI-powered project management with specialized agents and TDD workflows.
 
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 9-phase workflows.
+> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 5-phase workflows.
 
-| **10 Agents** | **52 Skills** | **48 Rules** | **9 Phases** | **91 Commands** | **27 Hooks** | **6 MCP Servers** |
+| **10 Agents** | **52 Skills** | **49 Rules** | **5 Phases** | **86 Commands** | **27 Hooks** | **6 MCP Servers** |
 |:-------------:|:-------------:|:------------:|:------------:|:---------------:|:-------------:|:----------------:|
 
 ---
@@ -54,7 +54,7 @@ Check that Aura Frog commands are available:
 ```
 
 You should see Aura Frog commands like:
-- `workflow:start` - Start 9-phase workflow
+- `workflow:start` - Start 5-phase workflow
 - `workflow:status` - Check workflow progress
 - `agent:list` - Show all available agents
 - `bugfix:quick` - Quick bug fix
@@ -107,9 +107,9 @@ workflow:start Analyze the current component structure
 
 **Expected:**
 - **agent-detector** skill auto-invokes → Selects appropriate agent
-- **workflow-orchestrator** skill auto-invokes → Starts 9-phase workflow
+- **workflow-orchestrator** skill auto-invokes → Starts 5-phase workflow
 - Claude analyzes your code
-- Shows Phase 1: Requirements Analysis
+- Shows Phase 1: Understand + Design
 - Displays approval gate
 - Waits for your response
 
@@ -121,7 +121,7 @@ workflow:approve
 ```
 
 **Expected:**
-- Proceeds to Phase 2: Technical Planning
+- Proceeds to Phase 2: Test RED
 - Shows next approval gate
 
 ---
@@ -166,16 +166,11 @@ Set environment variables in `.envrc` for:
 - `workflow:modify <changes>` - Modify deliverables
 
 ### Phase Commands (Advanced)
-- `workflow:phase:2` - Execute Phase 2 (Technical Planning)
-- `workflow:phase:3` - Execute Phase 3 (Design Review)
-- `workflow:phase:4` - Execute Phase 4 (Test Planning)
-- `workflow:phase:5a` - Execute Phase 5a (Write Tests - TDD RED)
-- `workflow:phase:5b` - Execute Phase 5b (Implementation - TDD GREEN)
-- `workflow:phase:5c` - Execute Phase 5c (Refactor - TDD REFACTOR)
-- `workflow:phase:6` - Execute Phase 6 (Code Review)
-- `workflow:phase:7` - Execute Phase 7 (QA Validation)
-- `workflow:phase:8` - Execute Phase 8 (Documentation)
-- `workflow:phase:9` - Execute Phase 9 (Notification)
+- `workflow:phase:1` - Execute Phase 1 (Understand + Design)
+- `workflow:phase:2` - Execute Phase 2 (Test RED)
+- `workflow:phase:3` - Execute Phase 3 (Build GREEN)
+- `workflow:phase:4` - Execute Phase 4 (Refactor + Review)
+- `workflow:phase:5` - Execute Phase 5 (Finalize)
 
 ### Other Commands
 - `project:init` - Initialize/reconfigure Aura Frog
@@ -319,7 +314,7 @@ Aura Frog includes **6 MCP servers** in `.mcp.json`:
 | **vitest** | Unit tests | "Run tests", "Check coverage" | None |
 | **firebase** | Firebase services | "Set up Firestore", "Firebase Auth" | `firebase login` |
 | **figma** | Design files | Figma URLs | `FIGMA_API_TOKEN` in `.envrc` |
-| **slack** | Notifications | Phase 9 completion | `SLACK_BOT_TOKEN` in `.envrc` |
+| **slack** | Notifications | Phase 5 completion | `SLACK_BOT_TOKEN` in `.envrc` |
 
 **No manual configuration needed** - MCPs requiring tokens will silently skip if not set.
 
@@ -369,22 +364,16 @@ workflow:start Refactor MyComponent
 - Loads `commands/workflow/start.md`
 - Activates relevant agents (dev, QA, UI designer)
 
-### 3. Executes 9-Phase Workflow
+### 3. Executes 5-Phase Workflow
 ```
-Phase 1: Requirements Analysis → [Auto-continue]
-Phase 2: Technical Planning → [APPROVAL GATE]
-Phase 3: Design Review → [Auto-continue]
-Phase 4: Test Planning → [Auto-continue]
-Phase 5a: Write Tests (TDD RED) → [Auto-continue]
-Phase 5b: Implementation (TDD GREEN) → [APPROVAL GATE]
-Phase 5c: Refactor (TDD REFACTOR) → [Auto-continue]
-Phase 6: Code Review → [Auto-continue]
-Phase 7: QA Validation → [Auto-continue]
-Phase 8: Documentation → [Auto-continue]
-Phase 9: Notification → [Auto-complete]
+Phase 1: Understand + Design → [APPROVAL GATE]
+Phase 2: Test RED → [Auto-continue]
+Phase 3: Build GREEN → [APPROVAL GATE]
+Phase 4: Refactor + Review → [Auto-continue]
+Phase 5: Finalize → [Auto-complete]
 ```
 
-**Only 2 approval gates** (Phase 2 & 5b) — other phases auto-continue after showing deliverables.
+**Only 2 approval gates** (Phase 1 & 3) -- other phases auto-continue after showing deliverables.
 
 ### 4. You Control Every Step
 At approval gates:
@@ -446,8 +435,8 @@ workflow:start <your-task-description>
 - **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
 - **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
 - **Skills:** `skills/README.md` (52 skills)
-- **Rules:** `rules/README.md` (48 quality rules)
-- **Commands:** `commands/README.md` (91 commands)
+- **Rules:** `rules/README.md` (49 quality rules)
+- **Commands:** `commands/README.md` (86 commands)
 - **Hooks:** `hooks/README.md` (27 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`

@@ -286,8 +286,8 @@ Create spec files in `.claude/visual/spec/`:
 ### With Workflow Orchestrator
 
 Visual testing integrates into:
-- **Phase 5b (GREEN):** After implementation, run visual tests
-- **Phase 7 (Verify):** Final verification includes visual regression
+- **Phase 3 (Build GREEN):** After implementation, run visual tests
+- **Phase 4 (Refactor + Review):** Final verification includes visual regression
 
 ### With Test Writer
 

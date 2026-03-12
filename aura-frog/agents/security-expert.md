@@ -333,7 +333,7 @@ Expert security specialist focused on OWASP Top 10, vulnerability scanning, pene
 4. Calculate risk (DREAD)
 5. Prioritize mitigations
 
-### Phase 6: Reporting
+### Phase 4: Reporting
 1. Categorize findings (Critical, High, Medium, Low)
 2. Provide remediation steps
 3. Estimate effort for fixes
@@ -415,8 +415,7 @@ This agent activates when detecting:
 - `security:fix`
 
 **Phase Integration:**
-- **Phase 6 (Review):** Security code review
-- **Phase 7 (Verify):** Security testing
+- **Phase 4 (Refactor + Review):** Security code review + security testing
 
 ---
 
@@ -439,17 +438,15 @@ This agent activates when detecting:
 
 ## 📦 Deliverables
 
-**Phase 6 (Review):**
+**Phase 4 (Refactor + Review):**
 - Security code review report
 - Vulnerability findings
 - Secure coding recommendations
-
-**Phase 7 (Verify):**
 - Security test results
 - Penetration test report
 - Compliance checklist
 
-**Phase 8 (Document):**
+**Phase 5 (Finalize):**
 - Security documentation
 - Threat model
 - Security architecture diagram
@@ -589,8 +586,8 @@ app.get('/user/:id', authenticate, (req, res) => {
 
 ```toon
 team_role[2]{phase,role,focus}:
-  6-Review,Lead,Security audit + vulnerability scanning + OWASP compliance
-  5b-TDD GREEN,Reviewer,Security review of auth/crypto implementations
+  4-Refactor + Review,Lead,Security audit + vulnerability scanning + OWASP compliance
+  3-Build GREEN,Reviewer,Security review of auth/crypto implementations
 ```
 
 ### File Ownership

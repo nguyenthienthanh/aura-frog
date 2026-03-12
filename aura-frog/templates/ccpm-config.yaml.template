@@ -9,7 +9,7 @@ project_context: "[PROJECT_NAME]"  # Reference to project-contexts/[PROJECT_NAME
 workflow:
   # Default workflow mode: auto, full, lightweight
   # auto: Claude chooses based on task complexity
-  # full: Always use 9-phase workflow
+  # full: Always use 5-phase workflow
   # lightweight: Always use quick commands
   default_mode: "auto"
   

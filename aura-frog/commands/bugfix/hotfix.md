@@ -31,78 +31,53 @@ bugfix:hotfix <JIRA-ID>
 
 ## 🔄 Hotfix Phases
 
-### Phase 1: Emergency Analysis (5-10 min)
+### Phase 1: Emergency Analysis + Plan (5-10 min)
 
 **Focus:**
 - Identify immediate cause
 - Assess impact
-- Quick solution design
-- Skip deep analysis
+- Quick solution design + minimal viable fix
+- Rollback plan + deploy strategy
+- Skip deep analysis and optimization
 
 **Approval:** Auto-approve after 10 seconds if no response
 
 ---
 
-### Phase 2: Quick Fix Plan (5-10 min)
+### Phase 2: Test RED (10-15 min)
 
-**Focus:**
-- Minimal viable fix
-- Rollback plan
-- Deploy strategy
-- Skip optimization
-
-**Approval:** Auto-approve after 10 seconds
-
----
-
-### Phase 3-5: TDD (RED → GREEN → REFACTOR)
-
-**Phase 3: TDD RED** (10-15 min)
 - Write minimal reproduction test
 - Skip edge case tests (add later)
 
-**Phase 4: TDD GREEN** (15-30 min)
+---
+
+### Phase 3: Build GREEN (15-30 min)
+
 - Implement quickest fix
 - Make test pass
 - Skip optimization
-
-**Phase 5: TDD REFACTOR** (OPTIONAL)
-- Ask user: "Refactor now or skip?"
-- Can skip if time-critical
-
----
-
-### Phase 6: Code Review (5-10 min)
-
-**Focus:**
-- Check for breaking changes
-- Verify no new bugs
-- Skip style issues (fix later)
 
 **Approval:** Required (no auto-approve)
 
 ---
 
-### Phase 7: QA Validation (10-15 min)
+### Phase 4: Refactor + Review (5-10 min, OPTIONAL refactor)
 
 **Focus:**
-- Verify fix works
-- Test rollback works
-- Skip full regression (run after deploy)
+- Refactor: Ask user "Refactor now or skip?" (can skip if time-critical)
+- Review: Check for breaking changes, verify no new bugs
+- QA: Verify fix works, test rollback works
+- Skip style issues and full regression (fix/run after deploy)
 
 ---
 
-### Phase 8: Hotfix Documentation (5 min)
+### Phase 5: Finalize (5 min, Auto)
 
 **Minimal docs:**
 - What was broken
 - What was fixed
 - Deploy instructions
 - Rollback instructions
-
----
-
-### Phase 9: Emergency Notification (Auto)
 
 **Immediate notifications:**
 - Slack: #incidents channel
@@ -173,15 +148,12 @@ bugfix:hotfix <JIRA-ID>
 
 | Phase | Standard | Hotfix | Time Saved |
 |-------|----------|--------|------------|
-| Analysis | 15-30 min | 5-10 min | 10-20 min |
-| Planning | 20-40 min | 5-10 min | 15-30 min |
-| TDD RED | 20-30 min | 10-15 min | 10-15 min |
-| TDD GREEN | 30-90 min | 15-30 min | 15-60 min |
-| TDD REFACTOR | 20-40 min | SKIP | 20-40 min |
-| Review | 15-30 min | 5-10 min | 10-20 min |
-| QA | 15-30 min | 10-15 min | 5-15 min |
-| Docs | 10-20 min | 5 min | 5-15 min |
-| **Total** | **2-4 hours** | **1-1.5 hours** | **1-2.5 hours** |
+| 1. Understand+Design | 30-60 min | 5-10 min | 25-50 min |
+| 2. Test RED | 20-30 min | 10-15 min | 10-15 min |
+| 3. Build GREEN | 30-90 min | 15-30 min | 15-60 min |
+| 4. Refactor+Review | 30-60 min | 5-10 min (skip refactor) | 25-50 min |
+| 5. Finalize | 10-20 min | 5 min | 5-15 min |
+| **Total** | **2-4 hours** | **40-70 min** | **1-2.5 hours** |
 
 ---
 
@@ -211,9 +183,10 @@ Phase 2: Quick Fix Plan... ✅
 
 ⏰ Auto-approving in 10 seconds...
 
-Phase 3: TDD RED...
+Phase 2: Test RED...
 [Shows tests]
 
+Phase 3: Build GREEN...
 APPROVAL REQUIRED
 Options: "approve" → Implement fix
 ```

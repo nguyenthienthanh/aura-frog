@@ -1,7 +1,7 @@
-# PHASE 5C: TDD REFACTOR - Improve Code Quality
+# PHASE 4: Refactor + Review - Improve Code Quality
 
-**Phase:** 5c of 9  
-**Duration:** 2-4 hours  
+**Phase:** 4 of 5
+**Duration:** 2-4 hours
 **Goal:** Refactor code while keeping tests green
 
 ---
@@ -124,7 +124,7 @@ Coverage: 87% ✅ (Unchanged or improved)
 ## Deliverables
 
 ```markdown
-# Phase 5c: Refactoring Report
+# Phase 4: Refactoring Report
 
 ## Changes Made:
 1. Extracted 3 utility functions
@@ -150,7 +150,7 @@ Coverage: 87% ✅ (Unchanged or improved)
 
 ```
 ═══════════════════════════════════════════════════════════
-♻️  PHASE 5C COMPLETE: TDD REFACTOR
+♻️  PHASE 4 COMPLETE: Refactor + Review
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
@@ -167,12 +167,12 @@ Code refactored, tests still green, quality improved ✅
    ✅ Code quality improved
    ✅ No new bugs introduced
 
-⏭️  Next Phase: Phase 6 - Code Review
+⏭️  Next Phase: Phase 5 - Finalize
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 6
+Type "workflow:approve" → Proceed to Phase 5
 
 Your response:
 ═══════════════════════════════════════════════════════════
@@ -180,5 +180,5 @@ Your response:
 
 ---
 
-**Next:** Phase 6 - Code Review
+**Next:** Phase 5 - Finalize
 

@@ -52,13 +52,13 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 | 11 | **Save workflow state** | Enable resume if interrupted |
 | 12 | **Show next step guidance** | User knows what happens next |
 
-#### For Approval Phases (Phase 2 & 5b only)
+#### For Approval Phases (Phase 1 & 3 only)
 | # | Rule | Why |
 |---|------|-----|
 | A1 | **Show approval gate** | Human oversight for critical decisions |
-| A2 | **Wait for explicit approval** | Architecture & implementation review |
+| A2 | **Wait for explicit approval** | Design & implementation review |
 
-#### For Auto-Continue Phases (1, 3, 4, 5a, 5c, 6, 7, 8, 9)
+#### For Auto-Continue Phases (2, 4, 5)
 | # | Rule | Why |
 |---|------|-----|
 | AC1 | **Execute phase fully** | Phase is NOT skipped |
@@ -66,7 +66,7 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 | AC3 | **Continue automatically** | No wait for approval |
 | AC4 | **Stop on blockers** | Auto-stop if issues found |
 
-### After User Approval (Phase 2 & 5b)
+### After User Approval (Phase 1 & 3)
 
 | # | Rule | Why |
 |---|------|-----|
@@ -82,7 +82,7 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 0 | **Use Claude Code's native plan mode for planning tasks** (brainstorm, design, evaluate options). For full implementation, use Aura Frog's 9-phase workflow via `workflow:start`. The `planning` command creates a plan file that can be set as active plan with `plan:set` before starting a workflow. | Native plan mode is ideal for Quick/Standard tasks. The 9-phase workflow is for Deep complexity tasks requiring structured TDD. |
+| 0 | **Use Claude Code's native plan mode for planning tasks** (brainstorm, design, evaluate options). For full implementation, use Aura Frog's 5-phase workflow via `workflow:start`. The `planning` command creates a plan file that can be set as active plan with `plan:set` before starting a workflow. | Native plan mode is ideal for Quick/Standard tasks. The 5-phase workflow is for Deep complexity tasks requiring structured TDD. |
 
 ### Context & Loading
 
@@ -96,7 +96,7 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 4 | **Ignore approval gates (Phase 2 & 5b)** | Critical decisions need user review |
+| 4 | **Ignore approval gates (Phase 1 & 3)** | Critical decisions need user review |
 | 5 | **Skip auto-continue phases entirely** | Phases must execute and show deliverables |
 | 6 | **Skip confirmation for destructive actions** | Safety first |
 
@@ -160,7 +160,7 @@ After approval, continue automatically until:
 Continue Until:
   - Next approval gate reached
   - Blocking condition encountered
-  - Workflow complete (Phase 9)
+  - Workflow complete (Phase 5)
   - User interruption
   - Token limit reached
 ```
@@ -276,7 +276,7 @@ At 150K tokens (75% of 200K):
 □ Fix ALL lint issues before proceeding
 □ Show deliverables at each phase completion
 □ Show next step guidance (commands & suggestions)
-□ Wait for approval at Phase 2 & 5b only
+□ Wait for approval at Phase 1 & 3 only
 □ Auto-continue through other phases
 □ Save state
 □ Run tests
@@ -289,7 +289,7 @@ At 150K tokens (75% of 200K):
 □ Auto-push without user confirmation (never push silently)
 □ Skip context loading
 □ Skip auto-continue phases (must execute & show deliverables)
-□ Ignore approval gates at Phase 2 & 5b
+□ Ignore approval gates at Phase 1 & 3
 □ Skip tests
 □ Ignore linter
 □ Commit secrets
@@ -299,8 +299,8 @@ At 150K tokens (75% of 200K):
 
 ### Phase Behavior Summary
 ```
-Approval Phases (2, 5b):     Execute → Show → WAIT → User approves → Continue
-Auto-Continue Phases:        Execute → Show → Continue automatically
+Approval Phases (1, 3):      Execute → Show → WAIT → User approves → Continue
+Auto-Continue Phases (2,4,5): Execute → Show → Continue automatically
 Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
 ```
 

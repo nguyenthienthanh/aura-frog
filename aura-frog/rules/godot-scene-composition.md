@@ -242,7 +242,7 @@ structure[6]{folder,contents}:
 
 ---
 
-**Applied in:** Phase 2 (Design), Phase 5b (Implementation)
+**Applied in:** Phase 1 (Understand + Design), Phase 3 (Build GREEN)
 **Related:** `skills/godot-expert/SKILL.md`
 
 ---

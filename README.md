@@ -25,7 +25,7 @@ Transform Claude Code into a **structured AI development platform** with special
 
 <div align="center">
 
-| **10 Agents** | **52 Skills** | **91 Commands** | **48 Rules** | **27 Hooks** | **6 MCP Servers** |
+| **10 Agents** | **52 Skills** | **86 Commands** | **49 Rules** | **27 Hooks** | **6 MCP Servers** |
 |:-:|:-:|:-:|:-:|:-:|:-:|
 | Auto-selected | 13 auto-invoke | 6 bundled | TOON-optimized | Lifecycle | Auto-invoked |
 
@@ -35,10 +35,10 @@ Transform Claude Code into a **structured AI development platform** with special
 
 | Feature | What It Does | Why It Matters |
 |---------|-------------|----------------|
-| **9-Phase TDD Workflow** | Requirements -> Design -> UI -> Test Plan -> RED -> GREEN -> REFACTOR -> Review -> QA -> Docs | Enforced quality at every step. Only 2 approval gates. |
+| **5-Phase TDD Workflow** | Understand + Design -> Test RED -> Build GREEN -> Refactor + Review -> Finalize | Enforced quality at every step. Only 2 approval gates. |
 | **Agent Teams** | Real multi-agent orchestration with persistent teammates, peer messaging, shared tasks | Parallel work, cross-review, 2-3x faster for complex features |
 | **Model Routing** | Auto-select Haiku/Sonnet/Opus based on task complexity | 30-50% cost savings on trivial tasks |
-| **Fast-Track Mode** | Skip phases 1-3 when specs are ready, auto-execute 4-9 | Zero approval gates for pre-approved specs |
+| **Fast-Track Mode** | Skip Phase 1 when specs are ready, auto-execute 2-5 | Fewer approval gates for pre-approved specs |
 | **Self-Improving Learning** | Auto-detect patterns, corrections, create learned rules | Gets smarter with every session (local or Supabase) |
 | **Context-Fork Skills** | Heavy skills run in forked context to protect main window | No context bloat from framework docs or analysis |
 | **PreCompact Hook** | Auto-save workflow state before Claude compacts context | Never lose progress on long tasks |
@@ -143,27 +143,19 @@ Agents auto-activate based on your prompt context. Consolidated from 15 in v1.17
 
 ---
 
-### 9-Phase TDD Workflow
+### 5-Phase TDD Workflow
 
 ```
-  Phase 1: Understand       "What are we building?"           ⚡ Auto
-  Phase 2: Design           "How will we build it?"           ✋ APPROVAL
-  Phase 3: UI Breakdown     "What does it look like?"         ⚡ Auto
-  Phase 4: Plan Tests       "How will we test it?"            ⚡ Auto
-  ─────────────────────────────────────────────────────────────────
-  Phase 5a: Write Tests     TDD RED - Tests must FAIL         ⚡ Auto
-  Phase 5b: Build           TDD GREEN - Tests must PASS       ✋ APPROVAL
-  Phase 5c: Polish          TDD REFACTOR - Stay green         ⚡ Auto
-  ─────────────────────────────────────────────────────────────────
-  Phase 6: Review           Multi-agent code review           ⚡ Auto*
-  Phase 7: Verify           QA validation + coverage          ⚡ Auto
-  Phase 8: Document         Auto-generate docs                ⚡ Auto
-  Phase 9: Share            Team notification                 ⚡ Auto
+  Phase 1: Understand + Design    "What & how?"              ✋ APPROVAL
+  Phase 2: Test RED               TDD - Tests must FAIL      ⚡ Auto
+  Phase 3: Build GREEN            TDD - Tests must PASS      ✋ APPROVAL
+  Phase 4: Refactor + Review      Polish & review            ⚡ Auto
+  Phase 5: Finalize               Docs, notify, close        ⚡ Auto
 ```
 
-**Only 2 approval gates** (Phase 2 & 5b). All other phases auto-continue.
+**Only 2 approval gates** (Phase 1 & 3). All other phases auto-continue.
 
-**Fast-Track Mode:** Have specs ready? `fasttrack: <specs>` skips phases 1-3 and removes all approval gates.
+**Fast-Track Mode:** Have specs ready? `fasttrack: <specs>` skips Phase 1 and removes all approval gates.
 
 ---
 
@@ -212,7 +204,7 @@ User: "Implement user profile screen"
 1. agent-detector         → Selects mobile-expert
 2. model-router           → Picks Sonnet (standard task)
 3. project-context-loader → Loads your conventions
-4. workflow-orchestrator   → Executes 9-phase workflow
+4. workflow-orchestrator   → Executes 5-phase workflow
 ```
 
 **v1.20.1:** Heavy skills (`framework-expert`, `seo-bundle`, `testing-patterns`, `learning-analyzer`) now run with `context: fork` to protect main context window.
@@ -230,7 +222,7 @@ Auto-invoke based on context — zero config for most:
 | **vitest** | Unit tests | "Run tests", "Check coverage" | None |
 | **firebase** | Firebase services | "Set up Firestore" | `firebase login` |
 | **figma** | Design extraction | Figma URLs | `FIGMA_API_TOKEN` |
-| **slack** | Notifications | Phase 9 completion | `SLACK_BOT_TOKEN` |
+| **slack** | Notifications | Phase 5 completion | `SLACK_BOT_TOKEN` |
 
 ---
 
@@ -270,19 +262,19 @@ Optionally syncs to **Supabase** for cross-machine memory.
 
 | Mode | Command | Best For |
 |------|---------|----------|
-| **Full 9-Phase** | `workflow:start "task"` | New features, production code |
-| **Fast-Track** | `fasttrack: <specs>` | Pre-approved specs, no approval gates |
+| **Full 5-Phase** | `workflow:start "task"` | New features, production code |
+| **Fast-Track** | `fasttrack: <specs>` | Pre-approved specs, fewer approval gates |
 | **Quick Bug Fix** | `bugfix:quick "fix"` | Small TDD bug fixes |
 | **Refactor** | `refactor "file"` | Code refactoring |
 | **Planning** | `planning "feature"` | Create execution plan |
 
 ---
 
-## Commands (91 total, 6 bundled)
+## Commands (86 total, 6 bundled)
 
 | Bundled | Subcommands | Replaces |
 |---------|-------------|----------|
-| `/workflow` | start, status, approve, reject, handoff, resume | 22 commands |
+| `/workflow` | start, status, approve, reject, handoff, resume | 16 commands |
 | `/test` | unit, e2e, coverage, watch, docs | 4 commands |
 | `/project` | status, refresh, init, switch, list, config | 7 commands |
 | `/quality` | lint, complexity, review, fix | 3 commands |
@@ -298,8 +290,8 @@ aura-frog/
 ├── .claude-plugin/        plugin.json (manifest + capabilities)
 ├── agents/                10 specialized agents
 ├── skills/                52 skills (13 auto + 39 reference)
-├── commands/              91 commands (6 bundled + 85 individual)
-├── rules/                 48 quality rules (TOON-optimized)
+├── commands/              86 commands (6 bundled + 80 individual)
+├── rules/                 49 quality rules (TOON-optimized)
 ├── hooks/                 27 lifecycle hooks
 ├── docs/                  Phase guides, MCP guide, team guide
 ├── scripts/               Utility scripts (integrations, workflows)
@@ -332,13 +324,13 @@ aura-frog/
 |----------|-------------|
 | [GET_STARTED.md](aura-frog/GET_STARTED.md) | Complete getting started guide |
 | [CLAUDE.md](aura-frog/CLAUDE.md) | AI instructions (read by Claude) |
-| [docs/phases/](aura-frog/docs/phases/) | 9 detailed phase guides |
+| [docs/phases/](aura-frog/docs/phases/) | 5 detailed phase guides |
 | [docs/MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) | MCP servers setup |
 | [docs/AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) | Agent Teams guide |
 | [docs/BANNER_EXAMPLES.md](aura-frog/docs/BANNER_EXAMPLES.md) | Banner format examples |
 | [skills/README.md](aura-frog/skills/README.md) | 52 skills reference |
-| [commands/README.md](aura-frog/commands/README.md) | 91 commands reference |
-| [rules/README.md](aura-frog/rules/README.md) | 48 quality rules |
+| [commands/README.md](aura-frog/commands/README.md) | 86 commands reference |
+| [rules/README.md](aura-frog/rules/README.md) | 49 quality rules |
 | [hooks/README.md](aura-frog/hooks/README.md) | 27 lifecycle hooks |
 
 ---
@@ -349,7 +341,7 @@ aura-frog/
 |---------|:---------:|:-----------:|:----:|:----------------:|
 | Specialized agents | 10 | - | - | 3 modes |
 | Skills (auto-invoke) | 13 | 3 | - | - |
-| TDD workflow | 9-phase | - | - | - |
+| TDD workflow | 5-phase | - | - | - |
 | Agent Teams | Yes | - | - | - |
 | Model routing | Yes | - | - | - |
 | MCP servers | 6 bundled | - | - | - |

@@ -149,9 +149,9 @@ cat /tmp/aura-frog/responses/test-results-1234567890.txt
 
 ```toon
 workflow_integration[4]{phase,use_case,pattern}:
-  Phase 5a (Tests),Save test output,Pattern 1
-  Phase 6 (Review),Save linter output,Pattern 1
-  Phase 7 (Verify),Save coverage report,Pattern 1
+  Phase 2 (Test RED),Save test output,Pattern 1
+  Phase 4 (Refactor + Review),Save linter output,Pattern 1
+  Phase 4 (Refactor + Review),Save coverage report,Pattern 1
   Any,Large API responses,Pattern 2
 ```
 

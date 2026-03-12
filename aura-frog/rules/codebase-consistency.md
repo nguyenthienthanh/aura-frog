@@ -15,10 +15,10 @@
 
 This applies to:
 - **Phase 1 (Requirements):** Check if feature already exists or can be extended
-- **Phase 2 (Tech Planning):** Reuse existing services, APIs, patterns
-- **Phase 3 (UI Breakdown):** Use existing components, extend if needed
-- **Phase 4 (Test Planning):** Reuse test utilities, fixtures, helpers
-- **Phase 5 (Implementation):** Reuse hooks, utils, components before creating new
+- **Phase 2 (Test RED):** Reuse existing services, APIs, patterns
+- **Phase 3 (Build GREEN):** Use existing components, extend if needed
+- **Phase 4 (Refactor + Review):** Reuse test utilities, fixtures, helpers
+- **Phase 3 (Build GREEN):** Reuse hooks, utils, components before creating new
 
 ---
 
@@ -52,7 +52,7 @@ Glob: src/services/*.ts
 Glob: src/api/*.ts
 ```
 
-### Phase 3: UI Breakdown
+### Phase 3: Build GREEN
 
 ```bash
 # Find existing components
@@ -65,7 +65,7 @@ Read: src/components/[SimilarComponent].tsx
 Grep: "className=|styled|theme"
 ```
 
-### Phase 4-5: Tests & Implementation
+### Phase 4-5: Refactor + Review & Finalize
 
 ```bash
 # Find similar files

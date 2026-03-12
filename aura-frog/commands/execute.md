@@ -7,7 +7,7 @@
 
 ## 🎯 Overview
 
-Implement code based on a pre-existing plan, skipping planning phases and going straight to TDD implementation.
+Implement code based on a pre-existing plan, skipping Phase 1 (Understand + Design) and going straight to TDD implementation.
 
 **Use when:** 
 - Plan already created
@@ -55,7 +55,7 @@ const context = {
 ### 2. Create Execution Workflow
 
 ```typescript
-// Create lightweight workflow (skip Phase 1-4)
+// Create lightweight workflow (skip Phase 1)
 const workflowId = `execute-${planId}`;
 
 const workflow = {
@@ -63,11 +63,11 @@ const workflow = {
   workflow_name: `Execute: ${plan.task}`,
   source_plan: planId,
   phases: {
-    // Skip Phase 1-4 (planning done)
-    5: { name: "TDD Implementation", status: "pending" },
-    6: { name: "Code Review", status: "pending" },
-    7: { name: "QA Validation", status: "pending" },
-    8: { name: "Documentation", status: "pending" }
+    // Skip Phase 1 (planning done)
+    2: { name: "Test RED", status: "pending" },
+    3: { name: "Build GREEN", status: "pending" },
+    4: { name: "Refactor + Review", status: "pending" },
+    5: { name: "Finalize", status: "pending" }
   }
 };
 ```
@@ -105,22 +105,20 @@ const workflow = {
 
 ## 🎯 Execution Phases
 
-✅ Phase 1-4: Planning (SKIPPED - Plan exists)
+✅ Phase 1: Understand + Design (SKIPPED - Plan exists)
 
 **Starting:**
-⏳ Phase 5: TDD Implementation
-   - Phase 5a: Write failing tests (RED)
-   - Phase 5b: Implement code (GREEN)
-   - Phase 5c: Refactor (REFACTOR)
+⏳ Phase 2: Test RED
+   - Write failing tests
 
 **Then:**
-⏸️  Phase 6: Code Review
-⏸️  Phase 7: QA Validation
-⏸️  Phase 8: Documentation
+⏸️  Phase 3: Build GREEN
+⏸️  Phase 4: Refactor + Review
+⏸️  Phase 5: Finalize
 
 ---
 
-## 🚀 Starting Phase 5a: Write Tests
+## 🚀 Starting Phase 2: Write Tests (RED)
 
 **Creating test files based on plan:**
 - UserProfileHeader.test.tsx
@@ -132,18 +130,18 @@ Ready to proceed? (yes/no)
 
 ### 4. Execute TDD Cycle
 
-**Phase 5a: RED (Write Failing Tests)**
+**Phase 2: RED (Write Failing Tests)**
 
 ```typescript
 // Create test files from plan
 for (const component of plan.components) {
   const testFile = `${component.path}/__tests__/${component.name}.test.tsx`;
-  
+
   const testContent = generateTests(component, {
     coverage: plan.testStrategy.coverage || 85,
     scenarios: plan.testStrategy.scenarios
   });
-  
+
   createFile(testFile, testContent);
 }
 
@@ -153,19 +151,19 @@ console.log(`✅ Created ${tests.length} test files`);
 console.log(`🔴 All tests failing (RED phase) - Good!`);
 ```
 
-**Phase 5b: GREEN (Implement)**
+**Phase 3: GREEN (Implement)**
 
 ```typescript
 // Create components from plan
 for (const component of plan.components) {
   const componentFile = `${component.path}/${component.name}.tsx`;
-  
+
   const componentCode = generateComponent(component, {
     props: component.props,
     state: component.state,
     logic: component.logic
   });
-  
+
   createFile(componentFile, componentCode);
 }
 
@@ -175,7 +173,7 @@ console.log(`✅ Created ${components.length} components`);
 console.log(`🟢 All tests passing (GREEN phase) - Good!`);
 ```
 
-**Phase 5c: REFACTOR**
+**Phase 4: REFACTOR + REVIEW**
 
 ```typescript
 // Apply best practices
@@ -197,7 +195,7 @@ console.log(`🟢 All tests still passing - Good!`);
 ### 5. Continue Through Phases
 
 ```typescript
-// Phase 6: Code Review
+// Phase 4: Refactor + Review (continued)
 runCodeReview({
   checkLinter: true,
   checkComplexity: true,
@@ -205,14 +203,13 @@ runCodeReview({
   compareWithPlan: true
 });
 
-// Phase 7: QA Validation
 runQAValidation({
   runAllTests: true,
   checkCoverage: true,
   verifyRequirements: true
 });
 
-// Phase 8: Documentation
+// Phase 5: Finalize
 generateDocumentation({
   implementationSummary: true,
   apiDocs: true,
@@ -228,10 +225,9 @@ generateDocumentation({
 ```markdown
 ## ⏱️ Progress
 
-**Phase 5: TDD Implementation**
-├─ ✅ 5a: RED (15 min) - Tests created
-├─ ✅ 5b: GREEN (45 min) - Code implemented
-└─ ⏳ 5c: REFACTOR (in progress)
+**Phase 2: Test RED** ✅ (15 min) - Tests created
+**Phase 3: Build GREEN** ✅ (45 min) - Code implemented
+**Phase 4: Refactor + Review** ⏳ (in progress)
 
 **Metrics:**
 - Files created: 6 (3 components + 3 tests)
@@ -252,12 +248,12 @@ generateDocumentation({
 execute [plan-id]
 
 # Auto-executes:
-- Phase 5: TDD (with approvals)
-- Phase 6: Review
-- Phase 7: QA
-- Phase 8: Docs
+- Phase 2: Test RED
+- Phase 3: Build GREEN (with approval)
+- Phase 4: Refactor + Review
+- Phase 5: Finalize
 
-# Shows approval gate at each phase
+# Shows approval gate at Phase 3
 ```
 
 ### Manual Control
@@ -266,11 +262,11 @@ execute [plan-id]
 execute [plan-id] --manual
 
 # Step-by-step:
-1. Shows Phase 5a plan
+1. Shows Phase 2 plan
 2. Wait for: proceed
-3. Execute Phase 5a
+3. Execute Phase 2
 4. Wait for: approve
-5. Shows Phase 5b plan
+5. Shows Phase 3 plan
 ... etc
 ```
 
@@ -318,23 +314,22 @@ src/components/UserProfile/__tests__/
 logs/workflows/execute-[plan-id]/
 ├── workflow-state.json
 ├── execution.log
-├── phase-5a.log
-├── phase-5b.log
-└── phase-5c.log
+├── phase-2.log
+├── phase-3.log
+└── phase-4.log
 ```
 
 **Deliverables:**
 ```
 logs/contexts/execute-[plan-id]/
 └── deliverables/
-    ├── 05-tdd-implementation/
-    │   ├── implementation-summary.md
+    ├── 02-test-red/
     │   └── test-report.md
-    ├── 06-code-review/
+    ├── 03-build-green/
+    │   └── implementation-summary.md
+    ├── 04-refactor-review/
     │   └── review-report.md
-    ├── 07-qa-validation/
-    │   └── qa-report.md
-    └── 08-documentation/
+    └── 05-finalize/
         └── api-docs.md
 ```
 
@@ -346,26 +341,27 @@ logs/contexts/execute-[plan-id]/
 
 **workflow:start "Task":**
 ```
-Phase 1: Requirements ✅
-Phase 2: Technical Plan ✅
-Phase 3: Design Review ✅
-Phase 4: Test Planning ✅
-Phase 5: Implementation ✅
-Phase 6-9: ...
+Phase 1: Understand + Design ✅
+Phase 2: Test RED ✅
+Phase 3: Build GREEN ✅
+Phase 4: Refactor + Review ✅
+Phase 5: Finalize ✅
 
-Total: 9 phases, ~3.5 hours
+Total: 5 phases, ~3.5 hours
 ```
 
 **execute [plan-id]:**
 ```
-Phase 1-4: SKIPPED (plan exists)
-Phase 5: Implementation ✅
-Phase 6-9: ...
+Phase 1: SKIPPED (plan exists)
+Phase 2: Test RED ✅
+Phase 3: Build GREEN ✅
+Phase 4: Refactor + Review ✅
+Phase 5: Finalize ✅
 
-Total: 5 phases, ~2 hours
+Total: 4 phases, ~2 hours
 ```
 
-**Savings:** 1.5 hours, 4 phases
+**Savings:** 1.5 hours, 1 phase
 
 ---
 
@@ -419,8 +415,8 @@ planning "Refactor UserProfile" --execute
 ✅ All files created as planned  
 ✅ Tests pass (TDD cycle)  
 ✅ Coverage target met  
-✅ Code review passed  
-✅ QA validation passed  
+✅ Refactor + review passed
+✅ Finalization complete
 ✅ Documentation generated  
 
 ---

@@ -410,7 +410,7 @@ resource "aws_instance" "web" {
 - `deploy:setup`
 
 **Integration:**
-- Phase 9 (Share) or new Phase 10 (Deployment)
+- Phase 5 (Finalize) - Deployment
 
 ---
 
@@ -427,18 +427,18 @@ resource "aws_instance" "web" {
 
 ## 📦 Deliverables
 
-**Phase 2 (Design):**
+**Phase 1 (Understand + Design):**
 - Deployment architecture diagram
 - Infrastructure requirements
 - Cloud provider selection
 
-**Phase 5c (Polish):**
+**Phase 4 (Refactor + Review):**
 - Dockerfile
 - CI/CD pipeline
 - Kubernetes manifests
 - Infrastructure code
 
-**Phase 9 (Share) / Phase 10 (Deployment):**
+**Phase 5 (Finalize):**
 - Deployment guide
 - Monitoring setup
 - Rollback procedures
@@ -454,10 +454,9 @@ resource "aws_instance" "web" {
 
 ```toon
 team_role[4]{phase,role,focus}:
-  2-Design,Support,Deployment architecture + infrastructure planning
-  5c-TDD REFACTOR,Support,Dockerfile + CI/CD pipeline creation
-  8-Docs,Support,Deployment guides + runbooks
-  9-Share,Lead,Deploy to staging/production + notifications
+  1-Understand + Design,Support,Deployment architecture + infrastructure planning
+  4-Refactor + Review,Support,Dockerfile + CI/CD pipeline creation
+  5-Finalize,Lead,Deployment guides + runbooks + deploy to staging/production + notifications
 ```
 
 ### File Claiming Conventions

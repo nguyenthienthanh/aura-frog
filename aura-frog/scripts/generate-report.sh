@@ -36,7 +36,7 @@ find "$CONTEXT_DIR" -name "*.json" -type f | head -10 | while read -r context; d
   
   echo "### Workflow: $feature" >> "$OUTPUT_FILE"
   echo "- ID: $id" >> "$OUTPUT_FILE"
-  echo "- Phase: $phase/9" >> "$OUTPUT_FILE"
+  echo "- Phase: $phase/5" >> "$OUTPUT_FILE"
   echo "- Started: $started" >> "$OUTPUT_FILE"
   echo "" >> "$OUTPUT_FILE"
 done

@@ -55,7 +55,7 @@
 
 ## New in 1.8.1
 
-- **workflow-orchestrator** - Streamlined workflow with only 2 approval gates (Phase 2 Design, Phase 5b Implementation). Other phases auto-continue unless blockers hit.
+- **workflow-orchestrator** - Streamlined workflow with only 2 approval gates (Phase 1 Design, Phase 3 Build GREEN). Other phases auto-continue unless blockers hit.
 
 ## New in 1.7.0
 
@@ -96,7 +96,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 - Complex tasks requiring multiple phases
 
 **What it does:**
-- Executes Aura Frog's 9-phase workflow
+- Executes Aura Frog's 5-phase workflow
 - Enforces TDD (RED → GREEN → REFACTOR)
 - Multi-agent collaboration
 - Quality gates at every phase
@@ -147,9 +147,9 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 - "bugfix:quick" command
 
 **What it does:**
-- Lightweight fix process (skips full 9-phase workflow)
+- Lightweight fix process (skips full 5-phase workflow)
 - Still enforces TDD: write failing test → implement fix → verify
-- 3 approval gates (vs 9 in full workflow)
+- 3 approval gates (vs 5 in full workflow)
 - Much faster for simple bugs
 
 ---
@@ -177,7 +177,7 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 
 **Triggers:**
 - "review code", "code review", "check my code"
-- After Phase 5c in workflow
+- After Phase 4 (Refactor + Review) in workflow
 - Before merging pull requests
 
 **What it does:**

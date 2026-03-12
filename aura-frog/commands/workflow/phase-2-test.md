@@ -1,12 +1,12 @@
-# Command: workflow:phase:5a
+# Command: workflow:phase:2
 
-**Version:** 1.0.0  
-**Purpose:** Execute Phase 5a - Write Tests (RED Phase of TDD)  
-**Trigger:** Auto-triggered after Phase 4 approval OR manual `/workflow:phase:5a`
+**Version:** 1.0.0
+**Purpose:** Execute Phase 2 - Write Tests (RED Phase of TDD)
+**Trigger:** Auto-triggered after Phase 1 approval OR manual `/workflow:phase:2`
 
 ---
 
-## 🎯 Phase 5a Objectives (TDD RED Phase)
+## 🎯 Phase 2 Objectives (TDD RED Phase)
 
 **Write failing tests FIRST before any implementation.**
 
@@ -119,7 +119,7 @@ Tests:       15 failed, 0 passed, 15 total
 
 ### Step 6: Generate Test Report
 ```markdown
-# Phase 5a: Test Report (RED)
+# Phase 2: Test Report (RED)
 
 ## Tests Written
 
@@ -145,14 +145,14 @@ Failing: 73 ❌ (Expected!)
 - Coverage directory: coverage/
 
 ## Next Step
-Phase 5b: Implement code to make these tests pass (GREEN)
+Phase 3: Implement code to make these tests pass (GREEN)
 ```
 
 ---
 
 ## ✅ Success Criteria
 
-Phase 5a complete when:
+Phase 2 complete when:
 - [ ] Test files created for all components
 - [ ] All tests written (73 tests in example)
 - [ ] **ALL TESTS FAIL** (this is required!)
@@ -166,7 +166,7 @@ Phase 5a complete when:
 
 ```
 ═══════════════════════════════════════════════════════════
-🎯 PHASE 5a COMPLETE: Write Tests (RED)
+🎯 PHASE 2 COMPLETE: Write Tests (RED)
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
@@ -193,13 +193,13 @@ Wrote 73 tests for all components and hooks
    ✅ All tests failing (correct TDD RED phase)
    ✅ Coverage configured (85% target)
 
-⏭️  Next Phase: Phase 5b - Implementation (GREEN)
+⏭️  Next Phase: Phase 3 - Implementation (GREEN)
    Write minimum code to make all tests pass
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "/workflow:approve" → Proceed to Phase 5b (Implementation)
+Type "/workflow:approve" → Proceed to Phase 3 (Implementation)
 Type "/workflow:reject" → Revise tests
 Type "/workflow:modify <feedback>" → Adjust test cases
 
@@ -211,7 +211,7 @@ Your response:
 
 ## ⚠️ Validation Before Proceeding
 
-Before allowing Phase 5b:
+Before allowing Phase 3:
 
 ```typescript
 // Validate RED phase
@@ -234,7 +234,7 @@ if (!validation.allTestsFail) {
 
 ### ❌ Writing Implementation Code
 ```typescript
-// WRONG in Phase 5a!
+// WRONG in Phase 2!
 export const PostCaptionEditor = ({ caption }) => {
   return <View>...</View>;
 };
@@ -277,14 +277,14 @@ src/features/socialMarketing/
             └── useSocialMarketingCompositePostLogic.test.ts ⭐
 
 logs/contexts/{workflow-id}/deliverables/
-└── PHASE_5A_TEST_REPORT.md
+└── PHASE_2_TEST_REPORT.md
 ```
 
 ---
 
 ## 🎯 What Happens Next
 
-After approval → `/workflow:phase:5b`:
+After approval → `/workflow:phase:3`:
 - Implement components to make tests pass
 - Run tests → should turn GREEN ✅
 - Verify coverage meets threshold (85%)
@@ -292,7 +292,7 @@ After approval → `/workflow:phase:5b`:
 ---
 
 **Status:** Active command  
-**Related:** workflow:phase:4, workflow:phase:5b, workflow:approve
+**Related:** workflow:phase:1, workflow:phase:3, workflow:approve
 
 ---
 

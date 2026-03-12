@@ -90,7 +90,7 @@ Read: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 
 **Contains:**
 - Agent identification banner rule
-- 9-phase workflow
+- 5-phase workflow
 - TDD enforcement
 - Approval gates
 - All core Aura Frog behavior

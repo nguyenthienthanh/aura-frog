@@ -70,15 +70,11 @@ get_phase_dir_name() {
 # Get phase display name
 get_phase_name() {
     case $1 in
-        1) echo "Requirements Analysis" ;;
-        2) echo "Technical Planning" ;;
-        3) echo "Design Review" ;;
-        4) echo "Test Planning" ;;
-        5) echo "TDD Implementation" ;;
-        6) echo "Code Review" ;;
-        7) echo "QA Validation" ;;
-        8) echo "Documentation" ;;
-        9) echo "Notification" ;;
+        1) echo "Understand + Design" ;;
+        2) echo "Test RED" ;;
+        3) echo "Build GREEN" ;;
+        4) echo "Refactor + Review" ;;
+        5) echo "Finalize" ;;
         *) echo "Unknown Phase" ;;
     esac
 }
@@ -275,15 +271,11 @@ COMMANDS:
     help                                  Show this help
 
 PHASES:
-    1 - Requirements Analysis
-    2 - Technical Planning
-    3 - Design Review
-    4 - Test Planning
-    5 - TDD Implementation
-    6 - Code Review
-    7 - QA Validation
-    8 - Documentation
-    9 - Notification
+    1 - Understand + Design
+    2 - Test RED
+    3 - Build GREEN
+    4 - Refactor + Review
+    5 - Finalize
 
 EXAMPLES:
     # Save inline content

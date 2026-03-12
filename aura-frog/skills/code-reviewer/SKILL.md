@@ -6,7 +6,7 @@ priority: high
 triggers:
   - "review code"
   - "code review"
-  - "after Phase 5c"
+  - "after Phase 4"
   - "before merge"
 allowed-tools: Read, Grep, Glob, Bash
 ---

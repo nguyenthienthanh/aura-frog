@@ -41,7 +41,7 @@ if (!state || !state.workflow_id) {
 ### 2. Calculate Progress
 
 ```typescript
-const totalPhases = 9;
+const totalPhases = 5;
 const completedPhases = Object.values(state.phases)
   .filter(p => p.status === 'completed').length;
 const currentPhase = state.current_phase;
@@ -64,26 +64,20 @@ const progressPercent = Math.round((completedPhases / totalPhases) * 100);
 ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 60%
 ```
 
-**Phase:** 5b/9 - TDD GREEN (Implement)  
-**Status:** In Progress  
+**Phase:** 3/5 - Build GREEN
+**Status:** In Progress
 **Started:** 2 hours ago
 
 ## Timeline
 
 **Completed Phases:**
-  ✅ Phase 1: Requirements Analysis    (7 min, 25K tokens)
-  ✅ Phase 2: Technical Planning       (12 min, 45K tokens)
-  ✅ Phase 3: Design Review            (8 min, 30K tokens)
-  ✅ Phase 4: Test Planning            (10 min, 35K tokens)
-  ✅ Phase 5a: TDD RED                 (11 min, 40K tokens)
-  ⏳ Phase 5b: TDD GREEN               (15 min elapsed, 50K tokens)
+  ✅ Phase 1: Understand + Design      (20 min, 25K tokens)
+  ✅ Phase 2: Test RED                 (11 min, 40K tokens)
+  ⏳ Phase 3: Build GREEN              (15 min elapsed, 50K tokens)
 
 **Remaining Phases:**
-  ⏸️  Phase 5c: TDD REFACTOR           (~12 min)
-  ⏸️  Phase 6: Code Review             (~8 min)
-  ⏸️  Phase 7: QA Validation           (~7 min)
-  ⏸️  Phase 8: Documentation           (~10 min)
-  ⏸️  Phase 9: Notification            (~2 min)
+  ⏸️  Phase 4: Refactor + Review       (~12 min)
+  ⏸️  Phase 5: Finalize                (~5 min)
 
 ## Estimates
 
@@ -107,11 +101,11 @@ const progressPercent = Math.round((completedPhases / totalPhases) * 100);
 
 ## Milestones
 
-- [x] Requirements Complete (Phase 1)
-- [x] Planning Complete (Phases 2-4)
-- [ ] Implementation Complete (Phase 5) - 66% done
-- [ ] Validation Complete (Phases 6-7)
-- [ ] Deployment Ready (Phases 8-9)
+- [x] Planning Complete (Phase 1)
+- [x] Tests Written (Phase 2)
+- [ ] Implementation Complete (Phase 3) - 66% done
+- [ ] Review Complete (Phase 4)
+- [ ] Finalized (Phase 5)
 ```
 
 ---
@@ -152,32 +146,24 @@ function createProgressBar(percent: number, length: number = 50): string {
 
 | Phase | Avg Duration | Range |
 |-------|-------------|-------|
-| 1. Requirements | 7 min | 5-15 min |
-| 2. Technical Planning | 12 min | 10-20 min |
-| 3. Design Review | 8 min | 5-15 min |
-| 4. Test Planning | 10 min | 8-15 min |
-| 5a. TDD RED | 11 min | 8-15 min |
-| 5b. TDD GREEN | 25 min | 15-40 min |
-| 5c. TDD REFACTOR | 12 min | 10-20 min |
-| 6. Code Review | 8 min | 5-12 min |
-| 7. QA Validation | 7 min | 5-10 min |
-| 8. Documentation | 10 min | 8-15 min |
-| 9. Notification | 2 min | 1-3 min |
+| 1. Understand + Design | 20 min | 15-35 min |
+| 2. Test RED | 11 min | 8-15 min |
+| 3. Build GREEN | 25 min | 15-40 min |
+| 4. Refactor + Review | 15 min | 10-25 min |
+| 5. Finalize | 5 min | 3-10 min |
 
-**Total:** ~110 min (1h 50min average)
+**Total:** ~76 min (1h 16min average)
 
 ### Calculation
 
 ```typescript
 function estimateRemaining(state: WorkflowState): TimeEstimate {
   const avgDurations = {
-    1: 7, 2: 12, 3: 8, 4: 10,
-    5: 48, // 5a + 5b + 5c combined
-    6: 8, 7: 7, 8: 10, 9: 2
+    1: 20, 2: 11, 3: 25, 4: 15, 5: 5
   };
-  
+
   let remaining = 0;
-  for (let i = state.current_phase + 1; i <= 9; i++) {
+  for (let i = state.current_phase + 1; i <= 5; i++) {
     remaining += avgDurations[i] || 10;
   }
   
@@ -234,29 +220,29 @@ function calculatePace(state: WorkflowState): string {
 ```typescript
 const milestones = [
   {
-    name: 'Requirements Complete',
-    phases: [1],
-    weight: 10
-  },
-  {
     name: 'Planning Complete',
-    phases: [2, 3, 4],
-    weight: 30
+    phases: [1],
+    weight: 20
   },
   {
-    name: 'Implementation Complete',
-    phases: [5],  // 5a, 5b, 5c
-    weight: 40
-  },
-  {
-    name: 'Validation Complete',
-    phases: [6, 7],
+    name: 'Tests Written',
+    phases: [2],
     weight: 15
   },
   {
-    name: 'Deployment Ready',
-    phases: [8, 9],
-    weight: 5
+    name: 'Implementation Complete',
+    phases: [3],
+    weight: 40
+  },
+  {
+    name: 'Review Complete',
+    phases: [4],
+    weight: 15
+  },
+  {
+    name: 'Finalized',
+    phases: [5],
+    weight: 10
   }
 ];
 ```
@@ -266,64 +252,62 @@ const milestones = [
 ```markdown
 ## Milestones
 
-- [x] ✅ Requirements Complete (100%)
 - [x] ✅ Planning Complete (100%)
+- [x] ✅ Tests Written (100%)
 - [ ] ⏳ Implementation Complete (66%)
-      └─ Phase 5b in progress
-- [ ] ⏸️  Validation Complete (0%)
-- [ ] ⏸️  Deployment Ready (0%)
+      └─ Phase 3 in progress
+- [ ] ⏸️  Review Complete (0%)
+- [ ] ⏸️  Finalized (0%)
 ```
 
 ---
 
 ## 📊 Output Examples
 
-### Early Stage (Phase 2)
+### Early Stage (Phase 1)
 
 ```
 🚀 Workflow Progress
 
-[=====>               ] 22%
-Phase 2/9: Technical Planning
+[=====>               ] 20%
+Phase 1/5: Understand + Design
 
-✅ Phase 1: Requirements (7 min)
-⏳ Phase 2: In progress (5 min elapsed)
-⏸️  Phase 3-9: Pending
+⏳ Phase 1: In progress (10 min elapsed)
+⏸️  Phase 2-5: Pending
 
-ETA: ~90 min remaining
+ETA: ~66 min remaining
 Pace: ✅ Normal
 ```
 
-### Mid Stage (Phase 5b)
+### Mid Stage (Phase 3)
 
 ```
 🚀 Workflow Progress
 
 [===================> ] 60%
-Phase 5b/9: TDD GREEN
+Phase 3/5: Build GREEN
 
-✅ Phase 1-5a: Complete (48 min)
-⏳ Phase 5b: In progress (15 min)
-⏸️  Phase 5c-9: Pending (~40 min)
+✅ Phase 1-2: Complete (31 min)
+⏳ Phase 3: In progress (15 min)
+⏸️  Phase 4-5: Pending (~20 min)
 
-ETA: ~40 min remaining
+ETA: ~20 min remaining
 Pace: ✅ Normal
 Tokens: 285K / 1M (28.5%)
 ```
 
-### Late Stage (Phase 8)
+### Late Stage (Phase 5)
 
 ```
 🚀 Workflow Progress
 
-[========================================>] 89%
-Phase 8/9: Documentation
+[========================================>] 90%
+Phase 5/5: Finalize
 
-✅ Phase 1-7: Complete (95 min)
-⏳ Phase 8: In progress (5 min)
-⏸️  Phase 9: Notification (~2 min)
+✅ Phase 1-4: Complete (71 min)
+⏳ Phase 5: In progress (3 min)
 
-ETA: ~7 min remaining
+ETA: ~2 min remaining
 Pace: ✅ Normal
 Quality: ✅ All gates passed
 ```
@@ -335,20 +319,14 @@ Quality: ✅ All gates passed
 ### Timeline Chart
 
 ```
-Time: |-----|-----|-----|-----|-----|-----|-----|-----|-----|
-      0     20    40    60    80   100   120   140   160   180
-      
-P1:   |==>|
-P2:        |=======>|
-P3:                 |===>|
-P4:                      |====>|
-P5a:                           |====>|
-P5b:                                 |=============>| [NOW]
-P5c:                                              |=====>|
-P6:                                                     |==>|
-P7:                                                        |==>|
-P8:                                                           |====>|
-P9:                                                                |>|
+Time: |-----|-----|-----|-----|-----|-----|-----|
+      0     10    20    30    40    50    60    70
+
+P1:   |=========>|
+P2:              |====>|
+P3:                    |=============>| [NOW]
+P4:                                  |======>|
+P5:                                          |==>|
 ```
 
 ---
@@ -369,16 +347,16 @@ workflow:metrics   # Shows quality metrics
 Show progress in approval prompt:
 
 ```markdown
-## Phase 5b Complete
+## Phase 3 Complete
 
-**Progress:** 60% (Phase 5b/9)
-**Time:** 1h 3min elapsed, ~40min remaining
+**Progress:** 60% (Phase 3/5)
+**Time:** 46min elapsed, ~20min remaining
 **Tokens:** 285K used (28.5%)
 
 [Deliverables...]
 
 Options:
-- approve → Continue to Phase 5c
+- approve → Continue to Phase 4
 ```
 
 ---

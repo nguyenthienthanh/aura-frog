@@ -53,7 +53,7 @@ You: workflow:start Analyze the useSocialMediaPost hook and suggest improvements
 **Expected: Claude Should:**
 1. ✅ Detect command
 2. ✅ Read `commands/workflow/start.md`
-3. ✅ Execute Phase 1 (Requirements Analysis)
+3. ✅ Execute Phase 1 (Understand + Design)
 4. ✅ Analyze the hook file
 5. ✅ Generate analysis document
 6. ✅ Show approval gate like this:
@@ -74,7 +74,7 @@ Analyzed useSocialMediaPost hook (505 lines)
    ✅ Issues identified
    ✅ Improvements suggested
 
-⏭️  Next Phase: Phase 2 - Technical Planning
+⏭️  Next Phase: Phase 2 - Test RED
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
@@ -96,7 +96,7 @@ You: workflow:approve
 **Expected:**
 ```
 ✅ Phase 1 approved
-⏭️  Proceeding to Phase 2: Technical Planning...
+⏭️  Proceeding to Phase 2: Test RED...
 
 [Phase 2 execution starts...]
 ```
@@ -112,41 +112,30 @@ You: workflow:start Refactor SocialMarketingCompositePost.phone.tsx - split into
 ```
 
 **This will test:**
-- ✅ Component analysis (Phase 1)
-- ✅ Architecture design (Phase 2)
-- ✅ Design review (Phase 3)
-- ✅ Test planning (Phase 4)
-- ✅ TDD workflow (Phase 5a, 5b, 5c)
-- ✅ Code review (Phase 6)
-- ✅ QA validation (Phase 7)
-- ✅ Documentation (Phase 8)
-- ✅ Notification (Phase 9)
+- ✅ Understand + Design (Phase 1)
+- ✅ Test RED (Phase 2)
+- ✅ Build GREEN (Phase 3)
+- ✅ Refactor + Review (Phase 4)
+- ✅ Finalize (Phase 5)
 
 ### Expected Flow:
 
 ```
-Phase 1: Analyzes 713-line component → [Auto-continues]
-
-Phase 2: Creates tech spec with architecture
+Phase 1: Analyzes component, creates tech spec + design
 → You: workflow:approve  ← [APPROVAL GATE]
 
-Phase 3: Reviews UI component structure → [Auto-continues]
-Phase 4: Plans 70+ test cases → [Auto-continues]
-Phase 5a: Writes failing tests (RED) → [Auto-continues]
+Phase 2: Plans tests, writes failing tests (RED) → [Auto-continues]
 
-Phase 5b: Implements components (GREEN)
+Phase 3: Implements components (GREEN)
 → You: workflow:approve  ← [APPROVAL GATE]
 
-Phase 5c: Refactors code (REFACTOR) → [Auto-continues]
-Phase 6: Cross-agent code review → [Auto-continues]
-Phase 7: QA validation with coverage report → [Auto-continues]
-Phase 8: Generates documentation → [Auto-continues]
-Phase 9: Sends notifications → [Auto-complete]
+Phase 4: Refactors code + code review + QA validation → [Auto-continues]
+Phase 5: Generates documentation + sends notifications → [Auto-complete]
 
 🎉 WORKFLOW COMPLETE!
 ```
 
-**Note:** Only 2 approval gates (Phase 2 & 5b). Other phases auto-continue after showing deliverables.
+**Note:** Only 2 approval gates (Phase 1 & 3). Other phases auto-continue after showing deliverables.
 
 ---
 
@@ -205,19 +194,18 @@ WORKFLOW STATUS
    Status: In Progress
    Created: 2025-11-24 11:23:23
 
-📍 Current Phase: Phase 3 - Design Review
+📍 Current Phase: Phase 2 - Test RED
 
 📊 Phase Progress:
 
-  ✅ Phase 1: Requirements Analysis (approved)
-  ✅ Phase 2: Technical Planning (approved)
-→ 🔄 Phase 3: Design Review (in_progress)
-  ⏸️ Phase 4-9: Pending
+  ✅ Phase 1: Understand + Design (approved)
+→ 🔄 Phase 2: Test RED (in_progress)
+  ⏸️ Phase 3-5: Pending
 
-Progress: 2/9 phases (22%)
+Progress: 1/5 phases (20%)
 
 ⏭️  Next Action:
-   Wait for Phase 3 completion, then approve
+   Wait for Phase 2 completion, then auto-continue to Phase 3
 ```
 
 ---

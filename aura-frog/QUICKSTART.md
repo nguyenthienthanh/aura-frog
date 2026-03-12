@@ -56,7 +56,7 @@ At approval gates:
 
 | Command | Description |
 |---------|-------------|
-| `workflow:start <task>` | Start full 9-phase workflow |
+| `workflow:start <task>` | Start full 5-phase workflow |
 | `workflow:status` | Show current progress |
 | `workflow:approve` | Approve current phase |
 | `bugfix:quick <desc>` | Quick bug fix with TDD |

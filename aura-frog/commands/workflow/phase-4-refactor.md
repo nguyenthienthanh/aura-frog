@@ -1,12 +1,12 @@
-# Command: workflow:phase:5c
+# Command: workflow:phase:4
 
-**Version:** 1.0.0  
-**Purpose:** Execute Phase 5c - Refactor (REFACTOR Phase of TDD)  
-**Trigger:** Auto-triggered after Phase 5b approval OR manual `/workflow:phase:5c`
+**Version:** 1.0.0
+**Purpose:** Execute Phase 4 - Refactor (REFACTOR Phase of TDD)
+**Trigger:** Auto-triggered after Phase 3 approval OR manual `/workflow:phase:4`
 
 ---
 
-## 🎯 Phase 5c Objectives (TDD REFACTOR Phase)
+## 🎯 Phase 4 Objectives (TDD REFACTOR Phase)
 
 **Improve code quality WITHOUT changing behavior.**
 
@@ -243,7 +243,7 @@ const improvements = {
 
 ## ✅ Success Criteria
 
-Phase 5c complete when:
+Phase 4 complete when:
 - [ ] Code refactored for quality
 - [ ] **ALL 73 TESTS STILL PASS** ✅
 - [ ] Coverage maintained or improved
@@ -258,7 +258,7 @@ Phase 5c complete when:
 
 ```
 ═══════════════════════════════════════════════════════════
-🎯 PHASE 5c COMPLETE: Refactor
+🎯 PHASE 4 COMPLETE: Refactor
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
@@ -295,13 +295,13 @@ Refactored code for better quality, all tests still passing!
    ✅ Duplication eliminated (-80%)
    ✅ No behavior changes
 
-⏭️  Next Phase: Phase 6 - Code Review
-   Cross-agent review for final quality check
+⏭️  Next Phase: Phase 5 - Finalize
+   Documentation, QA validation, and notifications
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "/workflow:approve" → Proceed to Phase 6 (Code Review)
+Type "/workflow:approve" → Proceed to Phase 5 (Finalize)
 Type "/workflow:reject" → Revert refactorings
 Type "/workflow:modify <feedback>" → Adjust refactorings
 
@@ -347,7 +347,7 @@ src/features/socialMarketing/
             └── useSocialMarketingCompositePostLogic.ts (refactored)
 
 logs/contexts/{workflow-id}/deliverables/
-└── PHASE_5C_REFACTORING_REPORT.md
+└── PHASE_4_REFACTORING_REPORT.md
 ```
 
 ---
@@ -382,15 +382,15 @@ logs/contexts/{workflow-id}/deliverables/
 
 ## 🎯 What Happens Next
 
-After approval → `/workflow:phase:6`:
-- Cross-agent code review
+After approval → `/workflow:phase:5`:
+- Documentation and QA validation
 - Final quality checks
-- Identify any remaining issues
+- Notifications and workflow archive
 
 ---
 
 **Status:** Active command  
-**Related:** workflow:phase:5b, workflow:phase:6, workflow:approve
+**Related:** workflow:phase:3, workflow:phase:5, workflow:approve
 
 ---
 

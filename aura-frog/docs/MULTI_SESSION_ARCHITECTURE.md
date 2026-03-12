@@ -36,9 +36,9 @@ Split workflow by natural phase boundaries:
 
 ```toon
 sessions[3]{session,phases,focus,typical_tokens}:
-  Session 1,1-4,Planning (Requirements/Design/UI/Tests),50K-80K
-  Session 2,5,TDD Implementation (RED/GREEN/REFACTOR),80K-150K
-  Session 3,6-9,Review & Deploy (Review/Verify/Docs/Notify),40K-60K
+  Session 1,1,Planning (Understand + Design),50K-80K
+  Session 2,2-3,TDD (Test RED / Build GREEN),80K-150K
+  Session 3,4-5,Review & Finalize (Refactor + Review / Finalize),40K-60K
 ```
 
 **Benefits:**
@@ -187,7 +187,7 @@ Show this when approaching token limit:
 
 Current: ~150,000 tokens | Limit: ~200,000 tokens
 
-📍 Progress: Phase 5b - TDD GREEN (62% complete)
+📍 Progress: Phase 3 - Build GREEN (62% complete)
 
 🔄 Consider: `workflow:handoff` to start fresh session
 
@@ -250,7 +250,7 @@ cat > /tmp/aura-frog/agents/task-tests.md << EOF
 
 ## Context
 - Feature: User authentication
-- Phase: 5a (RED)
+- Phase: 2 (Test RED)
 - Files: src/auth/Login.tsx
 
 ## Task

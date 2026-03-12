@@ -1,15 +1,15 @@
 # Aura Frog Workflow Diagrams
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Format:** Mermaid (render with GitHub, VS Code, or mermaid.live)
-**Purpose:** Visual documentation of Aura Frog workflows and architecture
+**Purpose:** Visual documentation of Aura Frog 5-phase workflow and architecture
 
 ---
 
 ## Table of Contents
 
 1. [System Architecture](#1-system-architecture)
-2. [9-Phase Workflow](#2-9-phase-workflow-sequence)
+2. [5-Phase Workflow](#2-5-phase-workflow-sequence)
 3. [TDD Workflow (RED/GREEN/REFACTOR)](#3-tdd-workflow)
 4. [Agent Detection Flow](#4-agent-detection-flow)
 5. [Phase Transition Logic](#5-phase-transition-logic)
@@ -149,7 +149,7 @@ graph LR
 
 ---
 
-## 2. 9-Phase Workflow Sequence
+## 2. 5-Phase Workflow Sequence
 
 ### 2.1 Complete Workflow Sequence
 
@@ -163,42 +163,25 @@ sequenceDiagram
     participant QA as QA Automation
     participant SEC as Security Expert
 
-    Note over U,SEC: Phase 1: Requirements Analysis
+    Note over U,SEC: Phase 1: Understand + Design (APPROVAL gate)
     U->>PM: workflow:start "Add user auth"
     PM->>PM: Analyze requirements
     PM->>DEV: Cross-review requirements
-    PM->>QA: Cross-review requirements
+    PM->>DEV: Design architecture
+    DEV->>DEV: Create tech spec
+    DEV->>UI: Component breakdown (if applicable)
+    UI->>UI: Extract design tokens
     PM-->>U: Show deliverables + Approval Gate
     U->>PM: approve
 
-    Note over U,SEC: Phase 2: Technical Planning
-    PM->>DEV: Design architecture
-    DEV->>DEV: Create tech spec
-    DEV->>QA: Cross-review design
-    DEV-->>U: Show deliverables + Approval Gate
-    U->>DEV: approve
-
-    Note over U,SEC: Phase 3: UI Breakdown
-    DEV->>UI: Component breakdown
-    UI->>UI: Extract design tokens
-    UI->>DEV: Review components
-    UI-->>U: Show deliverables + Approval Gate
-    U->>UI: approve
-
-    Note over U,SEC: Phase 4: Test Planning
-    UI->>QA: Plan test strategy
+    Note over U,SEC: Phase 2: Test RED (auto-continue)
+    PM->>QA: Plan test strategy + write tests
     QA->>QA: Define test cases
-    QA->>DEV: Review test plan
-    QA-->>U: Show deliverables + Approval Gate
-    U->>QA: approve
-
-    Note over U,SEC: Phase 5a: TDD RED (Tests First)
     QA->>QA: Write failing tests
     QA->>QA: Run tests - MUST FAIL
-    QA-->>U: Tests failing ✓ + Approval Gate
-    U->>QA: approve
+    QA-->>U: Tests failing ✓ (auto-continue)
 
-    Note over U,SEC: Phase 5b: TDD GREEN (Implementation)
+    Note over U,SEC: Phase 3: Build GREEN (APPROVAL gate)
     QA->>DEV: Implement to pass tests
     DEV->>DEV: Write minimal code
     DEV->>DEV: Run tests - MUST PASS
@@ -206,33 +189,19 @@ sequenceDiagram
     DEV-->>U: Tests passing ✓ + Approval Gate
     U->>DEV: approve
 
-    Note over U,SEC: Phase 5c: TDD REFACTOR
+    Note over U,SEC: Phase 4: Refactor + Review (auto-continue)
     DEV->>DEV: Refactor code
     DEV->>DEV: Run tests - MUST STILL PASS
-    DEV-->>U: Tests still passing ✓ + Approval Gate
-    U->>DEV: approve
-
-    Note over U,SEC: Phase 6: Code Review
     DEV->>SEC: Security review
     SEC->>SEC: OWASP checks
     SEC->>QA: Quality review
-    SEC-->>U: Review report + Approval Gate
-    U->>SEC: approve
+    SEC-->>U: Refactored + reviewed ✓ (auto-continue)
 
-    Note over U,SEC: Phase 7: QA Validation
+    Note over U,SEC: Phase 5: Finalize (auto-complete)
     SEC->>QA: Final verification
-    QA->>QA: Run all tests
-    QA->>QA: Verify coverage ≥80%
-    QA-->>U: All tests pass ✓ + Approval Gate
-    U->>QA: approve
-
-    Note over U,SEC: Phase 8: Documentation
+    QA->>QA: Run all tests + verify coverage ≥80%
     QA->>PM: Generate docs
     PM->>PM: Update README, API docs
-    PM-->>U: Docs complete + Approval Gate
-    U->>PM: approve
-
-    Note over U,SEC: Phase 9: Notification (Auto)
     PM->>PM: Send Slack notification
     PM->>PM: Update JIRA ticket
     PM-->>U: Workflow Complete ✓
@@ -242,40 +211,25 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph "Planning Phases"
-        P1[Phase 1<br/>Requirements]
-        P2[Phase 2<br/>Design]
-        P3[Phase 3<br/>UI Breakdown]
-        P4[Phase 4<br/>Test Planning]
+    subgraph "Planning"
+        P1[Phase 1<br/>Understand + Design]
     end
 
-    subgraph "Implementation Phases"
-        P5A[Phase 5a<br/>TDD RED]
-        P5B[Phase 5b<br/>TDD GREEN]
-        P5C[Phase 5c<br/>REFACTOR]
+    subgraph "TDD"
+        P2[Phase 2<br/>Test RED]
+        P3[Phase 3<br/>Build GREEN]
+        P4[Phase 4<br/>Refactor + Review]
     end
 
-    subgraph "Validation Phases"
-        P6[Phase 6<br/>Code Review]
-        P7[Phase 7<br/>QA Validation]
+    subgraph "Delivery"
+        P5[Phase 5<br/>Finalize]
     end
 
-    subgraph "Delivery Phases"
-        P8[Phase 8<br/>Documentation]
-        P9[Phase 9<br/>Notification]
-    end
-
-    P1 -->|approve| P2
-    P2 -->|approve| P3
-    P3 -->|approve| P4
-    P4 -->|approve| P5A
-    P5A -->|tests fail ✓| P5B
-    P5B -->|tests pass ✓| P5C
-    P5C -->|tests pass ✓| P6
-    P6 -->|approve| P7
-    P7 -->|coverage ≥80%| P8
-    P8 -->|approve| P9
-    P9 -->|auto| DONE((Done))
+    P1 -->|"APPROVAL"| P2
+    P2 -->|"auto-continue"| P3
+    P3 -->|"APPROVAL"| P4
+    P4 -->|"auto-continue"| P5
+    P5 -->|"auto-complete"| DONE((Done))
 ```
 
 ---
@@ -286,22 +240,21 @@ graph LR
 
 ```mermaid
 flowchart TD
-    START([Phase 5 Start]) --> P5A
+    START([Phase 1 approved]) --> P2
 
-    subgraph P5A [Phase 5a: RED]
-        A1[Write test file] --> A2[Define test cases]
-        A2 --> A3[Run tests]
-        A3 --> A4{Tests FAIL?}
-        A4 -->|Yes ✓| A5[Tests failing as expected]
-        A4 -->|No ✗| A6[ERROR: Tests should fail!<br/>Tests aren't testing new code]
-        A6 --> A1
+    subgraph P2 [Phase 2: Test RED]
+        A1[Plan test strategy] --> A2[Define test cases]
+        A2 --> A3[Write failing tests]
+        A3 --> A4[Run tests]
+        A4 --> A5{Tests FAIL?}
+        A5 -->|Yes ✓| A6[Tests failing as expected]
+        A5 -->|No ✗| A7[ERROR: Tests should fail!<br/>Tests aren't testing new code]
+        A7 --> A1
     end
 
-    A5 --> GATE1{Approval Gate}
-    GATE1 -->|approve| P5B
-    GATE1 -->|reject| A1
+    A6 --> AUTO1[Auto-continue to Phase 3]
 
-    subgraph P5B [Phase 5b: GREEN]
+    subgraph P3 [Phase 3: Build GREEN]
         B1[Write minimal code] --> B2[Just enough to pass]
         B2 --> B3[Run tests]
         B3 --> B4{Tests PASS?}
@@ -313,39 +266,38 @@ flowchart TD
         B8 --> B1
     end
 
-    B7 --> GATE2{Approval Gate}
-    GATE2 -->|approve| P5C
-    GATE2 -->|reject| B1
+    B7 --> GATE{Approval Gate}
+    GATE -->|approve| P4
+    GATE -->|reject| B1
 
-    subgraph P5C [Phase 5c: REFACTOR]
+    subgraph P4 [Phase 4: Refactor + Review]
         C1[Identify improvements] --> C2[Refactor code]
         C2 --> C3[Run tests]
         C3 --> C4{Tests STILL PASS?}
-        C4 -->|Yes ✓| C5[Refactoring complete]
+        C4 -->|Yes ✓| C5[Security + quality review]
         C4 -->|No ✗| C6[REVERT refactor<br/>Tests must pass]
         C6 --> C1
+        C5 --> C7[Review complete]
     end
 
-    C5 --> GATE3{Approval Gate}
-    GATE3 -->|approve| DONE([Phase 6: Review])
-    GATE3 -->|reject| C1
+    C7 --> AUTO2[Auto-continue to Phase 5]
+    AUTO2 --> DONE([Phase 5: Finalize])
 ```
 
 ### 3.2 TDD State Transitions
 
 ```mermaid
 stateDiagram-v2
-    [*] --> RED: Start Phase 5
+    [*] --> RED: Phase 1 approved
 
-    RED: Phase 5a - RED
+    RED: Phase 2 - Test RED
     RED --> RED: Tests pass (wrong!)
-    RED --> GATE_RED: Tests fail ✓
+    RED --> AUTO_GREEN: Tests fail ✓
 
-    GATE_RED: Approval Gate
-    GATE_RED --> GREEN: approve
-    GATE_RED --> RED: reject
+    AUTO_GREEN: Auto-continue
+    AUTO_GREEN --> GREEN
 
-    GREEN: Phase 5b - GREEN
+    GREEN: Phase 3 - Build GREEN
     GREEN --> GREEN: Tests fail / Coverage < 80%
     GREEN --> GATE_GREEN: Tests pass + Coverage ≥80%
 
@@ -353,13 +305,12 @@ stateDiagram-v2
     GATE_GREEN --> REFACTOR: approve
     GATE_GREEN --> GREEN: reject
 
-    REFACTOR: Phase 5c - REFACTOR
+    REFACTOR: Phase 4 - Refactor + Review
     REFACTOR --> REFACTOR: Tests fail (revert!)
-    REFACTOR --> GATE_REFACTOR: Tests still pass ✓
+    REFACTOR --> AUTO_FINAL: Tests pass + review complete
 
-    GATE_REFACTOR: Approval Gate
-    GATE_REFACTOR --> [*]: approve → Phase 6
-    GATE_REFACTOR --> REFACTOR: reject
+    AUTO_FINAL: Auto-continue
+    AUTO_FINAL --> [*]: Phase 5 Finalize
 ```
 
 ---
@@ -467,29 +418,17 @@ flowchart TD
 
     subgraph CHECK [Validation Checks]
         C1{Phase-specific<br/>validation?}
-        C1 -->|Phase 5a| C2{Tests FAIL?}
-        C1 -->|Phase 5b| C3{Tests PASS?<br/>Coverage ≥80%?}
-        C1 -->|Phase 5c| C4{Tests STILL PASS?}
-        C1 -->|Phase 7| C5{All tests pass?<br/>Coverage ≥80%?}
-        C1 -->|Other| C6[Standard validation]
+        C1 -->|Phase 1| C2[Requirements + design complete?]
+        C1 -->|Phase 3| C3{Tests PASS?<br/>Coverage ≥80%?}
 
-        C2 -->|Yes| PASS
-        C2 -->|No| BLOCK1[ERROR: Tests should fail]
+        C2 --> PASS
         C3 -->|Yes| PASS
-        C3 -->|No| BLOCK2[ERROR: Tests must pass]
-        C4 -->|Yes| PASS
-        C4 -->|No| BLOCK3[ERROR: Refactor broke tests]
-        C5 -->|Yes| PASS
-        C5 -->|No| BLOCK4[ERROR: Validation failed]
-        C6 --> PASS
+        C3 -->|No| BLOCK1[ERROR: Tests must pass]
     end
 
-    PASS[Validation Passed ✓] --> NEXT[AUTO-CONTINUE<br/>to Phase N+1]
+    PASS[Validation Passed ✓] --> NEXT[Continue to<br/>next phase]
 
     BLOCK1 --> GATE
-    BLOCK2 --> GATE
-    BLOCK3 --> GATE
-    BLOCK4 --> GATE
 
     subgraph REJECT [Rejection Flow]
         R1[Analyze feedback]
@@ -514,24 +453,29 @@ flowchart TD
     SAVE --> END([Workflow Paused])
 ```
 
-### 5.2 Phase Skip Rules
+### 5.2 Phase Continuation Rules
 
 ```mermaid
 flowchart LR
-    subgraph "Auto-Skip Conditions"
-        AS1[Phase 3: UI Breakdown]
-        AS2[Phase 9: Notification]
+    subgraph "Approval Gates (2)"
+        AG1[Phase 1: Understand + Design]
+        AG3[Phase 3: Build GREEN]
     end
 
-    AS1 -->|"No UI components<br/>in task"| SKIP1[Auto-skip to Phase 4]
-    AS2 -->|"No Slack<br/>configured"| SKIP2[Auto-complete]
-
-    subgraph "User-Requested Skip"
-        US1[User: "skip phase 3,<br/>backend only"]
+    subgraph "Auto-Continue (2)"
+        AC2[Phase 2: Test RED]
+        AC4[Phase 4: Refactor + Review]
     end
 
-    US1 --> LOG[Log skip reason]
-    LOG --> PROCEED[Proceed to next phase]
+    subgraph "Auto-Complete (1)"
+        AC5[Phase 5: Finalize]
+    end
+
+    AG1 -->|"APPROVAL"| AC2
+    AC2 -->|"auto"| AG3
+    AG3 -->|"APPROVAL"| AC4
+    AC4 -->|"auto"| AC5
+    AC5 -->|"auto"| DONE((Done))
 ```
 
 ---
@@ -637,69 +581,28 @@ stateDiagram-v2
     Created --> Phase1_InProgress: Initialize
 
     Phase1_InProgress --> Phase1_Pending: Work complete
-    Phase1_Pending --> Phase2_InProgress: approve
+    Phase1_Pending --> Phase2_InProgress: approve (APPROVAL gate)
     Phase1_Pending --> Phase1_InProgress: reject
     Phase1_Pending --> Paused: stop
 
-    Phase2_InProgress --> Phase2_Pending: Work complete
-    Phase2_Pending --> Phase3_InProgress: approve
-    Phase2_Pending --> Phase2_InProgress: reject
-    Phase2_Pending --> Paused: stop
+    Phase2_InProgress --> Phase3_InProgress: Tests failing ✓ (auto-continue)
+    Phase2_InProgress --> Paused: stop
 
-    Phase3_InProgress --> Phase3_Pending: Work complete
-    Phase3_Pending --> Phase4_InProgress: approve
+    Phase3_InProgress --> Phase3_Pending: Tests passing ✓
+    Phase3_Pending --> Phase4_InProgress: approve (APPROVAL gate)
     Phase3_Pending --> Phase3_InProgress: reject
     Phase3_Pending --> Paused: stop
 
-    note right of Phase3_Pending: Can auto-skip if no UI
+    Phase4_InProgress --> Phase5_InProgress: Refactored + reviewed (auto-continue)
+    Phase4_InProgress --> Paused: stop
 
-    Phase4_InProgress --> Phase4_Pending: Work complete
-    Phase4_Pending --> Phase5a_InProgress: approve
-    Phase4_Pending --> Phase4_InProgress: reject
-    Phase4_Pending --> Paused: stop
-
-    Phase5a_InProgress --> Phase5a_Pending: Tests failing ✓
-    Phase5a_Pending --> Phase5b_InProgress: approve
-    Phase5a_Pending --> Phase5a_InProgress: reject
-    Phase5a_Pending --> Paused: stop
-
-    Phase5b_InProgress --> Phase5b_Pending: Tests passing ✓
-    Phase5b_Pending --> Phase5c_InProgress: approve
-    Phase5b_Pending --> Phase5b_InProgress: reject
-    Phase5b_Pending --> Paused: stop
-
-    Phase5c_InProgress --> Phase5c_Pending: Tests still passing ✓
-    Phase5c_Pending --> Phase6_InProgress: approve
-    Phase5c_Pending --> Phase5c_InProgress: reject
-    Phase5c_Pending --> Paused: stop
-
-    Phase6_InProgress --> Phase6_Pending: Review complete
-    Phase6_Pending --> Phase7_InProgress: approve
-    Phase6_Pending --> Phase6_InProgress: reject
-    Phase6_Pending --> Paused: stop
-
-    Phase7_InProgress --> Phase7_Pending: Validation complete
-    Phase7_Pending --> Phase8_InProgress: approve
-    Phase7_Pending --> Phase7_InProgress: reject
-    Phase7_Pending --> Paused: stop
-
-    Phase8_InProgress --> Phase8_Pending: Docs complete
-    Phase8_Pending --> Phase9_InProgress: approve
-    Phase8_Pending --> Phase8_InProgress: reject
-    Phase8_Pending --> Paused: stop
-
-    Phase9_InProgress --> Completed: Auto-complete
+    Phase5_InProgress --> Completed: Auto-complete
 
     Paused --> Phase1_InProgress: workflow:resume (phase 1)
     Paused --> Phase2_InProgress: workflow:resume (phase 2)
     Paused --> Phase3_InProgress: workflow:resume (phase 3)
     Paused --> Phase4_InProgress: workflow:resume (phase 4)
-    Paused --> Phase5a_InProgress: workflow:resume (phase 5a)
-    Paused --> Phase5b_InProgress: workflow:resume (phase 5b)
-    Paused --> Phase5c_InProgress: workflow:resume (phase 5c)
-    Paused --> Phase6_InProgress: workflow:resume (phase 6)
-    Paused --> Phase7_InProgress: workflow:resume (phase 7)
-    Paused --> Phase8_InProgress: workflow:resume (phase 8)
+    Paused --> Phase5_InProgress: workflow:resume (phase 5)
 
     Completed --> Archived: Archive
     Completed --> [*]: Delete
@@ -748,61 +651,39 @@ sequenceDiagram
     participant SEC as Security Expert
 
     rect rgb(200, 220, 255)
-        Note over User,SEC: Planning Phases (Session 1: ~50K-80K tokens)
+        Note over User,SEC: Phase 1: Understand + Design (APPROVAL gate)
         User->>PM: Start feature request
-        PM->>PM: Phase 1: Requirements
-        PM->>DEV: Review requirements
-        DEV-->>PM: Feedback
-        PM-->>User: Approval Gate
-
-        User->>PM: approve
-        PM->>DEV: Phase 2: Design
+        PM->>PM: Analyze requirements
+        PM->>DEV: Design architecture
+        DEV->>UI: Component breakdown
         DEV->>QA: Review design
         QA-->>DEV: Feedback
-        DEV-->>User: Approval Gate
-
-        User->>DEV: approve
-        DEV->>UI: Phase 3: UI Breakdown
-        UI-->>User: Approval Gate
-
-        User->>UI: approve
-        UI->>QA: Phase 4: Test Planning
-        QA-->>User: Approval Gate
+        PM-->>User: Approval Gate
+        User->>PM: approve
     end
 
     rect rgb(200, 255, 200)
-        Note over User,SEC: Implementation Phase (Session 2: ~80K-150K tokens)
-        User->>QA: approve
-        QA->>QA: Phase 5a: Write tests (RED)
-        QA-->>User: Tests failing ✓
+        Note over User,SEC: Phase 2-4: TDD Cycle (~80K-150K tokens)
+        PM->>QA: Phase 2: Plan + write tests (RED)
+        QA->>QA: Write failing tests
+        QA-->>User: Tests failing ✓ (auto-continue)
 
-        User->>QA: approve
-        QA->>DEV: Phase 5b: Implement (GREEN)
+        QA->>DEV: Phase 3: Implement (GREEN)
         DEV->>DEV: Write code
-        DEV-->>User: Tests passing ✓
-
+        DEV-->>User: Tests passing ✓ + Approval Gate
         User->>DEV: approve
-        DEV->>DEV: Phase 5c: Refactor
-        DEV-->>User: Tests still passing ✓
+
+        DEV->>DEV: Phase 4: Refactor
+        DEV->>SEC: Security review
+        SEC->>QA: Quality review
+        SEC-->>User: Refactored + reviewed ✓ (auto-continue)
     end
 
     rect rgb(255, 220, 200)
-        Note over User,SEC: Validation Phases (Session 3: ~40K-60K tokens)
-        User->>DEV: approve
-        DEV->>SEC: Phase 6: Security Review
-        SEC->>QA: Quality Review
-        SEC-->>User: Review Report
-
-        User->>SEC: approve
-        SEC->>QA: Phase 7: Final QA
-        QA-->>User: All Validated ✓
-
-        User->>QA: approve
-        QA->>PM: Phase 8: Documentation
-        PM-->>User: Docs Complete
-
-        User->>PM: approve
-        PM->>PM: Phase 9: Notifications
+        Note over User,SEC: Phase 5: Finalize (auto-complete)
+        SEC->>QA: Final verification
+        QA->>PM: Generate docs
+        PM->>PM: Notifications
         PM-->>User: Workflow Complete!
     end
 ```
@@ -849,18 +730,24 @@ flowchart TB
 
 ```mermaid
 gantt
-    title Token Budget per Session (~200K total)
+    title Token Budget per Phase (~40K total target)
     dateFormat X
     axisFormat %s
 
-    section Session 1
-    Phase 1-4 Planning    :a1, 0, 80
+    section Phase 1
+    Understand + Design         :a1, 0, 35
 
-    section Session 2
-    Phase 5 TDD           :a2, 0, 150
+    section Phase 2
+    Test RED                    :a2, 0, 40
 
-    section Session 3
-    Phase 6-9 Delivery    :a3, 0, 60
+    section Phase 3
+    Build GREEN                 :a3, 0, 40
+
+    section Phase 4
+    Refactor + Review           :a4, 0, 15
+
+    section Phase 5
+    Finalize                    :a5, 0, 8
 ```
 
 ### 9.2 Token Threshold Visualization
@@ -917,22 +804,22 @@ flowchart TD
     S2 --> S3[Generate Handoff Doc]
     S3 --> END([Workflow Paused])
 
-    NEXT --> DONE([Continue to Phase N+1])
+    NEXT --> DONE([Continue to next phase])
 ```
 
 ### 10.2 Gate Banner Format
 
 ```mermaid
 flowchart LR
-    subgraph "Approval Gate Banner"
+    subgraph "Approval Gate Banner (Phase 1 or Phase 3 only)"
         direction TB
         H1["━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"]
         H2["🏗️ Phase N: Name - Approval Needed"]
         H3["━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"]
-        H4["## Summary ✨"]
+        H4["## Summary"]
         H5["[Deliverables list]"]
         H6["---"]
-        H7["📍 Progress: ████░░░░ X%"]
+        H7["📍 Progress: ████░░░░ X/5"]
         H8["⏭️ Next: Phase N+1"]
         H9["---"]
         H10["Options:"]
@@ -966,6 +853,6 @@ npx @mermaid-js/mermaid-cli -i WORKFLOW_DIAGRAMS.md -o output/
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-11
+**Version:** 2.0.0
+**Last Updated:** 2026-03-12
 **Format:** Mermaid

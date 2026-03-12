@@ -67,7 +67,7 @@ criteria[5]{criterion,weight}:
 
 ## When to Use
 
-- Before committing to full 9-phase workflow
+- Before committing to full 5-phase workflow
 - Complex tasks needing upfront design
 - When multiple approaches are possible
 - To get estimates before starting

@@ -17,7 +17,7 @@ Image analysis enables agents to:
 
 ## 📸 When to Use
 
-### Phase 3: Design Review
+### Phase 3: Build GREEN
 ```
 User provides:
 - Figma screenshots
@@ -228,7 +228,7 @@ Requires manual specification:
 
 ## 📊 Workflow Integration
 
-### Phase 3: Design Review
+### Phase 3: Build GREEN
 ```
 1. User provides Figma screenshot
    ↓
@@ -406,7 +406,7 @@ Agent:
 
 User: "approve"
 
-Agent: ✅ Proceeding to Phase 4: Test Planning
+Agent: ✅ Proceeding to Phase 4: Refactor + Review
 ```
 
 ---

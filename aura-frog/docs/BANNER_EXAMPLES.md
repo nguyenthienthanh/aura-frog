@@ -84,7 +84,7 @@
 ┃ 🔥 Architecting greatness                               ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## Phase 2: Technical Planning
+## Phase 1: Understand + Design
 
 Starting technical design for [feature]...
 ```
@@ -93,7 +93,7 @@ Starting technical design for [feature]...
 
 ```
 ⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: qa-automation │ Phase: 7 - Verify               ┃
+┃ Agent: qa-automation │ Phase: 4 - Refactor + Review     ┃
 ┃ Model: Opus 4.6 │ Teams: ✓ │ 🔌 MCP: playwright          ┃
 ┃ 🔥 Testing login flow                                  ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

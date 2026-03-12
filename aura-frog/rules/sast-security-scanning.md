@@ -3,7 +3,7 @@
 **Category:** Security
 **Priority:** Critical
 **Version:** 1.0.0
-**Applies To:** All code changes, Phase 6 (Code Review), Phase 7 (QA Validation)
+**Applies To:** All code changes, Phase 4 (Refactor + Review), Phase 5 (Finalize)
 
 ---
 
@@ -17,12 +17,12 @@ Static Application Security Testing (SAST) must be performed on all code changes
 
 ```toon
 required_triggers[6]{scenario,scan_type,phase}:
-  New feature implementation,Full scan,Phase 6
-  Bug fix touching auth/security,Targeted scan,Phase 6
-  API endpoint changes,API security scan,Phase 6
-  Database query changes,SQL injection scan,Phase 5b
-  User input handling,XSS/injection scan,Phase 5b
-  Dependency updates,Dependency audit,Phase 7
+  New feature implementation,Full scan,Phase 4
+  Bug fix touching auth/security,Targeted scan,Phase 4
+  API endpoint changes,API security scan,Phase 4
+  Database query changes,SQL injection scan,Phase 3
+  User input handling,XSS/injection scan,Phase 3
+  Dependency updates,Dependency audit,Phase 5
 ```
 
 ---
@@ -167,7 +167,7 @@ psalm --taint-analysis src/
 
 ## Phase Integration
 
-### Phase 5b (Implementation - GREEN)
+### Phase 3 (Build GREEN)
 
 ```markdown
 After tests pass:
@@ -176,7 +176,7 @@ After tests pass:
 3. Document any accepted risks for HIGH findings
 ```
 
-### Phase 6 (Code Review)
+### Phase 4 (Refactor + Review)
 
 ```markdown
 Code review MUST include:
@@ -186,7 +186,7 @@ Code review MUST include:
 4. Sign-off from security perspective
 ```
 
-### Phase 7 (QA Validation)
+### Phase 5 (Finalize)
 
 ```markdown
 Final validation:

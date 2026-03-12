@@ -33,14 +33,14 @@ usage() {
 # Get phase name
 get_phase_name() {
     local phase="$1"
-    local names=("" "Requirements" "Tech Planning" "UI Breakdown" "Test Planning" "TDD Implementation" "Code Review" "QA Validation" "Documentation" "Notification")
+    local names=("" "Understand + Design" "Test RED" "Build GREEN" "Refactor + Review" "Finalize")
     echo "${names[$phase]}"
 }
 
 # Calculate progress percentage
 calc_progress() {
     local phase="$1"
-    local total=9
+    local total=5
     local completed=$((phase - 1))
     echo "$((completed * 100 / total))"
 }
@@ -105,7 +105,7 @@ create_handoff() {
 - **Task:** ${task}
 - **Phase:** ${phase} - ${phase_name}
 - **Status:** ${status}
-- **Progress:** ${progress}% (${phase}/9 phases)
+- **Progress:** ${progress}% (${phase}/5 phases)
 
 ---
 
@@ -140,41 +140,24 @@ EOF
 
     # Add phase-specific next steps
     case "$phase" in
-        1) echo "1. Complete requirements gathering" >> "$handoff_file"
-           echo "2. Get user approval on requirements" >> "$handoff_file"
-           echo "3. Proceed to Phase 2 (Tech Planning)" >> "$handoff_file"
+        1) echo "1. Complete requirements gathering and design" >> "$handoff_file"
+           echo "2. Get user approval on requirements and design" >> "$handoff_file"
+           echo "3. Proceed to Phase 2 (Test RED)" >> "$handoff_file"
            ;;
-        2) echo "1. Review technical design" >> "$handoff_file"
-           echo "2. Finalize architecture decisions" >> "$handoff_file"
-           echo "3. Proceed to Phase 3 (UI Breakdown)" >> "$handoff_file"
+        2) echo "1. Finalize test strategy and write failing tests" >> "$handoff_file"
+           echo "2. Ensure all tests FAIL for correct reasons" >> "$handoff_file"
+           echo "3. Proceed to Phase 3 (Build GREEN)" >> "$handoff_file"
            ;;
-        3) echo "1. Complete UI component breakdown" >> "$handoff_file"
-           echo "2. Extract design tokens" >> "$handoff_file"
-           echo "3. Proceed to Phase 4 (Test Planning)" >> "$handoff_file"
-           ;;
-        4) echo "1. Finalize test strategy" >> "$handoff_file"
-           echo "2. Plan test cases" >> "$handoff_file"
-           echo "3. Proceed to Phase 5a (Write Tests - RED)" >> "$handoff_file"
-           ;;
-        5) echo "1. Continue TDD implementation" >> "$handoff_file"
+        3) echo "1. Continue TDD implementation" >> "$handoff_file"
            echo "2. Ensure tests pass (GREEN)" >> "$handoff_file"
-           echo "3. Refactor if needed" >> "$handoff_file"
-           echo "4. Proceed to Phase 6 (Code Review)" >> "$handoff_file"
+           echo "3. Proceed to Phase 4 (Refactor + Review)" >> "$handoff_file"
            ;;
-        6) echo "1. Address review feedback" >> "$handoff_file"
+        4) echo "1. Refactor code, address review feedback" >> "$handoff_file"
            echo "2. Fix any security issues" >> "$handoff_file"
-           echo "3. Proceed to Phase 7 (QA Validation)" >> "$handoff_file"
+           echo "3. Proceed to Phase 5 (Finalize)" >> "$handoff_file"
            ;;
-        7) echo "1. Verify all tests pass" >> "$handoff_file"
-           echo "2. Check coverage meets threshold" >> "$handoff_file"
-           echo "3. Proceed to Phase 8 (Documentation)" >> "$handoff_file"
-           ;;
-        8) echo "1. Complete documentation" >> "$handoff_file"
-           echo "2. Update README if needed" >> "$handoff_file"
-           echo "3. Proceed to Phase 9 (Notification)" >> "$handoff_file"
-           ;;
-        9) echo "1. Send completion notifications" >> "$handoff_file"
-           echo "2. Update JIRA ticket" >> "$handoff_file"
+        5) echo "1. Complete documentation" >> "$handoff_file"
+           echo "2. Send completion notifications" >> "$handoff_file"
            echo "3. Workflow complete!" >> "$handoff_file"
            ;;
     esac

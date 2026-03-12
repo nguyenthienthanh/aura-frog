@@ -1,6 +1,6 @@
 ---
 name: workflow-orchestrator
-description: "Execute 9-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
+description: "Execute 5-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
 autoInvoke: true
 priority: high
 triggers:
@@ -46,195 +46,122 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 2. **project-context-loader** → Load conventions (MANDATORY)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** - if simple, suggest lighter approach
+5. **Challenge requirements** → Ask clarifying questions before Phase 1 (see `rules/requirement-challenger.md`)
 
 ---
 
 ## Token Budget Per Phase
 
-**CRITICAL:** Stay within budget to avoid context explosion.
+**CRITICAL:** Stay within budget to avoid context explosion. Target: ≤30K for full workflow.
 
 ```toon
-token_budget[9]{phase,max_tokens,format}:
-  1,500,TOON summary only - NO prose
-  2,1500,Technical design in TOON + minimal prose
-  3,800,Component list in TOON
-  4,600,Test cases in TOON table
-  5a,1000,Test code only - no explanations
-  5b,2000,Implementation code - minimal comments
-  5c,500,Refactor summary in TOON
-  6,800,Review findings in TOON table
-  7-9,300 each,Status only
+token_budget[5]{phase,max_tokens,format}:
+  1,2000,TOON tables + minimal prose
+  2,1500,Test code only - no explanations
+  3,2500,Implementation code - minimal comments
+  4,1000,Refactor summary + review findings in TOON
+  5,500,Status only
 ```
-
-**Phase 1 HARD CAP: 500 tokens.** Use `/workflow:phase1-lite` format.
 
 ---
 
-## 9-Phase Workflow
+## 5-Phase Workflow
 
 | Phase | Name | Lead Agent | Deliverable | Gate |
 |-------|------|------------|-------------|------|
-| 1 | Understand 🎯 | pm-operations-orchestrator | Requirements (TOON, ≤500 tokens) | ⚡ Auto |
-| 2 | Design 🏗️ | Dev agent | Technical design | ✋ **Approval** |
-| 3 | UI Breakdown 🎨 | ui-expert | Component breakdown | ⚡ Auto |
-| 4 | Plan Tests 🧪 | qa-automation | Test strategy | ⚡ Auto |
-| 5a | Write Tests 🔴 | qa-automation + Dev | Failing tests (TDD RED) | ⚡ Auto |
-| 5b | Build 🟢 | Dev agent | Implementation (TDD GREEN) | ✋ **Approval** |
-| 5c | Polish ♻️ | Dev agent | Refactored code (TDD REFACTOR) | ⚡ Auto |
-| 6 | Review 👀 | security-expert | Quality review report | ⚡ Auto* |
-| 7 | Verify ✅ | qa-automation | All tests pass, coverage ≥80% | ⚡ Auto |
-| 8 | Document 📚 | pm-operations-orchestrator | Documentation | ⚡ Auto |
-| 9 | Share 🔔 | slack-operations | Team notification | ⚡ Auto |
+| 1 | Understand + Design | pm-operations-orchestrator → Dev | Requirements (TOON), technical design | **APPROVAL** |
+| 2 | Test (RED) | qa-automation + Dev | Failing tests (TDD RED) | Auto |
+| 3 | Build (GREEN) | Dev agent | Implementation (TDD GREEN) | **APPROVAL** |
+| 4 | Refactor + Review | Dev + security-expert | Clean code, quality/security check | Auto* |
+| 5 | Finalize | qa-automation + PM | Coverage ≥80%, docs, notification | Auto |
 
 **Gate Legend:**
-- ✋ **Approval** = Must wait for user approval before continuing
-- ⚡ Auto = Auto-continue after showing deliverables
-- ⚡ Auto* = Auto-continue unless issues found (stops if critical issues)
+- **APPROVAL** = Must wait for user approval before continuing
+- Auto = Auto-continue after showing deliverables
+- Auto* = Auto-continue unless critical issues found
 
 ---
 
 ## Phase Transition Rules
 
-### Valid Transitions
-
 ```
-Phase 1 (Understand) → Phase 2 (Design)
-  Mode: ⚡ AUTO-CONTINUE
-  Shows: Requirements summary, then continues
+Phase 1 (Understand + Design) → Phase 2 (Test RED)
+  Mode: APPROVAL REQUIRED
+  Pre-step: Challenge requirements (Standard/Deep only)
+  Blocker: No design approved
 
-Phase 2 (Design) → Phase 3 (UI)
-  Mode: ✋ APPROVAL REQUIRED
-  Blocker: No technical design approved
+Phase 2 (Test RED) → Phase 3 (Build GREEN)
+  Mode: AUTO-CONTINUE (if tests fail as expected)
+  Blocker: Tests pass → STOP (tests aren't testing new code)
 
-Phase 3 (UI) → Phase 4 (Plan Tests)
-  Mode: ⚡ AUTO-CONTINUE
-  Skip if: No UI component in task
-
-Phase 4 (Plan Tests) → Phase 5a (Write Tests)
-  Mode: ⚡ AUTO-CONTINUE
-  Shows: Test strategy, then continues
-
-Phase 5a (RED) → Phase 5b (GREEN)
-  Mode: ⚡ AUTO-CONTINUE (if tests fail as expected)
-  Blocker: Tests pass (they should fail!) → STOP
-
-Phase 5b (GREEN) → Phase 5c (REFACTOR)
-  Mode: ✋ APPROVAL REQUIRED
+Phase 3 (Build GREEN) → Phase 4 (Refactor + Review)
+  Mode: APPROVAL REQUIRED
   Blocker: Tests still failing
 
-Phase 5c (REFACTOR) → Phase 6 (Review)
-  Mode: ⚡ AUTO-CONTINUE (if tests still pass)
+Phase 4 (Refactor + Review) → Phase 5 (Finalize)
+  Mode: AUTO-CONTINUE (if tests still pass, no critical issues)
   Blocker: Tests broken by refactor → STOP
+  Blocker: Critical security issues → STOP
 
-Phase 6 (Review) → Phase 7 (Verify)
-  Mode: ⚡ AUTO-CONTINUE (unless critical issues)
-  Blocker: Critical security issues → STOP for approval
-
-Phase 7 (Verify) → Phase 8 (Document)
-  Mode: ⚡ AUTO-CONTINUE (if tests pass)
-  Blocker: Tests fail or coverage <80% → STOP
-
-Phase 8 (Document) → Phase 9 (Share)
-  Mode: ⚡ AUTO-CONTINUE
-  Auto-executes Phase 9
+Phase 5 (Finalize) → DONE
+  Mode: AUTO-COMPLETE
+  Blocker: Coverage <80% → STOP
 ```
-
-### Summary: Only 2 Approval Gates
-
-| Gate | Phase | Why |
-|------|-------|-----|
-| 1st | Phase 2 (Design) | Architecture decisions are hard to change later |
-| 2nd | Phase 5b (GREEN) | Main implementation - review before refactor |
-
-All other phases auto-continue unless a blocker is hit.
 
 ### Invalid Transitions (BLOCKED)
 
-- ❌ Skip from Phase 1 to Phase 5 (no design)
-- ❌ Phase 5b without 5a (no TDD)
-- ❌ Phase 7 with failing tests
-- ❌ Any phase skip without explicit user request
+- Skip from Phase 1 to Phase 3 (no tests written)
+- Phase 3 without Phase 2 (no TDD)
+- Phase 5 with failing tests
+- Any phase skip without explicit user request
 
 ---
 
 ## Approval Gates (Only 2)
 
-Approval is only required at **Phase 2 (Design)** and **Phase 5b (Implementation)**.
+Approval is only required at **Phase 1 (Design)** and **Phase 3 (Build)**.
 
 ### Gate Format
 
 ```markdown
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏗️ Phase [N]: [Name] - Approval Needed
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Phase [N]: [Name] - Approval Needed
 
-## [Friendly Summary] ✨
+## [Friendly Summary]
 
 [Deliverables list]
 
 ---
 
-📍 **Progress:** ████░░░░░░░░░░░░ [X]% ([N]/8 phases)
+Progress: [X]% ([N]/5 phases)
 
-⏭️ **After approval:**
+After approval:
 → Phases [N+1] to [X] will AUTO-CONTINUE
 → Next approval gate: Phase [Y]
 
 ---
 
-**Options:**
-- `approve` / `yes` → Continue (auto-runs until next gate)
+Options:
+- `approve` / `yes` → Continue
 - `reject: <reason>` → Brainstorm & re-do
 - `modify: <changes>` → Adjust deliverables
 - `stop` → Cancel workflow
-
-⚡ After approval, I'll AUTO-CONTINUE through multiple phases!
 ```
 
 See: `rules/workflow-navigation.md` for full navigation format.
-
-### Auto-Continue Phases (No Approval Needed)
-
-These phases show deliverables but continue automatically:
-
-| Phase | Shows | Then |
-|-------|-------|------|
-| 1. Understand | Requirements summary | → Continues to Phase 2 |
-| 3. UI Breakdown | Component breakdown | → Continues to Phase 4 |
-| 4. Test Plan | Test strategy | → Continues to Phase 5a |
-| 5a. TDD RED | Failing tests | → Continues to Phase 5b (if tests fail) |
-| 5c. TDD REFACTOR | Cleaned code | → Continues to Phase 6 (if tests pass) |
-| 6. Review | Review report | → Continues to Phase 7 (unless critical issues) |
-| 7. Verify | Test results | → Continues to Phase 8 (if pass) |
-| 8. Document | Documentation | → Continues to Phase 9 |
-
-**Auto-Stop Conditions:**
-- Phase 5a: Tests pass (should fail) → STOP
-- Phase 5c/6/7: Tests fail → STOP
-- Phase 6: Critical security issues → STOP
-- Phase 7: Coverage < 80% → STOP
 
 ### Valid Responses
 
 | Response | Action |
 |----------|--------|
-| `approve` / `yes` | Continue to next phase immediately |
+| `approve` / `yes` | Continue to next phase |
 | `reject: <reason>` | **Brainstorm first**, then restart phase |
-| `modify: <changes>` | **Light brainstorm**, then adjust deliverables |
+| `modify: <changes>` | **Light brainstorm**, then adjust |
 | `stop` / `cancel` | End workflow, save state |
 
-### Feedback Handling (IMPORTANT)
+### Feedback Handling
 
-**Default behavior:** Brainstorm feedback before implementing.
-- Analyze user's suggestion
-- Consider alternatives
-- Present options with pros/cons
-- Then implement agreed approach
-
-**Force mode:** Skip brainstorming when user says:
-- "must do: ..." → Implement directly
-- "just do: ..." → Skip discussion
-- "work like that" → No alternatives
+**Default:** Brainstorm feedback before implementing.
+**Force mode:** Skip brainstorming with "must do: ..." / "just do: ..." / "work like that"
 
 See: `rules/feedback-brainstorming.md`
 
@@ -242,46 +169,18 @@ See: `rules/feedback-brainstorming.md`
 
 ## AUTO-CONTINUE Behavior
 
-**Streamlined workflow with only 2 approval gates:**
-
 ### Flow Overview
 ```
-START → Phase 1 (auto) → Phase 2 ✋ APPROVAL
-      → Phase 3-5a (auto) → Phase 5b ✋ APPROVAL
-      → Phase 5c-9 (auto) → DONE
-```
-
-### Example Flow
-```
-User: "workflow:start Add JWT authentication"
-
-→ Phase 1: Understand (shows summary, auto-continues)
-→ Phase 2: Design
-  ✋ APPROVAL GATE - waits for user
-
-User: "approve"
-
-→ Phase 3: UI Breakdown (auto-continues)
-→ Phase 4: Test Plan (auto-continues)
-→ Phase 5a: TDD RED - write failing tests (auto-continues if tests fail)
-→ Phase 5b: TDD GREEN - implementation
-  ✋ APPROVAL GATE - waits for user
-
-User: "approve"
-
-→ Phase 5c: Refactor (auto-continues if tests pass)
-→ Phase 6: Review (auto-continues unless critical issues)
-→ Phase 7: Verify (auto-continues if tests pass)
-→ Phase 8: Document (auto-continues)
-→ Phase 9: Share (auto-executes)
-→ DONE ✅
+START → Phase 1 APPROVAL
+      → Phase 2 (auto) → Phase 3 APPROVAL
+      → Phase 4 (auto) → Phase 5 (auto) → DONE
 ```
 
 **Auto-Stop Triggers:**
-- Tests fail when they shouldn't (or pass when they should fail)
-- Critical security issues in review
-- Coverage below 80%
-- Token limit reached
+- Phase 2: Tests pass when they should fail
+- Phase 4: Tests fail after refactor, or critical security issues
+- Phase 5: Coverage below 80%
+- Any phase: Token limit reached
 
 **Token Awareness:**
 - At 75% (150K tokens): Warn user
@@ -295,76 +194,58 @@ User: "approve"
 ### TDD (NON-NEGOTIABLE)
 
 ```
-Phase 5a (RED):
-  ✅ Write tests FIRST
-  ✅ Run tests → MUST FAIL
-  ❌ If tests pass → STOP, tests aren't testing new code
+Phase 2 (RED):
+  Write tests FIRST → Run tests → MUST FAIL
+  If tests pass → STOP
 
-Phase 5b (GREEN):
-  ✅ Write minimal code to pass tests
-  ✅ Run tests → MUST PASS
-  ❌ If tests fail → Fix code, not tests
+Phase 3 (GREEN):
+  Write minimal code to pass → Run tests → MUST PASS
+  If tests fail → Fix code, not tests
 
-Phase 5c (REFACTOR):
-  ✅ Clean up code
-  ✅ Run tests → MUST STILL PASS
-  ❌ If tests fail → Revert refactor
+Phase 4 (REFACTOR):
+  Clean up code → Run tests → MUST STILL PASS
+  If tests fail → Revert refactor
 ```
 
 ### KISS Principle
 
-- ✅ Simple over complex
-- ✅ Standard patterns over custom
-- ✅ Solve today's problem, not tomorrow's
-- ❌ No premature abstraction
-- ❌ No over-engineering
-- ❌ No excessive configuration
+- Simple over complex
+- Standard patterns over custom
+- Solve today's problem, not tomorrow's
+- No premature abstraction or over-engineering
 
 ### Cross-Review
 
 | Phase | Creator | Reviewers |
 |-------|---------|-----------|
-| 1 (Understand) | PM | Dev + QA + UI |
-| 2 (Design) | Dev | Secondary Dev + QA |
-| 4 (Plan Tests) | QA | Dev |
-| 6 (Review) | Security | All |
+| 1 (Understand + Design) | PM → Dev | Secondary Dev + QA |
+| 4 (Refactor + Review) | Dev + Security | All |
 
 ---
 
 ## Phase Skip Rules
 
 ### Automatic Skips
-
-- **Phase 3 (UI):** Skip if task has no UI components
-- **Phase 9 (Share):** Skip if no Slack integration configured
+- **Phase 5 notification:** Skip Slack if no integration configured
+- **Phase 5 docs:** Skip if no documentation changes needed
 
 ### User-Requested Skips
-
-User can request skip with reason:
-```
-User: "skip phase 3, this is backend only"
-→ Log skip reason
-→ Proceed to Phase 4
-```
+User can request skip with reason. Log skip reason and proceed.
 
 ---
 
 ## Files to Load (ON-DEMAND ONLY)
 
-**TOKEN OPTIMIZATION:** Do NOT pre-load all files. Load only when entering that phase.
+**TOKEN OPTIMIZATION:** Load only when entering that phase.
 
 ### Phase Guides (Load ONE at a time)
 ```toon
-phase_files[9]{phase,file,load_when}:
-  1,docs/phases/phase-1-understand.md,Entering Phase 1
-  2,docs/phases/phase-2-design.md,Entering Phase 2
-  3,docs/phases/phase-3-ui.md,Entering Phase 3 (skip if no UI)
-  4,docs/phases/phase-4-test-planning.md,Entering Phase 4
-  5,docs/phases/phase-5-implementation.md,Entering Phase 5a/5b/5c
-  6,docs/phases/phase-6-review.md,Entering Phase 6
-  7,docs/phases/phase-7-verification.md,Entering Phase 7
-  8,docs/phases/phase-8-documentation.md,Entering Phase 8
-  9,docs/phases/phase-9-notification.md,Entering Phase 9
+phase_files[5]{phase,file,load_when}:
+  1,docs/phases/PHASE_1_UNDERSTAND_DESIGN.MD,Entering Phase 1
+  2,docs/phases/PHASE_2_TEST_RED.MD,Entering Phase 2
+  3,docs/phases/PHASE_3_BUILD_GREEN.MD,Entering Phase 3
+  4,docs/phases/PHASE_4_REFACTOR_REVIEW.MD,Entering Phase 4
+  5,docs/phases/PHASE_5_FINALIZE.MD,Entering Phase 5
 ```
 
 ### Project Context (Load ONCE at workflow start)
@@ -376,7 +257,7 @@ phase_files[9]{phase,file,load_when}:
 ### Rules (Load only if referenced)
 ```toon
 rules[4]{rule,load_when}:
-  tdd-workflow.md,Phase 5 only
+  tdd-workflow.md,Phase 2-4 only
   kiss-principle.md,Never (principle is inline above)
   feedback-brainstorming.md,Only on reject/modify response
   workflow-navigation.md,Only if navigation unclear
@@ -414,71 +295,42 @@ workflow:status
 ```
 User: "workflow:start Add user authentication with JWT"
 
-━━━ AUTO-CONTINUE BLOCK 1 ━━━
-
-Phase 1: Understand 🎯 [AUTO]
-├── Analyze requirements
-├── Define success criteria
-├── Identify risks
-└── Shows summary, continues automatically...
-
-Phase 2: Design 🏗️
-├── Design JWT architecture
-├── Define API endpoints
-├── Plan database schema
-└── ✋ APPROVAL GATE (1 of 2)
+━━━ Phase 1: Understand + Design ━━━
+├── Challenge requirements (1-2 questions)
+├── Analyze requirements, define success criteria
+├── Design architecture, API endpoints, data model
+└── APPROVAL GATE (1 of 2)
 
 User: "approve"
 
-━━━ AUTO-CONTINUE BLOCK 2 ━━━
+━━━ AUTO-CONTINUE BLOCK ━━━
 
-Phase 3: UI Breakdown 🎨 [AUTO]
-├── Design login/register screens
-├── Extract design tokens
-└── Continues automatically...
-
-Phase 4: Test Plan 🧪 [AUTO]
-├── Define test strategy
-├── List test cases
-└── Continues automatically...
-
-Phase 5a: Write Tests 🔴 [AUTO]
+Phase 2: Test (RED) [AUTO]
+├── Plan test strategy inline
 ├── Write failing tests (TDD RED)
 ├── Run tests → verify they FAIL
-└── Continues automatically (if tests fail as expected)...
+└── Continues automatically...
 
-Phase 5b: Build 🟢
-├── Implement code (TDD GREEN)
+Phase 3: Build (GREEN)
+├── Implement minimal code (TDD GREEN)
 ├── Run tests → verify they PASS
-└── ✋ APPROVAL GATE (2 of 2)
+└── APPROVAL GATE (2 of 2)
 
 User: "approve"
 
-━━━ AUTO-CONTINUE BLOCK 3 ━━━
+━━━ AUTO-CONTINUE TO DONE ━━━
 
-Phase 5c: Polish ♻️ [AUTO]
-├── Refactor code
+Phase 4: Refactor + Review [AUTO]
+├── Clean up code (TDD REFACTOR)
+├── Security/quality check inline
 ├── Run tests → still pass
 └── Continues automatically...
 
-Phase 6: Review 👀 [AUTO]
-├── Security review
-├── Code quality check
-└── Continues automatically (unless critical issues)...
-
-Phase 7: Verify ✅ [AUTO]
-├── Run all tests
-├── Check coverage ≥80%
-└── Continues automatically...
-
-Phase 8: Document 📚 [AUTO]
-├── Update documentation
-├── Generate ADRs if needed
-└── Continues automatically...
-
-Phase 9: Share 🔔 [AUTO]
-├── Send Slack notification
-└── Workflow complete ✅
+Phase 5: Finalize [AUTO]
+├── Verify coverage ≥80%
+├── Update documentation if needed
+├── Send notification if configured
+└── Workflow complete
 
 TOTAL APPROVALS NEEDED: 2
 ```
@@ -487,7 +339,7 @@ TOTAL APPROVALS NEEDED: 2
 
 ## Fast-Track Mode
 
-**When to use:** User provides complete specs/design. Skips phases 1-3, auto-executes 4-9 without approval gates.
+**When to use:** User provides complete specs/design. Skips Phase 1, auto-executes Phases 2-5 without approval gates.
 
 **Triggers:** `fasttrack: <specs>` | `workflow:fasttrack <file>` | "just build it"
 
@@ -508,7 +360,7 @@ required_sections[6]{section,purpose}:
 ### Fast-Track Execution
 
 ```
-Phase 4 → Phase 5a → Phase 5b → Phase 5c → Phase 6 → Phase 7 → Phase 8 → Phase 9
+Phase 2 → Phase 3 → Phase 4 → Phase 5
 (No approval gates — only stops on errors)
 ```
 
@@ -516,16 +368,16 @@ Phase 4 → Phase 5a → Phase 5b → Phase 5c → Phase 6 → Phase 7 → Phase
 
 | Condition | Phase | Action |
 |-----------|-------|--------|
-| Tests pass in RED | 5a | Stop — specs may be incomplete |
-| Tests fail after 3 attempts | 5b | Stop — ask user for clarification |
-| Critical security issue | 6 | Stop — fix before proceeding |
-| Coverage below 80% | 7 | Add tests, retry twice, then ask |
+| Tests pass in RED | 2 | Stop — specs may be incomplete |
+| Tests fail after 3 attempts | 3 | Stop — ask user for clarification |
+| Critical security issue | 4 | Stop — fix before proceeding |
+| Coverage below 80% | 5 | Add tests, retry twice, then ask |
 | Token limit warning | Any | Save state and handoff |
 
 ### Switching Modes
 
 ```
-standard → fasttrack: "approve phase 3, then fasttrack the rest"
+standard → fasttrack: "approve phase 1, then fasttrack the rest"
 fasttrack → standard: On error, auto-switches to standard mode
 ```
 
@@ -535,142 +387,44 @@ fasttrack → standard: On error, auto-switches to standard mode
 
 **When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled AND complexity = Deep + 2+ domains.
 
-**Gate:** Team mode ONLY activates for Deep complexity with 2+ domains scoring ≥50 each. All Quick and Standard tasks use single-agent or subagent mode to save tokens (~3x cost reduction).
-
-### Parallel Startup Sequence
-
-**This is the concrete sequence the lead agent executes:**
-
-```
-Step 1: CREATE TEAM
-────────────────────
-TeamCreate(team_name="[ticket-or-feature-slug]", description="[task summary]")
-
-Step 2: CREATE TASKS (all in one message)
-──────────────────────────────────────────
-TaskCreate(subject="[task-1]", description="[full context + files + acceptance criteria]")
-TaskCreate(subject="[task-2]", description="[full context + files + acceptance criteria]")
-TaskCreate(subject="[task-3]", description="[full context + files + acceptance criteria]")
-
-Step 3: SPAWN TEAMMATES IN PARALLEL (all in one message — this is the key)
-───────────────────────────────────────────────────────────────────────────
-Task(team_name="[slug]", name="architect", subagent_type="aura-frog:architect",
-     prompt="You are architect on team [slug]. Your role: [phase role].
-             Read team config: ~/.claude/teams/[slug]/config.json
-             Check TaskList for unclaimed tasks matching your expertise.
-             Claim with TaskUpdate(taskId, owner='architect', status='in_progress').
-             When done: TaskUpdate(taskId, status='completed') then
-             SendMessage(recipient='pm-operations-orchestrator', content='Done: [summary]')
-             Files you own: src/api/, src/services/, migrations/")
-
-Task(team_name="[slug]", name="ui-expert", subagent_type="aura-frog:ui-expert",
-     prompt="You are ui-expert on team [slug]. Your role: [phase role].
-             [same pattern as above]
-             Files you own: src/components/, src/ui/, *.css")
-
-Task(team_name="[slug]", name="qa-automation", subagent_type="aura-frog:qa-automation",
-     prompt="You are qa-automation on team [slug]. Your role: [phase role].
-             [same pattern as above]
-             Files you own: tests/, __tests__/, *.test.*")
-
-Step 4: MONITOR + COORDINATE
-─────────────────────────────
-- Teammates work in parallel on claimed tasks
-- Lead receives completion messages via SendMessage
-- Lead sends cross-review requests: SendMessage(recipient="qa-automation", content="Review architect's API design")
-- TeammateIdle hook auto-assigns idle teammates to cross-review
-
-Step 5: PHASE TRANSITION
-─────────────────────────
-- Lead validates all phase tasks complete
-- Lead shuts down current teammates: SendMessage(type="shutdown_request", recipient="architect")
-- Lead spawns new teammate set for next phase (repeat Steps 2-4)
-- Single-agent phases (7, 8, 9): lead works alone, no teammates
-```
+**Gate:** Team mode ONLY activates for Deep complexity with 2+ domains scoring >=50 each. Quick/Standard tasks use single-agent or subagent mode (~3x cost reduction).
 
 ### Phase Team Composition
 
 ```toon
-phase_teams[11]{phase,lead,primary,secondary,team_size}:
-  1-Understand,pm-operations-orchestrator,architect,qa-automation,3
-  2-Design,architect,ui-expert,qa-automation,3
-  3-UI,ui-expert,mobile-expert,-,2
-  4-Test Plan,qa-automation,architect,-,2
-  5a-TDD RED,qa-automation,architect,-,2
-  5b-TDD GREEN,architect,ui-expert+qa-automation,-,3
-  5c-TDD REFACTOR,architect,-,qa-automation(reviewer),2
-  6-Review,security-expert,architect+qa-automation,-,3
-  7-Verify,qa-automation,-,-,1
-  8-Document,pm-operations-orchestrator,-,-,1
-  9-Share,pm-operations-orchestrator,-,-,1
+phase_teams[5]{phase,lead,teammates,team_size}:
+  1-Understand+Design,pm-operations-orchestrator → architect,ui-expert+qa-automation,3
+  2-Test RED,qa-automation,architect,2
+  3-Build GREEN,architect,ui-expert+qa-automation,3
+  4-Refactor+Review,architect+security-expert,qa-automation(reviewer),3
+  5-Finalize,pm-operations-orchestrator,-,1
 ```
 
 ### Teammate Operation Pattern
 
-Each teammate follows this pattern after being spawned:
-
 ```
-1. Read ~/.claude/teams/[team-name]/config.json → discover team members
-2. TaskList → find unclaimed tasks matching specialization
-3. TaskUpdate(taskId, owner="[my-name]", status="in_progress") → claim task
-4. Do the work (read files, edit code, run tests)
-5. TaskUpdate(taskId, status="completed") → mark done
-6. SendMessage(type="message", recipient="[lead]",
-     summary="Task completed", content="Completed [task]. Summary: [what was done]")
-7. TaskList → check for more unclaimed tasks (repeat from step 3)
-8. If no tasks: TeammateIdle hook assigns cross-review or shutdown
+1. Read ~/.claude/teams/[team-name]/config.json
+2. TaskList → find unclaimed tasks
+3. TaskUpdate(taskId, owner, status="in_progress") → claim
+4. Do work → TaskUpdate(taskId, status="completed")
+5. SendMessage(recipient="lead", content="Done: [summary]")
+6. Check for more tasks or await shutdown
 ```
-
-### Team Token Budgets
-
-```toon
-team_token_budget[5]{phase_group,per_teammate,total_budget,notes}:
-  Phase 1 (Understand),300,900,Lead summarizes + teammates validate
-  Phase 2-4 (Design/UI/Test),1500,4500,Parallel design work
-  Phase 5a-5c (TDD),2000,6000,Parallel test writing + implementation
-  Phase 6-7 (Review/Verify),1000,3000,Parallel reviews
-  Phase 8-9 (Doc/Notify),500,500,Single agent phases
-```
-
-### Auto Team Lifecycle (Team-Workflow Bridge)
-
-When teams are active, phase transitions automatically manage team lifecycle:
-
-```
-Phase start (pre-phase hook):
-  -> team-bridge.cjs create-if-needed
-  -> Creates teams/ log dir, registers in workflow-state.json
-  -> Lead uses returned team name with TeamCreate()
-
-Phase end (post-phase hook):
-  -> team-bridge.cjs teardown (marks team completed)
-  -> merge-team-logs.sh --phase N (merges JSONL logs)
-
-Phase rejected:
-  -> team-bridge.cjs handle-rejection
-  -> Archives logs to -attempt-N, fresh dir for retry
-
-Workflow complete:
-  -> merge-team-logs.sh (all phases -> unified-timeline.jsonl)
-```
-
-Per-team logs are stored in `teams/phase-{slug}/` as JSONL files (one per agent + combined). Teammates log actions automatically when `AF_TEAM_LOG_DIR` is set in their environment.
-
-**Full docs:** `docs/TEAM_WORKFLOW_BRIDGE.md`
 
 ### Team vs Subagent Fallback
 
-If Agent Teams is not enabled OR complexity is not Deep + multi-domain:
+If Agent Teams not enabled OR complexity not Deep + multi-domain:
 - Sequential execution (standard subagent behavior)
-- Single context window
-- Hub-spoke communication via Task tool
+- Single context window, hub-spoke communication
 - No additional token overhead
+
+**Full docs:** `docs/AGENT_TEAMS_GUIDE.md` | `docs/TEAM_WORKFLOW_BRIDGE.md`
 
 ---
 
 **Remember:**
 - Follow phases in order
-- Only 2 approval gates: Phase 2 (Design) and Phase 5b (Implementation)
+- Only 2 approval gates: Phase 1 (Design) and Phase 3 (Build)
 - Auto-continue through other phases unless blocker hit
 - TDD is mandatory (RED → GREEN → REFACTOR)
 - Save state at token limit

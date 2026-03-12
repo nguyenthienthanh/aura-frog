@@ -135,24 +135,24 @@ The user should NEVER have to guess what they can do next.
 
 **TDD Workflow Coming:**
 After approval, we enter TDD cycle:
-• Phase 5a: Write failing tests (RED)
-• Phase 5b: Implement code (GREEN)
-• Phase 5c: Refactor (REFACTOR)
+• Phase 2: Write failing tests (Test RED)
+• Phase 3: Implement code (Build GREEN)
+• Phase 4: Refactor + Review
 
 **Suggested Next:**
 → Review the test plan above
-→ Type `approve` to start Phase 5a (TDD RED)
+→ Type `approve` to start Phase 2 (Test RED)
 → Or type `force implementation` to skip test-first (not recommended)
 ```
 
-### Phase 5a-c (Implementation) - During TDD
+### Phase 2-3 (TDD Implementation) - During TDD
 
 ```markdown
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 WHAT'S NEXT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Current:** Phase 5b (GREEN) - Implementing code
+**Current:** Phase 3 (Build GREEN) - Implementing code
 
 **Your Options:**
 • `continue` - Keep implementing
@@ -160,7 +160,7 @@ After approval, we enter TDD cycle:
 • `pause` - Save and take a break
 
 **Quick Commands:**
-• `skip refactor` - Skip Phase 5c, go to Review
+• `skip refactor` - Skip refactoring in Phase 4
 • `force review` - Jump to code review now
 • `add feature: <desc>` - Expand scope (careful!)
 
@@ -171,10 +171,10 @@ After approval, we enter TDD cycle:
 
 **Suggested Next:**
 → Continue implementing until all tests pass
-→ Then type `continue` to move to REFACTOR phase
+→ Then type `continue` to move to Phase 4 (Refactor + Review)
 ```
 
-### Phase 6 (Code Review) - After Delivery
+### Phase 4 (Refactor + Review) - After Delivery
 
 ```markdown
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -182,14 +182,14 @@ After approval, we enter TDD cycle:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Your Options:**
-• `approve` - Accept code, proceed to verification
+• `approve` - Accept code, proceed to finalize
 • `reject: <issues>` - Fix issues, re-review
 • `approve with notes: <notes>` - Accept with minor fixes
 
 **Quick Commands:**
 • `fix: <issue>` - Fix specific issue
 • `ignore: <item>` - Skip non-critical issue
-• `force verify` - Skip remaining fixes
+• `force finalize` - Skip remaining fixes
 
 **Review Summary:**
 • 🔒 Security: ✅ Passed
@@ -199,11 +199,11 @@ After approval, we enter TDD cycle:
 
 **Suggested Next:**
 → Review the code review findings above
-→ Type `approve` to proceed to Phase 7 (Verification)
+→ Type `approve` to proceed to Phase 5 (Finalize)
 → Or `fix: <issue>` to address specific items
 ```
 
-### Phase 7-9 (Verification, Documentation, Share)
+### Phase 5 (Finalize - Documentation, Notification)
 
 ```markdown
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -211,18 +211,18 @@ After approval, we enter TDD cycle:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Your Options:**
-• `approve` - Continue to next phase
-• `reject: <reason>` - Redo current phase
+• `approve` - Complete workflow
+• `reject: <reason>` - Redo finalize phase
 • `done` - Complete workflow now (skip remaining)
 
 **Quick Commands:**
-• `skip docs` - Skip documentation phase
+• `skip docs` - Skip documentation
 • `skip share` - Skip Slack notification
 • `force complete` - End workflow immediately
 
 **Suggested Next:**
 → Review deliverables above
-→ Type `approve` to continue
+→ Type `approve` to complete
 → Or `done` to complete the workflow
 ```
 
@@ -262,9 +262,9 @@ Always available, show in guidance when relevant:
 | `skip design` | Skip Phase 2 |
 | `skip ui` | Skip Phase 3 |
 | `skip tests` | Skip test writing (⚠️) |
-| `skip refactor` | Skip Phase 5c |
-| `skip docs` | Skip Phase 8 |
-| `skip share` | Skip Phase 9 |
+| `skip refactor` | Skip refactoring in Phase 4 |
+| `skip docs` | Skip documentation in Phase 5 |
+| `skip share` | Skip notification in Phase 5 |
 | `force implementation` | Jump to coding |
 | `force review` | Jump to code review |
 | `force complete` | End immediately |

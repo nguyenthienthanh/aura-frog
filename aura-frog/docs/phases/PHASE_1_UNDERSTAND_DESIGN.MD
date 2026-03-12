@@ -1,8 +1,8 @@
 # Phase 1: Requirements Analysis - Detailed Guidelines
 
-**Phase:** 1/9 - Requirements Analysis  
-**Duration:** 30-60 minutes  
-**Agents:** pm-operations-orchestrator, project-detector, jira-operations  
+**Phase:** 1/5 - Requirements Analysis
+**Duration:** 30-60 minutes
+**Agents:** pm-operations-orchestrator, project-detector, jira-operations
 **Deliverables:** Requirements document, user stories, acceptance criteria
 
 ---
@@ -446,11 +446,10 @@ Brief overview of feature (2-3 paragraphs)
 
 ## 10. Timeline Estimate
 
-- Phase 2 (Technical Planning): 2 days
-- Phase 3 (Design): 1 day
-- Phase 4 (Test Planning): 1 day
-- Phase 5 (Implementation): 5 days
-- Phase 6-8 (Review/QA/Docs): 2 days
+- Phase 1 (Understand + Design): 3 days
+- Phase 2 (Test RED): 1 day
+- Phase 3 (Build GREEN): 5 days
+- Phase 4-5 (Refactor + Review / Finalize): 2 days
 
 **Total:** 11 days (~2.5 weeks)
 ```
@@ -490,7 +489,7 @@ Brief overview of feature (2-3 paragraphs)
 
 ## Next Steps
 
-Phase 2: Technical Planning
+Phase 2: Test RED
 - System design
 - Architecture diagram
 - API contracts
@@ -523,7 +522,7 @@ Type:
 ```markdown
 ✅ Phase 1 Approved!
 
-Moving to Phase 2: Technical Planning
+Moving to Phase 2: Test RED
 Expected duration: 2 days
 Next agent: mobile-react-native (or detected agent)
 
@@ -737,7 +736,7 @@ Phase 1: Requirements Analysis - Review Complete
 - ✅ QA Testability Review
 - ✅ UI Design Review
 
-**Next Phase:** Technical Planning (Phase 2)
+**Next Phase:** Test RED (Phase 2)
 
 **Options:**
 - "approve" → Proceed to Phase 2
@@ -781,5 +780,5 @@ All templates available in:
 
 ---
 
-**Phase 1 Complete! Ready for Phase 2: Technical Planning** 🚀
+**Phase 1 Complete! Ready for Phase 2: Test RED** 🚀
 

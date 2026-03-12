@@ -3,7 +3,7 @@
 **Category:** Code Quality
 **Priority:** Critical
 **Version:** 1.0.0
-**Applies To:** All code, especially Phase 5b (Implementation)
+**Applies To:** All code, especially Phase 3 (Build GREEN)
 
 ---
 

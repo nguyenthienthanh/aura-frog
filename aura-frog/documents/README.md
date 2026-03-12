@@ -188,7 +188,7 @@ document feature "Auth" --format=confluence
 
 ### With Workflow
 ```bash
-# Phase 8 (Documentation) automatically generates docs
+# Phase 5 (Finalize) automatically generates docs
 workflow:start "Add feature"
 # Creates documentation in this folder
 ```

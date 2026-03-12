@@ -176,8 +176,8 @@ This rule applies to ALL workflow phases:
 phases[4]{phase,lint_action}:
   Phase 3 (Implementation),Lint after each file
   Phase 4 (Testing),Lint test files too
-  Phase 6 (Review),Verify zero lint issues
-  Phase 8 (Delivery),Final lint check before merge
+  Phase 4 (Refactor + Review),Verify zero lint issues
+  Phase 5 (Finalize),Final lint check before merge
 ```
 
 ---

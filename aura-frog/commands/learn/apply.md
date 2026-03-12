@@ -147,7 +147,7 @@ Show what would be applied without making changes:
 
 ### Would Apply (high confidence)
 1. Route React to react-expert (92%)
-2. Increase Phase 5a timeout (85%)
+2. Increase Phase 2 (Test RED) timeout (85%)
 
 ### Would Skip (low confidence)
 3. Add test batching (62%) - needs more data
@@ -277,7 +277,7 @@ Shows what would be applied without making changes:
    - File: agents/smart-agent-detector.md
    - Lines affected: 3
 
-2. **Increase Phase 5a timeout** (85% confidence)
+2. **Increase Phase 2 (Test RED) timeout** (85% confidence)
    - File: ccpm-config.yaml
    - Lines affected: 1
 
@@ -327,7 +327,7 @@ addition: |
 # Target: ccpm-config.yaml
 type: workflow_config
 file: ccpm-config.yaml
-path: "workflow.phase_5a.timeout"
+path: "workflow.phase_2.timeout"
 old: 180
 new: 300
 ```
@@ -406,7 +406,7 @@ File: `agents/smart-agent-detector.md`
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## Improvement 2/3: Increase Phase 5a timeout
+## Improvement 2/3: Increase Phase 2 (Test RED) timeout
 ...
 ```
 

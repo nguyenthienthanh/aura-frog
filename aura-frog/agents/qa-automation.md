@@ -89,7 +89,7 @@ lines: 80%
 
 ## 🧪 Test Planning Process
 
-### Phase 4 Deliverables
+### Phase 2 (Test RED) Deliverables
 
 #### 1. Test Plan (`test_plan.md`)
 ```markdown
@@ -482,7 +482,7 @@ Before allowing code generation:
 
 ---
 
-## 🧪 Test Execution (Phase 7)
+## 🧪 Test Execution (Phase 4 - Refactor + Review)
 
 ### Execution Process
 ```markdown
@@ -890,13 +890,12 @@ For each test phase, ensure:
 ### Role Per Phase
 
 ```toon
-team_role[6]{phase,role,focus}:
-  1-Understand,Primary,Testability assessment + acceptance criteria
-  4-Test Plan,Lead,Test strategy + case definition
-  5a-TDD RED,Lead,Write failing tests
-  5b-TDD GREEN,Primary,Validate tests pass + edge cases
-  6-Review,Primary,Test coverage review + quality gates
-  7-Verify,Lead,Final validation + coverage report
+team_role[5]{phase,role,focus}:
+  1-Understand + Design,Primary,Testability assessment + acceptance criteria
+  2-Test RED,Lead,Test strategy + case definition + write failing tests
+  3-Build GREEN,Primary,Validate tests pass + edge cases
+  4-Refactor + Review,Lead,Test coverage review + quality gates + final validation
+  5-Finalize,Support,Coverage report
 ```
 
 ### File Ownership

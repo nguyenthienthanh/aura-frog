@@ -172,7 +172,7 @@ return detection;
 context_tracking[6]{item,purpose}:
   Active project,Currently focused project (for workspaces)
   Active agents,Agents activated this session
-  Workflow phase,Current phase in 9-phase workflow
+  Workflow phase,Current phase in 5-phase workflow
   Pending approvals,Items waiting for user approval
   Modified files,Files changed this session
   Test status,Current test pass/fail state

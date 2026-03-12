@@ -231,7 +231,7 @@ Data Points: 123 workflows, 47 feedback items
 
 ### ❌ Failure Patterns
 
-**1. Phase 5a timeout on large test suites**
+**1. Phase 2 (Test RED) timeout on large test suites**
 - Frequency: 8 workflows
 - Impact: Workflow stall, manual intervention needed
 - Root Cause: Default 180s timeout insufficient for 100+ tests
@@ -259,7 +259,7 @@ Data Points: 123 workflows, 47 feedback items
 
 ### 📝 Suggested Improvements
 
-1. **Update Phase 5a timeout** (Confidence: 85%)
+1. **Update Phase 2 (Test RED) timeout** (Confidence: 85%)
    - File: `ccpm-config.yaml`
    - Change: timeout 180 → 300
    - Run: `/learn:apply --id abc123`

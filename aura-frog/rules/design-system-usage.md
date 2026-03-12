@@ -213,7 +213,7 @@ Run this mental checklist:
 
 ## Code Review Checklist
 
-During Phase 6 (Code Review), verify:
+During Phase 4 (Refactor + Review), verify:
 
 - [ ] Design system correctly detected
 - [ ] Only one primary design system used
@@ -335,8 +335,8 @@ export function ProductGrid({ products }) {
 ## Enforcement
 
 **Phase 3 (UI Breakdown):** Identify design system
-**Phase 5 (Implementation):** Use correct design system
-**Phase 6 (Code Review):** Verify consistency
+**Phase 3 (Build GREEN):** Use correct design system
+**Phase 4 (Refactor + Review):** Verify consistency
 
 **Linter Warning:**
 ```

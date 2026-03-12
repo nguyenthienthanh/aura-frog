@@ -1,7 +1,7 @@
-# PHASE 5B: TDD GREEN - Implement Feature
+# PHASE 3: Build GREEN - Implement Feature
 
-**Phase:** 5b of 9  
-**Duration:** 16-40 hours  
+**Phase:** 3 of 5
+**Duration:** 16-40 hours
 **Goal:** Write minimum code to make all tests pass
 
 ---
@@ -89,7 +89,7 @@ src/
 
 ### 2. Test Results
 ```markdown
-# Phase 5b: Implementation Report
+# Phase 3: Implementation Report
 
 ## Tests: 53/53 passing ✅
 ## Coverage: 87.3% ✅ (Target: 85%)
@@ -108,7 +108,7 @@ src/
 
 ```
 ═══════════════════════════════════════════════════════════
-🟢 PHASE 5B COMPLETE: TDD GREEN - Implementation
+🟢 PHASE 3 COMPLETE: Build GREEN - Implementation
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
@@ -125,12 +125,12 @@ All 53 tests passing, 87% coverage achieved ✅
    ✅ ESLint 0 warnings
    ✅ Features working
 
-⏭️  Next Phase: Phase 5c - TDD REFACTOR
+⏭️  Next Phase: Phase 4 - Refactor + Review
 
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 5c
+Type "workflow:approve" → Proceed to Phase 4
 Type "workflow:reject <reason>" → Revise implementation
 
 Your response:
@@ -139,5 +139,5 @@ Your response:
 
 ---
 
-**Next:** Phase 5c - TDD REFACTOR
+**Next:** Phase 4 - Refactor + Review
 

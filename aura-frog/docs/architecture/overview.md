@@ -164,9 +164,9 @@ project-config-loader
 
 ```
 pm-operations-orchestrator
-├── Manage 9-phase workflow
+├── Manage 5-phase workflow
 ├── Coordinate agents
-├── Approval gates (9 gates)
+├── Approval gates (2 gates)
 ├── Smart agent selection
 ├── Progress tracking
 └── Error recovery
@@ -176,74 +176,43 @@ pm-operations-orchestrator
 
 ## 🔄 Workflow Architecture
 
-### 9-Phase Workflow
+### 5-Phase Workflow
 
 ```
-Phase 1: Requirements Analysis
+Phase 1: Understand + Design
    │
-   ├─→ Agents: jira-operations, pm-orchestrator
-   ├─→ Input: JIRA ticket
-   ├─→ Output: requirements.md, user_stories.md
+   ├─→ Agents: pm-orchestrator, jira-operations, dev agents, ui-expert
+   ├─→ Input: JIRA ticket, Figma designs
+   ├─→ Output: requirements.md, tech_spec.md, component_breakdown.md
    ├─→ Approval Gate ✋
    │
    ↓
-Phase 2: Technical Planning
-   │
-   ├─→ Agents: dev agents (mobile/web/backend)
-   ├─→ Input: Requirements from Phase 1
-   ├─→ Output: tech_spec.md, architecture.drawio, lld.md
-   ├─→ Approval Gate ✋
-   │
-   ↓
-Phase 3: Design Review
-   │
-   ├─→ Agents: ui-expert, dev agents
-   ├─→ Input: Figma screenshots/links
-   ├─→ Output: component_breakdown.md, design_tokens.md
-   ├─→ Approval Gate ✋
-   │
-   ↓
-Phase 4: Test Planning
+Phase 2: Test RED
    │
    ├─→ Agents: qa-automation
-   ├─→ Input: Tech spec from Phase 2
-   ├─→ Output: test_plan.md, test_cases.md
-   ├─→ Approval Gate ✋
+   ├─→ Input: Tech spec from Phase 1
+   ├─→ Output: test_plan.md, failing test files
+   ├─→ Auto-continue ⚡
    │
    ↓
-Phase 5: Implementation (TDD)
+Phase 3: Build GREEN
    │
-   ├─→ 5a: Write Tests (RED) ✋
-   ├─→ 5b: Implement Code (GREEN) ✋
-   ├─→ 5c: Refactor ✋
    ├─→ Agents: dev agents, qa-automation
-   ├─→ Output: Source code, tests
-   │
-   ↓
-Phase 6: Code Review
-   │
-   ├─→ Agents: All dev agents (cross-review)
-   ├─→ Output: code_review_report.md
+   ├─→ Output: Source code, passing tests
    ├─→ Approval Gate ✋
    │
    ↓
-Phase 7: QA Validation
+Phase 4: Refactor + Review
    │
-   ├─→ Agents: qa-automation
-   ├─→ Output: test_execution_report.md, coverage_report.html
-   ├─→ Approval Gate ✋
+   ├─→ Agents: All dev agents (cross-review), security-expert, qa-automation
+   ├─→ Output: code_review_report.md, test_execution_report.md, coverage_report.html
+   ├─→ Auto-continue ⚡
    │
    ↓
-Phase 8: Documentation
+Phase 5: Finalize
    │
-   ├─→ Agents: confluence-operations
+   ├─→ Agents: confluence-operations, slack-operations, jira-operations
    ├─→ Output: implementation_summary.md, deployment_guide.md
-   ├─→ Approval Gate ✋
-   │
-   ↓
-Phase 9: Notification & Closure
-   │
-   ├─→ Agents: slack-operations, jira-operations
    ├─→ Actions: Update JIRA, notify team
    └─→ Done ✅
 ```

@@ -61,7 +61,9 @@ models[2]{name,fields}:
 
 ## Phase Deliverables Checklist
 
-### Phase 1: Understand (Requirements)
+### Phase 1: Understand + Design
+
+#### Requirements
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -80,9 +82,7 @@ models[2]{name,fields}:
 - [ ] Scope clearly defined
 ```
 
----
-
-### Phase 2: Design (Technical Specification)
+#### Design - Technical Specification
 
 | Deliverable | Location | Required | Purpose |
 |-------------|----------|----------|---------|
@@ -197,7 +197,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 2 Deliverables Check
+## Phase 1 Deliverables Check (Design)
 - [ ] TECH_SPEC.md created (AI-readable format)
 - [ ] TECH_SPEC_CONFLUENCE.md created (human-readable)
 - [ ] Architecture diagram included in both
@@ -206,9 +206,7 @@ Full Confluence page format with rich documentation:
 - [ ] Risk assessment documented
 ```
 
----
-
-### Phase 3: UI Breakdown (Design Analysis)
+#### UI Breakdown - Design Analysis
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -221,7 +219,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 3 Deliverables Check
+## Phase 1 Deliverables Check (UI Breakdown)
 - [ ] UI_BREAKDOWN.md created
 - [ ] Components identified and listed
 - [ ] Props/interfaces defined
@@ -231,7 +229,9 @@ Full Confluence page format with rich documentation:
 
 ---
 
-### Phase 4: Test Plan
+### Phase 2: Test RED
+
+#### Test Plan
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -243,7 +243,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 4 Deliverables Check
+## Phase 2 Deliverables Check (Test Plan)
 - [ ] TEST_PLAN.md created
 - [ ] Unit test scenarios listed
 - [ ] Integration test scenarios listed
@@ -252,9 +252,7 @@ Full Confluence page format with rich documentation:
 - [ ] Coverage target set (minimum 80%)
 ```
 
----
-
-### Phase 5a: TDD RED (Write Tests)
+#### TDD RED - Write Tests
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -263,7 +261,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 5a Deliverables Check
+## Phase 2 Deliverables Check (Test RED)
 - [ ] Test files created
 - [ ] All tests FAIL (expected)
 - [ ] Test file naming correct (*.test.ts, *.spec.ts)
@@ -272,7 +270,7 @@ Full Confluence page format with rich documentation:
 
 ---
 
-### Phase 5b: TDD GREEN (Implementation)
+### Phase 3: Build GREEN
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -281,7 +279,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 5b Deliverables Check
+## Phase 3 Deliverables Check (Build GREEN)
 - [ ] Code implemented
 - [ ] All tests PASS
 - [ ] No TypeScript errors
@@ -291,7 +289,9 @@ Full Confluence page format with rich documentation:
 
 ---
 
-### Phase 5c: TDD REFACTOR (Polish)
+### Phase 4: Refactor + Review
+
+#### TDD REFACTOR - Polish
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -300,16 +300,14 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 5c Deliverables Check
+## Phase 4 Deliverables Check (Refactor)
 - [ ] Code refactored
 - [ ] All tests still PASS
 - [ ] Code quality improved
 - [ ] No new warnings
 ```
 
----
-
-### Phase 6: Review (Code Review)
+#### Review - Code Review
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -320,7 +318,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 6 Deliverables Check
+## Phase 4 Deliverables Check (Review)
 - [ ] CODE_REVIEW.md created
 - [ ] Security issues listed (or "None found")
 - [ ] Performance issues listed (or "None found")
@@ -330,7 +328,9 @@ Full Confluence page format with rich documentation:
 
 ---
 
-### Phase 7: Verify (QA Validation)
+### Phase 5: Finalize
+
+#### Verify - QA Validation
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -341,7 +341,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 7 Deliverables Check
+## Phase 5 Deliverables Check (Verify)
 - [ ] QA_REPORT.md created
 - [ ] All tests passing
 - [ ] Coverage percentage documented
@@ -349,9 +349,7 @@ Full Confluence page format with rich documentation:
 - [ ] QA sign-off given
 ```
 
----
-
-### Phase 8: Document (Documentation)
+#### Document - Documentation
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -362,7 +360,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 8 Deliverables Check
+## Phase 5 Deliverables Check (Document)
 - [ ] IMPLEMENTATION_SUMMARY.md created
 - [ ] Changes documented
 - [ ] CHANGELOG.md updated
@@ -370,9 +368,7 @@ Full Confluence page format with rich documentation:
 - [ ] README updated (if needed)
 ```
 
----
-
-### Phase 9: Share (Notification)
+#### Share - Notification
 
 | Deliverable | Location | Required |
 |-------------|----------|----------|
@@ -382,7 +378,7 @@ Full Confluence page format with rich documentation:
 
 **Validation:**
 ```markdown
-## Phase 9 Deliverables Check
+## Phase 5 Deliverables Check (Share)
 - [ ] JIRA ticket updated (if applicable)
 - [ ] Team notified (if applicable)
 - [ ] Workflow state archived
@@ -397,16 +393,16 @@ Every workflow MUST create this folder structure:
 
 ```
 .claude/logs/workflows/{workflow-id}/
-├── REQUIREMENTS.md           # Phase 1
-├── TECH_SPEC.md              # Phase 2 - AI reads this (concise)
-├── TECH_SPEC_CONFLUENCE.md   # Phase 2 - Human-readable (full Confluence format)
-├── UI_BREAKDOWN.md           # Phase 3 (if UI)
-├── TEST_PLAN.md              # Phase 4
-├── CODE_REVIEW.md            # Phase 6
-├── QA_REPORT.md              # Phase 7
-├── IMPLEMENTATION_SUMMARY.md # Phase 8
-├── DEPLOYMENT_GUIDE.md       # Phase 8 (if deployment)
-├── CHANGELOG_ENTRY.md        # Phase 8
+├── REQUIREMENTS.md           # Phase 1 (Understand + Design)
+├── TECH_SPEC.md              # Phase 1 - AI reads this (concise)
+├── TECH_SPEC_CONFLUENCE.md   # Phase 1 - Human-readable (full Confluence format)
+├── UI_BREAKDOWN.md           # Phase 1 (if UI)
+├── TEST_PLAN.md              # Phase 2 (Test RED)
+├── CODE_REVIEW.md            # Phase 4 (Refactor + Review)
+├── QA_REPORT.md              # Phase 5 (Finalize)
+├── IMPLEMENTATION_SUMMARY.md # Phase 5 (Finalize)
+├── DEPLOYMENT_GUIDE.md       # Phase 5 (if deployment)
+├── CHANGELOG_ENTRY.md        # Phase 5
 └── workflow-state.json       # Workflow metadata
 ```
 
@@ -442,26 +438,20 @@ Required Deliverables:
 Workflow: {workflow-id}
 Status: Checking deliverables...
 
-Phase 1 (Understand):
+Phase 1 (Understand + Design):
   ✅ REQUIREMENTS.md
-
-Phase 2 (Design):
   ✅ TECH_SPEC.md (AI-readable)
   ✅ TECH_SPEC_CONFLUENCE.md (human-readable)
+  ✅ UI_BREAKDOWN.md (if UI)
 
-Phase 3 (UI Breakdown):
-  ✅ UI_BREAKDOWN.md
-
-Phase 4 (Test Plan):
+Phase 2 (Test RED):
   ✅ TEST_PLAN.md
 
-Phase 6 (Review):
+Phase 4 (Refactor + Review):
   ✅ CODE_REVIEW.md
 
-Phase 7 (Verify):
+Phase 5 (Finalize):
   ✅ QA_REPORT.md
-
-Phase 8 (Document):
   ✅ IMPLEMENTATION_SUMMARY.md
   ✅ CHANGELOG_ENTRY.md
 
@@ -479,8 +469,8 @@ If a deliverable is missing at a later phase:
 ```markdown
 **Missing Deliverable Detected**
 
-Document: TECH_SPEC.md (Phase 2)
-Current Phase: 5b
+Document: TECH_SPEC.md (Phase 1)
+Current Phase: 3
 
 Action: Creating TECH_SPEC.md retroactively...
 [Generate document based on current implementation]
@@ -507,17 +497,17 @@ Skipped deliverables:
 | Phase | Key Document | Must Have |
 |-------|--------------|-----------|
 | 1 | REQUIREMENTS.md | User stories, acceptance criteria |
-| 2 | TECH_SPEC.md | AI-readable: Architecture, files, APIs |
-| 2 | TECH_SPEC_CONFLUENCE.md | Human-readable: Full Confluence format |
-| 3 | UI_BREAKDOWN.md | Components, props, accessibility |
-| 4 | TEST_PLAN.md | Test scenarios, coverage target |
-| 5a | Test files | Failing tests |
-| 5b | Implementation | Passing tests |
-| 5c | Refactored code | Still passing |
-| 6 | CODE_REVIEW.md | Security, performance, practices |
-| 7 | QA_REPORT.md | Test results, coverage |
-| 8 | IMPLEMENTATION_SUMMARY.md | Changes, deployment |
-| 9 | Workflow archive | All documents |
+| 1 | TECH_SPEC.md | AI-readable: Architecture, files, APIs |
+| 1 | TECH_SPEC_CONFLUENCE.md | Human-readable: Full Confluence format |
+| 1 | UI_BREAKDOWN.md | Components, props, accessibility (if UI) |
+| 2 | TEST_PLAN.md | Test scenarios, coverage target |
+| 2 | Test files | Failing tests |
+| 3 | Implementation | Passing tests |
+| 4 | Refactored code | Still passing |
+| 4 | CODE_REVIEW.md | Security, performance, practices |
+| 5 | QA_REPORT.md | Test results, coverage |
+| 5 | IMPLEMENTATION_SUMMARY.md | Changes, deployment |
+| 5 | Workflow archive | All documents |
 
 ---
 
@@ -530,14 +520,14 @@ At each phase approval, run:
 ls .claude/logs/workflows/{workflow-id}/
 
 # Check required documents
-[ -f "REQUIREMENTS.md" ] && echo "✅ Phase 1" || echo "❌ Phase 1"
-[ -f "TECH_SPEC.md" ] && echo "✅ Phase 2 (AI)" || echo "❌ Phase 2 (AI)"
-[ -f "TECH_SPEC_CONFLUENCE.md" ] && echo "✅ Phase 2 (Confluence)" || echo "❌ Phase 2 (Confluence)"
-[ -f "UI_BREAKDOWN.md" ] && echo "✅ Phase 3" || echo "⚠️ Phase 3 (optional)"
-[ -f "TEST_PLAN.md" ] && echo "✅ Phase 4" || echo "❌ Phase 4"
-[ -f "CODE_REVIEW.md" ] && echo "✅ Phase 6" || echo "❌ Phase 6"
-[ -f "QA_REPORT.md" ] && echo "✅ Phase 7" || echo "❌ Phase 7"
-[ -f "IMPLEMENTATION_SUMMARY.md" ] && echo "✅ Phase 8" || echo "❌ Phase 8"
+[ -f "REQUIREMENTS.md" ] && echo "✅ Phase 1 (Requirements)" || echo "❌ Phase 1 (Requirements)"
+[ -f "TECH_SPEC.md" ] && echo "✅ Phase 1 (AI Spec)" || echo "❌ Phase 1 (AI Spec)"
+[ -f "TECH_SPEC_CONFLUENCE.md" ] && echo "✅ Phase 1 (Confluence)" || echo "❌ Phase 1 (Confluence)"
+[ -f "UI_BREAKDOWN.md" ] && echo "✅ Phase 1 (UI)" || echo "⚠️ Phase 1 (UI - optional)"
+[ -f "TEST_PLAN.md" ] && echo "✅ Phase 2" || echo "❌ Phase 2"
+[ -f "CODE_REVIEW.md" ] && echo "✅ Phase 4" || echo "❌ Phase 4"
+[ -f "QA_REPORT.md" ] && echo "✅ Phase 5" || echo "❌ Phase 5"
+[ -f "IMPLEMENTATION_SUMMARY.md" ] && echo "✅ Phase 5 (Summary)" || echo "❌ Phase 5 (Summary)"
 ```
 
 ---

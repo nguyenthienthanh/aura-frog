@@ -87,8 +87,8 @@ use_cases[5]{scenario,thoughts,model}:
 phase_integration[4]{phase,use,focus}:
   Phase 1,Requirements analysis,Understand scope and constraints
   Phase 2,Technical planning,Evaluate approaches
-  Phase 5b,Complex implementation,Debug tricky issues
-  Phase 6,Code review,Deep analysis of changes
+  Phase 3,Complex implementation,Debug tricky issues
+  Phase 4,Code review,Deep analysis of changes
 ```
 
 ---

@@ -103,15 +103,11 @@ get_phase_status() {
 # Get phase name
 get_phase_name() {
     case $1 in
-        1) echo "Requirements Analysis" ;;
-        2) echo "Technical Planning" ;;
-        3) echo "Design Review" ;;
-        4) echo "Test Planning" ;;
-        5) echo "TDD Implementation" ;;
-        6) echo "Code Review" ;;
-        7) echo "QA Validation" ;;
-        8) echo "Documentation" ;;
-        9) echo "Notification" ;;
+        1) echo "Understand + Design" ;;
+        2) echo "Test RED" ;;
+        3) echo "Build GREEN" ;;
+        4) echo "Refactor + Review" ;;
+        5) echo "Finalize" ;;
         *) echo "Unknown Phase" ;;
     esac
 }

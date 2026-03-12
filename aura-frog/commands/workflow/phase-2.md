@@ -1,251 +1,124 @@
 # Command: workflow:phase:2
 
-**Version:** 1.0.0  
-**Purpose:** Execute Phase 2 - Technical Planning  
+**Version:** 1.0.0
+**Purpose:** Execute Phase 2 - Test RED (Write Failing Tests)
 **Trigger:** Auto-triggered after Phase 1 approval OR manual `/workflow:phase:2`
 
 ---
 
 ## 🎯 Phase 2 Objectives
 
-Create detailed technical specification and architecture plan for implementation.
+Write failing tests before implementation (TDD RED phase). All tests must fail at this stage - they define the expected behavior for Phase 3.
 
 **Deliverables:**
-1. Technical Specification (TECH_SPEC.md)
-2. Architecture Diagram
-3. Component/Module Breakdown
-4. API Design (if applicable)
-5. File Change List
+1. Test scaffolding with failing tests
+2. Test cases covering requirements from Phase 1
+3. Verification that all tests fail (RED state)
 
 ---
 
 ## 📋 Execution Steps
 
 ### Step 1: Pre-Phase Hook
-- Load Phase 1 requirements
+- Load Phase 1 requirements and design
 - Verify previous phase approved
 - Initialize Phase 2 state
 - Show phase banner
 
-### Step 2: Analyze Codebase
-**Primary Agent:** Dev agent (mobile-react-native/web-*/backend-laravel)
+### Step 2: Define Test Cases
+**Primary Agent:** qa-automation
 
 Actions:
-- Read existing code structure
-- Identify similar patterns in codebase
-- Analyze dependencies
-- Review project conventions
+- Derive test cases from Phase 1 requirements and success criteria
+- Identify unit test, integration test, and E2E test boundaries
+- Define edge cases and error scenarios
+- Map tests to components/modules from Phase 1 design
 
-### Step 3: Design Architecture
-**Agents:** Dev agent + UI Designer (if UI changes)
+### Step 3: Write Test Scaffolding
+**Agent:** qa-automation + Dev agent
 
 Create:
-- High-level architecture
-- Component hierarchy
-- Data flow diagram
-- State management strategy
-- File/folder structure
+- Test file structure matching the planned code structure
+- Test stubs for each requirement
+- Mock/fixture setup
+- Assertion scaffolding
 
-### Step 4: Define Technical Details
-- Props/interfaces for each component
-- API contracts (request/response)
-- Database schema changes (if backend)
-- Third-party integrations
-- Performance considerations
+### Step 4: Verify RED State
+- Run all tests
+- Confirm every test fails (RED)
+- Document expected vs actual for each test
+- Flag any tests that pass unexpectedly (indicates existing code already covers it)
 
-### Step 5: Estimate Complexity
-- File changes count
-- Lines of code estimate
-- Dependencies to add/update
-- Potential risks
-- **Story Points** (Fibonacci: 1, 2, 3, 5, 8, 13, 21)
-- **Time estimate** (hours/days)
-
-### Step 6: Generate Deliverables
-Create comprehensive tech spec document:
+### Step 5: Generate Deliverables
 
 ```markdown
-# Technical Specification
+# Phase 2: Test RED - Deliverables
 
-## Overview
-[Brief description]
+## Test Cases
+| ID | Requirement | Test Type | Status |
+|----|------------|-----------|--------|
+| T1 | [req] | unit | RED ✗ |
+| T2 | [req] | integration | RED ✗ |
 
-## Architecture
-[Architecture diagram in ASCII/mermaid]
-
-## Components/Modules
-### Component 1
-- Purpose: ...
-- Props: ...
-- State: ...
-- Dependencies: ...
-
-## File Changes
-- CREATE: path/to/new/file.tsx
-- UPDATE: path/to/existing/file.tsx
-- DELETE: path/to/old/file.tsx
-
-## API Design (if applicable)
-### Endpoint 1
-- Method: POST
-- Path: /api/v1/resource
-- Request: {...}
-- Response: {...}
-
-## Database Changes (if applicable)
-[Schema changes]
-
-## Dependencies
-- Add: package@version
-- Update: package@version
-
-## Testing Strategy
-[High-level test plan]
-
-## Risks & Mitigation
-[Potential issues and solutions]
+## Test Files Created
+- tests/unit/[component].test.ts
+- tests/integration/[feature].test.ts
 
 ## Estimation
+
 ### Story Points
 **Total:** X story points (Fibonacci scale)
 
 **Breakdown:**
-- Phase 4 (Test Planning): 1 point
-- Phase 5a (Write Tests): 2 points
-- Phase 5b (Implementation): 5 points
-- Phase 5c (Refactor): 2 points
-- Phase 6 (Code Review): 1 point
-- Phase 7 (QA Verification): 2 points
+- Phase 2 (Test RED): 2 points
+- Phase 3 (Build GREEN): 5 points
+- Phase 4 (Refactor + Review): 3 points
+- Phase 5 (Finalize): 1 point
 
 **Confidence:** High/Medium/Low
 
-**Story Point Reference:**
-- 1 point: Trivial (~1-2 hours)
-- 2 points: Simple (~2-4 hours)
-- 3 points: Moderate (~4-6 hours)
-- 5 points: Complex (~1 day)
-- 8 points: Very Complex (~2 days)
-- 13 points: Extensive (~3 days)
-- 21 points: Epic (consider breaking down)
-
 ### Time Estimate
-- Phase 4-5: X hours
-- Phase 6-7: Y hours
+- Phase 2-5: X hours
 - **Total:** Z hours (~W days)
-
-**Velocity Factor:** Based on team velocity (adjust for your team)
 ```
-
----
-
-## 🎨 Architecture Diagram Format
-
-Use ASCII art or Mermaid syntax:
-
-```
-┌─────────────────┐
-│  Main Component │
-└────────┬────────┘
-         │
-    ┌────┴────┬────────────┬──────────┐
-    │         │            │          │
-┌───▼───┐ ┌──▼──┐ ┌───────▼──┐ ┌────▼────┐
-│ Comp1 │ │Comp2│ │  Comp3   │ │  Hook   │
-└───────┘ └─────┘ └──────────┘ └─────────┘
-```
-
-Or Mermaid:
-```mermaid
-graph TD
-    A[Main Component] --> B[Component 1]
-    A --> C[Component 2]
-    A --> D[Custom Hook]
-    B --> E[Sub-component]
-```
-
----
-
-## 📦 Template Usage
-
-Uses `templates/tech-spec.md` as base template.
-
-Customize for:
-- Mobile (React Native)
-- Web (Vue/React/Next.js)
-- Backend (Laravel/API)
 
 ---
 
 ## ✅ Success Criteria
 
 Phase 2 is complete when:
-- [ ] Architecture defined clearly
-- [ ] All components/modules listed
-- [ ] Props/interfaces specified
-- [ ] File changes identified
-- [ ] Dependencies listed
-- [ ] Risks identified
-- [ ] Timeline estimated
-- [ ] Tech spec document created
-- [ ] Diagram included
+- [ ] Test cases derived from Phase 1 requirements
+- [ ] Test scaffolding created
+- [ ] All tests run and fail (RED state confirmed)
+- [ ] Edge cases and error scenarios covered
+- [ ] Test-to-requirement traceability documented
 
 ---
 
-## 🚦 Approval Gate
+## 🚦 Auto-Continue
+
+Phase 2 auto-continues to Phase 3 (Build GREEN) without approval gate. The failing tests serve as the specification for implementation.
 
 ```
 ═══════════════════════════════════════════════════════════
-🎯 PHASE 2 COMPLETE: Technical Planning
+🔴 PHASE 2 COMPLETE: Test RED
 ═══════════════════════════════════════════════════════════
 
 📊 Summary:
-Created technical specification with architecture design
+Test scaffolding created - all tests failing (RED)
 
 📦 Deliverables:
-   📄 TECH_SPEC.md (architecture, components, API design)
-   📊 architecture-diagram.png
+   📄 Test files with failing tests
+   📊 Test-to-requirement mapping
 
 📈 Metrics:
-   - Components to create: 5
-   - Files to change: 8 files
-   - New dependencies: 2 packages
-   - Story Points: 8 points (Complex)
-   - Estimated effort: 1-2 days (~12-16 hours)
-   - Confidence: High
+   - Test files created: X
+   - Test cases: Y (all RED ✗)
+   - Coverage target: Z%
 
-✅ Success Criteria:
-   ✅ Architecture clearly defined
-   ✅ Component breakdown complete
-   ✅ File changes identified
-   ✅ Risks assessed
-
-⏭️  Next Phase: Phase 3 - Design Review
-
-───────────────────────────────────────────────────────────
-⚠️  ACTION REQUIRED
-
-Type "/workflow:approve" → Proceed to Phase 3
-Type "/workflow:reject" → Restart Phase 2
-Type "/workflow:modify <feedback>" → Refine tech spec
-
-Your response:
+⏭️  AUTO-CONTINUING to Phase 3: Build GREEN 🟢
 ═══════════════════════════════════════════════════════════
 ```
-
----
-
-## 🔄 If Rejected
-
-User can provide feedback:
-```
-/workflow:reject Need to reconsider state management approach
-```
-
-Agent will:
-1. Read feedback
-2. Re-analyze architecture
-3. Update tech spec
-4. Show approval gate again
 
 ---
 
@@ -253,19 +126,27 @@ Agent will:
 
 ```
 logs/contexts/{workflow-id}/deliverables/
-└── PHASE_2_TECH_SPEC.md (comprehensive tech spec)
+└── PHASE_2_TEST_RED.md (test cases and scaffolding report)
 ```
 
 ---
 
 ## 🎯 What Happens Next
 
-After approval:
-- `/workflow:phase:3` - Design Review (if UI changes)
-- Or skip to `/workflow:phase:4` - Test Planning
+After Phase 2 completes:
+- Auto-continues to `/workflow:phase:3` - Build GREEN (implement code to make tests pass)
 
 ---
 
-**Status:** Active command  
-**Related:** workflow:phase:1, workflow:phase:3, workflow:approve
+## 📚 Related Documentation
 
+- **Phase Guide:** `docs/phases/PHASE_2_TEST_RED.MD`
+- **Detailed Test Scaffolding:** `commands/workflow/phase-2-test.md`
+- **Previous Phase:** `commands/workflow/phase-1.md`
+- **Next Phase:** `commands/workflow/phase-3.md`
+- **Workflow Start:** `commands/workflow/start.md`
+
+---
+
+**Status:** Active command
+**Related:** workflow:phase:1, workflow:phase:3, workflow:approve

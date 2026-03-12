@@ -2,7 +2,7 @@
 
 **Category:** Workflow Quality  
 **Priority:** Critical  
-**Applies To:** Phase 1, Phase 2, Phase 4
+**Applies To:** Phase 1 (Understand + Design), Phase 2 (Test RED), Phase 4 (Refactor + Review)
 
 ---
 
@@ -12,7 +12,7 @@ Cross-review ensures quality by having multiple agents review deliverables befor
 
 ---
 
-## Phase 1: Requirements Analysis Review
+## Phase 1: Requirements & Design Review (Understand + Design)
 
 ### Who Reviews?
 
@@ -219,14 +219,14 @@ Phase 1: Requirements Analysis - Review Complete
 ✋ **APPROVAL REQUIRED**: Phase 1 Complete
 
 **Options:**
-- "approve" → Proceed to Phase 2 (Technical Planning)
+- "approve" → Proceed to Phase 2 (Test RED)
 - "reject: [reason]" → Revise requirements
 - "modify: [changes]" → Request specific changes
 ```
 
 ---
 
-## Phase 2: Technical Planning Review
+## Phase 1 (continued): Technical Planning Review
 
 ### Who Reviews?
 
@@ -239,7 +239,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ```markdown
 ┌─────────────────────────────────────────┐
-│  Phase 2: Technical Planning            │
+│  Phase 2: Test RED                      │
 │  (Lead Dev Agent creates tech spec)     │
 └─────────────────────────────────────────┘
                   ↓
@@ -358,7 +358,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-## Phase 4: Test Plan Review
+## Phase 2: Test Plan Review (Test RED)
 
 ### Who Reviews?
 
@@ -370,7 +370,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ```markdown
 ┌─────────────────────────────────────────┐
-│  Phase 4: Test Planning                 │
+│  Phase 4: Refactor + Review             │
 │  (QA Agent creates test plan)           │
 └─────────────────────────────────────────┘
                   ↓
@@ -509,9 +509,9 @@ Cross-reviews add time but improve quality:
 
 | Phase | Without Review | With Review | Time Added |
 |-------|---------------|-------------|------------|
-| Phase 1 | 45 min | 70 min | +25 min |
-| Phase 2 | 90 min | 115 min | +25 min |
-| Phase 4 | 60 min | 75 min | +15 min |
+| Phase 1 (Understand + Design) | 135 min | 185 min | +50 min |
+| Phase 2 (Test RED) | 60 min | 75 min | +15 min |
+| Phase 4 (Refactor + Review) | 90 min | 120 min | +30 min |
 
 **Total added time:** ~65 minutes  
 **Quality improvement:** Significant  
@@ -531,10 +531,10 @@ In team mode, cross-reviews happen **in parallel** via teammate messaging instea
 
 ```toon
 team_review[4]{phase,reviewers,mechanism,time_savings}:
-  Phase 1,Dev + QA + UI teammates,Parallel teammate messages,~60% faster
-  Phase 2,Secondary Dev + QA teammates,Parallel teammate messages,~60% faster
-  Phase 4,Dev teammate(s),Direct teammate message,~50% faster
-  Phase 6,All active teammates,Broadcast to team,~70% faster
+  Phase 1 (Understand + Design),Dev + QA + UI teammates,Parallel teammate messages,~60% faster
+  Phase 1 (Tech Planning),Secondary Dev + QA teammates,Parallel teammate messages,~60% faster
+  Phase 2 (Test RED),Dev teammate(s),Direct teammate message,~50% faster
+  Phase 4 (Refactor + Review),All active teammates,Broadcast to team,~70% faster
 ```
 
 ### Teammate Review Message Format
@@ -558,11 +558,10 @@ Subject: Phase [N] Review
 
 | Phase | Sequential | Team Mode | Savings |
 |-------|-----------|-----------|---------|
-| Phase 1 | 70 min | 30 min | 57% |
-| Phase 2 | 115 min | 50 min | 57% |
-| Phase 4 | 75 min | 35 min | 53% |
-| Phase 6 | 90 min | 30 min | 67% |
-| **Total** | **350 min** | **145 min** | **59%** |
+| Phase 1 (Understand + Design) | 185 min | 80 min | 57% |
+| Phase 2 (Test RED) | 75 min | 35 min | 53% |
+| Phase 4 (Refactor + Review) | 120 min | 40 min | 67% |
+| **Total** | **380 min** | **155 min** | **59%** |
 
 ### Fallback
 
@@ -570,5 +569,5 @@ When Agent Teams is not enabled, standard sequential cross-review applies (no ch
 
 ---
 
-**Applied in:** Phase 1, Phase 2, Phase 4, and Code Review (Phase 6)
+**Applied in:** Phase 1 (Understand + Design), Phase 2 (Test RED), and Phase 4 (Refactor + Review)
 

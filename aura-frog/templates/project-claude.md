@@ -33,7 +33,7 @@ Bundled MCP servers auto-invoke based on context:
 | **figma** | Figma URLs |
 | **playwright** | E2E test requests |
 | **vitest** | Unit test requests |
-| **slack** | Phase 9 notifications |
+| **slack** | Phase 5 notifications |
 
 **Setup:** Copy `.envrc.template` and set tokens. See `docs/MCP_GUIDE.md`.
 

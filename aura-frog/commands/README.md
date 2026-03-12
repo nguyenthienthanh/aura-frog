@@ -12,7 +12,7 @@ Individual commands are now bundled into unified entry points with subcommand me
 
 | Bundled Command | Replaces | Subcommands |
 |-----------------|----------|-------------|
-| `/workflow` | 22 workflow commands | start, status, phase, next, approve, handoff, resume |
+| `/workflow` | 16 workflow commands | start, status, phase, next, approve, handoff, resume |
 | `/test` | 4 test commands | unit, e2e, coverage, watch, docs |
 | `/project` | 7 project commands | status, refresh, init, switch, list, config, sync-settings |
 | `/quality` | 3 quality commands | lint, complexity, review, fix |
@@ -52,7 +52,7 @@ commands/
 ├── setup/              # Setup & configuration (2 commands)
 ├── skill/              # Skill management (1 command)
 ├── test/               # Testing commands (4 commands)
-├── workflow/           # Core workflow commands (22 commands)
+├── workflow/           # Core workflow commands (16 commands)
 ├── document.md         # document (standalone)
 ├── execute.md          # execute (standalone)
 ├── help.md             # help (standalone)
@@ -64,7 +64,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[92]{category,command,file,description}:
+commands[86]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -72,7 +72,7 @@ commands[92]{category,command,file,description}:
   api,api:design,api/design.md,Design API endpoints
   api,api:test,api/test.md,Test API endpoints
   bugfix,bugfix,bugfix.md,Bundled bug fix menu (interactive)
-  bugfix,bugfix:fix,bugfix/fix.md,Full 9-phase bug fix workflow
+  bugfix,bugfix:fix,bugfix/fix.md,Full 5-phase bug fix workflow
   bugfix,bugfix:quick,bugfix/quick.md,Quick bug fix (grouped phases)
   bugfix,bugfix:hotfix,bugfix/hotfix.md,Emergency production hotfix
   db,db:design,db/design.md,Design database schema
@@ -142,17 +142,11 @@ commands[92]{category,command,file,description}:
   workflow,workflow:metrics,workflow/metrics.md,Show metrics
   workflow,workflow:predict,workflow/predict.md,Predict token usage
   workflow,workflow:budget,workflow/budget.md,Manage workflow token budget
-  workflow,workflow:phase-1,workflow/phase-1.md,Execute Phase 1 (Understand)
-  workflow,workflow:phase-2,workflow/phase-2.md,Execute Phase 2 (Design)
-  workflow,workflow:phase-3,workflow/phase-3.md,Execute Phase 3 (UI)
-  workflow,workflow:phase-4,workflow/phase-4.md,Execute Phase 4 (Test Plan)
-  workflow,workflow:phase-5a,workflow/phase-5a.md,Execute Phase 5a (RED)
-  workflow,workflow:phase-5b,workflow/phase-5b.md,Execute Phase 5b (GREEN)
-  workflow,workflow:phase-5c,workflow/phase-5c.md,Execute Phase 5c (REFACTOR)
-  workflow,workflow:phase-6,workflow/phase-6.md,Execute Phase 6 (Review)
-  workflow,workflow:phase-7,workflow/phase-7.md,Execute Phase 7 (QA)
-  workflow,workflow:phase-8,workflow/phase-8.md,Execute Phase 8 (Docs)
-  workflow,workflow:phase-9,workflow/phase-9.md,Execute Phase 9 (Share)
+  workflow,workflow:phase-1,workflow/phase-1.md,Execute Phase 1 (Understand + Design)
+  workflow,workflow:phase-2,workflow/phase-2.md,Execute Phase 2 (Test RED)
+  workflow,workflow:phase-2-test,workflow/phase-2-test.md,Execute Phase 2 test scaffolding
+  workflow,workflow:phase-3-green,workflow/phase-3-green.md,Execute Phase 3 (Build GREEN)
+  workflow,workflow:phase-4-refactor,workflow/phase-4-refactor.md,Execute Phase 4 (Refactor + Review)
   standalone,document,document.md,Generate documentation
   standalone,execute,execute.md,Execute saved plan
   standalone,help,help.md,Show help and available commands
@@ -165,7 +159,7 @@ commands[92]{category,command,file,description}:
 
 ```toon
 stats[22]{category,count}:
-  workflow,24
+  workflow,17
   project,10
   agent,4
   test,5
@@ -188,7 +182,7 @@ stats[22]{category,count}:
   review,1
   skill,1
   standalone,4
-  total,92
+  total,86
 ```
 
 ---

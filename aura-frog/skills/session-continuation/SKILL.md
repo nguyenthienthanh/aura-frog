@@ -54,7 +54,7 @@ triggers[5]{trigger,action}:
 Triggers:
   - Token count: >= 150,000 (75% of 200K limit)
   - User request: "handoff", "save", "pause"
-  - Long workflow: Phases 1-4 complete, starting Phase 5
+  - Long workflow: Phases 1-2 complete, starting Phase 3
 
 Auto-prompt:
   "⚠️ Token usage is at 75%. Would you like to save workflow state for continuation in a new session?"
@@ -73,9 +73,9 @@ Auto-prompt:
   "updated_at": "2025-11-29T16:45:30Z",
   "status": "paused",
 
-  "current_phase": 5,
-  "current_sub_phase": "a",
-  "phase_name": "Write Tests (TDD RED)",
+  "current_phase": 3,
+  "current_sub_phase": null,
+  "phase_name": "Build GREEN",
 
   "task": {
     "description": "Implement user authentication with JWT",
@@ -90,27 +90,15 @@ Auto-prompt:
 
   "phases_completed": {
     "1": {
-      "name": "Requirements Analysis",
+      "name": "Understand + Design",
       "status": "approved",
-      "deliverables": ["requirements.md"],
+      "deliverables": ["requirements.md", "tech-spec.md", "architecture.md"],
       "approved_at": "2025-11-29T14:45:00Z"
     },
     "2": {
-      "name": "Technical Planning",
+      "name": "Test RED",
       "status": "approved",
-      "deliverables": ["tech-spec.md", "architecture.md"],
-      "approved_at": "2025-11-29T15:10:00Z"
-    },
-    "3": {
-      "name": "UI Breakdown",
-      "status": "skipped",
-      "skip_reason": "Backend-only feature",
-      "approved_at": "2025-11-29T15:12:00Z"
-    },
-    "4": {
-      "name": "Test Planning",
-      "status": "approved",
-      "deliverables": ["test-plan.md"],
+      "deliverables": ["test-plan.md", "failing-tests"],
       "approved_at": "2025-11-29T15:30:00Z"
     }
   },
@@ -147,11 +135,9 @@ Auto-prompt:
 📋 **Workflow ID:** AUTH-123
 
 📊 **Progress:**
-- ✅ Phase 1: Requirements Analysis - Approved
-- ✅ Phase 2: Technical Planning - Approved
-- ⏭️ Phase 3: UI Breakdown - Skipped (backend-only)
-- ✅ Phase 4: Test Planning - Approved
-- 🔄 Phase 5a: Write Tests - In Progress
+- ✅ Phase 1: Understand + Design - Approved
+- ✅ Phase 2: Test RED - Approved
+- 🔄 Phase 3: Build GREEN - In Progress
 
 📁 **State Saved:**
 `.claude/logs/workflows/AUTH-123/workflow-state.json`
@@ -227,15 +213,13 @@ Actions:
 📝 **Task:** Implement user authentication with JWT
 
 📊 **Restored State:**
-- Current Phase: 5a - Write Tests (TDD RED)
+- Current Phase: 3 - Build GREEN
 - Primary Agent: backend-nodejs
 - Tech Stack: Node.js, Express, PostgreSQL
 
 ✅ **Completed Phases:**
-- Phase 1: Requirements Analysis ✓
-- Phase 2: Technical Planning ✓
-- Phase 3: UI Breakdown (skipped) ✓
-- Phase 4: Test Planning ✓
+- Phase 1: Understand + Design ✓
+- Phase 2: Test RED ✓
 
 🔑 **Key Decisions Restored:**
 - Using JWT with refresh tokens
@@ -243,9 +227,9 @@ Actions:
 - bcrypt for password hashing
 
 ───────────────────────────────────────────────────────────
-⏭️ **CONTINUING FROM:** Phase 5a - Write Tests
+⏭️ **CONTINUING FROM:** Phase 3 - Build GREEN
 
-Ready to continue writing tests for authentication.
+Ready to continue implementing authentication.
 
 Type "continue" to proceed or "status" for more details.
 ═══════════════════════════════════════════════════════════
@@ -330,8 +314,8 @@ Behavior:
 ├── AUTH-123/
 │   ├── workflow-state.json      # Current state
 │   ├── requirements.md          # Phase 1 deliverable
-│   ├── tech-spec.md            # Phase 2 deliverable
-│   └── test-plan.md            # Phase 4 deliverable
+│   ├── tech-spec.md            # Phase 1 deliverable
+│   └── test-plan.md            # Phase 2 deliverable
 ├── fix-login-0128/
 │   └── ...
 └── README.md                    # Index of workflows
@@ -423,16 +407,12 @@ workflow:
   phase: 5
   status: in_progress
 
-phases[9]{num,name,status}:
-  1,Requirements,completed
-  2,Tech Planning,completed
-  3,UI Breakdown,skipped
-  4,Test Planning,completed
-  5,TDD Implementation,in_progress
-  6,Code Review,pending
-  7,QA Validation,pending
-  8,Documentation,pending
-  9,Notification,pending
+phases[5]{num,name,status}:
+  1,Understand + Design,completed
+  2,Test RED,completed
+  3,Build GREEN,in_progress
+  4,Refactor + Review,pending
+  5,Finalize,pending
 
 agents[2]: backend-nodejs,qa-automation
 ```

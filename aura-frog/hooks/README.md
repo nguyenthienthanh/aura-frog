@@ -165,7 +165,7 @@ env_vars[4]{var,description}:
 
 📋 **Workflow:** AUTH-123
 📝 **Task:** Implement user authentication with JWT
-📍 **Phase:** 5a
+📍 **Phase:** 2
 🤖 **Agent:** backend-nodejs
 
 📦 **Project:** my-api
@@ -410,7 +410,7 @@ Hook: 🟡 Security scan: 2 issue(s) in users.ts
 ---
 
 ### 7c. PostToolUse - Auto Test Runner (NEW in 1.20.1)
-**When:** After Write or Edit during TDD phases (5a, 5b, 5c) - async
+**When:** After Write or Edit during TDD phases (2, 3, 4) - async
 
 **Actions:**
 - ✅ Auto-detect test runner from project config
@@ -432,7 +432,7 @@ Hook: 🟡 Security scan: 2 issue(s) in users.ts
 
 **Example:**
 ```
-Writing: src/services/auth.ts (Phase 5b)
+Writing: src/services/auth.ts (Phase 3)
 Hook: ✅ Auto-test (vitest): Tests: 23 passed | Duration: 1.2s
 ```
 
@@ -596,7 +596,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 **Example:**
 ```
 --- Aura Frog Context ---
-📍 Phase: 5b
+📍 Phase: 3
 📋 Plan: plans/241223-user-profile
 📦 Project: my-app
 🤖 Agents: backend-nodejs, qa-automation

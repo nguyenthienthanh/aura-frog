@@ -225,5 +225,5 @@ Brief description of changes
 
 ---
 
-**Applied in:** Phase 5b (Implementation), Phase 6 (Code Review), Phase 8 (Documentation)
+**Applied in:** Phase 3 (Build GREEN), Phase 4 (Refactor + Review), Phase 5 (Finalize)
 

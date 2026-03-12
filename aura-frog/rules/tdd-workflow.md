@@ -10,18 +10,14 @@
 ### Mandatory Workflow
 
 ```
-🔴 RED Phase: Write Failing Test
+🔴 RED Phase (Phase 2): Write Failing Test
+   ↓ (auto-continue)
+🟢 GREEN Phase (Phase 3): Make Test Pass
    ↓
    [APPROVAL GATE]
    ↓
-🟢 GREEN Phase: Make Test Pass
-   ↓
-   [APPROVAL GATE]
-   ↓
-♻️ REFACTOR Phase: Improve Code
-   ↓
-   [APPROVAL GATE]
-   ↓
+♻️ REFACTOR Phase (Phase 4): Improve Code
+   ↓ (auto-continue)
 ✅ DONE
 ```
 
