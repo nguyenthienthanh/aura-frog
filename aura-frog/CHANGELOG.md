@@ -4,27 +4,34 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [1.20.1] - 2026-03-11
+## [1.21.0] - 2026-03-12
 
-### Log Cleanup Command, Requirement Challenger & 5-Phase Workflow
+### 5-Phase Workflow Consolidation & Full Repo Cleanup
 
 #### Added
 - **`logs:cleanup` command** - Clean old log files, workflow data, and session artifacts older than X days. Supports `--dry-run` preview mode. Default threshold: 30 days
-- **`requirement-challenger` rule** - Proactive critical thinking step that challenges requirements before accepting them. Asks clarifying questions about clarity, scope, assumptions, edge cases, feasibility, and simpler alternatives. Integrates with Phase 1, workflow:start, and workflow:modify. Skippable with "just do it" / "skip challenge"
+- **`requirement-challenger` rule** - Proactive critical thinking before accepting requirements. Challenges clarity, scope, assumptions, edge cases, feasibility, and alternatives. Skippable with "just do it"
+- **`PHASE_5_FINALIZE.MD`** - New phase doc for Phase 5 (Finalize): documentation, notifications, workflow closure
 - **`workflow:phase-2-test` command** - Execute Phase 2 test scaffolding
 - **`workflow:phase-3-green` command** - Execute Phase 3 (Build GREEN)
 - **`workflow:phase-4-refactor` command** - Execute Phase 4 (Refactor + Review)
 
 #### Updated
 - **9-phase → 5-phase workflow consolidation** - Phases condensed: Phase 1 (Understand + Design), Phase 2 (Test RED), Phase 3 (Build GREEN), Phase 4 (Refactor + Review), Phase 5 (Finalize). Same 2 approval gates (Phase 1 and Phase 3). Removed 9 old phase commands, added 3 new ones
-- **`workflow-orchestrator` skill** - Added challenge step to pre-execution checklist and Phase 1 flow
-- **`phase1-lite` skill** - Added pre-step for requirement challenge before generating TOON output
-- **`workflow/start` command** - Added challenge step to workflow initialization flow
-- **`workflow/modify` command** - Added scope impact challenge before brainstorming
+- **Full repo cleanup** - Updated 130+ files: all shell scripts, commands, rules, skills, agents, docs, READMEs, and templates now consistently reference the 5-phase workflow with correct phase names
+- **Shell scripts** - Rewrote phase name case statements in 6 workflow scripts (workflow-status.sh, init-workflow.sh, phase-transition.sh, save-deliverable.sh, session-handoff.sh, generate-report.sh)
+- **Phase naming** - Fixed all "Technical Planning"→"Test RED", "Design Review"→"Build GREEN", "Test Planning"→"Refactor + Review" references
+- **Root README.md** - Updated counts, workflow diagram, approval gates, and feature table
+- **All component READMEs** - Consistent counts: 10 agents, 52 skills, 49 rules, 86 commands, 27 hooks
+
+#### Removed
+- 7 old phase docs (PHASE_2_TECHNICAL_PLANNING through PHASE_9_NOTIFICATION)
+- 9 old phase commands (phase-3.md through phase-9.md)
 
 #### Stats
 - Commands: 92 → 86 (-6: 9-phase → 5-phase consolidation, +1: logs:cleanup)
 - Rules: 48 → 49 (+1: requirement-challenger)
+- Phase docs: 9 → 5 (+1: PHASE_5_FINALIZE.MD)
 
 ---
 

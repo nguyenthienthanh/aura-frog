@@ -1,6 +1,6 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.20.1
+**Version:** 1.21.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2026-02-09
 
@@ -233,4 +233,4 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-**Version:** 1.20.1 | **Format:** TOON
+**Version:** 1.21.0 | **Format:** TOON

@@ -1,12 +1,12 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.20.1
+**System:** Aura Frog v1.21.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 52 skills + 86 commands + 5-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
-## New in 1.20.1 - Best Practices Enforcement
+## New in 1.21.0 - Best Practices Enforcement
 
 - **6 new hooks** — Security scan, commit attribution, security-critical warnings, auto test runner, token tracker, scope drift detection
 - **PR template** — AI-specific review checklist (`templates/pull_request_template.md`)
@@ -81,7 +81,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.21.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -279,4 +279,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.20.1
+**Version:** 1.21.0

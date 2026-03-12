@@ -150,7 +150,7 @@ The model-router works WITH agent-detector:
 
 **Updated Banner Format:**
 ```
-⚡ 🐸 AURA FROG v1.20.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.21.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: ui-expert │ Phase: 4 - Implement                ┃
 ┃ Model: haiku │ Teams: ✓ enabled                         ┃
 ┃ 🎯 Trivial task: typo fix │ 🔥 Quick fix incoming!      ┃
