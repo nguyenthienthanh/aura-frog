@@ -1,6 +1,6 @@
 # Aura Frog Scripts
 
-**Version:** 1.21.0
+**Version:** 1.22.0
 **Purpose:** Utility scripts for integrations, workflows, and automation
 
 ---
@@ -22,7 +22,7 @@ scripts/
 ## Quick Reference
 
 ```toon
-scripts[24]{category,script,purpose}:
+scripts[27]{category,script,purpose}:
   integration,jira-fetch.sh,Fetch Jira tickets with TOON output
   integration,confluence-fetch.sh,Fetch Confluence pages with TOON output
   integration,setup-integrations.sh,Interactive integration setup (Jira/Confluence/Slack/Figma)
@@ -46,7 +46,10 @@ scripts[24]{category,script,purpose}:
   visual,init-claude-visual.sh,Initialize Claude visual testing
   utility,validate-config.sh,Validate plugin configuration
   utility,validate-toon.sh,Validate TOON format files
-  utility,context-compress.sh,Compress context for token optimization
+  utility,context-compress.sh,Compress context for token optimization (12 pattern detections)
+  utility,repo-map-gen.sh,Generate annotated directory tree with purpose descriptions
+  utility,file-registry-gen.sh,Generate key files index (entry points / configs / hub files)
+  utility,architecture-gen.sh,Analyze architecture type / dependencies / patterns / data flow
   utility,session-handoff.sh,Create session handoff files
   utility,response-save.sh,Save large responses to files
   utility,detect-design-system.sh,Detect design system in project
@@ -251,4 +254,4 @@ export SLACK_TEAM_ID="T0123456789"
 
 ---
 
-**Version:** 1.21.0 | **Last Updated:** 2026-01-16
+**Version:** 1.22.0 | **Last Updated:** 2026-01-16

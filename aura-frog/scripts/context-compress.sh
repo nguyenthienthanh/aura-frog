@@ -1,7 +1,7 @@
 #!/bin/bash
 # Context Compression Generator
 # Creates token-efficient session context in TOON format
-# Version: 1.1.0
+# Version: 2.0.0
 
 set -e
 
@@ -18,7 +18,7 @@ OUTPUT_DIR="${1:-.claude}"
 PROJECT_ROOT="${2:-.}"
 
 usage() {
-    echo "Context Compression Generator v1.1.0"
+    echo "Context Compression Generator v2.0.0"
     echo ""
     echo "Usage: $0 [output-dir] [project-root]"
     echo ""
@@ -26,7 +26,7 @@ usage() {
     echo "Token-efficient TOON format with codebase patterns."
     echo ""
     echo "Output:"
-    echo "  session-context.toon  - Patterns + workflow state (~150 tokens)"
+    echo "  session-context.toon  - Patterns + workflow state (~200 tokens)"
 }
 
 # Detect project type and tech stack
@@ -132,6 +132,121 @@ detect_styling() {
     fi
 }
 
+# Detect indentation style
+detect_indentation() {
+    local sample_file=""
+    for ext in ts tsx js jsx py go php dart rs; do
+        sample_file=$(find . -name "*.$ext" -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/vendor/*" -type f 2>/dev/null | head -1)
+        [ -n "$sample_file" ] && break
+    done
+
+    if [ -n "$sample_file" ]; then
+        local tab_count=$(grep -cP '^\t' "$sample_file" 2>/dev/null || echo 0)
+        local space4_count=$(grep -cP '^    \S' "$sample_file" 2>/dev/null || echo 0)
+        local space2_count=$(grep -cP '^  \S' "$sample_file" 2>/dev/null || echo 0)
+
+        if [ "$tab_count" -gt "$space2_count" ] && [ "$tab_count" -gt "$space4_count" ]; then
+            echo "tabs"
+        elif [ "$space4_count" -gt "$space2_count" ]; then
+            echo "4-space"
+        else
+            echo "2-space"
+        fi
+    else
+        echo "2-space"
+    fi
+}
+
+# Detect state management approach
+detect_state_mgmt() {
+    if grep -rq "zustand\|create(" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "zustand"
+    elif grep -rq "createSlice\|configureStore\|@reduxjs" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "redux"
+    elif grep -rq "defineStore" --include="*.ts" --include="*.vue" . 2>/dev/null; then
+        echo "pinia"
+    elif grep -rq "makeAutoObservable\|makeObservable" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "mobx"
+    elif grep -rq "BlocProvider\|Cubit" --include="*.dart" . 2>/dev/null; then
+        echo "bloc"
+    elif grep -rq "ChangeNotifierProvider\|Riverpod" --include="*.dart" . 2>/dev/null; then
+        echo "riverpod"
+    elif grep -rq "useContext\|createContext" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "context"
+    elif grep -rq "useState" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "local-state"
+    else
+        echo "none"
+    fi
+}
+
+# Detect API integration pattern
+detect_api_pattern() {
+    if grep -rq "@trpc\|trpc" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "trpc"
+    elif grep -rq "useQuery\|useMutation\|QueryClient" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "react-query"
+    elif grep -rq "useSWR" --include="*.ts" --include="*.tsx" . 2>/dev/null; then
+        echo "swr"
+    elif grep -rq "axios" --include="*.ts" --include="*.tsx" --include="*.js" . 2>/dev/null; then
+        echo "axios"
+    elif grep -rq "fetch(" --include="*.ts" --include="*.tsx" --include="*.js" . 2>/dev/null; then
+        echo "fetch"
+    elif grep -rq "http\.get\|http\.post\|Dio" --include="*.dart" . 2>/dev/null; then
+        echo "dio/http"
+    else
+        echo "none"
+    fi
+}
+
+# Detect component style (functional vs class)
+detect_component_style() {
+    local func_count=$(grep -rc "const.*=.*(" --include="*.tsx" --include="*.jsx" . 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')
+    local class_count=$(grep -rc "class.*extends.*Component\|class.*extends.*React" --include="*.tsx" --include="*.jsx" . 2>/dev/null | awk -F: '{s+=$2} END{print s+0}')
+
+    if [ "$class_count" -gt "$func_count" ]; then
+        echo "class"
+    elif [ "$func_count" -gt 0 ]; then
+        echo "functional"
+    else
+        echo "n/a"
+    fi
+}
+
+# Detect environment variable pattern
+detect_env_pattern() {
+    if [ -f ".env.local" ] || [ -f ".env.development" ]; then
+        echo "dotenv-multi"
+    elif [ -f ".env" ] || [ -f ".env.example" ]; then
+        echo "dotenv"
+    elif [ -f ".envrc" ] || [ -f ".envrc.template" ]; then
+        echo "direnv"
+    elif grep -rq "process\.env\|os\.environ\|os\.Getenv" --include="*.ts" --include="*.js" --include="*.py" --include="*.go" . 2>/dev/null; then
+        echo "env-vars"
+    else
+        echo "none"
+    fi
+}
+
+# Detect monorepo tool
+detect_monorepo() {
+    if [ -f "pnpm-workspace.yaml" ]; then
+        echo "pnpm"
+    elif [ -f "lerna.json" ]; then
+        echo "lerna"
+    elif [ -f "nx.json" ]; then
+        echo "nx"
+    elif [ -f "turbo.json" ]; then
+        echo "turbo"
+    elif [ -f "rush.json" ]; then
+        echo "rush"
+    elif [ -f "package.json" ] && grep -q '"workspaces"' package.json 2>/dev/null; then
+        echo "npm-workspaces"
+    else
+        echo "none"
+    fi
+}
+
 # Get current git branch
 get_git_branch() {
     git branch --show-current 2>/dev/null || echo "main"
@@ -170,6 +285,13 @@ generate_session_context() {
     local styling=$(detect_styling)
     local branch=$(get_git_branch)
 
+    local indentation=$(detect_indentation)
+    local state_mgmt=$(detect_state_mgmt)
+    local api_pattern=$(detect_api_pattern)
+    local component_style=$(detect_component_style)
+    local env_pattern=$(detect_env_pattern)
+    local monorepo=$(detect_monorepo)
+
     cat << EOF
 # Session Context
 # Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -181,13 +303,19 @@ project:
   name: $project_name
   stack: $tech_stack
 
-patterns[6]{type,convention,example}:
+patterns[12]{type,convention,example}:
   file_naming,$file_naming,$(get_example "$file_naming")
   imports,$imports,$(get_example "$imports")
   exports,$exports,$(get_example "$exports")
   errors,$errors,$(get_example "$errors")
   testing,$testing,describe/it
   styling,$styling,$(get_example "$styling")
+  indentation,$indentation,${indentation}
+  state_mgmt,$state_mgmt,${state_mgmt}
+  api_pattern,$api_pattern,${api_pattern}
+  components,$component_style,${component_style}
+  env,$env_pattern,${env_pattern}
+  monorepo,$monorepo,${monorepo}
 
 workflow:
   phase: 0
@@ -208,7 +336,7 @@ main() {
 
     cd "$PROJECT_ROOT"
 
-    echo -e "${CYAN}Context Compression Generator v1.1.0${NC}"
+    echo -e "${CYAN}Context Compression Generator v2.0.0${NC}"
     echo "======================================="
     echo ""
     echo -e "Project: ${GREEN}$(basename "$(pwd)")${NC}"
@@ -217,14 +345,20 @@ main() {
 
     mkdir -p "$OUTPUT_DIR"
 
-    echo -e "${YELLOW}Scanning codebase patterns...${NC}"
+    echo -e "${YELLOW}Scanning codebase patterns (12 detections)...${NC}"
 
-    echo -e "  File naming: $(detect_file_naming)"
-    echo -e "  Imports:     $(detect_import_style)"
-    echo -e "  Exports:     $(detect_export_pattern)"
-    echo -e "  Errors:      $(detect_error_pattern)"
-    echo -e "  Testing:     $(detect_testing)"
-    echo -e "  Styling:     $(detect_styling)"
+    echo -e "  File naming:   $(detect_file_naming)"
+    echo -e "  Imports:       $(detect_import_style)"
+    echo -e "  Exports:       $(detect_export_pattern)"
+    echo -e "  Errors:        $(detect_error_pattern)"
+    echo -e "  Testing:       $(detect_testing)"
+    echo -e "  Styling:       $(detect_styling)"
+    echo -e "  Indentation:   $(detect_indentation)"
+    echo -e "  State mgmt:    $(detect_state_mgmt)"
+    echo -e "  API pattern:   $(detect_api_pattern)"
+    echo -e "  Components:    $(detect_component_style)"
+    echo -e "  Env pattern:   $(detect_env_pattern)"
+    echo -e "  Monorepo:      $(detect_monorepo)"
     echo ""
 
     echo -e "${YELLOW}Generating session-context.toon...${NC}"

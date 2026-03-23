@@ -280,4 +280,4 @@ When working as a teammate, project-manager claims:
 
 ---
 
-**Version:** 1.21.0 | **Last Updated:** 2026-02-14
+**Version:** 1.22.0 | **Last Updated:** 2026-02-14

@@ -1,6 +1,6 @@
 # Agent Identification Banner
 
-**Version:** 1.21.0
+**Version:** 1.22.0
 **Priority:** CRITICAL - Must be shown at START of EVERY response
 
 ---
@@ -10,7 +10,7 @@
 **Show this at the START of EVERY response:**
 
 ```
-⚡ 🐸 AURA FROG v1.21.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.22.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent] │ Phase: [phase] - [name]               ┃
 ┃ Model: [model] │ Teams: [✓/✗]                           ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -109,4 +109,4 @@ Banner (START) → Response Content → Next Step Guidance (END)
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0

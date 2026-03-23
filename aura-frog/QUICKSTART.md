@@ -1,31 +1,27 @@
-# Aura Frog Quickstart
-
-Get started with Aura Frog in under 2 minutes.
-
----
-
-## Prerequisites
-
-1. **Claude Code** installed - [Installation Guide](https://docs.anthropic.com/en/docs/claude-code)
-2. **Git** installed
-
----
+# Aura Frog — 60-Second Quickstart
 
 ## Install
 
-Run these commands in Claude Code terminal:
-
 ```bash
-# Add marketplace (one-time)
+# In Claude Code terminal:
 /plugin marketplace add nguyenthienthanh/aura-frog
-
-# Install plugin
 /plugin install aura-frog@aurafrog
 ```
 
-Done! Aura Frog is now available in all your projects.
+## Use
 
----
+```bash
+# Initialize project context (recommended, run once)
+project:init
+
+# Start a workflow
+workflow:start "Your task description"
+
+# At approval gates:
+# approve     → continue
+# reject      → redo with feedback
+# modify      → adjust deliverables
+```
 
 ## Update
 
@@ -33,49 +29,23 @@ Done! Aura Frog is now available in all your projects.
 /plugin marketplace update aurafrog
 ```
 
----
+## Essential Commands
 
-## First Workflow
-
-```bash
-# Initialize project (optional but recommended)
-project:init
-
-# Start a workflow
-workflow:start "Your task description"
-```
-
-At approval gates:
-- `approve` - Continue to next phase
-- `reject: <reason>` - Restart current phase
-- `modify: <changes>` - Adjust deliverables
-
----
-
-## Common Commands
-
-| Command | Description |
+| Command | What it does |
 |---------|-------------|
-| `workflow:start <task>` | Start full 5-phase workflow |
-| `workflow:status` | Show current progress |
+| `workflow:start <task>` | Full 5-phase TDD workflow |
+| `bugfix:quick <desc>` | Quick bug fix with tests |
+| `project:init` | Scan repo, generate context |
 | `workflow:approve` | Approve current phase |
-| `bugfix:quick <desc>` | Quick bug fix with TDD |
-| `refactor <file>` | Code refactoring |
-| `project:init` | Initialize project context |
-| `agent:list` | Show all agents |
-| `learn:status` | Show learning system status (NEW) |
-
----
+| `agent:list` | Show available agents |
 
 ## Learn More
 
-- **Full Guide:** [GET_STARTED.md](GET_STARTED.md)
-- **Usage Guide:** [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
-- **Commands:** [commands/README.md](commands/README.md)
-- **MCP Setup:** [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md)
-- **Learning System:** [docs/LEARNING_SYSTEM.md](docs/LEARNING_SYSTEM.md)
-- **Agent Teams:** [docs/AGENT_TEAMS_GUIDE.md](docs/AGENT_TEAMS_GUIDE.md) (NEW)
+- [GET_STARTED.md](GET_STARTED.md) — Full setup guide
+- [commands/README.md](commands/README.md) — All 86 commands
+- [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md) — MCP server setup
+- [docs/AGENT_TEAMS_GUIDE.md](docs/AGENT_TEAMS_GUIDE.md) — Multi-agent orchestration
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0

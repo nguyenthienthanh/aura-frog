@@ -171,4 +171,4 @@ Test your content visibility in AI search:
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0

@@ -1,6 +1,6 @@
 # Aura Frog Workflow Testing Guide
 
-**Version:** 1.21.0
+**Version:** 1.22.0
 **Last Updated:** 2026-02-09
 **Purpose:** How to test the command-based Aura Frog workflow system
 

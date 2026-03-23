@@ -154,4 +154,4 @@ Include:
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0

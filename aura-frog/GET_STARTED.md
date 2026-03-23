@@ -4,20 +4,13 @@
 
 # Get Started with Aura Frog
 
-### A Plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-
-> **Code with main character energy**
+### From install to your first TDD workflow in 2 minutes
 
 </div>
 
 ---
 
-**Aura Frog** - A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that adds AI-powered project management with specialized agents and TDD workflows.
-
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool that operates in your terminal. Aura Frog extends it with structured 5-phase workflows.
-
-| **10 Agents** | **52 Skills** | **49 Rules** | **5 Phases** | **86 Commands** | **27 Hooks** | **6 MCP Servers** |
-|:-------------:|:-------------:|:------------:|:------------:|:---------------:|:-------------:|:----------------:|
+> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 10 agents, 5-phase TDD workflows, and multi-agent orchestration.
 
 ---
 
@@ -450,5 +443,5 @@ Type `workflow:start <task>` to begin your first workflow.
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0
 

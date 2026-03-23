@@ -31,13 +31,16 @@ Initialize Aura Frog for a project:
 ├── CLAUDE.md                    # References plugin for instructions
 ├── settings.local.json          # Merged permissions from plugin
 ├── project-contexts/[project]/
-│   ├── project-config.yaml      # Tech stack, integrations
-│   ├── conventions.md           # Naming, structure patterns
+│   ├── project-config.yaml      # Tech stack, integrations, entry points, key deps
+│   ├── conventions.md           # Naming, structure, code style, patterns, idioms
 │   ├── rules.md                 # Project-specific rules
-│   └── examples.md              # Code examples
+│   ├── examples.md              # Code examples
+│   ├── repo-map.md              # Annotated directory tree with purpose descriptions
+│   ├── file-registry.yaml       # Key files index (entry points, configs, hub files)
+│   └── architecture.md          # Module map, data flow, design patterns, dependencies
 ├── logs/                        # Workflow logs (git-ignored)
 │   └── workflows/
-└── session-context.toon         # Cached patterns (auto-generated)
+└── session-context.toon         # Cached patterns (12 detections, auto-generated)
 ```
 
 ---
@@ -79,6 +82,42 @@ integrations:
   jira: {if JIRA_* env vars present}
   figma: {if FIGMA_* env vars present}
 ```
+
+### 3b. Generate Deep Context Files (NEW in v2.0.0)
+
+These scripts collect raw structural data. Claude then enriches with AI-generated descriptions.
+
+```bash
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
+PROJECT_ROOT=$(pwd)
+PROJECT_NAME="[DETECTED_PROJECT_NAME]"
+CONTEXT_DIR=".claude/project-contexts/$PROJECT_NAME"
+
+# Generate annotated repo map (directory tree with purpose descriptions)
+bash "$PLUGIN_DIR/scripts/repo-map-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/repo-map.md" 3
+echo "✅ Generated repo-map.md"
+
+# Generate file registry (key files: entry points, configs, hub files)
+bash "$PLUGIN_DIR/scripts/file-registry-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/file-registry.yaml" 50
+echo "✅ Generated file-registry.yaml"
+
+# Generate architecture analysis (type, dependencies, patterns, data flow)
+bash "$PLUGIN_DIR/scripts/architecture-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/architecture.md"
+echo "✅ Generated architecture.md"
+
+# Generate enhanced session context (12 pattern detections)
+bash "$PLUGIN_DIR/scripts/context-compress.sh" ".claude" "$PROJECT_ROOT"
+echo "✅ Generated session-context.toon (12 patterns)"
+```
+
+**After script generation, Claude enriches the output:**
+
+1. **repo-map.md** — Review directories with generic annotations ("Contains: md files") and replace with specific purpose descriptions based on file content sampling
+2. **file-registry.yaml** — Add `description` fields for key files by reading their first few lines
+3. **architecture.md** — Fill in module relationships, data flow details, and pattern analysis based on actual codebase understanding
+4. **conventions.md** — Enhance with code style patterns (component structure, state management approach, API integration pattern, error handling idioms) detected from the session-context.toon patterns
+
+**Token budget for enrichment:** ~2000 tokens max. Keep descriptions concise (1 line per item).
 
 ### 4. Create/Update CLAUDE.md
 
@@ -210,4 +249,4 @@ fi
 
 ---
 
-**Version:** 2.0.0
+**Version:** 3.0.0

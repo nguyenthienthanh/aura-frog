@@ -3,7 +3,7 @@
 **Agent ID:** pm-operations-orchestrator
 **Priority:** 95
 **Role:** Orchestrator (Team Coordinator)
-**Version:** 1.21.0
+**Version:** 1.22.0
 
 ---
 
@@ -393,4 +393,4 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 
 ---
 
-**Version:** 1.21.0 | **Last Updated:** 2026-02-14
+**Version:** 1.22.0 | **Last Updated:** 2026-02-14

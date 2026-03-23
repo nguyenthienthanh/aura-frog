@@ -4,6 +4,31 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [1.22.0] - 2026-03-23
+
+### Deep Project Init — Instant Repo Understanding
+
+#### Added
+- **`repo-map-gen.sh` script** — Generates annotated directory tree with purpose descriptions inferred from directory names, READMEs, and file types. Configurable depth (default 3). Skips node_modules, .git, dist, build, vendor
+- **`file-registry-gen.sh` script** — Identifies key files (entry points, configs, hub files imported by 3+ others) and outputs YAML registry with roles and relationships. Configurable max files (default 50)
+- **`architecture-gen.sh` script** — Analyzes architecture type (monorepo, plugin, fullstack, SPA, API, MVC), key dependencies with purpose annotations, design patterns (repository, service layer, middleware, hooks, etc.), and data flow patterns
+- **3 new project context files** — `repo-map.md`, `file-registry.yaml`, `architecture.md` generated during `project:init` and `project:regen`
+- **Smart context loading strategy** — Routes context loading by scenario: simple questions (~200 tokens), bug fixes (~800 tokens), full context (~2000 tokens), architecture decisions (~1000 tokens)
+- **6 new pattern detections in context-compress.sh** — indentation style, state management, API integration pattern, component style, environment variable pattern, monorepo tool
+
+#### Updated
+- **`context-compress.sh`** v1.1.0 → v2.0.0 — Now detects 12 patterns (was 6)
+- **`project:init` command** v2.0.0 → v3.0.0 — Added Step 3b for deep context generation with Claude enrichment
+- **`project:regen` command** v1.0.0 → v2.0.0 — Added Steps 4.5-4.8 for regenerating new context files
+- **`project-context-loader` skill** v1.1.0 → v2.0.0 — Loads 7 context files (was 4), smart loading strategy, updated token efficiency metrics
+- **Project context files** — 4 → 7 files per project
+- **`.claude/CLAUDE.md`** — Updated context_files reference from 4 → 7
+
+#### Stats
+- Scripts: 34 → 37 (+3: repo-map-gen, file-registry-gen, architecture-gen)
+
+---
+
 ## [1.21.0] - 2026-03-12
 
 ### 5-Phase Workflow Consolidation & Full Repo Cleanup

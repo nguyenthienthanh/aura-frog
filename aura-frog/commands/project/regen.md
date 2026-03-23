@@ -69,12 +69,13 @@ Choice [1]:
 
 ### 3. Re-scan Project
 
-**Same deep analysis as `project:init` Step 3:**
+**Same deep analysis as `project:init` Steps 3 + 3b:**
 - Scan project structure
 - Detect framework and tech stack
-- Extract patterns and conventions
+- Extract patterns and conventions (12 detections)
 - Detect team reviewers
 - Analyze code examples
+- Regenerate repo map, file registry, and architecture analysis
 
 ### 4. Update Project Context Files
 
@@ -106,6 +107,35 @@ Choice [1]:
 - Update component examples
 - Update test examples
 - Update API examples
+
+#### 4.5. Regenerate `repo-map.md` (NEW in v3.0.0)
+```bash
+bash "$PLUGIN_DIR/scripts/repo-map-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/repo-map.md" 3
+```
+- Re-walk directory tree
+- Update purpose annotations
+- Claude enriches generic annotations with specific descriptions
+
+#### 4.6. Regenerate `file-registry.yaml` (NEW in v3.0.0)
+```bash
+bash "$PLUGIN_DIR/scripts/file-registry-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/file-registry.yaml" 50
+```
+- Re-detect entry points, configs, hub files
+- Update import counts and relationships
+- Claude adds/updates file descriptions
+
+#### 4.7. Regenerate `architecture.md` (NEW in v3.0.0)
+```bash
+bash "$PLUGIN_DIR/scripts/architecture-gen.sh" "$PROJECT_ROOT" "$CONTEXT_DIR/architecture.md"
+```
+- Re-detect architecture type, dependencies, patterns, data flow
+- Claude enriches with module relationships
+
+#### 4.8. Regenerate `session-context.toon` (Enhanced)
+```bash
+bash "$PLUGIN_DIR/scripts/context-compress.sh" ".claude" "$PROJECT_ROOT"
+```
+- Now detects 12 patterns (was 6): adds indentation, state mgmt, API pattern, component style, env pattern, monorepo
 
 ### 5. Sync Plugin Settings
 
@@ -243,9 +273,12 @@ Team:
 
 ✅ .claude/project-contexts/[project-name]/
    ├── project-config.yaml   - Updated (tech stack, structure)
-   ├── conventions.md        - Updated (patterns)
+   ├── conventions.md        - Updated (patterns + code style)
    ├── rules.md              - Updated (quality rules)
-   └── examples.md           - Updated (code examples)
+   ├── examples.md           - Updated (code examples)
+   ├── repo-map.md           - Regenerated (directory tree)
+   ├── file-registry.yaml    - Regenerated (key files index)
+   └── architecture.md       - Regenerated (architecture analysis)
 
 ✅ ccpm-config.yaml
    - Updated: [changes made]
@@ -432,6 +465,6 @@ Detected Values > Existing Config > Defaults
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-25
+**Version:** 2.0.0
+**Last Updated:** 2026-03-20
 

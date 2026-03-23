@@ -491,4 +491,4 @@ team_decision[4]{condition,mode}:
 
 ---
 
-**Version:** 1.21.0 | **Last Updated:** 2026-02-09
+**Version:** 1.22.0 | **Last Updated:** 2026-02-09

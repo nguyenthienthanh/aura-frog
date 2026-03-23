@@ -1,17 +1,18 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.21.0
+**System:** Aura Frog v1.22.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 52 skills + 86 commands + 5-phase workflow + auto-invoking skills + bundled MCP
 
 ---
 
-## New in 1.21.0 - Best Practices Enforcement
+## New in 1.22.0 - Deep Project Init
 
-- **6 new hooks** — Security scan, commit attribution, security-critical warnings, auto test runner, token tracker, scope drift detection
-- **PR template** — AI-specific review checklist (`templates/pull_request_template.md`)
-- **Stderr fix** — 5 hooks had `2>&1` suppressing block/warning messages
-- **Hooks: 21 → 27**
+- **3 new context generators** — `repo-map-gen.sh` (annotated directory tree), `file-registry-gen.sh` (key files index), `architecture-gen.sh` (architecture analysis)
+- **`context-compress.sh` v2.0** — 12 pattern detections (was 6): adds indentation, state mgmt, API pattern, component style, env, monorepo
+- **Project context: 4 → 7 files** — New: `repo-map.md`, `file-registry.yaml`, `architecture.md`
+- **Smart context loading** — Route by scenario: simple (~200 tokens), bug fix (~800), full (~2000), architecture (~1000)
+- **Scripts: 34 → 37**
 
 ---
 
@@ -81,7 +82,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (REQUIRED EVERY RESPONSE)
 
 ```
-⚡ 🐸 AURA FROG v1.21.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v1.22.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -279,4 +280,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.21.0
+**Version:** 1.22.0
