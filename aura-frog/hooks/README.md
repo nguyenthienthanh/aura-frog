@@ -1,7 +1,7 @@
 # Aura Frog Hooks System
 
 **Purpose:** Configure Claude Code lifecycle hooks for Aura Frog workflows
-**Version:** 1.22.0
+**Version:** 2.0.0
 
 ---
 
@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (27 Total)
+## Active Hooks (24 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -68,34 +68,7 @@ env_vars[16]{var,description}:
 
 ---
 
-### 0b. SessionStart - Visual Testing Detection (NEW in 1.14.0)
-**When:** Once per session (after environment injection)
-
-**Actions:**
-- ✅ Detect `.claude/visual/` folder in project
-- ✅ Load visual testing configuration
-- ✅ Set environment variables for visual testing
-- ✅ Display visual testing status
-
-**Injected Environment Variables:**
-```toon
-env_vars[4]{var,description}:
-  AF_VISUAL_TESTING,true if visual testing configured
-  AF_VISUAL_PATH,Path to .claude/visual folder
-  AF_VISUAL_WEB_THRESHOLD,Web diff threshold (default 0.5%)
-  AF_VISUAL_PDF_THRESHOLD,PDF diff threshold (default 1.0%)
-```
-
-**Example Output:**
-```
-🎨 Visual Testing: enabled | Thresholds: web 0.5% / pdf 1.0% | Specs: 5 | Baselines: 3
-```
-
-**Script:** `hooks/visual-pixel-init.cjs`
-
----
-
-### 0c. SessionStart - Firebase Cleanup (NEW in 1.16.0)
+### 0b. SessionStart - Firebase Cleanup (NEW in 1.16.0)
 **When:** Once per session (after environment injection)
 
 **Actions:**
@@ -113,7 +86,7 @@ env_vars[4]{var,description}:
 
 ---
 
-### 0d. SessionStart - Workflow Edit Detection (NEW in 1.16.0)
+### 0c. SessionStart - Workflow Edit Detection (NEW in 1.16.0)
 **When:** Once per session (after environment injection)
 
 **Actions:**
@@ -142,7 +115,7 @@ env_vars[4]{var,description}:
 
 ---
 
-### 0e. SessionStart - Compact Resume (NEW in 1.16.0)
+### 0d. SessionStart - Compact Resume (NEW in 1.16.0)
 **When:** Once per session (after compact)
 
 **Actions:**
@@ -218,7 +191,7 @@ ios/Pods
 
 ---
 
-### 1b. PreToolUse - Commit Attribution (NEW in 1.22.0)
+### 1b. PreToolUse - Commit Attribution (NEW in 2.0.0)
 **When:** Before any Bash tool execution containing `git commit`
 
 **Actions:**
@@ -276,7 +249,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 ---
 
-### 3b. PreToolUse - Security-Critical Warnings (NEW in 1.22.0)
+### 3b. PreToolUse - Security-Critical Warnings (NEW in 2.0.0)
 **When:** Before Write or Edit to security-sensitive files
 
 **Actions:**
@@ -378,7 +351,7 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 ---
 
-### 7b. PostToolUse - Security Scan (NEW in 1.22.0)
+### 7b. PostToolUse - Security Scan (NEW in 2.0.0)
 **When:** After Write or Edit tool completes (async)
 
 **Actions:**
@@ -409,7 +382,7 @@ Hook: 🟡 Security scan: 2 issue(s) in users.ts
 
 ---
 
-### 7c. PostToolUse - Auto Test Runner (NEW in 1.22.0)
+### 7c. PostToolUse - Auto Test Runner (NEW in 2.0.0)
 **When:** After Write or Edit during TDD phases (2, 3, 4) - async
 
 **Actions:**
@@ -440,7 +413,7 @@ Hook: ✅ Auto-test (vitest): Tests: 23 passed | Duration: 1.2s
 
 ---
 
-### 7d. PostToolUse - Token Tracker (NEW in 1.22.0)
+### 7d. PostToolUse - Token Tracker (NEW in 2.0.0)
 **When:** After any tool execution (async)
 
 **Actions:**
@@ -518,7 +491,7 @@ Hook: 🟠 Token usage: ~145K / 200K (72%) [HIGH]
 
 ---
 
-### 8b. UserPromptSubmit - Scope Drift Detection (NEW in 1.22.0)
+### 8b. UserPromptSubmit - Scope Drift Detection (NEW in 2.0.0)
 **When:** Every user prompt submission (async)
 
 **Actions:**
@@ -599,7 +572,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 📍 Phase: 3
 📋 Plan: plans/241223-user-profile
 📦 Project: my-app
-🤖 Agents: backend-nodejs, qa-automation
+🤖 Agents: backend-nodejs, tester
 -------------------------
 ```
 
@@ -608,7 +581,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10b. TeammateIdle - Idle Teammate Handler (NEW in 1.22.0)
+### 10b. TeammateIdle - Idle Teammate Handler (NEW in 2.0.0)
 **When:** A teammate has no remaining tasks (Agent Teams mode only)
 
 **Actions:**
@@ -623,7 +596,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 10c. TaskCompleted - Task Completion Validator (NEW in 1.22.0)
+### 10c. TaskCompleted - Task Completion Validator (NEW in 2.0.0)
 **When:** A teammate marks a task as done (Agent Teams mode only)
 
 **Actions:**
@@ -659,7 +632,7 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
-### 11b. PreCompact - Pre-Compact State Save (NEW in 1.22.0)
+### 11b. PreCompact - Pre-Compact State Save (NEW in 2.0.0)
 **When:** Before Claude auto-compacts context
 
 **Actions:**
@@ -802,9 +775,8 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[27]{event,name,purpose}:
+hooks[24]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
-  SessionStart,Visual Testing Init,Detect and configure visual testing
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
   SessionStart,Compact Resume,Restore workflow context after compact
@@ -834,6 +806,32 @@ hooks[27]{event,name,purpose}:
 
 ---
 
-**Version:** 1.22.0
+## Exit Code Standard
+
+| Code | Meaning | Use When |
+|------|---------|----------|
+| `0` | Success / non-blocking | Hook ran successfully, continue normally |
+| `1` | Warning | Hook detected a non-critical issue; show stderr, continue |
+| `2` | Block action | Hook detected a critical issue, prevent the tool from executing |
+
+**Convention:** Use `0` for success and early-exit (fail-open). Use `1` for soft warnings (e.g., missing attribution, security scan findings). Use `2` for hard blocks (e.g., destructive commands, scanning blocked directories, rejecting incomplete tasks).
+
+**Current usage across hooks:**
+
+| Hook | Exit 0 | Exit 1 | Exit 2 | Notes |
+|------|--------|--------|--------|-------|
+| `scout-block.cjs` | Yes | -- | Yes | Blocks node_modules/dist scanning |
+| `commit-attribution.cjs` | Yes | Yes | -- | Warns on missing Co-Authored-By |
+| `security-scan.cjs` | Yes | Yes | -- | Warns on vulnerability patterns |
+| `security-critical-warn.cjs` | Yes | -- | -- | Warns via stderr, exits 0 |
+| `scope-drift.cjs` | Yes | Yes | -- | Warns on scope divergence |
+| `task-completed.cjs` | Yes | -- | Yes | Rejects incomplete tasks (Agent Teams) |
+| `teammate-idle.cjs` | Yes | -- | Yes | Keeps alive with work assignment |
+| `set-active-plan.cjs` | Yes | Yes | -- | Errors on invalid args/paths |
+| All other hooks | Yes | -- | -- | Non-blocking, success-only |
+
+---
+
+**Version:** 2.0.0
 **Last Updated:** 2026-02-27
-**Status:** Active hooks system (27 hooks)
+**Status:** Active hooks system (24 hooks)

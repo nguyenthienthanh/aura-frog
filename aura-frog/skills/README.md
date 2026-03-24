@@ -1,7 +1,7 @@
 # Aura Frog Skills
 
-**Version:** 1.22.0
-**Total Skills:** 52 (13 auto-invoking + 39 reference)
+**Version:** 2.0.0
+**Total Skills:** 43 (8 auto-invoking + 35 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -11,14 +11,12 @@
 
 ## New in 1.17.0 - Context Optimization
 
-**Auto-invoke reduced from 28 → 13** through consolidation:
+**Auto-invoke reduced from 28 → 8** through consolidation:
 
-- **model-router** - Auto-select optimal Claude model (Haiku/Sonnet/Opus) based on task complexity. Reduces costs by 30-50% on simple tasks.
 - **framework-expert** - Unified framework bundle with lazy loading. Replaces 12 individual framework skills in auto-invoke (~80% token reduction).
-- **seo-bundle** - Consolidated SEO/GEO skills. Replaces 5 individual SEO skills in auto-invoke.
 - **testing-patterns** - Unified testing patterns across all frameworks.
 
-**Note:** Individual framework and SEO skills remain as reference documentation, loaded on-demand by the bundle skills.
+**Note:** Individual framework skills remain as reference documentation, loaded on-demand by the bundle skills. SEO/GEO and Godot skills have been externalized as separate addons.
 
 **Docs:** `docs/REFACTOR_ANALYSIS.md` for full optimization guide.
 
@@ -26,17 +24,7 @@
 
 ## New in 1.16.0
 
-- **seo-expert** - SEO and search engine optimization (meta tags, structured data, Core Web Vitals, sitemaps)
-- **ai-discovery-expert** - AI Discovery optimization for Perplexity, ChatGPT Search, Gemini, and LLM citation
-- **seo-check** - Invokable command: `/seo:check` - Full SEO/GEO audit
-- **seo-schema** - Invokable command: `/seo:schema` - Validate structured data with Rich Results Test
-- **seo-geo** - Invokable command: `/seo:geo` - AI discovery (GEO) audit
-
----
-
-## New in 1.14.0
-
-- **visual-pixel-perfect** - Pixel-perfect visual testing with auto-fix loop. Implement → Render → Snapshot → Compare → Fix until pass.
+- SEO/GEO skills (seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo) have been **externalized as a separate addon**.
 
 ---
 
@@ -63,7 +51,7 @@
 
 ## New in 1.6.0
 
-- **godot-expert** - Godot game development expert for HTML5, Android, iOS, and desktop exports with GDScript best practices
+- **godot-expert** has been **externalized as a separate addon**.
 
 ## New in 1.5.0
 
@@ -391,29 +379,26 @@ MCP tools: atlassian / figma / slack (When mentioned)
 ## Skill Priorities (TOON)
 
 ```toon
-auto_invoke_skills[13]{name,priority,trigger}:
+auto_invoke_skills[8]{name,priority,trigger}:
   agent-detector,highest,ALWAYS (100%) - includes lazy-agent-loader
-  model-router,highest,After agent detection - selects optimal model
   workflow-orchestrator,critical,Complex tasks - includes fasttrack mode
-  project-context-loader,high,Before code generation
   framework-expert,high,Framework task - lazy loads specific patterns
-  seo-bundle,high,SEO/GEO task - lazy loads relevant patterns
   testing-patterns,high,Test task - unified testing patterns
   code-reviewer,high,After implementation
-  session-continuation,high,Token limit warning + handoff/resume
   bugfix-quick,medium,Bug mentions
   test-writer,medium,Test requests
   code-simplifier,medium,Simplify/KISS/complexity
-  response-analyzer,medium,Large output handling
 ```
 
-**Reference Skills (39)** - Loaded on-demand by bundles or commands:
-- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
-- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
-- Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
+**Reference Skills (35)** - Loaded on-demand by bundles or commands:
+- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, typescript (11)
+- Design: design-system-library, stitch-design, design-expert (3)
 - Learning: learning-analyzer, self-improve (2)
 - Workflow: lazy-agent-loader, phase1-lite (2)
-- Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, nativewind-generator (14)
+- Context: project-context-loader, session-continuation, response-analyzer (3)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, git-worktree (14)
+
+> **Externalized addons:** Godot (godot-expert) and SEO/GEO (seo-bundle, seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo) are available as separate addons.
 
 > **MCP Integrations:** JIRA, Figma, Confluence, and Slack are now handled via bundled MCP servers. Configure in `.mcp.json`.
 ---
@@ -705,32 +690,7 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-### 25. **godot-expert** (Priority: HIGH)
-
-**Auto-invokes when:** Working with Godot game projects
-
-**Triggers:** godot, gdscript, game, .gd, .tscn, scene, node, project.godot
-
-**What it does:**
-- Scene composition patterns
-- GDScript typed best practices
-- Physics and collision handling
-- Input handling (desktop + touch/mobile)
-- Animation and audio systems
-- Multi-platform export (HTML5, Android, iOS, Desktop)
-- Testing with GDUnit
-
-**Export Targets:**
-- HTML5 (WebGL, browser games)
-- Android (APK/AAB for Google Play)
-- iOS (IPA for App Store)
-- Windows, macOS, Linux
-
-**📚 Details:** `skills/godot-expert/SKILL.md`
-
----
-
-### 26. **code-simplifier** (Priority: HIGH)
+### 25. **code-simplifier** (Priority: HIGH)
 
 **Auto-invokes when:** Code is overly complex, deep nesting, or user asks to simplify
 
@@ -747,93 +707,11 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-### 27. **seo-expert** (Priority: HIGH)
-
-**Auto-invokes when:** Working with SEO, meta tags, schema markup, sitemaps
-
-**Triggers:** SEO, search engine, meta tags, structured data, schema markup, sitemap, robots.txt, canonical, google search
-
-**What it does:**
-- Technical SEO implementation (meta tags, canonical URLs, hreflang)
-- Core Web Vitals optimization (LCP, INP, CLS)
-- Schema.org structured data (JSON-LD)
-- Open Graph and Twitter Cards
-- Sitemap and robots.txt configuration
-- Image SEO and internal linking
-
-**📚 Details:** `skills/seo-expert/SKILL.md`
+> **Note:** SEO/GEO skills (seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo) and Godot skill (godot-expert) are available as separate addons.
 
 ---
 
-### 28. **ai-discovery-expert** (Priority: HIGH)
-
-**Auto-invokes when:** Optimizing for AI search engines like Perplexity, ChatGPT, Gemini
-
-**Triggers:** AI search, Perplexity, ChatGPT search, Gemini, AI discovery, LLM citation, AI crawler
-
-**What it does:**
-- Answer-first content structure for AI citation
-- AI crawler configuration (GPTBot, PerplexityBot, ClaudeBot)
-- Entity optimization for E-E-A-T
-- Semantic HTML for AI parsing
-- LLM.txt standard implementation
-- Citation-worthy content patterns
-
-**📚 Details:** `skills/ai-discovery-expert/SKILL.md`
-
----
-
-### 29. **seo-check** (Priority: HIGH) - Invokable Command
-
-**Invoke with:** `/seo:check [url]`
-
-**Triggers:** seo:check, seo check, seo audit, check seo
-
-**What it does:**
-- Comprehensive SEO and GEO audit
-- Meta tags validation
-- Structured data checking
-- Core Web Vitals analysis
-- AI discovery readiness
-
-**📚 Details:** `skills/seo-check/SKILL.md`
-
----
-
-### 30. **seo-schema** (Priority: HIGH) - Invokable Command
-
-**Invoke with:** `/seo:schema [url]`
-
-**Triggers:** seo:schema, schema validation, validate schema, rich results, json-ld validation
-
-**What it does:**
-- Validate Schema.org JSON-LD
-- Google Rich Results Test integration
-- Common error detection and fixes
-- Schema type guidance
-
-**📚 Details:** `skills/seo-schema/SKILL.md`
-
----
-
-### 31. **seo-geo** (Priority: HIGH) - Invokable Command
-
-**Invoke with:** `/seo:geo [url]`
-
-**Triggers:** seo:geo, geo audit, ai discovery, perplexity optimization, chatgpt search
-
-**What it does:**
-- AI crawler access audit (GPTBot, PerplexityBot, ClaudeBot)
-- Content structure analysis
-- E-E-A-T entity signals check
-- Freshness signals verification
-- FAQ implementation review
-
-**📚 Details:** `skills/seo-geo/SKILL.md`
-
----
-
-**Version:** 1.22.0
+**Version:** 2.0.0
 **Last Updated:** 2026-02-09
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 52 (13 auto-invoking + 39 reference)
+**Total Skills:** 43 (8 auto-invoking + 35 reference)

@@ -2,7 +2,7 @@
 
 **Category:** QA Expert  
 **Priority:** High  
-**Used By:** qa-automation agent
+**Used By:** tester agent
 
 ---
 
@@ -59,5 +59,5 @@ test.describe('User Authentication', () => {
 
 ---
 
-**Used by qa-automation agent for end-to-end test implementation.**
+**Used by tester agent for end-to-end test implementation.**
 

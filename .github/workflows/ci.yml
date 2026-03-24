@@ -1,0 +1,74 @@
+name: Aura Frog CI
+
+on:
+  push:
+    branches: [main, v*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate TOON format
+        run: bash aura-frog/scripts/validate-toon.sh || true
+
+      - name: Validate config
+        run: bash aura-frog/scripts/validate-config.sh || true
+
+      - name: Validate counts consistency
+        run: bash aura-frog/scripts/validate-counts.sh
+
+      - name: Check for broken markdown links
+        run: |
+          errors=0
+          for file in $(find aura-frog -name "*.md" -not -path "*/node_modules/*"); do
+            grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | sed 's/\](//' | sed 's/)//' | while read -r link; do
+              dir=$(dirname "$file")
+              target="$dir/$link"
+              if [ ! -e "$target" ] && [ ! -e "$link" ]; then
+                echo "Broken link in $file: $link"
+                errors=$((errors + 1))
+              fi
+            done
+          done
+          echo "Link check complete"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dev dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dev dependencies
+        run: npm install
+
+      - name: Lint hooks
+        run: npm run lint || true

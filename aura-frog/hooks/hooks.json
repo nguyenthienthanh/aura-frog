@@ -9,10 +9,6 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/visual-pixel-init.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/firebase-cleanup.cjs\" 2>&1"
           },
           {
@@ -22,6 +18,15 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" --resume 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/update-check.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-notify.cjs\" 2>&1"
           }
         ]
       }
@@ -59,6 +64,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/security-critical-warn.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/phase-checkpoint.cjs\" 2>&1"
           }
         ]
       }

@@ -37,7 +37,7 @@ function ensureCacheDir() {
     if (!fs.existsSync(CACHE_DIR)) {
       fs.mkdirSync(CACHE_DIR, { recursive: true });
     }
-  } catch { /* ignore */ }
+  } catch { /* fs mkdir - non-blocking, will retry next time */ }
 }
 
 /**
@@ -48,7 +48,7 @@ function loadCache() {
     if (fs.existsSync(SMART_LEARN_CACHE)) {
       return JSON.parse(fs.readFileSync(SMART_LEARN_CACHE, 'utf-8'));
     }
-  } catch { /* ignore */ }
+  } catch { /* malformed data - skip silently, fresh state on next run */ }
   return {
     filePatterns: {},      // file extension -> { patterns: [], successCount: 0 }
     codePatterns: {},      // pattern type -> { count, examples }
@@ -66,7 +66,7 @@ function saveCache(cache) {
     // Trim successful actions
     cache.successfulActions = (cache.successfulActions || []).slice(-CACHE_MAX_SIZE);
     fs.writeFileSync(SMART_LEARN_CACHE, JSON.stringify(cache, null, 2));
-  } catch { /* ignore */ }
+  } catch { /* fs/cache write - non-blocking, will retry next time */ }
 }
 
 /**

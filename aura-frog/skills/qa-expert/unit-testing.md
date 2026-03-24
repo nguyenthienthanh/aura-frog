@@ -2,7 +2,7 @@
 
 **Category:** QA Expert  
 **Priority:** High  
-**Used By:** qa-automation
+**Used By:** tester
 
 ---
 

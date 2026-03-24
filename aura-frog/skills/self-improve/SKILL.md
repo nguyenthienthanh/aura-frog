@@ -212,12 +212,12 @@ Confidence: 92% | Frequency: 28
 **Evidence:**
 - 28 workflows with React component tasks
 - react-expert success rate: 96%
-- Current default (ui-expert) success rate: 78%
+- Current default (frontend) success rate: 78%
 
-**Change to:** `agents/smart-agent-detector.md`
+**Change to:** `agents/router.md`
 ```diff
 react_patterns:
-- default_agent: ui-expert
+- default_agent: frontend
 + default_agent: react-expert
 + file_extensions: [.tsx, .jsx]
 ```
@@ -227,7 +227,7 @@ Apply this improvement? [y/n/skip/modify]:
 User: y
 
 Claude: ✅ Applied improvement 1/3
-Backup saved to: backups/smart-agent-detector.md.20260107
+Backup saved to: backups/router.md.20260107
 
 ## Improvement 2/3: ...
 ```

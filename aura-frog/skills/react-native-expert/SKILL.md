@@ -1,7 +1,7 @@
 ---
 name: react-native-expert
 description: "React Native best practices expert. PROACTIVELY use when working with React Native, mobile apps, Expo. Triggers: react-native, expo, mobile, iOS, Android, NativeWind"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "react-native"

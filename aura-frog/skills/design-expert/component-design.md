@@ -2,7 +2,7 @@
 
 **Category:** Design Expert  
 **Priority:** High  
-**Used By:** ui-expert agent
+**Used By:** frontend agent
 
 ---
 
@@ -159,5 +159,5 @@ Pages: Final implementation
 
 ---
 
-**Used by ui-expert agent for component design and breakdown.**
+**Used by frontend agent for component design and breakdown.**
 

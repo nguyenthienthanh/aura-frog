@@ -34,7 +34,7 @@ function loadRecentOps() {
       const tenMinutesAgo = Date.now() - (10 * 60 * 1000);
       return data.filter(op => op.timestamp > tenMinutesAgo);
     }
-  } catch { /* ignore */ }
+  } catch { /* malformed data - skip silently, fresh state on next run */ }
   return [];
 }
 
@@ -46,7 +46,7 @@ function saveRecentOps(ops) {
     // Keep only last 50 operations
     const trimmed = ops.slice(-50);
     fs.writeFileSync(STATE_FILE, JSON.stringify(trimmed));
-  } catch { /* ignore */ }
+  } catch { /* fs/cache write - non-blocking, ops tracking is best-effort */ }
 }
 
 /**
@@ -98,7 +98,7 @@ async function main() {
     try {
       const stdin = fs.readFileSync(0, 'utf-8').trim();
       if (stdin) data = JSON.parse(stdin);
-    } catch { /* ignore */ }
+    } catch { /* malformed data - skip silently, no stdin or invalid JSON is expected */ }
 
     const { tool, input, output, session_id: sessionId } = data;
 

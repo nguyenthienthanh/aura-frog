@@ -1,16 +1,26 @@
 # Agent Identification Banner
 
-**Version:** 1.22.0
-**Priority:** CRITICAL - Must be shown at START of EVERY response
+**Version:** 2.0.0
+**Priority:** CRITICAL - Must be shown at session start, phase transitions, and agent switches
+
+---
+
+## When to Show Banner
+
+```toon
+banner_display[4]{when,required}:
+  First response of session,YES
+  Phase transition (entering new phase),YES
+  Agent switch (different agent activated),YES
+  Regular mid-conversation response,NO — skip to save tokens
+```
 
 ---
 
 ## Banner Template
 
-**Show this at the START of EVERY response:**
-
 ```
-⚡ 🐸 AURA FROG v1.22.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v2.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent] │ Phase: [phase] - [name]               ┃
 ┃ Model: [model] │ Teams: [✓/✗]                           ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -30,8 +40,8 @@
 ```toon
 banner_fields[6]{field,values,source}:
   Agent,Auto-detected agent name,skills/agent-detector/SKILL.md
-  Phase,"- (none) | 1-Understand | 2-Design | 3-UI | 4-Test Plan | 5a-RED | 5b-GREEN | 5c-REFACTOR | 6-Review | 7-Verify | 8-Document | 9-Share",Workflow state
-  Model,"Haiku 4.5 | Sonnet 4.5 | Opus 4.6 | (external models)",skills/model-router/SKILL.md
+  Phase,"- (none) | 1-Understand+Design | 2-Test RED | 3-Build GREEN | 4-Refactor+Review | 5-Finalize",Workflow state
+  Model,"Haiku 4.5 | Sonnet 4.5 | Opus 4.6 | (external models)",Auto-detected from environment
   Teams,"✓ enabled | ✗ off | ✓ (N active)",CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS env
   MCP,"context7 | playwright | vitest | figma | firebase | slack",Active MCP servers
   Aura,"2-4 word contextual phrase (fun/gen-z energy)",Context of current action
@@ -109,4 +119,4 @@ Banner (START) → Response Content → Next Step Guidance (END)
 
 ---
 
-**Version:** 1.22.0
+**Version:** 2.0.0

@@ -1,7 +1,7 @@
 ---
 name: go-expert
 description: "Go/Golang backend expert. PROACTIVELY use when working with Go, Gin, Echo, Fiber frameworks. Triggers: golang, go, gin, echo, fiber"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "golang"

@@ -14,7 +14,7 @@ triggers:
 # Skill: PM Expert
 
 **Category:** Reference Skill
-**Used By:** pm-operations-orchestrator agent
+**Used By:** lead agent
 
 ---
 

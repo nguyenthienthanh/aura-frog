@@ -2,7 +2,7 @@
 
 **Category:** QA Expert  
 **Priority:** High  
-**Used By:** qa-automation agent
+**Used By:** tester agent
 
 ---
 
@@ -127,5 +127,5 @@ RED → GREEN → REFACTOR
 
 ---
 
-**Used by qa-automation agent for test planning and strategy.**
+**Used by tester agent for test planning and strategy.**
 

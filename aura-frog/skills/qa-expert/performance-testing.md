@@ -2,7 +2,7 @@
 
 **Category:** QA Expert  
 **Priority:** Medium  
-**Used By:** qa-automation agent
+**Used By:** tester agent
 
 ---
 
@@ -63,5 +63,5 @@ export default function () {
 
 ---
 
-**Used by qa-automation agent for performance validation.**
+**Used by tester agent for performance validation.**
 

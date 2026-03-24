@@ -1,7 +1,7 @@
 ---
 name: nextjs-expert
 description: "Next.js best practices expert. PROACTIVELY use when working with Next.js, App Router, Server Components, API routes. Triggers: nextjs, next.js, app router, server components, API routes"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "nextjs"

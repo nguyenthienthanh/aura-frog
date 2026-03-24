@@ -14,3 +14,6 @@
 # .expo
 # android/build
 # ios/Pods
+node_modules
+__tests__
+coverage

@@ -32,7 +32,7 @@ function ensureDir(dirPath) {
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
-  } catch { /* ignore */ }
+  } catch { /* fs mkdir - non-blocking, will retry next time */ }
 }
 
 /**

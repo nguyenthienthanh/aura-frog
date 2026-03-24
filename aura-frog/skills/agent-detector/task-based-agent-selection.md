@@ -26,7 +26,7 @@ Similarly, a frontend repo may require:
 
 ## Task Content Analysis Patterns
 
-### Frontend Tasks (Activate: ui-expert)
+### Frontend Tasks (Activate: frontend)
 
 **Triggers regardless of repo type:**
 
@@ -190,7 +190,7 @@ database_keywords[12]{keyword,context,score}:
 
 ---
 
-### Security Tasks (Activate: security-expert)
+### Security Tasks (Activate: security)
 
 **Triggers regardless of repo type:**
 
@@ -215,7 +215,7 @@ security_task_patterns[15]{pattern,description,score}:
 
 ---
 
-### DevOps Tasks (Activate: devops-cicd)
+### DevOps Tasks (Activate: devops)
 
 **Triggers regardless of repo type:**
 
@@ -240,7 +240,7 @@ devops_task_patterns[15]{pattern,description,score}:
 
 ---
 
-### Testing Tasks (Activate: qa-automation)
+### Testing Tasks (Activate: tester)
 
 **Triggers regardless of repo type:**
 
@@ -262,7 +262,7 @@ testing_task_patterns[12]{pattern,description,score}:
 
 ---
 
-### UI/Design Tasks (Activate: ui-expert)
+### UI/Design Tasks (Activate: frontend)
 
 **Triggers regardless of repo type:**
 
@@ -334,9 +334,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "password reset" → backend context, but task is frontend
 
 **Result:**
-- **Primary:** ui-expert (95 pts) - handles template styling
+- **Primary:** frontend (95 pts) - handles template styling
 - **Secondary:** backend-laravel (40 pts) - repo context
-- **Approach:** ui-expert leads, backend-laravel advises on Laravel Blade
+- **Approach:** frontend leads, backend-laravel advises on Laravel Blade
 
 ---
 
@@ -352,9 +352,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "breaking across pages" → CSS/layout issue
 
 **Result:**
-- **Primary:** ui-expert (120 pts) - CSS/HTML for PDF
+- **Primary:** frontend (120 pts) - CSS/HTML for PDF
 - **Secondary:** backend-nodejs (40 pts) - integration
-- **Approach:** ui-expert fixes HTML/CSS, backend handles PDF library
+- **Approach:** frontend fixes HTML/CSS, backend handles PDF library
 
 ---
 
@@ -419,12 +419,12 @@ This task-based analysis **enhances** existing detection:
 
 ```toon
 team_task_patterns[6]{pattern,team_composition,reason}:
-  Full feature (frontend+backend+tests),architect(lead)+ui-expert+qa-automation,Cross-domain implementation
-  Security audit,security-expert(lead)+architect+qa-automation,Deep analysis + remediation + verification
-  Performance optimization,architect(lead)+devops-cicd+qa-automation,Backend + infra + benchmarks
-  Design system implementation,ui-expert(lead)+architect+qa-automation,Components + API + tests
-  Database migration + UI,architect(lead)+ui-expert+qa-automation,Schema + views + validation
-  Mobile feature (cross-platform),mobile-expert(lead)+architect+qa-automation,App + API + tests
+  Full feature (frontend+backend+tests),architect(lead)+frontend+tester,Cross-domain implementation
+  Security audit,security(lead)+architect+tester,Deep analysis + remediation + verification
+  Performance optimization,architect(lead)+devops+tester,Backend + infra + benchmarks
+  Design system implementation,frontend(lead)+architect+tester,Components + API + tests
+  Database migration + UI,architect(lead)+frontend+tester,Schema + views + validation
+  Mobile feature (cross-platform),mobile(lead)+architect+tester,App + API + tests
 ```
 
 ### Team Activation Threshold
@@ -450,4 +450,4 @@ TEAM_ACTIVATION(complexity, scores):
 
 ---
 
-**Related:** `agent-detector/SKILL.md`, `agents/smart-agent-detector.md`
+**Related:** `agent-detector/SKILL.md`, `agents/router.md`

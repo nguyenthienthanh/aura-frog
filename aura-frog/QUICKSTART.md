@@ -26,8 +26,17 @@ workflow:start "Your task description"
 ## Update
 
 ```bash
+# Check current version
+plugin:update
+
+# Update to latest
 /plugin marketplace update aurafrog
+
+# Restart Claude Code after update
+/exit
 ```
+
+**Auto-check:** Aura Frog checks for updates daily. Set `AF_UPDATE_CHECK=false` to disable.
 
 ## Essential Commands
 
@@ -48,4 +57,4 @@ workflow:start "Your task description"
 
 ---
 
-**Version:** 1.22.0
+**Version:** 2.0.0

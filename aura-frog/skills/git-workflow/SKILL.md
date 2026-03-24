@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 description: "Token-efficient git operations with security scanning and auto-split commits"
-autoInvoke: true
+autoInvoke: false
 priority: high
 model: haiku
 triggers:

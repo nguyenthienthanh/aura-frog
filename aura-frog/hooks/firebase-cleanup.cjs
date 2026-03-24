@@ -94,7 +94,7 @@ function ensureGitignore() {
         console.log('💡 Tip: Add firebase-debug.log to .gitignore');
       }
     }
-  } catch { /* ignore */ }
+  } catch { /* optional feature unavailable - .gitignore check is non-blocking */ }
 }
 
 /**

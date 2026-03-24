@@ -81,9 +81,9 @@ complexity[3]{level,criteria,approach}:
 
 ```toon
 model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Simple queries/Orchestration,pm-operations-orchestrator/project-manager
-  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/qa-automation/ui-expert
-  opus,Architecture/Deep analysis/Security audits/Complex planning,security-expert (audits)/Any agent (architecture mode)
+  haiku,Quick tasks/Simple queries/Orchestration,lead/scanner
+  sonnet,Standard implementation/Coding/Testing/Bug fixes,All dev agents/tester/frontend
+  opus,Architecture/Deep analysis/Security audits/Complex planning,security (audits)/Any agent (architecture mode)
 ```
 
 ### Complexity → Model
@@ -112,17 +112,17 @@ task_model[8]{task_type,model,reason}:
 ### Agent Default Models
 
 ```toon
-agent_models[11]{agent,default_model,opus_when}:
-  pm-operations-orchestrator,haiku,Never (orchestration only)
-  project-manager,haiku,Never (detection/context loading)
-  smart-agent-detector,haiku,Never (routing only)
+agent_models[10]{agent,default_model,opus_when}:
+  lead,haiku,Never (orchestration only)
+  scanner,haiku,Never (detection/context loading)
+  router,haiku,Never (routing only)
   architect,sonnet,Schema design / migration planning / system architecture
-  ui-expert,sonnet,Design system architecture
-  mobile-expert,sonnet,Architecture decisions
-  game-developer,sonnet,Game architecture decisions
-  security-expert,sonnet,opus for full audits
-  qa-automation,sonnet,Never
-  devops-cicd,sonnet,Infrastructure architecture
+  frontend,sonnet,Design system architecture
+  mobile,sonnet,Architecture decisions
+  strategist,sonnet,Business strategy / ROI evaluation
+  security,sonnet,opus for full audits
+  tester,sonnet,Never
+  devops,sonnet,Infrastructure architecture
 ```
 
 ### Model Selection Output
@@ -154,13 +154,13 @@ Task(subagent_type="backend-nodejs", model="sonnet", ...)
 
 ```toon
 task_content_triggers[7]{category,example_patterns,activates,score_boost}:
-  Frontend,html template/blade/twig/email template/pdf styling/css,ui-expert,+50 to +60
+  Frontend,html template/blade/twig/email template/pdf styling/css,frontend,+50 to +60
   Backend,api endpoint/controller/middleware/queue job/webhook,architect (+ framework skill),+50 to +55
   Database,migration/schema/query optimization/slow query/n+1,architect,+55 to +60
-  Security,xss/sql injection/csrf/vulnerability/auth bypass,security-expert,+55 to +60
-  DevOps,docker/kubernetes/ci-cd/terraform/deployment,devops-cicd,+50 to +55
-  Testing,unit test/e2e test/coverage/mock/fixture,qa-automation,+45 to +55
-  Design,figma/wireframe/design system/accessibility,ui-expert,+50 to +60
+  Security,xss/sql injection/csrf/vulnerability/auth bypass,security,+55 to +60
+  DevOps,docker/kubernetes/ci-cd/terraform/deployment,devops,+50 to +55
+  Testing,unit test/e2e test/coverage/mock/fixture,tester,+45 to +55
+  Design,figma/wireframe/design system/accessibility,frontend,+50 to +60
 ```
 
 **Key insight:** Task content score ≥50 → Override or co-lead with repo-based agent.
@@ -170,12 +170,12 @@ task_content_triggers[7]{category,example_patterns,activates,score_boost}:
 # Backend repo, but frontend task
 Repo: Laravel API
 Task: "Fix email template styling"
-→ ui-expert (PRIMARY) + architect (SECONDARY)
+→ frontend (PRIMARY) + architect (SECONDARY)
 
 # Frontend repo, but backend task
 Repo: Next.js
 Task: "Add rate limiting to API route"
-→ architect (PRIMARY) + ui-expert (SECONDARY)
+→ architect (PRIMARY) + frontend (SECONDARY)
 ```
 
 ---
@@ -204,14 +204,14 @@ Detect user **intent** from action keywords:
 
 ```toon
 intent_detection[8]{intent,keywords,primary,secondary}:
-  Implementation,implement/create/add/build/develop,Dev agent,ui-expert/qa-automation
-  Bug Fix,fix/bug/error/issue/broken/crash,Dev agent,qa-automation
-  Testing,test/testing/coverage/QA/spec,qa-automation,Dev agent
-  Design/UI,design/UI/UX/layout/figma/style,ui-expert,Dev agent
+  Implementation,implement/create/add/build/develop,Dev agent,frontend/tester
+  Bug Fix,fix/bug/error/issue/broken/crash,Dev agent,tester
+  Testing,test/testing/coverage/QA/spec,tester,Dev agent
+  Design/UI,design/UI/UX/layout/figma/style,frontend,Dev agent
   Database,database/schema/query/migration/SQL,architect,Backend agent
-  Security,security/vulnerability/audit/owasp/secure,security-expert,Dev agent
-  Performance,performance/slow/optimize/speed/memory,devops-cicd,Dev agent
-  Deployment,deploy/docker/kubernetes/CI-CD/pipeline,devops-cicd,-
+  Security,security/vulnerability/audit/owasp/secure,security,Dev agent
+  Performance,performance/slow/optimize/speed/memory,devops,Dev agent
+  Deployment,deploy/docker/kubernetes/CI-CD/pipeline,devops,-
 ```
 
 ### Layer 3: Project Context Detection
@@ -284,18 +284,18 @@ thresholds[4]{level,score,role}:
 
 ## QA Agent Conditional Activation
 
-**qa-automation is ALWAYS Secondary when:**
+**tester is ALWAYS Secondary when:**
 - Intent = Implementation (+30 pts as secondary)
 - Intent = Bug Fix (+35 pts as secondary)
 - New feature being created
 - Code modification requested
 
-**qa-automation is Primary when:**
+**tester is Primary when:**
 - Intent = Testing (keywords: test, coverage, QA)
 - User explicitly asks for tests
 - Coverage report requested
 
-**qa-automation is SKIPPED when:**
+**tester is SKIPPED when:**
 - Pure documentation task
 - Pure design discussion (no code)
 - Research/exploration only
@@ -315,9 +315,9 @@ Task Analysis:
 - "PDF" → Frontend task pattern (+50)
 - "layout" → Frontend keyword (+40)
 - "table" → Frontend keyword (+30)
-→ Total frontend score: 120 pts → ui-expert is PRIMARY
+→ Total frontend score: 120 pts → frontend is PRIMARY
 
-Even if repo is pure backend, ui-expert leads this task!
+Even if repo is pure backend, frontend leads this task!
 ```
 
 **Apply patterns from:** `task-based-agent-selection.md`
@@ -370,11 +370,11 @@ mobile-react-native:
   - Recent *.phone.tsx: +20 (file pattern)
   → Total: 95 pts ✅ PRIMARY
 
-qa-automation:
+tester:
   - Bug fix intent: +35 (secondary for bugs)
   → Total: 35 pts ✅ OPTIONAL
 
-ui-expert:
+frontend:
   - "button" keyword: +20 (UI element)
   → Total: 20 pts ❌ NOT SELECTED
 ```
@@ -411,10 +411,10 @@ ui-expert:
 
 ```toon
 agents[4]{category,count,list}:
-  Development,4,architect/ui-expert/mobile-expert/game-developer
-  Quality & Security,2,security-expert/qa-automation
-  DevOps & Operations,1,devops-cicd
-  Infrastructure,3,smart-agent-detector/pm-operations-orchestrator/project-manager
+  Development,4,architect/frontend/mobile/gamedev
+  Quality & Security,2,security/tester
+  DevOps & Operations,1,devops
+  Infrastructure,3,router/lead/scanner
 ```
 
 ---
@@ -430,10 +430,10 @@ Layer 2 (Intent): "create" → Implementation
 Layer 4 (Files): *.phone.tsx present → +20
 
 Detection Result:
-  ✅ Agent: mobile-expert (PRIMARY, 80 pts)
+  ✅ Agent: mobile (PRIMARY, 80 pts)
   ✅ Model: sonnet
   ✅ Complexity: Standard
-  ✅ Secondary: ui-expert (35), qa-automation (30)
+  ✅ Secondary: frontend (35), tester (30)
 ```
 
 ### Example 2: Context-Based Detection (No Tech Mention)
@@ -448,7 +448,7 @@ Detection Result:
   ✅ Agent: architect (PRIMARY, 95 pts) + laravel-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
-  ✅ Secondary: qa-automation (35)
+  ✅ Secondary: tester (35)
 ```
 
 ### Example 3: Architecture Task (Uses Opus)
@@ -462,7 +462,7 @@ Detection Result:
   ✅ Agent: architect (PRIMARY)
   ✅ Model: opus (architecture task)
   ✅ Complexity: Deep
-  ✅ Secondary: security-expert (55)
+  ✅ Secondary: security (55)
 ```
 
 ### Example 4: Quick Fix (Uses Haiku)
@@ -472,7 +472,7 @@ User: "Fix typo in README.md line 42"
 Complexity: Quick (single file, explicit location)
 
 Detection Result:
-  ✅ Agent: pm-operations-orchestrator
+  ✅ Agent: lead
   ✅ Model: haiku
   ✅ Complexity: Quick
 ```
@@ -489,7 +489,7 @@ Task Content Analysis:
 → Frontend score: 125 pts (OVERRIDE)
 
 Detection Result:
-  ✅ Agent: ui-expert (PRIMARY, 125 pts) - leads template fix
+  ✅ Agent: frontend (PRIMARY, 125 pts) - leads template fix
   ✅ Agent: architect (SECONDARY, 40 pts) - Blade context + laravel-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
@@ -508,7 +508,7 @@ Task Content Analysis:
 
 Detection Result:
   ✅ Agent: architect (PRIMARY, 90 pts) - database optimization
-  ✅ Agent: ui-expert (SECONDARY, 40 pts) - API route context + nextjs-expert skill
+  ✅ Agent: frontend (SECONDARY, 40 pts) - API route context + nextjs-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
 ```
@@ -525,7 +525,7 @@ Task Content Analysis:
 → Frontend score: 120 pts (OVERRIDE)
 
 Detection Result:
-  ✅ Agent: ui-expert (PRIMARY, 120 pts) - HTML/CSS for PDF
+  ✅ Agent: frontend (PRIMARY, 120 pts) - HTML/CSS for PDF
   ✅ Agent: architect (SECONDARY, 40 pts) - PDF library integration + nodejs-expert skill
   ✅ Model: sonnet
   ✅ Complexity: Standard
@@ -589,8 +589,8 @@ When team mode is selected, output:
 - **Complexity:** Deep
 - **Team Composition:**
   - architect (lead) - system design, API endpoints
-  - ui-expert (primary) - frontend components
-  - qa-automation (primary) - test strategy + TDD
+  - frontend (primary) - frontend components
+  - tester (primary) - test strategy + TDD
 - **Reason:** Multi-domain feature requiring parallel work
 ```
 
@@ -632,14 +632,14 @@ team_rules[4]{rule,detail}:
 
 User can force specific agent:
 ```
-User: "Use only qa-automation for this task"
+User: "Use only tester for this task"
 → Override automatic selection
-→ qa-automation becomes PRIMARY regardless of scoring
+→ tester becomes PRIMARY regardless of scoring
 ```
 
 ---
 
-**Full detection algorithm:** `agents/smart-agent-detector.md`
+**Full detection algorithm:** `agents/router.md`
 **Selection guide:** `docs/AGENT_SELECTION_GUIDE.md`
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

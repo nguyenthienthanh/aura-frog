@@ -2,7 +2,7 @@
 
 **Category:** Design Expert
 **Version:** 1.0.0
-**Used By:** ui-expert
+**Used By:** frontend
 
 ---
 

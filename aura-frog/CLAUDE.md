@@ -1,18 +1,21 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v1.22.0
+**System:** Aura Frog v2.0.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 10 agents + 52 skills + 86 commands + 5-phase workflow + auto-invoking skills + bundled MCP
+**Purpose:** 10 agents + 43 skills + 86 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
 ---
 
-## New in 1.22.0 - Deep Project Init
+## New in 2.0.0 - Deep Project Init
 
 - **3 new context generators** — `repo-map-gen.sh` (annotated directory tree), `file-registry-gen.sh` (key files index), `architecture-gen.sh` (architecture analysis)
 - **`context-compress.sh` v2.0** — 12 pattern detections (was 6): adds indentation, state mgmt, API pattern, component style, env, monorepo
 - **Project context: 4 → 7 files** — New: `repo-map.md`, `file-registry.yaml`, `architecture.md`
 - **Smart context loading** — Route by scenario: simple (~200 tokens), bug fix (~800), full (~2000), architecture (~1000)
-- **Scripts: 34 → 37**
+- **Collaborative Planning** — Deep tasks get 4-round deliberation (Builder/Breaker/User/Why → debate → simulate → converge)
+- **`strategist` agent** — Business-level thinking (ROI, MVP scoping, scope creep detection)
+- **Agent rename** — Shorter, clearer: `lead`, `frontend`, `mobile`, `tester`, `security`, `devops`, `gamedev`, `scanner`, `router`
+- **Scripts: 34 → 37**, **Rules: 45**, **Agents: 10**
 
 ---
 
@@ -23,7 +26,7 @@
 - **Fasttrack merged** — Now a mode inside `workflow-orchestrator` (53 -> 52 skills)
 - **Approval gates slimmed** (558 -> 96 lines) — Points to orchestrator for details
 - **PreCompact hook** — Auto-save workflow state before context compaction
-- **`context: fork`** — Heavy skills (framework-expert, seo-bundle, testing-patterns, learning-analyzer) run in forked context
+- **`context: fork`** — Heavy skills (framework-expert, testing-patterns, learning-analyzer) run in forked context
 - **plugin.json** — Removed invalid `engines`, `capabilities`, `stats` fields
 
 ---
@@ -40,17 +43,15 @@
 ## New in 1.17.0 - Context Optimization
 
 **Cost Reduction:**
-- `model-router` - Auto-select Haiku/Sonnet/Opus (30-50% savings on trivial tasks)
 - `framework-expert` - Lazy-load framework patterns (~80% token reduction)
-- `seo-bundle` - Consolidated SEO/GEO skills
 - `testing-patterns` - Unified testing patterns
 
-**Consolidated Agents (15 → 10):**
-- `project-manager` ← project-detector + project-config-loader + project-context-manager
+**Consolidated Agents (15 → 11):**
+- `scanner` ← project-detector + project-config-loader + project-context-manager
 - `architect` ← backend-expert + database-specialist
-- `ui-expert` ← web-expert + ui-designer
+- `frontend` ← web-expert + ui-designer
 
-**Bundled Commands:** `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`, `/seo`
+**Bundled Commands:** `/workflow`, `/test`, `/project`, `/quality`, `/bugfix`
 
 **Docs:** `docs/REFACTOR_ANALYSIS.md`
 
@@ -79,10 +80,10 @@ session_start[6]{step,action,file}:
 
 ---
 
-## Agent Banner (REQUIRED EVERY RESPONSE)
+## Agent Banner (Session Start + Phase Transitions + Agent Switches)
 
 ```
-⚡ 🐸 AURA FROG v1.22.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v2.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -116,29 +117,26 @@ mcp_servers[6]{name,package,purpose,requires}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[13]{name,trigger,file}:
+skills[8]{name,trigger,file}:
   agent-detector,Every message (includes lazy-agent-loader),skills/agent-detector/SKILL.md
-  model-router,After agent detection,skills/model-router/SKILL.md
-  project-context-loader,Before code gen,skills/project-context-loader/SKILL.md
   framework-expert,Framework task (lazy-loads specific patterns),skills/framework-expert/SKILL.md
-  seo-bundle,SEO/GEO task,skills/seo-bundle/SKILL.md
   testing-patterns,Test task,skills/testing-patterns/SKILL.md
   workflow-orchestrator,Complex feature (includes fasttrack mode),skills/workflow-orchestrator/SKILL.md
   bugfix-quick,Bug fix request,skills/bugfix-quick/SKILL.md
   test-writer,Test request,skills/test-writer/SKILL.md
   code-reviewer,Code review,skills/code-reviewer/SKILL.md
   code-simplifier,Simplify/KISS/complexity,skills/code-simplifier/SKILL.md
-  session-continuation,Token limit/handoff,skills/session-continuation/SKILL.md
-  response-analyzer,Large outputs,skills/response-analyzer/SKILL.md
 ```
 
-**Reference Skills (39 - loaded on-demand by bundles or commands):**
-- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, godot, typescript (12)
-- SEO experts: seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo (5)
-- Design: design-system-library, stitch-design, visual-pixel-perfect, design-expert (4)
+**Reference Skills (35 - loaded on-demand by bundles or commands):**
+- Framework experts: react, react-native, vue, angular, nextjs, nodejs, python, laravel, go, flutter, typescript (11)
+- Design: design-system-library, stitch-design, design-expert (3)
 - Learning: learning-analyzer, self-improve (2)
 - Workflow: lazy-agent-loader, phase1-lite (2)
-- Others: api-designer, debugging, migration-helper, performance-optimizer, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, nativewind-generator, pm-expert, qa-expert, refactor-expert (14)
+- Context: project-context-loader, session-continuation, response-analyzer (3)
+- Others: api-designer, debugging, migration-helper, performance-optimizer, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, git-worktree, pm-expert, qa-expert, refactor-expert (14)
+
+> **Externalized:** Godot and SEO/GEO modules available as separate addons.
 
 **All skills:** `skills/README.md`
 
@@ -174,13 +172,12 @@ plan_routing[3]{complexity,approach}:
 ## Bundled Commands
 
 ```toon
-bundled_commands[6]{command,subcommands,replaces}:
+bundled_commands[5]{command,subcommands,replaces}:
   /workflow,"start/status/phase/next/approve/handoff/resume",16 workflow commands
   /test,"unit/e2e/coverage/watch/docs",4 test commands
   /project,"status/refresh/init/switch/list/config/sync-settings",7 project commands
   /quality,"lint/complexity/review/fix",3 quality commands
   /bugfix,"quick/full/hotfix",3 bugfix commands
-  /seo,"check/schema/geo",3 seo commands
 ```
 
 **Usage:** `/workflow` shows menu, `/workflow start "task"` uses direct subcommand.
@@ -190,12 +187,12 @@ bundled_commands[6]{command,subcommands,replaces}:
 ## Resources
 
 ```toon
-resources[12]{name,location}:
+resources[15]{name,location}:
   Agents (10),agents/
   Commands (86),commands/
-  Rules (49),rules/
-  Skills (13 auto-invoke + 39 reference),skills/
-  Hooks (27),hooks/
+  Rules (45),rules/
+  Skills (8 auto-invoke + 35 reference),skills/
+  Hooks (24),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
@@ -203,6 +200,9 @@ resources[12]{name,location}:
   Banner Examples,docs/BANNER_EXAMPLES.md
   Getting Started,GET_STARTED.md
   Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
+  Troubleshooting,docs/TROUBLESHOOTING.md
+  Tutorial,docs/guides/FIRST_WORKFLOW_TUTORIAL.md
+  Release Notes,docs/RELEASE_NOTES.md
 ```
 
 ---
@@ -218,7 +218,7 @@ team_mode[4]{aspect,detail}:
   Gate,Deep + 2+ domains ≥50 each → team. Quick/Standard → always subagent
   Startup,TeamCreate → TaskCreate × N → parallel Task × N (one message)
   Hooks,TeammateIdle (assign cross-review) + TaskCompleted (validate quality)
-  Orchestration,pm-operations-orchestrator as lead → creates teammates per phase
+  Orchestration,lead as lead → creates teammates per phase
 ```
 
 **Backward Compatible:** When disabled OR Quick/Standard tasks, standard subagent behavior applies.
@@ -280,4 +280,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 1.22.0
+**Version:** 2.0.0

@@ -1,7 +1,7 @@
 ---
 name: debugging
 description: "Systematic debugging with root cause investigation. NO fixes without understanding cause first."
-autoInvoke: true
+autoInvoke: false
 priority: high
 model: sonnet
 triggers:

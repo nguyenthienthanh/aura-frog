@@ -13,7 +13,7 @@ triggers:
 # Skill: Design Expert
 
 **Category:** Reference Skill
-**Used By:** ui-expert agent
+**Used By:** frontend agent
 
 ---
 

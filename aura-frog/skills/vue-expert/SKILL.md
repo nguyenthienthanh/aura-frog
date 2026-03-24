@@ -1,7 +1,7 @@
 ---
 name: vue-expert
 description: "Vue.js best practices expert. PROACTIVELY use when working with Vue 3, Composition API, Pinia, Nuxt. Triggers: vue, composition API, pinia, nuxt, .vue files"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "vue"

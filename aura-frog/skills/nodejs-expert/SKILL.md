@@ -1,7 +1,7 @@
 ---
 name: nodejs-expert
 description: "Node.js backend expert. PROACTIVELY use when working with Express, NestJS, Fastify, Node.js APIs. Triggers: nodejs, express, nestjs, fastify, api route, backend"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "nodejs"

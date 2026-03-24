@@ -168,7 +168,7 @@ function isLinterAvailable(linter) {
         const deps = { ...pkg.dependencies, ...pkg.devDependencies };
         return linter in deps;
       }
-    } catch { /* ignore */ }
+    } catch { /* malformed data - skip silently, linter detection is best-effort */ }
   }
 
   // Check composer.json for PHP tools
@@ -181,7 +181,7 @@ function isLinterAvailable(linter) {
         const pkgName = linter === 'pint' ? 'laravel/pint' : 'friendsofphp/php-cs-fixer';
         return pkgName in deps;
       }
-    } catch { /* ignore */ }
+    } catch { /* malformed data - skip silently, linter detection is best-effort */ }
   }
 
   // For system tools, check if command exists

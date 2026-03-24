@@ -24,7 +24,7 @@ function needsTddReminder(userPrompt) {
 
 // Check if approval reminder needed
 function needsApprovalReminder(state) {
-  const approvalPhases = ['3', '6', '7', '9'];
+  const approvalPhases = ['1', '3'];
   return state.phase && approvalPhases.includes(state.phase);
 }
 

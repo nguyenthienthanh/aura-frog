@@ -39,16 +39,16 @@ const PHASE_SLUGS = {
 
 // Phase team composition: lead + members
 const PHASE_TEAMS = {
-  '1': { lead: 'pm-operations-orchestrator', members: ['architect', 'qa-automation'] },
-  '2': { lead: 'architect', members: ['ui-expert', 'qa-automation'] },
-  '3': { lead: 'ui-expert', members: ['mobile-expert'] },
-  '4': { lead: 'qa-automation', members: ['architect'] },
-  '5a': { lead: 'qa-automation', members: ['architect'] },
-  '5b': { lead: 'architect', members: ['ui-expert', 'qa-automation'] },
-  '5c': { lead: 'architect', members: ['qa-automation'] },
-  '6': { lead: 'security-expert', members: ['architect', 'qa-automation'] },
-  '7': { lead: 'qa-automation', members: [] },
-  '8': { lead: 'pm-operations-orchestrator', members: [] },
+  '1': { lead: 'lead', members: ['architect', 'tester'] },
+  '2': { lead: 'architect', members: ['frontend', 'tester'] },
+  '3': { lead: 'frontend', members: ['mobile'] },
+  '4': { lead: 'tester', members: ['architect'] },
+  '5a': { lead: 'tester', members: ['architect'] },
+  '5b': { lead: 'architect', members: ['frontend', 'tester'] },
+  '5c': { lead: 'architect', members: ['tester'] },
+  '6': { lead: 'security', members: ['architect', 'tester'] },
+  '7': { lead: 'tester', members: [] },
+  '8': { lead: 'lead', members: [] },
   '9': { lead: 'voice-operations', members: [] }
 };
 

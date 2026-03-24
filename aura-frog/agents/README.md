@@ -1,6 +1,6 @@
 # Aura Frog Agents Directory
 
-**Version:** 1.22.0
+**Version:** 2.0.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2026-02-09
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Aura Frog provides **10 specialized agents** (reduced from 15 in v1.17.0 through consolidation, voice-operations removed in v1.18.1).
+Aura Frog provides **10 specialized agents** (reduced from 15 in v1.17.0 through consolidation, voice-operations removed in v1.18.1, strategist added in v2.0.0, gamedev externalized in v1.23.0).
 
 ---
 
@@ -16,9 +16,9 @@ Aura Frog provides **10 specialized agents** (reduced from 15 in v1.17.0 through
 
 | New Agent | Replaces | Purpose |
 |-----------|----------|---------|
-| **project-manager** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
+| **scanner** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
 | **architect** | backend-expert, database-specialist | System design + database architecture |
-| **ui-expert** | web-expert, ui-designer | Frontend + design systems |
+| **frontend** | web-expert, ui-designer | Frontend + design systems |
 
 ---
 
@@ -26,16 +26,16 @@ Aura Frog provides **10 specialized agents** (reduced from 15 in v1.17.0 through
 
 ```toon
 agents[10]{name,file,expertise}:
-  project-manager,project-manager.md,Project detection + config + context
   architect,architect.md,System design + database + backend architecture
-  ui-expert,ui-expert.md,Frontend frameworks + design systems + accessibility
-  mobile-expert,mobile-expert.md,React Native + Flutter + mobile platforms
-  game-developer,game-developer.md,Godot game development + multi-platform export
-  devops-cicd,devops-cicd.md,CI/CD pipelines + deployment + infrastructure
-  qa-automation,qa-automation.md,Testing strategies + QA automation
-  security-expert,security-expert.md,Security audits + vulnerability assessment
-  pm-operations-orchestrator,pm-operations-orchestrator.md,Project management + workflow coordination
-  smart-agent-detector,smart-agent-detector.md,Agent selection + routing logic
+  frontend,frontend.md,Frontend frameworks + design systems + accessibility
+  mobile,mobile.md,React Native + Flutter + mobile platforms
+  strategist,strategist.md,Business strategy + product thinking + ROI evaluation
+  tester,tester.md,Testing strategies + QA + TDD enforcement
+  security,security.md,Security audits + vulnerability assessment
+  devops,devops.md,CI/CD pipelines + deployment + infrastructure
+  lead,lead.md,Workflow coordination + team lead
+  scanner,scanner.md,Project detection + config + context
+  router,router.md,Agent selection + routing logic
 ```
 
 ---
@@ -64,11 +64,12 @@ agent:list
 
 | Category | Agents | Purpose |
 |----------|--------|---------|
-| **Development** | ui-expert, mobile-expert, architect, game-developer | Code implementation |
-| **Infrastructure** | devops-cicd | Deployment + CI/CD |
-| **Quality** | qa-automation, security-expert | Testing + security |
-| **Management** | pm-operations-orchestrator | Workflow coordination |
-| **System** | project-manager, smart-agent-detector | Internal operations |
+| **Development** | architect, frontend, mobile | Code implementation |
+| **Strategy** | strategist | Business thinking + product decisions |
+| **Quality** | tester, security | Testing + security |
+| **Infrastructure** | devops | Deployment + CI/CD |
+| **Management** | lead | Workflow coordination |
+| **System** | scanner, router | Internal operations |
 
 ---
 
@@ -79,15 +80,17 @@ agent:list
 | v1.16.0 | 15 | - |
 | v1.17.0 | 11 | -4 (consolidated) |
 | v1.18.1 | 10 | -1 (voice-operations removed) |
+| v2.0.0 | 11 | +1 (strategist added) |
+| v1.23.0 | 10 | -1 (gamedev externalized as addon) |
 
 **Removed files (consolidated):**
 - backend-expert.md → architect
 - database-specialist.md → architect
-- web-expert.md → ui-expert
-- ui-designer.md → ui-expert
-- project-detector.md → project-manager
-- project-config-loader.md → project-manager
-- project-context-manager.md → project-manager
+- web-expert.md → frontend
+- ui-designer.md → frontend
+- project-detector.md → scanner
+- project-config-loader.md → scanner
+- project-context-manager.md → scanner
 
 ---
 
@@ -95,10 +98,9 @@ agent:list
 
 - **Agent Detector:** `skills/agent-detector/SKILL.md`
 - **Lazy Agent Loader:** `skills/lazy-agent-loader/SKILL.md`
-- **Model Router:** `skills/model-router/SKILL.md`
 - **Agent Selection Guide:** `docs/AGENT_SELECTION_GUIDE.md`
 - **Refactor Analysis:** `docs/REFACTOR_ANALYSIS.md`
 
 ---
 
-**Version:** 1.22.0 | **Last Updated:** 2026-02-09
+**Version:** 2.0.0 | **Last Updated:** 2026-02-09

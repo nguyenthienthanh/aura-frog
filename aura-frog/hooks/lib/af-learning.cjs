@@ -343,7 +343,7 @@ async function recordWorkflowMetrics(metrics) {
       project_type: metrics.projectType || process.env.AF_PROJECT_TYPE,
       framework: metrics.framework || process.env.AF_FRAMEWORK,
       workflow_type: metrics.workflowType || 'full',
-      total_phases: metrics.totalPhases || 9,
+      total_phases: metrics.totalPhases || 5,
       completed_phases: metrics.completedPhases || 0,
       success: metrics.success,
       failure_reason: metrics.failureReason,

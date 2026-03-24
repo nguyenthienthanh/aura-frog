@@ -1,6 +1,6 @@
 # Aura Frog Commands Directory
 
-**Version:** 1.22.0
+**Version:** 2.0.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Last Updated:** 2026-02-09
 
@@ -17,7 +17,6 @@ Individual commands are now bundled into unified entry points with subcommand me
 | `/project` | 7 project commands | status, refresh, init, switch, list, config, sync-settings |
 | `/quality` | 3 quality commands | lint, complexity, review, fix |
 | `/bugfix` | 3 bugfix commands | quick, full, hotfix |
-| `/seo` | 3 seo commands | check, schema, geo |
 
 **Benefits:** Interactive menus, auto-detection, reduced command memorization.
 
@@ -48,7 +47,6 @@ commands/
 ├── quality/            # Code quality (3 commands)
 ├── review/             # Code review (1 command)
 ├── security/           # Security scanning (3 commands)
-├── seo/                # SEO & GEO optimization (3 commands) - NEW
 ├── setup/              # Setup & configuration (2 commands)
 ├── skill/              # Skill management (1 command)
 ├── test/               # Testing commands (4 commands)
@@ -118,10 +116,6 @@ commands[86]{category,command,file,description}:
   security,security:audit,security/audit.md,Run security audit
   security,security:deps,security/deps.md,Scan dependency vulnerabilities
   security,security:scan,security/scan.md,Scan for security issues
-  seo,seo,seo.md,Bundled SEO menu (interactive)
-  seo,seo:check,seo/check.md,Full SEO/GEO audit
-  seo,seo:schema,seo/schema.md,Validate structured data (Rich Results Test)
-  seo,seo:geo,seo/geo.md,AI discovery optimization audit
   setup,setup:integrations,setup/integrations.md,Configure JIRA/Confluence/Slack/Figma
   setup,setup:activate,setup/activate.md,Activate project configuration
   skill,skill:create,skill/create.md,Create reusable skill
@@ -158,7 +152,7 @@ commands[86]{category,command,file,description}:
 ## Statistics (TOON)
 
 ```toon
-stats[22]{category,count}:
+stats[21]{category,count}:
   workflow,17
   project,10
   agent,4
@@ -170,7 +164,6 @@ stats[22]{category,count}:
   planning,3
   quality,4
   security,3
-  seo,4
   api,2
   db,2
   design,2
@@ -233,4 +226,4 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-**Version:** 1.22.0 | **Format:** TOON
+**Version:** 2.0.0 | **Format:** TOON

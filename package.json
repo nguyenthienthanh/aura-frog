@@ -1,0 +1,14 @@
+{
+  "name": "aura-frog-dev",
+  "private": true,
+  "description": "Dev tools only. NOT part of the plugin.",
+  "scripts": {
+    "test": "jest --config jest.config.cjs",
+    "test:watch": "jest --config jest.config.cjs --watch",
+    "lint": "eslint aura-frog/hooks/ --ext .cjs"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^9.0.0"
+  }
+}

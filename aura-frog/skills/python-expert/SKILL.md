@@ -1,7 +1,7 @@
 ---
 name: python-expert
 description: "Python backend expert. PROACTIVELY use when working with Django, FastAPI, Flask, Python APIs. Triggers: python, django, fastapi, flask, async python"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "python"

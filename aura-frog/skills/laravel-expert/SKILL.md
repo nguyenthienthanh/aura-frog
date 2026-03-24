@@ -1,7 +1,7 @@
 ---
 name: laravel-expert
 description: "Laravel/PHP backend expert. PROACTIVELY use when working with Laravel, PHP APIs, Eloquent ORM. Triggers: laravel, php, eloquent, artisan"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "laravel"

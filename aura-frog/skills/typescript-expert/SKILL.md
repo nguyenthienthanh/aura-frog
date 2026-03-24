@@ -1,7 +1,7 @@
 ---
 name: typescript-expert
 description: "TypeScript best practices expert. PROACTIVELY use when working with TypeScript/JavaScript files. Triggers: .ts, .tsx, .js, .jsx files, type errors, ESLint issues, strict mode"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "typescript"

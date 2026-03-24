@@ -401,7 +401,7 @@ function detectAgentMapping(framework, patterns) {
     'gin': 'backend-go',
     'echo': 'backend-go',
     'fiber': 'backend-go',
-    'godot': 'game-developer'
+    'godot': 'gamedev'
   };
 
   if (framework && frameworkAgents[framework]) {
@@ -410,10 +410,10 @@ function detectAgentMapping(framework, patterns) {
 
   // Add secondary agents based on patterns
   if (patterns.templates.length > 0) {
-    agents.secondary.push('ui-expert');
+    agents.secondary.push('frontend');
   }
   if (patterns.frontend.length > 0 && !agents.primary?.startsWith('web-')) {
-    agents.secondary.push('ui-expert');
+    agents.secondary.push('frontend');
   }
   if (patterns.backend.length > 0 && !agents.primary?.startsWith('backend-')) {
     // Determine backend agent from file patterns
@@ -425,10 +425,10 @@ function detectAgentMapping(framework, patterns) {
   // Always available agents
   agents.available = [
     'architect',
-    'security-expert',
-    'qa-automation',
-    'ui-expert',
-    'devops-cicd'
+    'security',
+    'tester',
+    'frontend',
+    'devops'
   ];
 
   // Dedupe secondary

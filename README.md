@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-1.22.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -105,6 +105,7 @@ You: "approve"
 | **Agents** | One generic AI | **10 specialists** auto-selected per task |
 | **Cost** | Opus for everything | **Model routing** saves 30-50% |
 | **Context** | Re-explain every session | **Deep Project Init** remembers everything |
+| **Planning** | One perspective, hope for the best | **3 agents debate** your plan before building |
 | **Teams** | One agent at a time | **Multi-agent orchestration** with cross-review |
 | **Integrations** | Copy-paste from docs | **6 MCP servers** auto-invoked |
 
@@ -116,9 +117,9 @@ You: "approve"
 
 <div align="center">
 
-| 10 Agents | 52 Skills | 86 Commands | 49 Rules | 27 Hooks | 6 MCPs |
+| 10 Agents | 43 Skills | 86 Commands | 45 Rules | 24 Hooks | 6 MCPs |
 |:-:|:-:|:-:|:-:|:-:|:-:|
-| Auto-selected per task | 13 auto-invoke | 6 bundled menus | Quality enforcement | Lifecycle automation | Zero-config |
+| Auto-selected per task | 8 auto-invoke | 5 bundled menus | Quality enforcement | Lifecycle automation | Zero-config |
 
 </div>
 
@@ -145,11 +146,11 @@ Every feature goes through 5 phases. Only 2 require your approval:
 Claude stops being a generalist. The right expert activates for every task:
 
 ```
-"Build a React dashboard"     → ui-expert activates
+"Build a React dashboard"     → frontend activates
 "Optimize the SQL queries"    → architect activates
-"Set up CI/CD pipeline"       → devops-cicd activates
-"Fix the login screen crash"  → mobile-expert activates
-"Run a security audit"        → security-expert activates
+"Set up CI/CD pipeline"       → devops activates
+"Fix the login screen crash"  → mobile activates
+"Run a security audit"        → security activates
 ```
 
 <details>
@@ -158,15 +159,15 @@ Claude stops being a generalist. The right expert activates for every task:
 | Agent | Specialization |
 |-------|---------------|
 | `architect` | System design, database, backend (Node.js, Python, Laravel, Go) |
-| `ui-expert` | Frontend (React, Vue, Angular, Next.js) + design systems |
-| `mobile-expert` | React Native, Flutter, Expo, NativeWind |
-| `game-developer` | Godot, GDScript, multi-platform export |
-| `security-expert` | OWASP audits, vulnerability scanning, SAST |
-| `qa-automation` | Jest, Cypress, Playwright, Detox, coverage |
-| `devops-cicd` | Docker, K8s, CI/CD, monitoring |
-| `project-manager` | Project detection, config, context |
-| `smart-agent-detector` | Intelligent agent + model selection |
-| `pm-operations-orchestrator` | Workflow coordination, team lead |
+| `frontend` | Frontend (React, Vue, Angular, Next.js) + design systems |
+| `mobile` | React Native, Flutter, Expo, NativeWind |
+| `strategist` | Business strategy, ROI evaluation, MVP scoping |
+| `security` | OWASP audits, vulnerability scanning, SAST |
+| `tester` | Jest, Cypress, Playwright, Detox, coverage |
+| `devops` | Docker, K8s, CI/CD, monitoring |
+| `scanner` | Project detection, config, context |
+| `router` | Intelligent agent + model selection |
+| `lead` | Workflow coordination, team lead |
 
 </details>
 
@@ -187,16 +188,45 @@ Automatic. No configuration needed.
 For complex features, Aura Frog spins up a real team:
 
 ```
-pm-operations-orchestrator (Lead)
+lead (Lead)
 ├── architect          → Designs the system
-├── ui-expert          → Builds the frontend
-├── qa-automation      → Writes tests
-└── security-expert    → Reviews for vulnerabilities
+├── frontend          → Builds the frontend
+├── tester      → Writes tests
+└── security    → Reviews for vulnerabilities
 
 All working in parallel. Cross-reviewing each other's work.
 ```
 
 **Complexity gate:** Only activates for tasks that actually need it. Simple tasks stay single-agent (saves ~3x tokens).
+
+### Collaborative Planning (Deep Tasks)
+
+For complex tasks, Phase 1 doesn't just analyze — it **debates**.
+
+```
+Round 1: Four agents independently analyze the same task
+         📐 Architect (Builder)    — "How to build it"
+         🔍 Tester (Breaker)      — "How it can fail"
+         👤 Frontend (User)       — "How it's experienced"
+         💼 Strategist (Why)      — "Should we even build this?"
+
+Round 2: Each reviews the other three — flags disagreements + gaps
+         architect:   "JWT with refresh tokens, monolith architecture"
+         tester:      "Nobody addressed rate limiting or token rotation"
+         frontend:    "Users expect social login, not just email"
+         strategist:  "Start with email-only MVP. Social login Phase 2."
+
+Round 3: Simulate real scenarios against the proposed plan
+         ✅ Happy path signup        — all 4 handle it
+         ❌ Brute force login        — nobody addressed it → added
+         💼 Low signup conversion    — strategist added tracking
+
+Round 4: Lead converges on the optimal plan
+         Scope reduced 40% (strategist challenged). Risks documented.
+         Plan is battle-tested before a single line of code.
+```
+
+**Result:** Plans that survive scrutiny from 4 perspectives — including "should we build this at all?" Catches scope creep and wasted effort before it happens.
 
 ### Deep Project Init
 
@@ -253,12 +283,15 @@ Aura Frog learns from every session:
 | | Link |
 |---|---|
 | **Getting Started** | [GET_STARTED.md](aura-frog/GET_STARTED.md) |
-| **All Commands (86)** | [commands/README.md](aura-frog/commands/README.md) |
-| **All Skills (52)** | [skills/README.md](aura-frog/skills/README.md) |
+| **All Commands (84)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Skills (43)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams** | [AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) |
 | **Lifecycle Hooks** | [hooks/README.md](aura-frog/hooks/README.md) |
 | **Changelog** | [CHANGELOG.md](aura-frog/CHANGELOG.md) |
+| **Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](aura-frog/docs/guides/FIRST_WORKFLOW_TUTORIAL.md) |
+| **Troubleshooting** | [TROUBLESHOOTING.md](aura-frog/docs/TROUBLESHOOTING.md) |
+| **Release Notes** | [RELEASE_NOTES.md](aura-frog/docs/RELEASE_NOTES.md) |
 
 ---
 
@@ -267,15 +300,24 @@ Aura Frog learns from every session:
 ```
 aura-frog/
 ├── agents/         10 specialized agents (auto-selected)
-├── skills/         52 skills (13 auto-invoke + 39 reference)
-├── commands/       86 commands (6 bundled menus)
-├── rules/          49 quality rules (TOON-optimized)
-├── hooks/          27 lifecycle hooks
+├── skills/         43 skills (8 auto-invoke + 35 reference)
+├── commands/       86 commands (5 bundled menus)
+├── rules/          45 quality rules (TOON-optimized)
+├── hooks/          24 lifecycle hooks
 ├── scripts/        37 utility scripts
 ├── templates/      Document templates
 ├── docs/           Guides & references
 └── .mcp.json       6 bundled MCP servers
 ```
+
+---
+
+## Good to Know
+
+- **Agents are persona-based** — same Claude instance with different instructions, not separate AI models
+- **Agent Teams requires experimental flag** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- **Token savings** are from structured TOON format and smart context loading, not model switching
+- **Collaborative planning** adds ~8.5K tokens to Phase 1 for Deep tasks (justified by catching expensive mistakes early)
 
 ---
 
@@ -289,6 +331,8 @@ We welcome contributions! The highest-impact areas:
 - **Bug fixes & docs** — always appreciated
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) or submit an issue.
+
+> **Godot and SEO modules available as separate addons.**
 
 ---
 

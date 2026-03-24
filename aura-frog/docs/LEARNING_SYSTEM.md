@@ -1,169 +1,76 @@
 # Aura Frog Learning System
 
-**Version:** 1.22.0
+**Version:** 2.0.0
 **Status:** Production Ready
 
-The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights. **Works out of the box with local storage**, optionally syncs to Supabase for cross-machine memory.
-
-**NEW in v1.16.0:**
-- **Local storage by default** - No setup required!
-- **Smart Learn** - Auto-detect patterns from successful operations (no feedback needed)
-- **Workflow Edit Detection** - Learn from your direct edits to workflow files
-- **Learned Rules MD** - Human-readable file auto-linked to instructions
+The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights. It works out of the box with local JSON files -- no external services required.
 
 ---
 
-## Storage Modes
+## Local Storage (Default -- Zero Setup)
 
-| Mode | Setup Required | Persistence | Best For |
-|------|----------------|-------------|----------|
-| **Local** (default) | None | Per-project | Individual developers, quick start |
-| **Supabase** | 5 min setup | Cross-machine, cross-project | Teams, multiple machines |
+Learning works immediately with no configuration. All data stays in your project:
 
-### Local Storage (Default)
-
-**No configuration needed!** Learning works immediately.
-
-Files created in `.claude/learning/`:
 ```
 .claude/learning/
 ├── feedback.json      # All feedback entries (max 500)
 ├── patterns.json      # Learned patterns
 ├── metrics.json       # Workflow metrics
-└── learned-rules.md   # Human-readable rules
+└── learned-rules.md   # Human-readable rules (auto-linked to instructions)
 ```
 
-Plus a link file at `.claude/LEARNED_PATTERNS.md` that points Claude to the learned rules.
+A link file at `.claude/LEARNED_PATTERNS.md` points Claude to the learned rules automatically.
 
-### Supabase Storage (Optional)
+**Data Retention (Local):**
+- Feedback: Last 500 entries
+- Patterns: Indefinite
+- Cache: Last 200 entries
 
-For cross-machine and team memory:
-
-```bash
-# Add to .envrc
-export SUPABASE_URL="https://your-project.supabase.co"
-export SUPABASE_SECRET_KEY="your-secret-key"
-export AF_LEARNING_ENABLED="true"
-```
-
-Then run: `./scripts/supabase/setup.sh`
+**Reset:** `rm -rf .claude/learning/`
 
 ---
 
 ## How Learning Works
 
-### 1. Smart Learn (Automatic, No Feedback)
+### 1. Smart Learn (Automatic -- No Feedback Needed)
 
-Detects patterns from **successful operations** - no user feedback required.
+Detects patterns from successful operations automatically.
 
-**What It Detects:**
-| Language | Patterns |
-|----------|----------|
+| Language | Patterns Detected |
+|----------|-------------------|
 | TypeScript/JS | arrow_functions, prefer_const, async_await, explicit_types, react_hooks, error_handling |
 | Python | python_type_hints, python_async |
 | Bash | Command patterns, pipe usage, chaining |
 
-**How It Works:**
-1. After every successful Write/Edit/Bash
-2. Analyzes the content/command for patterns
-3. Tracks success counts per pattern
-4. After 3+ successes, creates a learned pattern
-
-**Example:**
-```
-🧠 Smart Learn: Pattern detected! "prefer_const" in .ts files
-🧠 Smart Learn: Bash pattern! "npm" is frequently used
-```
+After every successful Write/Edit/Bash, the hook analyzes content for patterns. After 3+ successes, a learned pattern is created.
 
 **Hook:** `hooks/smart-learn.cjs`
 
----
-
 ### 2. Auto-Learn (From User Corrections)
 
-Detects corrections in user messages and learns from them.
+Detects corrections and approvals in user messages.
 
-**Detection Patterns:**
-- Direct negations: "no", "nope", "wrong", "incorrect"
-- Corrections: "actually", "should be", "shouldn't", "instead of"
-- Modifications: "change that", "fix that", "don't do that", "remove that"
-- Preferences: "I prefer", "always use", "never use", "don't add"
-- Approvals: "good job", "great", "perfect", "looks good"
+**Detection:** "no", "wrong", "actually", "should be", "I prefer", "always use", "never use", "good job", "perfect", "looks good"
 
-**How It Works:**
-1. On every user message submission
-2. Detects correction/approval patterns
-3. Categorizes (code_style, testing, security, etc.)
-4. Stores with deduplication (24h window)
-5. After 3+ similar corrections, creates a learned pattern
-
-**Example:**
-```
-🧠 Learning: Captured correction [code_style:minimal_comments] (1x)
-# After 3 similar corrections:
-🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurrences)
-```
+Corrections are categorized (code_style, testing, security, etc.) with 24h deduplication. After 3+ similar corrections, a learned pattern is created.
 
 **Hook:** `hooks/auto-learn.cjs`
 
----
-
-### 3. Workflow Edit Detection (From Direct User Edits)
+### 3. Workflow Edit Detection (From Direct Edits)
 
 Learns from your direct edits to workflow MD files (outside Claude sessions).
 
-**Monitored Files:**
-- `.claude/cache/workflow-state.json`
-- `.claude/logs/workflows/*.md`
-- `docs/workflow/*.md`
-- Any `phase-*.md`, `plan.md`, `spec.md`, `requirements.md`
+**Monitored:** `.claude/cache/workflow-state.json`, `.claude/logs/workflows/*.md`, `docs/workflow/*.md`, `phase-*.md`, `plan.md`, `spec.md`, `requirements.md`
 
-**What It Detects:**
-- Structure preferences (headers, bullet points, code blocks)
-- Verbosity preferences (content added/removed)
-- Tone preferences (filler phrases removed)
-- Documentation style
-
-**How It Works:**
-1. At session start, scans monitored files
-2. Compares with last known state (hash-based)
-3. If user edited file, extracts changes
-4. Analyzes changes for patterns
-5. Records learnings automatically
-
-**Example:**
-```
-🧠 Workflow Edit: Detected 2 pattern(s) from user edits to plan.md
-```
+**Detects:** Structure preferences (headers, bullets), verbosity preferences, tone preferences, documentation style.
 
 **Hook:** `hooks/workflow-edit-learn.cjs`
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Aura Frog Plugin                          │
-├─────────────────────────────────────────────────────────────────┤
-│  Learning Hooks                    │  Storage                    │
-│  ├── smart-learn.cjs (NEW)        │  ├── Local (default)        │
-│  ├── auto-learn.cjs               │  │   └── .claude/learning/  │
-│  ├── workflow-edit-learn.cjs (NEW)│  └── Supabase (optional)    │
-│  ├── feedback-capture.cjs         │      └── af_* tables        │
-│  └── session-metrics.cjs          │                              │
-├─────────────────────────────────────────────────────────────────┤
-│  Library: hooks/lib/af-learning.cjs (v2.0.0 - dual-mode)        │
-├─────────────────────────────────────────────────────────────────┤
-│  Output: .claude/learning/learned-rules.md → Instructions        │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
 ## Learned Rules File
 
-The system auto-generates `.claude/learning/learned-rules.md` containing:
+The system auto-generates `.claude/learning/learned-rules.md`:
 
 ```markdown
 # Learned Patterns & Rules
@@ -182,13 +89,9 @@ The system auto-generates `.claude/learning/learned-rules.md` containing:
 **Examples:**
 - Don't add comments everywhere, only when needed
 **Frequency:** 4 occurrences
-
-## Recent Corrections
-- **code_style:** Stop adding JSDoc to every function...
-- **testing:** Always use describe blocks for grouping...
 ```
 
-This file is **automatically linked** via `.claude/LEARNED_PATTERNS.md`, ensuring Claude reads and applies learned patterns.
+This file is automatically linked via `.claude/LEARNED_PATTERNS.md`, ensuring Claude reads and applies learned patterns.
 
 ---
 
@@ -207,19 +110,12 @@ This file is **automatically linked** via `.claude/LEARNED_PATTERNS.md`, ensurin
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AF_LEARNING_ENABLED` | (auto) | Force enable learning (Supabase mode) |
-| `AF_LOCAL_LEARNING` | `true` | Enable local learning fallback |
-| `AF_FORCE_LOCAL` | `false` | Force local mode even with Supabase |
+| `AF_LOCAL_LEARNING` | `true` | Enable local learning |
+| `AF_FORCE_LOCAL` | `false` | Force local mode even with Supabase configured |
 | `AF_FEEDBACK_COLLECTION` | `true` | Enable feedback collection |
 | `AF_METRICS_COLLECTION` | `true` | Enable metrics collection |
-| `SUPABASE_URL` | - | Supabase project URL |
-| `SUPABASE_SECRET_KEY` | - | Supabase secret key |
 
----
-
-## Disable Learning
-
-To disable all learning:
+**Disable all learning:**
 ```bash
 export AF_LOCAL_LEARNING="false"
 export AF_LEARNING_ENABLED="false"
@@ -229,65 +125,67 @@ export AF_LEARNING_ENABLED="false"
 
 ## Privacy & Data
 
-### What's Stored
+**Stored:** Feedback text, pattern summaries, performance metrics, workflow metadata.
 
-- Feedback text (corrections, reasons)
-- Pattern summaries
-- Performance metrics
-- Workflow metadata
-
-### What's NOT Stored
-
-- Full source code content
-- API keys or secrets
-- Personal information
-- Full conversation logs
-
-### Data Retention (Supabase)
-
-- Feedback: 90 days
-- Metrics: 1 year
-- Patterns: Indefinite
-
-### Data Retention (Local)
-
-- Feedback: Last 500 entries
-- Patterns: Indefinite
-- Cache: Last 200 entries
+**NOT stored:** Full source code, API keys/secrets, personal information, full conversation logs.
 
 ---
 
 ## Troubleshooting
 
-### Check Learning Status
+| Issue | Solution |
+|-------|----------|
+| Learning not working | Check `.claude/learning/` directory exists |
+| Missing patterns | Smart Learn needs 3+ successes; Auto-Learn needs 3+ similar corrections; 24h dedup window |
+| Check status | Run `/learn:status` -- should show `Mode: local`, pattern and feedback counts |
 
+---
+
+## Advanced: Cross-Machine Sync (Supabase)
+
+For teams or multi-machine setups, you can optionally sync learning data to Supabase.
+
+**Setup (5 min):**
 ```bash
-learn:status
+# Add to .envrc
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_SECRET_KEY="your-secret-key"
+export AF_LEARNING_ENABLED="true"
 ```
 
-Should show:
-- `Mode: local` or `Mode: supabase`
-- `Patterns: X`
-- `Feedback: Y`
+Then run: `./scripts/supabase/setup.sh`
 
-### Learning Not Working
+**Additional env vars for Supabase mode:**
 
-1. Check mode: Is it local or Supabase?
-2. For local: Check `.claude/learning/` directory exists
-3. For Supabase: Verify `SUPABASE_URL` and `SUPABASE_SECRET_KEY`
+| Variable | Description |
+|----------|-------------|
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SECRET_KEY` | Supabase secret key |
+| `AF_LEARNING_ENABLED` | Force enable learning (Supabase mode) |
 
-### Missing Patterns
+**Data Retention (Supabase):** Feedback: 90 days | Metrics: 1 year | Patterns: Indefinite
 
-- Smart Learn requires 3+ successful operations
-- Auto-Learn requires 3+ similar corrections
-- Deduplication skips identical feedback within 24h
+**Troubleshooting Supabase:** Verify `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are set. Run `/learn:status` to confirm `Mode: supabase`.
 
-### Reset Learning (Local)
+---
 
-```bash
-rm -rf .claude/learning/
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Learning Hooks              │  Storage                  │
+│  ├── smart-learn.cjs         │  ├── Local (default)      │
+│  ├── auto-learn.cjs          │  │   └── .claude/learning/ │
+│  ├── workflow-edit-learn.cjs │  └── Supabase (optional)  │
+│  ├── feedback-capture.cjs    │      └── af_* tables      │
+│  └── session-metrics.cjs     │                           │
+├──────────────────────────────────────────────────────────┤
+│  Library: hooks/lib/af-learning.cjs (dual-mode)          │
+├──────────────────────────────────────────────────────────┤
+│  Output: .claude/learning/learned-rules.md               │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-**Version:** 1.22.0 | **Last Updated:** 2026-01-20
+**Version:** 2.0.0 | **Last Updated:** 2026-01-20

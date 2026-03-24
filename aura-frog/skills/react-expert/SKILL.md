@@ -1,7 +1,7 @@
 ---
 name: react-expert
 description: "React best practices expert. PROACTIVELY use when working with React components, hooks, state management. Triggers: React, JSX, hooks, useState, useEffect, component"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "react"

@@ -35,7 +35,7 @@ function detectTestRunner() {
       if (devDeps.vitest || scripts.test?.includes('vitest')) return { cmd: 'npx vitest run', name: 'vitest' };
       if (devDeps.jest || scripts.test?.includes('jest')) return { cmd: 'npx jest --passWithNoTests', name: 'jest' };
       if (scripts.test) return { cmd: 'npm test', name: 'npm test' };
-    } catch { /* ignore */ }
+    } catch { /* malformed data - skip silently, fall through to other detectors */ }
   }
 
   // Python projects
@@ -44,7 +44,7 @@ function detectTestRunner() {
       try {
         const content = fs.readFileSync('pyproject.toml', 'utf-8');
         if (content.includes('pytest')) return { cmd: 'python -m pytest -x -q', name: 'pytest' };
-      } catch { /* ignore */ }
+      } catch { /* malformed data - skip silently, fall through to default pytest */ }
     }
     return { cmd: 'python -m pytest -x -q', name: 'pytest' };
   }

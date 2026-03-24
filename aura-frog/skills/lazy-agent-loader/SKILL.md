@@ -39,12 +39,12 @@ agent_index[24]{id,category,specialty,keywords}:
   backend-python,dev,Python backend,python/django/fastapi/flask/api
   backend-go,dev,Go backend,go/golang/gin/fiber/api
   backend-laravel,dev,Laravel/PHP backend,laravel/php/eloquent/artisan
-  security-expert,quality,Security auditing,security/vulnerability/audit/owasp/penetration
-  qa-automation,quality,Testing/QA,test/testing/coverage/qa/jest/cypress
-  devops-cicd,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline/terraform
-  smart-agent-detector,infra,Agent detection,detect/agent/select/route
-  pm-operations-orchestrator,infra,PM/orchestration,pm/project/orchestrate/manage
-  project-manager,infra,Project management,project/detect/identify/config/context
+  security,quality,Security auditing,security/vulnerability/audit/owasp/penetration
+  tester,quality,Testing/QA,test/testing/coverage/qa/jest/cypress
+  devops,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline/terraform
+  router,infra,Agent detection,detect/agent/select/route
+  lead,infra,PM/orchestration,pm/project/orchestrate/manage
+  scanner,infra,Project management,project/detect/identify/config/context
 ```
 
 ---
@@ -117,7 +117,7 @@ comparison[4]{scenario,without_lazy,with_lazy,savings}:
 ```
 Loaded agents are cached in conversation context.
 If agent already loaded, skip re-loading.
-Track loaded agents: loaded_agents[]: mobile-react-native,qa-automation
+Track loaded agents: loaded_agents[]: mobile-react-native,tester
 ```
 
 ### Force Reload
@@ -136,11 +136,11 @@ User: "Create a React Native screen for login"
 
 1. Agent Detector scores all agents using keywords from agent_index
    - mobile-react-native: +60 (react-native) +20 (context) = 80 ✅ PRIMARY
-   - ui-expert: +35 (screen/login implies UI) → OPTIONAL
+   - frontend: +35 (screen/login implies UI) → OPTIONAL
 
 2. Lazy Loader activates:
    - Load: agents/mobile-react-native.md (~1500 tokens)
-   - Skip: ui-expert (score < 50)
+   - Skip: frontend (score < 50)
 
 3. Context loaded:
    - Agent index: ~1200 tokens

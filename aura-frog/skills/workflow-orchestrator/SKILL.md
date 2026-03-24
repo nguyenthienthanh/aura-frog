@@ -19,7 +19,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 # Aura Frog Workflow Orchestrator
 
 **Priority:** CRITICAL - Use for complex feature implementations
-**Version:** 1.22.0
+**Version:** 2.0.0
 
 ---
 
@@ -67,13 +67,25 @@ token_budget[5]{phase,max_tokens,format}:
 
 ## 5-Phase Workflow
 
+### Collaborative Planning (Deep Tasks Only)
+
+For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
+- 3 agents (Builder, Breaker, User) analyze independently
+- Cross-review and debate each other's proposals
+- Simulate use cases to find gaps
+- PM converges on optimal plan
+
+**Details:** `rules/collaborative-planning.md`
+
+**Gate:** Only for Deep tasks. Quick/Standard use single-agent Phase 1.
+
 | Phase | Name | Lead Agent | Deliverable | Gate |
 |-------|------|------------|-------------|------|
-| 1 | Understand + Design | pm-operations-orchestrator → Dev | Requirements (TOON), technical design | **APPROVAL** |
-| 2 | Test (RED) | qa-automation + Dev | Failing tests (TDD RED) | Auto |
+| 1 | Understand + Design | lead → Dev | Requirements (TOON), technical design | **APPROVAL** |
+| 2 | Test (RED) | tester + Dev | Failing tests (TDD RED) | Auto |
 | 3 | Build (GREEN) | Dev agent | Implementation (TDD GREEN) | **APPROVAL** |
-| 4 | Refactor + Review | Dev + security-expert | Clean code, quality/security check | Auto* |
-| 5 | Finalize | qa-automation + PM | Coverage ≥80%, docs, notification | Auto |
+| 4 | Refactor + Review | Dev + security | Clean code, quality/security check | Auto* |
+| 5 | Finalize | tester + PM | Coverage ≥80%, docs, notification | Auto |
 
 **Gate Legend:**
 - **APPROVAL** = Must wait for user approval before continuing
@@ -88,6 +100,7 @@ token_budget[5]{phase,max_tokens,format}:
 Phase 1 (Understand + Design) → Phase 2 (Test RED)
   Mode: APPROVAL REQUIRED
   Pre-step: Challenge requirements (Standard/Deep only)
+  Pre-step (Deep only): Collaborative planning (3-perspective deliberation)
   Blocker: No design approved
 
 Phase 2 (Test RED) → Phase 3 (Build GREEN)
@@ -393,11 +406,11 @@ fasttrack → standard: On error, auto-switches to standard mode
 
 ```toon
 phase_teams[5]{phase,lead,teammates,team_size}:
-  1-Understand+Design,pm-operations-orchestrator → architect,ui-expert+qa-automation,3
-  2-Test RED,qa-automation,architect,2
-  3-Build GREEN,architect,ui-expert+qa-automation,3
-  4-Refactor+Review,architect+security-expert,qa-automation(reviewer),3
-  5-Finalize,pm-operations-orchestrator,-,1
+  1-Understand+Design,lead → architect,frontend+tester,3
+  2-Test RED,tester,architect,2
+  3-Build GREEN,architect,frontend+tester,3
+  4-Refactor+Review,architect+security,tester(reviewer),3
+  5-Finalize,lead,-,1
 ```
 
 ### Teammate Operation Pattern

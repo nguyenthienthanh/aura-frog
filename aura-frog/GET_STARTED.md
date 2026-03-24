@@ -10,6 +10,8 @@
 
 ---
 
+> **First time?** Follow the [Interactive Tutorial](docs/guides/FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
+
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 10 agents, 5-phase TDD workflows, and multi-agent orchestration.
 
 ---
@@ -379,6 +381,8 @@ At approval gates:
 
 ## Troubleshooting
 
+For common issues and solutions, see the full [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
+
 ### Claude doesn't recognize commands?
 
 **Try being explicit:**
@@ -427,10 +431,10 @@ workflow:start <your-task-description>
 - **MCP Guide:** `docs/MCP_GUIDE.md` (6 MCP servers)
 - **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
 - **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
-- **Skills:** `skills/README.md` (52 skills)
-- **Rules:** `rules/README.md` (49 quality rules)
+- **Skills:** `skills/README.md` (43 skills)
+- **Rules:** `rules/README.md` (45 quality rules)
 - **Commands:** `commands/README.md` (86 commands)
-- **Hooks:** `hooks/README.md` (27 lifecycle hooks)
+- **Hooks:** `hooks/README.md` (24 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
 - **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`
 - **Phase Guides:** `docs/phases/`
@@ -443,5 +447,5 @@ Type `workflow:start <task>` to begin your first workflow.
 
 ---
 
-**Version:** 1.22.0
+**Version:** 2.0.0
 

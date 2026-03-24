@@ -85,7 +85,7 @@ Auto-prompt:
 
   "agents": {
     "primary": "backend-nodejs",
-    "secondary": ["security-expert", "qa-automation"]
+    "secondary": ["security", "tester"]
   },
 
   "phases_completed": {
@@ -414,7 +414,7 @@ phases[5]{num,name,status}:
   4,Refactor + Review,pending
   5,Finalize,pending
 
-agents[2]: backend-nodejs,qa-automation
+agents[2]: backend-nodejs,tester
 ```
 
 **Token savings:** TOON uses ~160 tokens vs JSON ~600 tokens (73% reduction)

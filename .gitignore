@@ -37,3 +37,8 @@ aura-frog/contexts/
 aura-frog/archive/
 .claude
 .envrc
+
+# Dev tooling (at repo root, NOT in plugin folder)
+node_modules/
+package-lock.json
+coverage/

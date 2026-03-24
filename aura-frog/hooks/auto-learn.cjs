@@ -141,7 +141,7 @@ function ensureCacheDir() {
     if (!fs.existsSync(CACHE_DIR)) {
       fs.mkdirSync(CACHE_DIR, { recursive: true });
     }
-  } catch { /* ignore */ }
+  } catch { /* fs mkdir - non-blocking, will retry next time */ }
 }
 
 /**
@@ -157,7 +157,7 @@ function loadCache() {
       data.patterns = data.patterns || {};
       return data;
     }
-  } catch { /* ignore */ }
+  } catch { /* malformed data - skip silently, fresh state on next run */ }
   return { entries: [], patterns: {} };
 }
 
@@ -170,7 +170,7 @@ function saveCache(cache) {
     // Keep only last 100 entries
     cache.entries = (cache.entries || []).slice(-100);
     fs.writeFileSync(FEEDBACK_CACHE_FILE, JSON.stringify(cache, null, 2));
-  } catch { /* ignore */ }
+  } catch { /* fs/cache write - non-blocking, will retry next time */ }
 }
 
 /**
@@ -235,7 +235,7 @@ function updateLocalPatternsFile(category, rule, reason, count) {
     content = content.replace(/Updated: .+/, `Updated: ${new Date().toISOString()}`);
 
     fs.writeFileSync(PATTERNS_FILE, content);
-  } catch { /* ignore */ }
+  } catch { /* fs/cache write - non-blocking, patterns regenerate from corrections */ }
 }
 
 /**

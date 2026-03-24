@@ -26,7 +26,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-CCPM_VERSION="1.0.0"
+AF_VERSION="2.0.0"
 INSTALL_DIR=".claude"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -34,7 +34,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 print_header() {
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "🐸 Aura Frog Installation v${CCPM_VERSION}"
+    echo -e "🐸 Aura Frog Installation v${AF_VERSION}"
     echo -e "A Plugin for Claude Code ✨"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
@@ -169,8 +169,8 @@ create_config() {
     print_info "Creating configuration files..."
 
     # Copy example config if not exists
-    if [ ! -f "$INSTALL_DIR/ccpm-config.yaml" ] && [ -f "$INSTALL_DIR/ccpm-config.example.yaml" ]; then
-        cp "$INSTALL_DIR/ccpm-config.example.yaml" "$INSTALL_DIR/ccpm-config.yaml"
+    if [ ! -f "$INSTALL_DIR/aura-frog-config.yaml" ] && [ -f "$INSTALL_DIR/aura-frog-config.example.yaml" ]; then
+        cp "$INSTALL_DIR/aura-frog-config.example.yaml" "$INSTALL_DIR/aura-frog-config.yaml"
     fi
 
     # Copy .envrc template if not exists
@@ -205,7 +205,7 @@ update_gitignore() {
     local gitignore_entries=(
         "$INSTALL_DIR/.envrc"
         "$INSTALL_DIR/logs/"
-        "$INSTALL_DIR/ccpm-config.yaml"
+        "$INSTALL_DIR/aura-frog-config.yaml"
         "$INSTALL_DIR/active-workflow.txt"
     )
 
@@ -346,8 +346,8 @@ run_health_check() {
     fi
 
     # Check configuration
-    if [ ! -f "$INSTALL_DIR/ccpm-config.yaml" ]; then
-        print_warning "ccpm-config.yaml not found"
+    if [ ! -f "$INSTALL_DIR/aura-frog-config.yaml" ]; then
+        print_warning "aura-frog-config.yaml not found"
     fi
 
     if [ "$errors" -eq 0 ]; then

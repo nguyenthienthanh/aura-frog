@@ -1,7 +1,7 @@
 ---
 name: flutter-expert
 description: "Flutter/Dart mobile expert. PROACTIVELY use when working with Flutter, Dart, mobile apps. Triggers: flutter, dart, widget, bloc, riverpod"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "flutter"

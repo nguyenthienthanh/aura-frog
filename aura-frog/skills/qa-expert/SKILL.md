@@ -14,7 +14,7 @@ triggers:
 # Skill: QA Expert
 
 **Category:** Reference Skill
-**Used By:** qa-automation agent
+**Used By:** tester agent
 
 ---
 

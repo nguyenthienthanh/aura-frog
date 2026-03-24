@@ -2,7 +2,7 @@
 
 **Project:** [PROJECT_NAME]
 **Tech Stack:** [TECH_STACK]
-**Aura Frog Version:** 1.22.0
+**Aura Frog Version:** 2.0.0
 
 ---
 
@@ -75,4 +75,4 @@ context_files[4]{file,purpose}:
 
 ---
 
-**Version:** 1.22.0 | **Generated:** [DATE]
+**Version:** 2.0.0 | **Generated:** [DATE]

@@ -2,7 +2,7 @@
 
 **Category:** PM Expert  
 **Priority:** High  
-**Used By:** pm-operations-orchestrator
+**Used By:** lead
 
 ---
 
@@ -408,4 +408,4 @@ Works closely with:
 
 ---
 
-**Used by PM Operations Orchestrator to manage stakeholder relationships throughout the 5-phase workflow.**
+**Used by Lead to manage stakeholder relationships throughout the 5-phase workflow.**

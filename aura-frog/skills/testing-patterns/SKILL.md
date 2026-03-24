@@ -30,7 +30,7 @@ Unified testing patterns across all frameworks. Provides consistent test structu
 
 **Consolidates testing knowledge from:**
 - test-writer skill
-- qa-automation agent patterns
+- tester agent patterns
 - Framework-specific test patterns
 
 ---
@@ -379,7 +379,7 @@ if (detection.testInfra) {
 ## Related Files
 
 - `skills/test-writer/SKILL.md` - Test generation skill
-- `agents/qa-automation.md` - QA agent
+- `agents/tester.md` - QA agent
 - `rules/tdd-workflow.md` - TDD enforcement rule
 - `commands/test/unit.md`, `commands/test/e2e.md`
 

@@ -1,7 +1,7 @@
 ---
 name: angular-expert
 description: "Angular/TypeScript frontend expert. PROACTIVELY use when working with Angular, RxJS, NgRx. Triggers: angular, ngrx, rxjs, component.ts"
-autoInvoke: true
+autoInvoke: false
 priority: high
 triggers:
   - "angular"

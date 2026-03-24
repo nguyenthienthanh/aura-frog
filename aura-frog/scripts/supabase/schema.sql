@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS af_workflow_metrics (
   project_type TEXT,
   framework TEXT,
   workflow_type TEXT, -- 'full', 'fasttrack', 'bugfix'
-  total_phases INT DEFAULT 9,
+  total_phases INT DEFAULT 5,
   completed_phases INT DEFAULT 0,
   success BOOLEAN,
   failure_reason TEXT,

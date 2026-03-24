@@ -1,7 +1,7 @@
 # Aura Frog Quality Rules
 
-**Version:** 1.22.0
-**Total Rules:** 49
+**Version:** 2.0.0
+**Total Rules:** 45
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -9,7 +9,7 @@
 ## Rule Index (TOON Format)
 
 ```toon
-rules[49]{category,rule,priority,purpose}:
+rules[45]{category,rule,priority,purpose}:
   system,agent-identification-banner,critical,Show agent banner every response
   system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
   system,codebase-consistency,high,Learn patterns before writing code
@@ -28,9 +28,7 @@ rules[49]{category,rule,priority,purpose}:
   quality,smart-commenting,medium,Comment why not what
   quality,prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
   quality,post-implementation-linting,high,Run lint and fix issues after every implementation
-  quality,seo-technical-requirements,high,Meta tags + Core Web Vitals + crawlability
   quality,structured-data-schema,high,JSON-LD Schema.org implementation
-  quality,ai-discovery-optimization,high,AI search engine + LLM citation optimization
   architecture,api-design-rules,high,RESTful conventions + versioning
   architecture,state-management,high,React/Vue state patterns
   architecture,dependency-management,high,Version pinning + security audits
@@ -47,18 +45,16 @@ rules[49]{category,rule,priority,purpose}:
   workflow,workflow-navigation,high,Progress tracking and phase status
   workflow,feedback-brainstorming,high,Brainstorm before implementing feedback
   workflow,requirement-challenger,high,Challenge requirements before accepting them
+  workflow,collaborative-planning,high,Multi-team deliberation for Deep tasks (3 perspectives + debate + simulation)
   workflow,impact-analysis,critical,Analyze all usages before modifying
   workflow,workflow-deliverables,critical,Verify all phase documents created
   documentation,diagram-requirements,medium,Mermaid diagrams for complex features
   ui,accessibility-rules,high,WCAG compliance + ARIA
   ui,frontend-excellence,critical,UX laws + performance + mobile patterns
-  ui,visual-pixel-accuracy,critical,Pixel-perfect visual testing hard rules
   ui,correct-file-extensions,medium,Proper file naming
   ui,direct-hook-access,medium,Lifecycle hooks
   workflow,estimation,high,Story points + time + risk assessment
   workflow,verification,critical,Fresh verification before claiming done
-  godot,godot-scene-composition,high,When to use scenes vs nodes
-  godot,godot-gdscript-typing,high,Type hints and static typing
 ```
 
 ---
@@ -77,15 +73,14 @@ priorities[3]{level,meaning,enforcement}:
 ## Categories Summary
 
 ```toon
-categories[8]{name,count,critical_rules}:
+categories[7]{name,count,critical_rules}:
   system,10,5
-  quality,11,3
+  quality,8,3
   architecture,6,0
   security,1,1
-  workflow,11,6
+  workflow,12,6
   documentation,1,0
-  ui,5,2
-  godot,2,0
+  ui,4,1
 ```
 
 ---
@@ -136,9 +131,8 @@ See: `project-linting-precedence.md`
 - [ ] Follow `accessibility-rules` - WCAG compliance
 
 ### For SEO & AI Discovery
-- [ ] Follow `seo-technical-requirements` - Meta tags, Core Web Vitals, crawlability
 - [ ] Follow `structured-data-schema` - JSON-LD Schema.org markup
-- [ ] Follow `ai-discovery-optimization` - AI search engines, LLM citation
+- [ ] *SEO and AI Discovery modules available as separate addons*
 
 ### For Testing
 - [ ] Follow `tdd-workflow` - Tests first
@@ -166,7 +160,7 @@ See: `project-linting-precedence.md`
 
 ---
 
-**Version:** 1.22.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
+**Version:** 2.0.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
 
 ---
 
@@ -181,7 +175,7 @@ Framework-specific rules have been migrated to **Expert Skills** for on-demand l
 | `react-native-expert` | RN, Expo, mobile | Lists, navigation, platform code |
 | `vue-expert` | Vue, Composition API | Script setup, Pinia, reactivity |
 | `nextjs-expert` | Next.js, App Router | Server Components, caching |
-| `seo-expert` | SEO, meta tags, schema | Technical SEO, Core Web Vitals |
-| `ai-discovery-expert` | Perplexity, ChatGPT | AI search optimization |
+| *seo-expert* | *Available as addon* | *SEO module externalized* |
+| *ai-discovery-expert* | *Available as addon* | *AI discovery module externalized* |
 
 These skills auto-invoke when working with the respective framework.

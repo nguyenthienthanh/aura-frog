@@ -4,9 +4,11 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [1.22.0] - 2026-03-23
+## [2.0.0] - 2026-03-24
 
-### Deep Project Init — Instant Repo Understanding
+### Major Refactor — Agent Rename, Context Optimization, Quality Overhaul
+
+Formerly v1.22.0, promoted to v2.0.0 for breaking changes (agent renames, module removals).
 
 #### Added
 - **`repo-map-gen.sh` script** — Generates annotated directory tree with purpose descriptions inferred from directory names, READMEs, and file types. Configurable depth (default 3). Skips node_modules, .git, dist, build, vendor
@@ -15,8 +17,14 @@ All notable changes to Aura Frog will be documented in this file.
 - **3 new project context files** — `repo-map.md`, `file-registry.yaml`, `architecture.md` generated during `project:init` and `project:regen`
 - **Smart context loading strategy** — Routes context loading by scenario: simple questions (~200 tokens), bug fixes (~800 tokens), full context (~2000 tokens), architecture decisions (~1000 tokens)
 - **6 new pattern detections in context-compress.sh** — indentation style, state management, API integration pattern, component style, environment variable pattern, monorepo tool
+- **`collaborative-planning` rule** — Multi-team deliberation for Deep tasks. 4 rounds: independent analysis (4 perspectives: Builder/Breaker/User/Why), cross-review + debate, use case simulation, convergence. Works with or without Agent Teams enabled
+- **`strategist` agent** — Business-level thinking: ROI evaluation, MVP scoping, scope creep detection, build vs buy decisions. 4th perspective in collaborative planning ("Why build this?")
 
 #### Updated
+- **Agent rename** — All 9 non-architect agents renamed for clarity and consistency:
+  - `ui-expert` → `frontend`, `mobile-expert` → `mobile`, `game-developer` → `gamedev`
+  - `qa-automation` → `tester`, `security-expert` → `security`, `devops-cicd` → `devops`
+  - `project-manager` → `scanner`, `pm-operations-orchestrator` → `lead`, `smart-agent-detector` → `router`
 - **`context-compress.sh`** v1.1.0 → v2.0.0 — Now detects 12 patterns (was 6)
 - **`project:init` command** v2.0.0 → v3.0.0 — Added Step 3b for deep context generation with Claude enrichment
 - **`project:regen` command** v1.0.0 → v2.0.0 — Added Steps 4.5-4.8 for regenerating new context files
@@ -24,8 +32,29 @@ All notable changes to Aura Frog will be documented in this file.
 - **Project context files** — 4 → 7 files per project
 - **`.claude/CLAUDE.md`** — Updated context_files reference from 4 → 7
 
+- **`docs/TROUBLESHOOTING.md`** — Comprehensive error recovery guide
+- **`docs/guides/FIRST_WORKFLOW_TUTORIAL.md`** — Interactive step-by-step tutorial
+- **`docs/RELEASE_NOTES.md`** — Human-readable release highlights
+- **`commands/tutorial.md`** — Onboarding command
+- **`commands/plugin/update.md`** — Plugin update instructions
+- **`hooks/changelog-notify.cjs`** — Shows release highlights after update
+- **Enhanced `update-check.cjs`** — Major version warning + changelog link
+
+#### Removed
+- **`model-router` skill** — Cannot switch model mid-session in Claude Code. Misleading feature. (220 lines)
+- **`visual-pixel-perfect` skill + rule + hook** — Niche Figma-to-code workflow, <5% usage. (695 lines)
+- **`nativewind-generator` skill** — Hyper-niche NativeWind generator. (241 lines)
+- **`visual-pixel-init.cjs`** — Removed from SessionStart hooks (ran every session for unused feature)
+- **17 skills set to `autoInvoke: false`** — 12 framework experts + 5 niche skills. Only bundle loaders auto-invoke now. (~9,067 lines removed from auto-invoke pool)
+- **Banner policy changed** — Only at session start, phase transitions, agent switches (was every response). Saves ~3-4K tokens/session.
+
 #### Stats
-- Scripts: 34 → 37 (+3: repo-map-gen, file-registry-gen, architecture-gen)
+- Agents: 10 (9 renamed, +1 strategist, -1 gamedev externalized)
+- Skills: 52 → 43 (-10: model-router, visual-pixel-perfect, nativewind-generator, godot-expert, seo-bundle, seo-check, seo-expert, seo-geo, seo-schema, ai-discovery-expert; +1: git-worktree)
+- Rules: 49 → 45 (-5: visual-pixel-accuracy, godot-gdscript-typing, godot-scene-composition, seo-technical-requirements, ai-discovery-optimization; +1: collaborative-planning)
+- Hooks: 27 → 23 (-1: visual-pixel-init; +2: phase-checkpoint, update-check; note: count is .cjs files only)
+- Commands: 86 → 84 (-4: seo commands; +2: workflow/rollback, metrics/dashboard)
+- Auto-invoke skills: 13 → 8 (removed model-router, seo-bundle; disabled 17 niche/framework experts)
 
 ---
 
@@ -113,8 +142,8 @@ Full Claude Agent Teams integration for real multi-agent orchestration with pers
 - **Team mode detection** in agent-detector skill - Decision matrix for team vs subagent mode
 - **Phase team composition** in workflow-orchestrator - Per-phase lead/primary/secondary teammate assignments
 - **Team task patterns** in task-based-agent-selection - Multi-domain task triggers for team activation
-- **Team Lead Mode** for pm-operations-orchestrator - Team creation, task distribution, cross-review coordination
-- **Team Mode Behavior** sections for architect, ui-expert, qa-automation, security-expert, mobile-expert agents
+- **Team Lead Mode** for lead - Team creation, task distribution, cross-review coordination
+- **Team Mode Behavior** sections for architect, frontend, tester, security, mobile agents
 - **Team mode cross-review** in cross-review-workflow rule - Parallel reviews via teammate messaging (~59% faster)
 - **Team context management** in context-management rule - Explicit context passing for independent teammates
 - **Team execution rules** in execution-rules - ALWAYS/NEVER rules for team mode
@@ -130,7 +159,7 @@ Full Claude Agent Teams integration for real multi-agent orchestration with pers
 - **`subagent-init.cjs`** - Teammate awareness via `CLAUDE_TEAMMATE_NAME` env var, team context injection
 - **`hooks.json`** - Added TeammateIdle and TaskCompleted hook events (Hooks: 21 → 23)
 - **Session state schema** - Added `teamMode` and `activeTeammates` fields
-- **smart-agent-detector** - Team mode output format and team vs subagent decision matrix
+- **router** - Team mode output format and team vs subagent decision matrix
 - **plugin.json** - Version 1.18.0, updated description
 - **`project:init`** - Settings merge now includes env vars (not just permissions)
 - **`project:regen`** - Added Step 5: Sync Plugin Settings (auto-merges latest plugin defaults)
@@ -179,9 +208,9 @@ Critical patches to reduce token usage from ~200k to ~40k per workflow:
 #### Consolidated Agents (15 → 11)
 | New Agent | Replaces | Purpose |
 |-----------|----------|---------|
-| **project-manager** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
+| **scanner** | project-detector, project-config-loader, project-context-manager | Unified project detection, config, and context |
 | **architect** | backend-expert, database-specialist | System design + database architecture |
-| **ui-expert** | web-expert, ui-designer | Frontend + design systems |
+| **frontend** | web-expert, ui-designer | Frontend + design systems |
 
 #### Bundled Commands (6 new unified commands)
 | Command | Replaces | Subcommands |
@@ -360,7 +389,7 @@ Major frontend optimization with actionable UX/UI guidance, plus automatic linti
 
 #### Updated
 - **`agents/web-expert.md`** v3.0 - Added performance targets, UX laws, accessibility checklist, loading/error patterns
-- **`agents/mobile-expert.md`** v3.0 - Added touch targets, thumb zones, iOS/Android conventions, FlashList, haptics
+- **`agents/mobile.md`** v3.0 - Added touch targets, thumb zones, iOS/Android conventions, FlashList, haptics
 - **`agents/ui-designer.md`** v2.0 - Added UX laws application, accessibility checks in analysis
 - **`rules/README.md`** - Added frontend-excellence rule, count: 44 → 45
 - **`skills/README.md`** - Added code-simplifier skill, count: 37 → 38
@@ -797,7 +826,7 @@ Comprehensive Godot engine support for multi-platform game development (HTML5, A
   - `references/ui-patterns.md` - Game UI (HUD, menus, dialogs, touch controls)
   - `references/testing-gdunit.md` - GDUnit testing patterns
 
-- **`agents/game-developer.md`** - New agent for game development
+- **`agents/gamedev.md`** - New agent for game development
   - Detects Godot projects from `project.godot`
   - Routes to `godot-expert` skill
   - Future support for Phaser.js, Unity, Unreal
@@ -821,7 +850,7 @@ Comprehensive Godot engine support for multi-platform game development (HTML5, A
 - **Documentation**
   - `CLAUDE.md` - Added godot-expert to skills (23 auto-invoking)
   - `skills/README.md` - Added skill documentation, updated counts
-  - `agents/README.md` - Added game-developer agent (15 agents)
+  - `agents/README.md` - Added gamedev agent (15 agents)
   - `rules/README.md` - Added 2 Godot rules (44 total)
 
 #### Skill Content (godot-expert)
@@ -1106,7 +1135,7 @@ Major improvements focused on token efficiency and automatic complexity detectio
 - `hooks/lib/session-state.cjs` - Added projectType, packageManager, framework fields
 - `skills/README.md` - Added new skills (35 → 37)
 - `agents/backend-expert.md` - Model specification
-- `agents/qa-automation.md` - Model specification
+- `agents/tester.md` - Model specification
 - `agents/ui-designer.md` - Model specification
 
 #### Documentation Cleanup
@@ -1235,7 +1264,7 @@ Streamlined the plugin by replacing custom integration scripts with bundled MCP 
 #### Consolidated Agents (24 → 14)
 - **backend-expert** - Merged: backend-go, backend-laravel, backend-nodejs, backend-python
 - **web-expert** - Merged: web-angular, web-nextjs, web-reactjs, web-vuejs
-- **mobile-expert** - Merged: mobile-flutter, mobile-react-native
+- **mobile** - Merged: mobile-flutter, mobile-react-native
 - **Removed** - jira-operations, confluence-operations, slack-operations (use MCP)
 
 #### Removed Files
@@ -1589,7 +1618,7 @@ Major update standardizing skill file format and streamlining plugin structure.
 - Dual-file loader architecture
 
 ### [5.0.0-beta] - 2025-11-26
-- New agents: backend-nodejs, security-expert, devops-cicd
+- New agents: backend-nodejs, security, devops
 - 11 new commands (security, performance, deployment)
 
 ### [4.6.0] - 2025-11-26

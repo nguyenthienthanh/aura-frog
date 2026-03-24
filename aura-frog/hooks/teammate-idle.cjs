@@ -25,21 +25,21 @@ const {
 // Agent specialization to task keyword mapping
 const AGENT_TASK_PATTERNS = {
   'architect': ['api', 'backend', 'database', 'schema', 'migration', 'query', 'architecture', 'design'],
-  'ui-expert': ['frontend', 'component', 'css', 'styling', 'layout', 'responsive', 'design-system', 'ui'],
-  'qa-automation': ['test', 'coverage', 'e2e', 'unit', 'integration', 'assertion', 'fixture', 'mock'],
-  'security-expert': ['security', 'auth', 'vulnerability', 'owasp', 'xss', 'injection', 'audit'],
-  'mobile-expert': ['mobile', 'react-native', 'flutter', 'ios', 'android', 'app'],
-  'game-developer': ['godot', 'game', 'scene', 'sprite', 'physics', 'gdscript'],
-  'devops-cicd': ['deploy', 'ci', 'cd', 'docker', 'pipeline', 'infrastructure'],
-  'pm-operations-orchestrator': ['requirement', 'plan', 'coordinate', 'document', 'review']
+  'frontend': ['frontend', 'component', 'css', 'styling', 'layout', 'responsive', 'design-system', 'ui'],
+  'tester': ['test', 'coverage', 'e2e', 'unit', 'integration', 'assertion', 'fixture', 'mock'],
+  'security': ['security', 'auth', 'vulnerability', 'owasp', 'xss', 'injection', 'audit'],
+  'mobile': ['mobile', 'react-native', 'flutter', 'ios', 'android', 'app'],
+  'gamedev': ['godot', 'game', 'scene', 'sprite', 'physics', 'gdscript'],
+  'devops': ['deploy', 'ci', 'cd', 'docker', 'pipeline', 'infrastructure'],
+  'lead': ['requirement', 'plan', 'coordinate', 'document', 'review']
 };
 
 // Cross-review assignments by phase
 const CROSS_REVIEW_PHASES = {
-  '2': ['qa-automation'],      // QA reviews design
-  '5b': ['qa-automation'],     // QA reviews implementation
-  '5c': ['security-expert'],   // Security reviews refactored code
-  '6': ['architect', 'qa-automation']  // Review phase
+  '2': ['tester'],      // QA reviews design
+  '5b': ['tester'],     // QA reviews implementation
+  '5c': ['security'],   // Security reviews refactored code
+  '6': ['architect', 'tester']  // Review phase
 };
 
 function getTeammateName() {
@@ -104,7 +104,7 @@ function main() {
   const pendingApprovals = Object.entries(state?.approvalStatus || {})
     .filter(([_, v]) => v === 'pending');
 
-  if (pendingApprovals.length > 0 && role === 'pm-operations-orchestrator') {
+  if (pendingApprovals.length > 0 && role === 'lead') {
     console.error(`⏳ Pending approvals: ${pendingApprovals.map(([k]) => k).join(', ')}`);
     console.error('Action: Review and process pending approval gates');
     process.exit(2); // Keep alive

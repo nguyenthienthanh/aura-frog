@@ -7,9 +7,12 @@
  *
  * Estimation: Tracks tool calls and file sizes to approximate token consumption.
  * Displays warnings at 50%, 70%, 85% of estimated 200K limit.
+ * Saves per-session metrics to .claude/metrics/sessions/ for dashboard.
  *
  * Exit codes:
  * - 0: Always (informational only)
+ *
+ * @version 1.1.0
  */
 
 const fs = require('fs');
@@ -41,7 +44,7 @@ function loadTracker() {
     if (fs.existsSync(CACHE_FILE)) {
       return JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
     }
-  } catch { /* ignore */ }
+  } catch { /* cache read failed - fresh tracker on next call */ }
   return {
     sessionId: process.ppid?.toString(),
     totalEstimate: 5000, // Base system prompt estimate
@@ -56,7 +59,49 @@ function saveTracker(tracker) {
     const dir = path.dirname(CACHE_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(CACHE_FILE, JSON.stringify(tracker, null, 2));
-  } catch { /* ignore */ }
+  } catch { /* cache write - non-blocking */ }
+}
+
+// Save session metrics to .claude/metrics/sessions/ for dashboard
+function saveSessionMetrics(tracker, toolName) {
+  try {
+    const metricsDir = path.join(process.cwd(), '.claude', 'metrics', 'sessions');
+    if (!fs.existsSync(metricsDir)) fs.mkdirSync(metricsDir, { recursive: true });
+
+    const date = new Date().toISOString().slice(0, 10);
+    const sessionId = tracker.sessionId || 'unknown';
+    const metricsFile = path.join(metricsDir, `${date}-${sessionId}.json`);
+
+    let metrics;
+    try {
+      metrics = JSON.parse(fs.readFileSync(metricsFile, 'utf-8'));
+    } catch {
+      metrics = {
+        sessionId,
+        date,
+        startedAt: tracker.startedAt,
+        totalTokens: 0,
+        toolCalls: 0,
+        tokensByTool: {},
+        tokensByPhase: {},
+        agent: process.env.AF_CURRENT_AGENT || 'unknown',
+      };
+    }
+
+    const cost = TOKEN_COSTS[toolName] || TOKEN_COSTS.default;
+    metrics.totalTokens = tracker.totalEstimate;
+    metrics.toolCalls = tracker.toolCalls;
+    metrics.tokensByTool[toolName] = (metrics.tokensByTool[toolName] || 0) + cost;
+    metrics.lastUpdated = new Date().toISOString();
+
+    // Track phase if available
+    const phase = process.env.AF_CURRENT_PHASE;
+    if (phase) {
+      metrics.tokensByPhase[phase] = (metrics.tokensByPhase[phase] || 0) + cost;
+    }
+
+    fs.writeFileSync(metricsFile, JSON.stringify(metrics, null, 2));
+  } catch { /* metrics save - non-blocking, best-effort */ }
 }
 
 function estimateFileTokens(filePath) {
@@ -66,7 +111,7 @@ function estimateFileTokens(filePath) {
       // ~4 chars per token for code
       return Math.min(Math.ceil(stat.size / 4), 10000);
     }
-  } catch { /* ignore */ }
+  } catch { /* file stat failed - non-blocking */ }
   return 0;
 }
 
@@ -117,6 +162,7 @@ try {
   }
 
   saveTracker(tracker);
+  saveSessionMetrics(tracker, toolName);
   process.exit(0);
 
 } catch (error) {

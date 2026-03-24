@@ -1,6 +1,6 @@
 # Aura Frog Scripts
 
-**Version:** 1.22.0
+**Version:** 2.0.0
 **Purpose:** Utility scripts for integrations, workflows, and automation
 
 ---
@@ -254,4 +254,4 @@ export SLACK_TEAM_ID="T0123456789"
 
 ---
 
-**Version:** 1.22.0 | **Last Updated:** 2026-01-16
+**Version:** 2.0.0 | **Last Updated:** 2026-01-16

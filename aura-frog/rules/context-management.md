@@ -52,7 +52,7 @@ cleanup_triggers[4]{trigger,action}:
 
 ## Model Selection Guidelines
 
-Use `skills/model-router/SKILL.md` for automatic routing, but understand the principles:
+Understand the model selection principles:
 
 | Task Type | Recommended Model | Reasoning |
 |-----------|-------------------|-----------|
@@ -227,7 +227,6 @@ team_antipatterns[3]{pattern,problem,solution}:
 
 ## Related Files
 
-- `skills/model-router/SKILL.md` - Automatic model selection
 - `skills/framework-expert/SKILL.md` - Lazy framework loading
 - `docs/REFACTOR_ANALYSIS.md` - Full optimization analysis
 - `hooks/lib/af-project-cache.cjs` - Project detection caching
