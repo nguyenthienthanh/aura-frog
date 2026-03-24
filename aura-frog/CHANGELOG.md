@@ -4,6 +4,15 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.1.2] - 2026-03-24
+
+### Fix — scout-block false positives on heredoc content
+
+#### Fixed
+- **scout-block.cjs** — Only checks first line of Bash commands against blocked patterns, not multiline heredoc bodies. Prevents false blocks when release notes or strings contain words like "coverage" or "target"
+
+---
+
 ## [2.1.1] - 2026-03-24
 
 ### Maintenance — Version Sync Cleanup
