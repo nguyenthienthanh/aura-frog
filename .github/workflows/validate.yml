@@ -1,0 +1,139 @@
+name: Plugin Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-counts:
+    name: Validate Component Counts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count components
+        run: |
+          echo "## Component Count Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          AGENTS=$(ls aura-frog/agents/*.md 2>/dev/null | grep -v README | wc -l | tr -d ' ')
+          SKILLS=$(ls -d aura-frog/skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
+          COMMANDS=$(find aura-frog/commands -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          RULES=$(find aura-frog/rules -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          HOOKS=$(ls aura-frog/hooks/*.cjs 2>/dev/null | wc -l | tr -d ' ')
+
+          echo "| Component | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Agents | $AGENTS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Skills | $SKILLS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commands | $COMMANDS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Rules | $RULES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Hooks | $HOOKS |" >> $GITHUB_STEP_SUMMARY
+
+          # Verify expected counts from plugin.json
+          DESC=$(grep '"description"' aura-frog/.claude-plugin/plugin.json)
+
+          EXPECTED_AGENTS=$(echo "$DESC" | grep -oP '\d+ specialized agents' | grep -oP '\d+')
+          EXPECTED_SKILLS=$(echo "$DESC" | grep -oP '\d+ skills' | grep -oP '\d+')
+          EXPECTED_COMMANDS=$(echo "$DESC" | grep -oP '\d+ commands' | grep -oP '\d+')
+          EXPECTED_HOOKS=$(echo "$DESC" | grep -oP '\d+ hooks' | grep -oP '\d+')
+          EXPECTED_RULES=$(echo "$DESC" | grep -oP '\d+ rules' | grep -oP '\d+')
+
+          PASS=true
+          [ "$AGENTS" != "$EXPECTED_AGENTS" ] && echo "❌ Agents: expected $EXPECTED_AGENTS, got $AGENTS" && PASS=false
+          [ "$SKILLS" != "$EXPECTED_SKILLS" ] && echo "❌ Skills: expected $EXPECTED_SKILLS, got $SKILLS" && PASS=false
+          [ "$COMMANDS" != "$EXPECTED_COMMANDS" ] && echo "❌ Commands: expected $EXPECTED_COMMANDS, got $COMMANDS" && PASS=false
+          [ "$HOOKS" != "$EXPECTED_HOOKS" ] && echo "❌ Hooks: expected $EXPECTED_HOOKS, got $HOOKS" && PASS=false
+          [ "$RULES" != "$EXPECTED_RULES" ] && echo "❌ Rules: expected $EXPECTED_RULES, got $RULES" && PASS=false
+
+          if [ "$PASS" = true ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ All counts match plugin.json" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Count mismatch detected" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+  validate-hooks:
+    name: Validate Hook Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check hook syntax
+        run: |
+          echo "## Hook Syntax Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          PASS=true
+          for hook in aura-frog/hooks/*.cjs aura-frog/hooks/lib/*.cjs; do
+            [ ! -f "$hook" ] && continue
+            name=$(basename "$hook")
+            if node --check "$hook" 2>/dev/null; then
+              echo "✅ $name" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $name — syntax error" >> $GITHUB_STEP_SUMMARY
+              PASS=false
+            fi
+          done
+
+          [ "$PASS" = false ] && exit 1
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All hooks parse successfully" >> $GITHUB_STEP_SUMMARY
+
+  validate-structure:
+    name: Validate File Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check key files exist
+        run: |
+          echo "## File Structure Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          PASS=true
+          check_exists() {
+            if [ -e "$1" ]; then
+              echo "✅ $1" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $1 — MISSING" >> $GITHUB_STEP_SUMMARY
+              PASS=false
+            fi
+          }
+
+          check_exists "aura-frog/.claude-plugin/plugin.json"
+          check_exists "aura-frog/CLAUDE.md"
+          check_exists "aura-frog/CHANGELOG.md"
+          check_exists "aura-frog/hooks/hooks.json"
+          check_exists "aura-frog/rules/core/"
+          check_exists "aura-frog/rules/agent/"
+          check_exists "aura-frog/rules/workflow/"
+          check_exists "aura-frog/agents/lead.md"
+          check_exists "aura-frog/agents/router.md"
+          check_exists "aura-frog/skills/agent-detector/SKILL.md"
+          check_exists "aura-frog/skills/workflow-orchestrator/SKILL.md"
+          check_exists ".mcp.json"
+
+          [ "$PASS" = false ] && exit 1
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All key files present" >> $GITHUB_STEP_SUMMARY
+
+  performance-report:
+    name: Performance Report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run performance measurement
+        run: |
+          echo "## Performance Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          bash aura-frog/scripts/measure-performance.sh >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
