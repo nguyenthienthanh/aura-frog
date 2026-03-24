@@ -1,0 +1,103 @@
+#!/bin/bash
+# af — Aura Frog CLI wrapper
+# Zero dependencies, pure bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PLUGIN_DIR="$PROJECT_ROOT/aura-frog"
+
+# Read version from plugin.json
+VERSION=$(grep '"version"' "$PLUGIN_DIR/.claude-plugin/plugin.json" 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+REPO="nguyenthienthanh/aura-frog"
+
+case "${1:-help}" in
+  install)
+    echo "🐸 Installing Aura Frog..."
+    echo ""
+    echo "Run in Claude Code:"
+    echo "  /plugin marketplace add $REPO"
+    echo "  /plugin install aura-frog@aurafrog"
+    ;;
+
+  update)
+    echo "🐸 Checking for updates..."
+    latest=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null | grep tag_name | cut -d'"' -f4)
+    if [ -n "$latest" ]; then
+      echo "Current: v$VERSION"
+      echo "Latest:  $latest"
+      if [ "v$VERSION" = "$latest" ]; then
+        echo "✅ Up to date"
+      else
+        echo ""
+        echo "Update in Claude Code:"
+        echo "  /plugin marketplace update aurafrog"
+      fi
+    else
+      echo "Could not check latest version (no network?)"
+    fi
+    ;;
+
+  version|-v|--version)
+    echo "Aura Frog v$VERSION"
+    ;;
+
+  doctor)
+    echo "🐸 Aura Frog Health Check"
+    echo "========================="
+    # Check plugin dir
+    [ -d "$PLUGIN_DIR" ] && echo "✅ Plugin directory exists" || echo "❌ Plugin directory not found"
+    # Check plugin.json
+    [ -f "$PLUGIN_DIR/.claude-plugin/plugin.json" ] && echo "✅ plugin.json exists (v$VERSION)" || echo "❌ plugin.json missing"
+    # Check hooks
+    hook_count=$(ls "$PLUGIN_DIR/hooks/"*.cjs 2>/dev/null | wc -l | tr -d ' ')
+    echo "✅ Hooks: $hook_count registered"
+    # Check project init (if in a project)
+    if [ -d ".claude/project-contexts" ]; then
+      ctx_count=$(ls .claude/project-contexts/*/project-config.yaml 2>/dev/null | wc -l | tr -d ' ')
+      echo "✅ Project initialized ($ctx_count context files)"
+    else
+      echo "ℹ️  No project context (run project:init in Claude Code)"
+    fi
+    # Check env
+    [ -f ".envrc" ] && echo "✅ .envrc found" || echo "ℹ️  No .envrc (optional)"
+    # Check git
+    git rev-parse --is-inside-work-tree &>/dev/null && echo "✅ Git repo" || echo "⚠️  Not a git repo"
+    # Run validate-counts if available
+    if [ -f "$PLUGIN_DIR/scripts/validate-counts.sh" ]; then
+      echo ""
+      echo "Running count validation..."
+      bash "$PLUGIN_DIR/scripts/validate-counts.sh" 2>/dev/null || true
+    fi
+    ;;
+
+  measure)
+    if [ -f "$PLUGIN_DIR/scripts/measure-performance.sh" ]; then
+      bash "$PLUGIN_DIR/scripts/measure-performance.sh"
+    else
+      echo "❌ measure-performance.sh not found"
+    fi
+    ;;
+
+  profile)
+    if [ -f "$PLUGIN_DIR/scripts/profile-hooks.sh" ]; then
+      bash "$PLUGIN_DIR/scripts/profile-hooks.sh" "${2:-3}"
+    else
+      echo "❌ profile-hooks.sh not found"
+    fi
+    ;;
+
+  help|-h|--help|*)
+    echo "🐸 Aura Frog CLI v$VERSION"
+    echo ""
+    echo "Usage: af <command>"
+    echo ""
+    echo "Commands:"
+    echo "  install    Show install instructions"
+    echo "  update     Check for updates"
+    echo "  version    Show current version"
+    echo "  doctor     Health check"
+    echo "  measure    Run performance measurement"
+    echo "  profile    Profile hook execution times"
+    echo "  help       Show this help"
+    ;;
+esac

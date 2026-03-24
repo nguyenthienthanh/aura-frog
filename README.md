@@ -129,7 +129,7 @@ You: "approve"
 
 <div align="center">
 
-| 10 Agents | 43 Skills | 86 Commands | 45 Rules | 26 Hooks | 6 MCPs |
+| 10 Agents | 43 Skills | 88 Commands | 45 Rules | 27 Hooks | 6 MCPs |
 |:-:|:-:|:-:|:-:|:-:|:-:|
 | Auto-selected per task | 8 auto-invoke | 5 bundled menus | 3-tier loading | Conditional execution | Zero-config |
 
@@ -347,8 +347,8 @@ aura-frog/
 │   ├── core/       13 rules — always loaded
 │   ├── agent/      15 rules — loaded per agent type
 │   └── workflow/   17 rules — loaded per phase
-├── hooks/          26 lifecycle hooks (conditional execution)
-├── scripts/        18 utility scripts
+├── hooks/          27 lifecycle hooks (conditional execution)
+├── scripts/        20 utility scripts
 ├── templates/      Document templates
 ├── docs/           Guides, tutorials & references
 └── .mcp.json       6 bundled MCP servers
