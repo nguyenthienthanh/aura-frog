@@ -81,10 +81,10 @@ Install the `af` command for health checks and setup guides outside Claude Code:
 
 ```bash
 # In your regular terminal (not Claude Code):
-sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af" /usr/local/bin/af
+sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
 
 # Or without sudo — add to PATH:
-echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts:$PATH"' >> ~/.zshrc
+echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/scripts:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 

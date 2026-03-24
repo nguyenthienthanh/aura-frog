@@ -20,10 +20,10 @@ outside of Claude Code.
 Run ONE of these in your terminal:
 
   # Option 1: Symlink (recommended)
-  sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af" /usr/local/bin/af
+  sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
 
   # Option 2: Add to PATH (no sudo)
-  echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts:$PATH"' >> ~/.zshrc
+  echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/scripts:$PATH"' >> ~/.zshrc
   source ~/.zshrc
 
 Then type: af doctor

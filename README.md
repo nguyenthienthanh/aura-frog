@@ -80,7 +80,7 @@ workflow:start "Your task here"
 setup:cli
 
 # Or manually:
-sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af" /usr/local/bin/af
+sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
 ```
 
 Then use anywhere: `af doctor`, `af setup remote`, `af setup channels`, `af measure`.

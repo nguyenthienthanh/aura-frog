@@ -8,7 +8,7 @@ REPO="nguyenthienthanh/aura-frog"
 # Auto-detect plugin location
 find_plugin_dir() {
   # 1. Marketplace install (most users)
-  local marketplace="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/aura-frog"
+  local marketplace="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog"
   [ -d "$marketplace" ] && echo "$marketplace" && return
 
   # 2. Local repo (developers)
@@ -39,7 +39,7 @@ handle_setup() {
       local af_path="${BASH_SOURCE[0]}"
       if [ ! -f "$af_path" ]; then
         # Try marketplace location
-        af_path="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af"
+        af_path="$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af"
       fi
 
       if [ ! -f "$af_path" ]; then
@@ -69,7 +69,7 @@ handle_setup() {
         echo "  sudo ln -sf \"$af_path\" /usr/local/bin/af"
         echo ""
         echo "  # Option 2: Add to PATH"
-        echo "  echo 'export PATH=\"\$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts:\$PATH\"' >> ~/.zshrc"
+        echo "  echo 'export PATH=\"\$HOME/.claude/plugins/marketplaces/aurafrog/scripts:\$PATH\"' >> ~/.zshrc"
       fi
       ;;
 
