@@ -258,4 +258,3 @@ Safe to ignore - the schema uses `CREATE TABLE IF NOT EXISTS`.
 
 ---
 
-**Version:** 1.0.0

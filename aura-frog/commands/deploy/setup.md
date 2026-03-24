@@ -1,8 +1,7 @@
 # Command: deploy:setup
 
 **Command:** `deploy:setup [platform]`
-**Agent:** devops-cicd
-**Version:** 1.0.0
+**Agent:** devops
 
 ---
 
@@ -98,4 +97,3 @@ deploy:setup --platform kubernetes
 ---
 
 **Command:** deploy:setup
-**Version:** 1.0.0

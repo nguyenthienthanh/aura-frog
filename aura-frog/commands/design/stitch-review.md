@@ -1,9 +1,8 @@
 # Command: design:stitch-review
 
 **Command:** `design:stitch-review [code/figma-link]`
-**Agents:** ui-expert
+**Agents:** frontend
 **Skill:** stitch-design
-**Version:** 1.0.0
 
 ---
 
@@ -180,4 +179,3 @@ After running this command:
 
 **Command:** design:stitch-review
 **Skill:** skills/stitch-design/SKILL.md
-**Version:** 1.0.0

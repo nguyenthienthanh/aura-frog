@@ -434,6 +434,5 @@ planning "Refactor UserProfile" --execute
 ---
 
 **Command:** execute  
-**Version:** 1.0.0  
 **Added:** Aura Frog v1.3
 

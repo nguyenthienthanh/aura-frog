@@ -30,8 +30,8 @@ Show the current project detection status from cache. Displays detected tech sta
 **Project Type:** single-repo
 **Framework:** laravel
 **Package Manager:** composer
-**Primary Agent:** backend-laravel
-**Secondary Agents:** ui-expert (templates detected)
+**Primary Agent:** architect
+**Secondary Agents:** frontend (templates detected)
 **Test Framework:** phpunit
 **Templates:** blade
 **Styles:** tailwind, scss
@@ -56,9 +56,9 @@ Show the current project detection status from cache. Displays detected tech sta
 ┌─────────────────┬────────────────┬────────────────────┬──────────┐
 │ Project         │ Framework      │ Agent              │ Tests    │
 ├─────────────────┼────────────────┼────────────────────┼──────────┤
-│ frontend-app    │ nextjs         │ web-nextjs         │ vitest   │
-│ backend-api     │ laravel        │ backend-laravel    │ phpunit  │
-│ mobile-app      │ react-native   │ mobile-react-native│ jest     │
+│ frontend-app    │ nextjs         │ frontend         │ vitest   │
+│ backend-api     │ laravel        │ architect    │ phpunit  │
+│ mobile-app      │ react-native   │ mobile│ jest     │
 └─────────────────┴────────────────┴────────────────────┴──────────┘
 
 **Cache Status:**
@@ -97,7 +97,7 @@ When you mention a project name in your task, the system automatically selects i
 ```
 Task: "Fix the login bug in backend-api"
 → Matches project: backend-api
-→ Agent: backend-laravel
+→ Agent: architect
 ```
 
 ---

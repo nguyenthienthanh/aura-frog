@@ -2,7 +2,6 @@
 
 **Command:** `db:optimize [target]`
 **Agent:** architect
-**Version:** 1.0.0
 
 ---
 
@@ -100,4 +99,3 @@ SELECT * FROM users WHERE LOWER(email) = 'test@example.com';
 ---
 
 **Command:** db:optimize
-**Version:** 1.0.0

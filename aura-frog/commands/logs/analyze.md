@@ -1,8 +1,7 @@
 # Command: logs:analyze
 
 **Command:** `logs:analyze [timeframe]`
-**Agent:** devops-cicd
-**Version:** 1.0.0
+**Agent:** devops
 
 ---
 
@@ -454,4 +453,3 @@ logs:analyze --search "authentication failed|unauthorized|forbidden"
 ---
 
 **Command:** logs:analyze
-**Version:** 1.0.0

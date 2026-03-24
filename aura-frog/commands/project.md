@@ -81,8 +81,8 @@ Select [1-8] or type command:
 **Path:** /Users/dev/my-app
 
 ### Agents
-- **Primary:** web-nextjs
-- **Secondary:** backend-nodejs, qa-automation
+- **Primary:** frontend
+- **Secondary:** architect, tester
 
 ### Test Infrastructure
 - **Framework:** vitest

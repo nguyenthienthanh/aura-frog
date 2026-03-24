@@ -75,5 +75,4 @@ Display help information for commands or topics.
 
 ---
 
-**Version:** 1.0.0
 

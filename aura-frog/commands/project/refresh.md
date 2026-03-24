@@ -93,8 +93,8 @@ Cache is automatically invalidated when:
 **Project Type:** single-repo
 **Framework:** nextjs
 **Package Manager:** pnpm
-**Primary Agent:** web-nextjs
-**Secondary Agents:** backend-nodejs
+**Primary Agent:** frontend
+**Secondary Agents:** architect
 **Test Framework:** vitest
 **Templates:** (none)
 **From Cache:** No (fresh scan)
@@ -108,9 +108,9 @@ Cache is automatically invalidated when:
 **Workspace:** my-projects
 **Projects:** 3
 
-- **frontend-app** (nextjs) → web-nextjs
-- **backend-api** (laravel) → backend-laravel
-- **mobile-app** (react-native) → mobile-react-native
+- **frontend-app** (nextjs) → frontend
+- **backend-api** (laravel) → architect
+- **mobile-app** (react-native) → mobile
 
 **From Cache:** No (fresh scan)
 ```

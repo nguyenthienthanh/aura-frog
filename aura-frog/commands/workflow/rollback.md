@@ -76,4 +76,3 @@ echo "Rolled back to pre-phase-$PHASE checkpoint"
 
 ---
 
-**Version:** 1.0.0

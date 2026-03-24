@@ -36,7 +36,7 @@ Switch to a different project configuration.
 ✅ Switched to: YOUR Proj Mobile
 
 **Project Info:**
-- Type: mobile-react-native
+- Type: mobile
 - Path: /Users/.../my-mobile-app
 - Regions: PH, MY, ID, IB, HK
 - Status: Active
@@ -47,9 +47,9 @@ Switch to a different project configuration.
 - Test Coverage: 80%
 
 **Active Agents:**
-- mobile-react-native (+25 project bonus)
-- qa-automation
-- ui-expert
+- mobile (+25 project bonus)
+- tester
+- frontend
 ```
 
 ---
@@ -69,5 +69,4 @@ Switch to a different project configuration.
 
 ---
 
-**Version:** 1.0.0
 

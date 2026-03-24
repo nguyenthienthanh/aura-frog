@@ -14,9 +14,9 @@ Show detailed information about a specific agent including capabilities, tech st
 ## Usage
 
 ```
-agent:info mobile-react-native
-agent:info qa-automation
-agent:info ui-expert
+agent:info mobile
+agent:info tester
+agent:info frontend
 ```
 
 ---
@@ -24,11 +24,11 @@ agent:info ui-expert
 ## Output Example
 
 ```markdown
-# Agent: mobile-react-native
+# Agent: mobile
 
 **Priority:** 100 (Highest)  
 **Status:** ✅ Active  
-**File:** agents/mobile-react-native.md
+**File:** agents/mobile.md
 
 ## Description
 Expert in React Native and Expo mobile development with multi-region support.
@@ -70,5 +70,4 @@ Automatically activates when you mention:
 
 ---
 
-**Version:** 1.0.0
 

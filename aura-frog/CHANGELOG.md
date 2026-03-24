@@ -4,6 +4,18 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.2.1] - 2026-03-25
+
+### Cleanup — Command files bulk update
+
+#### Fixed
+- **Outdated agent names in 30+ commands** — pm-operations-orchestrator→lead, qa-automation→tester, ui-expert→frontend, devops-cicd→devops, security-expert→security, etc.
+- **Obsolete file references** — smart-agent-detector.md→agent-detector/SKILL.md
+- **Version footers removed** from all command files
+- **Stale version numbers** in banner examples updated
+
+---
+
 ## [2.2.0] - 2026-03-24
 
 ### ClaudeKit Learnings + Showcase + CI

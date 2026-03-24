@@ -36,4 +36,3 @@ Need help? See `docs/TROUBLESHOOTING.md` for common issues.
 
 ---
 
-**Version:** 1.0.0

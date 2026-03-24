@@ -1,6 +1,5 @@
 # Command: workflow:reject
 
-**Version:** 1.0.0  
 **Purpose:** Reject current phase and restart with feedback  
 **Trigger:** User types `/workflow:reject <reason>` at approval gate
 

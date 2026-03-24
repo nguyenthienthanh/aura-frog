@@ -71,4 +71,3 @@ Token tracker hook saves per-session data to `.claude/metrics/sessions/`:
 
 ---
 
-**Version:** 1.0.0

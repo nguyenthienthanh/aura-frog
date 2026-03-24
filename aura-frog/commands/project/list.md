@@ -17,7 +17,7 @@ List all configured projects in Aura Frog with their status and details.
 # Configured Projects
 
 ## 1. your-project ⭐ (Active)
-**Type:** mobile-react-native  
+**Type:** mobile  
 **Path:** /Users/.../your-project  
 **Status:** ✅ Configured  
 **Last Used:** 2025-11-24
@@ -34,7 +34,7 @@ List all configured projects in Aura Frog with their status and details.
 ---
 
 ## 2. Backend_API
-**Type:** backend-laravel  
+**Type:** architect  
 **Path:** /Users/.../Backend_API  
 **Status:** ✅ Configured  
 **Last Used:** 2025-11-20
@@ -49,5 +49,4 @@ To add a new project, navigate to its directory and run:
 
 ---
 
-**Version:** 1.0.0
 

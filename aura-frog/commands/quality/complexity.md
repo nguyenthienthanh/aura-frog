@@ -1,8 +1,7 @@
 # Command: quality:complexity
 
 **Command:** `quality:complexity [target]`
-**Agent:** qa-automation
-**Version:** 1.0.0
+**Agent:** tester
 
 ---
 
@@ -377,4 +376,3 @@ fi
 ---
 
 **Command:** quality:complexity
-**Version:** 1.0.0

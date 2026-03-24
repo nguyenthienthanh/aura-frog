@@ -68,5 +68,4 @@ skill:create database-optimization qa-expert
 
 ---
 
-**Version:** 1.0.0
 

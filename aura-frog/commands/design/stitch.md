@@ -1,9 +1,8 @@
 # Command: design:stitch
 
 **Command:** `design:stitch "<requirements>"`
-**Agents:** ui-expert
+**Agents:** frontend
 **Skill:** stitch-design
-**Version:** 1.0.0
 
 ---
 
@@ -144,4 +143,3 @@ design:stitch-review [code/link]
 
 **Command:** design:stitch
 **Skill:** skills/stitch-design/SKILL.md
-**Version:** 1.0.0

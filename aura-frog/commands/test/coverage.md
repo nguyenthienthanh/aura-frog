@@ -291,6 +291,5 @@ test:coverage
 ---
 
 **Command:** test:coverage  
-**Version:** 1.0.0  
 **Added:** Aura Frog v1.3
 

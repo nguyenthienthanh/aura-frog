@@ -52,43 +52,43 @@ fi
 if [ -f "$PROJECT_ROOT/package.json" ]; then
   if grep -q "react-native" "$PROJECT_ROOT/package.json"; then
     TECH_STACK="React Native"
-    PRIMARY_AGENT="mobile-react-native"
+    PRIMARY_AGENT="mobile"
   elif grep -q "\"next\"" "$PROJECT_ROOT/package.json"; then
     TECH_STACK="Next.js"
-    PRIMARY_AGENT="web-nextjs"
+    PRIMARY_AGENT="frontend"
   elif grep -q "\"vue\"" "$PROJECT_ROOT/package.json"; then
     TECH_STACK="Vue.js"
-    PRIMARY_AGENT="web-vuejs"
+    PRIMARY_AGENT="frontend"
   elif grep -q "\"react\"" "$PROJECT_ROOT/package.json"; then
     TECH_STACK="React"
-    PRIMARY_AGENT="web-reactjs"
+    PRIMARY_AGENT="frontend"
   elif grep -q "\"angular\"" "$PROJECT_ROOT/package.json"; then
     TECH_STACK="Angular"
-    PRIMARY_AGENT="web-angular"
+    PRIMARY_AGENT="frontend"
   else
     TECH_STACK="Node.js"
-    PRIMARY_AGENT="backend-nodejs"
+    PRIMARY_AGENT="architect"
   fi
 elif [ -f "$PROJECT_ROOT/composer.json" ]; then
   if grep -q "laravel" "$PROJECT_ROOT/composer.json"; then
     TECH_STACK="Laravel"
-    PRIMARY_AGENT="backend-laravel"
+    PRIMARY_AGENT="architect"
   else
     TECH_STACK="PHP"
-    PRIMARY_AGENT="backend-laravel"
+    PRIMARY_AGENT="architect"
   fi
 elif [ -f "$PROJECT_ROOT/pubspec.yaml" ]; then
   TECH_STACK="Flutter"
-  PRIMARY_AGENT="mobile-flutter"
+  PRIMARY_AGENT="mobile"
 elif [ -f "$PROJECT_ROOT/go.mod" ]; then
   TECH_STACK="Go"
-  PRIMARY_AGENT="backend-go"
+  PRIMARY_AGENT="architect"
 elif [ -f "$PROJECT_ROOT/requirements.txt" ] || [ -f "$PROJECT_ROOT/pyproject.toml" ]; then
   TECH_STACK="Python"
-  PRIMARY_AGENT="backend-python"
+  PRIMARY_AGENT="architect"
 else
   TECH_STACK="Unknown"
-  PRIMARY_AGENT="pm-operations-orchestrator"
+  PRIMARY_AGENT="lead"
 fi
 ```
 
@@ -219,15 +219,15 @@ fi
 You: setup:activate
 
 Claude:
-⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: pm-operations-orchestrator │ Phase: -              ┃
+⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: lead │ Phase: -              ┃
 ┃ 🔥 Activating the frog                                    ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🔍 Detecting project...
    ✅ Project: my-project
    ✅ Tech Stack: React Native
-   ✅ Primary Agent: mobile-react-native
+   ✅ Primary Agent: mobile
 
 📁 Creating .claude/CLAUDE.md...
    ✅ Created from template
@@ -239,7 +239,7 @@ Claude:
 
 📊 Project: my-project
 🛠️  Tech Stack: React Native
-🤖 Primary Agent: mobile-react-native
+🤖 Primary Agent: mobile
 
 🎯 Start a new session to see Aura Frog in action!
 ```
@@ -250,8 +250,8 @@ Claude:
 You: setup:activate
 
 Claude:
-⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: pm-operations-orchestrator │ Phase: -              ┃
+⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: lead │ Phase: -              ┃
 ┃ 🔥 Already vibing                                         ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -270,8 +270,8 @@ Claude:
 You: setup:activate
 
 Claude:
-⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: pm-operations-orchestrator │ Phase: -              ┃
+⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Agent: lead │ Phase: -              ┃
 ┃ 🔥 Merging instructions                                   ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -331,5 +331,4 @@ With `.claude/CLAUDE.md`:
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-11-29

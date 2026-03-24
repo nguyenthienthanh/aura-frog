@@ -36,12 +36,12 @@ steps[5]{step,action}:
 
 ```toon
 detection[6]{keywords,agent}:
-  mobile/ios/android,mobile-react-native
+  mobile/ios/android,mobile
   web/react/vue,web-frontend
   api/backend/server,backend-*
-  test/qa/cypress,qa-automation
-  ui/design/figma,ui-expert
-  always,pm-operations-orchestrator
+  test/qa/cypress,tester
+  ui/design/figma,frontend
+  always,lead
 ```
 
 ---

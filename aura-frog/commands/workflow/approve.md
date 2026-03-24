@@ -1,6 +1,5 @@
 # Command: workflow:approve
 
-**Version:** 1.0.0  
 **Purpose:** Approve current phase and proceed to next phase  
 **Trigger:** User types `/workflow:approve` at approval gate
 

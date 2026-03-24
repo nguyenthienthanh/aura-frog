@@ -59,4 +59,3 @@ Set `AF_UPDATE_CHECK=false` in `.envrc` to disable.
 
 ---
 
-**Version:** 1.0.0

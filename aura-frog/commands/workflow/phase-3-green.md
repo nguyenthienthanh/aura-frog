@@ -1,6 +1,5 @@
 # Command: workflow:phase:3
 
-**Version:** 1.0.0
 **Purpose:** Execute Phase 3 - Build GREEN (Implementation Phase of TDD)
 **Trigger:** Auto-triggered after Phase 2 completion OR manual `/workflow:phase:3`
 
@@ -40,7 +39,7 @@
 - Check test failures
 
 ### Step 2: Implement Components
-**Agents:** Primary dev agent + qa-automation
+**Agents:** Primary dev agent + tester
 
 For each component, implement:
 

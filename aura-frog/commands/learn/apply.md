@@ -75,7 +75,7 @@ Display to user:
 Route .tsx files to react-expert by default
 
 ### Proposed Change
-File: `agents/smart-agent-detector.md`
+File: `agents/router.md`
 
 Add to file pattern matching section:
 ```diff
@@ -92,7 +92,7 @@ Add to file pattern matching section:
 1. **Create backup:**
 ```bash
 mkdir -p backups
-cp agents/smart-agent-detector.md "backups/smart-agent-detector.md.$(date +%Y%m%d)"
+cp agents/router.md "backups/router.md.$(date +%Y%m%d)"
 ```
 
 2. **Make the edit** using Edit tool
@@ -109,7 +109,7 @@ curl -X PATCH "${SUPABASE_URL}/rest/v1/af_learned_patterns?id=eq.abc123" \
 4. **Confirm to user:**
 ```
 ✅ Applied: Route React to react-expert
-   Backup: backups/smart-agent-detector.md.20260107
+   Backup: backups/router.md.20260107
 ```
 
 ### Step 4: Continue to Next Improvement
@@ -161,7 +161,7 @@ Show what would be applied without making changes:
 
 | Category | Target File | Change Type |
 |----------|-------------|-------------|
-| `agent` | `agents/smart-agent-detector.md` | Add routing rule |
+| `agent` | `agents/router.md` | Add routing rule |
 | `workflow` | `ccpm-config.yaml` | Adjust settings |
 | `phase` | `skills/workflow-orchestrator/SKILL.md` | Update phase config |
 | `rule` | `rules/*.md` | Add/modify rule |
@@ -274,7 +274,7 @@ Shows what would be applied without making changes:
 ### Would Apply (--auto eligible)
 
 1. **Route React to react-expert** (92% confidence)
-   - File: agents/smart-agent-detector.md
+   - File: agents/router.md
    - Lines affected: 3
 
 2. **Increase Phase 2 (Test RED) timeout** (85% confidence)
@@ -311,9 +311,9 @@ new: "coverage_threshold: 85"
 ### Agent Configuration
 
 ```yaml
-# Target: agents/smart-agent-detector.md
+# Target: agents/router.md
 type: agent_routing
-file: agents/smart-agent-detector.md
+file: agents/router.md
 section: "Pattern Matching"
 addition: |
   - pattern: "*.tsx"
@@ -387,10 +387,10 @@ Default react-expert agent for React component files (.tsx, .jsx)
 ### Evidence
 - 28 React component tasks analyzed
 - react-expert: 96% success rate
-- ui-expert (current): 78% success rate
+- frontend (current): 78% success rate
 
 ### Change
-File: `agents/smart-agent-detector.md`
+File: `agents/router.md`
 
 ```diff
   file_patterns:
@@ -402,7 +402,7 @@ File: `agents/smart-agent-detector.md`
 [a]pply | [s]kip | [m]odify | [q]uit: a
 
 ✅ Applied improvement
-   Backup: backups/smart-agent-detector.md.2026-01-07
+   Backup: backups/router.md.2026-01-07
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -412,4 +412,3 @@ File: `agents/smart-agent-detector.md`
 
 ---
 
-**Version:** 1.0.0

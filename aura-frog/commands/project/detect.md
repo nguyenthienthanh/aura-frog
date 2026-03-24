@@ -20,7 +20,7 @@ Analyze current directory and detect project type, tech stack, and structure.
 **Name:** your-project  
 **Path:** /Users/nguyenthanh/Projects/.../your-project
 
-## Detected Type: mobile-react-native ✅
+## Detected Type: mobile ✅
 
 **Evidence:**
 - ✅ package.json contains "react-native"
@@ -44,12 +44,11 @@ Analyze current directory and detect project type, tech stack, and structure.
 ## Configuration Recommendations
 - Test coverage target: 80%
 - TDD enforcement: Strict
-- Primary agent: mobile-react-native
+- Primary agent: mobile
 
 Run `project:init` to configure Aura Frog for this project.
 ```
 
 ---
 
-**Version:** 1.0.0
 

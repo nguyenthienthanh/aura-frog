@@ -1,8 +1,7 @@
 # Command: docker:create
 
 **Command:** `docker:create [options]`
-**Agent:** devops-cicd
-**Version:** 1.0.0
+**Agent:** devops
 
 ---
 
@@ -95,4 +94,3 @@ volumes:
 ---
 
 **Command:** docker:create
-**Version:** 1.0.0

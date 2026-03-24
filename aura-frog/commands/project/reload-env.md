@@ -258,5 +258,4 @@ Variables are loaded for the current Claude Code session only. They persist unti
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-12-01

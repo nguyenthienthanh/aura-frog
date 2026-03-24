@@ -1,6 +1,5 @@
 # Command: Phase 1 - Understand + Design
 
-**Version:** 1.0.0
 **Phase:** 1 of 5
 **Duration:** 15-30 minutes
 **Tagline:** "What are we building?"
@@ -36,20 +35,20 @@ Phase 1 is where we understand the task requirements, goals, and success criteri
 ## 🤖 Agents Involved
 
 ### Primary Agent
-- **pm-operations-orchestrator** - Leads requirements analysis
+- **lead** - Leads requirements analysis
 
 ### Cross-Review Agents
-- **Development Agent** (mobile-react-native, web-reactjs, backend-laravel, etc.)
+- **Development Agent** (mobile, frontend, architect, etc.)
   - Reviews technical feasibility
   - Identifies technical challenges
   - Suggests alternatives if needed
 
-- **qa-automation**
+- **tester**
   - Reviews testability
   - Identifies test scenarios
   - Suggests test coverage approach
 
-- **ui-expert** (if UI/UX involved)
+- **frontend** (if UI/UX involved)
   - Reviews design requirements
   - Identifies UI/UX considerations
   - Suggests design patterns
@@ -180,10 +179,10 @@ After completing Phase 1, show this approval gate:
 *"What are we building?"*
 
 **👤 Agents Working:**
-- 🎯 **Primary:** pm-operations-orchestrator (Requirements Lead)
+- 🎯 **Primary:** lead (Requirements Lead)
 - 🤝 **Cross-Review:** [dev-agent] (Technical Feasibility)
-- ✅ **Cross-Review:** qa-automation (Testability Check)
-- 🎨 **Cross-Review:** ui-expert (Design Review) [if applicable]
+- ✅ **Cross-Review:** tester (Testability Check)
+- 🎨 **Cross-Review:** frontend (Design Review) [if applicable]
 
 **🤖 System:** Aura Frog Team Agents v1.0.0
 **📋 Mode:** Workflow Phase Execution
@@ -241,7 +240,7 @@ We'll write failing tests before implementation (TDD RED phase).
 ⚡ After approval, I'll AUTO-CONTINUE to Phase 2!
 
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** pm-operations-orchestrator | 📋 **System:** Aura Frog v1.10.0
+🤖 **Agent:** lead | 📋 **System:** Aura Frog v2.2.0
 **─────────────────────────────────────────────────────────**
 
 Your response:
@@ -313,7 +312,6 @@ Phase 1 is complete when:
 ---
 
 **Phase:** 1 of 5
-**Version:** 1.0.0
 **Status:** Active
 **Last Updated:** 2026-03-12
 

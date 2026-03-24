@@ -1,8 +1,7 @@
 # Command: api:design
 
 **Command:** `api:design [feature]`
-**Agents:** backend-nodejs, backend-python, backend-go
-**Version:** 1.0.0
+**Agents:** architect, architect, architect
 
 ---
 
@@ -170,4 +169,3 @@ input CreateUserInput {
 ---
 
 **Command:** api:design
-**Version:** 1.0.0

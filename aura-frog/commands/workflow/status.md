@@ -1,6 +1,5 @@
 # Command: workflow:status
 
-**Version:** 1.0.0  
 **Purpose:** Display current workflow status and progress  
 **Trigger:** User types `/workflow:status`
 
@@ -44,10 +43,10 @@ Shows comprehensive workflow status including:
    Duration: 1h 15m
 
 🤖 Active Agents:
-   - mobile-react-native (primary)
-   - qa-automation (secondary)
-   - ui-expert (secondary)
-   - pm-operations-orchestrator (coordinator)
+   - mobile (primary)
+   - tester (secondary)
+   - frontend (secondary)
+   - lead (coordinator)
 
 📍 Current Phase: Phase 2 - Test RED
 
@@ -134,9 +133,9 @@ DETAILED WORKFLOW STATUS
    ✅ Risks mitigated
 
    Agents Involved:
-   - mobile-react-native (primary)
-   - ui-expert (secondary)
-   - pm-operations-orchestrator (coordinator)
+   - mobile (primary)
+   - frontend (secondary)
+   - lead (coordinator)
 
 📋 Phase 2: Test RED (CURRENT)
    Status: 🔄 In Progress
@@ -148,8 +147,8 @@ DETAILED WORKFLOW STATUS
    - Setting up test scaffolding
 
    Agents Working:
-   - mobile-react-native (active)
-   - qa-automation (supporting)
+   - mobile (active)
+   - tester (supporting)
 ```
 
 ---

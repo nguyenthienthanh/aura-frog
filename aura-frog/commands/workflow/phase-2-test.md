@@ -1,6 +1,5 @@
 # Command: workflow:phase:2
 
-**Version:** 1.0.0
 **Purpose:** Execute Phase 2 - Write Tests (RED Phase of TDD)
 **Trigger:** Auto-triggered after Phase 1 approval OR manual `/workflow:phase:2`
 
@@ -38,7 +37,7 @@
 - Identify what needs to be tested
 
 ### Step 2: Create Test Files
-**Agent:** qa-automation + primary dev agent
+**Agent:** tester + primary dev agent
 
 For each component/module:
 ```typescript

@@ -1,6 +1,5 @@
 # Command: workflow:modify
 
-**Version:** 1.0.0  
 **Purpose:** Request modifications to current phase without full reject/restart  
 **Trigger:** User types `/workflow:modify <instructions>` at approval gate
 

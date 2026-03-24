@@ -1,8 +1,7 @@
 # Command: logs:cleanup
 
 **Command:** `logs:cleanup [days]`
-**Agent:** pm-operations-orchestrator
-**Version:** 1.0.0
+**Agent:** lead
 
 ---
 
@@ -146,4 +145,3 @@ Preserved: .gitkeep files, files newer than 30 days
 ---
 
 **Command:** logs:cleanup
-**Version:** 1.0.0

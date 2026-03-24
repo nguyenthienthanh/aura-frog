@@ -1,8 +1,7 @@
 # Command: cicd:create
 
 **Command:** `cicd:create [platform]`
-**Agent:** devops-cicd
-**Version:** 1.0.0
+**Agent:** devops
 
 ---
 
@@ -114,4 +113,3 @@ jobs:
 ---
 
 **Command:** cicd:create
-**Version:** 1.0.0

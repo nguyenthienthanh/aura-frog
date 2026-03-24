@@ -2,7 +2,6 @@
 
 **Command:** `db:design [feature]`
 **Agent:** architect
-**Version:** 1.0.0
 
 ---
 
@@ -100,4 +99,3 @@ CREATE INDEX idx_posts_created ON posts(created_at DESC);
 ---
 
 **Command:** db:design
-**Version:** 1.0.0

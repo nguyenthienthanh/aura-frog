@@ -1,7 +1,7 @@
 # Command: monitor:setup
 
 **Purpose:** Setup application monitoring (errors, performance, logging)
-**Agent:** devops-cicd
+**Agent:** devops
 
 ---
 

@@ -1,8 +1,7 @@
 # Command: security:scan
 
 **Command:** `security:scan [path]`
-**Agent:** security-expert
-**Version:** 1.0.0
+**Agent:** security
 
 ---
 
@@ -112,4 +111,3 @@ db.query(query, [id]);
 ---
 
 **Command:** security:scan
-**Version:** 1.0.0

@@ -1,6 +1,5 @@
 # Command: workflow:phase:4
 
-**Version:** 1.0.0
 **Purpose:** Execute Phase 4 - Refactor (REFACTOR Phase of TDD)
 **Trigger:** Auto-triggered after Phase 3 approval OR manual `/workflow:phase:4`
 

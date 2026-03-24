@@ -1,7 +1,7 @@
 # Command: security:audit
 
 **Purpose:** Comprehensive security audit (dependencies, SAST, secrets, OWASP)
-**Agent:** security-expert
+**Agent:** security
 
 ---
 
@@ -20,7 +20,7 @@ security:audit --output report.md # Custom output
 
 ```toon
 steps[6]{step,action,tools}:
-  1. Detect,Identify project type + tech stack,project-detector
+  1. Detect,Identify project type + tech stack,scanner
   2. Dependencies,Scan for vulnerable packages,"npm audit/pip-audit/composer audit"
   3. Secrets,Find exposed credentials + API keys,gitleaks/truffleHog
   4. SAST,Static code analysis for vulnerabilities,semgrep/eslint-security

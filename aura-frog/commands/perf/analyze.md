@@ -1,8 +1,7 @@
 # Command: perf:analyze
 
 **Command:** `perf:analyze [target]`
-**Agents:** qa-automation, web/mobile agents
-**Version:** 1.0.0
+**Agents:** tester, web/mobile agents
 
 ---
 
@@ -151,4 +150,3 @@ perf:analyze --bundle
 ---
 
 **Command:** perf:analyze
-**Version:** 1.0.0

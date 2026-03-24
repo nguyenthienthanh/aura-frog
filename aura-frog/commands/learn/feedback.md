@@ -280,4 +280,3 @@ This reduces manual input needed.
 
 ---
 
-**Version:** 1.0.0

@@ -160,4 +160,3 @@ With `--brief`:
 
 ---
 
-**Version:** 1.0.0

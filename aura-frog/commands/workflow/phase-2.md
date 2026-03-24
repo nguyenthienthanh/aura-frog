@@ -1,6 +1,5 @@
 # Command: workflow:phase:2
 
-**Version:** 1.0.0
 **Purpose:** Execute Phase 2 - Test RED (Write Failing Tests)
 **Trigger:** Auto-triggered after Phase 1 approval OR manual `/workflow:phase:2`
 
@@ -26,7 +25,7 @@ Write failing tests before implementation (TDD RED phase). All tests must fail a
 - Show phase banner
 
 ### Step 2: Define Test Cases
-**Primary Agent:** qa-automation
+**Primary Agent:** tester
 
 Actions:
 - Derive test cases from Phase 1 requirements and success criteria
@@ -35,7 +34,7 @@ Actions:
 - Map tests to components/modules from Phase 1 design
 
 ### Step 3: Write Test Scaffolding
-**Agent:** qa-automation + Dev agent
+**Agent:** tester + Dev agent
 
 Create:
 - Test file structure matching the planned code structure

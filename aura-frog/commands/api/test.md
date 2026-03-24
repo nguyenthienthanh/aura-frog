@@ -1,8 +1,7 @@
 # Command: api:test
 
 **Command:** `api:test [endpoint]`
-**Agent:** qa-automation
-**Version:** 1.0.0
+**Agent:** tester
 
 ---
 
@@ -199,4 +198,3 @@ export default function() {
 ---
 
 **Command:** api:test
-**Version:** 1.0.0

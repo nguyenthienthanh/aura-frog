@@ -38,15 +38,15 @@ List all available agents or filter by criteria.
 ## Available Agents (14 total)
 
 ### Development (5 agents)
-- mobile-react-native (Priority: 100) ⭐ Active
-- web-vuejs (Priority: 90)
-- web-reactjs (Priority: 90)
-- web-nextjs (Priority: 90)
-- backend-laravel (Priority: 90)
+- mobile (Priority: 100) ⭐ Active
+- frontend (Priority: 90)
+- frontend (Priority: 90)
+- frontend (Priority: 90)
+- architect (Priority: 90)
 
 ### Quality & Design (2 agents)
-- qa-automation (Priority: 85) ⭐ Active
-- ui-expert (Priority: 85) ⭐ Active
+- tester (Priority: 85) ⭐ Active
+- frontend (Priority: 85) ⭐ Active
 
 ### Operations (4 agents)
 - jira-operations (Priority: 80)
@@ -55,10 +55,10 @@ List all available agents or filter by criteria.
 - linear-operations (Priority: 75)
 
 ### Infrastructure (3 agents)
-- pm-operations-orchestrator (Priority: 95) ⭐ Active
-- project-detector (Priority: 100) ⭐ Active
-- project-config-loader (Priority: 100)
-- project-context-manager (Priority: 95) ⭐ Active
+- lead (Priority: 95) ⭐ Active
+- scanner (Priority: 100) ⭐ Active
+- scanner (Priority: 100)
+- scanner (Priority: 95) ⭐ Active
 
 ⭐ Active agents: 6
 💤 Inactive agents: 8
@@ -74,5 +74,4 @@ List all available agents or filter by criteria.
 
 ---
 
-**Version:** 1.0.0
 

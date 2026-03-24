@@ -1,6 +1,5 @@
 # Command: workflow:predict
 
-**Version:** 1.0.0
 **Purpose:** Predict token usage for a workflow before starting
 **Category:** Workflow Enhancement
 **Last Updated:** 2025-11-26
@@ -389,7 +388,6 @@ data/
 ---
 
 **Command:** workflow:predict
-**Version:** 1.0.0
 **Status:** ✅ Ready for Implementation
 **Priority:** High
 **Dependencies:** Historical metrics collection

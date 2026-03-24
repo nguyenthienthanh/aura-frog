@@ -172,4 +172,3 @@ If a project explicitly sets `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=0`, it will N
 
 ---
 
-**Version:** 1.0.0

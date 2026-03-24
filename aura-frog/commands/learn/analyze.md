@@ -224,7 +224,7 @@ Data Points: 123 workflows, 47 feedback items
 **2. react-expert for component tasks**
 - Confidence: 92%
 - Frequency: 28 tasks
-- Evidence: 96% success rate vs 78% for ui-expert
+- Evidence: 96% success rate vs 78% for frontend
 - Recommendation: Update agent routing
 
 ---
@@ -252,7 +252,7 @@ Data Points: 123 workflows, 47 feedback items
 
 | Task Type | Current | Recommended | Expected Gain |
 |-----------|---------|-------------|---------------|
-| React UI | ui-expert | react-expert | +18% success |
+| React UI | frontend | react-expert | +18% success |
 | API routes | general | nodejs-expert | +10% success |
 
 ---
@@ -265,7 +265,7 @@ Data Points: 123 workflows, 47 feedback items
    - Run: `/learn:apply --id abc123`
 
 2. **Route React to react-expert** (Confidence: 92%)
-   - File: `agents/smart-agent-detector.md`
+   - File: `agents/router.md`
    - Change: Add .tsx/.jsx file pattern
    - Run: `/learn:apply --id def456`
 
@@ -305,4 +305,3 @@ User feedback analysis:
 
 ---
 
-**Version:** 1.0.0

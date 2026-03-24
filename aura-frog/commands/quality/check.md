@@ -1,8 +1,7 @@
 # Command: quality:check
 
 **Command:** `quality:check [target]`
-**Agent:** qa-automation
-**Version:** 1.0.0
+**Agent:** tester
 
 ---
 
@@ -257,4 +256,3 @@ radon cc . -a
 ---
 
 **Command:** quality:check
-**Version:** 1.0.0

@@ -1,8 +1,7 @@
 # Command: security:deps
 
 **Command:** `security:deps [options]`
-**Agent:** security-expert
-**Version:** 1.0.0
+**Agent:** security
 
 ---
 
@@ -110,4 +109,3 @@ npm audit fix
 ---
 
 **Command:** security:deps
-**Version:** 1.0.0

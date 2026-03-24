@@ -14,8 +14,8 @@ Manually activate a specific agent for the current workflow.
 ## Usage
 
 ```
-agent:activate qa-automation
-agent:activate ui-expert
+agent:activate tester
+agent:activate frontend
 ```
 
 ---
@@ -23,7 +23,7 @@ agent:activate ui-expert
 ## Output
 
 ```markdown
-✅ Agent Activated: qa-automation
+✅ Agent Activated: tester
 
 The QA Automation agent is now active and will participate in:
 - Test planning
@@ -36,5 +36,4 @@ This agent will remain active for the current workflow.
 
 ---
 
-**Version:** 1.0.0
 

@@ -375,6 +375,5 @@ Options:
 ---
 
 **Command:** workflow:progress  
-**Version:** 1.0.0  
 **Added:** Aura Frog v1.2
 

@@ -130,7 +130,6 @@ switch (changeType) {
 ---
 
 **Plan saved:** `plans/refactor-userprofile-20251124-150000.md`  
-**Version:** 2 (updated)
 
 **Next steps:**
 - Review updated plan
@@ -188,6 +187,5 @@ execute [plan-id]            # Execute (possibly refined) plan
 ---
 
 **Command:** planning:refine  
-**Version:** 1.0.0  
 **Added:** Aura Frog v1.3
 

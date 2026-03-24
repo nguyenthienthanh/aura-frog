@@ -129,5 +129,4 @@ When user runs `mcp:status`:
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-12-22

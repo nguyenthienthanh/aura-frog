@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.1-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
