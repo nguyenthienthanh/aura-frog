@@ -4,6 +4,29 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.2.0] - 2026-03-24
+
+### ClaudeKit Learnings + Showcase + CI
+
+#### Added
+- **thinking-boost.cjs** — UserPromptSubmit hook that silently enhances Claude's reasoning depth based on task complexity (3 levels). Disable with `AF_THINKING_BOOST=0`
+- **6-aspect code reviewer** — Rewrote code-reviewer skill: security, types, error handling, tests, quality, simplification. TOON summary + severity ratings
+- **measure-performance.sh** — Real publishable performance numbers (context overhead, token estimates, component inventory, codebase stats)
+- **profile-hooks.sh** — Hook execution profiling with timing, output size, token estimates
+- **af CLI wrapper** — Zero-dependency bash tool: doctor, measure, profile, version, update
+- **FEEDBACK.md** — Testimonial collection guide
+- **metrics:performance command** — Run performance measurement
+- **metrics:hooks command** — Run hook profiling
+- **CI validation workflow** — GitHub Actions: count validation, hook syntax check, file structure, performance report
+- **Showcase samples** — Real workflow outputs: JWT auth (Phase 1/4/5) and pagination bugfix (Phase 1)
+
+#### Stats
+- Commands: 86 → 88 (+metrics/performance, +metrics/hooks)
+- Hooks: 26 → 27 (+thinking-boost)
+- Scripts: 18 → 20 (+measure-performance, +profile-hooks)
+
+---
+
 ## [2.1.2] - 2026-03-24
 
 ### Fix — scout-block false positives on heredoc content

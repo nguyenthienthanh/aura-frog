@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-2.1.2-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -304,6 +304,18 @@ Need to pause?        → `workflow:handoff` saves everything for later
 ```
 
 Your work is never lost.
+
+### CLI Tool (`af`)
+
+Zero-dependency bash CLI for quick checks outside Claude Code:
+
+```bash
+./scripts/af doctor     # Health check
+./scripts/af measure    # Performance report
+./scripts/af profile    # Hook execution profiling
+./scripts/af version    # Current version
+./scripts/af update     # Check for updates
+```
 
 ---
 
