@@ -146,7 +146,7 @@ Task(subagent_type="backend-nodejs", model="sonnet", ...)
 
 ## Multi-Layer Detection System
 
-### Layer 0: Task Content Analysis (NEW - Highest Priority)
+### Layer 0: Task Content Analysis (Highest Priority)
 
 **Analyze the actual task, not just the repo.** A backend repo may have frontend tasks (templates, PDFs, emails).
 
@@ -304,7 +304,47 @@ thresholds[4]{level,score,role}:
 
 ## Detection Process
 
-### Step 0: Task Content Analysis (NEW - Do This First!)
+### Pre-Step: Check Detection Cache (Performance Optimization)
+
+**Before running full detection, check if a cached result can be reused.**
+
+Cache file: `.claude/cache/agent-detection-cache.json`
+
+```toon
+cache_check[4]{condition,action}:
+  Cache exists AND same workflowId AND phase > 1,Use cached result (skip Steps 0-5)
+  Cache exists AND same workflowId AND phase = 1,Invalidate — re-detect (requirements may change agents)
+  New workflow OR no workflowId,Invalidate — full detection
+  User override (e.g. "Use tester"),Invalidate — honor explicit override
+```
+
+**Cache hit output:**
+```markdown
+## Detection Result (cached)
+- **Agent:** [cached-agent]
+- **Model:** [cached-model]
+- **Complexity:** [cached-complexity]
+- **Cache:** hit (workflow: [id], phase: [N])
+```
+
+**Cache write:** After completing Steps 0-5, write detection result to cache file:
+```json
+{
+  "workflowId": "FEAT-123",
+  "agent": "architect",
+  "model": "sonnet",
+  "complexity": "Standard",
+  "secondary": ["tester"],
+  "teamMode": false,
+  "detectedAt": "2026-03-24T10:00:00Z"
+}
+```
+
+**Savings:** ~500-1000 tokens per message after first detection in a workflow.
+
+---
+
+### Step 0: Task Content Analysis (Do This First!)
 
 **Analyze the task itself before checking the repo.**
 
@@ -386,7 +426,7 @@ frontend:
 
 ### Step 5: Show Banner
 
-**See:** `rules/agent-identification-banner.md` for official format.
+**See:** `rules/core/agent-identification-banner.md` for official format.
 
 **Single Agent Banner:**
 ```

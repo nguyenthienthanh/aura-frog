@@ -112,6 +112,14 @@ async function main() {
       process.exit(0);
     }
 
+    // Fast path: skip brand-new files (ctime ≈ mtime means just created, no correction possible)
+    try {
+      const stat = fs.statSync(filePath);
+      if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000) {
+        process.exit(0);
+      }
+    } catch { /* file may not exist yet — skip silently */ }
+
     const recentOps = loadRecentOps();
 
     // Check if this is AI operation or user correction

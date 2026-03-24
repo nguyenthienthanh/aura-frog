@@ -94,6 +94,72 @@ function getSessionContext() {
 }
 
 /**
+ * Generate compact context summary for post-compact resume
+ * Writes a markdown file with essential workflow state that Claude reads after compact
+ */
+function generateCompactContext(workflowState, sessionContext) {
+  try {
+    const lines = ['# Compact Context Resume\n'];
+
+    // Workflow state
+    if (workflowState) {
+      lines.push(`## Workflow: ${workflowState.workflow_id}`);
+      lines.push(`- **Phase:** ${workflowState.current_phase}${workflowState.current_sub_phase || ''}`);
+      lines.push(`- **Status:** ${workflowState.status || 'in_progress'}`);
+      if (workflowState.task?.description) {
+        lines.push(`- **Task:** ${workflowState.task.description}`);
+      }
+      if (workflowState.agents?.primary) {
+        lines.push(`- **Agent:** ${workflowState.agents.primary}`);
+      }
+      lines.push('');
+    }
+
+    // Phase 1 decisions (if available)
+    if (workflowState?.workflow_id) {
+      const phase1Path = path.join(WORKFLOW_DIR, workflowState.workflow_id, 'deliverables', 'PHASE_1_REQUIREMENTS_ANALYSIS.md');
+      if (fs.existsSync(phase1Path)) {
+        try {
+          const phase1 = fs.readFileSync(phase1Path, 'utf-8');
+          // Extract just the key decisions (first 500 chars)
+          const summary = phase1.substring(0, 500).split('\n').slice(0, 15).join('\n');
+          lines.push('## Phase 1 Decisions (summary)');
+          lines.push(summary);
+          lines.push('...\n');
+        } catch { /* skip if unreadable */ }
+      }
+    }
+
+    // Modified files (from git)
+    try {
+      const { execSync } = require('child_process');
+      const modified = execSync('git diff --name-only HEAD 2>/dev/null', { encoding: 'utf-8' }).trim();
+      if (modified) {
+        lines.push('## Modified Files (uncommitted)');
+        modified.split('\n').slice(0, 20).forEach(f => lines.push(`- ${f}`));
+        lines.push('');
+      }
+    } catch { /* no git or no changes */ }
+
+    // Session context
+    if (sessionContext) {
+      lines.push('## Session Context');
+      if (sessionContext.project_name) lines.push(`- **Project:** ${sessionContext.project_name}`);
+      if (sessionContext.framework) lines.push(`- **Framework:** ${sessionContext.framework}`);
+      if (sessionContext.git_branch) lines.push(`- **Branch:** ${sessionContext.git_branch}`);
+      if (sessionContext.complexity) lines.push(`- **Complexity:** ${sessionContext.complexity}`);
+      lines.push('');
+    }
+
+    const contextFile = path.join(CACHE_DIR, 'compact-context.md');
+    fs.writeFileSync(contextFile, lines.join('\n'));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Save handoff state before compact
  */
 function saveHandoff() {
@@ -107,6 +173,9 @@ function saveHandoff() {
     if (!workflowState && !sessionContext.project_name) {
       return false;
     }
+
+    // Generate compact context for post-compact resume
+    generateCompactContext(workflowState, sessionContext);
 
     const handoff = {
       version: '1.0.0',
@@ -223,7 +292,17 @@ function injectResumeContext(handoff) {
     const resumeContextFile = path.join(CACHE_DIR, 'resume-context.md');
     const context = generateResumeContext(handoff);
 
-    fs.writeFileSync(resumeContextFile, context);
+    // Append compact context if available
+    const compactContextFile = path.join(CACHE_DIR, 'compact-context.md');
+    let fullContext = context;
+    if (fs.existsSync(compactContextFile)) {
+      try {
+        fullContext += '\n' + fs.readFileSync(compactContextFile, 'utf-8');
+        fs.unlinkSync(compactContextFile); // Clean up after reading
+      } catch { /* skip if unreadable */ }
+    }
+
+    fs.writeFileSync(resumeContextFile, fullContext);
 
     // Output to console for immediate display
     console.log(context);
@@ -268,7 +347,7 @@ function main() {
   process.exit(0);
 }
 
-module.exports = { saveHandoff, loadHandoff, generateResumeContext };
+module.exports = { saveHandoff, loadHandoff, generateResumeContext, generateCompactContext };
 
 if (require.main === module) {
   main();

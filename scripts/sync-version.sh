@@ -54,8 +54,8 @@ declare -a MD_FILES=(
   "$PLUGIN_DIR/docs/STYLING_DETECTION_GUIDE.md"
   "$PLUGIN_DIR/docs/AGENT_SELECTION_GUIDE.md"
   # Rules with banner examples
-  "$PLUGIN_DIR/rules/agent-identification-banner.md"
-  "$PLUGIN_DIR/rules/next-step-guidance.md"
+  "$PLUGIN_DIR/rules/core/agent-identification-banner.md"
+  "$PLUGIN_DIR/rules/workflow/next-step-guidance.md"
   # Commands with banner examples
   "$PLUGIN_DIR/commands/setup/activate.md"
   "$PLUGIN_DIR/commands/workflow/phase-1.md"

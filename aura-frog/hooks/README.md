@@ -23,7 +23,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (24 Total)
+## Active Hooks (26 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -775,7 +775,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[24]{event,name,purpose}:
+hooks[26]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
@@ -800,7 +800,9 @@ hooks[24]{event,name,purpose}:
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
   TaskCompleted,Task Completion Validator,Validate teammate task completion (Agent Teams)
+  SessionStart,Test Pattern Extractor,Extract test conventions from recent test files
   Stop,Compact Handoff + Metrics,Auto-save workflow state + session metrics
+  Stop,Rate Limit Reminder,Remind to check /usage for API rate limits
   PreCompact,Pre-Compact State Save,Save workflow state before auto-compact
 ```
 
@@ -834,4 +836,4 @@ hooks[24]{event,name,purpose}:
 
 **Version:** 2.0.0
 **Last Updated:** 2026-02-27
-**Status:** Active hooks system (24 hooks)
+**Status:** Active hooks system (26 hooks)

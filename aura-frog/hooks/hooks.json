@@ -27,6 +27,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-notify.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/test-pattern-extractor.cjs\" 2>&1"
           }
         ]
       }

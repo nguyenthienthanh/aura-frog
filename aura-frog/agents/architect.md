@@ -36,9 +36,9 @@ Use for architectural decisions, system design, database modeling, and complex b
 
 ## Related Files
 
-- **API Design Rules:** `rules/api-design-rules.md`
-- **Performance Rules:** `rules/performance-rules.md`
-- **Security Scanning:** `rules/sast-security-scanning.md`
+- **API Design Rules:** `rules/agent/api-design-rules.md`
+- **Performance Rules:** `rules/agent/performance-rules.md`
+- **Security Scanning:** `rules/agent/sast-security-scanning.md`
 - **Framework Skills:** `skills/nodejs-expert/`, `skills/python-expert/`, etc.
 - **Migration Helper:** `skills/migration-helper/SKILL.md`
 

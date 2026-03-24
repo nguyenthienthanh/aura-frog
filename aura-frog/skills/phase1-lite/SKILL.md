@@ -19,7 +19,7 @@ allowed-tools: NONE
 
 ## Pre-Step: Challenge Requirements
 
-**Before generating output**, apply `rules/requirement-challenger.md`:
+**Before generating output**, apply `rules/workflow/requirement-challenger.md`:
 - **Quick tasks:** Skip challenge, proceed directly
 - **Standard tasks:** Ask 1-2 clarifying questions, wait for answers
 - **Deep tasks:** Ask 3-5 questions across clarity/scope/assumptions/edge cases

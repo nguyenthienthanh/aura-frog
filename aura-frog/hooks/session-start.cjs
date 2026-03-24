@@ -62,6 +62,47 @@ const {
 
 const { loadMemory } = require('./lib/af-memory-loader.cjs');
 
+// Session cache config
+const SESSION_CACHE_FILE = path.join(process.cwd(), '.claude', 'cache', 'session-start-cache.json');
+const SESSION_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const ENVRC_PATH = path.join(process.cwd(), '.envrc');
+
+/**
+ * Check if session cache is valid
+ */
+function getValidCache() {
+  try {
+    if (!fs.existsSync(SESSION_CACHE_FILE)) return null;
+
+    const cache = JSON.parse(fs.readFileSync(SESSION_CACHE_FILE, 'utf-8'));
+    const age = Date.now() - (cache.cachedAt || 0);
+
+    // TTL expired
+    if (age > SESSION_CACHE_TTL) return null;
+
+    // .envrc changed since cache
+    if (fs.existsSync(ENVRC_PATH)) {
+      const envrcMtime = fs.statSync(ENVRC_PATH).mtimeMs;
+      if (envrcMtime > (cache.cachedAt || 0)) return null;
+    }
+
+    return cache;
+  } catch { return null; }
+}
+
+/**
+ * Save session cache
+ */
+function saveSessionCache(data) {
+  try {
+    const cacheDir = path.dirname(SESSION_CACHE_FILE);
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    fs.writeFileSync(SESSION_CACHE_FILE, JSON.stringify({ ...data, cachedAt: Date.now() }, null, 2));
+  } catch { /* non-blocking */ }
+}
+
 /**
  * Build context summary for output (compact, single line)
  */
@@ -106,6 +147,17 @@ async function main() {
     const envFile = process.env.CLAUDE_ENV_FILE;
     const source = data.source || 'unknown';
     const sessionId = data.session_id || process.ppid?.toString() || null;
+
+    // Fast path: use cached session if valid (skips all detection)
+    const cached = getValidCache();
+    if (cached && envFile && source !== 'init') {
+      // Apply cached env vars
+      for (const [key, value] of Object.entries(cached.envVars || {})) {
+        if (value) writeEnv(envFile, key, value);
+      }
+      console.log(`🐸 Session ${source} (cached). ${cached.contextSummary || ''}`);
+      process.exit(0);
+    }
 
     // Load cascading config
     const config = loadConfig();
@@ -216,6 +268,36 @@ async function main() {
 
     // Output context summary
     const contextSummary = buildContextOutput(config, detections, resolved, memoryResult);
+
+    // Save session cache for fast path on next startup
+    const envVars = {
+      AF_SESSION_ID: sessionId || '',
+      AF_PROJECT_TYPE: detections.type || '',
+      AF_PACKAGE_MANAGER: detections.pm || '',
+      AF_FRAMEWORK: detections.framework || '',
+      AF_PROJECT_ROOT: staticEnv.projectRoot,
+      AF_ACTIVE_PLAN: resolved.resolvedBy === 'session' ? resolved.path : '',
+      AF_SUGGESTED_PLAN: resolved.resolvedBy === 'branch' ? resolved.path : '',
+      AF_REPORTS_PATH: reportsPath,
+      AF_PLANS_PATH: config.paths?.plans || 'plans',
+      AF_WORKFLOWS_PATH: config.paths?.workflows || '.claude/logs/workflows',
+      AF_GIT_BRANCH: staticEnv.gitBranch || '',
+      AF_GIT_URL: staticEnv.gitUrl || '',
+      AF_NODE_VERSION: staticEnv.nodeVersion || '',
+      AF_OS_PLATFORM: staticEnv.osPlatform,
+      AF_USER: staticEnv.user,
+      AF_TIMEZONE: staticEnv.timezone,
+      AF_MEMORY_LOADED: memoryResult.loaded ? 'true' : 'false',
+      AF_MEMORY_COUNT: memoryResult.count.toString()
+    };
+    if (staticEnv.pythonVersion) envVars.AF_PYTHON_VERSION = staticEnv.pythonVersion;
+    if (staticEnv.phpVersion) envVars.AF_PHP_VERSION = staticEnv.phpVersion;
+    if (staticEnv.goVersion) envVars.AF_GO_VERSION = staticEnv.goVersion;
+    if (staticEnv.godotVersion) envVars.AF_GODOT_VERSION = staticEnv.godotVersion;
+    if (config.locale?.responseLanguage) envVars.AF_RESPONSE_LANGUAGE = config.locale.responseLanguage;
+
+    saveSessionCache({ envVars, contextSummary: contextSummary || '' });
+
     if (contextSummary) {
       console.log(`🐸 Session ${source}. ${contextSummary}`);
     } else {

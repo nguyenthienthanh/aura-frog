@@ -380,7 +380,7 @@ if (detection.testInfra) {
 
 - `skills/test-writer/SKILL.md` - Test generation skill
 - `agents/tester.md` - QA agent
-- `rules/tdd-workflow.md` - TDD enforcement rule
+- `rules/core/tdd-workflow.md` - TDD enforcement rule
 - `commands/test/unit.md`, `commands/test/e2e.md`
 
 ---

@@ -46,7 +46,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 2. **project-context-loader** → Load conventions (MANDATORY)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** - if simple, suggest lighter approach
-5. **Challenge requirements** → Ask clarifying questions before Phase 1 (see `rules/requirement-challenger.md`)
+5. **Challenge requirements** → Ask clarifying questions before Phase 1 (see `rules/workflow/requirement-challenger.md`)
 
 ---
 
@@ -75,7 +75,7 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 - Simulate use cases to find gaps
 - PM converges on optimal plan
 
-**Details:** `rules/collaborative-planning.md`
+**Details:** `rules/workflow/collaborative-planning.md`
 
 **Gate:** Only for Deep tasks. Quick/Standard use single-agent Phase 1.
 
@@ -160,7 +160,7 @@ Options:
 - `stop` → Cancel workflow
 ```
 
-See: `rules/workflow-navigation.md` for full navigation format.
+See: `rules/workflow/workflow-navigation.md` for full navigation format.
 
 ### Valid Responses
 
@@ -176,7 +176,7 @@ See: `rules/workflow-navigation.md` for full navigation format.
 **Default:** Brainstorm feedback before implementing.
 **Force mode:** Skip brainstorming with "must do: ..." / "just do: ..." / "work like that"
 
-See: `rules/feedback-brainstorming.md`
+See: `rules/workflow/feedback-brainstorming.md`
 
 ---
 
@@ -441,4 +441,4 @@ If Agent Teams not enabled OR complexity not Deep + multi-domain:
 - Auto-continue through other phases unless blocker hit
 - TDD is mandatory (RED → GREEN → REFACTOR)
 - Save state at token limit
-- **ALWAYS show what's next** after each phase (see `rules/workflow-navigation.md`)
+- **ALWAYS show what's next** after each phase (see `rules/workflow/workflow-navigation.md`)

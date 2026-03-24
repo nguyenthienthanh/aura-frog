@@ -16,7 +16,7 @@ triggers:
 
 **Category:** Code Quality
 **Version:** 1.0.0
-**Rule Reference:** `rules/simplicity-over-complexity.md`
+**Rule Reference:** `rules/core/simplicity-over-complexity.md`
 
 ---
 
@@ -26,7 +26,7 @@ Detect and simplify overly complex code. Apply KISS principle (Keep It Simple, S
 
 **Philosophy:** The best code is code you don't have to write. Less is more.
 
-**Full Guide:** Read `rules/simplicity-over-complexity.md` for comprehensive patterns and examples.
+**Full Guide:** Read `rules/core/simplicity-over-complexity.md` for comprehensive patterns and examples.
 
 ---
 
@@ -107,7 +107,7 @@ Result:
 
 ## Related Resources
 
-- **Full KISS Guide:** `rules/simplicity-over-complexity.md`
+- **Full KISS Guide:** `rules/core/simplicity-over-complexity.md`
 - **Complexity Command:** `commands/quality/complexity.md`
 - **Refactor Workflow:** `commands/refactor.md`
 - **Code Reviewer:** `skills/code-reviewer/SKILL.md`

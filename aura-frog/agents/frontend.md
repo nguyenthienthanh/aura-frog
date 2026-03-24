@@ -36,8 +36,8 @@ Use for all frontend implementation, UI components, design system work, and user
 
 ## Related Files
 
-- **Accessibility Rules:** `rules/accessibility-rules.md`
-- **Frontend Excellence:** `rules/frontend-excellence.md`
+- **Accessibility Rules:** `rules/agent/accessibility-rules.md`
+- **Frontend Excellence:** `rules/agent/frontend-excellence.md`
 - **Design System Skill:** `skills/design-system-library/SKILL.md`
 - **Framework Skills:** `skills/react-expert/`, `skills/vue-expert/`, etc.
 

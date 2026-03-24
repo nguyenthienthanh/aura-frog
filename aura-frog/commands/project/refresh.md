@@ -27,8 +27,22 @@ Refresh the project detection cache. Forces a fresh scan of the codebase to upda
 ## Usage
 
 ```
-/project:refresh
+/project:refresh                # Full refresh (rescan everything)
+/project:refresh --incremental  # Only refresh changed files (faster)
 ```
+
+### Incremental Mode
+
+Uses `git diff` to detect which files changed since the last refresh. Only re-runs the generators that are affected:
+
+| Changed Files | Generators Re-run |
+|---------------|-------------------|
+| package.json, go.mod, etc. | file-registry, architecture |
+| New/deleted files | repo-map, file-registry |
+| Source code (.ts, .py, etc.) | architecture |
+| Config (.eslintrc, tsconfig) | conventions |
+
+**Script:** `scripts/project-refresh-incremental.sh`
 
 ---
 

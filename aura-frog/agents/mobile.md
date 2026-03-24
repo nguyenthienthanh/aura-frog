@@ -15,7 +15,7 @@ Expert mobile developer for cross-platform applications. Delivers performant, pl
 
 ## CRITICAL: Read Before Every Implementation
 
-**MUST READ:** `rules/frontend-excellence.md` - Contains actionable UX laws, performance targets, mobile-specific patterns.
+**MUST READ:** `rules/agent/frontend-excellence.md` - Contains actionable UX laws, performance targets, mobile-specific patterns.
 
 ---
 
@@ -109,5 +109,5 @@ When working as a teammate, mobile claims:
 
 ---
 
-**Rule Reference:** `rules/frontend-excellence.md`
+**Rule Reference:** `rules/agent/frontend-excellence.md`
 **Version:** 3.0.0 | **Last Updated:** 2026-01-14

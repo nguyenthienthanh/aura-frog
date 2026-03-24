@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v2.0.0
+**System:** Aura Frog v2.1.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 43 skills + 86 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
@@ -61,9 +61,9 @@
 
 ```toon
 session_start[6]{step,action,file}:
-  1,Check & load .envrc (AUTO-RUN if not loaded),rules/env-loading.md
+  1,Check & load .envrc (AUTO-RUN if not loaded),rules/core/env-loading.md
   2,Load memory from Supabase (auto via hook),hooks/lib/af-memory-loader.cjs
-  3,Show agent banner,rules/agent-identification-banner.md
+  3,Show agent banner,rules/core/agent-identification-banner.md
   4,Detect agent + model,skills/agent-detector/SKILL.md
   5,Load project context,skills/project-context-loader/SKILL.md
   6,Verify MCP servers,commands/mcp/status.md
@@ -83,7 +83,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (Session Start + Phase Transitions + Agent Switches)
 
 ```
-⚡ 🐸 AURA FROG v2.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v2.1.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -92,7 +92,7 @@ session_start[6]{step,action,file}:
 
 **Teams status is MANDATORY in every banner.** Show `✓ enabled` or `✗ off`.
 
-**Details:** `rules/agent-identification-banner.md`
+**Details:** `rules/core/agent-identification-banner.md`
 
 ---
 
@@ -153,7 +153,7 @@ plan_routing[3]{complexity,approach}:
   Deep (multi-file architecture),workflow-orchestrator 5-phase workflow
 ```
 
-**Details:** `rules/execution-rules.md`
+**Details:** `rules/core/execution-rules.md`
 
 ---
 
@@ -165,7 +165,7 @@ plan_routing[3]{complexity,approach}:
 
 **2-Gate Workflow:** Only Phase 1 (Understand + Design) & Phase 3 (Build GREEN) require approval. Other phases auto-continue.
 
-**Details:** `rules/execution-rules.md`
+**Details:** `rules/core/execution-rules.md`
 
 ---
 
@@ -190,9 +190,9 @@ bundled_commands[5]{command,subcommands,replaces}:
 resources[15]{name,location}:
   Agents (10),agents/
   Commands (86),commands/
-  Rules (45),rules/
+  Rules (45: 13 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
   Skills (8 auto-invoke + 35 reference),skills/
-  Hooks (24),hooks/
+  Hooks (26),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
@@ -237,7 +237,30 @@ context_rules[4]{rule,action}:
   High context (>70%),Use /compact with focus instructions
 ```
 
-**Details:** `rules/context-management.md`
+**Details:** `rules/core/context-management.md`
+
+---
+
+## Rule Loading Strategy (3-Tier)
+
+Rules are organized into `core/`, `agent/`, `workflow/` subdirectories for selective loading.
+
+```toon
+rule_tiers[3]{tier,dir,count,when}:
+  Core,rules/core/,13,ALWAYS — every session
+  Agent,rules/agent/,15,Per-agent — only relevant rules
+  Workflow,rules/workflow/,17,Per-phase — only current phase rules
+```
+
+```toon
+loading_examples[4]{scenario,loaded,est_tokens}:
+  Quick fix,Core only (13),~2000
+  Standard Phase 1,Core + agent subset + Phase 1 workflow,~4000
+  Standard Phase 3,Core + agent subset + Phase 3 workflow,~3500
+  Deep (full),Core + all agent + current phase workflow,~5000
+```
+
+**Details:** `rules/README.md`
 
 ---
 
@@ -280,4 +303,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 2.0.0
+**Version:** 2.1.0

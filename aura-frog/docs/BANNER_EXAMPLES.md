@@ -1,7 +1,7 @@
 # Banner Examples Reference
 
 **Version:** 2.0.0
-**Purpose:** Full banner examples for all scenarios. Core rule: `rules/agent-identification-banner.md`
+**Purpose:** Full banner examples for all scenarios. Core rule: `rules/core/agent-identification-banner.md`
 
 ---
 

@@ -603,7 +603,7 @@ cat package.json | grep -E "(nativewind|emotion|styled-components)"
 
 - **Design System Library:** `skills/design-system-library/` → Full design system patterns
 - **Design System Guide:** `docs/DESIGN_SYSTEM_GUIDE.md` → Selection and implementation
-- **Design System Rule:** `rules/design-system-usage.md` → Enforcement rules
+- **Design System Rule:** `rules/agent/design-system-usage.md` → Enforcement rules
 - **Agent Guide:** `agents/mobile-react-native.md` → "Styling Conventions"
 - **UI Expert Agent:** `agents/ui-expert.md` → Design system detection
 - **NativeWind Skill:** `skills/nativewind-component-generator.md`

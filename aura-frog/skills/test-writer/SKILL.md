@@ -34,6 +34,26 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ---
 
+## Pre-Step: Load Test Patterns (if available)
+
+Before writing tests, check for cached test patterns extracted from the project:
+
+```
+File: .claude/cache/test-patterns.json
+```
+
+If this file exists, use it to match the project's existing conventions:
+- **framework** → Use the same test framework (vitest, jest, pytest, etc.)
+- **imports** → Use the same testing libraries (@testing-library, supertest, etc.)
+- **mocks** → Match mock patterns (vi.mock vs jest.mock, etc.)
+- **naming** → Match file naming convention (.test. vs .spec. vs _test.)
+- **style** → Match describe/it vs flat test() style
+- **sampleFiles** → Reference these files for structural patterns
+
+**If no cache exists:** Detect from package.json/pyproject.toml as usual.
+
+---
+
 ## Test Writing Process
 
 ### 1. Analyze Target Code

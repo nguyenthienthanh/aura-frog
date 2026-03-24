@@ -119,7 +119,7 @@ frameworks[6]{framework,runner,coverage}:
 
 - **Test Writer Skill:** `skills/test-writer/SKILL.md`
 - **Testing Patterns:** `skills/testing-patterns/SKILL.md`
-- **TDD Rule:** `rules/tdd-workflow.md`
+- **TDD Rule:** `rules/core/tdd-workflow.md`
 - **Legacy Commands:** `commands/test/unit.md`, `commands/test/e2e.md`
 
 ---

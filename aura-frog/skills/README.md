@@ -698,12 +698,12 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 **What it does:**
 - Quick reference for KISS principle application
-- References comprehensive `rules/simplicity-over-complexity.md`
+- References comprehensive `rules/core/simplicity-over-complexity.md`
 - Provides complexity targets checklist
 - Links to `quality:complexity` command for analysis
 
 **📚 Details:** `skills/code-simplifier/SKILL.md`
-**📚 Full Guide:** `rules/simplicity-over-complexity.md`
+**📚 Full Guide:** `rules/core/simplicity-over-complexity.md`
 
 ---
 

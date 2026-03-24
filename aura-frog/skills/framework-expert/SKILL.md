@@ -284,7 +284,7 @@ fullstack_loading[3]{scenario,loads,tokens}:
   - `skills/nextjs-expert/SKILL.md`
   - etc.
 - `hooks/lib/af-project-cache.cjs` - Project detection cache
-- `rules/context-management.md` - Token optimization rules
+- `rules/core/context-management.md` - Token optimization rules
 
 ---
 

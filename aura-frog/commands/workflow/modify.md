@@ -54,7 +54,7 @@ Examples:
 ```
 User types /workflow:modify <instructions>
     ↓
-Agent CHALLENGES scope impact (rules/requirement-challenger.md):
+Agent CHALLENGES scope impact (rules/workflow/requirement-challenger.md):
   - Could this expand scope significantly?
   - Should this be a separate workflow?
     ↓
@@ -81,7 +81,7 @@ Show updated approval gate
 
 **Force phrases:** "just do:", "must do:", "exactly:", "no discussion"
 
-See: `rules/feedback-brainstorming.md`
+See: `rules/workflow/feedback-brainstorming.md`
 
 ---
 

@@ -1,61 +1,109 @@
 # Aura Frog Quality Rules
 
 **Version:** 2.0.0
-**Total Rules:** 45
+**Total Rules:** 45 (13 core + 15 agent + 17 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
 
-## Rule Index (TOON Format)
+## 3-Tier Rule Architecture
+
+Rules are organized into tiers to reduce context overhead. Only load what's needed.
 
 ```toon
-rules[45]{category,rule,priority,purpose}:
-  system,agent-identification-banner,critical,Show agent banner every response
-  system,mcp-response-logging,medium,Save MCP responses to logs in TOON format
-  system,codebase-consistency,high,Learn patterns before writing code
-  system,env-loading,critical,Load .envrc at session start
-  system,execution-rules,critical,ALWAYS/NEVER execution rules
-  system,priority-hierarchy,critical,Config priority order
-  system,dual-file-architecture,high,Plugin + project structure
-  system,token-time-awareness,high,Monitor token usage
-  system,project-linting-precedence,critical,Merge project + Aura Frog rules
-  system,context-management,high,Token optimization + model selection + lazy loading
-  quality,simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated - keep implementations simple
-  quality,error-handling-standard,critical,Typed errors + structured responses
-  quality,logging-standards,high,Structured logging + sanitization
-  quality,code-quality,high,TypeScript strict + no any
-  quality,naming-conventions,medium,Consistent naming patterns
-  quality,smart-commenting,medium,Comment why not what
-  quality,prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
-  quality,post-implementation-linting,high,Run lint and fix issues after every implementation
-  quality,structured-data-schema,high,JSON-LD Schema.org implementation
-  architecture,api-design-rules,high,RESTful conventions + versioning
-  architecture,state-management,high,React/Vue state patterns
-  architecture,dependency-management,high,Version pinning + security audits
-  architecture,performance-rules,medium,Optimization guidelines
-  architecture,theme-consistency,medium,Design system adherence
-  architecture,design-system-usage,high,Proper design system implementation
-  security,sast-security-scanning,critical,OWASP Top 10 + SAST scanning
-  workflow,tdd-workflow,critical,RED → GREEN → REFACTOR
-  workflow,cross-review-workflow,high,Multi-agent review process
-  workflow,approval-gates,critical,Human approval required
-  workflow,git-workflow,high,Commit conventions
-  workflow,safety-rules,critical,Security guidelines
-  workflow,next-step-guidance,critical,Always show next steps and commands
-  workflow,workflow-navigation,high,Progress tracking and phase status
-  workflow,feedback-brainstorming,high,Brainstorm before implementing feedback
-  workflow,requirement-challenger,high,Challenge requirements before accepting them
-  workflow,collaborative-planning,high,Multi-team deliberation for Deep tasks (3 perspectives + debate + simulation)
-  workflow,impact-analysis,critical,Analyze all usages before modifying
-  workflow,workflow-deliverables,critical,Verify all phase documents created
-  documentation,diagram-requirements,medium,Mermaid diagrams for complex features
-  ui,accessibility-rules,high,WCAG compliance + ARIA
-  ui,frontend-excellence,critical,UX laws + performance + mobile patterns
-  ui,correct-file-extensions,medium,Proper file naming
-  ui,direct-hook-access,medium,Lifecycle hooks
-  workflow,estimation,high,Story points + time + risk assessment
-  workflow,verification,critical,Fresh verification before claiming done
+tiers[3]{tier,dir,count,when_loaded}:
+  Core,rules/core/,13,ALWAYS — every session
+  Agent,rules/agent/,15,Per-agent — only when agent activates
+  Workflow,rules/workflow/,17,Per-phase — only during active workflow
 ```
+
+**Token savings:** ~30-50% reduction vs loading all 45 rules every message.
+
+---
+
+## Core Rules (13) — Always Loaded
+
+```toon
+core[13]{rule,priority,purpose}:
+  execution-rules,critical,ALWAYS/NEVER execution rules
+  tdd-workflow,critical,RED → GREEN → REFACTOR
+  approval-gates,critical,Human approval required
+  context-management,high,Token optimization + model selection + lazy loading
+  code-quality,high,TypeScript strict + no any
+  naming-conventions,medium,Consistent naming patterns
+  simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated
+  verification,critical,Fresh verification before claiming done
+  env-loading,critical,Load .envrc at session start
+  agent-identification-banner,critical,Show agent banner every response
+  correct-file-extensions,medium,Proper file naming
+  prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
+  direct-hook-access,medium,Lifecycle hooks
+```
+
+---
+
+## Agent Rules (15) — Loaded Per Agent
+
+```toon
+agent[15]{rule,priority,agents}:
+  frontend-excellence,critical,frontend/mobile
+  design-system-usage,high,frontend
+  theme-consistency,medium,frontend
+  api-design-rules,high,architect
+  structured-data-schema,high,architect/frontend
+  performance-rules,medium,All dev agents
+  sast-security-scanning,critical,security
+  safety-rules,critical,security/devops
+  accessibility-rules,high,frontend
+  state-management,high,frontend/mobile
+  dual-file-architecture,high,scanner/lead
+  logging-standards,high,architect/devops
+  error-handling-standard,critical,All dev agents
+  dependency-management,high,architect/devops
+  codebase-consistency,high,All agents
+```
+
+---
+
+## Workflow Rules (17) — Loaded Per Phase
+
+```toon
+workflow[17]{rule,priority,phases}:
+  workflow-deliverables,critical,All phases
+  requirement-challenger,high,Phase 1
+  collaborative-planning,high,Phase 1 (Deep only)
+  feedback-brainstorming,high,Phase 1
+  cross-review-workflow,high,Phase 4
+  next-step-guidance,critical,All phases
+  workflow-navigation,high,All phases
+  impact-analysis,critical,Phase 1 + Phase 3
+  estimation,high,Phase 1
+  priority-hierarchy,critical,Phase 1
+  post-implementation-linting,high,Phase 3 + Phase 4
+  smart-commenting,medium,Phase 3
+  diagram-requirements,medium,Phase 1
+  token-time-awareness,high,All phases
+  git-workflow,high,Phase 5
+  mcp-response-logging,medium,All phases
+  project-linting-precedence,critical,Phase 3
+```
+
+---
+
+## Rule Loading Strategy
+
+```toon
+loading[4]{scenario,rules_loaded,est_tokens}:
+  Quick fix (no workflow),Core only (13),~2000
+  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~4000
+  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3500
+  Deep (full workflow),Core + all Agent + current Phase Workflow,~5000
+```
+
+**Agent detection determines which agent rules to load:**
+- `frontend` agent → loads: frontend-excellence, design-system-usage, theme-consistency, accessibility-rules, state-management
+- `architect` agent → loads: api-design-rules, structured-data-schema, logging-standards, error-handling-standard, dependency-management
+- `security` agent → loads: sast-security-scanning, safety-rules
 
 ---
 
@@ -66,21 +114,6 @@ priorities[3]{level,meaning,enforcement}:
   critical,Must follow,Blocks workflow progression
   high,Should follow,Generates warnings
   medium,Recommended,Best practices
-```
-
----
-
-## Categories Summary
-
-```toon
-categories[7]{name,count,critical_rules}:
-  system,10,5
-  quality,8,3
-  architecture,6,0
-  security,1,1
-  workflow,12,6
-  documentation,1,0
-  ui,4,1
 ```
 
 ---
@@ -100,67 +133,7 @@ No conflict: All rules apply together
 **Example:** Project has `semi: false`, Aura Frog has TDD rule
 → Result: No semicolons (project) + TDD (Aura Frog)
 
-See: `project-linting-precedence.md`
-
----
-
-## Quick Reference
-
-### Session Start (CRITICAL)
-- [ ] Follow `agent-identification-banner` - Show banner every response
-- [ ] Follow `env-loading` - Load .envrc if exists
-- [ ] Follow `execution-rules` - Load project context first
-- [ ] Follow `next-step-guidance` - Show next steps every response
-
-### Before Coding
-- [ ] Check `project-linting-precedence` - Merge project config with Aura Frog rules
-- [ ] Read `simplicity-over-complexity` - YAGNI + DRY + KISS (keep it simple, don't add unused features, don't abstract prematurely)
-- [ ] Read `prefer-established-libraries` - Use lodash/es-toolkit first
-
-### During Coding
-- [ ] Follow `code-quality` - TypeScript strict mode
-- [ ] Follow `naming-conventions` - Consistent names
-- [ ] Follow `error-handling-standard` - Proper error types
-- [ ] Follow `logging-standards` - Structured logs
-
-### For APIs
-- [ ] Follow `api-design-rules` - RESTful conventions
-
-### For Frontend
-- [ ] Follow `state-management` - Proper state patterns
-- [ ] Follow `accessibility-rules` - WCAG compliance
-
-### For SEO & AI Discovery
-- [ ] Follow `structured-data-schema` - JSON-LD Schema.org markup
-- [ ] *SEO and AI Discovery modules available as separate addons*
-
-### For Testing
-- [ ] Follow `tdd-workflow` - Tests first
-
-### For Refactoring
-- [ ] Follow `impact-analysis` - Analyze all usages before modifying
-- [ ] Run grep/search to find all references
-- [ ] Update all affected files
-- [ ] Verify no breaking changes
-
-### For Security
-- [ ] Follow `sast-security-scanning` - OWASP Top 10 checks
-- [ ] Follow `safety-rules` - External system safety
-
-### For Review
-- [ ] Follow `cross-review-workflow` - Multi-agent review
-
----
-
-## Related Documentation
-
-- **Skills:** `skills/README.md` - Auto-invoking capabilities
-- **Phases:** `docs/phases/` - 5-phase workflow guides
-- **Agents:** `agents/` - Agent definitions
-
----
-
-**Version:** 2.0.0 | **Last Updated:** 2026-02-09 | **Format:** TOON
+See: `workflow/project-linting-precedence.md`
 
 ---
 
@@ -179,3 +152,15 @@ Framework-specific rules have been migrated to **Expert Skills** for on-demand l
 | *ai-discovery-expert* | *Available as addon* | *AI discovery module externalized* |
 
 These skills auto-invoke when working with the respective framework.
+
+---
+
+## Related Documentation
+
+- **Skills:** `skills/README.md` - Auto-invoking capabilities
+- **Phases:** `docs/phases/` - 5-phase workflow guides
+- **Agents:** `agents/` - Agent definitions
+
+---
+
+**Version:** 2.0.0 | **Last Updated:** 2026-03-24 | **Format:** TOON

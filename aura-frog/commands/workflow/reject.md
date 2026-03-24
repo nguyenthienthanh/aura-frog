@@ -61,7 +61,7 @@ Show new approval gate
 
 **Force phrases:** "must do:", "just do:", "work like that", "I insist"
 
-See: `rules/feedback-brainstorming.md`
+See: `rules/workflow/feedback-brainstorming.md`
 
 ---
 

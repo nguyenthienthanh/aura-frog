@@ -275,6 +275,14 @@ async function main() {
     // Handle Write/Edit success
     if (toolName === 'Write' || toolName === 'Edit') {
       const filePath = process.env.CLAUDE_FILE_PATHS || '';
+
+      // Early exit: skip non-learnable file types
+      const SKIP_EXTS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.css', '.scss', '.svg', '.png', '.jpg', '.gif', '.ico', '.lock', '.log', '.env', '.toml', '.ini', '.cfg']);
+      const ext = path.extname(filePath).toLowerCase();
+      if (SKIP_EXTS.has(ext)) {
+        process.exit(0);
+      }
+
       const content = toolInput;
 
       if (filePath && content) {

@@ -3,7 +3,7 @@
  * auto-test-runner.cjs - Auto-run tests after implementation changes
  *
  * PostToolUse hook on Write|Edit. Runs async.
- * Only activates during TDD phases (5a, 5b, 5c).
+ * Only activates during TDD phases (2-Test RED, 3-Build GREEN, 4-Refactor).
  * Detects test runner from project config and runs related tests.
  *
  * Exit codes:
@@ -16,7 +16,7 @@ const { execSync } = require('child_process');
 const { readSessionState } = require('./lib/af-config-utils.cjs');
 
 // TDD phases where auto-testing is relevant
-const TDD_PHASES = ['5a', '5b', '5c'];
+const TDD_PHASES = ['2', '3', '4'];
 
 // Max test execution time (30 seconds)
 const TEST_TIMEOUT = 30000;
@@ -82,7 +82,10 @@ try {
   const state = readSessionState(sessionId);
   const currentPhase = state?.phase || process.env.AF_CURRENT_PHASE;
 
-  if (!currentPhase || !TDD_PHASES.includes(currentPhase)) {
+  // In TDD phase: always run. Outside workflow: only if editing a test file
+  const inTddPhase = currentPhase && TDD_PHASES.includes(currentPhase);
+  const isTestFile = /\.(test|spec|_test)\.[^.]+$/.test(filePath) || /\/__tests__\//.test(filePath);
+  if (!inTddPhase && !isTestFile) {
     process.exit(0);
   }
 

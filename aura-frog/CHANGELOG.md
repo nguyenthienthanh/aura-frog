@@ -4,6 +4,38 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.1.0] - 2026-03-24
+
+### Performance Optimization — 8 PERF Items
+
+#### Added
+- **3-tier rule architecture (PERF-2)** — Rules reorganized into `core/` (13), `agent/` (15), `workflow/` (17) subdirectories for selective loading. ~30-50% token reduction vs loading all 45 rules
+- **Agent detection cache (PERF-4)** — Cache detection results per workflow. Skip full 5-step detection after Phase 1. ~500-1000 tokens saved per message
+- **Session start TTL cache (PERF-6)** — 1-hour cache for session-start.cjs. Skips all detection on cache hit. Invalidated by TTL expiry or .envrc changes
+- **Smart compact context (PERF-3)** — `generateCompactContext()` in compact-handoff.cjs writes Phase 1 decisions, modified files, and session context for post-compact resume
+- **Test pattern extractor (PERF-7)** — New `test-pattern-extractor.cjs` hook extracts framework, imports, mock patterns from 3 most recent test files. Cache: `.claude/cache/test-patterns.json`
+- **Incremental project refresh (PERF-8)** — New `project-refresh-incremental.sh` script. Uses `git diff` to only re-run affected generators. `/project:refresh --incremental`
+- **Rate limit reminder hook** — `rate-limit-check.cjs` on Stop event reminds user to run `/usage`
+
+#### Fixed
+- **TDD phase references (PERF-5)** — `auto-test-runner.cjs` updated from `['5a', '5b', '5c']` to `['2', '3', '4']` matching 5-phase workflow
+- **Non-workflow test mode (PERF-5)** — Auto-test-runner now runs when editing test files even outside a workflow
+
+#### Updated
+- **smart-learn.cjs (PERF-1D)** — Early exit for non-code files (.md, .json, .css, etc.)
+- **feedback-capture.cjs (PERF-1E)** — Fast path skip for brand-new files (ctime ≈ mtime)
+- **test-writer SKILL.md** — Loads test patterns from cache before writing tests
+- **Rule path references** — Updated across CLAUDE.md, agents, sync-version.sh
+- **Hooks:** 24 → 26 (+test-pattern-extractor, +rate-limit-check)
+- **Scripts:** 17 → 18 (+project-refresh-incremental.sh)
+
+#### Stats
+- Rules: 45 (13 core + 15 agent + 17 workflow)
+- Hooks: 26 (was 24)
+- Scripts: 18 (was 17)
+
+---
+
 ## [2.0.0] - 2026-03-24
 
 ### Major Refactor — Agent Rename, Context Optimization, Quality Overhaul
