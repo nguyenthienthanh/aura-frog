@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v2.1.0
+**System:** Aura Frog v2.1.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 43 skills + 86 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
@@ -83,7 +83,7 @@ session_start[6]{step,action,file}:
 ## Agent Banner (Session Start + Phase Transitions + Agent Switches)
 
 ```
-⚡ 🐸 AURA FROG v2.1.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v2.1.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
 ┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -303,4 +303,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 2.1.0
+**Version:** 2.1.1

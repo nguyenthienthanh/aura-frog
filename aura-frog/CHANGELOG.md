@@ -4,6 +4,24 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.1.1] - 2026-03-24
+
+### Maintenance — Version Sync Cleanup
+
+#### Fixed
+- **marketplace.json** — Was stuck at 2.0.0, now synced
+- **`.claude/CLAUDE.md`** — Was stuck at 1.22.0, now synced
+
+#### Removed
+- **Version footers from 55+ files** — Only 4 files now carry the plugin version
+- **Hardcoded versions in banner examples** — Now use `{version}` placeholder
+
+#### Updated
+- **`sync-version.sh`** — Simplified to only update 4 version files + README badge
+- **Templates** — Use `[AF_VERSION]` placeholder instead of hardcoded version
+
+---
+
 ## [2.1.0] - 2026-03-24
 
 ### Performance Optimization — 8 PERF Items
