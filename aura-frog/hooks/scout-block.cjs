@@ -110,13 +110,15 @@ try {
       process.exit(0);
     }
 
-    // Block directory access commands
+    // Block directory access commands — only check the first line (actual command),
+    // not heredoc/multiline content (e.g. release notes containing "coverage")
+    const firstLine = command.split('\n')[0];
     const accessPatterns = ['cd ', 'ls ', 'cat ', 'head ', 'tail ', 'find ', 'grep '];
-    const isAccessCommand = accessPatterns.some(p => command.includes(p));
+    const isAccessCommand = accessPatterns.some(p => firstLine.includes(p));
 
     if (isAccessCommand) {
       for (const pattern of allPatterns) {
-        if (command.includes(pattern)) {
+        if (firstLine.includes(pattern)) {
           console.error(`⛔ Blocked: command accesses ${pattern}`);
           process.exit(2);
         }
