@@ -91,4 +91,3 @@ curl -u "$JIRA_EMAIL:$JIRA_API_TOKEN" "$JIRA_URL/rest/api/3/myself"
 
 ---
 
-**Version:** 2.0.0

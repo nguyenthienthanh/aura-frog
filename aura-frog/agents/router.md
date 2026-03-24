@@ -2,7 +2,6 @@
 
 **Agent ID:** router
 **Priority:** 100
-**Version:** 2.0.0
 **Status:** Active
 
 ---
@@ -87,4 +86,3 @@ agents[10]{id,domain,priority}:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-02-09

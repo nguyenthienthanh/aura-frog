@@ -2,7 +2,6 @@
 
 **Category:** Testing (Bundled)
 **Scope:** Session
-**Version:** 2.0.0
 
 ---
 
@@ -124,4 +123,3 @@ frameworks[6]{framework,runner,coverage}:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-21

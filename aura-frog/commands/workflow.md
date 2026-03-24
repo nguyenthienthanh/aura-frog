@@ -2,7 +2,6 @@
 
 **Category:** Workflow (Bundled)
 **Scope:** Session
-**Version:** 2.0.0
 
 ---
 
@@ -166,4 +165,3 @@ Legacy commands still work but redirect to bundled command.
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-21

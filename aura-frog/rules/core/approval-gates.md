@@ -1,6 +1,5 @@
 # Approval Gates - Phase Transition Control
 
-**Version:** 2.0.0
 **Purpose:** Streamlined 2-gate approval workflow
 **Priority:** CRITICAL
 
@@ -86,4 +85,3 @@ Workflow state saved to `.claude/logs/workflows/[workflow-id]/workflow-state.jso
 
 ---
 
-**Version:** 2.0.0

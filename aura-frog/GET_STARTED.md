@@ -447,5 +447,4 @@ Type `workflow:start <task>` to begin your first workflow.
 
 ---
 
-**Version:** 2.0.0
 

@@ -29,10 +29,17 @@ All notable changes to Aura Frog will be documented in this file.
 - **Hooks:** 24 → 26 (+test-pattern-extractor, +rate-limit-check)
 - **Scripts:** 17 → 18 (+project-refresh-incremental.sh)
 
+#### Maintenance
+- **Version footer cleanup** — Removed `**Version:** X.Y.Z` footers from ~55 files. Only 4 files now carry the plugin version (plugin.json, marketplace.json, CLAUDE.md, .claude/CLAUDE.md)
+- **Banner examples use `{version}` placeholder** — No more hardcoded versions in example banners
+- **Simplified `sync-version.sh`** — Removed broad sweep, now only updates 4 version files + README badge
+- **Fixed marketplace.json** — Was stuck at 2.0.0, now synced to 2.1.0
+
 #### Stats
 - Rules: 45 (13 core + 15 agent + 17 workflow)
 - Hooks: 26 (was 24)
 - Scripts: 18 (was 17)
+- Version files: 4 (was 60+)
 
 ---
 

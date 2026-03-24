@@ -84,4 +84,3 @@ sections[10]{section,content}:
 
 ---
 
-**Version:** 2.0.0

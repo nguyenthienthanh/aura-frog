@@ -1,6 +1,5 @@
 # Agent Selection Guide
 
-**Version:** 2.1.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** Complete guide to intelligent agent selection in Aura Frog
 
@@ -418,7 +417,4 @@ Confidence: 85% (High)
 
 ---
 
-**Guide Version:** 2.1.0
-**Aura Frog Version:** 1.3.0
 **Format:** TOON
-**Last Updated:** 2025-12-10

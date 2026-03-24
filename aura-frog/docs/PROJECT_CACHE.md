@@ -1,6 +1,5 @@
 # Project Detection Cache
 
-**Version:** 2.0.0
 
 ---
 
@@ -335,4 +334,3 @@ const result = getProjectForTask("Fix the login bug in backend-api");
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-21

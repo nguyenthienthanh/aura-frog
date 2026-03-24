@@ -78,4 +78,3 @@ severity[4]{level,action,sla}:
 
 ---
 
-**Version:** 2.0.0

@@ -3,7 +3,6 @@
 **Agent ID:** lead
 **Priority:** 95
 **Role:** Orchestrator (Team Coordinator)
-**Version:** 2.0.0
 
 ---
 
@@ -91,4 +90,3 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-02-14

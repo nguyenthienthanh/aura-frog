@@ -8,10 +8,12 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+> **25+ releases** · **9,000+ lines of hook code** · **8 test suites & CI** · **MIT License**
 
 **[Install in 30 seconds](#-install)** | **[See it in action](#-see-it-in-action)** | **[Why Aura Frog?](#-the-problem)**
 
@@ -43,6 +45,17 @@ Aura Frog:
 ```
 
 **You approve twice. Aura Frog handles the rest.**
+
+<details>
+<summary>🆕 What's New in v2.1 — Performance Release</summary>
+
+- **~60% less context overhead** — 3-tier rule architecture (core/agent/workflow)
+- **Smart caching everywhere** — Agent detection, session start, test patterns
+- **Workflow survives /compact** — Design decisions preserved across context resets
+- **Auto-test pattern matching** — Tests match your project's conventions automatically
+- **Incremental project refresh** — Only re-scan changed files via `git diff`
+
+</details>
 
 ---
 
@@ -103,7 +116,6 @@ You: "approve"
 |---|:---|:---|
 | **Quality** | Hope and pray | TDD enforced (RED → GREEN → REFACTOR) |
 | **Agents** | One generic AI | **10 specialists** auto-selected per task |
-| **Cost** | Opus for everything | **Model routing** saves 30-50% |
 | **Context** | Re-explain every session | **Deep Project Init** remembers everything |
 | **Planning** | One perspective, hope for the best | **3 agents debate** your plan before building |
 | **Teams** | One agent at a time | **Multi-agent orchestration** with cross-review |
@@ -117,9 +129,9 @@ You: "approve"
 
 <div align="center">
 
-| 10 Agents | 43 Skills | 86 Commands | 45 Rules | 24 Hooks | 6 MCPs |
+| 10 Agents | 43 Skills | 86 Commands | 45 Rules | 26 Hooks | 6 MCPs |
 |:-:|:-:|:-:|:-:|:-:|:-:|
-| Auto-selected per task | 8 auto-invoke | 5 bundled menus | Quality enforcement | Lifecycle automation | Zero-config |
+| Auto-selected per task | 8 auto-invoke | 5 bundled menus | 3-tier loading | Conditional execution | Zero-config |
 
 </div>
 
@@ -171,17 +183,17 @@ Claude stops being a generalist. The right expert activates for every task:
 
 </details>
 
-### Model Routing (Save 30-50%)
+### Smart Complexity Routing
 
-Stop paying Opus prices for typo fixes:
+Aura Frog auto-detects task complexity and recommends the optimal approach:
 
 ```
-"Fix this typo"              → Haiku   (cheapest)
-"Add pagination to the API"  → Sonnet  (balanced)
-"Design the auth system"     → Opus    (most capable)
+"Fix this typo"              → Quick: direct edit, no workflow
+"Add pagination to the API"  → Standard: light workflow
+"Design the auth system"     → Deep: full 5-phase + collaborative planning
 ```
 
-Automatic. No configuration needed.
+Automatic. No configuration needed. Saves tokens by matching effort to complexity.
 
 ### Agent Teams
 
@@ -245,6 +257,24 @@ Generates 7 context files:
 
 **Result:** 95% fewer tokens wasted on re-scanning. New sessions start working immediately.
 
+### Performance-Conscious by Design
+
+Aura Frog is aware of its own resource consumption:
+
+```
+Context Optimization:
+  📦 3-tier rules          → Only load what's needed per agent & phase
+  🧠 Agent detection cache → Skip re-detection during active workflow
+  ⚡ Session start cache   → <1s on repeat sessions (vs 3-5s cold)
+  🔇 Conditional hooks     → Skip processing for non-code files
+  📋 Smart compact         → Preserve decisions when Claude resets context
+
+Token Budget:
+  Full workflow target: ≤30K tokens (5 phases)
+  Always-loaded context: ~2,700 lines (core rules only)
+  Full rules if needed: 11,612 lines (loaded selectively)
+```
+
 ### 6 MCP Servers (Zero Config)
 
 Library docs, E2E testing, unit tests, Firebase, Figma designs, Slack notifications — all auto-invoked when Claude needs them.
@@ -265,6 +295,16 @@ Aura Frog learns from every session:
 - Creates learned rules that persist across sessions
 - Optional Supabase sync for cross-machine memory
 
+### Built-in Safety Net
+
+```
+Workflow crashed?     → Auto-saves state. Type `workflow:resume`
+Context window full?  → Auto-preserves Phase 1 decisions across /compact
+Need to pause?        → `workflow:handoff` saves everything for later
+```
+
+Your work is never lost.
+
 ---
 
 ## Workflow Modes
@@ -283,7 +323,7 @@ Aura Frog learns from every session:
 | | Link |
 |---|---|
 | **Getting Started** | [GET_STARTED.md](aura-frog/GET_STARTED.md) |
-| **All Commands (84)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Commands (86)** | [commands/README.md](aura-frog/commands/README.md) |
 | **All Skills (43)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams** | [AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) |
@@ -300,24 +340,29 @@ Aura Frog learns from every session:
 ```
 aura-frog/
 ├── agents/         10 specialized agents (auto-selected)
+│   └── reference/  10 pattern files (lazy-loaded)
 ├── skills/         43 skills (8 auto-invoke + 35 reference)
 ├── commands/       86 commands (5 bundled menus)
-├── rules/          45 quality rules (TOON-optimized)
-├── hooks/          24 lifecycle hooks
-├── scripts/        37 utility scripts
+├── rules/          45 quality rules (3-tier: core/agent/workflow)
+│   ├── core/       13 rules — always loaded
+│   ├── agent/      15 rules — loaded per agent type
+│   └── workflow/   17 rules — loaded per phase
+├── hooks/          26 lifecycle hooks (conditional execution)
+├── scripts/        18 utility scripts
 ├── templates/      Document templates
-├── docs/           Guides & references
+├── docs/           Guides, tutorials & references
 └── .mcp.json       6 bundled MCP servers
 ```
 
 ---
 
-## Good to Know
+## How It Works Under the Hood
 
-- **Agents are persona-based** — same Claude instance with different instructions, not separate AI models
-- **Agent Teams requires experimental flag** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-- **Token savings** are from structured TOON format and smart context loading, not model switching
-- **Collaborative planning** adds ~8.5K tokens to Phase 1 for Deep tasks (justified by catching expensive mistakes early)
+- **Agents are instruction-based** — Same Claude instance, different expert instructions per task. No extra API calls or separate models.
+- **3-tier rule loading** — Core rules always active. Agent-specific rules load when that agent is detected. Phase-specific rules load when entering that phase. ~60% less context vs loading everything.
+- **Agent Teams requires experimental flag** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Without it, standard subagent mode works for all tasks.
+- **Self-learning is local-first** — Works immediately with JSON files. No Supabase required. Optional cloud sync for teams.
+- **Hooks are conditional** — Security scans only run on code files. Test runners only fire during TDD phases. Learning only tracks code patterns. ~40-60% fewer hook executions vs always-fire.
 
 ---
 
@@ -348,8 +393,8 @@ MIT License — See [LICENSE](LICENSE)
 
 ### Code with main character energy.
 
-**[Install Now](#-install)** | **[Documentation](aura-frog/GET_STARTED.md)** | **[Report Issue](https://github.com/nguyenthienthanh/aura-frog/issues)**
+**[Install Now](#-install)** · **[Tutorial](aura-frog/docs/guides/FIRST_WORKFLOW_TUTORIAL.md)** · **[Troubleshooting](aura-frog/docs/TROUBLESHOOTING.md)** · **[Report Issue](https://github.com/nguyenthienthanh/aura-frog/issues)**
 
-*Built by [@nguyenthienthanh](https://github.com/nguyenthienthanh)*
+*Built by [@nguyenthienthanh](https://github.com/nguyenthienthanh) · [Release Notes](aura-frog/docs/RELEASE_NOTES.md) · [Changelog](aura-frog/CHANGELOG.md)*
 
 </div>

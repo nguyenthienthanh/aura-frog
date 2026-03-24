@@ -72,4 +72,3 @@ Progress: 60% complete
 
 ---
 
-**Version:** 2.0.0

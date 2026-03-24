@@ -140,4 +140,3 @@ For detailed techniques, see:
 
 ---
 
-**Version:** 2.0.0

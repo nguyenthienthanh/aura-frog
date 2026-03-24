@@ -1,7 +1,6 @@
 # Skill: Smart Phase Skipping
 
 **Category:** Workflow Optimization
-**Version:** 2.0.0
 **Used By:** lead, workflow-orchestrator
 
 ---
@@ -161,4 +160,3 @@ Is this documentation only?
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-03-12

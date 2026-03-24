@@ -74,4 +74,3 @@ workflow:resume {workflow-id}
 
 ---
 
-**Version:** 2.0.0

@@ -89,4 +89,3 @@ output[5]{metric,before,after}:
 
 ---
 
-**Version:** 2.0.0

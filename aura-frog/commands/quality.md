@@ -2,7 +2,6 @@
 
 **Category:** Quality (Bundled)
 **Scope:** Session
-**Version:** 2.0.0
 
 ---
 
@@ -106,4 +105,3 @@ Select [1-8] or type command:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-21

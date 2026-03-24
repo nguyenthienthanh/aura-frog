@@ -2,7 +2,6 @@
 
 **Category:** Code Quality & Architecture
 **Priority:** Critical
-**Version:** 2.0.0
 **Applies To:** All phases, especially Phase 1 (Understand + Design), Phase 3 (Build GREEN), Phase 4 (Refactor + Review)
 
 ---
@@ -108,4 +107,3 @@ checklist[5]{question,if_no}:
 
 ---
 
-**Version:** 2.0.0 | **Replaces:** yagni-principle.md + dry-with-caution.md + kiss-avoid-over-engineering.md

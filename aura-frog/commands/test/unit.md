@@ -99,4 +99,3 @@ src/components/UserProfile/
 
 ---
 
-**Version:** 2.0.0

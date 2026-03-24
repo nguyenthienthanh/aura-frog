@@ -109,4 +109,3 @@ Task: "Fix the login bug in backend-api"
 
 ---
 
-**Version:** 2.0.0

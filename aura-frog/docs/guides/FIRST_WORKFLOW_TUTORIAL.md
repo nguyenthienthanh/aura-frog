@@ -107,4 +107,3 @@ In 2 approvals:
 
 ---
 
-**Version:** 2.0.0

@@ -1,6 +1,5 @@
 # Agent Identification Banner
 
-**Version:** 2.0.0
 **Priority:** CRITICAL - Must be shown at session start, phase transitions, and agent switches
 
 ---
@@ -20,7 +19,7 @@ banner_display[4]{when,required}:
 ## Banner Template
 
 ```
-⚡ 🐸 AURA FROG v2.0.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: [agent] │ Phase: [phase] - [name]               ┃
 ┃ Model: [model] │ Teams: [✓/✗]                           ┃
 ┃ 🔥 [aura-message]                                      ┃
@@ -119,4 +118,3 @@ Banner (START) → Response Content → Next Step Guidance (END)
 
 ---
 
-**Version:** 2.0.0

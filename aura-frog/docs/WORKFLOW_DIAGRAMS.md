@@ -1,6 +1,5 @@
 # Aura Frog Workflow Diagrams
 
-**Version:** 2.0.0
 **Format:** Mermaid (render with GitHub, VS Code, or mermaid.live)
 **Purpose:** Visual documentation of Aura Frog 5-phase workflow and architecture
 
@@ -853,6 +852,5 @@ npx @mermaid-js/mermaid-cli -i WORKFLOW_DIAGRAMS.md -o output/
 
 ---
 
-**Version:** 2.0.0
 **Last Updated:** 2026-03-12
 **Format:** Mermaid

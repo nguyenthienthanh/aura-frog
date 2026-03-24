@@ -2,7 +2,6 @@
 
 **Category:** Bug Fixing (Bundled)
 **Scope:** Session
-**Version:** 2.0.0
 
 ---
 
@@ -87,4 +86,3 @@ Or describe the bug directly:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-21

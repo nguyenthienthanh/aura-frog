@@ -2,7 +2,6 @@
 
 **Agent ID:** scanner
 **Priority:** 100 (System Agent)
-**Version:** 2.0.0
 **Status:** Active
 
 ---
@@ -102,4 +101,3 @@ When working as a teammate, scanner claims:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-02-14

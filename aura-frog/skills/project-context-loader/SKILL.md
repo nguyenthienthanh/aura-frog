@@ -15,7 +15,6 @@ allowed-tools: Read, Write, Grep, Glob, Bash
 # Project Context Loader
 
 **Priority:** HIGH - Use before any workflow or code generation
-**Version:** 2.0.0
 
 ---
 

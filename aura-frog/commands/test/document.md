@@ -84,4 +84,3 @@ outputs[6]{file,content}:
 
 ---
 
-**Version:** 2.0.0

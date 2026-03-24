@@ -465,6 +465,5 @@ Detected Values > Existing Config > Defaults
 
 ---
 
-**Version:** 2.0.0
 **Last Updated:** 2026-03-20
 

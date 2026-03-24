@@ -91,4 +91,3 @@ After Phase 1 completes:
 ---
 
 **Related:** `workflow:approve`, `workflow:status`, `workflow:phase:2`
-**Version:** 2.0.0

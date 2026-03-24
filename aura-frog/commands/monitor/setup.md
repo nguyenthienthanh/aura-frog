@@ -75,4 +75,3 @@ env_vars[4]{platform,vars}:
 
 ---
 
-**Version:** 2.0.0

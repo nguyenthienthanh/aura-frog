@@ -92,4 +92,3 @@ types[6]{type,when,example}:
 ---
 
 **Template:** `templates/refactor-analysis.md`
-**Version:** 2.0.0

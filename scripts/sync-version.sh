@@ -37,34 +37,19 @@ declare -a JSON_FILES=(
   "$PROJECT_ROOT/.claude-plugin/marketplace.json"
 )
 
+# Only files that still carry the plugin version
+# (most files had version footers removed to avoid sync issues)
 declare -a MD_FILES=(
-  # Core plugin files
+  # Main plugin entry point (header + footer)
   "$PLUGIN_DIR/CLAUDE.md"
-  "$PLUGIN_DIR/README.md"
-  "$PLUGIN_DIR/GET_STARTED.md"
-  "$PLUGIN_DIR/TODO.md"
-  # Index files
-  "$PLUGIN_DIR/rules/README.md"
-  "$PLUGIN_DIR/skills/README.md"
-  "$PLUGIN_DIR/hooks/README.md"
-  "$PLUGIN_DIR/commands/README.md"
-  "$PLUGIN_DIR/agents/README.md"
-  # Docs
-  "$PLUGIN_DIR/docs/MCP_GUIDE.md"
-  "$PLUGIN_DIR/docs/STYLING_DETECTION_GUIDE.md"
-  "$PLUGIN_DIR/docs/AGENT_SELECTION_GUIDE.md"
-  # Rules with banner examples
-  "$PLUGIN_DIR/rules/core/agent-identification-banner.md"
-  "$PLUGIN_DIR/rules/workflow/next-step-guidance.md"
-  # Commands with banner examples
-  "$PLUGIN_DIR/commands/setup/activate.md"
-  "$PLUGIN_DIR/commands/workflow/phase-1.md"
-  # Root README
+  # Banner in CLAUDE.md references version
+  "$PLUGIN_DIR/CLAUDE.md"
+  # Project CLAUDE.md
+  "$PROJECT_ROOT/.claude/CLAUDE.md"
+  # Root README (badge)
   "$PROJECT_ROOT/README.md"
   # Global CLAUDE.md (user home)
   "$HOME/.claude/CLAUDE.md"
-  # Project CLAUDE.md
-  "$PROJECT_ROOT/.claude/CLAUDE.md"
 )
 
 declare -a YAML_FILES=(
@@ -268,15 +253,15 @@ main() {
   print_info "Updating version: $CURRENT_VERSION -> $NEW_VERSION"
   echo ""
 
-  # Update JSON files
+  # Update JSON files (explicit list)
   echo -e "${BLUE}JSON files:${NC}"
   for file in "${JSON_FILES[@]}"; do
     update_json_version "$file" "$NEW_VERSION"
   done
 
-  # Update Markdown files
+  # Update Markdown files (explicit list)
   echo ""
-  echo -e "${BLUE}Markdown files:${NC}"
+  echo -e "${BLUE}Markdown files (explicit):${NC}"
   for file in "${MD_FILES[@]}"; do
     update_md_version "$file" "$NEW_VERSION"
   done
@@ -287,6 +272,9 @@ main() {
   for file in "${YAML_FILES[@]}"; do
     update_yaml_version "$file" "$NEW_VERSION"
   done
+
+  # Note: Version footers were removed from most files (v2.1.0+).
+  # Only plugin.json, marketplace.json, CLAUDE.md, .claude/CLAUDE.md, and README.md carry the version now.
 
   echo ""
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

@@ -1,6 +1,5 @@
 # Execution Rules
 
-**Version:** 2.0.0
 **Priority:** CRITICAL - Behavioral constraints for all operations
 **Type:** Rule (Behavioral Constraints)
 **Updated:** v1.8.0 - Aligned with 2-gate workflow
@@ -366,5 +365,4 @@ CLOSE:   Lead sends shutdown_request → teammates approve → next phase
 
 ---
 
-**Version:** 2.1.0
 **Last Updated:** 2026-02-09

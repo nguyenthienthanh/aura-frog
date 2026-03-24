@@ -124,4 +124,3 @@ Cache is automatically invalidated when:
 
 ---
 
-**Version:** 2.0.0

@@ -17,7 +17,6 @@ allowed-tools: Read, Write, Bash
 
 **Purpose:** Manage workflow state across sessions with handoff and resume
 **Priority:** HIGH
-**Version:** 2.0.0
 
 ---
 
@@ -421,5 +420,4 @@ agents[2]: backend-nodejs,tester
 
 ---
 
-**Version:** 2.0.0
 **Last Updated:** 2025-12-23

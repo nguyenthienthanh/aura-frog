@@ -1,6 +1,5 @@
 # Aura Frog Learning System
 
-**Version:** 2.0.0
 **Status:** Production Ready
 
 The Learning System enables Aura Frog to improve over time by collecting feedback, analyzing patterns, and generating actionable insights. It works out of the box with local JSON files -- no external services required.
@@ -188,4 +187,3 @@ Then run: `./scripts/supabase/setup.sh`
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-01-20

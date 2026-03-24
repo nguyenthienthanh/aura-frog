@@ -1,7 +1,7 @@
 #!/bin/bash
 # Context Compression Generator
 # Creates token-efficient session context in TOON format
-# Version: 2.0.0
+# Aura Frog Plugin Script
 
 set -e
 
@@ -18,7 +18,7 @@ OUTPUT_DIR="${1:-.claude}"
 PROJECT_ROOT="${2:-.}"
 
 usage() {
-    echo "Context Compression Generator v2.0.0"
+    echo "Context Compression Generator"
     echo ""
     echo "Usage: $0 [output-dir] [project-root]"
     echo ""
@@ -336,7 +336,7 @@ main() {
 
     cd "$PROJECT_ROOT"
 
-    echo -e "${CYAN}Context Compression Generator v2.0.0${NC}"
+    echo -e "${CYAN}Context Compression Generator${NC}"
     echo "======================================="
     echo ""
     echo -e "Project: ${GREEN}$(basename "$(pwd)")${NC}"

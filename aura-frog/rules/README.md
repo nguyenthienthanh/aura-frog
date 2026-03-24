@@ -1,6 +1,5 @@
 # Aura Frog Quality Rules
 
-**Version:** 2.0.0
 **Total Rules:** 45 (13 core + 15 agent + 17 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -163,4 +162,3 @@ These skills auto-invoke when working with the respective framework.
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2026-03-24 | **Format:** TOON

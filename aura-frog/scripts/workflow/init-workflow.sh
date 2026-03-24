@@ -2,7 +2,7 @@
 
 # Workflow Initialization Script
 # Purpose: Initialize new workflow with human-readable naming
-# Version: 2.0.0 - Meaningful names + proper log structure
+# Meaningful names + proper log structure
 
 set -euo pipefail
 

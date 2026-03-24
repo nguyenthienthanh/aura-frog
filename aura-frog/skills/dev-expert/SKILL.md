@@ -13,7 +13,6 @@ triggers:
 # Skill: Dev Expert
 
 **Category:** Reference Skill
-**Version:** 2.0.0
 **Used By:** All development agents
 
 ---
@@ -67,4 +66,3 @@ state_types[3]{type,use_when,solution}:
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** 2025-12-23

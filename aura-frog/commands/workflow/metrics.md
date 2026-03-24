@@ -65,4 +65,3 @@ thresholds[5]{metric,pass,warn,fail}:
 
 ---
 
-**Version:** 2.0.0

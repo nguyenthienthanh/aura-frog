@@ -94,4 +94,3 @@ yarn cypress run --spec "cypress/e2e/**"   # Specific tests
 
 ---
 
-**Version:** 2.0.0

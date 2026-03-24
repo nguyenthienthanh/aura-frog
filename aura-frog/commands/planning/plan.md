@@ -74,4 +74,3 @@ criteria[5]{criterion,weight}:
 
 ---
 
-**Version:** 2.0.0
