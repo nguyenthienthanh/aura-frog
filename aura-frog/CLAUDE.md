@@ -2,7 +2,7 @@
 
 **System:** Aura Frog v2.2.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 10 agents + 43 skills + 88 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
+**Purpose:** 10 agents + 43 skills + 89 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
 ---
 

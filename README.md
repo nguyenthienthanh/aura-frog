@@ -73,6 +73,18 @@ That's it. Start your first workflow:
 workflow:start "Your task here"
 ```
 
+**Optional:** Install the `af` CLI for health checks and setup guides outside Claude Code:
+
+```bash
+# In Claude Code:
+setup:cli
+
+# Or manually:
+sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af" /usr/local/bin/af
+```
+
+Then use anywhere: `af doctor`, `af setup remote`, `af setup channels`, `af measure`.
+
 ---
 
 ## See It In Action

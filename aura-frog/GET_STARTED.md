@@ -75,6 +75,27 @@ This will:
 
 **Or skip and use defaults** - Aura Frog works out of the box!
 
+### Step 4: Install CLI (Optional)
+
+Install the `af` command for health checks and setup guides outside Claude Code:
+
+```bash
+# In your regular terminal (not Claude Code):
+sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af" /usr/local/bin/af
+
+# Or without sudo — add to PATH:
+echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Then use anywhere:
+```bash
+af doctor           # Health check
+af setup remote     # Remote control guide
+af setup channels   # Telegram/Discord channels
+af measure          # Performance report
+```
+
 ---
 
 ## Test Your Setup

@@ -1,22 +1,207 @@
 #!/bin/bash
 # af — Aura Frog CLI wrapper
 # Zero dependencies, pure bash
+# Install: af setup cli
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-PLUGIN_DIR="$PROJECT_ROOT/aura-frog"
-
-# Read version from plugin.json
-VERSION=$(grep '"version"' "$PLUGIN_DIR/.claude-plugin/plugin.json" 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
 REPO="nguyenthienthanh/aura-frog"
 
+# Auto-detect plugin location
+find_plugin_dir() {
+  # 1. Marketplace install (most users)
+  local marketplace="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/aura-frog"
+  [ -d "$marketplace" ] && echo "$marketplace" && return
+
+  # 2. Local repo (developers)
+  local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local local_repo="$(dirname "$script_dir")/aura-frog"
+  [ -d "$local_repo" ] && echo "$local_repo" && return
+
+  # 3. Current directory
+  [ -d "aura-frog" ] && echo "aura-frog" && return
+
+  echo ""
+}
+
+PLUGIN_DIR="$(find_plugin_dir)"
+VERSION="unknown"
+if [ -n "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/.claude-plugin/plugin.json" ]; then
+  VERSION=$(grep '"version"' "$PLUGIN_DIR/.claude-plugin/plugin.json" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+fi
+
+# ─── Setup subcommands ───────────────────────────────────────────────
+handle_setup() {
+  case "${1:-}" in
+    cli)
+      echo "🐸 Install af CLI globally"
+      echo "=========================="
+      echo ""
+      # Find the af script location
+      local af_path="${BASH_SOURCE[0]}"
+      if [ ! -f "$af_path" ]; then
+        # Try marketplace location
+        af_path="$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/af"
+      fi
+
+      if [ ! -f "$af_path" ]; then
+        echo "❌ Could not find af script"
+        echo "   Run this inside Claude Code: setup:cli"
+        return 1
+      fi
+
+      local target="/usr/local/bin/af"
+      echo "This will create a symlink:"
+      echo "  $target → $af_path"
+      echo ""
+      read -p "Proceed? (y/n) " -n 1 -r
+      echo ""
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if ln -sf "$af_path" "$target" 2>/dev/null; then
+          echo "✅ Installed! Type 'af' anywhere to use."
+        else
+          echo "⚠️  Permission denied. Try with sudo:"
+          echo "  sudo ln -sf \"$af_path\" $target"
+        fi
+      else
+        echo "Cancelled."
+        echo ""
+        echo "Manual install options:"
+        echo "  # Option 1: Symlink (recommended)"
+        echo "  sudo ln -sf \"$af_path\" /usr/local/bin/af"
+        echo ""
+        echo "  # Option 2: Add to PATH"
+        echo "  echo 'export PATH=\"\$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts:\$PATH\"' >> ~/.zshrc"
+      fi
+      ;;
+
+    remote)
+      echo "🐸 Remote Control Setup"
+      echo "======================="
+      echo ""
+      echo "Remote Control lets you drive Claude Code from your phone or browser."
+      echo ""
+      echo "Start a session with remote control:"
+      echo "  claude --remote-control"
+      echo ""
+      echo "This generates a URL + QR code. Open it on claude.ai or scan with your phone."
+      echo ""
+      echo "Features:"
+      echo "  - Approve/deny permissions from phone"
+      echo "  - Send messages to running session"
+      echo "  - View Claude's output in real-time"
+      echo ""
+      echo "Named session:"
+      echo "  claude --remote-control --name \"My Project\""
+      ;;
+
+    channels)
+      echo "🐸 Channels Setup (Research Preview)"
+      echo "====================================="
+      echo ""
+      echo "Channels push external events INTO your Claude Code session."
+      echo "Requires Claude Code v2.1.80+ and claude.ai login."
+      echo ""
+      echo "── Telegram ──────────────────────────"
+      echo "  1. Create bot via @BotFather on Telegram"
+      echo "  2. In Claude Code:"
+      echo "     /plugin install telegram@claude-plugins-official"
+      echo "     /telegram:configure <your-bot-token>"
+      echo "  3. Start session:"
+      echo "     claude --channels plugin:telegram@claude-plugins-official"
+      echo "  4. DM your bot → get pairing code → /telegram:access pair <code>"
+      echo ""
+      echo "── Discord ───────────────────────────"
+      echo "  1. Create bot in Discord Developer Portal"
+      echo "  2. In Claude Code:"
+      echo "     /plugin install discord@claude-plugins-official"
+      echo "  3. Start session:"
+      echo "     claude --channels plugin:discord@claude-plugins-official"
+      echo ""
+      echo "── Custom Webhook ────────────────────"
+      echo "  Build an MCP server that emits notifications/claude/channel events."
+      echo "  See: https://docs.anthropic.com/en/docs/claude-code/channels"
+      echo ""
+      echo "── Test (fakechat) ───────────────────"
+      echo "  claude --channels plugin:fakechat@claude-plugins-official"
+      ;;
+
+    slack)
+      echo "🐸 Slack MCP Setup"
+      echo "==================="
+      echo ""
+      echo "Aura Frog bundles a Slack MCP server for notifications."
+      echo ""
+      echo "1. Create Slack App: https://api.slack.com/apps"
+      echo "   - Add scopes: chat:write, channels:history, channels:read, users:read"
+      echo "   - Install to workspace → get Bot Token (xoxb-...)"
+      echo ""
+      echo "2. Add to your .envrc:"
+      echo "   export SLACK_BOT_TOKEN=\"xoxb-your-token\""
+      echo "   export SLACK_TEAM_ID=\"T0123456789\""
+      echo ""
+      echo "3. Reload env in Claude Code:"
+      echo "   project:reload-env"
+      echo ""
+      echo "4. Test:"
+      echo "   Ask Claude to post a message to a Slack channel."
+      echo ""
+      echo "Aura Frog auto-invokes Slack MCP for Phase 9 notifications"
+      echo "and workflow completion alerts."
+      ;;
+
+    schedule)
+      echo "🐸 Scheduled Tasks Setup"
+      echo "========================="
+      echo ""
+      echo "── Session-scoped (dies when you exit) ──"
+      echo "  /loop 5m check if the deployment finished"
+      echo "  /loop 30m /review-pr 1234"
+      echo "  /loop 1h check CI status"
+      echo ""
+      echo "── Cron expressions ──"
+      echo "  */5 * * * *     Every 5 minutes"
+      echo "  0 9 * * *       Daily at 9am"
+      echo "  0 9 * * 1-5     Weekdays at 9am"
+      echo ""
+      echo "── Cloud tasks (persistent, no machine needed) ──"
+      echo "  Use /schedule in Claude Code to create remote agents"
+      echo "  that run on Anthropic's cloud on a cron schedule."
+      echo ""
+      echo "── Limits ──"
+      echo "  Max 50 tasks per session"
+      echo "  3-day auto-expiry for recurring tasks"
+      echo "  Minimum interval: 1 minute (local), 1 hour (cloud)"
+      ;;
+
+    *)
+      echo "🐸 Aura Frog Setup"
+      echo ""
+      echo "Usage: af setup <topic>"
+      echo ""
+      echo "Topics:"
+      echo "  cli        Install af globally (type 'af' anywhere)"
+      echo "  remote     Remote Control (drive from phone/browser)"
+      echo "  channels   Channels (Telegram, Discord, webhooks)"
+      echo "  slack      Slack MCP notifications"
+      echo "  schedule   Scheduled tasks and cron jobs"
+      ;;
+  esac
+}
+
+# ─── Main ─────────────────────────────────────────────────────────────
 case "${1:-help}" in
+  setup)
+    handle_setup "$2"
+    ;;
+
   install)
     echo "🐸 Installing Aura Frog..."
     echo ""
     echo "Run in Claude Code:"
     echo "  /plugin marketplace add $REPO"
     echo "  /plugin install aura-frog@aurafrog"
+    echo ""
+    echo "Then install the CLI:"
+    echo "  af setup cli"
     ;;
 
   update)
@@ -44,45 +229,47 @@ case "${1:-help}" in
   doctor)
     echo "🐸 Aura Frog Health Check"
     echo "========================="
-    # Check plugin dir
-    [ -d "$PLUGIN_DIR" ] && echo "✅ Plugin directory exists" || echo "❌ Plugin directory not found"
-    # Check plugin.json
-    [ -f "$PLUGIN_DIR/.claude-plugin/plugin.json" ] && echo "✅ plugin.json exists (v$VERSION)" || echo "❌ plugin.json missing"
+    if [ -z "$PLUGIN_DIR" ]; then
+      echo "❌ Plugin not found"
+      echo "   Install: /plugin marketplace add $REPO"
+      exit 1
+    fi
+    echo "✅ Plugin: $PLUGIN_DIR"
+    echo "✅ Version: $VERSION"
     # Check hooks
     hook_count=$(ls "$PLUGIN_DIR/hooks/"*.cjs 2>/dev/null | wc -l | tr -d ' ')
-    echo "✅ Hooks: $hook_count registered"
-    # Check project init (if in a project)
+    echo "✅ Hooks: $hook_count"
+    # Check project context
     if [ -d ".claude/project-contexts" ]; then
-      ctx_count=$(ls .claude/project-contexts/*/project-config.yaml 2>/dev/null | wc -l | tr -d ' ')
-      echo "✅ Project initialized ($ctx_count context files)"
+      echo "✅ Project initialized"
     else
-      echo "ℹ️  No project context (run project:init in Claude Code)"
+      echo "ℹ️  No project context (run project:init)"
     fi
     # Check env
     [ -f ".envrc" ] && echo "✅ .envrc found" || echo "ℹ️  No .envrc (optional)"
     # Check git
     git rev-parse --is-inside-work-tree &>/dev/null && echo "✅ Git repo" || echo "⚠️  Not a git repo"
-    # Run validate-counts if available
-    if [ -f "$PLUGIN_DIR/scripts/validate-counts.sh" ]; then
-      echo ""
-      echo "Running count validation..."
-      bash "$PLUGIN_DIR/scripts/validate-counts.sh" 2>/dev/null || true
+    # Check CLI install
+    if command -v af &>/dev/null; then
+      echo "✅ CLI installed globally"
+    else
+      echo "ℹ️  CLI not global (run: af setup cli)"
     fi
     ;;
 
   measure)
-    if [ -f "$PLUGIN_DIR/scripts/measure-performance.sh" ]; then
+    if [ -n "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/scripts/measure-performance.sh" ]; then
       bash "$PLUGIN_DIR/scripts/measure-performance.sh"
     else
-      echo "❌ measure-performance.sh not found"
+      echo "❌ Plugin not found or measure-performance.sh missing"
     fi
     ;;
 
   profile)
-    if [ -f "$PLUGIN_DIR/scripts/profile-hooks.sh" ]; then
+    if [ -n "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/scripts/profile-hooks.sh" ]; then
       bash "$PLUGIN_DIR/scripts/profile-hooks.sh" "${2:-3}"
     else
-      echo "❌ profile-hooks.sh not found"
+      echo "❌ Plugin not found or profile-hooks.sh missing"
     fi
     ;;
 
@@ -92,6 +279,7 @@ case "${1:-help}" in
     echo "Usage: af <command>"
     echo ""
     echo "Commands:"
+    echo "  setup      Setup guides (cli, remote, channels, slack, schedule)"
     echo "  install    Show install instructions"
     echo "  update     Check for updates"
     echo "  version    Show current version"
@@ -99,5 +287,10 @@ case "${1:-help}" in
     echo "  measure    Run performance measurement"
     echo "  profile    Profile hook execution times"
     echo "  help       Show this help"
+    echo ""
+    echo "Quick start:"
+    echo "  af setup cli       Install globally (type 'af' anywhere)"
+    echo "  af setup remote    Setup remote control"
+    echo "  af setup channels  Setup Telegram/Discord channels"
     ;;
 esac
