@@ -33,7 +33,7 @@
         "vue",
         "laravel",
         "nextjs",
-        "flutter",
+        "flutter"
       ],
       "strict": true
     }

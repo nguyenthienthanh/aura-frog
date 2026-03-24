@@ -202,6 +202,10 @@
             "type": "command",
             "async": true,
             "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rate-limit-check.cjs\" 2>&1"
           }
         ]
       }
