@@ -2,7 +2,6 @@
 
 **Category:** Documentation
 **Priority:** Medium
-**Version:** 1.0.0
 **Applies To:** Complex features, workflows, architecture changes
 
 ---
@@ -185,4 +184,3 @@ See `docs/WORKFLOW_DIAGRAMS.md` for comprehensive examples of all diagram types.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-12-11

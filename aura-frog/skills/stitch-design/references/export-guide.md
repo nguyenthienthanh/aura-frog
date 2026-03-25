@@ -222,4 +222,3 @@ After exporting, share with Claude by:
 
 ---
 
-**Version:** 1.0.0

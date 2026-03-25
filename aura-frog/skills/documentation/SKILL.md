@@ -12,7 +12,6 @@ triggers:
 # Skill: Documentation (ADR & Runbook)
 
 **Category:** Documentation
-**Version:** 1.0.0
 **Used By:** All agents, Phase 5
 
 ---
@@ -149,7 +148,6 @@ docs/adr/
 
 **Service:** [Service name]
 **Owner:** [Team/Person]
-**Last Updated:** YYYY-MM-DD
 **On-Call:** [Rotation/Contact]
 
 ## Overview
@@ -320,4 +318,3 @@ docs/runbooks/
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

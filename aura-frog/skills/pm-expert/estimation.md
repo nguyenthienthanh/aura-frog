@@ -1,7 +1,6 @@
 # Skill: Estimation
 
 **Category:** PM Expert
-**Version:** 1.0.0
 **Used By:** lead
 
 ---
@@ -181,4 +180,3 @@ Use variance data to improve future estimates.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

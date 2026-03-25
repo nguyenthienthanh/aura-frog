@@ -350,7 +350,6 @@ warning: Detected mixed design system usage
 ---
 
 **Rule:** design-system-usage
-**Version:** 1.0.0
 **Added:** Aura Frog v1.2
 **Priority:** High
 **Impact:** UI consistency, maintainability, developer experience

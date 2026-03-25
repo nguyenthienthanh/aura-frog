@@ -1,6 +1,5 @@
 # TOON Format Guide
 
-**Version:** 1.0.0
 **Purpose:** Token-optimized notation for AI-readable documents
 **Source:** [TOON Format](https://github.com/toon-format/toon) by toon-format
 **License:** MIT
@@ -141,7 +140,7 @@ risks[N]{risk,impact,probability,mitigation}:
 plan:
   feature: [Feature Name]
   coverage_target: 85
-  test_lead: qa-automation
+  test_lead: tester
 
 tests[N]{id,category,description,priority}:
   TC-001,unit,Auth service login function,high
@@ -295,4 +294,3 @@ files[3]{path,action}:
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-12-09

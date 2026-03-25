@@ -131,4 +131,3 @@ interface Theme {
 
 ---
 
-**Version:** 1.3.0 | **Priority:** Critical

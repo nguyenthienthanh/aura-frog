@@ -1,6 +1,5 @@
 # MCP Response Logging
 
-**Version:** 1.3.1
 **Priority:** Medium
 **Type:** Rule (Auto-Save)
 
@@ -84,4 +83,3 @@ workflow-manager.sh mcp-get jira PROJ-123
 
 ---
 
-**Version:** 1.3.1

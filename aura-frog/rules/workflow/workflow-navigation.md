@@ -1,6 +1,5 @@
 # Rule: Workflow Navigation
 
-**Version:** 1.1.3
 **Priority:** HIGH
 **Applies:** All workflow phases and approval gates
 
@@ -250,5 +249,4 @@ Tokens: ████████████░░░░ 75% (~150K used)
 
 ---
 
-**Version:** 1.1.4
 **Last Updated:** 2025-12-04

@@ -1,6 +1,5 @@
 # Configuration Loading Order
 
-**Version:** 1.0.0
 **Last Updated:** 2025-11-27
 
 ---
@@ -64,7 +63,7 @@ export AURA_FROG_DEFAULT_COVERAGE="85"
 ```yaml
 project:
   name: "My Mobile App"
-  type: "mobile-react-native"
+  type: "mobile"
 
 tech_stack:
   primary:
@@ -602,5 +601,4 @@ cat .claude/project-contexts/*/project-config.yaml 2>/dev/null | head -20
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-11-27

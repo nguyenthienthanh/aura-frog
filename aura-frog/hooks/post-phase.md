@@ -1,6 +1,5 @@
 # Post-Phase Hook - Phase Completion
 
-**Version:** 1.0.0  
 **Purpose:** Execute after each phase completes  
 **Trigger:** Automatically run after Phase N execution
 
@@ -475,7 +474,6 @@ if (!diagramValidation.valid) {
 
 ---
 
-**Version:** 1.0.0  
 **Trigger:** After each phase execution  
 **Critical:** YES - Must complete successfully before approval prompt
 

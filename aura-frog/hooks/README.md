@@ -22,7 +22,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (26 Total)
+## Active Hooks (27 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -774,7 +774,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[26]{event,name,purpose}:
+hooks[27]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files

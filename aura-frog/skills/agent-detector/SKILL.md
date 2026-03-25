@@ -15,7 +15,6 @@ allowed-tools: NONE
 # Aura Frog Agent Detector
 
 **Priority:** HIGHEST - Runs FIRST for every message
-**Version:** 3.0.0
 
 ---
 
@@ -131,7 +130,7 @@ Include in detection result:
 
 ```markdown
 ## Detection Result
-- **Agent:** backend-nodejs
+- **Agent:** architect
 - **Model:** sonnet
 - **Complexity:** Standard
 - **Reason:** API endpoint implementation
@@ -139,7 +138,7 @@ Include in detection result:
 
 When spawning Task tool, use the detected model:
 ```
-Task(subagent_type="backend-nodejs", model="sonnet", ...)
+Task(subagent_type="architect", model="sonnet", ...)
 ```
 
 ---
@@ -186,13 +185,13 @@ Check if user **directly mentions** a technology:
 
 ```toon
 tech_detection[10]{technology,keywords,agent,score}:
-  React Native,react-native/expo/RN,mobile-react-native,+60
+  React Native,react-native/expo/RN,mobile,+60
   Flutter,flutter/dart/bloc,mobile-flutter,+60
   Angular,angular/ngrx/rxjs,web-angular,+60
   Vue.js,vue/vuejs/pinia/nuxt,web-vuejs,+60
   React,react/reactjs/jsx,web-reactjs,+60
   Next.js,next/nextjs/ssr/ssg,web-nextjs,+60
-  Node.js,nodejs/express/nestjs/fastify,backend-nodejs,+60
+  Node.js,nodejs/express/nestjs/fastify,architect,+60
   Python,python/django/fastapi/flask,backend-python,+60
   Go,go/golang/gin/fiber,backend-go,+60
   Laravel,laravel/php/eloquent/artisan,backend-laravel,+60
@@ -220,13 +219,13 @@ Read project files to **infer** tech stack:
 
 ```toon
 project_detection[10]{file,indicates,agent,score}:
-  app.json (with expo),React Native,mobile-react-native,+40
+  app.json (with expo),React Native,mobile,+40
   pubspec.yaml,Flutter,mobile-flutter,+40
   angular.json,Angular,web-angular,+40
   *.vue files,Vue.js,web-vuejs,+40
   next.config.js,Next.js,web-nextjs,+40
   package.json + react (no next),React,web-reactjs,+40
-  package.json + express/nestjs,Node.js,backend-nodejs,+40
+  package.json + express/nestjs,Node.js,architect,+40
   requirements.txt/pyproject.toml,Python,backend-python,+40
   go.mod/go.sum,Go,backend-go,+40
   artisan/composer.json + laravel,Laravel,backend-laravel,+40
@@ -238,12 +237,12 @@ Check **recent files** and naming conventions:
 
 ```toon
 file_patterns[9]{pattern,agent,score}:
-  *.phone.tsx/*.tablet.tsx,mobile-react-native,+20
+  *.phone.tsx/*.tablet.tsx,mobile,+20
   *.dart/lib/ folder,mobile-flutter,+20
   *.component.ts/*.service.ts,web-angular,+20
   *.vue,web-vuejs,+20
   app/route.ts (Next.js),web-nextjs,+20
-  *.controller.ts/*.module.ts,backend-nodejs,+20
+  *.controller.ts/*.module.ts,architect,+20
   views.py/models.py,backend-python,+20
   *.go,backend-go,+20
   *Controller.php/*Model.php,backend-laravel,+20
@@ -404,7 +403,7 @@ Extracted:
 
 ### Step 3: Score All Agents (Combine Task + Repo)
 ```
-mobile-react-native:
+mobile:
   - "iOS" keyword: +35 (semantic)
   - CWD = /mobile-app: +40 (context)
   - Recent *.phone.tsx: +20 (file pattern)

@@ -13,7 +13,6 @@ triggers:
 
 # Sequential Thinking
 
-**Version:** 1.0.0
 **Use When:** Complex problems requiring structured analysis
 
 ---

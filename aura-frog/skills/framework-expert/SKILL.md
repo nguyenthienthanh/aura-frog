@@ -20,7 +20,6 @@ context: fork
 # Skill: Framework Expert (Bundle)
 
 **Skill ID:** framework-expert
-**Version:** 1.0.0
 **Priority:** 50
 **Auto-Invoke:** Yes (when framework task detected)
 
@@ -299,4 +298,3 @@ The framework-expert bundle is the **default** for normal usage.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21

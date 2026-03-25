@@ -1,6 +1,5 @@
 # Pre-Approval Hook - Approval Prompt Display
 
-**Version:** 1.0.0  
 **Purpose:** Display approval prompt and wait for user decision  
 **Trigger:** After post-phase hook completes
 
@@ -435,7 +434,6 @@ try {
 
 ---
 
-**Version:** 1.0.0  
 **Trigger:** After post-phase hook, before processing user response  
 **Critical:** YES - Core of approval gate mechanism
 

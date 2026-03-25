@@ -1,6 +1,5 @@
 # TDD Workflow Rules
 
-**Version:** 1.0.0  
 **Purpose:** Enforce Test-Driven Development workflow
 
 ---

@@ -1,6 +1,5 @@
 # On-Start Hook - Workflow Initialization Check
 
-**Version:** 1.1.4
 **Purpose:** Check project setup before workflow starts
 **Trigger:** Automatically run when `workflow:start` or any workflow command is executed
 
@@ -325,6 +324,5 @@ If you see the reminder:
 
 ---
 
-**Version:** 1.0.0
 **Created:** 2025-11-27
 **Last Updated:** 2025-11-27

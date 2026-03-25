@@ -2,7 +2,6 @@
 
 **Category:** Code Quality
 **Priority:** High
-**Version:** 1.0.0
 **Applies To:** Frontend applications (React, Vue, React Native)
 
 ---
@@ -229,4 +228,3 @@ const store = useStore()
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

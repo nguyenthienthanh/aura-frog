@@ -1,7 +1,6 @@
 # Skill: Risk Management
 
 **Category:** PM Expert
-**Version:** 1.0.0
 **Used By:** lead
 
 ---
@@ -139,4 +138,3 @@ For low-impact risks: Document known issues, fix only critical ones
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

@@ -2,7 +2,6 @@
 
 **Agent ID:** mobile
 **Priority:** 95
-**Version:** 3.0.0
 **Status:** Active
 
 ---
@@ -110,4 +109,3 @@ When working as a teammate, mobile claims:
 ---
 
 **Rule Reference:** `rules/agent/frontend-excellence.md`
-**Version:** 3.0.0 | **Last Updated:** 2026-01-14

@@ -3,7 +3,6 @@
 **Category:** Code Quality
 **Priority:** High
 **Enforcement:** Linter + Code Review
-**Version:** 1.1.0
 
 ---
 
@@ -202,6 +201,5 @@ items[3]{name,type,required}:
 
 ---
 
-**Version:** 1.2.0
 **Last Updated:** 2025-12-23
 

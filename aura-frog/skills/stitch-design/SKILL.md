@@ -14,7 +14,6 @@ triggers:
 # Skill: Google Stitch Design
 
 **Category:** Design Skill
-**Version:** 1.0.0
 **Used By:** frontend
 
 ---
@@ -217,4 +216,3 @@ design_types[5]{type,use_case,template}:
 
 **Remember:** Stitch has no API - user must manually paste prompt and export results.
 
-**Version:** 1.0.0

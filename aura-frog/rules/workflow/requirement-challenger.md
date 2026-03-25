@@ -1,6 +1,5 @@
 # Rule: Requirement Challenger
 
-**Version:** 1.0.0
 **Priority:** HIGH
 **Applies:** Phase 1 (Understand), workflow:modify, workflow:start, any requirement/feedback entry point
 
@@ -193,4 +192,3 @@ These rules complement each other. Challenger validates the requirement, brainst
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-03-11

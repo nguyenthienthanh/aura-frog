@@ -8,7 +8,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
+┃ Agent: mobile │ Phase: 2 - Design               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Architecting greatness                               ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -18,7 +18,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: pm-operations-orchestrator │ Phase: -           ┃
+┃ Agent: lead │ Phase: -           ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Ready to rock                                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -28,7 +28,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: ui-expert │ Phase: -                            ┃
+┃ Agent: frontend │ Phase: -                            ┃
 ┃ Model: Opus 4.6 │ Teams: ✓ │ 🔌 MCP: context7           ┃
 ┃ 🔥 Fetching React docs                                 ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -38,7 +38,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: ui-expert │ Phase: 5b - TDD GREEN               ┃
+┃ Agent: frontend │ Phase: 5b - TDD GREEN               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✗ │ 🔌 MCP: context7, vitest  ┃
 ┃ 🔥 Building with tests                                 ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -48,7 +48,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agents: qa-automation + security-expert                ┃
+┃ Agents: tester + security                ┃
 ┃ Phase: 6 - Review │ Teams: ✓ enabled                    ┃
 ┃ Model: Opus 4.6 │ 🔥 Eagle eyes on                      ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -59,7 +59,7 @@
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃ Agent: architect │ Phase: 2 - Design                    ┃
-┃ Teams: ✓ (3 active) │ ui-expert, qa-automation          ┃
+┃ Teams: ✓ (3 active) │ frontend, tester          ┃
 ┃ Model: Opus 4.6 │ 🔥 Team assemble                       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -68,7 +68,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Teammate: qa-automation │ Lead: architect               ┃
+┃ Teammate: tester │ Lead: architect               ┃
 ┃ Phase: 5a - TDD RED │ Role: Lead                        ┃
 ┃ Teams: ✓ │ Model: Sonnet 4.5 │ 🔥 Tests first always     ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -78,7 +78,7 @@
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: mobile-expert │ Phase: 2 - Design               ┃
+┃ Agent: mobile │ Phase: 2 - Design               ┃
 ┃ Model: Sonnet 4.5 │ Teams: ✓ enabled                    ┃
 ┃ 🔥 Architecting greatness                               ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -92,7 +92,7 @@ Starting technical design for [feature]...
 
 ```
 ⚡ 🐸 AURA FROG v{version} ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: qa-automation │ Phase: 4 - Refactor + Review     ┃
+┃ Agent: tester │ Phase: 4 - Refactor + Review     ┃
 ┃ Model: Opus 4.6 │ Teams: ✓ │ 🔌 MCP: playwright          ┃
 ┃ 🔥 Testing login flow                                  ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -127,10 +127,10 @@ Starting technical design for [feature]...
 
 | Scenario | Type | Example |
 |----------|------|---------|
-| Simple coding | Single | `Agent: backend-nodejs` |
-| Code review | Multi | `Agents: qa-automation + security-expert` |
-| Full feature | Multi | `Agents: mobile-expert + ui-expert, qa-automation` |
-| General question | Single | `Agent: pm-operations-orchestrator` |
+| Simple coding | Single | `Agent: architect` |
+| Code review | Multi | `Agents: tester + security` |
+| Full feature | Multi | `Agents: mobile + frontend, tester` |
+| General question | Single | `Agent: lead` |
 
 ---
 

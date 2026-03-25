@@ -77,4 +77,3 @@ All require: **Run → Read → Report**
 
 ---
 
-**Version:** 1.0.0

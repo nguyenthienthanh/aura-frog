@@ -16,7 +16,6 @@ triggers:
 # Skill: Design System Library
 
 **Category:** Implementation Skill
-**Version:** 1.3.0
 
 ---
 

@@ -62,7 +62,7 @@ Cross-review ensures quality by having multiple agents review deliverables befor
 ```markdown
 ## Dev Technical Review - Requirements Analysis
 
-**Reviewer:** [mobile-react-native / web-vuejs / backend-laravel]  
+**Reviewer:** [mobile / frontend / backend-laravel]  
 **Review Date:** [Date]
 
 ### Technical Feasibility ✅/❌
@@ -107,7 +107,7 @@ Cross-review ensures quality by having multiple agents review deliverables befor
 ```markdown
 ## QA Testability Review - Requirements Analysis
 
-**Reviewer:** qa-automation  
+**Reviewer:** tester  
 **Review Date:** [Date]
 
 ### Acceptance Criteria Quality ✅/❌
@@ -162,7 +162,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-### Dev Review (mobile-react-native)
+### Dev Review (mobile)
 **Status:** ✅ Approved  
 **Key Points:**
 - Technical approach is sound
@@ -174,7 +174,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-### QA Review (qa-automation)
+### QA Review (tester)
 **Status:** ✅ Approved  
 **Key Points:**
 - Acceptance criteria are testable
@@ -185,7 +185,7 @@ Phase 1: Requirements Analysis - Review Complete
 
 ---
 
-### UI Design Review (ui-expert)
+### UI Design Review (frontend)
 **Status:** ⚠️ Approved with notes  
 **Key Points:**
 - Figma designs available
@@ -318,7 +318,7 @@ Phase 1: Requirements Analysis - Review Complete
 ```markdown
 ## QA Review - Technical Planning Feasibility
 
-**Reviewer:** qa-automation  
+**Reviewer:** tester  
 **Review Date:** [Date]
 
 ### Testability Assessment ✅/❌
@@ -393,7 +393,7 @@ Phase 1: Requirements Analysis - Review Complete
 ```markdown
 ## Dev Review - Test Plan Feasibility
 
-**Test Plan Author:** qa-automation  
+**Test Plan Author:** tester  
 **Reviewer:** [Dev agent]  
 **Review Date:** [Date]
 
@@ -483,8 +483,8 @@ If reviewers disagree:
 
 **Issue:** State management approach
 
-**Dev Review (mobile-react-native):** ✅ Approved - Use Zustand  
-**Dev Review (web-reactjs):** ❌ Rejected - Should use Redux for consistency
+**Dev Review (mobile):** ✅ Approved - Use Zustand  
+**Dev Review (frontend):** ❌ Rejected - Should use Redux for consistency
 
 **PM Orchestrator Analysis:**
 - Mobile and web are separate repos

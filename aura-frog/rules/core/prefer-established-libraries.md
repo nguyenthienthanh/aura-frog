@@ -76,4 +76,3 @@ Context7 fetches current, version-specific documentation.
 
 ---
 
-**Version:** 1.3.0

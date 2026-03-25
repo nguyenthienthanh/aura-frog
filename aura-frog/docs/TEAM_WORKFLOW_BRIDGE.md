@@ -55,12 +55,12 @@ Workflow complete
 |   |-- phase-02-technical-planning/
 |   |   |-- team-log.jsonl        # Combined team timeline
 |   |   |-- architect.jsonl       # Per-agent log
-|   |   |-- ui-expert.jsonl
-|   |   `-- qa-automation.jsonl
+|   |   |-- frontend.jsonl
+|   |   `-- tester.jsonl
 |   |-- phase-05b-tdd-green/
 |   |   |-- team-log.jsonl
 |   |   |-- architect.jsonl
-|   |   `-- ui-expert.jsonl
+|   |   `-- frontend.jsonl
 |   |-- phase-05b-tdd-green-attempt-1/   # Rejected attempt preserved
 |   |   `-- ...
 |   `-- ...
@@ -132,7 +132,7 @@ logger.logAction('custom_action', 'Did something', { key: 'value' });
 logger.logTaskClaimed('task-1', 'Design auth API');
 logger.logTaskCompleted('task-1', 'Design auth API', { phase: '2' });
 logger.logFileEdited('src/api/auth.ts', 'Created auth endpoint');
-logger.logMessageSent('qa-automation', 'Review needed');
+logger.logMessageSent('tester', 'Review needed');
 ```
 
 ---
@@ -177,7 +177,7 @@ This preserves the full audit trail for every attempt.
       "status": "completed",
       "created_at": "2026-02-11T10:00:00Z",
       "teardown_at": "2026-02-11T10:15:00Z",
-      "teammates": ["architect", "ui-expert", "qa-automation"],
+      "teammates": ["architect", "frontend", "tester"],
       "log_dir": ".claude/logs/workflows/AUTH-456/teams/phase-02-technical-planning/",
       "attempt": 1
     }

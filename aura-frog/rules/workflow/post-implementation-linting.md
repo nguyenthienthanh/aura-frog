@@ -2,7 +2,6 @@
 
 **Priority:** High
 **Applies To:** All code implementation tasks
-**Version:** 1.3.0
 
 ---
 
@@ -182,4 +181,3 @@ phases[4]{phase,lint_action}:
 
 ---
 
-**Version:** 1.3.0

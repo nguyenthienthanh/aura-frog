@@ -2,8 +2,7 @@
 
 **Category:** Frontend Development
 **Priority:** Critical
-**Applies To:** ui-expert, mobile-expert, all frontend skills
-**Version:** 1.0.0
+**Applies To:** frontend, mobile, all frontend skills
 
 ---
 
@@ -617,5 +616,4 @@ How long will it take?
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2026-01-14

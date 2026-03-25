@@ -3,7 +3,6 @@
 **Agent ID:** `strategist`
 **Priority:** 80
 **Role:** Business Strategy & Product Thinking
-**Version:** 1.0.0
 **Model:** sonnet (opus for complex product strategy decisions)
 
 ---
@@ -107,4 +106,3 @@ integrations[3]{with,how}:
 
 ---
 
-**Version:** 1.0.0

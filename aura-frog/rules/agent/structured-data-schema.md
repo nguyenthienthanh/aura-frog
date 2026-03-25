@@ -2,7 +2,6 @@
 
 **Category:** Quality
 **Priority:** High
-**Version:** 1.0.0
 **Purpose:** Implement Schema.org structured data for rich search results and AI discovery
 
 ---
@@ -419,4 +418,3 @@ schema_errors[5]{error,fix}:
 ---
 
 **Related Skills:** `seo-expert`, `ai-discovery-expert`
-**Version:** 1.0.0

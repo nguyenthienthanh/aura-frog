@@ -138,4 +138,3 @@ gh pr create --title "type(scope): description" --body "## Summary
 
 ---
 
-**Version:** 1.0.0

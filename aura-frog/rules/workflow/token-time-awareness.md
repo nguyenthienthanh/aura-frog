@@ -1,6 +1,5 @@
 # Token & Time Awareness
 
-**Version:** 1.0.0
 **Priority:** HIGH - Monitor throughout every session
 **Type:** Rule (Always Enforced)
 
@@ -190,5 +189,4 @@ STRONGLY RECOMMEND: Run `workflow:handoff` NOW to avoid losing progress.
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-11-29

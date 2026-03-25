@@ -1,6 +1,5 @@
 # Rule: Next Step Guidance
 
-**Version:** 1.0.0
 **Priority:** CRITICAL
 **Enforcement:** EVERY response must include next step guidance
 **Applies To:** All interactions, phases, and approval gates
@@ -375,7 +374,7 @@ The guidance block should appear AFTER the agent banner:
 
 ```markdown
 ⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: backend-nodejs │ Phase: 4 - Test Plan          ┃
+┃ Agent: architect │ Phase: 4 - Test Plan          ┃
 ┃ Model: claude │ 🔥 Planning comprehensive tests       ┃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -390,7 +389,6 @@ The guidance block should appear AFTER the agent banner:
 ---
 
 **Rule:** next-step-guidance
-**Version:** 1.0.0
 **Added:** Aura Frog v1.1.5
 **Priority:** CRITICAL
 **Impact:** User experience, workflow clarity, reduced friction

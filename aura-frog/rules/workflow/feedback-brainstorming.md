@@ -1,6 +1,5 @@
 # Rule: Feedback Brainstorming
 
-**Version:** 1.1.1
 **Priority:** HIGH
 **Applies:** All feedback scenarios (reject, modify, suggestions)
 
@@ -255,5 +254,4 @@ User: modify: just do [changes]
 
 ---
 
-**Version:** 1.1.4
 **Last Updated:** 2025-12-01

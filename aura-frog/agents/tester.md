@@ -3,7 +3,6 @@
 **Agent ID:** `tester`
 **Priority:** 85
 **Role:** Quality Assurance & Test Automation
-**Version:** 1.1.0
 **Model:** sonnet (haiku for simple test generation)
 
 ---
@@ -98,4 +97,3 @@ Claims: `tests/`, `__tests__/`, `spec/`, test configs (`jest.config.*`, `vitest.
 
 ---
 
-**Version:** 1.1.0 | **Last Updated:** 2026-02-09

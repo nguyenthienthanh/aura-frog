@@ -36,13 +36,13 @@ graph TB
         WO[Workflow Orchestrator]
 
         subgraph "Development Agents"
-            RN[mobile-react-native]
+            RN[mobile]
             FL[mobile-flutter]
-            RE[web-reactjs]
+            RE[frontend]
             NX[web-nextjs]
-            VU[web-vuejs]
+            VU[frontend]
             AN[web-angular]
-            NO[backend-nodejs]
+            NO[architect]
             PY[backend-python]
             GO[backend-go]
             LA[backend-laravel]
@@ -50,13 +50,13 @@ graph TB
         end
 
         subgraph "Quality Agents"
-            QA[qa-automation]
-            SE[security-expert]
-            UI[ui-expert]
+            QA[tester]
+            SE[security]
+            UI[frontend]
         end
 
         subgraph "Operations Agents"
-            DO[devops-cicd]
+            DO[devops]
             JI[jira-operations]
             CO[confluence-operations]
             SL[slack-operations]

@@ -2,7 +2,6 @@
 
 **Category:** Code Quality
 **Priority:** High
-**Version:** 1.0.0
 **Applies To:** All projects
 
 ---
@@ -248,4 +247,3 @@ npm dedupe
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

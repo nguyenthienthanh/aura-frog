@@ -13,7 +13,6 @@ triggers:
 
 # Problem Solving Techniques
 
-**Version:** 1.0.0
 **Use When:** Stuck, need breakthrough, or evaluating approaches
 
 ---

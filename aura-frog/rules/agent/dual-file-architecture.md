@@ -1,6 +1,5 @@
 # Dual-File Architecture
 
-**Version:** 1.0.0
 **Priority:** HIGH - Understanding file organization
 **Type:** Rule (Structural Standard)
 
@@ -159,7 +158,7 @@ Read and follow: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 Load from: .claude/project-contexts/my-app/
 
 ## Overrides (if any)
-- Primary agent: mobile-react-native
+- Primary agent: mobile
 - Test coverage: 90%
 ```
 
@@ -275,5 +274,4 @@ Now Aura Frog loads for ALL projects, even without project-level `.claude/CLAUDE
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-11-29

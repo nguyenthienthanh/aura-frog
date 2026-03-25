@@ -1,6 +1,5 @@
 # Impact Analysis Rule
 
-**Version:** 1.0.0
 **Priority:** CRITICAL - Must be done before any code modification
 **Type:** Rule (Mandatory Process)
 
@@ -251,5 +250,4 @@ npm test
 
 ---
 
-**Version:** 1.0.0
 **Last Updated:** 2025-12-08

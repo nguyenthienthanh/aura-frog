@@ -1,7 +1,6 @@
 # Skill: Project Planning
 
 **Category:** PM Expert
-**Version:** 1.0.0
 **Used By:** lead
 
 ---
@@ -154,4 +153,3 @@ Quick reference: Story Points (1-13), T-Shirt Sizing (XS-XL), Three-Point Estima
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

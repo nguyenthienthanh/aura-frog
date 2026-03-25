@@ -13,7 +13,6 @@ allowed-tools: NONE
 
 **Purpose:** Ultra-compact requirements output for Phase 1.
 **Token Cap:** 500 tokens MAX (hard limit).
-**Version:** 1.0.0
 
 ---
 

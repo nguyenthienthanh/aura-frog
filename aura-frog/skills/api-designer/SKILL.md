@@ -12,8 +12,7 @@ triggers:
 # Skill: API Designer
 
 **Category:** Dev Expert
-**Version:** 1.0.0
-**Used By:** backend-nodejs, backend-python, backend-go, backend-laravel
+**Used By:** architect, backend-python, backend-go, backend-laravel
 
 ---
 
@@ -214,4 +213,3 @@ paths:
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

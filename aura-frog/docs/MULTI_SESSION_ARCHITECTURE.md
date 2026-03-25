@@ -1,6 +1,5 @@
 # Multi-Session Architecture
 
-**Version:** 1.0.0
 **Purpose:** Enable complex workflows across multiple Claude Code sessions
 
 ---

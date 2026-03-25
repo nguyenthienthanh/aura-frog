@@ -2,7 +2,6 @@
 
 **Agent ID:** architect
 **Priority:** 85
-**Version:** 1.0.0
 **Status:** Active
 
 ---
@@ -92,4 +91,3 @@ Consolidated: `backend-expert.md` (backend patterns), `database-specialist.md` (
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21

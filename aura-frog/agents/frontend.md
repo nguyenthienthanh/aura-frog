@@ -2,7 +2,6 @@
 
 **Agent ID:** frontend
 **Priority:** 80
-**Version:** 1.0.0
 **Status:** Active
 
 ---
@@ -88,4 +87,3 @@ Consolidated: `web-expert.md` (frontend patterns), `ui-designer.md` (design syst
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21

@@ -710,6 +710,5 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 
 ---
 
-**Last Updated:** 2026-02-09
 **Format:** TOON (Token-Optimized)
 **Total Skills:** 43 (8 auto-invoking + 35 reference)

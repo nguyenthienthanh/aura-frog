@@ -12,7 +12,6 @@ triggers:
 # Skill: Migration Helper
 
 **Category:** Dev Expert
-**Version:** 1.0.0
 **Used By:** architect, backend agents
 
 ---
@@ -208,4 +207,3 @@ ALTER TABLE products DROP COLUMN price;
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

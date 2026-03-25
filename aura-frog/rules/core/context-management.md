@@ -234,4 +234,3 @@ team_antipatterns[3]{pattern,problem,solution}:
 
 ---
 
-**Version:** 1.1.0 | **Last Updated:** 2026-02-09

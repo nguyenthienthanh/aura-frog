@@ -26,7 +26,7 @@ Aura Frog v1.10.0 includes an advanced **Smart Agent Detector** that automatical
 ```toon
 scoring_weights[7]{criterion,weight,description}:
   explicit_mention,60,User directly mentions tech (React Native)
-  keyword_exact_match,50,Direct keyword match (test → qa-automation)
+  keyword_exact_match,50,Direct keyword match (test → tester)
   project_context,40,CWD + file structure + package.json
   semantic_match,35,Contextual/implied match
   task_complexity,30,Inferred from task description
@@ -50,7 +50,7 @@ Keywords: "implement", "create", "add", "build", "develop"
 
 Selected:
   Primary: Relevant dev agent (mobile, web, backend)
-  Secondary: ui-expert, qa-automation
+  Secondary: frontend, tester
 ```
 
 ### Bug Fix Intent
@@ -59,8 +59,8 @@ Keywords: "fix", "bug", "error", "issue", "broken"
 
 Selected:
   Primary: Relevant dev agent
-  Secondary: qa-automation
-  Skip: ui-expert (unless UI bug)
+  Secondary: tester
+  Skip: frontend (unless UI bug)
 ```
 
 ### Testing Intent
@@ -68,7 +68,7 @@ Selected:
 Keywords: "test", "testing", "coverage", "QA"
 
 Selected:
-  Primary: qa-automation
+  Primary: tester
   Secondary: Relevant dev agent
 ```
 
@@ -77,7 +77,7 @@ Selected:
 Keywords: "design", "UI", "UX", "layout", "figma"
 
 Selected:
-  Primary: ui-expert
+  Primary: frontend
   Secondary: Relevant dev agent
 ```
 
@@ -95,7 +95,7 @@ Selected:
 Keywords: "security", "vulnerability", "audit", "owasp"
 
 Selected:
-  Primary: security-expert
+  Primary: security
   Secondary: Relevant dev agent
 ```
 
@@ -104,7 +104,7 @@ Selected:
 Keywords: "performance", "slow", "optimize", "speed"
 
 Selected:
-  Primary: devops-cicd (perf commands)
+  Primary: devops (perf commands)
   Secondary: Relevant dev agent
 ```
 
@@ -113,7 +113,7 @@ Selected:
 Keywords: "deploy", "docker", "kubernetes", "pipeline"
 
 Selected:
-  Primary: devops-cicd
+  Primary: devops
   Commands: deploy:setup, docker:create, cicd:create
 ```
 
@@ -191,9 +191,9 @@ Analysis:
   - Files: PostScreen.phone.tsx (recent)
 
 Selected:
-  ✅ mobile-react-native (85) - Primary
-  ✅ ui-expert (50) - Secondary
-  ✅ qa-automation (30) - Optional
+  ✅ mobile (85) - Primary
+  ✅ frontend (50) - Secondary
+  ✅ tester (30) - Optional
 
 Reasoning:
   - "screen" implies mobile app
@@ -211,10 +211,10 @@ Analysis:
   - Context: Mixed frontend/backend project
 
 Selected:
-  ✅ web-reactjs (55) - Primary (Frontend)
-  ✅ backend-nodejs (55) - Primary (Backend)
-  ✅ ui-expert (45) - Secondary
-  ✅ qa-automation (30) - Optional
+  ✅ frontend (55) - Primary (Frontend)
+  ✅ architect (55) - Primary (Backend)
+  ✅ frontend (45) - Secondary
+  ✅ tester (30) - Optional
 
 Reasoning:
   - "page" → Frontend agent
@@ -234,7 +234,7 @@ Analysis:
 
 Selected:
   ✅ backend-laravel (90) - Primary
-  ✅ qa-automation (35) - Secondary
+  ✅ tester (35) - Secondary
 
 Reasoning:
   - CWD + files indicate Laravel
@@ -253,7 +253,7 @@ Analysis:
 
 Selected:
   ✅ architect (85) - Primary
-  ✅ backend-nodejs (40) - Secondary
+  ✅ architect (40) - Secondary
 
 Reasoning:
   - "schema" → Database specialist
@@ -269,8 +269,8 @@ Analysis:
   - Intent: Security audit
 
 Selected:
-  ✅ security-expert (85) - Primary
-  ✅ backend-nodejs (45) - Secondary
+  ✅ security (85) - Primary
+  ✅ architect (45) - Secondary
 
 Reasoning:
   - "secure" → Security expert
@@ -315,20 +315,20 @@ sensitivity:
 
 ### Override Automatic Selection
 ```
-User: "Use only qa-automation for this task"
+User: "Use only tester for this task"
 
 System: ✅ Manual override
-  - qa-automation (manual)
-  - pm-operations-orchestrator (always active)
+  - tester (manual)
+  - lead (always active)
 ```
 
 ### Project-Specific Priority
 ```yaml
 # .claude/project-contexts/my-project/project-config.yaml
 agents_priority:
-  - mobile-react-native
-  - ui-expert
-  - qa-automation
+  - mobile
+  - frontend
+  - tester
 
 # These get +25 bonus in scoring
 ```
@@ -345,28 +345,28 @@ Output:
 🧠 Agent Selection Debug
 ─────────────────────────────────────────
 
-mobile-react-native:
+mobile:
   - Project context (CWD): +40
   - Recent files (*.phone.tsx): +20
   - Base priority: +100
   → Total: 160 ✅ PRIMARY
 
-web-reactjs:
+frontend:
   - Keyword mismatch: 0
   - Base priority: +90
   → Total: 90 (not selected)
 
-ui-expert:
+frontend:
   - Task type (UI implied): +30
   - Base priority: +85
   → Total: 115 ✅ SECONDARY
 
-qa-automation:
+tester:
   - Task type (implementation): +30
   - Base priority: +85
   → Total: 115 ✅ SECONDARY
 
-Selected: mobile-react-native (primary), ui-expert, qa-automation
+Selected: mobile (primary), frontend, tester
 Confidence: 85% (High)
 ```
 
@@ -411,8 +411,8 @@ Confidence: 85% (High)
 ## 📚 Related Documentation
 
 - **Agent Definitions:** `agents/`
-- **Smart Agent Detector:** `agents/smart-agent-detector.md`
-- **Project Detector:** `agents/project-detector.md`
+- **Smart Agent Detector:** `agents/router.md`
+- **Project Detector:** `agents/scanner.md`
 - **Agent Identification:** `docs/AGENT_IDENTIFICATION_GUIDE.md`
 
 ---

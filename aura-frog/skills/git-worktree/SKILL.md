@@ -13,7 +13,6 @@ allowed-tools: Bash, Read, Write
 # Git Worktree Integration
 
 **Priority:** MEDIUM — Enhances workflow safety
-**Version:** 1.0.0
 
 ---
 
@@ -136,4 +135,3 @@ Works with `phase-checkpoint.cjs`:
 
 ---
 
-**Version:** 1.0.0

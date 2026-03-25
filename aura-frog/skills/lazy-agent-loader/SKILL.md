@@ -12,7 +12,6 @@ allowed-tools: Read, Glob
 # Lazy Agent Loader
 
 **Priority:** HIGH - Load agents on-demand
-**Version:** 1.0.0
 
 ---
 
@@ -29,13 +28,13 @@ Reduce token usage by:
 
 ```toon
 agent_index[24]{id,category,specialty,keywords}:
-  mobile-react-native,dev,React Native/Expo mobile,react-native/expo/RN/mobile/ios/android
+  mobile,dev,React Native/Expo mobile,react-native/expo/RN/mobile/ios/android
   mobile-flutter,dev,Flutter/Dart mobile,flutter/dart/bloc/mobile
   web-angular,dev,Angular frontend,angular/ngrx/rxjs/typescript
   web-vuejs,dev,Vue.js frontend,vue/vuejs/pinia/nuxt/composition
   web-reactjs,dev,React frontend,react/reactjs/jsx/hooks/redux
   web-nextjs,dev,Next.js fullstack,next/nextjs/ssr/ssg/app-router
-  backend-nodejs,dev,Node.js backend,nodejs/express/nestjs/fastify/api
+  architect,dev,Node.js backend,nodejs/express/nestjs/fastify/api
   backend-python,dev,Python backend,python/django/fastapi/flask/api
   backend-go,dev,Go backend,go/golang/gin/fiber/api
   backend-laravel,dev,Laravel/PHP backend,laravel/php/eloquent/artisan
@@ -77,13 +76,13 @@ agents/[agent-id].md
 ### Load Single Agent
 ```bash
 # Load full agent definition
-cat agents/mobile-react-native.md
+cat agents/mobile.md
 ```
 
 ### Load Agent Summary
 ```toon
 agent_summary{id,role,focus}:
-  mobile-react-native,Senior React Native Developer,Expo/RN mobile apps with TypeScript
+  mobile,Senior React Native Developer,Expo/RN mobile apps with TypeScript
 ```
 
 ---
@@ -117,12 +116,12 @@ comparison[4]{scenario,without_lazy,with_lazy,savings}:
 ```
 Loaded agents are cached in conversation context.
 If agent already loaded, skip re-loading.
-Track loaded agents: loaded_agents[]: mobile-react-native,tester
+Track loaded agents: loaded_agents[]: mobile,tester
 ```
 
 ### Force Reload
 ```
-User: "reload agent mobile-react-native"
+User: "reload agent mobile"
 → Clear cache for agent
 → Re-read full definition
 ```
@@ -135,16 +134,16 @@ User: "reload agent mobile-react-native"
 User: "Create a React Native screen for login"
 
 1. Agent Detector scores all agents using keywords from agent_index
-   - mobile-react-native: +60 (react-native) +20 (context) = 80 ✅ PRIMARY
+   - mobile: +60 (react-native) +20 (context) = 80 ✅ PRIMARY
    - frontend: +35 (screen/login implies UI) → OPTIONAL
 
 2. Lazy Loader activates:
-   - Load: agents/mobile-react-native.md (~1500 tokens)
+   - Load: agents/mobile.md (~1500 tokens)
    - Skip: frontend (score < 50)
 
 3. Context loaded:
    - Agent index: ~1200 tokens
-   - mobile-react-native full: ~1500 tokens
+   - mobile full: ~1500 tokens
    - Total: ~2700 tokens (vs ~48000 without lazy loading)
 ```
 

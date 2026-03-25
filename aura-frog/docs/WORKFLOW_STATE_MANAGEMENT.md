@@ -1,6 +1,5 @@
 # 🗂️ Workflow State Management
 
-**Version:** 1.0.0  
 **Purpose:** Manage multiple concurrent workflows
 
 ---
@@ -422,9 +421,9 @@ writeFile('active-workflow.txt', newWorkflowId);
   "context": {
     "task": "Add user authentication",
     "agents": [
-      "pm-operations-orchestrator",
-      "mobile-react-native",
-      "qa-automation"
+      "lead",
+      "mobile",
+      "tester"
     ],
     "project_root": "/path/to/project",
     "user": "developer",

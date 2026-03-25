@@ -256,4 +256,3 @@ Period: Last 30 days
 
 ---
 
-**Version:** 1.0.0

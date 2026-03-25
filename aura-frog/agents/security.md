@@ -2,7 +2,6 @@
 
 **Agent ID:** security
 **Priority:** 95
-**Version:** 1.0.0
 **Status:** Active
 
 ---

@@ -1,6 +1,5 @@
 # Aura Frog Team Agents - Architecture Overview
 
-**Version:** 3.0.0 Plugin-Based  
 **Last Updated:** 2025-11-23  
 **Reference:** [duongdev/ccpm Architecture](https://github.com/duongdev/ccpm)
 
@@ -59,18 +58,18 @@
 **Purpose:** Code implementation
 
 ```
-mobile-react-native
+mobile
 ├── React Native + Expo
 ├── Multi-region support (PH, MY, ID, IB, HK)
 ├── Phone & Tablet responsive
 └── Zustand state management
 
-web-vuejs
+frontend
 ├── Vue.js 3 + Composition API
 ├── Pinia state management
 └── Vite build tooling
 
-web-reactjs
+frontend
 ├── React 18+ with hooks
 ├── Context API / Redux
 └── Create React App / Vite
@@ -98,24 +97,24 @@ backend-laravel
 **Purpose:** Quality & design
 
 ```
-qa-automation
+tester
 ├── Test planning & execution
 ├── TDD enforcement (80% coverage)
 ├── Jest + React Testing Library
 └── Detox E2E testing
 
-ui-expert
+frontend
 ├── Design analysis (Figma)
 ├── Component breakdown
 ├── Design token extraction
 └── Accessibility (WCAG AA)
 
-project-detector
+scanner
 ├── Auto-detect project type
 ├── Load correct configuration
 └── Switch contexts
 
-project-context-manager
+scanner
 ├── Persist workflow state
 ├── Maintain agent memory
 └── Cross-session context
@@ -150,7 +149,7 @@ slack-operations
 ├── Status updates
 └── Alert on completion
 
-project-config-loader
+scanner
 ├── Load ccpm-config.yaml
 ├── Per-project settings
 └── Environment validation
@@ -163,7 +162,7 @@ project-config-loader
 **Purpose:** Workflow coordination
 
 ```
-pm-operations-orchestrator
+lead
 ├── Manage 5-phase workflow
 ├── Coordinate agents
 ├── Approval gates (2 gates)
@@ -181,7 +180,7 @@ pm-operations-orchestrator
 ```
 Phase 1: Understand + Design
    │
-   ├─→ Agents: pm-orchestrator, jira-operations, dev agents, ui-expert
+   ├─→ Agents: pm-orchestrator, jira-operations, dev agents, frontend
    ├─→ Input: JIRA ticket, Figma designs
    ├─→ Output: requirements.md, tech_spec.md, component_breakdown.md
    ├─→ Approval Gate ✋
@@ -189,7 +188,7 @@ Phase 1: Understand + Design
    ↓
 Phase 2: Test RED
    │
-   ├─→ Agents: qa-automation
+   ├─→ Agents: tester
    ├─→ Input: Tech spec from Phase 1
    ├─→ Output: test_plan.md, failing test files
    ├─→ Auto-continue ⚡
@@ -197,14 +196,14 @@ Phase 2: Test RED
    ↓
 Phase 3: Build GREEN
    │
-   ├─→ Agents: dev agents, qa-automation
+   ├─→ Agents: dev agents, tester
    ├─→ Output: Source code, passing tests
    ├─→ Approval Gate ✋
    │
    ↓
 Phase 4: Refactor + Review
    │
-   ├─→ Agents: All dev agents (cross-review), security-expert, qa-automation
+   ├─→ Agents: All dev agents (cross-review), security, tester
    ├─→ Output: code_review_report.md, test_execution_report.md, coverage_report.html
    ├─→ Auto-continue ⚡
    │
@@ -545,12 +544,12 @@ Ready
 
 ```yaml
 Project A:
-  agents: [mobile-react-native, qa-automation]
+  agents: [mobile, tester]
   integrations: [jira, figma]
   conventions: React Native style guide
   
 Project B:
-  agents: [web-vuejs, backend-laravel, qa-automation]
+  agents: [frontend, backend-laravel, tester]
   integrations: [linear, confluence]
   conventions: Vue.js style guide
 
@@ -573,7 +572,7 @@ Add more agents:
 Add more projects:
   1. Add project block to ccpm-config.yaml
   2. Define project-specific settings
-  3. Switch via project-detector
+  3. Switch via scanner
   
 Add more integrations:
   1. Install MCP server

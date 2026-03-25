@@ -1,6 +1,5 @@
 # CLAUDE.md File Architecture
 
-**Version:** 4.1.0
 **Last Updated:** 2025-11-27
 **Purpose:** Explain Aura Frog's dual-file loader CLAUDE.md architecture with Skills system
 
@@ -259,7 +258,6 @@ project:init
 
 ---
 
-**Version:** 3.0.0
 **Last Updated:** 2025-11-27
 **Status:** Active architecture
 **Major Change:** Removed project-level CLAUDE.md entirely - single plugin file only

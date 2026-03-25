@@ -162,4 +162,3 @@ Rate each category (1-5):
 
 ---
 
-**Version:** 1.0.0

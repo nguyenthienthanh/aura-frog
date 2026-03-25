@@ -1,6 +1,5 @@
 # Pre-Phase Hook - Phase Initialization
 
-**Version:** 1.0.0  
 **Purpose:** Execute before each phase starts  
 **Trigger:** Automatically run before Phase N execution
 
@@ -313,7 +312,6 @@ try {
 
 ---
 
-**Version:** 1.0.0  
 **Trigger:** Before each phase execution  
 **Critical:** YES - Must complete successfully before phase runs
 

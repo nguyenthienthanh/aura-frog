@@ -2,7 +2,7 @@
 
 **Category:** Dev Expert  
 **Priority:** High  
-**Used By:** mobile-react-native, web-reactjs, web-nextjs, web-vuejs
+**Used By:** mobile, web-reactjs, web-nextjs, web-vuejs
 
 ---
 

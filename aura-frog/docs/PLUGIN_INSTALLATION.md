@@ -54,4 +54,3 @@ See: `docs/PLUGIN_TROUBLESHOOTING.md`
 
 ---
 
-**Version:** 1.4.1

@@ -2,7 +2,6 @@
 
 **Category:** Security
 **Priority:** Critical
-**Version:** 1.0.0
 **Applies To:** All code changes, Phase 4 (Refactor + Review), Phase 5 (Finalize)
 
 ---
@@ -362,4 +361,3 @@ fi
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-12-11

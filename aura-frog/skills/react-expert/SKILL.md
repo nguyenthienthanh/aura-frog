@@ -509,4 +509,3 @@ checklist[10]{pattern,do_this}:
 
 ---
 
-**Version:** 1.3.0

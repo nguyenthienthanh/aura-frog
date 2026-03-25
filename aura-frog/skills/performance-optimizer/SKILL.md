@@ -12,7 +12,6 @@ triggers:
 # Skill: Performance Optimizer
 
 **Category:** Dev Expert
-**Version:** 1.0.0
 **Used By:** All development agents
 
 ---
@@ -215,4 +214,3 @@ After:
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

@@ -18,7 +18,6 @@ context: fork
 # Skill: Testing Patterns
 
 **Skill ID:** testing-patterns
-**Version:** 1.0.0
 **Priority:** 50
 **Auto-Invoke:** Yes (when test task detected)
 
@@ -385,4 +384,3 @@ if (detection.testInfra) {
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2026-01-21

@@ -92,4 +92,3 @@ Environment Variable > Project Config > Global Config > Default
 
 ---
 
-**Version:** 1.0.0

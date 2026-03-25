@@ -1,8 +1,7 @@
 # Skill: Design System Implementation
 
 **Category:** Design Expert
-**Version:** 1.0.0
-**Used By:** frontend, mobile-react-native, web-reactjs, web-vuejs, web-nextjs
+**Used By:** frontend, mobile, web-reactjs, web-vuejs, web-nextjs
 
 ---
 
@@ -164,4 +163,3 @@ export const useTheme = () => {
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

@@ -65,7 +65,7 @@ cache_contents[8]{item,description,example}:
   packageManager,Detected package manager,pnpm/composer/pip
   testInfra,Test framework + directories,{framework: vitest testDirs: [tests]}
   filePatterns,Frontend/backend/template files,{templates: [blade] styles: [tailwind]}
-  agents,Primary + secondary agents,{primary: web-nextjs secondary: [backend-nodejs]}
+  agents,Primary + secondary agents,{primary: web-nextjs secondary: [architect]}
   timestamp,When cache was created,1705849200000
   keyFilesHash,Hash of config files,a1b2c3d4e5f6
 ```
@@ -216,8 +216,8 @@ if (!detection) {
   },
   "agents": {
     "primary": "web-nextjs",
-    "secondary": ["backend-nodejs"],
-    "available": ["architect", "security-expert", "qa-automation"]
+    "secondary": ["architect"],
+    "available": ["architect", "security", "tester"]
   },
   "cwd": "/path/to/project",
   "detectedAt": "2026-01-21T10:30:00.000Z",
@@ -249,7 +249,7 @@ if (!detection) {
       "absolutePath": "/path/to/workspace/backend-api",
       "framework": "laravel",
       "packageManager": "composer",
-      "agents": { "primary": "backend-laravel", "secondary": ["ui-expert"] },
+      "agents": { "primary": "backend-laravel", "secondary": ["frontend"] },
       "testInfra": "phpunit"
     },
     {
@@ -258,7 +258,7 @@ if (!detection) {
       "absolutePath": "/path/to/workspace/mobile-app",
       "framework": "react-native",
       "packageManager": "yarn",
-      "agents": { "primary": "mobile-react-native", "secondary": [] },
+      "agents": { "primary": "mobile", "secondary": [] },
       "testInfra": "jest"
     }
   ],

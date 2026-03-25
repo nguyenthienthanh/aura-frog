@@ -1,6 +1,5 @@
 # Rule: Collaborative Planning (Multi-Team Deliberation)
 
-**Version:** 1.0.0
 **Applies to:** Phase 1 (Understand + Design) for Deep complexity tasks
 **Gate:** Only when `agent-detector` classifies task as **Deep** complexity
 
@@ -134,7 +133,7 @@ simulation_scenarios[5]{type,what_to_test}:
 ```toon
 simulation_results[N]{scenario,status,notes}:
   "User signs up with email",PASS,All 3 approaches handle this
-  "User signs up with duplicate email",PARTIAL,"architect handles it / qa flagged it / ui-expert missed it"
+  "User signs up with duplicate email",PARTIAL,"architect handles it / qa flagged it / frontend missed it"
   "10K concurrent signups",FAIL,"None addressed connection pooling — add to requirements"
 ```
 
@@ -289,4 +288,3 @@ token_budget[4]{round,budget,notes}:
 
 ---
 
-**Version:** 1.0.0

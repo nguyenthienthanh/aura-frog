@@ -2,7 +2,6 @@
 
 **Category:** Code Quality
 **Priority:** High
-**Version:** 1.0.0
 **Applies To:** All code, especially backend services
 
 ---
@@ -256,4 +255,3 @@ logger.error('Something failed')
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

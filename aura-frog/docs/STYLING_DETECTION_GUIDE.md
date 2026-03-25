@@ -1,6 +1,5 @@
 # Styling Approach Detection Guide
 
-**Version:** 4.6.0
 **Last Updated:** 2024-11-26
 **Purpose:** Guide agents to detect and use the correct styling approach for each project
 
@@ -115,7 +114,7 @@ grep -r "\.module\.css" src/ --include="*.tsx" --include="*.jsx" | head -5
 
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 
 🎨 **Styling Approach Selection**
@@ -429,7 +428,7 @@ else {
 **Scenario 1: Config specifies Emotion**
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 
 ✅ Detected styling approach: **Emotion** (from project config)
@@ -446,7 +445,7 @@ const Container = styled.View`...`;
 **Scenario 2: Detected NativeWind from code**
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 
 ✅ Detected styling approach: **NativeWind** (from existing code)
@@ -465,7 +464,7 @@ I'll use NativeWind for all new components:
 **Scenario 3: No clear approach, asking user**
 ```markdown
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** mobile-react-native | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
+🤖 **Agent:** mobile | 📋 **System:** Aura Frog v1.10.0 | 🎯 **Phase:** 2 (Design)
 **─────────────────────────────────────────────────────────**
 
 ⚠️ No styling approach specified in project config.
@@ -604,8 +603,8 @@ cat package.json | grep -E "(nativewind|emotion|styled-components)"
 - **Design System Library:** `skills/design-system-library/` → Full design system patterns
 - **Design System Guide:** `docs/DESIGN_SYSTEM_GUIDE.md` → Selection and implementation
 - **Design System Rule:** `rules/agent/design-system-usage.md` → Enforcement rules
-- **Agent Guide:** `agents/mobile-react-native.md` → "Styling Conventions"
-- **UI Expert Agent:** `agents/ui-expert.md` → Design system detection
+- **Agent Guide:** `agents/mobile.md` → "Styling Conventions"
+- **UI Expert Agent:** `agents/frontend.md` → Design system detection
 - **NativeWind Skill:** `skills/nativewind-component-generator.md`
 - **Project Config:** `.claude/project-contexts/template/project-config.yaml`
 - **Conventions:** `.claude/project-contexts/template/conventions.md`
@@ -628,5 +627,4 @@ cat package.json | grep -E "(nativewind|emotion|styled-components)"
 ---
 
 **Last Updated:** 2025-12-04
-**Version:** 4.7.0
 **Status:** ✅ Active Standard

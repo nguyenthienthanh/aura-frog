@@ -1,6 +1,5 @@
 # Rule: Project Linting Precedence
 
-**Version:** 1.1.0
 **Priority:** CRITICAL
 **Applies:** All code generation and review
 
@@ -252,5 +251,4 @@ npx prettier --check .
 
 ---
 
-**Version:** 1.1.0
 **Last Updated:** 2025-12-10

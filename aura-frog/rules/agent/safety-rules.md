@@ -1,6 +1,5 @@
 # Safety Rules - External System Interactions
 
-**Version:** 1.0.0  
 **Purpose:** Prevent accidental writes to external systems
 
 ---

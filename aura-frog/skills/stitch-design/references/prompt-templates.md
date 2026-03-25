@@ -471,4 +471,3 @@ Design a multi-step form for Personal Loan Application:
 
 ---
 
-**Version:** 1.0.0

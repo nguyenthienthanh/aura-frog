@@ -1,6 +1,5 @@
 # Task-Based Agent Selection
 
-**Version:** 1.0.0
 **Purpose:** Select agents based on task content, not just repository type
 
 ---
@@ -353,7 +352,7 @@ TASK_ANALYSIS(user_message, mentioned_files):
 
 **Result:**
 - **Primary:** frontend (120 pts) - CSS/HTML for PDF
-- **Secondary:** backend-nodejs (40 pts) - integration
+- **Secondary:** architect (40 pts) - integration
 - **Approach:** frontend fixes HTML/CSS, backend handles PDF library
 
 ---
@@ -368,9 +367,9 @@ TASK_ANALYSIS(user_message, mentioned_files):
 - "API route" → backend_task_patterns (+55)
 
 **Result:**
-- **Primary:** backend-nodejs (100 pts) - API logic
+- **Primary:** architect (100 pts) - API logic
 - **Secondary:** web-nextjs (40 pts) - Next.js API routes context
-- **Approach:** backend-nodejs leads API implementation
+- **Approach:** architect leads API implementation
 
 ---
 

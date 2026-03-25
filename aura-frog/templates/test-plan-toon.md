@@ -12,7 +12,7 @@ plan:
   feature: [Feature Name]
   jira: [JIRA-XXX]
   date: [YYYY-MM-DD]
-  lead: qa-automation
+  lead: tester
 ```
 
 ---

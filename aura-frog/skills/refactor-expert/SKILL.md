@@ -14,7 +14,6 @@ triggers:
 # Skill: Refactor Expert
 
 **Category:** Dev Expert
-**Version:** 1.1.0
 **Used By:** All development agents
 
 ---
@@ -183,4 +182,3 @@ After:
 
 ---
 
-**Version:** 1.1.0 | **Last Updated:** 2025-12-04

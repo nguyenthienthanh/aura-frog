@@ -115,18 +115,18 @@ Task(team_name="auth-system", name="architect", subagent_type="aura-frog:archite
     3. TaskUpdate(taskId, owner='architect', status='in_progress')
     4. Implement the auth endpoints and service
     5. TaskUpdate(taskId, status='completed')
-    6. SendMessage(recipient='pm-operations-orchestrator', summary='Auth API done',
+    6. SendMessage(recipient='lead', summary='Auth API done',
          content='Implemented login/register/refresh endpoints. Files changed: [list]')
     Files you own: src/api/, src/services/, migrations/
     CONTEXT: [project conventions, tech stack, existing patterns]")
 
-Task(team_name="auth-system", name="ui-expert", subagent_type="aura-frog:ui-expert",
-  prompt="You are ui-expert on team auth-system. Phase: 3-Build GREEN.
+Task(team_name="auth-system", name="frontend", subagent_type="aura-frog:frontend",
+  prompt="You are frontend on team auth-system. Phase: 3-Build GREEN.
     [same pattern — claim UI tasks, own src/components/]
     CONTEXT: [design system, component patterns]")
 
-Task(team_name="auth-system", name="qa-automation", subagent_type="aura-frog:qa-automation",
-  prompt="You are qa-automation on team auth-system. Phase: 3-Build GREEN.
+Task(team_name="auth-system", name="tester", subagent_type="aura-frog:tester",
+  prompt="You are tester on team auth-system. Phase: 3-Build GREEN.
     [same pattern — claim test tasks, own tests/]
     CONTEXT: [testing framework, coverage requirements]")
 ```
@@ -138,12 +138,12 @@ All 3 teammates start **simultaneously** and work in parallel.
 ```
 // Teammates send completion messages (auto-delivered to lead)
 // Lead assigns cross-review:
-SendMessage(type="message", recipient="qa-automation",
+SendMessage(type="message", recipient="tester",
   summary="Review auth API", content="Review architect's auth endpoints. Focus: input validation, error handling.")
 
 // Lead forwards feedback:
 SendMessage(type="message", recipient="architect",
-  summary="Review feedback", content="qa-automation found: [issues]. Please fix.")
+  summary="Review feedback", content="tester found: [issues]. Please fix.")
 ```
 
 ### Step 5: Shutdown + Next Phase
@@ -151,8 +151,8 @@ SendMessage(type="message", recipient="architect",
 ```
 // All tasks complete → shutdown teammates:
 SendMessage(type="shutdown_request", recipient="architect", content="Phase 3 complete")
-SendMessage(type="shutdown_request", recipient="ui-expert", content="Phase 3 complete")
-SendMessage(type="shutdown_request", recipient="qa-automation", content="Phase 3 complete")
+SendMessage(type="shutdown_request", recipient="frontend", content="Phase 3 complete")
+SendMessage(type="shutdown_request", recipient="tester", content="Phase 3 complete")
 
 // Advance to Phase 4, spawn new teammates if needed
 ```
@@ -182,11 +182,11 @@ Every teammate follows this pattern after being spawned:
 
 ```toon
 phase_teams[5]{phase,lead,primary,secondary,team_size}:
-  1-Understand + Design,pm-operations-orchestrator,architect+ui-expert,qa-automation,3
-  2-Test RED,qa-automation,architect,-,2
-  3-Build GREEN,architect,ui-expert+qa-automation,-,3
-  4-Refactor + Review,architect+security-expert,qa-automation,-,3
-  5-Finalize,pm-operations-orchestrator,-,-,1
+  1-Understand + Design,lead,architect+frontend,tester,3
+  2-Test RED,tester,architect,-,2
+  3-Build GREEN,architect,frontend+tester,-,3
+  4-Refactor + Review,architect+security,tester,-,3
+  5-Finalize,lead,-,-,1
 ```
 
 ---
@@ -235,10 +235,10 @@ Each agent type claims specific directories to prevent conflicts:
 ```toon
 file_ownership[5]{agent,directories}:
   architect,"src/api/ src/services/ src/repositories/ migrations/"
-  ui-expert,"src/components/ src/ui/ src/views/ *.css *.scss"
-  qa-automation,"tests/ __tests__/ spec/ *.test.* *.spec.*"
-  mobile-expert,"src/screens/ src/navigation/ *.ios.* *.android.*"
-  security-expert,"Reviews only (no file ownership)"
+  frontend,"src/components/ src/ui/ src/views/ *.css *.scss"
+  tester,"tests/ __tests__/ spec/ *.test.* *.spec.*"
+  mobile,"src/screens/ src/navigation/ *.ios.* *.android.*"
+  security,"Reviews only (no file ownership)"
 ```
 
 ---
@@ -310,8 +310,8 @@ Each team gets its own JSONL log directory:
 teams/phase-02-technical-planning/
   team-log.jsonl        # Combined timeline
   architect.jsonl       # Per-agent log
-  ui-expert.jsonl
-  qa-automation.jsonl
+  frontend.jsonl
+  tester.jsonl
 ```
 
 Teammates log actions automatically via `team-log-writer.cjs` when `AF_TEAM_LOG_DIR` is set.

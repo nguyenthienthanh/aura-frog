@@ -1,6 +1,5 @@
 # Priority Hierarchy
 
-**Version:** 1.1.0
 **Priority:** HIGH - Determines how instructions are loaded and merged
 **Type:** Rule (Structural Standard)
 **Format:** [TOON](https://github.com/toon-format/toon)
@@ -73,7 +72,7 @@ code_quality_merge[5]{priority,source,behavior}:
 Read: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 
 ## Project Overrides
-- Primary agent: mobile-react-native
+- Primary agent: mobile
 - Skip Phase 3 (no UI changes)
 - Test coverage: 90% (higher than default)
 ```
@@ -161,13 +160,13 @@ Claude Defaults ─┘
 **Additive:** Lists are merged (agents, skills)
 ```yaml
 # Plugin
-agents: [mobile-react-native, qa-automation]
+agents: [mobile, tester]
 
 # Project (adds to list)
-agents: [ui-expert]
+agents: [frontend]
 
 # Result
-agents: [mobile-react-native, qa-automation, ui-expert]
+agents: [mobile, tester, frontend]
 ```
 
 **Override:** Values are replaced
@@ -250,5 +249,4 @@ test_coverage: 90
 
 ---
 
-**Version:** 1.1.0
 **Last Updated:** 2025-12-10

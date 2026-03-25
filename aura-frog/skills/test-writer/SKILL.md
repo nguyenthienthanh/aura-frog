@@ -15,7 +15,6 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 # Aura Frog Test Writer
 
 **Priority:** MEDIUM - Use for test-related requests
-**Version:** 1.0.0
 
 ---
 

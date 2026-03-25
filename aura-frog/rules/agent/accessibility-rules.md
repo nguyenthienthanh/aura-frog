@@ -2,7 +2,6 @@
 
 **Category:** Code Quality
 **Priority:** High
-**Version:** 1.0.0
 **Applies To:** All UI development
 
 ---
@@ -206,4 +205,3 @@ Ensure applications are usable by everyone, including users with disabilities.
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

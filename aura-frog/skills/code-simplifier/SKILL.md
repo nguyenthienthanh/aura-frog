@@ -15,7 +15,6 @@ triggers:
 # Skill: Code Simplifier
 
 **Category:** Code Quality
-**Version:** 1.0.0
 **Rule Reference:** `rules/core/simplicity-over-complexity.md`
 
 ---
@@ -118,4 +117,3 @@ Result:
 
 ---
 
-**Version:** 1.0.0

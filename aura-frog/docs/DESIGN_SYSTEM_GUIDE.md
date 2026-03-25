@@ -1,6 +1,5 @@
 # Design System Guide
 
-**Version:** 1.0.0
 **Last Updated:** 2025-12-04
 
 This guide helps AI agents and developers build applications using popular design systems. It covers detection, selection, and implementation best practices.
@@ -387,7 +386,7 @@ Which should I use as the primary?
 
 - **Skills:** `skills/design-system-library/`
 - **Rules:** `rules/agent/design-system-usage.md`, `rules/agent/theme-consistency.md`
-- **Agent:** `agents/ui-expert.md`
+- **Agent:** `agents/frontend.md`
 - **Detection:** `docs/STYLING_DETECTION_GUIDE.md`
 
 ---

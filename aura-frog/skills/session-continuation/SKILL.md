@@ -83,7 +83,7 @@ Auto-prompt:
   },
 
   "agents": {
-    "primary": "backend-nodejs",
+    "primary": "architect",
     "secondary": ["security", "tester"]
   },
 
@@ -213,7 +213,7 @@ Actions:
 
 📊 **Restored State:**
 - Current Phase: 3 - Build GREEN
-- Primary Agent: backend-nodejs
+- Primary Agent: architect
 - Tech Stack: Node.js, Express, PostgreSQL
 
 ✅ **Completed Phases:**
@@ -413,11 +413,10 @@ phases[5]{num,name,status}:
   4,Refactor + Review,pending
   5,Finalize,pending
 
-agents[2]: backend-nodejs,tester
+agents[2]: architect,tester
 ```
 
 **Token savings:** TOON uses ~160 tokens vs JSON ~600 tokens (73% reduction)
 
 ---
 
-**Last Updated:** 2025-12-23

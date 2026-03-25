@@ -13,7 +13,6 @@ allowed-tools: Read, Write, Bash
 # MCP Response Analyzer
 
 **Priority:** MEDIUM - Use for large outputs
-**Version:** 1.0.0
 
 ---
 

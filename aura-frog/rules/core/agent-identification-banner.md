@@ -52,19 +52,19 @@ banner_fields[6]{field,values,source}:
 
 ```toon
 agent_map[10]{context,agent}:
-  General/Unknown,pm-operations-orchestrator
-  React Native/Flutter,mobile-expert
-  Vue/Angular/React/Next.js,ui-expert or web-* specific
+  General/Unknown,lead
+  React Native/Flutter,mobile
+  Vue/Angular/React/Next.js,frontend or web-* specific
   Node.js/Python/Laravel/Go,backend-* or architect
   Database/Architecture,architect
-  Security,security-expert
-  Testing/QA,qa-automation
-  DevOps/CI-CD,devops-cicd
-  Godot/Game,game-developer
-  UI/Design,ui-expert
+  Security,security
+  Testing/QA,tester
+  DevOps/CI-CD,devops
+  Godot/Game,architect
+  UI/Design,frontend
 ```
 
-**Full logic:** `agents/smart-agent-detector.md`
+**Full logic:** `skills/agent-detector/SKILL.md`
 
 ---
 

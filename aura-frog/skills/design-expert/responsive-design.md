@@ -1,7 +1,6 @@
 # Skill: Responsive Design Patterns
 
 **Category:** Design Expert
-**Version:** 1.0.0
 **Used By:** frontend
 
 ---
@@ -162,4 +161,3 @@ p { font-size: clamp(1rem, 2vw, 1.125rem); }
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

@@ -9,7 +9,7 @@ Human-readable summary of each release. For full technical changelog, see [CHANG
 **Breaking:** Agent names renamed, 10 skills removed, SEO/Godot externalized.
 
 ### Highlights
-- **Agent rename:** cleaner names (ui-expert → frontend, qa-automation → tester, etc.)
+- **Agent rename:** cleaner names (frontend → frontend, tester → tester, etc.)
 - **76% less context overhead:** auto-invoke skills reduced from 27 to 8
 - **Git worktree support:** isolate workflow changes on separate branches
 - **Phase checkpoints + rollback:** undo any phase with `workflow:rollback`

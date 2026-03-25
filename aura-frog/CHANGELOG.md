@@ -4,6 +4,21 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.2.2] - 2026-03-25
+
+### Full repo consistency pass — 116 files
+
+#### Fixed
+- **Old agent names** in rules, docs, skills, hooks, templates (30+ instances across 50+ files)
+- **Version footers** removed from all rules, skills, docs, hooks, agents files
+- **Count mismatches** — README/CLAUDE.md/hooks README all synced to actual: 10/43/89/45/27
+- **install.sh** version synced to current
+- **Broken file references** — smart-agent-detector.md → agent-detector/SKILL.md
+- **Placeholder date** in documentation skill replaced
+- **Stale Last Updated lines** removed from all skill files
+
+---
+
 ## [2.2.1] - 2026-03-25
 
 ### Cleanup — Command files bulk update

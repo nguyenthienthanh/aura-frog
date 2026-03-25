@@ -199,4 +199,3 @@ throw new AppError('User not found', 'USER_NOT_FOUND', 404)
 ---
 
 **Applied In:** Phase 2 (Design), Phase 5 (Implementation)
-**Version:** 1.0.0 | **Last Updated:** 2025-11-28

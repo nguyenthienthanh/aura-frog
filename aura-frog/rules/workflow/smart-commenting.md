@@ -190,4 +190,3 @@ function formatDate(date: Date): string
 
 ---
 
-**Version:** 1.3.0 | **Priority:** High

@@ -117,4 +117,3 @@ estimation_factors[4]{factor,weight,questions}:
 
 ---
 
-**Version:** 1.0.0

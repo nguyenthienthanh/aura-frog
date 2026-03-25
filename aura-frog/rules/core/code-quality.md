@@ -1,6 +1,5 @@
 # Code Quality Rules
 
-**Version:** 1.1.0
 **Purpose:** Ensure consistent, high-quality code across all projects
 
 ---
@@ -384,6 +383,5 @@ Before submitting code:
 
 ---
 
-**Version:** 1.1.0
 **Last Updated:** 2025-12-10
 
