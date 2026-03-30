@@ -143,9 +143,13 @@ You: "approve"
 | | Without Aura Frog | With Aura Frog |
 |---|:---|:---|
 | **Quality** | Hope and pray | TDD enforced (RED → GREEN → REFACTOR) |
+| **Planning** | One perspective, hope for the best | **3 agents debate** your plan before building |
 | **Agents** | One generic AI | **10 specialists** auto-selected per task |
 | **Context** | Re-explain every session | **Deep Project Init** remembers everything |
-| **Planning** | One perspective, hope for the best | **3 agents debate** your plan before building |
+| **Token overhead** | Loads everything into context | 3-tier rules — only loads what's needed (~75% less) |
+| **Code review** | "Looks good" | 6-aspect review: security, types, errors, tests, quality, simplification |
+| **Context reset** | Lose everything on /compact | Smart compact — preserves Phase 1 decisions |
+| **Learning** | Starts from scratch every time | Remembers your patterns and corrections |
 | **Teams** | One agent at a time | **Multi-agent orchestration** with cross-review |
 | **Integrations** | Copy-paste from docs | **6 MCP servers** auto-invoked |
 
@@ -387,8 +391,8 @@ aura-frog/
 │   ├── core/       12 rules — always loaded
 │   ├── agent/      15 rules — loaded per agent type
 │   └── workflow/   17 rules — loaded per phase
-├── hooks/          27 lifecycle hooks (conditional execution)
-├── scripts/        20 utility scripts
+├── hooks/          26 lifecycle hooks (conditional execution)
+├── scripts/        41 utility scripts
 ├── templates/      Document templates
 ├── docs/           Guides, tutorials & references
 └── .mcp.json       6 bundled MCP servers
