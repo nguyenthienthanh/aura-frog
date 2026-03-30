@@ -73,7 +73,7 @@ const LINTER_COMMANDS = {
   'eslint': {
     check: 'npx eslint --max-warnings 0',
     fix: 'npx eslint --fix',
-    configFiles: ['.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml', 'eslint.config.js', 'eslint.config.mjs'],
+    configFiles: ['.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', '.eslintrc.yml', 'eslint.config.js', 'eslint.config.mjs'],
   },
   'prettier': {
     check: 'npx prettier --check',
@@ -198,6 +198,29 @@ function isLinterAvailable(linter) {
 }
 
 /**
+ * Resolve command to local binary if available (e.g., npx eslint → ./node_modules/.bin/eslint)
+ */
+function resolveCommand(fixCmd) {
+  const parts = fixCmd.split(' ');
+  // If command starts with 'npx ', try local binary first
+  if (parts[0] === 'npx') {
+    const binName = parts[1];
+    const localBin = path.join(process.cwd(), 'node_modules', '.bin', binName);
+    if (fs.existsSync(localBin)) {
+      return [localBin, ...parts.slice(2)];
+    }
+  }
+  // If command starts with 'vendor/bin/', check it exists
+  if (parts[0].startsWith('vendor/bin/')) {
+    const vendorBin = path.join(process.cwd(), parts[0]);
+    if (fs.existsSync(vendorBin)) {
+      return [vendorBin, ...parts.slice(1)];
+    }
+  }
+  return parts;
+}
+
+/**
  * Run linter with auto-fix
  */
 function runLinter(linter, filePath) {
@@ -205,18 +228,36 @@ function runLinter(linter, filePath) {
   if (!config) return { success: true, skipped: true };
 
   try {
-    const parts = config.fix.split(' ');
-    const cmd = parts[0];
-    const args = [...parts.slice(1), filePath];
+    const resolved = resolveCommand(config.fix);
+    const cmd = resolved[0];
+    const args = [...resolved.slice(1), filePath];
+
+    // Detect legacy .eslintrc.* config and set env var for eslint 9+
+    const env = { ...process.env };
+    if (linter === 'eslint') {
+      const legacyConfigs = ['.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', '.eslintrc.yml'];
+      const hasLegacy = legacyConfigs.some(f => fs.existsSync(path.join(process.cwd(), f)));
+      if (hasLegacy) {
+        env.ESLINT_USE_FLAT_CONFIG = 'false';
+      }
+    }
+
+    // Snapshot file mtime before running fixer
+    const mtimeBefore = fs.statSync(filePath).mtimeMs;
+
     const result = spawnSync(cmd, args, {
       cwd: process.cwd(),
       timeout: 30000,
       encoding: 'utf-8',
+      env,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
+    const mtimeAfter = fs.statSync(filePath).mtimeMs;
+    const fileChanged = mtimeAfter !== mtimeBefore;
+
     if (result.status === 0) {
-      return { success: true, fixed: true, linter };
+      return { success: true, fixed: fileChanged, linter };
     } else {
       return {
         success: false,
@@ -240,6 +281,32 @@ function getAvailableLinters(filePath) {
 }
 
 /**
+ * Read stdin as a string (Claude Code sends JSON via stdin for PostToolUse hooks)
+ */
+function readStdin() {
+  try {
+    return fs.readFileSync(0, 'utf-8');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Extract file path from Claude Code PostToolUse stdin JSON
+ * Shape: { tool_input: { file_path }, tool_response: { filePath } }
+ */
+function extractFilePath(stdinData) {
+  try {
+    const data = JSON.parse(stdinData);
+    return (data.tool_input && data.tool_input.file_path)
+      || (data.tool_response && data.tool_response.filePath)
+      || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Main hook execution
  */
 async function main() {
@@ -249,7 +316,8 @@ async function main() {
   }
 
   try {
-    const filePath = process.env.CLAUDE_FILE_PATHS;
+    const stdin = readStdin();
+    const filePath = extractFilePath(stdin);
 
     if (!filePath) {
       process.exit(0);
@@ -304,7 +372,7 @@ async function main() {
   }
 }
 
-module.exports = { getAvailableLinters, isLinterAvailable, runLinter };
+module.exports = { getAvailableLinters, isLinterAvailable, runLinter, extractFilePath };
 
 if (require.main === module) {
   main();
