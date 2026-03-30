@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.3.1-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -367,8 +367,8 @@ aura-frog/
 │   └── reference/  10 pattern files (lazy-loaded)
 ├── skills/         43 skills (8 auto-invoke + 35 reference)
 ├── commands/       86 commands (5 bundled menus)
-├── rules/          45 quality rules (3-tier: core/agent/workflow)
-│   ├── core/       13 rules — always loaded
+├── rules/          44 quality rules (3-tier: core/agent/workflow)
+│   ├── core/       12 rules — always loaded
 │   ├── agent/      15 rules — loaded per agent type
 │   └── workflow/   17 rules — loaded per phase
 ├── hooks/          27 lifecycle hooks (conditional execution)

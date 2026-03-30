@@ -401,7 +401,6 @@ This task-based analysis **enhances** existing detection:
    - Task-based score ≥50 → Override or co-lead
    - Task-based score 30-49 → Add as secondary
    - Task-based score <30 → Keep repo-based only
-4. Show combined agents in banner
 ```
 
 ---

@@ -368,9 +368,9 @@ For non-workflow tasks, still provide guidance:
 
 ---
 
-## Integration with Agent Banner
+## Integration with Status Line
 
-The guidance block should appear AFTER the agent banner:
+The guidance block appears at the end of the response:
 
 ```markdown
 ⚡ 🐸 AURA FROG v1.10.0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

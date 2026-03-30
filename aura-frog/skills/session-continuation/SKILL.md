@@ -239,7 +239,6 @@ Type "continue" to proceed or "status" for more details.
 ```yaml
 On "continue":
   1. Resume from saved phase
-  2. Show agent banner
   3. Execute remaining phase steps
   4. Show approval gate when phase complete
 ```

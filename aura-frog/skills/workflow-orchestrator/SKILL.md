@@ -43,7 +43,6 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 1. **agent-detector** → Select lead agent (MANDATORY)
 2. **project-context-loader** → Load conventions (MANDATORY)
-3. **Show agent banner** at start of response
 4. **Verify task complexity** - if simple, suggest lighter approach
 5. **Challenge requirements** → Ask clarifying questions before Phase 1 (see `rules/workflow/requirement-challenger.md`)
 

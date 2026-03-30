@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v2.3.0
+**System:** Aura Frog v2.3.1
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 43 skills + 89 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
@@ -60,41 +60,31 @@
 ## Session Start (MANDATORY)
 
 ```toon
-session_start[6]{step,action,file}:
+session_start[5]{step,action,file}:
   1,Check & load .envrc (AUTO-RUN if not loaded),rules/core/env-loading.md
   2,Load memory from Supabase (auto via hook),hooks/lib/af-memory-loader.cjs
-  3,Show agent banner,rules/core/agent-identification-banner.md
-  4,Detect agent + model,skills/agent-detector/SKILL.md
-  5,Load project context,skills/project-context-loader/SKILL.md
-  6,Verify MCP servers,commands/mcp/status.md
+  3,Detect agent + model,skills/agent-detector/SKILL.md
+  4,Load project context,skills/project-context-loader/SKILL.md
+  5,Verify MCP servers,commands/mcp/status.md
 ```
 
 **CRITICAL: Always check env FIRST.** If env vars not loaded → run `project:reload-env` before continuing.
 
-**Show status in first response:**
-```
-🔌 MCP: context7 ✓ | playwright ✓ | vitest ✓ | firebase ✗
-🧠 Learning: enabled ✓ | Memory: 15 items loaded
-👥 Teams: ✓ enabled | Mode: ready
-```
-
 ---
 
-## Status Line (Primary — 0 tokens)
+## Status Line (0 tokens)
 
-Agent/phase/model info is shown in the CLI status bar, not in conversation text.
+Agent, phase, model, context %, and cost are shown in the CLI status bar — NOT in conversation text.
 
 ```
-🐸 AF v2.2.2 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v2.3.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
+
+**Do NOT render banners in conversation.** The status line handles it.
 
 **Setup:** `project:sync-settings` merges `statusLine` config into project settings.
-**Script:** `scripts/statusline.sh` reads session cache + Claude Code JSON input.
+**Script:** `scripts/statusline.sh`
 **Disable:** Remove `statusLine` from `.claude/settings.local.json`.
-
-**Conversation banner is OPTIONAL.** Only show on first response if status line is not configured.
-
-**Details:** `rules/core/agent-identification-banner.md`
 
 ---
 
@@ -192,14 +182,13 @@ bundled_commands[5]{command,subcommands,replaces}:
 resources[15]{name,location}:
   Agents (10),agents/
   Commands (86),commands/
-  Rules (45: 13 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
+  Rules (44: 12 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
   Skills (8 auto-invoke + 35 reference),skills/
   Hooks (27),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md
   Phases (5),docs/phases/
-  Banner Examples,docs/BANNER_EXAMPLES.md
   Getting Started,GET_STARTED.md
   Workflow Diagrams,docs/WORKFLOW_DIAGRAMS.md
   Troubleshooting,docs/TROUBLESHOOTING.md
@@ -305,4 +294,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 2.3.0
+**Version:** 2.3.1

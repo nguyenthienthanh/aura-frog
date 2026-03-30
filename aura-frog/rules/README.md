@@ -33,7 +33,6 @@ core[13]{rule,priority,purpose}:
   simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated
   verification,critical,Fresh verification before claiming done
   env-loading,critical,Load .envrc at session start
-  agent-identification-banner,critical,Show agent banner every response
   correct-file-extensions,medium,Proper file naming
   prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
   direct-hook-access,medium,Lifecycle hooks

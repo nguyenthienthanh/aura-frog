@@ -88,7 +88,6 @@ Read: ~/.claude/plugins/marketplaces/aurafrog/aura-frog/CLAUDE.md
 - Skills and commands
 
 **Contains:**
-- Agent identification banner rule
 - 5-phase workflow
 - TDD enforcement
 - Approval gates

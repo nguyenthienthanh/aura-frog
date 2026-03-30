@@ -18,7 +18,7 @@ Optimize token usage and context efficiency to reduce costs and improve reasonin
 
 ```toon
 context_tiers[3]{tier,tokens,loads}:
-  0-always,~500,Banner format + MCP list + core rules
+  0-always,~500,MCP list + core rules
   1-session,~1000,Project detection + tech stack + workflow phase
   2-demand,variable,Framework patterns + detailed rules + full skills
 ```

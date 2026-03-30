@@ -18,7 +18,6 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 1 | **Show agent banner** | User must know which agent is active |
 | 2 | **Load project context** | Must follow project conventions |
 | 3 | **Detect appropriate agent** | Right specialist for the task |
 
@@ -26,7 +25,6 @@ These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior acro
 
 | # | Rule | Why |
 |---|------|-----|
-| 4 | **Show banner before each phase** | User knows which agent handles phase |
 | 5 | **Read command definition** | Follow exact execution steps |
 | 6 | **Follow phase order** | Phases build on each other |
 | 7 | **Execute hooks** | Pre/post phase automation |
@@ -170,7 +168,6 @@ Continue Until:
 
 ### Phase Start
 ```markdown
-- [ ] Banner shown with correct agent(s) for this phase
 - [ ] Agent change announced if different from previous phase
 - [ ] Project context loaded
 - [ ] Phase guide read
@@ -241,7 +238,6 @@ At 150K tokens (75% of 200K):
 ```markdown
 ✅ User: "Implement feature X"
    Agent:
-   1. Shows banner
    2. Loads project context
    3. Starts Phase 1
    4. Shows approval gate
@@ -253,7 +249,6 @@ At 150K tokens (75% of 200K):
 ```markdown
 ❌ User: "Implement feature X"
    Agent:
-   1. Skips banner
    2. Assumes React project
    3. Starts coding immediately
    4. No approval gate
@@ -266,8 +261,6 @@ At 150K tokens (75% of 200K):
 
 ### ALWAYS Checklist
 ```
-□ Show agent banner (start of response)
-□ Show banner before each workflow phase
 □ Load project context
 □ Follow phase order
 □ Run lint after implementation (eslint/tslint)

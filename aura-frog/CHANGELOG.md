@@ -4,6 +4,22 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.3.1] - 2026-03-30
+
+### Remove conversation banner — status line only
+
+#### Removed
+- **agent-identification-banner.md** rule — deleted entirely
+- **BANNER_EXAMPLES.md** — no longer needed
+- All banner instructions from CLAUDE.md, execution-rules, agent-detector, workflow-orchestrator, session-continuation
+- Banner from session start steps (6 → 5 steps)
+
+#### Updated
+- Rules: 45 → 44 (12 core + 15 agent + 17 workflow)
+- CLAUDE.md: "Do NOT render banners in conversation" is now the rule
+
+---
+
 ## [2.3.0] - 2026-03-30
 
 ### Status Line — Banner moves to CLI status bar (0 tokens)

@@ -100,7 +100,6 @@ Skills are **model-invoked** capabilities that Claude automatically activates ba
 - Analyzes message for keywords and intent
 - Scores all available agents
 - Selects Primary (≥80), Secondary (50-79), Optional (30-49)
-- Shows agent identification banner
 - Proceeds as detected agent
 
 **⚠️ CRITICAL:** This skill MUST run FIRST before any other action
