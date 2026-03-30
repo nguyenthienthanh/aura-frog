@@ -44,7 +44,32 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 1. **agent-detector** → Select lead agent (MANDATORY)
 2. **project-context-loader** → Load conventions (MANDATORY)
 4. **Verify task complexity** - if simple, suggest lighter approach
-5. **Challenge requirements** → Ask clarifying questions before Phase 1 (see `rules/workflow/requirement-challenger.md`)
+5. **Socratic brainstorming** → Ask before building (Standard/Deep only)
+6. **Challenge requirements** → Probe assumptions (see `rules/workflow/requirement-challenger.md`)
+
+---
+
+## Phase 1 — Socratic Brainstorming (Standard + Deep tasks)
+
+Before presenting any design, engage the user with clarifying questions:
+
+1. **Ask 3-5 targeted questions** about requirements, constraints, and priorities
+   - "You mentioned JWT — have you considered OAuth2? What's the auth flow?"
+   - "What's the expected scale? This affects architecture decisions."
+   - "Any existing patterns in the codebase I should follow?"
+
+2. **Wait for user answers** before proceeding
+
+3. **Refine understanding** based on answers — ask follow-up if needed
+
+4. **Only then** present the design document for approval
+
+**Skip brainstorming for:**
+- Quick complexity tasks (bugfix, typo, small change)
+- FastTrack mode (user already has specs)
+- When user explicitly says "just do it" or "skip questions"
+
+**Why:** Asking questions catches 80% of misunderstandings before they become expensive Phase 3 rewrites.
 
 ---
 
@@ -97,6 +122,7 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 ```
 Phase 1 (Understand + Design) → Phase 2 (Test RED)
   Mode: APPROVAL REQUIRED
+  Pre-step: Socratic brainstorming (Standard/Deep only)
   Pre-step: Challenge requirements (Standard/Deep only)
   Pre-step (Deep only): Collaborative planning (3-perspective deliberation)
   Blocker: No design approved

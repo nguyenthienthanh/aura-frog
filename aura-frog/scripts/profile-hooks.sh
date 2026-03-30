@@ -26,12 +26,12 @@ for hook in "$HOOKS_DIR/"*.cjs; do
   total_bytes=0
 
   for i in $(seq 1 "$ITERATIONS"); do
-    start_ms=$(($(date +%s) * 1000 + $(date +%N 2>/dev/null | cut -c1-3 || echo 0)))
+    start_ms=$(( 10#$(date +%s%3N 2>/dev/null || echo "$(date +%s)000") ))
 
     # Run hook with empty JSON input, capture output
     output=$(echo '{}' | timeout 5 node "$hook" 2>&1 || true)
 
-    end_ms=$(($(date +%s) * 1000 + $(date +%N 2>/dev/null | cut -c1-3 || echo 0)))
+    end_ms=$(( 10#$(date +%s%3N 2>/dev/null || echo "$(date +%s)000") ))
 
     ms=$((end_ms - start_ms))
     [ "$ms" -lt 0 ] && ms=0

@@ -38,7 +38,7 @@ ACTUAL_AGENTS=$(find "$BASE_DIR/agents" -maxdepth 1 -name '*.md' ! -name 'README
 ACTUAL_SKILLS=$(find "$BASE_DIR/skills" -name 'SKILL.md' | wc -l | tr -d ' ')
 
 # Rules: .md files in rules/ excluding README.md
-ACTUAL_RULES=$(find "$BASE_DIR/rules" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+ACTUAL_RULES=$(find "$BASE_DIR/rules" -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
 
 # Commands: .md files in commands/ and commands/*/ excluding README.md
 ACTUAL_COMMANDS=$(find "$BASE_DIR/commands" -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')

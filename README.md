@@ -85,6 +85,22 @@ sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/
 
 Then use anywhere: `af doctor`, `af setup remote`, `af setup channels`, `af measure`.
 
+<details>
+<summary>Works with other platforms (skills-only mode)</summary>
+
+Aura Frog's **skills and commands** work on any platform that supports SKILL.md files. Hooks require Claude Code.
+
+| Platform | Install | What Works |
+|----------|---------|------------|
+| **Claude Code** | `/plugin marketplace add nguyenthienthanh/aura-frog` | Everything (skills + hooks + agents + MCP) |
+| **OpenAI Codex** | `cp -r aura-frog/skills/* ~/.codex/skills/` | Skills + commands only |
+| **Gemini CLI** | `cp -r aura-frog/skills/* ~/.gemini/skills/` | Skills + commands only |
+| **OpenCode** | `cp -r aura-frog/skills/* .opencode/skills/` | Skills + commands only |
+
+**Note:** Hooks (27), lifecycle automation, agent detection, and MCP servers are Claude Code exclusive. Other platforms get skills and commands but not the full workflow engine.
+
+</details>
+
 ---
 
 ## See It In Action
@@ -141,7 +157,7 @@ You: "approve"
 
 <div align="center">
 
-| 10 Agents | 43 Skills | 89 Commands | 45 Rules | 27 Hooks | 6 MCPs |
+| 10 Agents | 43 Skills | 89 Commands | 44 Rules | 27 Hooks | 6 MCPs |
 |:-:|:-:|:-:|:-:|:-:|:-:|
 | Auto-selected per task | 8 auto-invoke | 5 bundled menus | 3-tier loading | Conditional execution | Zero-config |
 
@@ -347,7 +363,7 @@ Zero-dependency bash CLI for quick checks outside Claude Code:
 | | Link |
 |---|---|
 | **Getting Started** | [GET_STARTED.md](aura-frog/GET_STARTED.md) |
-| **All Commands (86)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Commands (89)** | [commands/README.md](aura-frog/commands/README.md) |
 | **All Skills (43)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams** | [AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) |
@@ -366,7 +382,7 @@ aura-frog/
 ├── agents/         10 specialized agents (auto-selected)
 │   └── reference/  10 pattern files (lazy-loaded)
 ├── skills/         43 skills (8 auto-invoke + 35 reference)
-├── commands/       86 commands (5 bundled menus)
+├── commands/       89 commands (5 bundled menus)
 ├── rules/          44 quality rules (3-tier: core/agent/workflow)
 │   ├── core/       12 rules — always loaded
 │   ├── agent/      15 rules — loaded per agent type
