@@ -184,7 +184,7 @@ resources[15]{name,location}:
   Commands (86),commands/
   Rules (44: 12 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
   Skills (8 auto-invoke + 35 reference),skills/
-  Hooks (27),hooks/
+  Hooks (26),hooks/
   MCP Servers (6),.mcp.json
   MCP Guide,docs/MCP_GUIDE.md
   Learning System,docs/LEARNING_SYSTEM.md

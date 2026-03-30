@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
   "version": "2.3.1",
-  "description": "10 specialized agents, 5-phase TDD workflow, 44 rules (3-tier: core/agent/workflow), 43 skills (8 auto-invoke + 35 reference), 89 commands, 27 hooks, Agent Teams support. Godot and SEO modules available as separate addons. Main character energy for your codebase",
+  "description": "10 specialized agents, 5-phase TDD workflow, 44 rules (3-tier: core/agent/workflow), 43 skills (8 auto-invoke + 35 reference), 89 commands, 26 hooks, Agent Teams support. Godot and SEO modules available as separate addons. Main character energy for your codebase",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

@@ -22,7 +22,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (27 Total)
+## Active Hooks (26 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -828,7 +828,6 @@ hooks[27]{event,name,purpose}:
 | `scope-drift.cjs` | Yes | Yes | -- | Warns on scope divergence |
 | `task-completed.cjs` | Yes | -- | Yes | Rejects incomplete tasks (Agent Teams) |
 | `teammate-idle.cjs` | Yes | -- | Yes | Keeps alive with work assignment |
-| `set-active-plan.cjs` | Yes | Yes | -- | Errors on invalid args/paths |
 | All other hooks | Yes | -- | -- | Non-blocking, success-only |
 
 ---

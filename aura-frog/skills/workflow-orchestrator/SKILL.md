@@ -49,27 +49,11 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ---
 
-## Phase 1 — Socratic Brainstorming (Standard + Deep tasks)
+### Socratic Brainstorming (Standard + Deep only)
 
-Before presenting any design, engage the user with clarifying questions:
+Ask clarifying questions BEFORE presenting design. Understand the user's intent, constraints, and priorities through dialogue — don't assume.
 
-1. **Ask 3-5 targeted questions** about requirements, constraints, and priorities
-   - "You mentioned JWT — have you considered OAuth2? What's the auth flow?"
-   - "What's the expected scale? This affects architecture decisions."
-   - "Any existing patterns in the codebase I should follow?"
-
-2. **Wait for user answers** before proceeding
-
-3. **Refine understanding** based on answers — ask follow-up if needed
-
-4. **Only then** present the design document for approval
-
-**Skip brainstorming for:**
-- Quick complexity tasks (bugfix, typo, small change)
-- FastTrack mode (user already has specs)
-- When user explicitly says "just do it" or "skip questions"
-
-**Why:** Asking questions catches 80% of misunderstandings before they become expensive Phase 3 rewrites.
+Skip if: Quick complexity, FastTrack mode, or user says "just do it".
 
 ---
 

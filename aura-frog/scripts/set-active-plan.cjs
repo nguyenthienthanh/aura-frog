@@ -15,7 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { readSessionState, writeSessionState } = require('./lib/af-config-utils.cjs');
+const { readSessionState, writeSessionState } = require('../hooks/lib/af-config-utils.cjs');
 
 function main() {
   const args = process.argv.slice(2);

@@ -97,7 +97,7 @@ Aura Frog's **skills and commands** work on any platform that supports SKILL.md 
 | **Gemini CLI** | `cp -r aura-frog/skills/* ~/.gemini/skills/` | Skills + commands only |
 | **OpenCode** | `cp -r aura-frog/skills/* .opencode/skills/` | Skills + commands only |
 
-**Note:** Hooks (27), lifecycle automation, agent detection, and MCP servers are Claude Code exclusive. Other platforms get skills and commands but not the full workflow engine.
+**Note:** Hooks (26), lifecycle automation, agent detection, and MCP servers are Claude Code exclusive. Other platforms get skills and commands but not the full workflow engine.
 
 </details>
 
@@ -157,7 +157,7 @@ You: "approve"
 
 <div align="center">
 
-| 10 Agents | 43 Skills | 89 Commands | 44 Rules | 27 Hooks | 6 MCPs |
+| 10 Agents | 43 Skills | 89 Commands | 44 Rules | 26 Hooks | 6 MCPs |
 |:-:|:-:|:-:|:-:|:-:|:-:|
 | Auto-selected per task | 8 auto-invoke | 5 bundled menus | 3-tier loading | Conditional execution | Zero-config |
 

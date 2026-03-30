@@ -20,7 +20,7 @@ Set the active plan for the current session. This affects:
 ## Execution
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/hooks/set-active-plan.cjs" "$ARGUMENTS"
+node "${CLAUDE_PLUGIN_ROOT}/scripts/set-active-plan.cjs" "$ARGUMENTS"
 ```
 
 ## Clear Active Plan
