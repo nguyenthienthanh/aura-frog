@@ -34,6 +34,7 @@ Rules:
   permissions.allow  → Union (plugin + project, deduplicated)
   permissions.deny   → Union (plugin + project, deduplicated)
   env                → Plugin defaults + project overrides (project wins)
+  statusLine         → Always from plugin (canonical source)
   other keys         → Project values preserved, plugin adds missing
 ```
 
@@ -44,7 +45,7 @@ Rules:
 ### 1. Locate Files
 
 ```bash
-PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT}"
+PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/plugins/marketplaces/aurafrog/aura-frog}"
 PLUGIN_SETTINGS="$PLUGIN_DIR/settings.example.json"
 PROJECT_SETTINGS=".claude/settings.local.json"
 ```
@@ -91,6 +92,9 @@ jq -s '
   # Merge permissions.deny: union of both arrays
   (($plugin.permissions.deny // []) + ($project.permissions.deny // []) | unique) as $merged_deny |
 
+  # Merge statusLine: always take plugin version (canonical source)
+  ($plugin.statusLine // null) as $plugin_sl |
+
   # Build result: project base + merged fields
   $project * {
     env: $merged_env,
@@ -98,7 +102,7 @@ jq -s '
       allow: $merged_allow,
       deny: $merged_deny
     }
-  }
+  } + (if $plugin_sl then { statusLine: $plugin_sl } else {} end)
 ' "$PLUGIN_SETTINGS" "$PROJECT_SETTINGS" > /tmp/af-merged-settings.json
 
 # Replace project settings with merged result
@@ -152,6 +156,7 @@ echo "💾 Backup: $PROJECT_SETTINGS.backup.*"
 | `env` | Plugin defaults + project overrides | Plugin: `{TEAMS: "1"}` + Project: `{MY_VAR: "x"}` → Both kept |
 | `permissions.allow` | Union (deduplicated) | Plugin has new rule → added to project |
 | `permissions.deny` | Union (deduplicated) | Both lists combined |
+| `statusLine` | Always from plugin (canonical source) | Ensures correct script path after updates |
 | Other keys | Project values preserved | Project custom keys untouched |
 
 ### Environment Override Priority

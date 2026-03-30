@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 
 # Resolve base directory (aura-frog/aura-frog/)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BASE_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
 CLAUDE_MD="$BASE_DIR/CLAUDE.md"
 PLUGIN_JSON="$BASE_DIR/.claude-plugin/plugin.json"

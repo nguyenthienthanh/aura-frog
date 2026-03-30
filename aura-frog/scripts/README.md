@@ -8,12 +8,13 @@
 
 ```
 scripts/
+├── ci/                 # CI/CD scripts (GitHub Actions)
 ├── learn/              # Learning system scripts
 ├── supabase/           # Database setup scripts
 ├── visual/             # Visual testing scripts
 ├── workflow/           # Workflow management scripts
 ├── test/               # Test utilities
-└── *.sh                # Root-level utility scripts
+└── *.sh                # Root-level utility scripts (AI/Claude)
 ```
 
 ---
@@ -43,8 +44,10 @@ scripts[27]{category,script,purpose}:
   visual,snapshot-compare.sh,Compare snapshots
   visual,pdf-render.sh,Render PDFs for visual comparison
   visual,init-claude-visual.sh,Initialize Claude visual testing
-  utility,validate-config.sh,Validate plugin configuration
-  utility,validate-toon.sh,Validate TOON format files
+  ci,ci/validate-config.sh,Validate plugin configuration (CI)
+  ci,ci/validate-toon.sh,Validate TOON format files (CI)
+  ci,ci/validate-counts.sh,Validate component counts (CI)
+  ci,ci/generate-stats.sh,Generate stats.json from repo data (CI)
   utility,context-compress.sh,Compress context for token optimization (12 pattern detections)
   utility,repo-map-gen.sh,Generate annotated directory tree with purpose descriptions
   utility,file-registry-gen.sh,Generate key files index (entry points / configs / hub files)
@@ -187,16 +190,28 @@ export AF_LEARNING_ENABLED="true"
 
 ## Utility Scripts
 
-### Validate Configuration
+### Validate Configuration (CI)
 
 ```bash
-./scripts/validate-config.sh
+./scripts/ci/validate-config.sh
 ```
 
-### Validate TOON Files
+### Validate TOON Files (CI)
 
 ```bash
-./scripts/validate-toon.sh path/to/file.md
+./scripts/ci/validate-toon.sh path/to/file.md
+```
+
+### Validate Counts (CI)
+
+```bash
+./scripts/ci/validate-counts.sh
+```
+
+### Generate Stats (CI)
+
+```bash
+./scripts/ci/generate-stats.sh
 ```
 
 ### Session Handoff

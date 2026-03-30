@@ -4,6 +4,29 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.3.2] - 2026-03-30
+
+### Fixed
+- **validate-counts.sh** — Removed `-maxdepth 1` so rules in subdirs (core/agent/workflow) are counted correctly
+- **profile-hooks.sh** — Fixed nanosecond math overflow (octal parsing of `069`) using `10#` prefix
+- **set-active-plan.cjs** — Moved from `hooks/` to `scripts/` (was orphaned — CLI utility, not lifecycle hook)
+
+### Fixed
+- **sync-settings** — Now merges `statusLine` config from plugin (was ignored, causing broken paths)
+- **statusline path** — Fixed `${CLAUDE_PLUGIN_ROOT}` (not a real var) → hardcoded paths with fallback
+
+### Changed
+- **README.md** — Marketing rewrite: benefit-first headings, side-by-side before/after, ~37% shorter
+- **Socratic brainstorming** — Slimmed from 15-line detailed instructions to 3-line principle. Agent decides what to ask based on context.
+- **CI scripts** — Moved validate-*.sh to `scripts/ci/`, added `generate-stats.sh`
+
+### Updated
+- Hooks count: 27 → 26 (set-active-plan moved out)
+- Scripts count: 20 → 41 (actual count + moved file)
+- All counts synced across README, plugin.json, marketplace.json, CLAUDE.md
+
+---
+
 ## [2.3.1] - 2026-03-30
 
 ### Remove conversation banner — status line only

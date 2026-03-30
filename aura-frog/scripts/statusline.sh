@@ -50,5 +50,8 @@ for pjson in \
   fi
 done
 
-# Build status line
+# Get git branch
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "-")
+
+# Build status line (single line — Claude Code status bar doesn't support multi-line)
 echo "🐸 AF v${AF_VERSION} │ ${AF_AGENT} │ P${AF_PHASE} │ ${MODEL} │ ${CTX_INT}% ctx │ \$${COST}"
