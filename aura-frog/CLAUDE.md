@@ -1,6 +1,6 @@
 # Aura Frog - Plugin for Claude Code
 
-**System:** Aura Frog v2.2.2
+**System:** Aura Frog v2.3.0
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 **Purpose:** 10 agents + 43 skills + 89 commands + 5-phase workflow + 8 auto-invoking skills + bundled MCP
 
@@ -80,17 +80,19 @@ session_start[6]{step,action,file}:
 
 ---
 
-## Agent Banner (Session Start + Phase Transitions + Agent Switches)
+## Status Line (Primary — 0 tokens)
+
+Agent/phase/model info is shown in the CLI status bar, not in conversation text.
 
 ```
-⚡ 🐸 AURA FROG v2.2.1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-┃ Agent: [agent-name] │ Phase: [phase] - [name]          ┃
-┃ Model: [model] │ Teams: [✓ enabled / ✗ off]             ┃
-┃ 🔥 [aura-message]                                      ┃
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🐸 AF v2.2.2 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
-**Teams status is MANDATORY in every banner.** Show `✓ enabled` or `✗ off`.
+**Setup:** `project:sync-settings` merges `statusLine` config into project settings.
+**Script:** `scripts/statusline.sh` reads session cache + Claude Code JSON input.
+**Disable:** Remove `statusLine` from `.claude/settings.local.json`.
+
+**Conversation banner is OPTIONAL.** Only show on first response if status line is not configured.
 
 **Details:** `rules/core/agent-identification-banner.md`
 
@@ -303,4 +305,4 @@ Self-improvement through feedback collection and pattern analysis.
 
 ---
 
-**Version:** 2.2.2
+**Version:** 2.3.0

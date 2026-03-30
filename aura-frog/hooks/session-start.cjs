@@ -296,12 +296,38 @@ async function main() {
     if (staticEnv.godotVersion) envVars.AF_GODOT_VERSION = staticEnv.godotVersion;
     if (config.locale?.responseLanguage) envVars.AF_RESPONSE_LANGUAGE = config.locale.responseLanguage;
 
-    saveSessionCache({ envVars, contextSummary: contextSummary || '' });
+    saveSessionCache({
+      envVars,
+      contextSummary: contextSummary || '',
+      agent: 'ready',
+      phase: '-'
+    });
 
     if (contextSummary) {
       console.log(`🐸 Session ${source}. ${contextSummary}`);
     } else {
       console.log(`🐸 Session ${source}.`);
+    }
+
+    // Check if statusLine is configured — one-time hint
+    const statusHintFile = path.join(process.cwd(), '.claude', 'cache', 'statusline-hint-shown');
+    if (!fs.existsSync(statusHintFile)) {
+      try {
+        // Check project settings for statusLine
+        const settingsPath = path.join(process.cwd(), '.claude', 'settings.local.json');
+        let hasStatusLine = false;
+        if (fs.existsSync(settingsPath)) {
+          const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+          hasStatusLine = !!settings.statusLine;
+        }
+        if (!hasStatusLine) {
+          console.log('💡 Tip: Enable Aura Frog status line for always-visible agent/phase info (0 tokens). Run: project:sync-settings');
+        }
+        // Mark hint as shown
+        const hintDir = path.dirname(statusHintFile);
+        if (!fs.existsSync(hintDir)) fs.mkdirSync(hintDir, { recursive: true });
+        fs.writeFileSync(statusHintFile, Date.now().toString());
+      } catch { /* non-blocking */ }
     }
 
     // Show user assertions if configured

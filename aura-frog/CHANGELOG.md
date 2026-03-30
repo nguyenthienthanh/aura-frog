@@ -4,6 +4,26 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [2.3.0] - 2026-03-30
+
+### Status Line — Banner moves to CLI status bar (0 tokens)
+
+#### Added
+- **statusline.sh** — Status line script showing agent, phase, model, context %, cost. Pure bash, no `jq` required
+- **statusLine config** in `settings.example.json` — Enabled by default when settings are synced
+- **One-time hint** in session-start hook — Prompts user to enable status line if not configured
+- **agent/phase fields** in session cache — Status line reads current state from `.claude/cache/session-start-cache.json`
+
+#### Changed
+- **Banner rule downgraded** from CRITICAL to LOW — Status line is now primary display, conversation banner is optional
+- **CLAUDE.md** — Replaced banner section with status line documentation
+
+#### Token Savings
+- ~200 tokens saved per response (no more conversation banners)
+- Status line runs outside conversation context (0 token cost)
+
+---
+
 ## [2.2.2] - 2026-03-25
 
 ### Full repo consistency pass — 116 files

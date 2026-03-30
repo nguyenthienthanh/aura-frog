@@ -1,6 +1,8 @@
 # Agent Identification Banner
 
-**Priority:** CRITICAL - Must be shown at session start, phase transitions, and agent switches
+**Priority:** LOW - Status line is primary display. Conversation banner is optional (session start only).
+
+> **Status line enabled?** Skip conversation banners entirely — agent/phase/model info is always visible in the status bar. Only show a banner if explicitly requested or on first session response.
 
 ---
 
@@ -8,10 +10,10 @@
 
 ```toon
 banner_display[4]{when,required}:
-  First response of session,YES
-  Phase transition (entering new phase),YES
-  Agent switch (different agent activated),YES
-  Regular mid-conversation response,NO — skip to save tokens
+  First response of session,OPTIONAL — only if status line not configured
+  Phase transition (entering new phase),NO — status line shows phase
+  Agent switch (different agent activated),NO — status line shows agent
+  Regular mid-conversation response,NO — never
 ```
 
 ---
