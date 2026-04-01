@@ -20,7 +20,7 @@ Major architecture rewrite. Aura Frog now frames Claude Code as an Operating Sys
 - **CLAUDE.md** — Complete rewrite with OS framing, boot sequence, golden rules, orchestrator principles
 - **README.md** — Updated positioning: "An Operating System for software engineering"
 - **plugin.json** — New description with LLM OS framing
-- Rules: 44 → 46 (14 core + 15 agent + 17 workflow)
+- Rules: 44 → 45 (13 core + 15 agent + 17 workflow)
 
 #### Principles
 - **Memory as Hint** — All cached context treated as hints, verified against actual files before acting

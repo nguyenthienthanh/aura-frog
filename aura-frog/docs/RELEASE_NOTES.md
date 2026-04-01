@@ -14,7 +14,7 @@ Major architecture rewrite inspired by the LLM OS mental model.
 - **Process Table** — 10 agents with PID, state, token budget, and formal context switch protocol
 - **7 Golden Rules** — Lazy load, one agent at a time, TOON for data, compact proactively, TDD mandatory, memory as hint, write after verify
 - **CLAUDE.md rewrite** — Boot sequence, orchestrator principles, memory segments
-- Rules: 44 → 46 (new: memory-trust-policy)
+- Rules: 44 → 45 (new: memory-trust-policy)
 
 ---
 

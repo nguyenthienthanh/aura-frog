@@ -214,12 +214,12 @@ compression[3]{tier,trigger,cost}:
 
 ```toon
 rule_tiers[3]{tier,dir,count,when}:
-  Core,rules/core/,14,ALWAYS — every session
+  Core,rules/core/,13,ALWAYS — every session
   Agent,rules/agent/,15,Per-agent — only relevant rules
   Workflow,rules/workflow/,17,Per-phase — only current phase rules
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 46 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 45 rules every message.
 
 ---
 
@@ -273,7 +273,7 @@ team_mode[4]{aspect,detail}:
 resources[16]{name,location}:
   Agents (10),agents/
   Commands (89),commands/
-  Rules (46: 14 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
+  Rules (45: 13 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
   Skills (8 auto-invoke + 35 reference),skills/
   Hooks (26),hooks/
   MCP Servers (6),.mcp.json

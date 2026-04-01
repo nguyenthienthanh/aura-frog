@@ -232,7 +232,7 @@ All cached context is treated as a hint — agents verify against actual files b
 MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) → ManualCompact (full session snapshot). Context stays lean. Decisions survive.
 
 #### Performance by Design
-3-tier rule loading (~60% less context), conditional hooks (~40% fewer executions), agent detection caching, session start caching (<1s repeat sessions).
+3-tier rule loading (~75% less context), conditional hooks (~40% fewer executions), agent detection caching, session start caching (<1s repeat sessions).
 
 </details>
 
@@ -245,7 +245,7 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 | **Agents** | 10 | Right expert auto-selected per task |
 | **Skills** | 43 | 8 auto-invoke on context, 35 on-demand |
 | **Commands** | 89 | 5 bundled menus — discoverability built in |
-| **Rules** | 46 | 3-tier loading — only what's needed per phase |
+| **Rules** | 45 | 3-tier loading — only what's needed per phase |
 | **Hooks** | 26 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
 
@@ -291,9 +291,9 @@ aura-frog/
 ├── agents/         10 processes (auto-dispatched per task)
 ├── skills/         43 skills (8 auto-invoke + 35 on-demand)
 ├── commands/       89 commands (5 bundled menus)
-├── rules/          46 rules (14 core + 15 agent + 17 workflow)
+├── rules/          45 rules (13 core + 15 agent + 17 workflow)
 ├── hooks/          26 lifecycle hooks (conditional execution)
-├── scripts/        41 utility scripts
+├── scripts/        42 utility scripts
 ├── docs/           Guides, tutorials, OS architecture
 └── .mcp.json       6 device drivers (MCP servers)
 ```

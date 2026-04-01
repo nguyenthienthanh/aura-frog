@@ -43,9 +43,14 @@ for dir in "$BASE_DIR/skills/"*/; do
 done
 TOKENS=$((LOADED_WORDS * 4 / 3))
 
-TOTAL_LINES=$(find "$BASE_DIR/" -name '*.md' ! -name 'README.md' -exec cat {} + 2>/dev/null | wc -l | tr -d ' ')
-if [ "$TOTAL_LINES" -gt 0 ]; then
-  SAVINGS=$(( (TOTAL_LINES - ALWAYS_LOADED) * 100 / TOTAL_LINES ))
+# Total if ALL loadable content were loaded (rules + agents + skills + CLAUDE.md)
+ALL_RULES_LINES=$(find "$BASE_DIR/rules" -name '*.md' ! -name 'README.md' -exec cat {} + 2>/dev/null | wc -l | tr -d ' ')
+ALL_AGENTS_LINES=$(cat "$BASE_DIR/agents/"*.md 2>/dev/null | wc -l | tr -d ' ')
+ALL_SKILLS_LINES=$(find "$BASE_DIR/skills" -name 'SKILL.md' -exec cat {} + 2>/dev/null | wc -l | tr -d ' ')
+TOTAL_IF_ALL_LOADED=$((CLAUDE_MD_LINES + ALL_RULES_LINES + ALL_AGENTS_LINES + ALL_SKILLS_LINES))
+
+if [ "$TOTAL_IF_ALL_LOADED" -gt 0 ]; then
+  SAVINGS=$(( (TOTAL_IF_ALL_LOADED - ALWAYS_LOADED) * 100 / TOTAL_IF_ALL_LOADED ))
 else
   SAVINGS=0
 fi
