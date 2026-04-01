@@ -117,10 +117,23 @@ try {
     const isAccessCommand = accessPatterns.some(p => firstLine.includes(p));
 
     if (isAccessCommand) {
-      for (const pattern of allPatterns) {
-        if (firstLine.includes(pattern)) {
-          console.error(`⛔ Blocked: command accesses ${pattern}`);
-          process.exit(2);
+      // Extract paths from command — split on spaces, filter path-like tokens
+      const tokens = firstLine.split(/\s+/);
+      for (const token of tokens) {
+        if (token.includes('/') || token.includes('\\')) {
+          // Skip absolute system paths (not project-relative)
+          if (token.startsWith('/usr/') || token.startsWith('/opt/') || token.startsWith('/etc/') || token.startsWith('/tmp/')) {
+            continue;
+          }
+          // Use segment-based matching (same as file paths)
+          if (isBlocked(token, allPatterns)) {
+            const matched = allPatterns.find(p => {
+              const segments = token.replace(/\\/g, '/').toLowerCase().split('/');
+              return segments.some(s => s === p.toLowerCase());
+            });
+            console.error(`⛔ Blocked: command accesses ${matched}`);
+            process.exit(2);
+          }
         }
       }
     }
