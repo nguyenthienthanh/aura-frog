@@ -225,12 +225,48 @@ team_antipatterns[3]{pattern,problem,solution}:
 
 ---
 
+## 3-Tier Context Compression
+
+### Tier 1: MicroCompact (No API call)
+
+**Trigger:** Every 10 turns or context > 60%
+
+```toon
+microcompact_actions[5]{action,savings}:
+  Drop tool outputs older than 5 turns,~500-2000 tokens
+  Collapse repeated file reads (keep last),~200-500 tokens
+  Replace loaded file contents with pointers,~500-3000 tokens
+  Trim MCP responses to TOON summaries,~300-1000 tokens
+  Remove stale reasoning — keep conclusions only,~500-1500 tokens
+```
+
+### Tier 2: AutoCompact (API call — /compact)
+
+**Trigger:** Context > 80%
+
+1. Run MicroCompact first (reduce input size)
+2. Trigger `/compact` with specific focus instructions
+3. Output preserves: workflow state + key decisions + outcomes
+4. Phase deliverables stored as TOON snapshots
+
+### Tier 3: ManualCompact (User-triggered)
+
+**Trigger:** User request, `workflow:handoff`, or session restart
+
+Creates full session snapshot including workflow state, git diff, blockers, and next steps.
+
+**Details:** `docs/os-architecture.md`
+
+---
+
 ## Related Files
 
+- `rules/core/memory-trust-policy.md` - Memory as hint + write discipline
 - `skills/framework-expert/SKILL.md` - Lazy framework loading
 - `docs/REFACTOR_ANALYSIS.md` - Full optimization analysis
 - `hooks/lib/af-project-cache.cjs` - Project detection caching
 - `docs/AGENT_TEAMS_GUIDE.md` - Agent Teams setup guide
+- `docs/os-architecture.md` - OS architecture + process table
 
 ---
 

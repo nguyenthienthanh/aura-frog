@@ -1,10 +1,10 @@
 {
-  "version": "2.3.1",
-  "generated": "2026-03-30T08:46:22Z",
+  "version": "3.0.0",
+  "generated": "2026-04-01T00:00:00Z",
   "components": {
     "agents": 10,
     "skills": { "total": 43, "autoInvoke": 8 },
-    "rules": { "total": 44, "core": 12, "agent": 15, "workflow": 17 },
+    "rules": { "total": 46, "core": 14, "agent": 15, "workflow": 17 },
     "commands": 89,
     "hooks": 26,
     "mcpServers": 6,

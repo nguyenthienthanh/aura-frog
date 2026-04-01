@@ -1,7 +1,7 @@
 {
   "name": "aurafrog",
   "description": "Official Aura Frog marketplace - AI-powered development with specialized agents, structured workflows, and self-improving learning system",
-  "version": "2.3.2",
+  "version": "3.0.0",
   "owner": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -14,8 +14,8 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "10 specialized agents, 5-phase TDD workflow, 44 rules, 43 skills, 89 commands, 26 hooks, learning system",
-      "version": "2.3.2",
+      "description": "LLM OS for software engineering. 10 agents, 5-phase TDD, 46 rules, 43 skills, 89 commands, 26 hooks, 6 MCP servers",
+      "version": "3.0.0",
       "author": {
         "name": "Nguyen Thien Thanh",
         "url": "https://github.com/nguyenthienthanh"

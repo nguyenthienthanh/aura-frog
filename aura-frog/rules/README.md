@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 45 (13 core + 15 agent + 17 workflow)
+**Total Rules:** 46 (14 core + 15 agent + 17 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -11,23 +11,24 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 
 ```toon
 tiers[3]{tier,dir,count,when_loaded}:
-  Core,rules/core/,13,ALWAYS — every session
+  Core,rules/core/,14,ALWAYS — every session
   Agent,rules/agent/,15,Per-agent — only when agent activates
   Workflow,rules/workflow/,17,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 45 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 46 rules every message.
 
 ---
 
-## Core Rules (13) — Always Loaded
+## Core Rules (14) — Always Loaded
 
 ```toon
-core[13]{rule,priority,purpose}:
+core[14]{rule,priority,purpose}:
   execution-rules,critical,ALWAYS/NEVER execution rules
   tdd-workflow,critical,RED → GREEN → REFACTOR
   approval-gates,critical,Human approval required
-  context-management,high,Token optimization + model selection + lazy loading
+  memory-trust-policy,critical,Memory as hint + strict write discipline + retrieval hierarchy
+  context-management,high,Token optimization + model selection + 3-tier compression
   code-quality,high,TypeScript strict + no any
   naming-conventions,medium,Consistent naming patterns
   simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated
@@ -92,10 +93,10 @@ workflow[17]{rule,priority,phases}:
 
 ```toon
 loading[4]{scenario,rules_loaded,est_tokens}:
-  Quick fix (no workflow),Core only (13),~2000
-  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~4000
-  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3500
-  Deep (full workflow),Core + all Agent + current Phase Workflow,~5000
+  Quick fix (no workflow),Core only (14),~2200
+  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~4200
+  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3700
+  Deep (full workflow),Core + all Agent + current Phase Workflow,~5200
 ```
 
 **Agent detection determines which agent rules to load:**

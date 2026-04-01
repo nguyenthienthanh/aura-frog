@@ -4,6 +4,32 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.0.0] - 2026-04-01
+
+### LLM OS Architecture
+
+Major architecture rewrite. Aura Frog now frames Claude Code as an Operating System — Claude as kernel, agents as processes, context window as managed RAM.
+
+#### Added
+- **OS Architecture document** (`docs/os-architecture.md`) — Process table, memory segments, 3-tier compression, context switch protocol, golden rules
+- **Memory Trust Policy rule** (`rules/core/memory-trust-policy.md`) — Memory as hint + strict write discipline + retrieval hierarchy
+- **3-Tier Context Compression** — MicroCompact (free, every 10 turns) → AutoCompact (/compact at 80%) → ManualCompact (session snapshot)
+- **Process Table** — 10 agents mapped to PID/state/budget model with context switch protocol
+
+#### Changed
+- **CLAUDE.md** — Complete rewrite with OS framing, boot sequence, golden rules, orchestrator principles
+- **README.md** — Updated positioning: "An Operating System for software engineering"
+- **plugin.json** — New description with LLM OS framing
+- Rules: 44 → 46 (14 core + 15 agent + 17 workflow)
+
+#### Principles
+- **Memory as Hint** — All cached context treated as hints, verified against actual files before acting
+- **Strict Write Discipline** — State only updates after confirmed success
+- **Lazy Load Everything** — KERNEL + INDEX on boot (<3K tokens), rest on demand
+- **Orchestrate, Don't Execute** — Dispatch to right agent, verify output, advance
+
+---
+
 ## [2.3.2] - 2026-03-30
 
 ### Fixed

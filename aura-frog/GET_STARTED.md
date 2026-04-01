@@ -453,7 +453,7 @@ workflow:start <your-task-description>
 - **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
 - **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
 - **Skills:** `skills/README.md` (43 skills)
-- **Rules:** `rules/README.md` (45 quality rules)
+- **Rules:** `rules/README.md` (46 quality rules)
 - **Commands:** `commands/README.md` (86 commands)
 - **Hooks:** `hooks/README.md` (24 lifecycle hooks)
 - **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)

@@ -4,6 +4,20 @@ Human-readable summary of each release. For full technical changelog, see [CHANG
 
 ---
 
+## v3.0.0 — LLM OS Architecture (April 1, 2026)
+
+Major architecture rewrite inspired by the LLM OS mental model.
+
+- **OS framing** — Claude as kernel, agents as processes, context window as managed RAM, MCP as device drivers
+- **Memory Trust Policy** — New core rule: treat all cached context as hints, verify before acting, write state only after confirmed success
+- **3-Tier Compression** — MicroCompact (free cleanup every 10 turns) → AutoCompact (/compact at 80%) → ManualCompact (full snapshot)
+- **Process Table** — 10 agents with PID, state, token budget, and formal context switch protocol
+- **7 Golden Rules** — Lazy load, one agent at a time, TOON for data, compact proactively, TDD mandatory, memory as hint, write after verify
+- **CLAUDE.md rewrite** — Boot sequence, orchestrator principles, memory segments
+- Rules: 44 → 46 (new: memory-trust-policy)
+
+---
+
 ## v2.3.2 — README Rewrite + Fixes (March 30, 2026)
 
 - **README marketing rewrite** — Benefit-first headings, side-by-side before/after, ~37% shorter

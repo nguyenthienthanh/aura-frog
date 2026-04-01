@@ -4,16 +4,16 @@
 
 # Aura Frog
 
-### Stop prompting. Start shipping.
+### An Operating System for software engineering.
 
-The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — turns your AI into a structured development team with agents, TDD workflows, and real multi-agent orchestration.
+The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — 10 agents, 5-phase TDD workflow, self-healing memory, and multi-agent orchestration. One kernel. Zero untested code.
 
-[![Version](https://img.shields.io/badge/version-2.3.2-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**One prompt. Five phases. Production-ready code with tests.**
+**LLM OS architecture. Memory that heals itself. TDD that never skips.**
 
 **[Install in 30 seconds](#-install)** · **[See it in action](#-before--after)** · **[Why Aura Frog?](#-the-problem)**
 
@@ -31,7 +31,7 @@ No structure. No tests. No quality gates. Every session starts from scratch. Eve
 
 ## The Solution
 
-Aura Frog gives Claude Code **structure, memory, and a team.** You describe the feature. Aura Frog runs a 5-phase TDD workflow — analyzing requirements, writing tests first, building to pass them, reviewing for security, and finalizing docs.
+Aura Frog treats Claude Code as an **Operating System** — Claude is the kernel, agents are processes, and the context window is managed RAM. You describe the feature. Aura Frog dispatches the right agent, enforces a 5-phase TDD workflow, and compresses context automatically so you never lose decisions.
 
 **You approve twice. Aura Frog handles the rest.**
 
@@ -225,6 +225,12 @@ Automatically matches effort to task size — typos get direct edits, features g
 #### Built-in Safety Net
 Workflow crashed? `workflow:resume`. Context full? Decisions preserved across `/compact`. Need to pause? `workflow:handoff` saves everything.
 
+#### Memory That Heals Itself
+All cached context is treated as a hint — agents verify against actual files before acting. State only updates after confirmed success (Strict Write Discipline). No stale assumptions propagate.
+
+#### 3-Tier Context Compression
+MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) → ManualCompact (full session snapshot). Context stays lean. Decisions survive.
+
 #### Performance by Design
 3-tier rule loading (~60% less context), conditional hooks (~40% fewer executions), agent detection caching, session start caching (<1s repeat sessions).
 
@@ -239,7 +245,7 @@ Workflow crashed? `workflow:resume`. Context full? Decisions preserved across `/
 | **Agents** | 10 | Right expert auto-selected per task |
 | **Skills** | 43 | 8 auto-invoke on context, 35 on-demand |
 | **Commands** | 89 | 5 bundled menus — discoverability built in |
-| **Rules** | 44 | 3-tier loading — only what's needed per phase |
+| **Rules** | 46 | 3-tier loading — only what's needed per phase |
 | **Hooks** | 26 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
 
@@ -274,18 +280,22 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 
 ---
 
-## Architecture
+## Architecture — LLM OS
 
 ```
+Claude = Kernel          Context Window = RAM           Project Files = Disk
+Agents = Processes       5-Phase TDD = Scheduler        MCP = Device Drivers
+TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
+
 aura-frog/
-├── agents/         10 specialized agents (auto-selected)
-├── skills/         43 skills (8 auto-invoke + 35 reference)
+├── agents/         10 processes (auto-dispatched per task)
+├── skills/         43 skills (8 auto-invoke + 35 on-demand)
 ├── commands/       89 commands (5 bundled menus)
-├── rules/          44 quality rules (3-tier: core/agent/workflow)
+├── rules/          46 rules (14 core + 15 agent + 17 workflow)
 ├── hooks/          26 lifecycle hooks (conditional execution)
 ├── scripts/        41 utility scripts
-├── docs/           Guides, tutorials & references
-└── .mcp.json       6 bundled MCP servers
+├── docs/           Guides, tutorials, OS architecture
+└── .mcp.json       6 device drivers (MCP servers)
 ```
 
 ---
@@ -308,7 +318,7 @@ MIT — See [LICENSE](LICENSE)
 
 ![Aura Frog](assets/logo/mascot_coding_scene.png)
 
-### Your AI writes code. Aura Frog makes it production-ready.
+### Your AI writes code. Aura Frog runs the OS.
 
 **[Install Now](#-install)** · **[Tutorial](aura-frog/docs/guides/FIRST_WORKFLOW_TUTORIAL.md)** · **[Report Issue](https://github.com/nguyenthienthanh/aura-frog/issues)**
 
