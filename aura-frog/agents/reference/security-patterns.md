@@ -1,464 +1,122 @@
-# Security Agent - Full Reference Patterns
+# Security Agent - Reference Patterns
 
-**Source Agent:** `agents/security.md`
+**Source:** `agents/security.md`
 **Load:** On-demand when deep security expertise needed
 
 ---
 
-## Detailed OWASP Competencies
+## OWASP Competencies
 
-### Vulnerability Scanning
-- Dependency scanning (npm audit, Snyk, OWASP Dependency-Check)
-- Static code analysis (SonarQube, Semgrep, Bandit)
-- Dynamic scanning (OWASP ZAP, Burp Suite)
-- Container scanning (Trivy, Anchore)
-- Secret scanning (GitGuardian, TruffleHog)
-
-### Authentication & Authorization
-- OAuth 2.0 / OpenID Connect implementation review
-- JWT security (algorithm confusion, signature validation)
-- Session management (secure cookies, CSRF tokens)
-- Password policies (hashing, salting, bcrypt, argon2)
-- Multi-factor authentication (MFA) implementation
-- Role-Based Access Control (RBAC)
-- Attribute-Based Access Control (ABAC)
-
-### Secure Coding Practices
-- Input validation and sanitization
-- Output encoding (prevent XSS)
-- Parameterized queries (prevent SQL injection)
-- Secure file uploads
-- Content Security Policy (CSP)
-- Security headers (Helmet.js, HSTS, X-Frame-Options)
-- Rate limiting and throttling
-
-### Cryptography
-- Encryption at rest (AES-256, database encryption)
-- Encryption in transit (TLS 1.3, HTTPS)
-- Key management (KMS, Vault, env variables)
-- Hashing (SHA-256, bcrypt, argon2)
-- Digital signatures
-- Certificate management
-
-### API Security
-- API authentication (API keys, OAuth, JWT)
-- Rate limiting and quotas
-- Input validation
-- CORS configuration
-- API versioning security
-- GraphQL security (query depth limiting, cost analysis)
-
-### Mobile Security
-- Certificate pinning
-- Secure storage (Keychain, Keystore)
-- Code obfuscation
-- Root/jailbreak detection
-- Secure communication
-- Biometric authentication
-
-### Infrastructure Security
-- Cloud security (AWS IAM, GCP IAM, Azure RBAC)
-- Network security (firewalls, security groups)
-- Container security (Docker, Kubernetes)
-- Secrets management (AWS Secrets Manager, HashiCorp Vault)
-- Environment separation
-
-### Security Testing
-- Penetration testing basics
-- Threat modeling (STRIDE, DREAD)
-- Security test cases
-- Fuzzing
-- Security regression testing
-
-### Compliance & Standards
-- GDPR compliance
-- HIPAA compliance
-- PCI DSS compliance
-- SOC 2 Type II
-- ISO 27001
-- NIST Cybersecurity Framework
+```toon
+competencies[9]{area,key_topics}:
+  Vulnerability Scanning,"Dep scanning (npm audit/Snyk), SAST (SonarQube/Semgrep), DAST (ZAP/Burp), Container (Trivy), Secrets (TruffleHog/GitGuardian)"
+  Auth & AuthZ,"OAuth2/OIDC, JWT security (algo confusion/sig validation), session mgmt, password hashing (bcrypt/argon2), MFA, RBAC/ABAC"
+  Secure Coding,"Input validation/sanitization, output encoding (XSS), parameterized queries (SQLi), secure uploads, CSP, security headers (Helmet.js), rate limiting"
+  Cryptography,"AES-256 at rest, TLS 1.3 in transit, KMS/Vault key mgmt, SHA-256/bcrypt/argon2 hashing, digital signatures, cert mgmt"
+  API Security,"API auth (keys/OAuth/JWT), rate limiting/quotas, input validation, CORS, versioning security, GraphQL depth limiting"
+  Mobile Security,"Cert pinning, secure storage (Keychain/Keystore), obfuscation, root/jailbreak detection, biometric auth"
+  Infrastructure,"Cloud IAM (AWS/GCP/Azure), network security (firewalls/SGs), container security, secrets mgmt, env separation"
+  Security Testing,"Pen testing, threat modeling (STRIDE/DREAD), security test cases, fuzzing, regression testing"
+  Compliance,"GDPR, HIPAA, PCI DSS, SOC 2, ISO 27001, NIST CSF"
+```
 
 ---
 
-## Tech Stack Expertise
+## Security Tools
 
-### Security Tools
-
-**Dependency Scanning:**
-- npm audit (Node.js)
-- Snyk (multi-language)
-- OWASP Dependency-Check
-- pip-audit (Python)
-- bundler-audit (Ruby)
-- Go vulnerability scanner
-
-**Static Application Security Testing (SAST):**
-- SonarQube / SonarCloud
-- Semgrep
-- ESLint security plugins
-- Bandit (Python)
-- Brakeman (Ruby on Rails)
-- gosec (Go)
-
-**Dynamic Application Security Testing (DAST):**
-- OWASP ZAP
-- Burp Suite Community/Pro
-- Nikto
-- SQLMap
-
-**Secret Scanning:**
-- GitGuardian
-- TruffleHog
-- git-secrets
-- detect-secrets
-
-**Container Security:**
-- Trivy
-- Anchore
-- Clair
-- Docker Bench Security
+```toon
+tools_by_category[5]{category,tools}:
+  Dependency Scanning,"npm audit, Snyk, OWASP Dep-Check, pip-audit, bundler-audit, Go vuln scanner"
+  SAST,"SonarQube, Semgrep, ESLint security plugins, Bandit (Python), Brakeman (Rails), gosec (Go)"
+  DAST,"OWASP ZAP, Burp Suite, Nikto, SQLMap"
+  Secret Scanning,"GitGuardian, TruffleHog, git-secrets, detect-secrets"
+  Container Security,"Trivy, Anchore, Clair, Docker Bench"
+```
 
 ### Security Libraries
 
-**Node.js:**
-- helmet (security headers)
-- express-rate-limit
-- express-validator
-- joi / zod (validation)
-- bcrypt / argon2
-- jsonwebtoken
-- passport
-
-**Python:**
-- django-security
-- Flask-Security
-- cryptography
-- PyJWT
-- passlib
-
-**PHP:**
-- Laravel security features
-- password_hash / password_verify
-- CSRF protection
-
-**React Native:**
-- react-native-keychain
-- react-native-ssl-pinning
-- react-native-biometrics
+```toon
+libraries[4]{platform,key_libs}:
+  Node.js,"helmet, express-rate-limit, express-validator, joi/zod, bcrypt/argon2, jsonwebtoken, passport"
+  Python,"django-security, Flask-Security, cryptography, PyJWT, passlib"
+  PHP,"Laravel security features, password_hash/verify, CSRF protection"
+  React Native,"react-native-keychain, react-native-ssl-pinning, react-native-biometrics"
+```
 
 ### Cloud Security
 
-**AWS:**
-- AWS IAM, AWS Secrets Manager, AWS WAF
-- AWS Shield, AWS GuardDuty, AWS Security Hub
-
-**GCP:**
-- GCP IAM, Secret Manager
-- Cloud Armor, Security Command Center
-
-**Azure:**
-- Azure AD, Key Vault
-- Azure Security Center, Azure Sentinel
+```toon
+cloud_security[3]{provider,services}:
+  AWS,"IAM, Secrets Manager, WAF, Shield, GuardDuty, Security Hub"
+  GCP,"IAM, Secret Manager, Cloud Armor, Security Command Center"
+  Azure,"Azure AD, Key Vault, Security Center, Sentinel"
+```
 
 ---
 
-## Security Checklists
+## Web App Security Principles
 
-### Web Application Security Checklist
+**Authentication:** Hash with bcrypt/argon2 (cost>=12). Lockout after N failures. MFA for sensitive ops. Expiring one-time reset tokens. Session timeout <30min idle. CSRF tokens on state changes. Secure cookie flags (HttpOnly, Secure, SameSite).
 
-**Authentication:**
-- [ ] Passwords hashed with bcrypt/argon2 (cost factor >= 12)
-- [ ] Account lockout after N failed attempts
-- [ ] MFA available for sensitive operations
-- [ ] Secure password reset flow (tokens expire, one-time use)
-- [ ] Session timeout configured (< 30 min idle)
-- [ ] CSRF tokens on all state-changing operations
-- [ ] Secure cookie flags (HttpOnly, Secure, SameSite)
+**Authorization:** Least privilege. All routes have access control. Prevent horizontal + vertical privilege escalation. Authorize direct object references.
 
-**Authorization:**
-- [ ] Principle of least privilege enforced
-- [ ] All routes/endpoints have access control
-- [ ] Horizontal privilege escalation prevented
-- [ ] Vertical privilege escalation prevented
-- [ ] Direct object references are authorized
+**Input/Output:** Validate all inputs (client+server, whitelist). Content-Type + file size limits. Parameterized queries. Escape HTML/JS/CSS (XSS). CSP configured. Error messages leak nothing sensitive.
 
-**Input Validation:**
-- [ ] All user inputs validated (client + server)
-- [ ] Whitelist validation (not blacklist)
-- [ ] Content-Type validation for uploads
-- [ ] File size limits enforced
-- [ ] Parameterized queries (no string concatenation)
-- [ ] NoSQL injection prevention
+**Headers:** HSTS, X-Content-Type-Options: nosniff, X-Frame-Options, CSP, Referrer-Policy, Permissions-Policy.
 
-**Output Encoding:**
-- [ ] XSS prevention (escape HTML, JS, CSS)
-- [ ] Content Security Policy (CSP) configured
-- [ ] JSON responses properly encoded
-- [ ] Error messages don't leak sensitive data
+**Crypto:** HTTPS enforced (TLS 1.3). Encrypt sensitive data at rest. Secure RNG. No hardcoded secrets — use env vars or vault.
 
-**Security Headers:**
-- [ ] Strict-Transport-Security (HSTS)
-- [ ] X-Content-Type-Options: nosniff
-- [ ] X-Frame-Options: DENY or SAMEORIGIN
-- [ ] Content-Security-Policy
-- [ ] Referrer-Policy
-- [ ] Permissions-Policy
+**API:** Rate limiting on public endpoints. Auth required. CORS not wildcard. Request size limits. GraphQL depth limiting.
 
-**Cryptography:**
-- [ ] HTTPS enforced (TLS 1.3 preferred)
-- [ ] Sensitive data encrypted at rest
-- [ ] Secure random number generation
-- [ ] No hardcoded secrets in code
-- [ ] Secrets in environment variables or vault
+**Dependencies:** Keep updated. No known vulns. Dep scanning in CI/CD. Lockfile committed.
 
-**API Security:**
-- [ ] Rate limiting on public endpoints
-- [ ] API authentication required
-- [ ] CORS configured properly (not wildcard *)
-- [ ] API versioning implemented
-- [ ] Request size limits enforced
-- [ ] GraphQL query depth limiting
+**Logging:** Log security events (failed auth, privilege escalation). Sanitize PII from logs. Retention policy. Alerts for anomalies. Audit trail for admin actions.
 
-**Dependencies:**
-- [ ] Dependencies up to date
-- [ ] No known vulnerabilities (npm audit clean)
-- [ ] Dependency scanning in CI/CD
-- [ ] Lockfile committed (package-lock.json)
+### Mobile App Security Principles
 
-**Logging & Monitoring:**
-- [ ] Security events logged (failed auth, privilege escalation)
-- [ ] Logs don't contain sensitive data (passwords, tokens)
-- [ ] Log retention policy defined
-- [ ] Alerts for security anomalies
-- [ ] Audit trail for admin actions
+**Storage:** Sensitive data in Keychain/Keystore only. No sensitive data in logs/screenshots/backups. DB encryption. Cache cleared on logout.
 
-### Mobile App Security Checklist
+**Network:** Cert pinning. TLS 1.3. Public WiFi warnings.
 
-**Data Storage:**
-- [ ] Sensitive data in secure storage (Keychain, Keystore)
-- [ ] No sensitive data in logs
-- [ ] No sensitive data in screenshots/backups
-- [ ] Database encryption enabled
-- [ ] Cache cleared on logout
+**Code:** Obfuscation enabled (ProGuard/R8). Debug disabled in prod. No hardcoded API keys. Root/jailbreak detection. Anti-tampering.
 
-**Network:**
-- [ ] Certificate pinning implemented
-- [ ] TLS 1.3 enforced
-- [ ] Public WiFi warnings
-- [ ] VPN detection (if required)
-
-**Code Protection:**
-- [ ] Code obfuscation enabled (ProGuard, R8)
-- [ ] Debug mode disabled in production
-- [ ] No API keys hardcoded
-- [ ] Root/jailbreak detection (if required)
-- [ ] Anti-tampering checks
-
-**Authentication:**
-- [ ] Biometric authentication available
-- [ ] PIN/passcode required
-- [ ] Token refresh implemented
-- [ ] Auto-logout on inactivity
+**Auth:** Biometric available. PIN/passcode required. Token refresh. Auto-logout on inactivity.
 
 ---
 
 ## Security Audit Process
 
-### Phase 1: Information Gathering
-1. Map application architecture
-2. Identify entry points (APIs, forms, file uploads)
-3. List authentication mechanisms
-4. Document sensitive data flows
-5. Review third-party integrations
-
-### Phase 2: Automated Scanning
-1. Run dependency scanner (npm audit, Snyk)
-2. Run SAST (SonarQube, Semgrep)
-3. Run secret scanner (TruffleHog)
-4. Run container scanner (Trivy)
-5. Collect findings
-
-### Phase 3: Manual Code Review
-1. Review authentication logic
-2. Review authorization checks
-3. Check input validation
-4. Review cryptography usage
-5. Check security headers
-6. Review error handling
-7. Check logging practices
-
-### Phase 4: Dynamic Testing
-1. Test authentication bypass
-2. Test authorization bypass (IDOR, privilege escalation)
-3. Test injection vulnerabilities (SQL, XSS, command)
-4. Test file upload security
-5. Test session management
-6. Test API rate limiting
-7. Test CORS configuration
-
-### Phase 5: Threat Modeling
-1. Identify assets
-2. Identify threats (STRIDE)
-3. Identify vulnerabilities
-4. Calculate risk (DREAD)
-5. Prioritize mitigations
-
-### Phase 6: Reporting
-1. Categorize findings (Critical, High, Medium, Low)
-2. Provide remediation steps
-3. Estimate effort for fixes
-4. Create JIRA tickets for vulnerabilities
-5. Provide security roadmap
+```toon
+audit_phases[6]{phase,activities}:
+  1. Info Gathering,"Map architecture, identify entry points, list auth mechanisms, document data flows, review 3rd-party integrations"
+  2. Automated Scanning,"Run dep scanner, SAST, secret scanner, container scanner, collect findings"
+  3. Manual Code Review,"Review auth logic, authz checks, input validation, crypto usage, headers, error handling, logging"
+  4. Dynamic Testing,"Test auth bypass, authz bypass (IDOR/priv escalation), injection (SQL/XSS/cmd), file upload, session mgmt, rate limiting, CORS"
+  5. Threat Modeling,"Identify assets, threats (STRIDE), vulnerabilities, calculate risk (DREAD), prioritize mitigations"
+  6. Reporting,"Categorize findings (Critical/High/Medium/Low), remediation steps, effort estimates, tickets, security roadmap"
+```
 
 ---
 
-## Typical Workflows
+## Workflows
 
-### 1. Security Audit (Full)
-**Command:** `security:audit`
-- Run automated scans (deps, SAST, secrets)
-- Manual code review (OWASP Top 10)
-- Dynamic testing (DAST)
-- Threat modeling
-- Generate comprehensive report
-
-### 2. Dependency Vulnerability Scan
-**Command:** `security:deps`
-- Run npm audit / yarn audit
-- Run Snyk scan
-- Check for outdated packages
-- Identify vulnerable dependencies
-- Provide upgrade recommendations
-
-### 3. Code Security Scan
-**Command:** `security:scan`
-- Run SAST (SonarQube, Semgrep, ESLint security)
-- Check for hardcoded secrets
-- Check for insecure patterns
-- Identify security hotspots
-- Generate report
-
----
-
-## Security Tools Installation
-
-**Node.js:**
-```bash
-npm install helmet express-rate-limit express-validator
-npm install --save-dev @microsoft/eslint-plugin-sdl
-npm install --save-dev eslint-plugin-security
-```
-
-**Python:**
-```bash
-pip install bandit safety
-pip install flask-talisman  # Security headers for Flask
-```
-
-**Container:**
-```bash
-# Trivy
-brew install trivy
-trivy image myimage:latest
-```
-
-**Secret Scanning:**
-```bash
-# TruffleHog
-pip install trufflehog
-trufflehog git https://github.com/myorg/myrepo
+```toon
+workflows[3]{command,scope}:
+  security:audit,"Full audit: automated scans + manual review + DAST + threat model + report"
+  security:deps,"Dep vuln scan: npm/yarn audit + Snyk + outdated check + upgrade recommendations"
+  security:scan,"Code scan: SAST + secret check + insecure patterns + hotspots + report"
 ```
 
 ---
 
 ## Common Vulnerabilities & Fixes
 
-### SQL Injection
+**SQL Injection:** Use parameterized queries (`db.query(sql, [param])`) or ORMs (Prisma/TypeORM). Never string-concatenate user input into queries.
 
-**Vulnerable:**
-```javascript
-const query = `SELECT * FROM users WHERE id = ${userId}`;
-db.query(query);
-```
+**XSS:** Use DOMPurify or templating engines with auto-escaping. Never inject raw user input into HTML.
 
-**Secure:**
-```javascript
-const query = 'SELECT * FROM users WHERE id = ?';
-db.query(query, [userId]);
+**CSRF:** Use CSRF middleware (e.g., `csurf`). Validate tokens on all state-changing operations.
 
-// Or with Prisma/TypeORM (safe by default)
-prisma.user.findUnique({ where: { id: userId } });
-```
+**Weak Hashing:** Use bcrypt (cost 12+) or argon2. Never MD5/SHA1 for passwords.
 
-### XSS (Cross-Site Scripting)
-
-**Vulnerable:**
-```javascript
-res.send(`<h1>Hello ${username}</h1>`);
-```
-
-**Secure:**
-```javascript
-import DOMPurify from 'dompurify';
-res.send(`<h1>Hello ${DOMPurify.sanitize(username)}</h1>`);
-
-// Or use templating engines with auto-escaping
-res.render('hello', { username });  // EJS, Handlebars auto-escape
-```
-
-### CSRF (Cross-Site Request Forgery)
-
-**Vulnerable:**
-```javascript
-app.post('/transfer', (req, res) => {
-  // No CSRF protection
-  transfer(req.body.amount, req.body.to);
-});
-```
-
-**Secure:**
-```javascript
-import csrf from 'csurf';
-app.use(csrf({ cookie: true }));
-
-app.post('/transfer', (req, res) => {
-  // CSRF token validated automatically
-  transfer(req.body.amount, req.body.to);
-});
-```
-
-### Weak Password Hashing
-
-**Vulnerable:**
-```javascript
-import crypto from 'crypto';
-const hash = crypto.createHash('md5').update(password).digest('hex');
-```
-
-**Secure:**
-```javascript
-import bcrypt from 'bcrypt';
-const hash = await bcrypt.hash(password, 12);  // Cost factor 12
-const valid = await bcrypt.compare(password, hash);
-```
-
-### Insecure Direct Object Reference (IDOR)
-
-**Vulnerable:**
-```javascript
-app.get('/user/:id', (req, res) => {
-  const user = await User.findById(req.params.id);
-  res.json(user);  // No authorization check
-});
-```
-
-**Secure:**
-```javascript
-app.get('/user/:id', authenticate, (req, res) => {
-  if (req.user.id !== req.params.id && !req.user.isAdmin) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-  const user = await User.findById(req.params.id);
-  res.json(user);
-});
-```
+**IDOR:** Always check authorization (`req.user.id === req.params.id || isAdmin`) before returning resources.

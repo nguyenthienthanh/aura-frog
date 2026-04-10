@@ -1,13 +1,11 @@
-# Architect Agent - Full Reference Patterns
+# Architect Agent - Reference Patterns
 
-**Source Agent:** `agents/architect.md`
+**Source:** `agents/architect.md`
 **Load:** On-demand when deep architecture expertise needed
 
 ---
 
 ## Architectural Patterns
-
-### System Architecture
 
 ```toon
 patterns[6]{pattern,when_to_use,avoid_when}:
@@ -30,21 +28,9 @@ api_patterns[5]{aspect,guideline}:
   Auth,JWT for stateless + OAuth2 for third-party
 ```
 
-**RESTful Conventions:**
-```
-GET    /users          # List users
-GET    /users/:id      # Get user by ID
-POST   /users          # Create user
-PUT    /users/:id      # Replace user
-PATCH  /users/:id      # Update user fields
-DELETE /users/:id      # Delete user
-```
-
 ---
 
 ## Database Patterns
-
-### Schema Design
 
 ```toon
 schema_principles[6]{principle,description}:
@@ -55,8 +41,6 @@ schema_principles[6]{principle,description}:
   Naming,snake_case + singular table names + _id suffix for FKs
   Timestamps,created_at/updated_at on all tables + soft delete
 ```
-
-### Query Optimization
 
 ```toon
 optimization[8]{issue,solution}:
@@ -70,8 +54,6 @@ optimization[8]{issue,solution}:
   Memory issues,Streaming for large datasets
 ```
 
-### Migration Best Practices
-
 ```toon
 migration_rules[5]{rule,reason}:
   One change per migration,Easy rollback + clear history
@@ -83,50 +65,14 @@ migration_rules[5]{rule,reason}:
 
 ---
 
-## Framework-Specific Patterns
-
-### Node.js (Express/NestJS/Fastify)
+## Framework Layering
 
 ```toon
-nodejs_arch[5]{layer,responsibility}:
-  Controllers,Request handling + validation + response
-  Services,Business logic + orchestration
-  Repositories,Data access + query building
-  DTOs,Data transfer + validation schemas (Zod)
-  Middleware,Auth + logging + rate limiting + error handling
-```
-
-### Python (Django/FastAPI/Flask)
-
-```toon
-python_arch[5]{layer,responsibility}:
-  Views/Routes,Request handling + validation
-  Services,Business logic + use cases
-  Models,ORM + domain entities
-  Schemas,Pydantic for validation + serialization
-  Middleware,Auth + logging + exception handling
-```
-
-### Laravel (PHP)
-
-```toon
-laravel_arch[5]{layer,responsibility}:
-  Controllers,Request handling + validation (Form Requests)
-  Services,Business logic extraction
-  Models,Eloquent + scopes + relationships
-  Resources,API response transformation
-  Middleware,Auth + logging + throttle
-```
-
-### Go (Gin/Echo/Fiber)
-
-```toon
-go_arch[5]{layer,responsibility}:
-  Handlers,HTTP request handling
-  Services,Business logic + domain operations
-  Repositories,Database operations
-  Models,Domain entities + DTOs
-  Middleware,Auth + logging + recovery
+layers[4]{framework,controller,service,data,validation}:
+  Node.js (Express/NestJS),Controllers,Services,Repositories,Zod DTOs + Middleware
+  Python (Django/FastAPI),Views/Routes,Services,Models (ORM),Pydantic schemas + Middleware
+  Laravel (PHP),Controllers + Form Requests,Services,Eloquent Models + Scopes,Resources + Middleware
+  Go (Gin/Echo/Fiber),Handlers,Services,Repositories,Models/DTOs + Middleware
 ```
 
 ---
@@ -162,7 +108,7 @@ caching[5]{strategy,use_case,invalidation}:
 
 ## Decision Framework
 
-### When to Use Which Database
+### Database Selection
 
 ```toon
 db_selection[6]{type,use_when,examples}:
@@ -176,45 +122,10 @@ db_selection[6]{type,use_when,examples}:
 
 ### When to Split Services
 
-```
-Split when:
-- Different scaling needs
-- Different team ownership
-- Different deployment cycles
-- Clear domain boundary
-- Isolated failure required
-
-Keep together when:
-- Shared transactions needed
-- Simple domain
-- Small team
-- Frequent cross-service calls
-```
+Split when: different scaling needs, different team ownership, different deploy cycles, clear domain boundary, isolated failure required. Keep together when: shared transactions needed, simple domain, small team, frequent cross-service calls.
 
 ---
 
 ## Output Format
 
-When providing architectural guidance:
-
-```markdown
-## Architecture Decision
-
-### Context
-[Problem being solved]
-
-### Decision
-[Chosen approach]
-
-### Rationale
-- [Reason 1]
-- [Reason 2]
-
-### Consequences
-- Positive: [Benefits]
-- Negative: [Trade-offs]
-
-### Alternatives Considered
-1. [Alternative 1] - Rejected because [reason]
-2. [Alternative 2] - Rejected because [reason]
-```
+Architecture decisions use ADR format: Context (problem) -> Decision (approach) -> Rationale (reasons) -> Consequences (positive + negative trade-offs) -> Alternatives Considered (rejected + why).

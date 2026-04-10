@@ -2,17 +2,10 @@
 
 **Category:** Documentation
 **Priority:** Medium
-**Applies To:** Complex features, workflows, architecture changes
 
 ---
 
-## Overview
-
-All complex implementations MUST include Mermaid diagrams for visualization. Diagrams improve understanding, reduce miscommunication, and serve as living documentation.
-
----
-
-## When Diagrams Are REQUIRED
+## When Required
 
 ```toon
 required_triggers[6]{scenario,diagram_type,location}:
@@ -24,9 +17,7 @@ required_triggers[6]{scenario,diagram_type,location}:
   Database schema changes,ER diagram,Migration docs
 ```
 
----
-
-## When Diagrams Are RECOMMENDED
+## When Recommended
 
 ```toon
 recommended_triggers[4]{scenario,diagram_type,benefit}:
@@ -38,149 +29,49 @@ recommended_triggers[4]{scenario,diagram_type,benefit}:
 
 ---
 
-## Diagram Types by Use Case
+## Diagram Types
 
-### 1. Sequence Diagrams
-**Use for:** Interactions between components, API calls, agent handoffs
+| Type | Use For |
+|------|---------|
+| Sequence | Interactions between components, API calls, agent handoffs |
+| Flowchart | Decision trees, process flows, conditional logic |
+| State | Lifecycle states, status transitions |
+| ER | Database schemas, data models |
+| Graph | System architecture, component relationships |
 
-```mermaid
-sequenceDiagram
-    participant A as Component A
-    participant B as Component B
-    A->>B: Request
-    B-->>A: Response
-```
-
-### 2. Flowcharts
-**Use for:** Decision trees, process flows, conditional logic
-
-```mermaid
-flowchart TD
-    START([Start]) --> DECISION{Condition?}
-    DECISION -->|Yes| ACTION1[Action 1]
-    DECISION -->|No| ACTION2[Action 2]
-```
-
-### 3. State Diagrams
-**Use for:** Lifecycle states, status transitions, workflow states
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created
-    Created --> Active
-    Active --> Completed
-    Completed --> [*]
-```
-
-### 4. Entity Relationship (ER) Diagrams
-**Use for:** Database schemas, data models
-
-```mermaid
-erDiagram
-    USER ||--o{ ORDER : places
-    ORDER ||--|{ ITEM : contains
-```
-
-### 5. Architecture/Graph Diagrams
-**Use for:** System architecture, component relationships
-
-```mermaid
-graph TB
-    A[Frontend] --> B[API]
-    B --> C[Database]
-```
+All diagrams use Mermaid format.
 
 ---
 
-## Phase-Specific Requirements
-
-### Phase 2: Test RED
-**MUST include:**
-- Architecture diagram (component relationships)
-- Sequence diagram (main user flow)
-
-### Phase 3: Build GREEN
-**SHOULD include:**
-- Component hierarchy diagram
-- State flow diagram (if stateful)
-
-### Phase 4: Refactor + Review
-**SHOULD include:**
-- Test coverage flowchart
-- Integration test sequence
-
-### Phase 5: Finalize
-**MUST update:**
-- Any diagrams that changed during implementation
-
----
-
-## Diagram Quality Standards
-
-### MUST Have
-- [ ] Clear title describing what the diagram shows
-- [ ] All components labeled
-- [ ] Flow direction indicated (arrows)
-- [ ] Legend if using custom symbols
-
-### SHOULD Have
-- [ ] Color coding for different types (optional)
-- [ ] Notes for complex logic
-- [ ] Version/date in comments
-
-### MUST NOT
-- [ ] Over-complicate with too many elements (max 15-20 nodes)
-- [ ] Use unclear abbreviations without legend
-- [ ] Leave placeholder text
-
----
-
-## Location Guidelines
+## Phase Requirements
 
 ```toon
-location_rules[4]{diagram_scope,location,format}:
-  Feature-specific,docs/features/[feature]/,Inline in markdown
-  Architecture-level,docs/architecture/,Dedicated .md file
-  API documentation,docs/api/,Inline in API docs
-  Workflow/Process,docs/WORKFLOW_DIAGRAMS.md,Append to central file
+phase_diagrams[4]{phase,requirement}:
+  Phase 2 (Test RED),MUST: Architecture diagram + main user flow sequence
+  Phase 3 (Build GREEN),SHOULD: Component hierarchy + state flow (if stateful)
+  Phase 4 (Refactor + Review),SHOULD: Test coverage flowchart + integration test sequence
+  Phase 5 (Finalize),MUST: Update any diagrams changed during implementation
 ```
 
 ---
 
-## Enforcement
+## Quality Standards
 
-### During Phase 2 (Test RED)
-- Reviewer checks for required diagrams
-- Missing diagrams = approval blocked
-
-### During Phase 4 (Refactor + Review)
-- Verify diagrams match implementation
-- Update outdated diagrams
-
-### During Phase 5 (Finalize)
-- Final diagram review
-- Ensure all diagrams are accessible
+- Clear title, all components labeled, flow direction with arrows
+- Max 15-20 nodes per diagram
+- No unclear abbreviations without legend
+- No placeholder text
 
 ---
 
-## Tools
+## Location
 
-### Rendering
-- **GitHub:** Native Mermaid support in markdown
-- **VS Code:** "Markdown Preview Mermaid Support" extension
-- **Online:** [mermaid.live](https://mermaid.live)
-
-### Export
-```bash
-# Export to PNG/SVG
-npx @mermaid-js/mermaid-cli -i diagram.md -o output.png
+```toon
+location_rules[4]{scope,location}:
+  Feature-specific,docs/features/[feature]/ inline
+  Architecture-level,docs/architecture/ dedicated file
+  API documentation,docs/api/ inline
+  Workflow/Process,docs/WORKFLOW_DIAGRAMS.md
 ```
 
 ---
-
-## Examples Reference
-
-See `docs/WORKFLOW_DIAGRAMS.md` for comprehensive examples of all diagram types.
-
----
-

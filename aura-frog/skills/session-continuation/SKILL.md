@@ -15,8 +15,7 @@ allowed-tools: Read, Write, Bash
 
 # Session Continuation
 
-**Purpose:** Manage workflow state across sessions with handoff and resume
-**Priority:** HIGH
+Manage workflow state across sessions with handoff and resume.
 
 ---
 
@@ -32,7 +31,7 @@ state_vars[4]{var,purpose,persistence}:
 
 ---
 
-## When This Skill Activates
+## Triggers
 
 ```toon
 triggers[5]{trigger,action}:
@@ -47,359 +46,73 @@ triggers[5]{trigger,action}:
 
 ## Handoff Flow
 
-### Step 1: Detect Need for Handoff
+### 1. Detect Need
 
-```yaml
-Triggers:
-  - Token count: >= 150,000 (75% of 200K limit)
-  - User request: "handoff", "save", "pause"
-  - Long workflow: Phases 1-2 complete, starting Phase 3
+Triggers: Token >= 150K (75%), user request, or long workflow at phase boundary.
 
-Auto-prompt:
-  "⚠️ Token usage is at 75%. Would you like to save workflow state for continuation in a new session?"
-```
+### 2. Save State
 
-### Step 2: Save Workflow State
+**Location:** `.claude/logs/workflows/[workflow-id]/workflow-state.json`
 
-**State File Location:** `.claude/logs/workflows/[workflow-id]/workflow-state.json`
+**Content:** workflow_id, status, current_phase, task description, agents, phases_completed (with deliverables), context (tech stack, key decisions, blockers), token_usage.
 
-**State Content:**
-```json
-{
-  "workflow_id": "AUTH-123",
-  "version": "1.0.0",
-  "created_at": "2025-11-29T14:30:22Z",
-  "updated_at": "2025-11-29T16:45:30Z",
-  "status": "paused",
+### 3. Output Summary
 
-  "current_phase": 3,
-  "current_sub_phase": null,
-  "phase_name": "Build GREEN",
-
-  "task": {
-    "description": "Implement user authentication with JWT",
-    "ticket_id": "PROJ-1234",
-    "figma_url": null
-  },
-
-  "agents": {
-    "primary": "architect",
-    "secondary": ["security", "tester"]
-  },
-
-  "phases_completed": {
-    "1": {
-      "name": "Understand + Design",
-      "status": "approved",
-      "deliverables": ["requirements.md", "tech-spec.md", "architecture.md"],
-      "approved_at": "2025-11-29T14:45:00Z"
-    },
-    "2": {
-      "name": "Test RED",
-      "status": "approved",
-      "deliverables": ["test-plan.md", "failing-tests"],
-      "approved_at": "2025-11-29T15:30:00Z"
-    }
-  },
-
-  "context": {
-    "project_name": "my-api",
-    "tech_stack": "Node.js, Express, PostgreSQL",
-    "test_framework": "Jest",
-    "key_decisions": [
-      "Using JWT with refresh tokens",
-      "Storing sessions in Redis",
-      "bcrypt for password hashing"
-    ],
-    "blockers": [],
-    "notes": "User prefers functional approach over classes"
-  },
-
-  "token_usage": {
-    "at_handoff": 152340,
-    "estimated_remaining": 47660
-  }
-}
-```
-
-### Step 3: Generate Handoff Summary
-
-**Output to User:**
-
-```markdown
-═══════════════════════════════════════════════════════════
-🔄 WORKFLOW HANDOFF COMPLETE
-═══════════════════════════════════════════════════════════
-
-📋 **Workflow ID:** AUTH-123
-
-📊 **Progress:**
-- ✅ Phase 1: Understand + Design - Approved
-- ✅ Phase 2: Test RED - Approved
-- 🔄 Phase 3: Build GREEN - In Progress
-
-📁 **State Saved:**
-`.claude/logs/workflows/AUTH-123/workflow-state.json`
-
-📦 **Deliverables Created:**
-- requirements.md
-- tech-spec.md
-- architecture.md
-- test-plan.md
-
-🔑 **Key Decisions:**
-- Using JWT with refresh tokens
-- Storing sessions in Redis
-- bcrypt for password hashing
-
-───────────────────────────────────────────────────────────
-📥 **TO RESUME IN NEW SESSION:**
-
-Type: `workflow:resume AUTH-123`
-
-Or copy this command:
-```
-workflow:resume AUTH-123
-```
-═══════════════════════════════════════════════════════════
-```
+Show: workflow ID, phase progress, state file path, deliverables, key decisions, resume command (`workflow:resume <ID>`).
 
 ---
 
 ## Resume Flow
 
-### Step 1: Parse Resume Command
-
-```yaml
-Input: "workflow:resume AUTH-123"
-       "resume AUTH-123"
-       "continue workflow AUTH-123"
-
-Extract: workflow_id = "AUTH-123"
-```
-
-### Step 2: Load Workflow State
-
-```yaml
-Load: .claude/logs/workflows/[workflow-id]/workflow-state.json
-
-Validate:
-  - File exists
-  - JSON is valid
-  - Version compatible
-  - Status is "paused" or "waiting_approval"
-```
-
-### Step 3: Restore Context
-
-```yaml
-Actions:
-  1. Load project context (project-contexts/[project]/)
-  2. Activate saved agents
-  3. Load phase-specific rules
-  4. Restore key decisions
-  5. Load deliverables created so far
-```
-
-### Step 4: Show Resume Summary
-
-```markdown
-═══════════════════════════════════════════════════════════
-🔄 WORKFLOW RESUMED
-═══════════════════════════════════════════════════════════
-
-📋 **Workflow:** AUTH-123
-📝 **Task:** Implement user authentication with JWT
-
-📊 **Restored State:**
-- Current Phase: 3 - Build GREEN
-- Primary Agent: architect
-- Tech Stack: Node.js, Express, PostgreSQL
-
-✅ **Completed Phases:**
-- Phase 1: Understand + Design ✓
-- Phase 2: Test RED ✓
-
-🔑 **Key Decisions Restored:**
-- Using JWT with refresh tokens
-- Storing sessions in Redis
-- bcrypt for password hashing
-
-───────────────────────────────────────────────────────────
-⏭️ **CONTINUING FROM:** Phase 3 - Build GREEN
-
-Ready to continue implementing authentication.
-
-Type "continue" to proceed or "status" for more details.
-═══════════════════════════════════════════════════════════
-```
-
-### Step 5: Continue Execution
-
-```yaml
-On "continue":
-  1. Resume from saved phase
-  3. Execute remaining phase steps
-  4. Show approval gate when phase complete
-```
+1. **Parse:** Extract workflow_id from `workflow:resume <ID>`
+2. **Load:** Read state file, validate exists/valid/compatible version
+3. **Restore:** Load project context, activate agents, load phase rules, restore decisions
+4. **Show:** Resume summary with current phase and key decisions
+5. **Continue:** Resume from saved phase
 
 ---
 
 ## Commands
 
-### workflow:handoff
-
-**Syntax:** `workflow:handoff`
-
-**Action:** Save current workflow state and generate resume instructions.
-
-### workflow:resume
-
-**Syntax:** `workflow:resume <workflow-id>`
-
-**Action:** Load saved workflow state and continue from last phase.
-
-### workflow:list
-
-**Syntax:** `workflow:list`
-
-**Action:** Show all saved workflows with status.
-
-**Output:**
-```markdown
-📋 Saved Workflows:
-
-| ID | Task | Phase | Status | Last Updated |
-|----|------|-------|--------|--------------|
-| AUTH-123 | JWT Auth | 5a | paused | 2h ago |
-| fix-login-0128 | Login fix | 7 | waiting | 1d ago |
-| REFACTOR-789 | API refactor | complete | done | 3d ago |
-
-To resume: `workflow:resume <id>`
-```
+| Command | Action |
+|---------|--------|
+| `workflow:handoff` | Save state + generate resume instructions |
+| `workflow:resume <id>` | Load state + continue from last phase |
+| `workflow:list` | Show all saved workflows with status |
 
 ---
 
-## Auto-Save Behavior
+## Auto-Save
 
-### When Auto-Save Triggers
-
-```yaml
-Events:
-  - Phase completion (before approval gate)
-  - Every 5 minutes during active work
-  - Token count milestones (100K, 150K, 175K)
-  - Before any external system write
-```
-
-### Auto-Save is Silent
-
-```yaml
-Behavior:
-  - No user notification for routine saves
-  - Only notify at warning thresholds
-  - State file updated in background
-```
+Triggers: Phase completion, every 5 min, token milestones (100K/150K/175K). Silent -- no user notification except at warning thresholds.
 
 ---
 
-## State File Management
-
-### File Location
+## State Files
 
 ```
 .claude/logs/workflows/
 ├── AUTH-123/
-│   ├── workflow-state.json      # Current state
-│   ├── requirements.md          # Phase 1 deliverable
-│   ├── tech-spec.md            # Phase 1 deliverable
-│   └── test-plan.md            # Phase 2 deliverable
-├── fix-login-0128/
-│   └── ...
-└── README.md                    # Index of workflows
+│   ├── workflow-state.json
+│   ├── requirements.md, tech-spec.md, test-plan.md
+└── README.md (index)
 ```
 
-### Cleanup Policy
-
-```yaml
-Auto-cleanup:
-  - Completed workflows: Keep 30 days
-  - Cancelled workflows: Keep 7 days
-  - Paused workflows: Keep indefinitely
-
-Manual cleanup:
-  - Command: workflow:cleanup
-  - Removes old completed/cancelled workflows
-```
+**Cleanup:** Completed: 30 days. Cancelled: 7 days. Paused: indefinitely.
 
 ---
 
 ## Error Handling
 
-### State File Not Found
-
-```markdown
-❌ Workflow not found: AUTH-123
-
-Possible reasons:
-- Workflow ID is incorrect
-- State file was deleted
-- Workflow was never saved
-
-Available workflows:
-[list recent workflows]
-
-To start a new workflow: `workflow:start <task>`
-```
-
-### Corrupted State File
-
-```markdown
-❌ Cannot load workflow state: Invalid JSON
-
-Attempting recovery...
-- Found backup: workflow-state.backup.json
-- Restored from backup (15 minutes old)
-
-⚠️ Some recent progress may be lost.
-
-Continue with restored state? (yes/no)
-```
-
-### Version Mismatch
-
-```markdown
-⚠️ Workflow was created with Aura Frog v0.9.0
-Current version: v1.0.0
-
-Attempting migration...
-✅ State migrated successfully
-
-Continue? (yes/no)
-```
-
----
-
-## Best Practices
-
-### DO:
-- Handoff before token limit (at 150K)
-- Include workflow ID in task tracking
-- Resume promptly to maintain context
-- Review key decisions after resume
-
-### DON'T:
-- Wait until 200K tokens (may truncate)
-- Delete state files manually
-- Resume with different project context
-- Skip the resume summary review
+- **Not found:** Show available workflows, suggest `workflow:start`
+- **Corrupted:** Attempt backup restore (workflow-state.backup.json)
+- **Version mismatch:** Attempt migration
 
 ---
 
 ## TOON State Format (Token-Efficient)
 
 ```toon
-# .claude/workflow-state.toon
 workflow:
   id: AUTH-1234
   phase: 5
@@ -415,7 +128,6 @@ phases[5]{num,name,status}:
 agents[2]: architect,tester
 ```
 
-**Token savings:** TOON uses ~160 tokens vs JSON ~600 tokens (73% reduction)
+~160 tokens vs JSON ~600 tokens (73% reduction).
 
 ---
-

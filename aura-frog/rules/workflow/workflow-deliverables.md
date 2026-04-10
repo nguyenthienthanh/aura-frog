@@ -1,544 +1,101 @@
 # Workflow Deliverables Rule
 
-**Priority:** CRITICAL - Must verify deliverables at each phase
-**Type:** Rule (Mandatory Checklist)
+**Priority:** CRITICAL
+**Type:** Rule (Mandatory)
 
 ---
 
 ## Core Rule
 
-**Every workflow phase MUST produce its required deliverables before proceeding to the next phase.**
+**Every phase MUST produce required deliverables before proceeding.**
 
 ---
 
-## TOON Format for AI-Readable Documents
+## TOON Format
 
-**Use TOON (Token-Oriented Object Notation) for structured data in AI-readable documents.**
+Use TOON for AI-readable documents (TECH_SPEC.md, TEST_PLAN.md). Use Markdown for human-readable (REQUIREMENTS.md, TECH_SPEC_CONFLUENCE.md). ~40% token savings.
 
-TOON reduces token usage by ~40% while improving AI accuracy.
+Syntax: `files[3]{path,action,purpose}:` for tabular data. See `docs/TOON_FORMAT_GUIDE.md`.
 
-- **Source:** [TOON Format](https://github.com/toon-format/toon)
-- **Guide:** `docs/TOON_FORMAT_GUIDE.md`
+---
 
-### When to Use TOON
+## Phase Deliverables
 
 ```toon
-format_usage[4]{document,format,reason}:
-  TECH_SPEC.md,TOON,AI reads for implementation
-  TEST_PLAN.md,TOON,AI reads for test generation
-  REQUIREMENTS.md,Markdown,Narrative content
-  TECH_SPEC_CONFLUENCE.md,Markdown,Human-readable
+deliverables[12]{phase,document,required,key_content}:
+  1,REQUIREMENTS.md,YES,User stories + acceptance criteria + scope
+  1,TECH_SPEC.md,YES,AI-readable: architecture + files + APIs + risks
+  1,TECH_SPEC_CONFLUENCE.md,YES,Human-readable: full Confluence format
+  1,UI_BREAKDOWN.md,If UI,Components + props + accessibility
+  2,TEST_PLAN.md,YES,Test scenarios + coverage targets
+  2,Test files,YES,Failing tests (TDD RED)
+  3,Implementation,YES,Passing tests (TDD GREEN)
+  4,Refactored code,YES,Tests still passing
+  4,CODE_REVIEW.md,YES,Security + performance + best practices
+  5,QA_REPORT.md,YES,Test results + coverage
+  5,IMPLEMENTATION_SUMMARY.md,YES,Changes + deployment
+  5,CHANGELOG.md update,YES,Entry under current version
 ```
 
-### TOON Syntax Quick Reference
-
-```toon
-# Basic key-value
-feature: User Authentication
-
-# Simple arrays
-tags[3]: auth,profile,api
-
-# Tabular arrays (biggest savings)
-files[3]{path,action,purpose}:
-  src/auth.ts,CREATE,Auth service
-  src/login.tsx,CREATE,Login screen
-  src/types.ts,MODIFY,Add types
-
-# Use semicolons for nested values
-models[2]{name,fields}:
-  User,id;email;name
-  Post,id;title;userId
-```
-
-### Templates
-
-- `templates/tech-spec-toon.md` - TOON-enabled tech spec
-- `templates/test-plan-toon.md` - TOON-enabled test plan
-
----
-
-## Phase Deliverables Checklist
-
-### Phase 1: Understand + Design
-
-#### Requirements
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `REQUIREMENTS.md` | `.claude/logs/workflows/{id}/` | YES |
-| User stories | In REQUIREMENTS.md | YES |
-| Acceptance criteria | In REQUIREMENTS.md | YES |
-| Out of scope | In REQUIREMENTS.md | YES |
-| JIRA ticket summary | In REQUIREMENTS.md (if ticket) | If JIRA |
-
-**Validation:**
-```markdown
-## Phase 1 Deliverables Check
-- [ ] REQUIREMENTS.md created
-- [ ] User stories documented (at least 1)
-- [ ] Acceptance criteria listed (at least 3)
-- [ ] Scope clearly defined
-```
-
-#### Design - Technical Specification
-
-| Deliverable | Location | Required | Purpose |
-|-------------|----------|----------|---------|
-| `TECH_SPEC.md` | `.claude/logs/workflows/{id}/` | YES | **AI reads this** - Concise, structured for AI |
-| `TECH_SPEC_CONFLUENCE.md` | `.claude/logs/workflows/{id}/` | YES | Full Confluence page format for humans |
-| Architecture diagram | In both files | YES | System design |
-| File structure | In both files | YES | Code organization |
-| API contracts | In both files | If API | Endpoint definitions |
-| Database schema | In both files | If DB changes | Data model |
-| Component hierarchy | In both files | If frontend | UI structure |
-
-**CRITICAL: AI must ALWAYS read `TECH_SPEC.md`, NOT Confluence version.**
-
-#### TECH_SPEC.md (For AI)
-
-Concise, structured format optimized for AI consumption:
-
-```markdown
-# Tech Spec: [Feature Name]
-
-## Overview
-[1-2 sentences]
-
-## Architecture
-- Pattern: [e.g., Repository, Service Layer]
-- Key components: [list]
-
-## Files to Create/Modify
-| File | Action | Purpose |
-|------|--------|---------|
-| src/services/auth.ts | CREATE | Auth service |
-| src/hooks/useAuth.ts | MODIFY | Add logout |
-
-## API Contracts
-### POST /api/auth/login
-- Request: { email: string, password: string }
-- Response: { token: string, user: User }
-
-## Database Changes
-[If applicable]
-
-## Dependencies
-- [package@version] - reason
-
-## Risks & Mitigations
-| Risk | Mitigation |
-|------|------------|
-| [risk] | [mitigation] |
-```
-
-#### TECH_SPEC_CONFLUENCE.md (For Humans)
-
-Full Confluence page format with rich documentation:
-
-```markdown
-# [Feature Name] - Technical Specification
-
-## Document Info
-| Field | Value |
-|-------|-------|
-| Author | [name] |
-| Status | Draft / In Review / Approved |
-| Created | [date] |
-| JIRA | [ticket-id] |
-
-## Executive Summary
-[Detailed overview for stakeholders]
-
-## Background & Context
-[Why this feature is needed]
-
-## Goals & Non-Goals
-### Goals
-- [goal 1]
-### Non-Goals
-- [explicitly out of scope]
-
-## Technical Design
-### Architecture Overview
-[Detailed architecture with diagrams]
-
-### Component Design
-[Detailed component descriptions]
-
-### Data Flow
-[Step-by-step data flow]
-
-### API Design
-[Full API documentation with examples]
-
-### Database Schema
-[Complete schema with relationships]
-
-## Security Considerations
-[Security analysis]
-
-## Performance Considerations
-[Performance requirements and optimizations]
-
-## Testing Strategy
-[High-level testing approach]
-
-## Rollout Plan
-[Deployment strategy]
-
-## Open Questions
-[Unresolved items]
-
-## Appendix
-[Additional diagrams, references]
-```
-
-**Validation:**
-```markdown
-## Phase 1 Deliverables Check (Design)
-- [ ] TECH_SPEC.md created (AI-readable format)
-- [ ] TECH_SPEC_CONFLUENCE.md created (human-readable)
-- [ ] Architecture diagram included in both
-- [ ] File structure planned
-- [ ] Dependencies identified
-- [ ] Risk assessment documented
-```
-
-#### UI Breakdown - Design Analysis
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `UI_BREAKDOWN.md` | `.claude/logs/workflows/{id}/` | YES |
-| Component list | In UI_BREAKDOWN.md | YES |
-| Props definitions | In UI_BREAKDOWN.md | YES |
-| Figma design notes | In UI_BREAKDOWN.md | If Figma |
-| Responsive breakpoints | In UI_BREAKDOWN.md | If responsive |
-| Accessibility notes | In UI_BREAKDOWN.md | YES |
-
-**Validation:**
-```markdown
-## Phase 1 Deliverables Check (UI Breakdown)
-- [ ] UI_BREAKDOWN.md created
-- [ ] Components identified and listed
-- [ ] Props/interfaces defined
-- [ ] Accessibility requirements noted
-- [ ] Design tokens/theme values extracted
-```
-
----
-
-### Phase 2: Test RED
-
-#### Test Plan
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `TEST_PLAN.md` | `.claude/logs/workflows/{id}/` | YES |
-| Test scenarios | In TEST_PLAN.md | YES |
-| Test data requirements | In TEST_PLAN.md | YES |
-| Coverage targets | In TEST_PLAN.md | YES |
-| E2E test cases | In TEST_PLAN.md | If E2E needed |
-
-**Validation:**
-```markdown
-## Phase 2 Deliverables Check (Test Plan)
-- [ ] TEST_PLAN.md created
-- [ ] Unit test scenarios listed
-- [ ] Integration test scenarios listed
-- [ ] E2E test scenarios listed (if applicable)
-- [ ] Test data requirements defined
-- [ ] Coverage target set (minimum 80%)
-```
-
-#### TDD RED - Write Tests
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| Test files | `src/**/__tests__/` | YES |
-| Test report (failing) | Console output | YES |
-
-**Validation:**
-```markdown
-## Phase 2 Deliverables Check (Test RED)
-- [ ] Test files created
-- [ ] All tests FAIL (expected)
-- [ ] Test file naming correct (*.test.ts, *.spec.ts)
-- [ ] Assertions are meaningful
-```
-
----
-
-### Phase 3: Build GREEN
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| Implementation code | `src/` | YES |
-| Test report (passing) | Console output | YES |
-
-**Validation:**
-```markdown
-## Phase 3 Deliverables Check (Build GREEN)
-- [ ] Code implemented
-- [ ] All tests PASS
-- [ ] No TypeScript errors
-- [ ] No linting errors
-- [ ] Coverage meets target
-```
-
----
-
-### Phase 4: Refactor + Review
-
-#### TDD REFACTOR - Polish
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| Refactored code | `src/` | YES |
-| Test report (still passing) | Console output | YES |
-
-**Validation:**
-```markdown
-## Phase 4 Deliverables Check (Refactor)
-- [ ] Code refactored
-- [ ] All tests still PASS
-- [ ] Code quality improved
-- [ ] No new warnings
-```
-
-#### Review - Code Review
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `CODE_REVIEW.md` | `.claude/logs/workflows/{id}/` | YES |
-| Security review | In CODE_REVIEW.md | YES |
-| Performance review | In CODE_REVIEW.md | YES |
-| Best practices check | In CODE_REVIEW.md | YES |
-
-**Validation:**
-```markdown
-## Phase 4 Deliverables Check (Review)
-- [ ] CODE_REVIEW.md created
-- [ ] Security issues listed (or "None found")
-- [ ] Performance issues listed (or "None found")
-- [ ] Best practices violations listed (or "None found")
-- [ ] Recommendations documented
-```
-
----
-
-### Phase 5: Finalize
-
-#### Verify - QA Validation
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `QA_REPORT.md` | `.claude/logs/workflows/{id}/` | YES |
-| Test results | In QA_REPORT.md | YES |
-| Coverage report | In QA_REPORT.md | YES |
-| Manual test results | In QA_REPORT.md | If manual tests |
-
-**Validation:**
-```markdown
-## Phase 5 Deliverables Check (Verify)
-- [ ] QA_REPORT.md created
-- [ ] All tests passing
-- [ ] Coverage percentage documented
-- [ ] No regressions found
-- [ ] QA sign-off given
-```
-
-#### Document - Documentation
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| `IMPLEMENTATION_SUMMARY.md` | `.claude/logs/workflows/{id}/` | YES |
-| `DEPLOYMENT_GUIDE.md` | `.claude/logs/workflows/{id}/` | If deployment |
-| `CHANGELOG.md` update | Project root | YES |
-| `CONFLUENCE_PAGE.md` | `.claude/logs/workflows/{id}/` | If Confluence |
-
-**Validation:**
-```markdown
-## Phase 5 Deliverables Check (Document)
-- [ ] IMPLEMENTATION_SUMMARY.md created
-- [ ] Changes documented
-- [ ] CHANGELOG.md updated
-- [ ] API documentation updated (if API changes)
-- [ ] README updated (if needed)
-```
-
-#### Share - Notification
-
-| Deliverable | Location | Required |
-|-------------|----------|----------|
-| JIRA update | JIRA ticket | If JIRA |
-| Slack notification | Slack channel | If Slack configured |
-| Workflow archive | `.claude/logs/workflows/{id}/` | YES |
-
-**Validation:**
-```markdown
-## Phase 5 Deliverables Check (Share)
-- [ ] JIRA ticket updated (if applicable)
-- [ ] Team notified (if applicable)
-- [ ] Workflow state archived
-- [ ] All documents in workflow folder
-```
+**CRITICAL:** AI reads `TECH_SPEC.md`, NOT `TECH_SPEC_CONFLUENCE.md`.
 
 ---
 
 ## Workflow Folder Structure
 
-Every workflow MUST create this folder structure:
-
 ```
 .claude/logs/workflows/{workflow-id}/
-├── REQUIREMENTS.md           # Phase 1 (Understand + Design)
-├── TECH_SPEC.md              # Phase 1 - AI reads this (concise)
-├── TECH_SPEC_CONFLUENCE.md   # Phase 1 - Human-readable (full Confluence format)
-├── UI_BREAKDOWN.md           # Phase 1 (if UI)
-├── TEST_PLAN.md              # Phase 2 (Test RED)
-├── CODE_REVIEW.md            # Phase 4 (Refactor + Review)
-├── QA_REPORT.md              # Phase 5 (Finalize)
-├── IMPLEMENTATION_SUMMARY.md # Phase 5 (Finalize)
-├── DEPLOYMENT_GUIDE.md       # Phase 5 (if deployment)
-├── CHANGELOG_ENTRY.md        # Phase 5
-└── workflow-state.json       # Workflow metadata
+├── REQUIREMENTS.md
+├── TECH_SPEC.md              # AI reads this
+├── TECH_SPEC_CONFLUENCE.md   # Human-readable
+├── UI_BREAKDOWN.md           # If UI
+├── TEST_PLAN.md
+├── CODE_REVIEW.md
+├── QA_REPORT.md
+├── IMPLEMENTATION_SUMMARY.md
+├── DEPLOYMENT_GUIDE.md       # If deployment
+├── CHANGELOG_ENTRY.md
+└── workflow-state.json
 ```
-
-**IMPORTANT:** AI must read `TECH_SPEC.md` for implementation guidance, not `TECH_SPEC_CONFLUENCE.md`.
 
 ---
 
 ## Enforcement
 
-### Before Phase Transition
+Before phase transition: verify all required deliverables exist. Missing deliverable = cannot proceed.
 
-**MUST verify current phase deliverables exist before approving:**
-
-```markdown
-## Pre-Approval Check
-
-Current Phase: [X]
-Required Deliverables:
-- [x] Document 1 - Created ✅
-- [x] Document 2 - Created ✅
-- [ ] Document 3 - MISSING ❌
-
-❌ Cannot proceed - missing deliverables
-```
-
-### At Workflow End
-
-**MUST verify all documents exist before closing:**
-
-```markdown
-## Workflow Completion Check
-
-Workflow: {workflow-id}
-Status: Checking deliverables...
-
-Phase 1 (Understand + Design):
-  ✅ REQUIREMENTS.md
-  ✅ TECH_SPEC.md (AI-readable)
-  ✅ TECH_SPEC_CONFLUENCE.md (human-readable)
-  ✅ UI_BREAKDOWN.md (if UI)
-
-Phase 2 (Test RED):
-  ✅ TEST_PLAN.md
-
-Phase 4 (Refactor + Review):
-  ✅ CODE_REVIEW.md
-
-Phase 5 (Finalize):
-  ✅ QA_REPORT.md
-  ✅ IMPLEMENTATION_SUMMARY.md
-  ✅ CHANGELOG_ENTRY.md
-
-All deliverables present ✅
-Workflow can be closed.
-```
+At workflow end: verify all documents exist before closing.
 
 ---
 
 ## Missing Deliverable Recovery
 
-If a deliverable is missing at a later phase:
-
-### Option 1: Create Retroactively
-```markdown
-**Missing Deliverable Detected**
-
-Document: TECH_SPEC.md (Phase 1)
-Current Phase: 3
-
-Action: Creating TECH_SPEC.md retroactively...
-[Generate document based on current implementation]
-
-✅ TECH_SPEC.md created
-```
-
-### Option 2: Note Omission
-```markdown
-**Deliverable Intentionally Skipped**
-
-Document: UI_BREAKDOWN.md
-Reason: Backend-only feature, no UI components
-Approved by: User at Phase 3
-
-Skipped deliverables:
-- UI_BREAKDOWN.md (no UI)
-```
+- **Create retroactively:** Generate from current implementation
+- **Note omission:** Document skip reason (e.g., "Backend-only, no UI")
 
 ---
 
-## Quick Reference Card
-
-| Phase | Key Document | Must Have |
-|-------|--------------|-----------|
-| 1 | REQUIREMENTS.md | User stories, acceptance criteria |
-| 1 | TECH_SPEC.md | AI-readable: Architecture, files, APIs |
-| 1 | TECH_SPEC_CONFLUENCE.md | Human-readable: Full Confluence format |
-| 1 | UI_BREAKDOWN.md | Components, props, accessibility (if UI) |
-| 2 | TEST_PLAN.md | Test scenarios, coverage target |
-| 2 | Test files | Failing tests |
-| 3 | Implementation | Passing tests |
-| 4 | Refactored code | Still passing |
-| 4 | CODE_REVIEW.md | Security, performance, practices |
-| 5 | QA_REPORT.md | Test results, coverage |
-| 5 | IMPLEMENTATION_SUMMARY.md | Changes, deployment |
-| 5 | Workflow archive | All documents |
-
----
-
-## Automated Checks
-
-At each phase approval, run:
+## Automated Check
 
 ```bash
-# Check workflow folder exists
-ls .claude/logs/workflows/{workflow-id}/
-
-# Check required documents
-[ -f "REQUIREMENTS.md" ] && echo "✅ Phase 1 (Requirements)" || echo "❌ Phase 1 (Requirements)"
-[ -f "TECH_SPEC.md" ] && echo "✅ Phase 1 (AI Spec)" || echo "❌ Phase 1 (AI Spec)"
-[ -f "TECH_SPEC_CONFLUENCE.md" ] && echo "✅ Phase 1 (Confluence)" || echo "❌ Phase 1 (Confluence)"
-[ -f "UI_BREAKDOWN.md" ] && echo "✅ Phase 1 (UI)" || echo "⚠️ Phase 1 (UI - optional)"
+[ -f "REQUIREMENTS.md" ] && echo "✅ Phase 1" || echo "❌ Phase 1"
+[ -f "TECH_SPEC.md" ] && echo "✅ AI Spec" || echo "❌ AI Spec"
 [ -f "TEST_PLAN.md" ] && echo "✅ Phase 2" || echo "❌ Phase 2"
 [ -f "CODE_REVIEW.md" ] && echo "✅ Phase 4" || echo "❌ Phase 4"
 [ -f "QA_REPORT.md" ] && echo "✅ Phase 5" || echo "❌ Phase 5"
-[ -f "IMPLEMENTATION_SUMMARY.md" ] && echo "✅ Phase 5 (Summary)" || echo "❌ Phase 5 (Summary)"
 ```
 
 ---
 
 ## Related Rules
 
-| Rule | Connection |
-|------|------------|
-| `approval-gates.md` | Deliverables checked at gates |
-| `workflow-navigation.md` | Phase tracking |
-| `next-step-guidance.md` | Remind about deliverables |
-| `tdd-workflow.md` | Test file deliverables |
+```toon
+related[4]{rule,connection}:
+  approval-gates.md,Deliverables checked at gates
+  workflow-navigation.md,Phase tracking
+  next-step-guidance.md,Remind about deliverables
+  tdd-workflow.md,Test file deliverables
+```
 
 ---
 

@@ -627,4 +627,9 @@ cat package.json | grep -E "(nativewind|emotion|styled-components)"
 ---
 
 **Last Updated:** 2025-12-04
-**Status:** ✅ Active Standard
+**Status:** Active Standard
+
+## See Also
+
+- [Design System Guide](DESIGN_SYSTEM_GUIDE.md) — UI library selection and implementation
+- [Project Cache](../operations/PROJECT_CACHE.md) — How detection results are cached

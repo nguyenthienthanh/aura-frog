@@ -215,15 +215,13 @@ The sync script updates:
 
 ### Documentation Types
 
-1. **User Documentation** (`aura-frog/docs/`)
-   - Setup guides
-   - Integration guides
-   - Troubleshooting
+1. **User Documentation** (`docs/`)
+   - Setup guides, integration guides, troubleshooting
+   - Organized into: getting-started, architecture, guides, operations, reference
 
-2. **Developer Documentation** (`aura-frog/docs/`)
-   - Technical references
-   - API documentation
-   - Architecture guides
+2. **AI Documentation** (`aura-frog/docs/`)
+   - Compact TOON-formatted references for Claude
+   - Phase definitions
 
 3. **Agent Documentation** (`aura-frog/agents/`)
    - Agent capabilities
@@ -238,10 +236,10 @@ The sync script updates:
 ### Updating Documentation
 
 When adding features:
-1. Update relevant guide in `aura-frog/docs/`
-2. Update `aura-frog/README.md` if user-facing
+1. Update relevant guide in `docs/` (human docs) or `aura-frog/docs/` (AI refs)
+2. Update `README.md` if user-facing
 3. Add examples to appropriate files
-4. Update CHANGELOG.md
+4. Update `docs/reference/CHANGELOG.md`
 
 ---
 
@@ -300,7 +298,7 @@ mcp:status
 "Fetch JIRA ticket TEST-123"
 ```
 
-**See:** `aura-frog/docs/MCP_GUIDE.md` for complete MCP setup
+**See:** [MCP Guide](docs/operations/MCP_GUIDE.md) for complete MCP setup
 
 ---
 
@@ -424,7 +422,7 @@ git push origin main --tags
 ## Getting Help
 
 **Questions?**
-- 📖 Read the [documentation](aura-frog/docs/)
+- 📖 Read the [documentation](docs/README.md)
 - 🐛 Check [existing issues](https://github.com/nguyenthienthanh/aura-frog/issues)
 - 💬 Open a new issue for discussion
 

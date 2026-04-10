@@ -597,7 +597,7 @@ cat .claude/project-contexts/*/project-config.yaml 2>/dev/null | head -20
 **Configuration issues?**
 - Review this document
 - Run `config:validate` command
-- See `PLUGIN_INSTALLATION.md` for troubleshooting
+- See [TROUBLESHOOTING.md](../operations/TROUBLESHOOTING.md) for troubleshooting
 
 ---
 

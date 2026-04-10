@@ -16,526 +16,113 @@ allowed-tools: Read, Grep, Glob, Edit, Write
 
 # Vue Expert Skill
 
-Expert-level Vue 3 patterns, Composition API, state management, and performance optimization.
+Vue 3 patterns: Composition API, Pinia, reactivity, performance.
 
 ---
 
-## Auto-Detection
-
-This skill activates when:
-- Working with `.vue` files
-- Using Vue 3 Composition API
-- Detected `vue` in package.json
-- Using Pinia or Nuxt
-
----
-
-## 1. Composition API Patterns
-
-### Script Setup (Preferred)
+## 1. Composition API (Script Setup)
 
 ```vue
-<!-- ✅ GOOD - script setup syntax -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { User } from '@/types';
 
-// Props with defaults
-interface Props {
-  user: User;
-  showAvatar?: boolean;
-}
+interface Props { user: User; showAvatar?: boolean; }
+const props = withDefaults(defineProps<Props>(), { showAvatar: true });
+const emit = defineEmits<{ select: [user: User]; update: [id: string, data: Partial<User>]; }>();
 
-const props = withDefaults(defineProps<Props>(), {
-  showAvatar: true,
-});
-
-// Emits with types
-const emit = defineEmits<{
-  select: [user: User];
-  update: [id: string, data: Partial<User>];
-}>();
-
-// Reactive state
 const isLoading = ref(false);
-const items = ref<Item[]>([]);
-
-// Computed
 const fullName = computed(() => `${props.user.firstName} ${props.user.lastName}`);
-
-// Methods
-function handleSelect() {
-  emit('select', props.user);
-}
-
-// Lifecycle
-onMounted(async () => {
-  isLoading.value = true;
-  items.value = await fetchItems();
-  isLoading.value = false;
-});
 </script>
 ```
 
-### Composables (Custom Hooks)
+### Composables
+
+Extract reusable logic into `composables/useX.ts`. Return `readonly()` refs. Use `watch()` with `{ immediate: true }` for auto-fetch.
 
 ```typescript
-// ✅ GOOD - Reusable composable
-// composables/useUser.ts
-import { ref, computed } from 'vue';
-import type { User } from '@/types';
-
 export function useUser(userId: Ref<string>) {
   const user = ref<User | null>(null);
   const isLoading = ref(false);
   const error = ref<Error | null>(null);
-
-  const fullName = computed(() => {
-    if (user.value == null) return '';
-    return `${user.value.firstName} ${user.value.lastName}`;
-  });
-
-  async function fetchUser() {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      user.value = await api.getUser(userId.value);
-    } catch (e) {
-      error.value = e instanceof Error ? e : new Error('Unknown error');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  watch(userId, fetchUser, { immediate: true });
-
-  return {
-    user: readonly(user),
-    fullName,
-    isLoading: readonly(isLoading),
-    error: readonly(error),
-    refetch: fetchUser,
-  };
+  // ... fetch logic with watch(userId, fetchUser, { immediate: true })
+  return { user: readonly(user), isLoading: readonly(isLoading), error: readonly(error), refetch };
 }
-
-// Usage
-const userId = ref('123');
-const { user, fullName, isLoading } = useUser(userId);
 ```
 
 ---
 
-## 2. Reactivity Best Practices
+## 2. Reactivity
 
-### ref vs reactive
-
-```typescript
-// ✅ GOOD - ref for primitives
-const count = ref(0);
-const name = ref('');
-const isActive = ref(false);
-
-// ✅ GOOD - ref for objects (consistent .value)
-const user = ref<User | null>(null);
-user.value = { id: '1', name: 'John' };
-
-// ⚠️ CAUTION - reactive loses reactivity on reassignment
-const state = reactive({ user: null });
-state.user = newUser; // ✅ Works
-// state = { user: newUser }; // ❌ Loses reactivity!
-
-// ✅ GOOD - Use ref for replaceable objects
-const user = ref<User | null>(null);
-user.value = newUser; // ✅ Works
-```
-
-### Watch Patterns
-
-```typescript
-// ✅ GOOD - Watch single ref
-watch(userId, async (newId, oldId) => {
-  if (newId !== oldId) {
-    await fetchUser(newId);
-  }
-});
-
-// ✅ GOOD - Watch multiple sources
-watch(
-  [userId, companyId],
-  async ([newUserId, newCompanyId]) => {
-    await fetchData(newUserId, newCompanyId);
-  }
-);
-
-// ✅ GOOD - watchEffect for auto-tracking
-watchEffect(async () => {
-  // Automatically tracks userId.value
-  const data = await fetchUser(userId.value);
-  user.value = data;
-});
-
-// ✅ GOOD - Cleanup in watch
-watch(userId, async (newId, oldId, onCleanup) => {
-  const controller = new AbortController();
-  onCleanup(() => controller.abort());
-
-  const data = await fetchUser(newId, { signal: controller.signal });
-  user.value = data;
-});
-```
+- **ref** for all values (primitives and objects) -- consistent `.value`
+- **reactive** loses reactivity on reassignment -- avoid for replaceable objects
+- **watch:** Single ref, multiple `[ref1, ref2]`, or `watchEffect` for auto-tracking
+- **Cleanup:** Use `onCleanup` parameter for AbortController in async watchers
 
 ---
 
-## 3. Template Best Practices
+## 3. Template Patterns
 
-### Conditional Rendering
-
-```vue
-<template>
-  <!-- ❌ BAD - Implicit truthy check -->
-  <div v-if="userName">{{ userName }}</div>
-
-  <!-- ✅ GOOD - Explicit check -->
-  <div v-if="userName != null && userName !== ''">{{ userName }}</div>
-
-  <!-- ✅ GOOD - v-show for frequent toggles -->
-  <div v-show="isVisible">Frequently toggled content</div>
-
-  <!-- ✅ GOOD - v-if for conditional rendering -->
-  <div v-if="isLoaded">Rendered once</div>
-
-  <!-- ✅ GOOD - Template for multiple elements -->
-  <template v-if="items.length > 0">
-    <h2>Items</h2>
-    <ul>
-      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
-    </ul>
-  </template>
-  <EmptyState v-else />
-</template>
-```
-
-### List Rendering
-
-```vue
-<template>
-  <!-- ❌ BAD - Index as key -->
-  <li v-for="(item, index) in items" :key="index">{{ item.name }}</li>
-
-  <!-- ✅ GOOD - Unique ID as key -->
-  <li v-for="item in items" :key="item.id">{{ item.name }}</li>
-
-  <!-- ✅ GOOD - v-for with v-if (separate element) -->
-  <template v-for="item in items" :key="item.id">
-    <li v-if="item.isVisible">{{ item.name }}</li>
-  </template>
-
-  <!-- ✅ GOOD - Computed for filtering -->
-  <li v-for="item in visibleItems" :key="item.id">{{ item.name }}</li>
-</template>
-
-<script setup lang="ts">
-const visibleItems = computed(() => items.value.filter(item => item.isVisible));
-</script>
-```
-
-### Event Handling
-
-```vue
-<template>
-  <!-- ✅ GOOD - Inline for simple -->
-  <button @click="count++">Increment</button>
-
-  <!-- ✅ GOOD - Method reference -->
-  <button @click="handleClick">Click</button>
-
-  <!-- ✅ GOOD - With event -->
-  <input @input="handleInput($event)" />
-
-  <!-- ✅ GOOD - Modifiers -->
-  <form @submit.prevent="handleSubmit">
-  <input @keyup.enter="submit" />
-  <div @click.stop="handleClick">
-</template>
-```
+- Explicit `v-if` checks: `v-if="userName != null && userName !== ''"`
+- `v-show` for frequent toggles, `v-if` for conditional render
+- Unique `:key="item.id"` (never index)
+- `computed` for filtering (not methods in template)
+- Event modifiers: `@submit.prevent`, `@keyup.enter`, `@click.stop`
 
 ---
 
 ## 4. Component Design
 
-### Props Validation
-
-```vue
-<script setup lang="ts">
-// ✅ GOOD - Type-based props
-interface Props {
-  // Required
-  id: string;
-  user: User;
-
-  // Optional with type
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-
-  // With default (use withDefaults)
-  variant?: 'primary' | 'secondary';
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  size: 'md',
-  disabled: false,
-  variant: 'primary',
-});
-</script>
-```
-
-### Slots
-
-```vue
-<!-- ParentComponent.vue -->
-<template>
-  <Card>
-    <template #header>
-      <h2>Title</h2>
-    </template>
-
-    <template #default>
-      <p>Main content</p>
-    </template>
-
-    <template #footer="{ canSubmit }">
-      <button :disabled="!canSubmit">Submit</button>
-    </template>
-  </Card>
-</template>
-
-<!-- Card.vue -->
-<template>
-  <div class="card">
-    <header v-if="$slots.header">
-      <slot name="header" />
-    </header>
-
-    <main>
-      <slot />
-    </main>
-
-    <footer v-if="$slots.footer">
-      <slot name="footer" :canSubmit="isValid" />
-    </footer>
-  </div>
-</template>
-```
-
-### Expose
-
-```vue
-<!-- ✅ GOOD - Expose specific methods/refs -->
-<script setup lang="ts">
-const inputRef = ref<HTMLInputElement | null>(null);
-
-function focus() {
-  inputRef.value?.focus();
-}
-
-function reset() {
-  // Reset logic
-}
-
-// Only expose what's needed
-defineExpose({
-  focus,
-  reset,
-});
-</script>
-```
+- **Props:** `withDefaults(defineProps<Props>(), { ... })`
+- **Emits:** `defineEmits<{ event: [payload] }>()`
+- **Slots:** Named slots with `$slots.header` check, scoped slots with `:canSubmit="isValid"`
+- **Expose:** `defineExpose({ focus, reset })` -- only what consumers need
 
 ---
 
 ## 5. State Management (Pinia)
 
-### Store Definition
+**Setup store syntax** (Composition API style):
 
 ```typescript
-// stores/user.ts
-import { defineStore } from 'pinia';
-
-// ✅ GOOD - Setup store syntax (Composition API style)
 export const useUserStore = defineStore('user', () => {
-  // State
   const user = ref<User | null>(null);
-  const isLoading = ref(false);
-
-  // Getters
   const isAuthenticated = computed(() => user.value != null);
-  const fullName = computed(() => {
-    if (user.value == null) return '';
-    return `${user.value.firstName} ${user.value.lastName}`;
-  });
-
-  // Actions
-  async function login(credentials: Credentials) {
-    isLoading.value = true;
-    try {
-      user.value = await authApi.login(credentials);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  function logout() {
-    user.value = null;
-  }
-
-  return {
-    // State
-    user: readonly(user),
-    isLoading: readonly(isLoading),
-    // Getters
-    isAuthenticated,
-    fullName,
-    // Actions
-    login,
-    logout,
-  };
+  async function login(credentials: Credentials) { /* ... */ }
+  return { user: readonly(user), isAuthenticated, login };
 });
 ```
 
-### Store Usage
-
-```vue
-<script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-import { storeToRefs } from 'pinia';
-
-const userStore = useUserStore();
-
-// ✅ GOOD - storeToRefs for reactive destructuring
-const { user, isAuthenticated, fullName } = storeToRefs(userStore);
-
-// Actions don't need storeToRefs
-const { login, logout } = userStore;
-</script>
-```
+Usage: `storeToRefs(store)` for reactive destructuring. Actions don't need storeToRefs.
 
 ---
 
-## 6. Performance Optimization
+## 6. Performance
 
-### Computed Caching
-
-```typescript
-// ✅ GOOD - Computed for derived state (cached)
-const sortedItems = computed(() => {
-  return [...items.value].sort((a, b) => a.name.localeCompare(b.name));
-});
-
-// ❌ BAD - Method called in template (no caching)
-function getSortedItems() {
-  return [...items.value].sort((a, b) => a.name.localeCompare(b.name));
-}
-```
-
-### v-once and v-memo
-
-```vue
-<template>
-  <!-- ✅ GOOD - Static content -->
-  <footer v-once>
-    <p>Copyright 2024</p>
-  </footer>
-
-  <!-- ✅ GOOD - Memoize expensive renders -->
-  <div v-for="item in items" :key="item.id" v-memo="[item.id, item.selected]">
-    <ExpensiveComponent :item="item" />
-  </div>
-</template>
-```
-
-### Async Components
-
-```typescript
-// ✅ GOOD - Lazy load components
-const HeavyComponent = defineAsyncComponent(() =>
-  import('./components/HeavyComponent.vue')
-);
-
-// ✅ GOOD - With loading/error states
-const AsyncModal = defineAsyncComponent({
-  loader: () => import('./Modal.vue'),
-  loadingComponent: LoadingSpinner,
-  errorComponent: ErrorDisplay,
-  delay: 200,
-  timeout: 3000,
-});
-```
+- `computed` for derived state (cached vs method calls)
+- `v-once` for static content
+- `v-memo="[item.id, item.selected]"` for expensive list items
+- `defineAsyncComponent(() => import('./Heavy.vue'))` with loading/error states
 
 ---
 
-## 7. Form Handling
-
-### VeeValidate + Zod
+## 7. Forms (VeeValidate + Zod)
 
 ```vue
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { z } from 'zod';
-
-const schema = toTypedSchema(
-  z.object({
-    email: z.string().email('Invalid email'),
-    password: z.string().min(8, 'Min 8 characters'),
-  })
-);
-
-const { handleSubmit, errors, defineField } = useForm({
-  validationSchema: schema,
-});
-
+const schema = toTypedSchema(z.object({ email: z.string().email(), password: z.string().min(8) }));
+const { handleSubmit, errors, defineField } = useForm({ validationSchema: schema });
 const [email, emailAttrs] = defineField('email');
-const [password, passwordAttrs] = defineField('password');
-
-const onSubmit = handleSubmit(async (values) => {
-  await login(values);
-});
 </script>
-
-<template>
-  <form @submit="onSubmit">
-    <input v-model="email" v-bind="emailAttrs" type="email" />
-    <span v-if="errors.email">{{ errors.email }}</span>
-
-    <input v-model="password" v-bind="passwordAttrs" type="password" />
-    <span v-if="errors.password">{{ errors.password }}</span>
-
-    <button type="submit">Login</button>
-  </form>
-</template>
 ```
 
 ---
 
-## 8. TypeScript Integration
+## 8. TypeScript
 
-### Component Types
-
-```typescript
-// ✅ GOOD - Import component type
-import type { Component } from 'vue';
-import MyComponent from './MyComponent.vue';
-
-// ✅ GOOD - Template ref typing
-const modalRef = ref<InstanceType<typeof MyComponent> | null>(null);
-
-// ✅ GOOD - Global component types (env.d.ts)
-declare module 'vue' {
-  export interface GlobalComponents {
-    RouterLink: typeof import('vue-router')['RouterLink'];
-    RouterView: typeof import('vue-router')['RouterView'];
-  }
-}
-```
+- Template ref: `ref<InstanceType<typeof MyComponent> | null>(null)`
+- Global components: `declare module 'vue' { export interface GlobalComponents { ... } }`
 
 ---
 
@@ -558,4 +145,3 @@ checklist[12]{pattern,best_practice}:
 ```
 
 ---
-

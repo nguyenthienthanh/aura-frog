@@ -61,7 +61,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[87]{category,command,file,description}:
+commands[90]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -176,7 +176,7 @@ stats[21]{category,count}:
   skill,1
   metrics,4
   standalone,4
-  total,87
+  total,90
 ```
 
 ---
@@ -217,7 +217,56 @@ find commands -name "*.md" -type f | sort
 
 ---
 
-## 📝 Adding New Commands
+## Common Workflows
+
+### New Feature
+```
+workflow:start "Add user profiles"   → Full 5-phase TDD
+```
+
+### Quick Bug Fix
+```
+bugfix:quick "Cart total wrong"      → Understand → Test → Fix → Verify
+```
+
+### Add Tests to Existing Code
+```
+test:unit src/services/              → Auto-detect runner, generate tests
+test:coverage                        → Check gaps
+```
+
+### Security Review Before Release
+```
+security:audit                       → Full OWASP + deps + SAST
+security:deps                        → Vulnerability scan
+```
+
+### Project Setup (First Time)
+```
+project:init                         → Detect stack, create context files
+project:sync-settings                → Apply plugin settings
+```
+
+### Resume After Break
+```
+workflow:resume AUTH-123              → Pick up where you left off
+```
+
+---
+
+## Tips
+
+1. **Start with bundled commands** — `/workflow`, `/test`, `/quality`, `/bugfix`, `/project` cover 80% of usage
+2. **Let agents auto-detect** — You rarely need `agent:activate` manually
+3. **Use `bugfix:quick` for most bugs** — Full workflow is overkill for simple fixes
+4. **Run `prompts:evaluate` monthly** — See what features you're missing
+5. **`workflow:handoff` before long breaks** — Saves everything for next session
+6. **`quality:check` before commits** — Catches issues before review
+7. **Plans without workflows** — Use `planning` to think through complex tasks without committing
+
+---
+
+## Adding New Commands
 
 1. Determine category (create folder if new)
 2. Create file: `category/action.md`

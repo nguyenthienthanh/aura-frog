@@ -11,116 +11,46 @@ triggers:
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-# Aura Frog Code Reviewer — 6-Aspect Analysis
+# Code Reviewer — 6-Aspect Analysis
 
-**Priority:** HIGH — Use before merging code
+Use after implementation, during Phase 4, or before merge.
 
----
+## Process
 
-## When to Use
+1. Get changed files: `git diff --name-only main...HEAD`
+2. Run 6-aspect review (all mandatory)
+3. Generate report
+4. Decision
 
-- After implementation, before merge
-- During Phase 4 (Refactor + Review)
-- When explicitly requested
-
----
-
-## Review Process
-
-### Step 1: Get Changed Files
-
-```bash
-git diff --name-only main...HEAD
-# Or: files modified in current workflow
-```
-
-### Step 2: Run 6-Aspect Review
-
-**MANDATORY: All 6 aspects must be covered. Do not skip any.**
-
-#### Aspect 1: 🔒 Security
-- Hardcoded secrets (API keys, passwords, tokens)
-- SQL injection, XSS, command injection vectors
-- Auth/authz gaps (missing middleware, privilege escalation)
-- CSRF, CORS misconfigurations
-- Insecure crypto (MD5, SHA1, Math.random for tokens)
-
-#### Aspect 2: 🏷️ Type Safety
-- Missing type annotations on public functions
-- `any` type usage (suggest specific types)
-- Inconsistent return types
-- Null/undefined handling gaps
-- Generic types that could be narrower
-
-#### Aspect 3: ⚠️ Error Handling
-- Unhandled promise rejections
-- Empty catch blocks without justification
-- Missing error boundaries (React) / error middleware (Express)
-- Silent failures (errors swallowed without logging)
-- Missing retry logic on external calls
-
-#### Aspect 4: 🧪 Test Gaps
-- Untested critical paths
-- Missing edge case tests
-- Test quality (testing behavior vs implementation)
-- Mock quality (over-mocking, missing integration tests)
-- Gaps on modified files
-
-#### Aspect 5: 📐 Code Quality
-- KISS violations (over-engineering, premature abstraction)
-- DRY violations (duplicated logic)
-- Naming clarity (functions, variables, files)
-- Single Responsibility violations
-- Dead code, unused imports
-
-#### Aspect 6: ♻️ Simplification Opportunities
-- Complex conditionals that could be simplified
-- Deep nesting that could be flattened (early returns)
-- Long functions that should be split
-- Verbose patterns with simpler alternatives
-- Redundant null checks or type guards
-
-### Step 3: Generate Report
+## 6 Aspects
 
 ```toon
-review[6]{aspect,icon,status,findings}:
-  Security,🔒,✅|⚠️|❌,{count} findings
-  Types,🏷️,✅|⚠️|❌,{count} findings
-  Errors,⚠️,✅|⚠️|❌,{count} findings
-  Tests,🧪,✅|⚠️|❌,{count} findings
-  Quality,📐,✅|⚠️|❌,{count} findings
-  Simplify,♻️,✅|⚠️|❌,{count} findings
+aspects[6]{aspect,checks}:
+  Security,"Hardcoded secrets, injection (SQL/XSS/cmd), auth gaps, CSRF/CORS, insecure crypto"
+  Type Safety,"Missing annotations, any usage, inconsistent returns, null gaps"
+  Error Handling,"Unhandled rejections, empty catch, missing error boundaries, silent failures"
+  Test Gaps,"Untested critical paths, missing edge cases, over-mocking, gaps on modified files"
+  Code Quality,"KISS/DRY violations, naming clarity, SRP violations, dead code"
+  Simplification,"Complex conditionals, deep nesting, long functions, verbose patterns"
 ```
 
-**Detail each finding:**
+## Report Format
+
 ```
 [ASPECT] [SEVERITY] file:line — description
   → Fix: recommendation
 ```
 
-Severity: 🔴 CRITICAL (block merge) | 🟡 WARNING (should fix) | 🔵 INFO (nice to have)
+Severity: CRITICAL (block merge) | WARNING (should fix) | INFO (nice to have)
 
-### Step 4: Decision
+## Decision
 
-- **✅ APPROVED** — 0 critical, ≤3 warnings
-- **⚠️ APPROVED WITH COMMENTS** — 0 critical, >3 warnings
-- **❌ CHANGES REQUESTED** — Any critical finding
+- **APPROVED** — 0 critical, ≤3 warnings
+- **APPROVED WITH COMMENTS** — 0 critical, >3 warnings
+- **CHANGES REQUESTED** — Any critical finding
 
-### Step 5: Summary Line
+Summary: `Review: 🔒✅ 🏷️✅ ⚠️⚠️ 🧪✅ 📐✅ ♻️✅ — APPROVED WITH COMMENTS`
 
-```
-Review: 🔒✅ 🏷️✅ ⚠️⚠️ 🧪✅ 📐✅ ♻️✅ — APPROVED WITH COMMENTS (1 error handling warning)
-```
+## Block Merge On
 
----
-
-## Critical (Block Merge)
-
-- Hardcoded secrets
-- SQL injection / XSS / command injection
-- Missing auth on protected routes
-- Breaking changes without migration
-
----
-
-**Remember:** Review improves code quality. Be constructive.
+Hardcoded secrets, injection vulnerabilities, missing auth on protected routes, breaking changes without migration.

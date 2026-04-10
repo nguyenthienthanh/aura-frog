@@ -1,94 +1,30 @@
 # Rule: Environment Loading
 
 **Priority:** Critical
-**Applies:** Session start, before any workflow or prompt response
+**Applies:** Session start, before any response
 
 ---
 
 ## Rule
 
-**ALWAYS check environment variables FIRST before responding to any prompt.**
+Check environment variables FIRST. If not loaded → run `project:reload-env`.
 
-If environment is not configured → Run `project:reload-env` automatically.
+## Process
 
----
+1. Source `.envrc` (project root) or `.claude/.envrc` (fallback). Project root takes priority.
+2. Verify critical vars are set
+3. If missing → auto-run `project:reload-env`
 
-## Mandatory Check (Every Session)
+NEVER skip. NEVER respond without loading env first.
 
-Before responding to the user's first message, you MUST:
+## Variables
 
-1. **Check if key env vars are set:**
-   ```bash
-   # Check critical variables
-   [ -n "$SUPABASE_URL" ] && [ -n "$FIGMA_API_TOKEN" ] || echo "ENV NOT LOADED"
-   ```
-
-2. **If NOT configured → Auto-run reload:**
-   ```bash
-   # Locate and source .envrc
-   if [ -f ".envrc" ]; then
-     source .envrc
-   elif [ -f ".claude/.envrc" ]; then
-     source .claude/.envrc
-   fi
-   ```
-
-3. **Show env status in first response:**
-   ```
-   🔌 MCP: context7 ✓ | figma ✓ | playwright ✓ | vitest ✓ | slack ✗
-   🧠 Learning: enabled ✓
-   ```
-
-**NEVER skip this check. NEVER respond without loading env first.**
-
----
-
-## Steps
-
-1. **Check for `.envrc`** in these locations (in order):
-   - `.envrc` (project root)
-   - `.claude/.envrc` (Claude config directory)
-2. **If found, parse** all `export VAR=value` statements
-3. **Load variables** into current session context
-4. **Verify** critical variables are set before proceeding
-
-**Note:** If both files exist, project root takes priority. Variables from `.claude/.envrc` are loaded first, then overridden by `.envrc` if present.
-
----
-
-## Variable Categories
-
-### Integration Credentials
-```bash
-JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
-FIGMA_API_TOKEN
-SLACK_BOT_TOKEN, SLACK_CHANNEL_ID, SLACK_WEBHOOK_URL
-CONFLUENCE_URL, CONFLUENCE_EMAIL, CONFLUENCE_API_TOKEN
+```toon
+vars[2]{category,keys}:
+  Integrations,"JIRA_URL JIRA_EMAIL JIRA_API_TOKEN FIGMA_API_TOKEN SLACK_BOT_TOKEN CONFLUENCE_URL"
+  Workflow,"AURA_FROG_AUTO_APPROVE AURA_FROG_DEFAULT_COVERAGE AURA_FROG_TDD_ENFORCE"
 ```
 
-### Workflow Settings
-```bash
-AURA_FROG_AUTO_APPROVE
-AURA_FROG_DEFAULT_COVERAGE
-AURA_FROG_TDD_ENFORCE
-AURA_FROG_AUTO_NOTIFY
-AURA_FROG_TOKEN_WARNING
-```
+**Priority:** Environment Variable > Project Config > Global Config > Default
 
----
-
-## Priority Order
-
-```
-Environment Variable > Project Config > Global Config > Default
-```
-
----
-
-## Commands
-
-- `project:reload-env` - Reload after editing .envrc
-- `project:init` - Creates .envrc template
-
----
-
+**Commands:** `project:reload-env` (reload), `project:init` (creates template)

@@ -251,10 +251,10 @@ project:init
 
 ## Related Documentation
 
-- **Plugin CLAUDE.md:** `aura-frog/CLAUDE.md`
+- **Plugin CLAUDE.md:** `../../aura-frog/CLAUDE.md`
 - **Project Context Structure:** See `project:init` command
-- **Plugin Installation:** `aura-frog/docs/PLUGIN_INSTALLATION.md`
-- **Project Initialization:** `aura-frog/commands/project/init.md`
+- **Getting Started:** [GET_STARTED.md](../getting-started/GET_STARTED.md)
+- **Project Initialization:** `../../aura-frog/commands/project/init.md`
 
 ---
 

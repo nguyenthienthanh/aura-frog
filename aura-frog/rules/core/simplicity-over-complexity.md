@@ -1,109 +1,52 @@
 # Simplicity Over Complexity (YAGNI + DRY + KISS)
 
-**Category:** Code Quality & Architecture
 **Priority:** Critical
-**Applies To:** All phases, especially Phase 1 (Understand + Design), Phase 3 (Build GREEN), Phase 4 (Refactor + Review)
 
 ---
 
 ## Core Principles
 
 ```toon
-principles[3]{principle,rule,when}:
-  YAGNI,"Only implement what's needed RIGHT NOW. No speculative features.",Always
-  DRY,"Wait for Rule of Three (3 occurrences) before abstracting.",Phase 4
-  KISS,"Choose simplest solution that solves the problem. No over-engineering.",Always
+principles[3]{principle,rule}:
+  YAGNI,"Only implement what's needed RIGHT NOW. No speculative features."
+  DRY,"Wait for Rule of Three (3 occurrences) before abstracting."
+  KISS,"Choose simplest solution. No over-engineering."
 ```
 
----
-
-## Decision Flowchart
+## Decision Flow
 
 ```
 Is this in current requirements?
 ├── NO → Don't implement (YAGNI)
 └── YES → Is there a simpler approach?
-    ├── YES → Use the simpler one (KISS)
-    └── NO → Is this duplicated 3+ times?
-        ├── NO → Keep duplicate (DRY caution)
-        └── YES → Abstract it (Safe DRY)
+    ├── YES → Use simpler one (KISS)
+    └── NO → Duplicated 3+ times?
+        ├── NO → Keep duplicate
+        └── YES → Abstract it
 ```
-
----
 
 ## Anti-Patterns
 
 ```toon
-anti_patterns[6]{pattern,problem,fix}:
-  Speculative features,"Adding unused methods 'just in case'",Only add when there's a ticket/story
-  Premature abstraction,"Generic interface for 1-2 use cases",Wait for 3rd occurrence
-  Excessive config,"20+ env vars for 3 endpoints",Only configure what varies
-  Future-proof params,"options?: { role? dept? metadata? }",Only current-need params
-  Unnecessary layers,"Controller→Service→Repository for simple CRUD",Direct implementation
-  Over-generic code,"processData<T K V> with 5 type params",Specific named functions
+anti_patterns[6]{pattern,fix}:
+  Speculative features,Only add when there's a ticket
+  Premature abstraction,Wait for 3rd occurrence
+  Excessive config,Only configure what varies
+  Future-proof params,Only current-need params
+  Unnecessary layers,Direct implementation for simple CRUD
+  Over-generic code,Specific named functions
 ```
 
----
+## Abstract vs Keep Duplicated
 
-## Good vs Bad Abstractions
+**Safe to abstract:** Pure utilities, business rules, API clients, design tokens.
+**Keep duplicated:** Similar UI components (diverge by context), similar validations (domain-specific), similar tests (must be independent).
 
-### Abstract These (Safe DRY)
-
-| Pattern | Example |
-|---------|---------|
-| Pure utilities | `formatDate()`, `slugify()`, `debounce()` |
-| Business rules | Tax calculation, discount logic |
-| API clients | `apiClient.get()`, `apiClient.post()` |
-| Design tokens | Colors, spacing, typography |
-
-### Keep Duplicated (Intentional WET)
-
-| Pattern | Why |
-|---------|-----|
-| Similar UI components | They'll diverge by context |
-| Similar validations | Business rules differ per domain |
-| Similar tests | Tests should be independent |
-| Similar error messages | Context-specific is better |
-
----
-
-## Checklist Before Adding Code
-
-```toon
-checklist[5]{question,if_no}:
-  "Is this in current requirements?",Don't add it
-  "Does a test exist for this feature?",Write test first or skip
-  "Will this be used in current sprint?",Defer to when needed
-  "Can I explain why this is needed NOW?",Remove it
-  "Is there a simpler alternative?",Use the simpler one
-```
-
-**If any answer is NO → Don't add it.**
-
----
-
-## Phase-Specific Guidelines
-
-| Phase | Focus |
-|-------|-------|
-| Phase 1 (Understand + Design) | Challenge every abstraction layer. Question "might need in future." |
-| Phase 3 (Build GREEN) | Start with naive implementation. Don't optimize until measured. |
-| Phase 4 (Refactor + Review) | Apply Rule of Three. Only abstract proven patterns. Flag over-engineering. |
-
----
-
-## Warning Signs of Over-Engineering
+## Warning Signs
 
 - "We might need this later" → YAGNI
 - "This is more flexible" → Flexibility without use case = complexity
-- "It's more enterprise-grade" → Enterprise doesn't mean complex
-- Many parameters or type switches → Abstraction too broad
 - More configuration than code → Over-configurable
-- Code needs comments to understand → Not self-explanatory
+- Many parameters or type switches → Abstraction too broad
 
----
-
-**Key Insight:** You can **design** for extensibility without **implementing** extensions. Three similar lines of code is better than a premature abstraction.
-
----
-
+Three similar lines of code is better than a premature abstraction.

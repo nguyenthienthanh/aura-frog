@@ -22,7 +22,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (27 Total)
+## Active Hooks (35 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)

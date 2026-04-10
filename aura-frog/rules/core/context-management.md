@@ -1,20 +1,10 @@
 # Rule: Context Management
 
-**Category:** System
 **Priority:** High
-**Scope:** All sessions
 
 ---
 
-## Purpose
-
-Optimize token usage and context efficiency to reduce costs and improve reasoning quality. Less noise = better focus.
-
----
-
-## Core Principles
-
-### 1. Minimal Initial Context
+## Core: Load Minimally, Compact Proactively
 
 ```toon
 context_tiers[3]{tier,tokens,loads}:
@@ -23,250 +13,58 @@ context_tiers[3]{tier,tokens,loads}:
   2-demand,variable,Framework patterns + detailed rules + full skills
 ```
 
-**Rule:** Start with Tier 0+1. Load Tier 2 only when task requires it.
-
-### 2. Progressive Loading
-
-```toon
-loading_rules[4]{trigger,action,reason}:
-  Framework task detected,Load framework bundle,Needed for implementation
-  Security concern mentioned,Load security rules,Safety critical
-  Test task requested,Load test patterns,Quality assurance
-  Design task detected,Load design systems,UI consistency
-```
-
-**Don't:** Load all 12 framework expert skills at session start
-**Do:** Load only the detected framework's patterns when needed
-
-### 3. Context Cleanup
-
-```toon
-cleanup_triggers[4]{trigger,action}:
-  Task completed,/clear if switching domains
-  Context >80%,/compact with focus instructions
-  Switching tech stack,Clear framework-specific context
-  Error spiral (3+ failed attempts),/clear and restart fresh
-```
+Start with Tier 0+1. Load Tier 2 only when task requires it.
 
 ---
 
-## Model Selection Guidelines
+## Progressive Loading
 
-Understand the model selection principles:
+Load framework/security/test/design patterns only when task triggers them. Never load all 12 framework skills at start — lazy-load via `skills/framework-expert/SKILL.md`.
 
-| Task Type | Recommended Model | Reasoning |
-|-----------|-------------------|-----------|
-| Typo/formatting | Haiku | No deep reasoning needed |
-| Bug fixes | Sonnet | Balance of speed and quality |
-| New features | Sonnet | Standard implementation |
-| Architecture | Opus | Needs deep reasoning |
-| Security audit | Opus | Safety critical |
-| Refactoring | Sonnet/Opus | Depends on scope |
-
----
-
-## Token Budget Awareness
-
-### Track Usage
-
-The status bar shows token percentage. Act on these thresholds:
+## Token Thresholds
 
 ```toon
-token_thresholds[4]{percent,action,reason}:
-  <50%,Continue normally,Plenty of context remaining
-  50-70%,Consider /compact,Preserve important context
-  70-85%,Use /compact now,"Focus on [task details]"
-  >85%,Finish task then /clear,Prevent mid-task compaction
+thresholds[4]{percent,action}:
+  <50%,Continue normally
+  50-70%,Consider /compact
+  70-85%,"/compact Focus on [task details]"
+  >85%,Finish task then /clear
 ```
 
-### Compact Instructions
+## Session Boundaries
 
-When using `/compact`, provide focus:
-
-```bash
-# Good - specific focus
-/compact Focus on the auth module implementation and test failures
-
-# Bad - no guidance
-/compact
-```
+**/clear when:** switching projects, switching domains, after major task, context cluttered, after architecture discussion.
+**Don't /clear:** mid-implementation, during debugging, multi-file refactor in progress.
 
 ---
 
 ## Efficient Exploration
 
-### Use Subagents for Verbose Tasks
+- Use subagents for verbose tasks (test suites, lint, coverage) — summary returns to main
+- Read specific functions/line ranges, not entire files
+- Grep then read matches, not read-all-to-find
+- Cache detection results via project cache
+
+---
+
+## 3-Tier Compression
 
 ```toon
-subagent_tasks[5]{task,reason}:
-  Run full test suite,Keep verbose output out of main context
-  Fetch large documentation,Summarize before returning
-  Explore unfamiliar codebase,Agent returns summary only
-  Generate coverage report,Return metrics not full output
-  Lint entire project,Return issue count not all warnings
-```
-
-**Pattern:** Verbose output stays in subagent. Summary returns to main.
-
-### Targeted File Reading
-
-```toon
-reading_rules[4]{do,dont,reason}:
-  Read specific functions,Read entire large files,Reduce noise
-  Use line ranges,Read 1000+ line files fully,Focus on relevant
-  Grep then read matches,Read all files to find pattern,Efficient search
-  Cache detection results,Re-scan project each task,Use project cache
+compression[3]{tier,trigger,action}:
+  MicroCompact,"Every 10 turns or >60%","Drop old tool outputs + collapse file reads + TOON summaries"
+  AutoCompact,">80%","/compact with focus instructions — preserves workflow state + decisions"
+  ManualCompact,"User request or handoff","Full session snapshot (state + git diff + blockers + next steps)"
 ```
 
 ---
 
-## Session Boundaries
+## Team Context (Agent Teams)
 
-### When to /clear
-
-```toon
-clear_triggers[5]{trigger,reason}:
-  Switching projects,Different tech stack and context
-  Switching domains (frontend→backend),Different patterns needed
-  After major task completion,Fresh context for next task
-  Context feels cluttered,Quality of responses degrading
-  After architectural discussion,Implementation needs clean start
-```
-
-### When NOT to /clear
-
-- Mid-implementation (lose context)
-- During debugging (need history)
-- Multi-file refactor in progress
-
----
-
-## Skill Loading Optimization
-
-### Current (Expensive)
-```
-Session start → Load 12 framework skills → 6000+ tokens used
-```
-
-### Optimized (Efficient)
-```
-Session start → Load framework-expert bundle → Detect tech → Load only needed patterns → 500-1000 tokens
-```
-
-**Implementation:** `skills/framework-expert/SKILL.md` provides lazy loading.
-
----
-
-## Anti-Patterns
+Teammates have **separate context windows** — no shared history.
 
 ```toon
-antipatterns[5]{pattern,problem,solution}:
-  Load all skills at start,Wastes 5000+ tokens,Use lazy loading
-  Read entire codebase,Overwhelms context,Targeted exploration
-  Never use /clear,Stale context degrades quality,Clear between tasks
-  Ignore token warnings,Mid-task compaction loses context,Act at 70%
-  Always use Opus,15x cost for trivial tasks,Use model router
+team_rules[3]{rule,detail}:
+  Explicit context,Lead must send all relevant context via messages or shared files
+  Targeted sharing,Send only relevant file paths and summaries — not entire codebase
+  File claiming,Use file claiming to prevent merge conflicts
 ```
-
----
-
-## Quick Reference
-
-```bash
-# Check context usage
-# Look at status bar percentage
-
-# Compact with focus
-/compact Focus on [specific task details]
-
-# Clear for fresh start
-/clear
-
-# Check project detection (avoid re-scanning)
-/project:status
-```
-
----
-
-## Team Context Management (Agent Teams)
-
-**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
-
-Teammates are independent Claude Code instances with **separate context windows**. This has critical implications:
-
-### Key Differences
-
-```toon
-team_context_rules[4]{rule,detail}:
-  No shared history,Teammates do NOT see the lead's conversation history
-  Explicit context passing,Lead must send all relevant context via messages or shared files
-  File-based sharing,Use shared task descriptions and file paths for context
-  Independent loading,Each teammate loads its own project context independently
-```
-
-### Context Passing Best Practices
-
-```toon
-context_passing[4]{method,when,example}:
-  Task description,Creating tasks,Include file paths + requirements + constraints
-  Teammate message,Handoff or clarification,Send specific decisions/changes made
-  Shared files,Phase deliverables,Write to plan directory then reference path
-  Task dependencies,Sequential work,blockedBy ensures ordering
-```
-
-### Anti-Patterns in Team Mode
-
-```toon
-team_antipatterns[3]{pattern,problem,solution}:
-  Assume teammate knows context,They have empty context,Include all relevant info in task/message
-  Send entire codebase as context,Overwhelms teammate context,Send only relevant file paths and summaries
-  Multiple teammates editing same file,Merge conflicts,Use file claiming conventions from agent docs
-```
-
----
-
-## 3-Tier Context Compression
-
-### Tier 1: MicroCompact (No API call)
-
-**Trigger:** Every 10 turns or context > 60%
-
-```toon
-microcompact_actions[5]{action,savings}:
-  Drop tool outputs older than 5 turns,~500-2000 tokens
-  Collapse repeated file reads (keep last),~200-500 tokens
-  Replace loaded file contents with pointers,~500-3000 tokens
-  Trim MCP responses to TOON summaries,~300-1000 tokens
-  Remove stale reasoning — keep conclusions only,~500-1500 tokens
-```
-
-### Tier 2: AutoCompact (API call — /compact)
-
-**Trigger:** Context > 80%
-
-1. Run MicroCompact first (reduce input size)
-2. Trigger `/compact` with specific focus instructions
-3. Output preserves: workflow state + key decisions + outcomes
-4. Phase deliverables stored as TOON snapshots
-
-### Tier 3: ManualCompact (User-triggered)
-
-**Trigger:** User request, `workflow:handoff`, or session restart
-
-Creates full session snapshot including workflow state, git diff, blockers, and next steps.
-
-**Details:** `docs/os-architecture.md`
-
----
-
-## Related Files
-
-- `rules/core/memory-trust-policy.md` - Memory as hint + write discipline
-- `skills/framework-expert/SKILL.md` - Lazy framework loading
-- `docs/REFACTOR_ANALYSIS.md` - Full optimization analysis
-- `hooks/lib/af-project-cache.cjs` - Project detection caching
-- `docs/AGENT_TEAMS_GUIDE.md` - Agent Teams setup guide
-- `docs/os-architecture.md` - OS architecture + process table
-
----
-

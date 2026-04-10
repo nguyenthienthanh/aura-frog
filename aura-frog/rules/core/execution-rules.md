@@ -1,361 +1,102 @@
 # Execution Rules
 
-**Priority:** CRITICAL - Behavioral constraints for all operations
-**Type:** Rule (Behavioral Constraints)
-**Updated:** v1.8.0 - Aligned with 2-gate workflow
+**Priority:** CRITICAL
+**Updated:** v1.8.0
 
 ---
 
-## Core Rule
+## ALWAYS
 
-These are the fundamental ALWAYS/NEVER rules that govern Aura Frog behavior across all operations.
+```toon
+always[10]{rule}:
+  Load project context before any task
+  Detect appropriate agent
+  Read command definition — follow exact steps
+  Follow phase order (phases build on each other)
+  Execute pre/post phase hooks
+  Run ESLint/TSLint + TypeScript check after implementation — fix ALL issues
+  Show deliverables at phase completion
+  Save workflow state
+  Approval phases (1 & 3): show gate → WAIT for explicit approval
+  Auto-continue phases (2, 4, 5): execute fully → show deliverables → continue
+```
 
----
+## NEVER
 
-## ALWAYS Do
-
-### Before Any Task
-
-| # | Rule | Why |
-|---|------|-----|
-| 2 | **Load project context** | Must follow project conventions |
-| 3 | **Detect appropriate agent** | Right specialist for the task |
-
-### During Workflow
-
-| # | Rule | Why |
-|---|------|-----|
-| 5 | **Read command definition** | Follow exact execution steps |
-| 6 | **Follow phase order** | Phases build on each other |
-| 7 | **Execute hooks** | Pre/post phase automation |
-| 8 | **Load relevant rules** | Apply quality standards |
-| 9 | **Activate appropriate agents** | Multi-agent collaboration |
-| 10 | **Generate deliverables** | Tangible outputs per phase |
-
-### After Implementation
-
-| # | Rule | Why |
-|---|------|-----|
-| 11 | **Run ESLint/TSLint** | Catch code quality issues |
-| 12 | **Run TypeScript check** | Verify type safety |
-| 13 | **Fix ALL lint issues** | Zero warnings policy |
-| 14 | **Verify clean output** | No errors before proceeding |
-
-### At Phase Completion
-
-| # | Rule | Why |
-|---|------|-----|
-| 10 | **Show deliverables** | User sees what was accomplished |
-| 11 | **Save workflow state** | Enable resume if interrupted |
-| 12 | **Show next step guidance** | User knows what happens next |
-
-#### For Approval Phases (Phase 1 & 3 only)
-| # | Rule | Why |
-|---|------|-----|
-| A1 | **Show approval gate** | Human oversight for critical decisions |
-| A2 | **Wait for explicit approval** | Design & implementation review |
-
-#### For Auto-Continue Phases (2, 4, 5)
-| # | Rule | Why |
-|---|------|-----|
-| AC1 | **Execute phase fully** | Phase is NOT skipped |
-| AC2 | **Show deliverables** | User sees what was done |
-| AC3 | **Continue automatically** | No wait for approval |
-| AC4 | **Stop on blockers** | Auto-stop if issues found |
-
-### After User Approval (Phase 1 & 3)
-
-| # | Rule | Why |
-|---|------|-----|
-| 13 | **IMMEDIATELY execute next phase** | Auto-continue flow |
-| 14 | **Show token usage** | Monitor consumption |
-| 15 | **Continue until next approval gate or blocker** | Efficient execution |
+```toon
+never[12]{rule}:
+  Auto-commit without explicit user confirmation (show files + message then ask)
+  Auto-push without explicit user confirmation
+  Commit credentials/tokens
+  Push to main/master without approval
+  Write to external systems without confirmation
+  Skip project context loading
+  Ignore approval gates at Phase 1 & 3
+  Skip auto-continue phases (must execute and show deliverables)
+  Implement without tests (TDD mandatory)
+  Skip RED phase in TDD
+  Ignore linter errors
+  Leave any/unknown types (TypeScript strictness)
+```
 
 ---
 
-## NEVER Do
+## Plan Mode
 
-### Plan Mode Integration
-
-| # | Rule | Why |
-|---|------|-----|
-| 0 | **Use Claude Code's native plan mode for planning tasks** (brainstorm, design, evaluate options). For full implementation, use Aura Frog's 5-phase workflow via `workflow:start`. The `planning` command creates a plan file that can be set as active plan with `plan:set` before starting a workflow. | Native plan mode is ideal for Quick/Standard tasks. The 5-phase workflow is for Deep complexity tasks requiring structured TDD. |
-
-### Context & Loading
-
-| # | Rule | Why |
-|---|------|-----|
-| 1 | **Skip project context loading** | Will use wrong conventions |
-| 2 | **Ignore CLAUDE.md hierarchy** | Miss critical instructions |
-| 3 | **Assume tech stack** | Must detect/verify |
-
-### Approvals & Safety
-
-| # | Rule | Why |
-|---|------|-----|
-| 4 | **Ignore approval gates (Phase 1 & 3)** | Critical decisions need user review |
-| 5 | **Skip auto-continue phases entirely** | Phases must execute and show deliverables |
-| 6 | **Skip confirmation for destructive actions** | Safety first |
-
-### Git Operations (CRITICAL)
-
-| # | Rule | Why |
-|---|------|-----|
-| 7 | **Auto-commit without explicit user confirmation** | User must review staged changes and approve before `git commit` runs. Show files + message, then ask. |
-| 8 | **Auto-push without explicit user confirmation** | User must approve before `git push` runs. Never push silently. |
-| 9 | **Commit credentials/tokens** | Security risk |
-| 10 | **Push to main/master without approval** | Critical branch protection |
-
-### External Systems
-
-| # | Rule | Why |
-|---|------|-----|
-| 11 | **Write to external systems without confirmation** | Side effects need approval |
-
-### Code Quality
-
-| # | Rule | Why |
-|---|------|-----|
-| 10 | **Implement without tests** | TDD is mandatory |
-| 11 | **Skip RED phase in TDD** | Tests must fail first |
-| 12 | **Ignore linter errors** | Code quality standard |
-| 13 | **Leave any/unknown types** | TypeScript strictness |
-
-### Workflow Control
-
-| # | Rule | Why |
-|---|------|-----|
-| 14 | **Skip phases without justification** | Phases exist for a reason |
-| 15 | **Proceed if tests don't pass** | Quality gate |
-| 16 | **Continue if coverage below target** | Coverage requirement |
+Use Claude Code's native plan mode for Quick/Standard tasks (brainstorm, design, evaluate).
+For Deep complexity: use `workflow:start` for structured 5-phase TDD.
 
 ---
 
 ## Blocking Conditions
 
-Execution MUST stop when:
+Stop execution on: user rejection, tests failing, coverage below target, linter errors, security vulnerabilities, token limit approaching (150K), external system errors, missing credentials.
 
-```yaml
-Blocking Events:
-  - User rejection ("reject", "stop", "cancel")
-  - Tests failing (in GREEN phase)
-  - Coverage below target
-  - Linter errors
-  - Security vulnerabilities detected
-  - Token limit approaching (150K warning)
-  - External system errors
-  - Missing required credentials
-```
+## Auto-Continue
 
----
-
-## Auto-Continue Conditions
-
-After approval, continue automatically until:
-
-```yaml
-Continue Until:
-  - Next approval gate reached
-  - Blocking condition encountered
-  - Workflow complete (Phase 5)
-  - User interruption
-  - Token limit reached
-```
-
----
-
-## Execution Flow Checklist
-
-### Phase Start
-```markdown
-- [ ] Agent change announced if different from previous phase
-- [ ] Project context loaded
-- [ ] Phase guide read
-- [ ] Relevant rules loaded
-- [ ] Pre-phase hook executed
-```
-
-### Phase Execution
-```markdown
-- [ ] Following phase steps exactly
-- [ ] Generating required deliverables
-- [ ] Applying quality rules
-- [ ] Running tests (if applicable)
-- [ ] Checking coverage (if applicable)
-```
-
-### Phase Complete
-```markdown
-- [ ] All deliverables generated
-- [ ] Quality checks passed
-- [ ] State saved
-- [ ] Post-phase hook executed
-- [ ] Approval gate shown
-- [ ] Waiting for user response
-```
+After approval, continue until: next approval gate, blocking condition, workflow complete (Phase 5), user interruption, or token limit.
 
 ---
 
 ## Exception Handling
 
-### When Rules Conflict
-
 **Priority:** Project rules > Plugin rules > Generic rules
 
-```yaml
-Example:
-  Plugin: "Test coverage must be 80%"
-  Project: "Test coverage must be 90%"
-  Result: Use 90% (project wins)
-```
+**User requests skip:** Check if allowed → Document reason → Proceed or explain why not.
 
-### When User Requests Skip
-
-```yaml
-User: "Skip phase 3"
-Action:
-  1. Check if skip is allowed (see phase-skipping skill)
-  2. If allowed: Document reason, proceed
-  3. If not allowed: Explain why, suggest alternatives
-```
-
-### When Token Limit Approaching
-
-```yaml
-At 150K tokens (75% of 200K):
-  1. Show warning
-  2. Suggest handoff
-  3. Save state automatically
-  4. Provide resume instructions
-```
+**Token limit (150K):** Warn → Suggest handoff → Auto-save state.
 
 ---
 
-## Enforcement Examples
+## Team Mode (Agent Teams)
 
-### Correct Behavior
-
-```markdown
-✅ User: "Implement feature X"
-   Agent:
-   2. Loads project context
-   3. Starts Phase 1
-   4. Shows approval gate
-   5. Waits for approval
-```
-
-### Incorrect Behavior
-
-```markdown
-❌ User: "Implement feature X"
-   Agent:
-   2. Assumes React project
-   3. Starts coding immediately
-   4. No approval gate
-   5. Commits without review
-```
-
----
-
-## Quick Reference
-
-### ALWAYS Checklist
-```
-□ Load project context
-□ Follow phase order
-□ Run lint after implementation (eslint/tslint)
-□ Run TypeScript check (tsc --noEmit)
-□ Fix ALL lint issues before proceeding
-□ Show deliverables at each phase completion
-□ Show next step guidance (commands & suggestions)
-□ Wait for approval at Phase 1 & 3 only
-□ Auto-continue through other phases
-□ Save state
-□ Run tests
-□ Check coverage
-```
-
-### NEVER Checklist
-```
-□ Auto-commit without user confirmation (show files + message, ask first)
-□ Auto-push without user confirmation (never push silently)
-□ Skip context loading
-□ Skip auto-continue phases (must execute & show deliverables)
-□ Ignore approval gates at Phase 1 & 3
-□ Skip tests
-□ Ignore linter
-□ Commit secrets
-□ Push to main without approval
-□ Continue on blockers (tests fail, coverage low, security issues)
-```
-
-### Phase Behavior Summary
-```
-Approval Phases (1, 3):      Execute → Show → WAIT → User approves → Continue
-Auto-Continue Phases (2,4,5): Execute → Show → Continue automatically
-Auto-Stop (on blockers):     Execute → Issue found → STOP for fix
-```
-
----
-
-## Team Mode Rules (Agent Teams)
-
-**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is enabled.
-
-### Complexity Gate (CRITICAL — Token Savings)
+**When:** `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` enabled.
 
 ```toon
-team_gate[4]{complexity,domains,mode,token_cost}:
-  Quick,any,single agent,1x (baseline)
-  Standard,any,subagent,1x (baseline)
-  Deep,1 domain,subagent,1x (baseline)
-  Deep,2+ domains (≥50 each),team,~3x (parallel contexts)
+team_gate[4]{complexity,domains,mode,cost}:
+  Quick,any,single agent,1x
+  Standard,any,subagent,1x
+  Deep,1 domain,subagent,1x
+  Deep,2+ domains (≥50 each),team,~3x
 ```
 
-**Team mode ONLY activates for Deep + multi-domain tasks.** This saves ~3x tokens for all Quick and Standard tasks. The complexity gate is enforced by agent-detector — if it returns `Mode: subagent`, do NOT create a team.
+Team mode ONLY for Deep + multi-domain. If agent-detector returns `Mode: subagent`, do NOT create a team.
 
-### Parallel Startup Sequence
+**Startup:** TeamCreate → TaskCreate × N (one message) → Task × N (parallel) → teammates work independently.
 
+```toon
+team_always[6]{rule}:
+  Max 3 teammates per phase
+  Pass complete context to teammates
+  Use TaskCreate for all work items
+  Claim files before editing via TaskUpdate
+  Use SendMessage for handoffs
+  Spawn teammates in parallel (one message)
+
+team_never[5]{rule}:
+  Team mode for Quick/Standard tasks
+  Teammates commit independently (only lead manages git)
+  Skip file claiming
+  Create more than 3 teammates per phase
+  Teammates advance phases (only lead manages transitions)
 ```
-1. TeamCreate(team_name, description)               ← create team + task list
-2. TaskCreate × N (all in one message)              ← create all phase tasks upfront
-3. Task × N with team_name (all in one message)     ← spawn teammates in PARALLEL
-4. Teammates: TaskList → claim → work → complete    ← independent parallel work
-5. Lead: monitor messages → assign cross-review     ← coordinate
-6. Lead: shutdown teammates → advance phase         ← transition
-```
-
-### ALWAYS (Team Mode)
-
-| # | Rule | Why |
-|---|------|-----|
-| T1 | **Max 3 teammates per phase** | Prevent coordination overhead |
-| T2 | **Pass complete context to teammates** | They don't share conversation history |
-| T3 | **Use TaskCreate for all work items** | Shared task list prevents duplicate work |
-| T4 | **Claim files before editing via TaskUpdate** | Prevents merge conflicts |
-| T5 | **Use SendMessage for all handoffs** | Explicit coordination, lead has visibility |
-| T6 | **Spawn teammates in parallel (one message)** | Multiple Task calls = parallel start |
-
-### NEVER (Team Mode)
-
-| # | Rule | Why |
-|---|------|-----|
-| T7 | **Use team mode for Quick/Standard tasks** | Wastes ~3x tokens with no benefit |
-| T8 | **Teammates commit independently** | Only lead manages git operations |
-| T9 | **Skip file claiming** | Causes merge conflicts |
-| T10 | **Create more than 3 teammates per phase** | Coordination overhead exceeds benefit |
-| T11 | **Let teammates advance phases** | Only lead manages phase transitions |
-
-### Team Mode Quick Reference
-
-```
-GATE:    Deep complexity + 2+ domains + Agent Teams enabled → team mode
-STARTUP: TeamCreate → TaskCreate × N → Task × N (parallel) → teammates work
-LEAD:    Creates teammates → Distributes tasks → Manages phases → Commits
-MATE:    TaskList → claim → work → TaskUpdate(completed) → SendMessage(lead)
-CLOSE:   Lead sends shutdown_request → teammates approve → next phase
-```
-
----
-
-**Last Updated:** 2026-02-09

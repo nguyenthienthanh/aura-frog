@@ -4,6 +4,42 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.2.0] - 2026-04-10
+
+### Changed
+- **Documentation reorganization** — Separated human docs (`/docs/`) from AI instruction files (`aura-frog/docs/`). Human docs organized into: getting-started, architecture, guides, operations, reference, showcase
+- **Token optimization (62% reduction)** — Rewrote 65+ instruction files across all 3 tiers for token efficiency
+  - Tier 1 (always loaded): 6,144 → 2,911 lines (53% reduction, ~9,700 tokens/session saved)
+  - Tier 2 (per agent): 7,791 → 2,739 lines (65% reduction)
+  - Tier 3 (per phase): 4,461 → 1,384 lines (69% reduction)
+- **CLAUDE.md** — 293 → 216 lines (27%), compressed TOON tables and removed redundant sections
+- **Commands count** — 87 → 90 (3 new commands tracked)
+- **Hooks count** — 27 → 35 (8 new hooks tracked)
+
+### Added
+- `docs/README.md` — Central human documentation index with 6 categories
+- `docs/getting-started/` — GET_STARTED, QUICKSTART, FIRST_WORKFLOW_TUTORIAL
+- `docs/architecture/` — OS architecture, config loading, workflow state, diagrams
+- `docs/guides/` — Agent selection, teams, design systems, TOON format, usage
+- `docs/operations/` — MCP, troubleshooting, security, learning system, cache
+- `docs/reference/` — CHANGELOG, TESTING_GUIDE
+- `aura-frog/docs/os-architecture.md` — Compact TOON AI reference
+- `aura-frog/docs/styling-detection.md` — Compact TOON AI reference
+- `aura-frog/docs/usage-clarifications.md` — Compact TOON AI reference
+- `aura-frog/templates/README.md` — Index of 15 document templates
+
+### Removed
+- `aura-frog/docs/RELEASE_NOTES.md` — Redundant with CHANGELOG.md
+- `aura-frog/docs/PLUGIN_INSTALLATION.md` — Content merged into GET_STARTED.md
+- `aura-frog/docs/guides/COMMANDS_GUIDE.md` — Content merged into commands/README.md
+
+### Fixed
+- Component counts synced across all files (Commands: 90, Hooks: 35, Skills: 44, Rules: 45)
+- Cross-links added to 18 previously orphaned documentation files
+- Global CLAUDE.md version updated from 2.2.1 to 3.2.0
+
+---
+
 ## [3.1.0] - 2026-04-06
 
 ### Added

@@ -1,13 +1,11 @@
-# Frontend Agent - Full Reference Patterns
+# Frontend Agent - Reference Patterns
 
-**Source Agent:** `agents/frontend.md`
+**Source:** `agents/frontend.md`
 **Load:** On-demand when deep frontend/UI expertise needed
 
 ---
 
 ## Framework Patterns
-
-### React
 
 ```toon
 react_patterns[6]{pattern,implementation}:
@@ -19,8 +17,6 @@ react_patterns[6]{pattern,implementation}:
   Data Fetching,TanStack Query or SWR + loading/error states
 ```
 
-### Vue 3
-
 ```toon
 vue_patterns[6]{pattern,implementation}:
   Components,Script setup + TypeScript + defineProps/defineEmits
@@ -31,8 +27,6 @@ vue_patterns[6]{pattern,implementation}:
   Async,Suspense + async components + error handling
 ```
 
-### Angular
-
 ```toon
 angular_patterns[6]{pattern,implementation}:
   Components,Standalone + signals for state
@@ -42,8 +36,6 @@ angular_patterns[6]{pattern,implementation}:
   HTTP,Typed HTTP client + interceptors
   Change Detection,OnPush + async pipe + signals
 ```
-
-### Next.js
 
 ```toon
 nextjs_patterns[6]{pattern,implementation}:
@@ -59,8 +51,6 @@ nextjs_patterns[6]{pattern,implementation}:
 
 ## Design System Integration
 
-### Supported Systems
-
 ```toon
 design_systems[10]{system,detection,approach}:
   Material UI (MUI),@mui/material in deps,sx prop + theme customization
@@ -75,59 +65,26 @@ design_systems[10]{system,detection,approach}:
   Headless UI,@headlessui/react,Unstyled + Tailwind styling
 ```
 
-### Theme Configuration
-
-```typescript
-// MUI Theme Example
-const theme = createTheme({
-  palette: {
-    primary: { main: '#1976d2' },
-    secondary: { main: '#dc004e' },
-  },
-  typography: {
-    fontFamily: 'Inter, sans-serif',
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: { borderRadius: 8 },
-      },
-    },
-  },
-});
-```
-
 ---
 
 ## Component Architecture
 
-### Composition Patterns
-
 ```toon
 composition[5]{pattern,when_to_use,example}:
-  Compound Components,Related components that share state,Tabs + TabList + Tab + TabPanel
+  Compound Components,Related components sharing state,Tabs + TabList + Tab + TabPanel
   Render Props,Dynamic rendering logic,<List renderItem={(item) => ...}>
   Slots/Children,Flexible content injection,<Card header={...} footer={...}>
   HOC,Cross-cutting concerns (legacy),withAuth(Component)
   Hooks,Reusable logic extraction,useForm() usePagination()
 ```
 
-### Props Design
+### Props Design Principles
 
-```toon
-props_design[5]{principle,guideline}:
-  Minimal API,Only expose what's needed - less is more
-  Consistent Naming,onClick/onChange/onSubmit patterns
-  Defaults,Sensible defaults reduce required props
-  Types,Explicit TypeScript types + JSDoc
-  Composition,Prefer children over complex config objects
-```
+Minimal API (expose only what's needed). Consistent naming (onClick/onChange/onSubmit). Sensible defaults. Explicit TypeScript types. Prefer children over complex config objects.
 
 ---
 
-## Accessibility (A11y)
-
-### WCAG 2.1 Checklist
+## Accessibility (WCAG 2.1)
 
 ```toon
 accessibility[8]{category,requirements}:
@@ -139,22 +96,6 @@ accessibility[8]{category,requirements}:
   Images,Alt text + decorative images aria-hidden
   Focus,Visible focus indicator + logical tab order
   Motion,Reduced motion support + no auto-play
-```
-
-### ARIA Patterns
-
-```html
-<!-- Button with loading state -->
-<button aria-busy="true" aria-disabled="true">
-  <span aria-hidden="true">Loading...</span>
-  <span class="sr-only">Please wait, submitting form</span>
-</button>
-
-<!-- Modal dialog -->
-<div role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <h2 id="modal-title">Confirm Action</h2>
-  <!-- Focus trap implementation -->
-</div>
 ```
 
 ---
@@ -170,25 +111,11 @@ breakpoints[5]{name,size,target}:
   2xl,1536px,Large screens
 ```
 
-**Mobile-First Approach:**
-```css
-/* Base mobile styles */
-.card { padding: 1rem; }
-
-/* Tablet and up */
-@media (min-width: 768px) {
-  .card { padding: 2rem; }
-}
-
-/* Desktop and up */
-@media (min-width: 1024px) {
-  .card { padding: 3rem; }
-}
-```
+Mobile-first approach: base styles for mobile, progressive enhancement via media queries.
 
 ---
 
-## Performance Optimization
+## Performance
 
 ```toon
 performance[8]{technique,implementation}:
@@ -200,28 +127,6 @@ performance[8]{technique,implementation}:
   Fonts,font-display: swap + preload + subset
   Third-Party,Defer non-critical + facade pattern
   Core Web Vitals,LCP <2.5s + INP <200ms + CLS <0.1
-```
-
----
-
-## Form Handling
-
-### React Hook Form + Zod
-
-```typescript
-const schema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Min 8 characters'),
-});
-
-const { register, handleSubmit, formState: { errors } } = useForm({
-  resolver: zodResolver(schema),
-});
-
-<form onSubmit={handleSubmit(onSubmit)}>
-  <input {...register('email')} aria-invalid={!!errors.email} />
-  {errors.email && <span role="alert">{errors.email.message}</span>}
-</form>
 ```
 
 ---
@@ -239,7 +144,7 @@ state_choice[5]{approach,when_to_use}:
 
 ---
 
-## Animation Patterns
+## Animation
 
 ```toon
 animations[4]{type,library,use_case}:
@@ -247,41 +152,4 @@ animations[4]{type,library,use_case}:
   CSS Animations,Native CSS,Looping animations + keyframes
   Framer Motion,framer-motion,Complex React animations
   React Spring,@react-spring/web,Physics-based animations
-```
-
----
-
-## Output Format
-
-When providing UI guidance:
-
-```markdown
-## Component Design
-
-### Requirements
-[What the component needs to do]
-
-### Props Interface
-```typescript
-interface Props {
-  // Props with descriptions
-}
-```
-
-### Accessibility
-- [A11y consideration 1]
-- [A11y consideration 2]
-
-### Responsive Behavior
-- Mobile: [behavior]
-- Tablet: [behavior]
-- Desktop: [behavior]
-
-### States
-- Default
-- Hover
-- Focus
-- Disabled
-- Loading
-- Error
 ```

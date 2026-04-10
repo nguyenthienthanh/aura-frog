@@ -16,11 +16,11 @@ performance_gates[5]{metric,target,tool}:
   Touch Response,<100ms visual feedback,Manual testing
 ```
 
-**FAIL the build if animations drop below 60fps. No exceptions.**
+**FAIL the build if animations drop below 60fps.**
 
 ---
 
-## Mobile UX Requirements (Every Screen)
+## Mobile UX Requirements
 
 ### Touch Targets (Non-Negotiable)
 
@@ -32,41 +32,37 @@ touch_targets[4]{element,minimum_size,spacing}:
   Icons/links,44x44dp touch area,Even if icon is 24px
 ```
 
-### One-Handed Use (49% of Users)
+### Thumb Zones (One-Handed Use)
 
 ```toon
 thumb_zones[3]{zone,position,use_for}:
-  Easy reach (green),Bottom 40% of screen,Primary actions + FAB + navigation
-  Medium reach (yellow),Middle 40%,Content + secondary actions
-  Hard reach (red),Top 20%,Rarely used + close buttons + overflow menus
+  Easy (green),Bottom 40%,Primary actions + FAB + navigation
+  Medium (yellow),Middle 40%,Content + secondary actions
+  Hard (red),Top 20%,Rarely used + close + overflow menus
 ```
 
-**ALWAYS place primary CTA at bottom of screen within thumb reach.**
+**Primary CTA at bottom of screen within thumb reach.**
 
 ---
 
-## Platform Conventions (Must Follow)
-
-### iOS (Apple Human Interface Guidelines)
+## Platform Conventions
 
 ```toon
 ios_patterns[6]{element,pattern}:
-  Navigation,Large titles + back text + swipe-to-go-back gesture
-  Tab bar,Bottom (max 5 tabs) + labels always visible
-  Buttons,System blue #007AFF + SF Symbols icons
+  Navigation,Large titles + back text + swipe-to-go-back
+  Tab bar,Bottom (max 5) + labels always visible
+  Buttons,System blue #007AFF + SF Symbols
   Modals,Sheet from bottom + swipe down to dismiss
   Destructive actions,Red text + confirmation sheet
   Haptics,UIImpactFeedbackGenerator on significant actions
 ```
 
-### Android (Material Design 3)
-
 ```toon
 android_patterns[6]{element,pattern}:
   Navigation,Top app bar + NavigationDrawer or BottomNav
-  FAB,Bottom right + primary action + ripple effect
-  Buttons,Filled/Outlined/Text variants + Material You colors
-  Modals,Full-screen or bottom sheet + scrim behind
+  FAB,Bottom right + primary action + ripple
+  Buttons,Filled/Outlined/Text + Material You colors
+  Modals,Full-screen or bottom sheet + scrim
   Snackbars,Bottom + action button + auto-dismiss (4s)
   Haptics,HapticFeedbackConstants on key interactions
 ```
@@ -75,88 +71,13 @@ android_patterns[6]{element,pattern}:
 
 ## Implementation Patterns
 
-### Lists (FlashList/FlatList)
+**Lists:** Use FlashList for large lists with `estimatedItemSize`. Memoize `renderItem` with `useCallback`. Never use `ScrollView` with `.map()` for lists.
 
-```tsx
-// ALWAYS: Use FlashList for large lists
-import { FlashList } from '@shopify/flash-list';
+**Navigation:** Type-safe with `RootStackParamList` typing on `useNavigation`.
 
-<FlashList
-  data={items}
-  renderItem={renderItem}
-  estimatedItemSize={72}  // REQUIRED: measure your item height
-  keyExtractor={keyExtractor}
-/>
+**Animations:** Use Reanimated (`useSharedValue`, `withSpring`, `useAnimatedStyle`). Use Gesture Handler for gestures. 60fps required.
 
-// ALWAYS: Memoize renderItem
-const renderItem = useCallback(({ item }) => (
-  <MemoizedListItem item={item} onPress={handlePress} />
-), [handlePress]);
-
-// NEVER: ScrollView with .map() for lists
-// NEVER: Inline arrow functions in renderItem
-```
-
-### Navigation
-
-```tsx
-// ALWAYS: Type-safe navigation
-type RootStackParamList = {
-  Home: undefined;
-  Profile: { userId: string };
-};
-
-const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-navigation.navigate('Profile', { userId: '123' });
-```
-
-### Gestures & Animations (60fps Required)
-
-```tsx
-// ALWAYS: Use Reanimated for animations
-import Animated, { useSharedValue, withSpring, useAnimatedStyle } from 'react-native-reanimated';
-
-const scale = useSharedValue(1);
-const animatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: scale.value }]
-}));
-
-// ALWAYS: Use Gesture Handler for gestures
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-
-const panGesture = Gesture.Pan()
-  .onUpdate((e) => {
-    translateX.value = e.translationX;
-  });
-```
-
-### Loading & Error States
-
-```tsx
-// ALWAYS: Skeleton screens that match content layout
-function UserListSkeleton() {
-  return (
-    <View>
-      {[1,2,3].map(i => (
-        <View key={i} className="flex-row items-center p-4 gap-3">
-          <View className="w-12 h-12 rounded-full bg-gray-200 animate-pulse" />
-          <View className="flex-1 gap-2">
-            <View className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
-            <View className="h-3 w-1/2 bg-gray-200 rounded animate-pulse" />
-          </View>
-        </View>
-      ))}
-    </View>
-  );
-}
-
-// ALWAYS: Pull-to-refresh for lists
-<FlatList refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} />
-
-// ALWAYS: Haptic feedback on significant actions
-import * as Haptics from 'expo-haptics';
-Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-```
+**Loading states:** Skeleton screens matching content layout. Pull-to-refresh for lists. Haptic feedback on significant actions.
 
 ---
 
@@ -188,25 +109,6 @@ competencies[10]{area,technologies}:
 
 ---
 
-## Deliverables by Phase
-
-| Phase | Output | Quality Gates |
-|-------|--------|---------------|
-| 2 (Design) | Screen specs, navigation flow | Touch targets defined, platform variants |
-| 5a (UI) | Screens with platform conventions | 60fps verified, gestures implemented |
-| 5b (Build) | Features, API integration, offline | Error/loading states, haptics added |
-| 7 (Verify) | Unit tests, E2E tests | Both platforms tested, Detox passing |
-| 8 (Docs) | Setup guide, deep link config | Platform-specific notes included |
-
----
-
 ## Quality Checklist (Every PR)
 
-- [ ] Touch targets >=48dp for primary, >=44dp for secondary
-- [ ] Primary actions in bottom 40% of screen
-- [ ] 60fps animations verified with Perf Monitor
-- [ ] Loading skeletons match content layout
-- [ ] Error states have retry actions
-- [ ] Haptic feedback on significant interactions
-- [ ] Tested on both iOS and Android
-- [ ] Swipe gestures work where expected (back, dismiss, refresh)
+Touch targets >=48dp primary/>=44dp secondary. Primary actions in bottom 40%. 60fps verified. Skeleton loaders match content. Error states have retry. Haptic feedback on key interactions. Tested on both iOS and Android. Swipe gestures work (back, dismiss, refresh).

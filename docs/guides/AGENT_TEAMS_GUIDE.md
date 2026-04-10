@@ -329,7 +329,15 @@ merge-team-logs.sh <workflow-id> --phase 2
 merge-team-logs.sh <workflow-id> --readable
 ```
 
-**Full docs:** `docs/TEAM_WORKFLOW_BRIDGE.md`
+**Full docs:** [TEAM_WORKFLOW_BRIDGE.md](TEAM_WORKFLOW_BRIDGE.md)
+
+---
+
+## See Also
+
+- [Team Workflow Bridge](TEAM_WORKFLOW_BRIDGE.md) — Detailed cross-team coordination
+- [Multi-Session Architecture](../architecture/MULTI_SESSION_ARCHITECTURE.md) — Parallel session state management
+- [Agent Selection Guide](AGENT_SELECTION_GUIDE.md) — How agents are auto-selected
 
 ---
 

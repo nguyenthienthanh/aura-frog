@@ -403,4 +403,8 @@ Which should I use as the primary?
 ---
 
 **Maintained by:** Aura Frog Team
-**Questions?** See the related skills and rules for detailed guidance.
+
+## See Also
+
+- [Styling Detection Guide](STYLING_DETECTION_GUIDE.md) — How agents auto-detect CSS frameworks
+- `skills/design-system-library/` — Design system selection skill

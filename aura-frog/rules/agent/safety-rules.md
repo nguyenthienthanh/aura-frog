@@ -4,276 +4,77 @@
 
 ---
 
-## 🛡️ Core Safety Principles
+## Core Principle
 
-### 1. Always Confirm Before Writing
-**Rule:** NEVER write to external systems without explicit user confirmation
-
-**Applies to:**
-- JIRA (status updates, comments, subtasks)
-- Confluence (page creation, updates)
-- Slack (notifications)
-- Linear (issue updates)
-- Git (commits, pushes)
-
-**Enforcement:** Show confirmation prompt, wait for user response
+**NEVER write to external systems without explicit user confirmation. Read-only operations are safe.**
 
 ---
 
-## ⚠️ Confirmation Required
+## Confirmation Required
 
-### JIRA Operations
-```markdown
-⚠️ **CONFIRMATION REQUIRED: JIRA Write**
+These operations require showing a confirmation prompt and waiting for user response:
 
-**Action:** Update ticket status
-**Ticket:** PROJPH-1234
-**From:** In Progress
-**To:** Code Review
-
-**Type "confirm" to proceed or "cancel" to skip**
+```toon
+confirm_required[5]{system,operations}:
+  JIRA,"Status updates, comments, subtasks"
+  Confluence,"Page creation, updates"
+  Slack,Notifications
+  Linear,Issue updates
+  Git,"Commits, pushes"
 ```
 
-### Confluence Operations
-```markdown
-⚠️ **CONFIRMATION REQUIRED: Confluence Write**
-
-**Action:** Create page
-**Space:** PROJ
-**Title:** "Implementation Summary"
-
-**Preview:**
-[First 500 chars of content]
-
-**Type "confirm" to proceed or "cancel" to skip**
-```
-
-### Git Operations
-```markdown
-⚠️ **CONFIRMATION REQUIRED: Git Commit**
-
-**Files to commit:** 5 files
-- src/features/sharing/ShareModal.tsx
-- src/features/sharing/ShareModal.test.tsx
-- ... (3 more)
-
-**Commit message:**
-feat(sharing): implement social media sharing
-
-**Type "confirm" to proceed**
-```
+Confirmation format: show action + target + details, then wait for "confirm" or "cancel".
 
 ---
 
-## ✅ No Confirmation Needed (Read-Only)
+## Safe (No Confirmation)
 
-Safe operations that don't modify data:
-- ✅ Fetch JIRA tickets
-- ✅ Read Confluence pages
-- ✅ List Linear issues
-- ✅ Git status, log, diff
-- ✅ Send Slack notifications (informational only)
+Read-only: fetch JIRA tickets, read Confluence pages, list Linear issues, git status/log/diff.
 
 ---
 
-## 🚫 Forbidden Operations
+## Forbidden (Never Auto-Execute)
 
-### Never Auto-Execute:
-- ❌ Delete JIRA tickets
-- ❌ Delete Confluence pages
-- ❌ Force push to Git
-- ❌ Delete Git branches
-- ❌ Modify production data
-- ❌ Run database migrations in production
+Delete JIRA tickets, delete Confluence pages, force push, delete branches, modify production data, run production migrations.
 
-**If user requests these:** Warn about risks and require explicit "I understand" confirmation
+If user requests these: warn about risks, require explicit "I understand" confirmation.
 
 ---
 
-## 🔐 Security Rules
+## API Keys & Tokens
 
-### API Keys & Tokens
-```yaml
-Storage:
-  ✅ Environment variables
-  ✅ .envrc (with direnv)
-  ❌ Never in code
-  ❌ Never in config files
-  ❌ Never in git
-
-Access:
-  ✅ Read from process.env
-  ✅ Masked in logs
-  ❌ Never log full tokens
-  ❌ Never show in UI
-```
-
-### Sensitive Data
-```yaml
-Never log or expose:
-  - API tokens
-  - Passwords
-  - Private keys
-  - User PII
-  - Database credentials
-
-Always redact:
-  - Tokens in error messages
-  - Credentials in stack traces
-  - Sensitive data in reports
-```
+- Store in environment variables / .envrc (never in code, config files, or git)
+- Mask in logs, never show full tokens in UI
+- Redact in error messages and stack traces
 
 ---
 
-## ⏸️ Approval Gates (v1.8.0 - Streamlined)
+## Approval Gates
 
-### Phase Approval Gates
-```markdown
-Only 2 approval gates (Phase 1 & 3):
-
-Phase 1: Understand + Design → ✋ APPROVAL REQUIRED
-Phase 2: Test RED            → ⚡ Auto-continue (auto-stop if tests pass)
-Phase 3: Build GREEN         → ✋ APPROVAL REQUIRED
-Phase 4: Refactor + Review   → ⚡ Auto-continue (auto-stop on security issues or test failures)
-Phase 5: Finalize            → ⚡ Auto (read-only)
-
-Auto-continue = Execute phase, show deliverables, continue (no wait)
-Auto-stop = Stop if issues found (tests fail, security issues, etc.)
+```toon
+phase_gates[5]{phase,gate}:
+  Phase 1 (Understand + Design),APPROVAL REQUIRED
+  Phase 2 (Test RED),Auto-continue (auto-stop if tests pass)
+  Phase 3 (Build GREEN),APPROVAL REQUIRED
+  Phase 4 (Refactor + Review),Auto-continue (auto-stop on security/test issues)
+  Phase 5 (Finalize),Auto (read-only)
 ```
 
-### Code Generation Gates
-```markdown
-Before generating/modifying code:
-
-1. Show files to be affected
-2. Describe changes
-3. Estimate impact (LOC, breaking changes)
-4. Request approval
-
-User must type "proceed" or "confirm"
-```
+Before generating/modifying code: show affected files, describe changes, estimate impact, request approval.
 
 ---
 
-## 🎯 Error Handling
+## Error Handling
 
-### Failed Operations
-```typescript
-try {
-  await jiraApi.updateStatus(ticketId, newStatus);
-} catch (error) {
-  // Log error (sanitized)
-  logger.error('JIRA update failed', {
-    ticketId,
-    // Don't log token or sensitive data
-  });
-  
-  // User-friendly message
-  showError('Failed to update JIRA ticket. Please try again or update manually.');
-  
-  // Don't throw - allow workflow to continue
-}
-```
-
-### Rollback on Failure
-```typescript
-// If multi-step operation fails, rollback completed steps
-try {
-  await step1();
-  await step2();
-  await step3(); // Fails here
-} catch (error) {
-  // Rollback step2 and step1
-  await rollback();
-  throw new RollbackError('Operation failed, changes reverted');
-}
-```
+- Log errors (sanitized, no sensitive data)
+- Show user-friendly message
+- Don't throw — allow workflow to continue
+- For multi-step operations: rollback completed steps on failure
 
 ---
 
-## 📝 Audit Trail
+## Emergency Stop
 
-### Log All External Writes
-```typescript
-interface AuditLog {
-  timestamp: Date;
-  action: string;
-  system: 'jira' | 'confluence' | 'git' | 'slack';
-  userId: string;
-  details: {
-    before?: any;
-    after?: any;
-    approved: boolean;
-  };
-}
-
-// Log every write operation
-await auditLogger.log({
-  timestamp: new Date(),
-  action: 'jira:update_status',
-  system: 'jira',
-  userId: currentUser.id,
-  details: {
-    before: 'In Progress',
-    after: 'Code Review',
-    approved: true,
-  },
-});
-```
+User types "stop", "cancel", or "abort" → immediately halt all operations, rollback pending changes.
 
 ---
-
-## 🔄 Retry Logic
-
-### Safe Retry Pattern
-```typescript
-async function safeRetry<T>(
-  operation: () => Promise<T>,
-  maxRetries: number = 3
-): Promise<T> {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await operation();
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-      
-      // Exponential backoff
-      await sleep(Math.pow(2, i) * 1000);
-    }
-  }
-}
-
-// Usage
-await safeRetry(() => jiraApi.updateStatus(id, status));
-```
-
----
-
-## ✅ Checklist Before External Write
-
-- [ ] User explicitly requested this action
-- [ ] Confirmation prompt shown
-- [ ] User confirmed (typed "confirm")
-- [ ] Operation is safe (no destructive action)
-- [ ] Sensitive data redacted from logs
-- [ ] Audit log entry created
-- [ ] Error handling in place
-- [ ] Rollback plan exists
-- [ ] User notified of result
-
----
-
-## 🚨 Emergency Stop
-
-### User Can Always Stop
-```
-User types: "stop", "cancel", "abort"
-→ Immediately halt all operations
-→ Rollback pending changes
-→ Return to safe state
-```
-
----
-
-**Remember:** When in doubt, ASK for confirmation. Better safe than sorry! 🛡️
-

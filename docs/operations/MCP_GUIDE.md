@@ -459,6 +459,14 @@ async function getCachedData(key: string) {
 
 ---
 
+## See Also
+
+- [Confluence Operations Guide](../guides/CONFLUENCE_OPERATIONS.md) — Using the Confluence MCP integration
+- [Image Analysis Guide](../guides/IMAGE_ANALYSIS.md) — Visual analysis with Figma and screenshots
+- [Config Loading Order](../architecture/CONFIG_LOADING_ORDER.md) — How MCP config fits into the loading chain
+
+---
+
 ## Resources
 
 - [MCP Official Docs](https://modelcontextprotocol.io)

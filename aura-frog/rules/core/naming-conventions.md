@@ -1,205 +1,48 @@
 # Naming Conventions
 
-**Category:** Code Quality
 **Priority:** High
 **Enforcement:** Linter + Code Review
 
 ---
 
-## ⚠️ Merge With Project Config
+## Project Config Priority
 
-**IMPORTANT:** These conventions MERGE with project's ESLint naming rules.
-
-```
-Project config overrides conflicts → Aura Frog fills gaps → Combined result
-```
-
-- If project defines naming rules → Project wins
-- If project is silent → These conventions apply
-
-**See:** `rules/project-linting-precedence.md` for details.
+Project's ESLint naming rules override these. These fill gaps only.
 
 ---
 
 ## File Naming
 
-### Components
+```toon
+files[5]{type,pattern,example}:
+  Components,"PascalCase.{phone|tablet}.tsx",ShareModal.phone.tsx
+  Hooks,"useCamelCase.tsx",useSharePost.tsx
+  Utilities,"camelCase.ts",formatDate.ts
+  Tests,"Name.test.tsx",ShareModal.test.tsx
+  Constants,"UPPER_SNAKE_CASE.ts",API_ENDPOINTS.ts
 ```
-PascalCase.{phone|tablet}.tsx
-Example: ShareModal.phone.tsx
-```
-
-### Hooks
-```
-useCamelCase.tsx
-Example: useSharePost.tsx
-```
-
-### Utilities
-```
-camelCase.ts
-Example: formatDate.ts
-```
-
-### Tests
-```
-ComponentName.test.tsx
-hookName.test.ts
-Example: ShareModal.test.tsx
-```
-
-### Constants
-```
-UPPER_SNAKE_CASE.ts
-Example: API_ENDPOINTS.ts
-```
-
----
 
 ## Variable Naming
 
-### Boolean
-```typescript
-// Prefix with is/has/should/can
-const isLoading = true
-const hasPermission = false
-const shouldUpdate = true
-const canEdit = false
-```
-
-### Arrays
-```typescript
-// Plural nouns
-const users = []
-const items = []
-const products = []
-```
-
-### Functions
-```typescript
-// Verb + noun
-function fetchUser() {}
-function handleSubmit() {}
-function validateEmail() {}
-```
-
-### Event Handlers
-```typescript
-// handle + Event
-const handleClick = () => {}
-const handleChange = () => {}
-const handleSubmit = () => {}
-```
-
----
-
-## Component Naming
-
-### React/React Native
-```typescript
-// PascalCase
-export function ShareModal() {}
-export const UserCard = () => {}
-```
-
-### Vue
-```vue
-<!-- PascalCase or kebab-case -->
-<ShareModal />
-<share-modal />
-```
-
----
-
-## Type/Interface Naming
-
-```typescript
-// PascalCase, descriptive
-interface User {
-  id: string
-  name: string
-}
-
-type UserRole = 'admin' | 'user'
-
-// Props suffix for component props
-interface ShareModalProps {
-  isOpen: boolean
-  onClose: () => void
-}
-```
-
----
-
-## Constant Naming
-
-```typescript
-// UPPER_SNAKE_CASE for true constants
-const MAX_RETRY_ATTEMPTS = 3
-const API_BASE_URL = 'https://api.example.com'
-
-// camelCase for config objects
-const apiConfig = {
-  timeout: 5000,
-  retries: 3
-}
-```
-
----
-
-## Structured Data Format
-
-**ALWAYS use TOON format for structured data in documentation.**
-
 ```toon
-format_rules[3]{element,format,avoid}:
-  Tables,TOON blocks,Markdown tables
-  Lists with structure,TOON arrays,Bullet lists
-  Configuration,TOON key-value,Plain text
+variables[4]{type,convention,example}:
+  Booleans,"is/has/should/can prefix","isLoading hasPermission canEdit"
+  Arrays,"Plural nouns","users items products"
+  Functions,"Verb + noun","fetchUser handleSubmit validateEmail"
+  Event handlers,"handle + Event","handleClick handleChange"
 ```
 
-### Example
+## Types & Components
 
-```toon
-# ✅ Use TOON
-items[3]{name,type,required}:
-  email,string,yes
-  age,number,no
-  role,enum,yes
-```
+- Components: PascalCase (`ShareModal`, `UserCard`)
+- Interfaces/Types: PascalCase (`User`, `ShareModalProps`)
+- Props: suffix with `Props` (`ShareModalProps`)
+- Constants: UPPER_SNAKE_CASE for values, camelCase for config objects
 
-```markdown
-<!-- ❌ Avoid markdown tables -->
-| Name | Type | Required |
-|------|------|----------|
-| email | string | yes |
-```
+## Structured Data
 
-**Reference:** `docs/TOON_FORMAT_GUIDE.md`
+Use TOON format for structured data in documentation. Reference: `docs/guides/TOON_FORMAT_GUIDE.md`
 
----
+## Avoid
 
-## Best Practices
-
-### Do's ✅
-- ✅ Use descriptive names
-- ✅ Be consistent across codebase
-- ✅ Follow language conventions
-- ✅ Use meaningful abbreviations only
-- ✅ Use TOON for structured data
-
-### Don'ts ❌
-- ❌ Single letter variables (except i, j in loops)
-- ❌ Abbreviations like `usr`, `btn`, `msg`
-- ❌ Generic names like `data`, `temp`, `obj`
-- ❌ Inconsistent casing
-- ❌ Markdown tables in documentation
-
----
-
-**Applied in:** All phases, enforced in Phase 4 (Refactor + Review)
-
----
-
-**Last Updated:** 2025-12-23
-
+Single-letter vars (except loop counters), vague abbreviations (`usr`, `btn`), generic names (`data`, `temp`, `obj`), inconsistent casing.

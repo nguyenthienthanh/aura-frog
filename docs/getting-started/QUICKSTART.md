@@ -51,9 +51,9 @@ plugin:update
 ## Learn More
 
 - [GET_STARTED.md](GET_STARTED.md) — Full setup guide
-- [commands/README.md](commands/README.md) — All 86 commands
-- [docs/MCP_GUIDE.md](docs/MCP_GUIDE.md) — MCP server setup
-- [docs/AGENT_TEAMS_GUIDE.md](docs/AGENT_TEAMS_GUIDE.md) — Multi-agent orchestration
+- [All Commands](../../aura-frog/commands/README.md) — 90 commands
+- [MCP Guide](../operations/MCP_GUIDE.md) — MCP server setup
+- [Agent Teams Guide](../guides/AGENT_TEAMS_GUIDE.md) — Multi-agent orchestration
 
 ---
 

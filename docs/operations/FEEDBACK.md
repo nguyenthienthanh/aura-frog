@@ -18,3 +18,9 @@ Using Aura Frog? We'd love to hear about it!
 ## Current Users
 
 *Be the first to share your experience!*
+
+---
+
+## See Also
+
+- [Contributing Guide](../../CONTRIBUTING.md) — How to contribute code, agents, skills, and bug fixes

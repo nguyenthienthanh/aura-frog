@@ -1,6 +1,6 @@
 <div align="center">
 
-![Welcome to Aura Frog](../assets/logo/mascot_full.png)
+![Welcome to Aura Frog](../../assets/logo/mascot_full.png)
 
 # Get Started with Aura Frog
 
@@ -10,7 +10,7 @@
 
 ---
 
-> **First time?** Follow the [Interactive Tutorial](docs/guides/FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
+> **First time?** Follow the [Interactive Tutorial](FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 10 agents, 5-phase TDD workflows, and multi-agent orchestration.
 
@@ -193,6 +193,25 @@ Set environment variables in `.envrc` for:
 - `project:reload-env` - Reload .envrc variables
 - `help` - Show all available commands
 - `agent:list` - Show all agents and their capabilities
+
+---
+
+## Manual Installation (Advanced)
+
+If plugin marketplace commands don't work, install manually:
+
+```bash
+# Clone to plugins directory
+mkdir -p ~/.claude/plugins/marketplaces/aurafrog
+git clone https://github.com/nguyenthienthanh/aura-frog.git \
+  ~/.claude/plugins/marketplaces/aurafrog/aura-frog
+
+# Create settings.local.json (REQUIRED)
+cd ~/.claude/plugins/marketplaces/aurafrog/aura-frog
+cp settings.example.json settings.local.json
+```
+
+**Uninstall:** `/plugin uninstall aura-frog@aurafrog`
 
 ---
 
@@ -402,30 +421,7 @@ At approval gates:
 
 ## Troubleshooting
 
-For common issues and solutions, see the full [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
-
-### Claude doesn't recognize commands?
-
-**Try being explicit:**
-```
-Please execute the workflow command: workflow:start <task>
-
-Follow the steps in commands/workflow/start.md
-```
-
-### Need to reconfigure?
-
-```
-project:init
-```
-
-Choose "Reset configuration" option.
-
-### Want to see all agents?
-
-```
-agent:list
-```
+For common issues and solutions, see the full [Troubleshooting Guide](../operations/TROUBLESHOOTING.md).
 
 ---
 
@@ -447,18 +443,12 @@ workflow:start <your-task-description>
 
 ## Support
 
-- **Documentation:** `README.md`
-- **Testing Guide:** `TESTING_GUIDE.md`
-- **MCP Guide:** `docs/MCP_GUIDE.md` (6 MCP servers)
-- **Scripts Guide:** `scripts/README.md` (integration & utility scripts)
-- **Learning System:** `docs/LEARNING_SYSTEM.md` (local + Supabase)
-- **Skills:** `skills/README.md` (43 skills)
-- **Rules:** `rules/README.md` (46 quality rules)
-- **Commands:** `commands/README.md` (86 commands)
-- **Hooks:** `hooks/README.md` (24 lifecycle hooks)
-- **Agent Teams:** `docs/AGENT_TEAMS_GUIDE.md` (multi-agent orchestration)
-- **Diagrams:** `docs/WORKFLOW_DIAGRAMS.md`
-- **Phase Guides:** `docs/phases/`
+- **All Documentation:** [docs/README.md](../README.md) (central index)
+- **Usage Guide:** [Usage Guide](../guides/USAGE_GUIDE.md) (best practices + workflow modes)
+- **MCP Guide:** [MCP Guide](../operations/MCP_GUIDE.md) (6 MCP servers)
+- **Learning System:** [Learning System](../operations/LEARNING_SYSTEM.md) (local + Supabase)
+- **Troubleshooting:** [Troubleshooting](../operations/TROUBLESHOOTING.md)
+- **Changelog:** [Changelog](../reference/CHANGELOG.md)
 
 ---
 

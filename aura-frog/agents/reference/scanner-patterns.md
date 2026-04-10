@@ -7,8 +7,6 @@
 
 ## Project Detection
 
-### Detection Sources
-
 ```toon
 detection_sources[10]{file,detects,agent_mapping}:
   package.json,JS/TS framework + deps,web-*/backend-nodejs
@@ -23,126 +21,54 @@ detection_sources[10]{file,detects,agent_mapping}:
   project.godot,Godot engine,gamedev
 ```
 
-### Framework Detection Priority
-
-```
-1. Explicit config files (angular.json, next.config.js)
-2. Package dependencies (react, vue, laravel)
-3. File patterns (*.vue, *.dart, *.go)
-4. Directory structure (app/, pages/, src/)
-```
+**Detection priority:** 1) Explicit config files (angular.json, next.config.js), 2) Package dependencies, 3) File patterns (*.vue, *.dart), 4) Directory structure.
 
 ---
 
 ## Project Types
 
 ```toon
-project_types[4]{type,description,detection}:
-  single-repo,Standard single project,One package.json/composer.json at root
-  monorepo,Multiple packages in one repo,pnpm-workspace.yaml/lerna.json/turbo.json
-  workspace,Multiple independent repos,Parent folder with 2+ project subdirs
-  library,Publishable package,exports field in package.json
+project_types[4]{type,detection}:
+  single-repo,One package.json/composer.json at root
+  monorepo,"pnpm-workspace.yaml / lerna.json / turbo.json / nx.json / rush.json / package.json workspaces"
+  workspace,Parent folder with 2+ project subdirs
+  library,exports field in package.json
 ```
-
-### Monorepo Detection
-
-| Tool | Config File |
-|------|-------------|
-| pnpm | `pnpm-workspace.yaml` |
-| npm/yarn | `package.json` with `workspaces` |
-| Lerna | `lerna.json` |
-| Nx | `nx.json` |
-| Turborepo | `turbo.json` |
-| Rush | `rush.json` |
 
 ---
 
 ## Configuration Loading
 
-### Load Order
-
-```
-1. .claude/project-contexts/[project-name]/project-config.yaml
-2. .claude/project-contexts/[project-name]/conventions.md
-3. .claude/project-contexts/[project-name]/rules.md
-4. .claude/project-contexts/[project-name]/examples.md
-```
+**Load order:** 1) project-config.yaml, 2) conventions.md, 3) rules.md, 4) examples.md (all from `.claude/project-contexts/[project-name]/`).
 
 ### Project Config Schema
 
 ```yaml
-# project-config.yaml
-project:
-  name: my-app
-  type: single-repo
-
-tech_stack:
-  framework: nextjs
-  language: typescript
-  package_manager: pnpm
-
-agents:
-  primary: web-nextjs
-  secondary:
-    - backend-nodejs
-    - tester
-
-testing:
-  framework: vitest
-  coverage_target: 80
-
-integrations:
-  jira_project: PROJ
-  figma_file: abc123
+project: { name, type }
+tech_stack: { framework, language, package_manager }
+agents: { primary, secondary[] }
+testing: { framework, coverage_target }
+integrations: { jira_project, figma_file }
 ```
 
 ---
 
 ## Cache Management
 
-### Cache Location
-
-```
-Single Project:
-.claude/project-contexts/[project-name]/project-detection.json
-
-Monorepo:
-.claude/project-contexts/[root]/monorepo-detection.json
-packages/[pkg]/.claude/project-contexts/[pkg]/project-detection.json
-
-Workspace:
-.claude/project-contexts/workspace-detection.json
-[project]/.claude/project-contexts/[project]/project-detection.json
+```toon
+cache_locations[3]{type,path}:
+  Single Project,.claude/project-contexts/[name]/project-detection.json
+  Monorepo root,.claude/project-contexts/[root]/monorepo-detection.json
+  Workspace,.claude/project-contexts/workspace-detection.json
 ```
 
-### Cache Invalidation
+**Invalidation:** Config file mtime/size changed -> re-scan. Cache >24h -> re-scan. `/project:refresh` -> force re-scan.
 
-| Trigger | Action |
-|---------|--------|
-| Config file mtime/size changed | Re-scan |
-| Cache older than 24 hours | Re-scan |
-| `/project:refresh` command | Force re-scan |
-
-### Cache Usage
-
-```javascript
-// Fast path - use cached detection
-const detection = getCachedDetection();
-if (detection && isValid(detection)) {
-  return detection; // ~5ms
-}
-
-// Slow path - full scan
-const detection = detectProject(); // ~200ms
-saveCache(detection);
-return detection;
-```
+**Fast path:** Use cached detection (~5ms) when valid. Full scan (~200ms) on cache miss, then save.
 
 ---
 
 ## Context Tracking
-
-### Session Context
 
 ```toon
 context_tracking[6]{item,purpose}:
@@ -154,56 +80,16 @@ context_tracking[6]{item,purpose}:
   Test status,Current test pass/fail state
 ```
 
-### Context Injection
-
-Injects context into:
-- Agent detection (project-specific agent priority)
-- Subagent spawning (workflow phase, pending approvals)
-- Session continuation (state preservation)
-
----
-
-## Output Format
-
-```markdown
-**Project Detection**
-
-**Project:** my-app
-**Type:** single-repo
-**Framework:** nextjs
-**Package Manager:** pnpm
-
-**Agents:**
-- Primary: web-nextjs
-- Secondary: backend-nodejs, tester
-
-**Test Infrastructure:**
-- Framework: vitest
-- Config: vitest.config.ts
-- Directories: tests/, __tests__/
-
-**From Cache:** Yes (updated 2h ago)
-```
+Context injects into: agent detection (project-specific priority), subagent spawning (phase, approvals), session continuation (state preservation).
 
 ---
 
 ## Integration with Agent Detector
 
-```
-1. Agent detector runs on every message
-2. Agent detector calls scanner for context
-3. Project-manager returns cached detection
-4. Agent detector uses detection for agent scoring
-5. Detected agent loads with project context
-```
+Agent detector runs every message -> calls scanner for context -> scanner returns cached detection -> detector uses it for agent scoring -> detected agent loads with project context.
 
 ---
 
 ## Legacy Agents (Deprecated)
 
-The following agents are now consolidated into scanner:
-- `project-detector.md` -> Detection functionality
-- `project-config-loader.md` -> Config loading functionality
-- `project-context-manager.md` -> Context tracking functionality
-
-These files remain for backwards compatibility but redirect to scanner.
+`project-detector.md`, `project-config-loader.md`, `project-context-manager.md` are consolidated into scanner. Legacy files remain for backwards compatibility but redirect here.

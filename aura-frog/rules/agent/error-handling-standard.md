@@ -2,20 +2,19 @@
 
 **Category:** Code Quality
 **Priority:** Critical
-**Applies To:** All code, especially Phase 3 (Build GREEN)
+**Applies To:** All code
 
 ---
 
-## Overview
+## Core Principle
 
-Consistent, structured error handling improves debugging, user experience, and system reliability. Handle errors at the right level with appropriate responses.
+**Handle errors at the right level with typed error classes, user-friendly messages, and structured logging. Never swallow errors silently.**
 
 ---
 
 ## Error Class Hierarchy
 
 ```typescript
-// Base error class with structured information
 class AppError extends Error {
   constructor(
     message: string,
@@ -25,11 +24,9 @@ class AppError extends Error {
   ) {
     super(message)
     this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
   }
 }
 
-// Specific error types
 class ValidationError extends AppError {
   constructor(message: string, public fields?: Record<string, string>) {
     super(message, 'VALIDATION_ERROR', 400)
@@ -41,34 +38,17 @@ class NotFoundError extends AppError {
     super(`${resource}${id ? ` with id ${id}` : ''} not found`, 'NOT_FOUND', 404)
   }
 }
-
-class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized') {
-    super(message, 'UNAUTHORIZED', 401)
-  }
-}
-
-class ForbiddenError extends AppError {
-  constructor(message = 'Forbidden') {
-    super(message, 'FORBIDDEN', 403)
-  }
-}
-
-class ConflictError extends AppError {
-  constructor(message: string) {
-    super(message, 'CONFLICT', 409)
-  }
-}
+// Also: UnauthorizedError(401), ForbiddenError(403), ConflictError(409)
 ```
 
 ---
 
-## Error Codes Standard
+## Error Codes
 
 ```toon
-error_codes[8]{code,http_status,when_to_use}:
+error_codes[8]{code,http,when}:
   VALIDATION_ERROR,400,Invalid input data
-  UNAUTHORIZED,401,Missing/invalid authentication
+  UNAUTHORIZED,401,Missing/invalid auth
   FORBIDDEN,403,Authenticated but not authorized
   NOT_FOUND,404,Resource doesn't exist
   CONFLICT,409,Duplicate or state conflict
@@ -79,182 +59,14 @@ error_codes[8]{code,http_status,when_to_use}:
 
 ---
 
-## Error Handling Patterns
-
-### 1. API/Backend Errors
-
-```typescript
-// Express/Node.js error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  // Log all errors
-  logger.error({
-    error: err.message,
-    code: err instanceof AppError ? err.code : 'INTERNAL_ERROR',
-    stack: err.stack,
-    path: req.path,
-    method: req.method
-  })
-
-  // Operational errors: send to client
-  if (err instanceof AppError && err.isOperational) {
-    return res.status(err.statusCode).json({
-      error: {
-        code: err.code,
-        message: err.message,
-        ...(err instanceof ValidationError && { fields: err.fields })
-      }
-    })
-  }
-
-  // Programming errors: hide details
-  return res.status(500).json({
-    error: {
-      code: 'INTERNAL_ERROR',
-      message: 'An unexpected error occurred'
-    }
-  })
-})
-```
-
-### 2. Service Layer Errors
-
-```typescript
-class UserService {
-  async getUser(id: string): Promise<User> {
-    const user = await this.repository.findById(id)
-    if (!user) {
-      throw new NotFoundError('User', id)
-    }
-    return user
-  }
-
-  async createUser(data: CreateUserDTO): Promise<User> {
-    // Validate
-    const errors = this.validate(data)
-    if (Object.keys(errors).length > 0) {
-      throw new ValidationError('Invalid user data', errors)
-    }
-
-    // Check duplicate
-    const existing = await this.repository.findByEmail(data.email)
-    if (existing) {
-      throw new ConflictError('User with this email already exists')
-    }
-
-    return this.repository.create(data)
-  }
-}
-```
-
-### 3. Frontend Error Handling
-
-```typescript
-// API client with error transformation
-async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
-  try {
-    const response = await fetch(url, options)
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new ApiError(error.error.message, error.error.code, response.status)
-    }
-
-    return response.json()
-  } catch (error) {
-    if (error instanceof ApiError) throw error
-    throw new ApiError('Network error', 'NETWORK_ERROR', 0)
-  }
-}
-
-// React hook with error handling
-function useUsers() {
-  const [error, setError] = useState<ApiError | null>(null)
-
-  const fetchUsers = async () => {
-    try {
-      setError(null)
-      return await apiRequest<User[]>('/api/users')
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err)
-        // Handle specific errors
-        if (err.code === 'UNAUTHORIZED') {
-          redirectToLogin()
-        }
-      }
-      throw err
-    }
-  }
-
-  return { fetchUsers, error }
-}
-```
-
-### 4. React Native Error Boundary
-
-```tsx
-class ErrorBoundary extends React.Component<Props, State> {
-  state = { hasError: false, error: null }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log to error tracking service
-    errorTracker.capture(error, { extra: errorInfo })
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <ErrorFallback error={this.state.error} onRetry={() => this.setState({ hasError: false })} />
-    }
-    return this.props.children
-  }
-}
-```
-
----
-
-## Error Response Format
-
-### API Error Response
+## Response Format
 
 ```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input data",
-    "fields": {
-      "email": "Invalid email format",
-      "password": "Must be at least 8 characters"
-    }
-  }
-}
-```
+// Success error response
+{ "error": { "code": "VALIDATION_ERROR", "message": "Invalid input", "fields": { "email": "Required" } } }
 
-### Internal Error (Production)
-
-```json
-{
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "An unexpected error occurred"
-  }
-}
-```
-
-### Internal Error (Development)
-
-```json
-{
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "Cannot read property 'id' of undefined",
-    "stack": "TypeError: Cannot read property...",
-    "path": "/api/users/123"
-  }
-}
+// Production internal error (hide details)
+{ "error": { "code": "INTERNAL_ERROR", "message": "An unexpected error occurred" } }
 ```
 
 ---
@@ -262,7 +74,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 ## User-Friendly Messages
 
 ```toon
-user_messages[5]{error_code,technical,user_friendly}:
+user_messages[5]{code,technical,user_facing}:
   VALIDATION_ERROR,Field X failed regex,Please enter a valid X
   NOT_FOUND,Entity not found,This item doesn't exist
   UNAUTHORIZED,JWT expired,Please log in again
@@ -272,78 +84,20 @@ user_messages[5]{error_code,technical,user_friendly}:
 
 ---
 
-## Logging Standards
+## Key Patterns
 
-**See:** `rules/logging-standards.md` for comprehensive logging guide.
-
-Quick rules: Include error code, message, stack, requestId, userId. Never log passwords/tokens/PII.
-
----
-
-## Error Handling Checklist
-
-### For Every Error-Prone Operation
-
-- [ ] Wrap in try/catch or .catch()
-- [ ] Throw appropriate error type
-- [ ] Include actionable error message
-- [ ] Log with sufficient context
-- [ ] Return user-friendly message
-
-### For API Endpoints
-
-- [ ] Validate input before processing
-- [ ] Handle all expected error cases
-- [ ] Use consistent error response format
-- [ ] Don't leak sensitive information
-- [ ] Log errors with request context
+- **API handler:** Log all errors with context (code, stack, path, requestId). Send operational errors to client, hide programming error details.
+- **Service layer:** Throw typed errors (NotFoundError, ValidationError). Validate before processing.
+- **Frontend:** Transform API errors, handle specific codes (401 → redirect to login). Use Error Boundaries for React.
+- **Logging:** See `rules/logging-standards.md`. Include code, message, stack, requestId. Never log passwords/tokens.
 
 ---
 
-## Anti-Patterns to Avoid
+## Anti-Patterns
 
-```typescript
-// ❌ Silent failure
-try {
-  await riskyOperation()
-} catch (e) {
-  // Do nothing
-}
-
-// ❌ Generic catch-all
-catch (e) {
-  console.log('error')
-}
-
-// ❌ Throwing strings
-throw 'Something went wrong'
-
-// ❌ Exposing internal details
-res.status(500).json({ error: error.stack })
-
-// ❌ Not handling async errors
-async function handler() {
-  riskyOperation()  // Missing await, error lost
-}
-```
+- `catch (e) { /* nothing */ }` — silent failure
+- `throw 'Something went wrong'` — throw Error objects
+- `res.status(500).json({ error: error.stack })` — leaking internals
+- `riskyOperation()` without await — lost async errors
 
 ---
-
-## Best Practices
-
-### Do's ✅
-- Use typed error classes
-- Handle errors at the appropriate level
-- Provide user-friendly messages
-- Log with context for debugging
-- Fail fast on programming errors
-
-### Don'ts ❌
-- Swallow errors silently
-- Expose stack traces in production
-- Use generic error messages internally
-- Log sensitive data
-- Catch errors you can't handle
-
----
-

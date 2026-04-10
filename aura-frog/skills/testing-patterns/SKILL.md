@@ -15,372 +15,97 @@ triggers:
 context: fork
 ---
 
-# Skill: Testing Patterns
+# Testing Patterns
 
-**Skill ID:** testing-patterns
-**Priority:** 50
-**Auto-Invoke:** Yes (when test task detected)
-
----
-
-## Purpose
-
-Unified testing patterns across all frameworks. Provides consistent test structure, naming, and best practices regardless of the testing framework (Jest, Vitest, Pytest, PHPUnit, Go testing, etc.).
-
-**Consolidates testing knowledge from:**
-- test-writer skill
-- tester agent patterns
-- Framework-specific test patterns
-
----
-
-## Triggers
-
-- Test keywords: test, spec, coverage, mock, fixture, TDD
-- Test file patterns: *.test.ts, *.spec.ts, *_test.go, test_*.py
-- Commands: /test:unit, /test:e2e, /test:coverage
-
----
-
-## Universal Test Principles
+## Principles
 
 ```toon
-test_principles[8]{principle,description}:
-  AAA Pattern,Arrange → Act → Assert (every test)
+principles[8]{principle,detail}:
+  AAA Pattern,"Arrange → Act → Assert"
   Single Assertion,One logical assertion per test
   Descriptive Names,"should [action] when [condition]"
   No Test Logic,No conditionals in tests
-  Isolated Tests,Each test independent - no shared state
-  Fast Execution,Unit tests <100ms each
-  Deterministic,Same result every run - no flaky tests
-  Test Behavior,Test what not how - avoid implementation details
+  Isolated Tests,Independent — no shared state
+  Fast Execution,Unit <100ms each
+  Deterministic,Same result every run
+  Test Behavior,"Test what not how"
 ```
-
----
 
 ## Test Types
 
 ```toon
-test_types[4]{type,scope,speed,when}:
-  Unit,Single function/class,<100ms,Always - 80% of tests
-  Integration,Multiple units together,<1s,API endpoints + DB queries
+types[4]{type,scope,speed,ratio}:
+  Unit,Single function/class,<100ms,80% of tests
+  Integration,Multiple units + API/DB,<1s,As needed
   E2E,Full user flow,<30s,Critical paths only
-  Snapshot,UI output comparison,<500ms,Component rendering
+  Snapshot,UI output comparison,<500ms,Components
 ```
-
----
 
 ## Framework Detection
 
 ```toon
-test_frameworks[8]{framework,detect_by,runner,assertion}:
-  Jest,jest.config.js OR package.json jest,npx jest,expect()
-  Vitest,vitest.config.ts,npx vitest,expect()
-  Pytest,pytest.ini OR conftest.py,pytest,assert
-  PHPUnit,phpunit.xml,./vendor/bin/phpunit,$this->assert*
-  Go,*_test.go files,go test,t.Error/t.Fatal
-  RSpec,spec/ directory + Gemfile,bundle exec rspec,expect().to
-  Cypress,cypress.config.ts,npx cypress,cy.*
-  Detox,.detoxrc.js,detox test,expect(element)
+frameworks[8]{framework,detect_by,runner}:
+  Jest,jest.config.js / package.json,npx jest
+  Vitest,vitest.config.ts,npx vitest
+  Pytest,pytest.ini / conftest.py,pytest
+  PHPUnit,phpunit.xml,./vendor/bin/phpunit
+  Go,*_test.go files,go test
+  RSpec,spec/ + Gemfile,bundle exec rspec
+  Cypress,cypress.config.ts,npx cypress
+  Detox,.detoxrc.js,detox test
 ```
 
----
+## Test Structure (Universal)
 
-## Test File Structure
+All frameworks follow AAA pattern with describe/context grouping:
 
-### JavaScript/TypeScript (Jest/Vitest)
-
-```typescript
-// user.service.test.ts
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { UserService } from './user.service';
-
-describe('UserService', () => {
-  let service: UserService;
-
-  beforeEach(() => {
-    service = new UserService();
-  });
-
-  describe('createUser', () => {
-    it('should create user with valid data', async () => {
-      // Arrange
-      const userData = { email: 'test@example.com', name: 'Test' };
-
-      // Act
-      const result = await service.createUser(userData);
-
-      // Assert
-      expect(result.id).toBeDefined();
-      expect(result.email).toBe(userData.email);
-    });
-
-    it('should throw error when email is invalid', async () => {
-      // Arrange
-      const userData = { email: 'invalid', name: 'Test' };
-
-      // Act & Assert
-      await expect(service.createUser(userData))
-        .rejects.toThrow('Invalid email');
-    });
-  });
-});
+```
+describe('Module')
+  describe('when condition')
+    it('should behavior') → Arrange → Act → Assert
 ```
 
-### Python (Pytest)
-
-```python
-# test_user_service.py
-import pytest
-from user_service import UserService
-
-class TestUserService:
-    @pytest.fixture
-    def service(self):
-        return UserService()
-
-    def test_create_user_with_valid_data(self, service):
-        # Arrange
-        user_data = {"email": "test@example.com", "name": "Test"}
-
-        # Act
-        result = service.create_user(user_data)
-
-        # Assert
-        assert result.id is not None
-        assert result.email == user_data["email"]
-
-    def test_create_user_raises_on_invalid_email(self, service):
-        # Arrange
-        user_data = {"email": "invalid", "name": "Test"}
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="Invalid email"):
-            service.create_user(user_data)
-```
-
-### PHP (PHPUnit)
-
-```php
-// UserServiceTest.php
-class UserServiceTest extends TestCase
-{
-    private UserService $service;
-
-    protected function setUp(): void
-    {
-        $this->service = new UserService();
-    }
-
-    public function test_create_user_with_valid_data(): void
-    {
-        // Arrange
-        $userData = ['email' => 'test@example.com', 'name' => 'Test'];
-
-        // Act
-        $result = $this->service->createUser($userData);
-
-        // Assert
-        $this->assertNotNull($result->id);
-        $this->assertEquals($userData['email'], $result->email);
-    }
-
-    public function test_create_user_throws_on_invalid_email(): void
-    {
-        // Arrange
-        $userData = ['email' => 'invalid', 'name' => 'Test'];
-
-        // Assert
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid email');
-
-        // Act
-        $this->service->createUser($userData);
-    }
-}
-```
-
-### Go
-
-```go
-// user_service_test.go
-func TestUserService_CreateUser(t *testing.T) {
-    t.Run("should create user with valid data", func(t *testing.T) {
-        // Arrange
-        service := NewUserService()
-        userData := UserData{Email: "test@example.com", Name: "Test"}
-
-        // Act
-        result, err := service.CreateUser(userData)
-
-        // Assert
-        if err != nil {
-            t.Fatalf("unexpected error: %v", err)
-        }
-        if result.ID == "" {
-            t.Error("expected ID to be set")
-        }
-        if result.Email != userData.Email {
-            t.Errorf("expected email %s, got %s", userData.Email, result.Email)
-        }
-    })
-
-    t.Run("should return error when email is invalid", func(t *testing.T) {
-        // Arrange
-        service := NewUserService()
-        userData := UserData{Email: "invalid", Name: "Test"}
-
-        // Act
-        _, err := service.CreateUser(userData)
-
-        // Assert
-        if err == nil {
-            t.Error("expected error, got nil")
-        }
-    })
-}
-```
-
----
+Adapt syntax per framework (describe/it for JS, class/def for Python, t.Run for Go).
 
 ## Mocking Patterns
 
 ```toon
-mock_patterns[5]{pattern,when,example}:
-  Spy,Track calls without changing behavior,vi.spyOn(obj 'method')
-  Stub,Replace with fixed return value,vi.fn().mockReturnValue(x)
-  Mock,Replace with custom implementation,vi.fn().mockImplementation(fn)
-  Fake,In-memory implementation,new FakeUserRepository()
-  Fixture,Predefined test data,fixtures/users.json
+patterns[5]{pattern,when}:
+  Spy,Track calls without changing behavior
+  Stub,Replace with fixed return value
+  Mock,Replace with custom implementation
+  Fake,In-memory implementation for complex deps
+  Fixture,Predefined test data files
 ```
-
-### Mock Example (Vitest)
-
-```typescript
-import { vi } from 'vitest';
-
-// Mock module
-vi.mock('./email.service', () => ({
-  EmailService: vi.fn().mockImplementation(() => ({
-    send: vi.fn().mockResolvedValue({ sent: true }),
-  })),
-}));
-
-// Spy on method
-const spy = vi.spyOn(userService, 'validate');
-await userService.createUser(data);
-expect(spy).toHaveBeenCalledWith(data.email);
-```
-
----
 
 ## Coverage Targets
 
 ```toon
-coverage_targets[4]{metric,minimum,good,excellent}:
-  Line coverage,70%,80%,90%
-  Branch coverage,60%,70%,80%
-  Function coverage,80%,90%,95%
-  Statement coverage,70%,80%,90%
+coverage[4]{metric,minimum,good}:
+  Line,70%,80%
+  Branch,60%,70%
+  Function,80%,90%
+  Statement,70%,80%
 ```
 
----
-
-## TDD Workflow
-
-```
-1. RED: Write failing test first
-   ↓
-2. GREEN: Write minimum code to pass
-   ↓
-3. REFACTOR: Improve code quality
-   ↓
-4. REPEAT for next requirement
-```
-
-**TDD Rules:**
-- Never write production code without a failing test
-- Write only enough test to fail (compilation counts)
-- Write only enough code to pass the test
-
----
-
-## E2E Testing Patterns
-
-### Cypress (Web)
-
-```typescript
-describe('Login Flow', () => {
-  it('should login with valid credentials', () => {
-    cy.visit('/login');
-    cy.get('[data-testid="email"]').type('user@example.com');
-    cy.get('[data-testid="password"]').type('password123');
-    cy.get('[data-testid="submit"]').click();
-    cy.url().should('include', '/dashboard');
-    cy.get('[data-testid="welcome"]').should('contain', 'Welcome');
-  });
-});
-```
-
-### Detox (Mobile)
-
-```typescript
-describe('Login Flow', () => {
-  it('should login with valid credentials', async () => {
-    await element(by.id('email')).typeText('user@example.com');
-    await element(by.id('password')).typeText('password123');
-    await element(by.id('submit')).tap();
-    await expect(element(by.id('dashboard'))).toBeVisible();
-  });
-});
-```
-
----
-
-## Test Naming Convention
+## Anti-Patterns
 
 ```toon
-naming[4]{format,example,use_when}:
-  should_when,"should return user when id exists",Behavior description
-  method_scenario_result,"createUser_validData_returnsUser",Method-focused
-  given_when_then,"givenValidUser_whenCreate_thenSuccess",BDD style
-  test_method,"test_create_user_with_valid_data",Python/PHP style
+avoid[6]{pattern,fix}:
+  Test implementation details,Test behavior/output only
+  Shared state between tests,Reset in beforeEach
+  Sleep/delays,Use waitFor/polling
+  Too many mocks,Use fakes for complex deps
+  Giant multi-assertion tests,One concern per test
+  No assertions,Always assert expected outcomes
 ```
 
----
-
-## Anti-Patterns to Avoid
+## Naming Conventions
 
 ```toon
-antipatterns[6]{pattern,problem,solution}:
-  Test implementation,Brittle tests break on refactor,Test behavior/output only
-  Shared state,Tests affect each other,Reset state in beforeEach
-  Sleep/delays,Slow flaky tests,Use waitFor/polling
-  Too many mocks,Tests don't reflect reality,Use fakes for complex deps
-  Giant tests,Hard to debug failures,One assertion per test
-  No assertions,Test always passes,Assert expected outcomes
+naming[4]{format,example}:
+  should_when,"should return user when id exists"
+  method_scenario_result,"createUser_validData_returnsUser"
+  given_when_then,"givenValidUser_whenCreate_thenSuccess"
+  test_method,"test_create_user_with_valid_data"
 ```
-
----
-
-## Integration with Project Cache
-
-```javascript
-const detection = getCachedDetection();
-if (detection.testInfra) {
-  // Load patterns for detected test framework
-  loadPatterns('testing', detection.testInfra.framework);
-}
-```
-
----
-
-## Related Files
-
-- `skills/test-writer/SKILL.md` - Test generation skill
-- `agents/tester.md` - QA agent
-- `rules/core/tdd-workflow.md` - TDD enforcement rule
-- `commands/test/unit.md`, `commands/test/e2e.md`
-
----
-
