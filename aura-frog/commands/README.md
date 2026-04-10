@@ -61,7 +61,7 @@ commands/
 ## Commands Index (TOON)
 
 ```toon
-commands[86]{category,command,file,description}:
+commands[87]{category,command,file,description}:
   agent,agent:list,agent/list.md,List all available agents
   agent,agent:activate,agent/activate.md,Activate specific agent
   agent,agent:deactivate,agent/deactivate.md,Deactivate agent
@@ -144,6 +144,7 @@ commands[86]{category,command,file,description}:
   standalone,execute,execute.md,Execute saved plan
   standalone,help,help.md,Show help and available commands
   standalone,refactor,refactor.md,Code refactoring workflow
+  metrics,prompts:evaluate,metrics/prompt-evaluate.md,Evaluate prompt usage patterns and get improvement suggestions
 ```
 
 ---
@@ -173,8 +174,9 @@ stats[21]{category,count}:
   plan,1
   review,1
   skill,1
+  metrics,4
   standalone,4
-  total,86
+  total,87
 ```
 
 ---

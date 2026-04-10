@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — 10 agents, 5-phase TDD workflow, self-healing memory, and multi-agent orchestration. One kernel. Zero untested code.
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](aura-frog/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](aura-frog/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -243,10 +243,10 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 10 | Right expert auto-selected per task |
-| **Skills** | 43 | 8 auto-invoke on context, 35 on-demand |
-| **Commands** | 89 | 5 bundled menus — discoverability built in |
+| **Skills** | 44 | 8 auto-invoke on context, 36 on-demand |
+| **Commands** | 87 | 5 bundled menus — discoverability built in |
 | **Rules** | 45 | 3-tier loading — only what's needed per phase |
-| **Hooks** | 26 | Conditional — skip processing for non-code files |
+| **Hooks** | 27 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
@@ -270,8 +270,8 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 |---|---|
 | **Getting Started** | [GET_STARTED.md](aura-frog/GET_STARTED.md) |
 | **First Workflow Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](aura-frog/docs/guides/FIRST_WORKFLOW_TUTORIAL.md) |
-| **All Commands (89)** | [commands/README.md](aura-frog/commands/README.md) |
-| **All Skills (43)** | [skills/README.md](aura-frog/skills/README.md) |
+| **All Commands (87)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Skills (44)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams Guide** | [AGENT_TEAMS_GUIDE.md](aura-frog/docs/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](aura-frog/docs/MCP_GUIDE.md) |
 | **Hooks & Lifecycle** | [hooks/README.md](aura-frog/hooks/README.md) |
@@ -289,10 +289,10 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         10 processes (auto-dispatched per task)
-├── skills/         43 skills (8 auto-invoke + 35 on-demand)
-├── commands/       89 commands (5 bundled menus)
+├── skills/         44 skills (8 auto-invoke + 36 on-demand)
+├── commands/       87 commands (5 bundled menus)
 ├── rules/          45 rules (13 core + 15 agent + 17 workflow)
-├── hooks/          26 lifecycle hooks (conditional execution)
+├── hooks/          27 lifecycle hooks (conditional execution)
 ├── scripts/        42 utility scripts
 ├── docs/           Guides, tutorials, OS architecture
 └── .mcp.json       6 device drivers (MCP servers)

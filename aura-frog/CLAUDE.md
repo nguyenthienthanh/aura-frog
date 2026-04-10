@@ -1,9 +1,9 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.0.0
+**System:** Aura Frog v3.1.0
 **Architecture:** LLM OS — Claude as kernel, agents as processes, context window as RAM
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
-**Purpose:** 10 agents + 43 skills + 89 commands + 5-phase TDD workflow + 6 MCP servers
+**Purpose:** 10 agents + 44 skills + 87 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
 
@@ -66,7 +66,7 @@ golden_rules[7]{rule,detail}:
 Agent, phase, model, context %, and cost are shown in the CLI status bar — NOT in conversation text.
 
 ```
-🐸 AF v3.0.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.1.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 **Do NOT render banners in conversation.** The status line handles it.
@@ -272,10 +272,10 @@ team_mode[4]{aspect,detail}:
 ```toon
 resources[16]{name,location}:
   Agents (10),agents/
-  Commands (89),commands/
+  Commands (87),commands/
   Rules (45: 13 core + 15 agent + 17 workflow),rules/{core|agent|workflow}/
-  Skills (8 auto-invoke + 35 reference),skills/
-  Hooks (26),hooks/
+  Skills (8 auto-invoke + 36 reference),skills/
+  Hooks (27),hooks/
   MCP Servers (6),.mcp.json
   OS Architecture,docs/os-architecture.md
   MCP Guide,docs/MCP_GUIDE.md
@@ -290,4 +290,4 @@ resources[16]{name,location}:
 
 ---
 
-**Version:** 3.0.0
+**Version:** 3.1.0

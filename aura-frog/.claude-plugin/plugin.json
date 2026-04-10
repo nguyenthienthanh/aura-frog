@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "3.0.0",
-  "description": "LLM OS for software engineering. 10 agents, 5-phase TDD workflow, 45 rules (3-tier), 43 skills, 89 commands, 26 hooks, 6 MCP servers. Memory-as-hint architecture, 3-tier context compression, multi-agent orchestration.",
+  "version": "3.1.0",
+  "description": "LLM OS for software engineering. 10 agents, 5-phase TDD workflow, 45 rules (3-tier), 44 skills, 87 commands, 27 hooks, 6 MCP servers. Memory-as-hint architecture, 3-tier context compression, multi-agent orchestration.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

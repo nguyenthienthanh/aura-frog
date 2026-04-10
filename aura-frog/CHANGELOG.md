@@ -4,6 +4,22 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.1.0] - 2026-04-06
+
+### Added
+- **Prompt Logger hook** (`hooks/prompt-logger.cjs`) — Logs every user prompt with metadata (intent, complexity, word count, commands referenced) to `.claude/metrics/prompts/{date}.jsonl`. 30-day auto-rotation. Disable with `AF_PROMPT_LOGGING=false`.
+- **Prompt Evaluator skill** (`skills/prompt-evaluator/SKILL.md`) — Analyze prompt usage patterns and get improvement suggestions. Trigger: `/prompts:evaluate`
+- **Prompt Evaluate command** (`commands/metrics/prompt-evaluate.md`) — `/prompts:evaluate [--days N]` generates usage report with intent distribution, feature utilization, gaps, and a 0-100 usage score
+- **Evaluate Prompts script** (`scripts/metrics/evaluate-prompts.cjs`) — Analysis engine: computes stats from JSONL logs, generates prioritized suggestions (10 rules), identifies gaps, calculates usage score
+
+### Updated
+- Skills: 43 → 44 (added prompt-evaluator)
+- Commands: 86 → 87 (added prompts:evaluate)
+- Hooks: 26 → 27 (added prompt-logger)
+- `hooks.json` — Added prompt-logger to UserPromptSubmit (async)
+
+---
+
 ## [3.0.0] - 2026-04-01
 
 ### LLM OS Architecture

@@ -22,7 +22,7 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (26 Total)
+## Active Hooks (27 Total)
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -556,6 +556,31 @@ Hook: 🧠 Learning: Pattern detected! "code_style:minimal_comments" (3 occurren
 
 ---
 
+### 9b. UserPromptSubmit - Prompt Logger (NEW in 3.1.0)
+**When:** Every user prompt submission (async)
+
+**Actions:**
+- Log user prompts with metadata (timestamp, word count, intent, complexity)
+- Detect intent (question, command, task, debug, feedback, chat)
+- Track commands/skills referenced in prompts
+- Detect complexity signals (multi-file, architecture, security, performance)
+- Store to `.claude/metrics/prompts/{date}.jsonl` (one line per prompt)
+- Auto-cleanup logs older than 30 days
+
+**Example:**
+```
+User: "Implement JWT authentication for the API"
+→ Logged: {intent: "implement", words: 7, complexity: ["security"], agent: "lead"}
+```
+
+**Storage:** `.claude/metrics/prompts/{date}.jsonl`
+**Retention:** 30 days (auto-cleaned)
+**Disable:** Set `AF_PROMPT_LOGGING=false` in environment
+
+**Script:** `hooks/prompt-logger.cjs`
+
+---
+
 ### 10. SubagentStart - Context Injection
 **When:** Any subagent starts
 
@@ -774,7 +799,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[27]{event,name,purpose}:
+hooks[28]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
@@ -796,6 +821,7 @@ hooks[27]{event,name,purpose}:
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Scope Drift Detection,Warn when conversation scope diverges
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
+  UserPromptSubmit,Prompt Logger,Log prompts with metadata for usage analysis
   SubagentStart,Context Injection,Auto-inject workflow context to subagents
   TeammateIdle,Idle Teammate Handler,Assign work to idle teammates (Agent Teams)
   TaskCompleted,Task Completion Validator,Validate teammate task completion (Agent Teams)
@@ -832,5 +858,5 @@ hooks[27]{event,name,purpose}:
 
 ---
 
-**Last Updated:** 2026-02-27
-**Status:** Active hooks system (26 hooks)
+**Last Updated:** 2026-04-06
+**Status:** Active hooks system (27 hooks)

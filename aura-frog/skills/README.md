@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 43 (8 auto-invoking + 35 reference)
+**Total Skills:** 44 (8 auto-invoking + 36 reference)
 **Platform:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) Plugin
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
@@ -394,6 +394,7 @@ auto_invoke_skills[8]{name,priority,trigger}:
 - Learning: learning-analyzer, self-improve (2)
 - Workflow: lazy-agent-loader, phase1-lite (2)
 - Context: project-context-loader, session-continuation, response-analyzer (3)
+- Analytics: prompt-evaluator (1)
 - Others: api-designer, debugging, migration-helper, performance-optimizer, pm-expert, qa-expert, refactor-expert, sequential-thinking, problem-solving, scalable-thinking, dev-expert, documentation, git-workflow, git-worktree (14)
 
 > **Externalized addons:** Godot (godot-expert) and SEO/GEO (seo-bundle, seo-expert, ai-discovery-expert, seo-check, seo-schema, seo-geo) are available as separate addons.
@@ -710,4 +711,4 @@ Expert skills provide comprehensive best practices for specific frameworks. They
 ---
 
 **Format:** TOON (Token-Optimized)
-**Total Skills:** 43 (8 auto-invoking + 35 reference)
+**Total Skills:** 44 (8 auto-invoking + 36 reference)
