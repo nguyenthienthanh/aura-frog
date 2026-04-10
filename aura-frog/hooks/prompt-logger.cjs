@@ -135,11 +135,11 @@ function main() {
     let userPrompt = '';
     try {
       const data = JSON.parse(input);
-      userPrompt = data.user_prompt || '';
+      userPrompt = data.prompt || data.user_prompt || '';
     } catch { /* not JSON */ }
 
     if (!userPrompt) {
-      userPrompt = process.env.CLAUDE_USER_INPUT || '';
+      userPrompt = process.env.CLAUDE_USER_PROMPT || '';
     }
 
     if (!userPrompt || userPrompt.length < 2) {

@@ -455,7 +455,15 @@ async function main() {
   }
 
   try {
-    const userInput = process.env.CLAUDE_USER_INPUT || '';
+    let userInput = '';
+    try {
+      const stdin = require('fs').readFileSync(0, 'utf-8').trim();
+      const data = JSON.parse(stdin);
+      userInput = data.prompt || '';
+    } catch { /* no stdin */ }
+    if (!userInput) {
+      userInput = process.env.CLAUDE_USER_PROMPT || '';
+    }
 
     if (!userInput || userInput.length < 5) {
       process.exit(0);

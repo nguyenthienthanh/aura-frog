@@ -54,7 +54,7 @@ function main() {
   let userPrompt = '';
   try {
     const data = JSON.parse(input);
-    userPrompt = data.user_prompt || '';
+    userPrompt = data.prompt || data.user_prompt || '';
   } catch { /* not JSON */ }
 
   const state = readSessionState();
