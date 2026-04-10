@@ -4,6 +4,15 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.2.1] - 2026-04-10
+
+### Fixed
+- **prompt-logger hook** — Was reading `data.user_prompt` from stdin, but Claude Code sends `data.prompt`. Prompts were never logged.
+- **thinking-boost hook** — Same stdin field bug (`user_prompt` → `prompt`)
+- **auto-learn hook** — Added stdin JSON parsing (was env-only), now reads `data.prompt`
+
+---
+
 ## [3.2.0] - 2026-04-10
 
 ### Changed
