@@ -240,7 +240,7 @@ We'll write failing tests before implementation (TDD RED phase).
 ⚡ After approval, I'll AUTO-CONTINUE to Phase 2!
 
 **─────────────────────────────────────────────────────────**
-🤖 **Agent:** lead | 📋 **System:** Aura Frog v2.2.0
+🤖 **Agent:** lead | 📋 **System:** Aura Frog {version}
 **─────────────────────────────────────────────────────────**
 
 Your response:

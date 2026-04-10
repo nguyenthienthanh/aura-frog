@@ -294,7 +294,7 @@ aura-frog/
 ├── commands/       90 commands (5 bundled menus)
 ├── rules/          45 rules (13 core + 15 agent + 17 workflow)
 ├── hooks/          35 lifecycle hooks (conditional execution)
-├── scripts/        42 utility scripts
+├── scripts/        43 utility scripts
 ├── docs/           AI reference docs (phases, TOON refs)
 └── .mcp.json       6 device drivers (MCP servers)
 ```

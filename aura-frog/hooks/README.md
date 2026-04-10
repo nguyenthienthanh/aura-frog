@@ -859,4 +859,4 @@ hooks[28]{event,name,purpose}:
 ---
 
 **Last Updated:** 2026-04-06
-**Status:** Active hooks system (27 hooks)
+**Status:** Active hooks system (35 hooks)

@@ -1,6 +1,6 @@
 # Aura Frog OS Architecture
 
-**Version:** 3.0.0
+**Version:** 3.2.1
 **Inspired by:** Karpathy's LLM OS mental model
 
 ---
