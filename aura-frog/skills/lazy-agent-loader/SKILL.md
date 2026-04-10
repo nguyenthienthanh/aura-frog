@@ -11,23 +11,14 @@ allowed-tools: Read, Glob
 
 # Lazy Agent Loader
 
-**Priority:** HIGH - Load agents on-demand
+Reduce token usage: load agent summaries initially (~50 tokens each), full definition only when activated.
 
 ---
 
-## Purpose
-
-Reduce token usage by:
-1. Loading only agent **summaries** initially (~50 tokens each)
-2. Loading **full definition** only when agent is activated
-3. Caching loaded agents in session state
-
----
-
-## Agent Index (Summaries Only)
+## Agent Index
 
 ```toon
-agent_index[24]{id,category,specialty,keywords}:
+agent_index[16]{id,category,specialty,keywords}:
   mobile,dev,React Native/Expo mobile,react-native/expo/RN/mobile/ios/android
   mobile-flutter,dev,Flutter/Dart mobile,flutter/dart/bloc/mobile
   web-angular,dev,Angular frontend,angular/ngrx/rxjs/typescript
@@ -38,9 +29,9 @@ agent_index[24]{id,category,specialty,keywords}:
   backend-python,dev,Python backend,python/django/fastapi/flask/api
   backend-go,dev,Go backend,go/golang/gin/fiber/api
   backend-laravel,dev,Laravel/PHP backend,laravel/php/eloquent/artisan
-  security,quality,Security auditing,security/vulnerability/audit/owasp/penetration
+  security,quality,Security auditing,security/vulnerability/audit/owasp
   tester,quality,Testing/QA,test/testing/coverage/qa/jest/cypress
-  devops,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline/terraform
+  devops,ops,DevOps/CI-CD,deploy/docker/kubernetes/ci-cd/pipeline
   router,infra,Agent detection,detect/agent/select/route
   lead,infra,PM/orchestration,pm/project/orchestrate/manage
   scanner,infra,Project management,project/detect/identify/config/context
@@ -50,51 +41,11 @@ agent_index[24]{id,category,specialty,keywords}:
 
 ## Loading Strategy
 
-### Initial Load (~1200 tokens)
-```
-1. Load this index file (agent_index)
-2. DO NOT load individual agent files
-3. Use index for agent detection scoring
-```
-
-### On Agent Selection (~500-2000 tokens per agent)
-```
-1. Agent scores ≥80 (PRIMARY) → Load full definition
-2. Agent scores 50-79 (SECONDARY) → Load summary only
-3. Agent scores <50 (OPTIONAL) → Don't load
-```
-
-### Full Definition Location
-```
-agents/[agent-id].md
-```
-
----
-
-## Loading Commands
-
-### Load Single Agent
-```bash
-# Load full agent definition
-cat agents/mobile.md
-```
-
-### Load Agent Summary
-```toon
-agent_summary{id,role,focus}:
-  mobile,Senior React Native Developer,Expo/RN mobile apps with TypeScript
-```
-
----
-
-## Integration with Agent Detector
-
-```
-Step 1: Score agents using agent_index keywords
-Step 2: Identify PRIMARY agent(s) with score ≥80
-Step 3: Load ONLY PRIMARY agent full definitions
-Step 4: For SECONDARY agents, use summary from index
-```
+| Score | Level | Action |
+|-------|-------|--------|
+| >= 80 | PRIMARY | Load full definition (`agents/[id].md`) |
+| 50-79 | SECONDARY | Summary only from index |
+| < 50 | OPTIONAL | Don't load |
 
 ---
 
@@ -102,63 +53,22 @@ Step 4: For SECONDARY agents, use summary from index
 
 ```toon
 comparison[4]{scenario,without_lazy,with_lazy,savings}:
-  Initial load (24 agents),~48000,~1200,97.5%
-  Single agent task,~48000,~2700,94.4%
-  Dual agent task,~48000,~4200,91.3%
-  Full stack (3 agents),~48000,~5700,88.1%
+  Initial load,~48000,~1200,97.5%
+  Single agent,~48000,~2700,94.4%
+  Dual agent,~48000,~4200,91.3%
+  3 agents,~48000,~5700,88.1%
 ```
 
 ---
 
-## Cache Strategy
+## Cache
 
-### Session Cache
-```
-Loaded agents are cached in conversation context.
-If agent already loaded, skip re-loading.
-Track loaded agents: loaded_agents[]: mobile,tester
-```
-
-### Force Reload
-```
-User: "reload agent mobile"
-→ Clear cache for agent
-→ Re-read full definition
-```
+Loaded agents cached in session. Track: `loaded_agents[]: mobile,tester`. Force reload: `reload agent <id>`.
 
 ---
 
-## Example Flow
+## Integration
 
-```
-User: "Create a React Native screen for login"
-
-1. Agent Detector scores all agents using keywords from agent_index
-   - mobile: +60 (react-native) +20 (context) = 80 ✅ PRIMARY
-   - frontend: +35 (screen/login implies UI) → OPTIONAL
-
-2. Lazy Loader activates:
-   - Load: agents/mobile.md (~1500 tokens)
-   - Skip: frontend (score < 50)
-
-3. Context loaded:
-   - Agent index: ~1200 tokens
-   - mobile full: ~1500 tokens
-   - Total: ~2700 tokens (vs ~48000 without lazy loading)
-```
+Used automatically by `agent-detector` for optimized loading. Score agents by keywords from index, load only PRIMARY agents.
 
 ---
-
-## Agent Categories
-
-```toon
-categories[4]{name,count,when_to_load}:
-  dev,11,When code/implementation requested
-  quality,3,When review/test/design requested
-  ops,5,When deploy/integrate/notify requested
-  infra,5,Usually auto-loaded by system
-```
-
----
-
-**Note:** This skill is automatically used by `agent-detector` for optimized loading.

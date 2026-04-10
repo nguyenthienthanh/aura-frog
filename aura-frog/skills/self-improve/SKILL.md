@@ -11,28 +11,16 @@ triggers:
 
 # Self-Improve Skill
 
-**Type:** Meta
-**Trigger:** `/learn:apply`, after analysis
-**Auto-invoke:** No (requires user approval)
-
----
-
-## Purpose
-
-Apply learned improvements to the Aura Frog plugin:
-- Update rules based on patterns
-- Adjust agent routing
-- Modify workflow configurations
-- Generate new knowledge base entries
+Apply learned improvements: update rules, adjust agent routing, modify workflow configs, generate knowledge entries.
 
 ---
 
 ## Usage
 
 ```bash
-/learn:apply                    # Review and apply pending improvements
-/learn:apply --auto             # Auto-apply high-confidence (≥0.8) suggestions
-/learn:apply --preview          # Preview changes without applying
+/learn:apply                    # Review and apply pending
+/learn:apply --auto             # Auto-apply high-confidence (>=0.8)
+/learn:apply --preview          # Preview without applying
 /learn:apply --id <pattern_id>  # Apply specific pattern
 ```
 
@@ -40,213 +28,55 @@ Apply learned improvements to the Aura Frog plugin:
 
 ## Improvement Types
 
-### 1. Rule Updates
-
-When patterns suggest rule modifications:
-
-```yaml
-# Before analysis
-rules:
-  code_coverage_threshold: 80
-
-# After learning shows 85% coverage correlates with fewer bugs
-rules:
-  code_coverage_threshold: 85
-```
-
-Implementation:
-1. Identify pattern suggesting rule change
-2. Generate rule modification
-3. Create backup of current rule
-4. Apply modification
-5. Mark pattern as applied in Supabase
-
-### 2. Agent Routing
-
-When agent success rates indicate better routing:
-
-```yaml
-# Update agent-detector scoring
-agent_overrides:
-  react_component:
-    primary: react-expert
-    confidence_boost: 10
-  api_endpoint:
-    primary: nodejs-expert
-    secondary: python-expert
-```
-
-Implementation:
-1. Query agent success rates by task type
-2. Calculate optimal routing
-3. Update agent-detector configuration
-4. Test with sample tasks
-
-### 3. Workflow Adjustments
-
-When workflow patterns suggest changes:
-
-```yaml
-# Add auto-stop threshold adjustment
-workflow:
-  phase_2:
-    timeout: 300  # increased from 180
-    batch_size: 50  # for large test suites
-```
-
-### 4. Knowledge Base
-
-When insights should be preserved:
-
-```markdown
-# New knowledge entry
-Type: tip
-Title: Use TDD for API endpoints
-Content: Analysis of 47 workflows shows TDD approach for API
-         endpoints reduces bug count by 40% compared to non-TDD.
-Tags: [workflow, tdd, api]
-Priority: 75
+```toon
+types[4]{type,target,example}:
+  Rule updates,rules/*.md,Increase coverage threshold 80→85
+  Agent routing,agent-detector config,Default react-expert for .tsx
+  Workflow adjustments,workflow config,Increase Phase 2 timeout
+  Knowledge base,knowledge entries,TDD reduces bugs by 40% for APIs
 ```
 
 ---
 
 ## Safety Guards
 
-### Approval Required
+**Approval required** unless: `--auto` AND confidence >= 0.8 AND frequency >= 5.
 
-All improvements require explicit approval unless:
-- `--auto` flag is used AND
-- Confidence ≥ 0.8 AND
-- Pattern frequency ≥ 5
+**Rollback:** Every change creates backup + log. `/learn:rollback <id>` or `--all`.
 
-### Rollback Support
-
-Every applied improvement:
-1. Creates backup of original configuration
-2. Logs the change with timestamp
-3. Can be rolled back via `/learn:rollback <change_id>`
-
-### Validation
-
-Before applying:
-1. Syntax validation of generated rules
-2. Conflict detection with existing rules
-3. Impact assessment (files affected)
+**Validation:** Syntax check, conflict detection, impact assessment before applying.
 
 ---
 
 ## Apply Process
 
-### Step 1: Fetch Pending Improvements
-
-```sql
-SELECT * FROM v_improvement_suggestions
-WHERE applied = FALSE
-ORDER BY confidence DESC;
-```
-
-### Step 2: Generate Changes
-
-For each suggestion:
-1. Determine target file(s)
-2. Generate modification
-3. Calculate impact
-
-### Step 3: Present for Review
-
-```markdown
-## Pending Improvements
-
-### 1. Increase Phase 2 timeout (ID: abc123)
-**Confidence:** 85%
-**Frequency:** 8 occurrences
-**Impact:** Modifies `ccpm-config.yaml`
-
-**Change:**
-```diff
-workflow:
-  phase_5a:
--   timeout: 180
-+   timeout: 300
-```
-
-**Evidence:**
-- 8 workflows failed with timeout in Phase 2
-- Average test count: 127 files
-- Average completion time needed: 245s
-
-[ ] Apply  [ ] Skip  [ ] Modify
-```
-
-### Step 4: Apply Changes
-
-1. Create backup: `backups/ccpm-config.yaml.20260107`
-2. Apply modification
-3. Update Supabase: `UPDATE af_learned_patterns SET applied=TRUE WHERE id=...`
-4. Log change
+1. **Fetch:** Query `v_improvement_suggestions WHERE applied = FALSE`
+2. **Generate:** Determine target files, create modifications, calculate impact
+3. **Review:** Present diff with confidence, frequency, evidence. User chooses: Apply / Skip / Modify
+4. **Apply:** Create backup, apply modification, mark applied in Supabase, log change
 
 ---
 
 ## Rollback
 
 ```bash
-/learn:rollback <change_id>     # Rollback specific change
+/learn:rollback <change_id>     # Specific change
 /learn:rollback --list          # List recent changes
-/learn:rollback --all           # Rollback all changes from today
-```
-
----
-
-## Example Session
-
-```
-User: /learn:apply
-
-Claude: 🐸 Self-Improve: Found 3 pending improvements
-
-## Improvement 1/3: Agent Routing Update
-Confidence: 92% | Frequency: 28
-
-**Suggestion:** Default react-expert for .tsx files
-
-**Evidence:**
-- 28 workflows with React component tasks
-- react-expert success rate: 96%
-- Current default (frontend) success rate: 78%
-
-**Change to:** `agents/router.md`
-```diff
-react_patterns:
-- default_agent: frontend
-+ default_agent: react-expert
-+ file_extensions: [.tsx, .jsx]
-```
-
-Apply this improvement? [y/n/skip/modify]:
-
-User: y
-
-Claude: ✅ Applied improvement 1/3
-Backup saved to: backups/router.md.20260107
-
-## Improvement 2/3: ...
+/learn:rollback --all           # All changes from today
 ```
 
 ---
 
 ## Configuration
 
-In `ccpm-config.yaml`:
-
 ```yaml
 learning:
   self_improve:
     enabled: true
-    auto_apply_threshold: 0.8  # Confidence threshold for --auto
-    min_frequency: 5           # Minimum occurrences for auto-apply
-    backup_dir: backups/       # Where to store backups
-    max_auto_per_day: 10       # Limit auto-applies per day
+    auto_apply_threshold: 0.8
+    min_frequency: 5
+    backup_dir: backups/
+    max_auto_per_day: 10
 ```
 
 ---
-
