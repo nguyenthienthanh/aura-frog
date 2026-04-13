@@ -4,6 +4,13 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.4.1] - 2026-04-13
+
+### Added
+- **Prompt Quality Evaluator (Mode 2)** — Evaluate and optimize any specific prompt. Scores 5 dimensions (clarity, instruction quality, efficiency, robustness, output alignment) with 0-10 calibration. Detects anti-patterns (filler phrases, redundancy, teaching model what it knows). Outputs minimal fix + production version.
+
+---
+
 ## [3.4.0] - 2026-04-13
 
 ### Changed
