@@ -1,125 +1,64 @@
-# Command: /test
+# Test Commands
 
-**Category:** Testing (Bundled)
-**Scope:** Session
-
----
-
-## Purpose
-
-Unified testing command with intelligent test type detection. Replaces individual test commands with a single entry point.
+Unified testing command with intelligent test type detection. Supports unit, e2e, coverage, and documentation generation across Jest, Vitest, Pytest, PHPUnit, Go testing, Cypress, Playwright, and Detox.
 
 ---
 
-## Usage
+## /test
 
-```bash
-# Auto-detect and run appropriate tests
-/test
+**Trigger:** `/test`, `/test [subcommand]`
 
-# Specific test types
-/test unit [path]
-/test e2e [path]
-/test coverage [path]
-/test watch [path]
+Interactive test menu with auto-detection. When called without subcommand, detects framework (Jest, Vitest, Pytest, PHPUnit, Go), test type (unit/integration/e2e), and scope (changed files or full suite). Offers quick actions: run all, run changed, run with coverage, watch mode, debug failing test, update snapshots.
 
-# Documentation
-/test docs
-```
+**Usage:** `/test`, `/test watch [path]`, `/test snapshot`, `/test debug "user login"`
 
 ---
 
-## Subcommands
+## /test:unit
 
-| Subcommand | Description | Example |
-|------------|-------------|---------|
-| `unit [path]` | Run unit tests | `/test unit src/services/` |
-| `e2e [path]` | Run E2E tests | `/test e2e` |
-| `coverage [path]` | Run with coverage report | `/test coverage src/` |
-| `watch [path]` | Run in watch mode | `/test watch` |
-| `docs` | Generate test documentation | `/test docs` |
-| `snapshot` | Update snapshots | `/test snapshot` |
-| `debug <test>` | Debug specific test | `/test debug "user login"` |
+**Trigger:** `test:unit <path>`, `add unit tests`, `unit test`
+
+Generate and run unit tests targeting a coverage threshold. Analyzes files, extracts testable units, creates test files with setup/assertions/mocks, runs them, and reports coverage. Generates tests for rendering, interactions, validation, hooks, edge cases, and snapshots.
+
+**Usage:** `test:unit "src/components/UserProfile.tsx" --coverage=85`
+**Options:** `--coverage` (default 80), `--focus` (component/hooks/edge-cases), `--mocks` (auto/minimal)
 
 ---
 
-## Auto-Detection
+## /test:e2e
 
-When called without subcommand, detects:
+**Trigger:** `test:e2e <flow>`, `add e2e tests`, `e2e test`
 
-1. **Test Framework:** Jest, Vitest, Pytest, PHPUnit, Go testing
-2. **Test Type:** Based on file patterns and config
-3. **Scope:** Changed files or full suite
+Generate end-to-end tests for user flows. Supports Cypress (web), Detox (React Native), and Playwright (multi-browser). Covers happy path, validation, edge cases, UI/UX states, accessibility, and session flows. Auto-detects tool or specify with `--tool`.
 
-```
-🧪 Test Commands
-
-Detected: vitest (coverage: 78%)
-
-Quick Actions:
-  [1] Run all tests
-  [2] Run changed tests only
-  [3] Run with coverage
-
-Test Types:
-  [4] Unit tests
-  [5] Integration tests
-  [6] E2E tests
-
-Utilities:
-  [7] Watch mode
-  [8] Debug failing test
-  [9] Update snapshots
-
-Select [1-9] or type command:
-```
+**Usage:** `test:e2e "User login flow" --tool=cypress --mode=full`
+**Options:** `--tool` (cypress/detox/playwright), `--mode` (happy/full/a11y), `--viewport` (mobile/desktop/tablet)
 
 ---
 
-## Framework Support
+## /test:coverage
 
-```toon
-frameworks[6]{framework,runner,coverage}:
-  Vitest,npx vitest,@vitest/coverage-v8
-  Jest,npx jest,--coverage
-  Pytest,pytest,pytest-cov
-  PHPUnit,./vendor/bin/phpunit,--coverage-html
-  Go,go test,go test -cover
-  Cypress,npx cypress run,--
-```
+**Trigger:** `test:coverage`, `coverage`, `check coverage`
+
+Analyze current test coverage and identify gaps. Reports overall metrics (statements, branches, functions, lines), per-directory breakdown, files below target, uncovered lines with suggested tests, and prioritized recommendations with time estimates. Tracks coverage trends over time.
+
+**Usage:** `test:coverage --target=85 --format=detailed`
+**Options:** `--target` (default 80), `--format` (summary/detailed/json), `--below-target`, `--critical`
 
 ---
 
-## Coverage Output
+## /test:document
 
-```markdown
-## 📊 Test Coverage Report
+**Trigger:** `test:document <description|JIRA-ID>`
 
-**Overall:** 78% (target: 80%)
+Generate comprehensive test documentation from requirements. Produces TEST_REQUIREMENTS.md, TEST_CASES.md (with ID, priority, steps, expected results), TEST_MATRIX.md (traceability), TEST_PLAN.md, generated test code, and a master COMPLETE_TEST_DOCUMENT.md. Output in `.claude/logs/documents/tests/`.
 
-| File | Lines | Branches | Functions |
-|------|-------|----------|-----------|
-| auth.service.ts | 92% | 85% | 100% |
-| user.service.ts | 75% | 70% | 80% |
-| api.controller.ts | 68% | 60% | 75% |
-
-### Uncovered Lines
-- `auth.service.ts:45-48` - Error handling branch
-- `user.service.ts:120-125` - Edge case validation
-
-### Recommendations
-1. Add test for auth error handling
-2. Cover user validation edge cases
-```
+**Usage:** `test:document "User authentication" --type=e2e --framework=playwright`
+**Options:** `--type` (functional/integration/e2e/performance/security), `--format` (markdown/confluence/pdf), `--coverage` (default 80)
 
 ---
 
-## Related Files
+## Related
 
-- **Test Writer Skill:** `skills/test-writer/SKILL.md`
-- **Testing Patterns:** `skills/testing-patterns/SKILL.md`
-- **TDD Rule:** `rules/core/tdd-workflow.md`
-- **Legacy Commands:** `commands/test/unit.md`, `commands/test/e2e.md`
-
----
-
+- **Skills:** `test-writer`, `testing-patterns`, `bugfix-quick`
+- **Rules:** `rules/core/tdd-workflow.md`

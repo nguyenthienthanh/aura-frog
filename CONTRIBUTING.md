@@ -93,7 +93,7 @@ aura-frog/                           # Repository root
 │   ├── CLAUDE.md                    # Core AI instructions
 │   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
 │   ├── agents/                      # 10 specialized agents (consolidated)
-│   ├── commands/                    # 90 commands (5 bundled entry points)
+│   ├── commands/                    # 26 commands (5 bundled entry points)
 │   ├── skills/                      # 44 skills (8 auto-invoke + 36 reference)
 │   ├── rules/                       # 45 quality rules
 │   ├── hooks/                       # 28 lifecycle hooks (.cjs scripts)

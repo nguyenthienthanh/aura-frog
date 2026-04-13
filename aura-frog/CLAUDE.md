@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
 **System:** Aura Frog v3.3.0 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 10 agents + 44 skills + 90 commands + 5-phase TDD workflow + 6 MCP servers
+**Purpose:** 10 agents + 44 skills + 26 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
 
@@ -176,12 +176,17 @@ tiers[3]{tier,count,when}:
 ## Bundled Commands
 
 ```toon
-commands[5]{cmd,subs}:
-  /workflow,"start/status/approve/handoff/resume"
-  /test,"unit/e2e/coverage"
-  /project,"status/init/switch/sync-settings"
-  /quality,"lint/complexity/review"
-  /bugfix,"quick/full/hotfix"
+commands[10]{cmd,subs}:
+  /workflow,"start/status/approve/modify/reject/resume/handoff/rollback/predict/progress/budget/metrics"
+  /project,"init/detect/status/list/switch/refresh/regen/reload-env/sync-settings"
+  /learn,"status/feedback/analyze/apply/setup"
+  /test,"unit/e2e/coverage/document"
+  /bugfix,"fix/quick/hotfix"
+  /quality,"check/complexity/debt"
+  /security,"audit/scan/deps"
+  /perf,"analyze/bundle/lighthouse/optimize"
+  /metrics,"dashboard/hooks/performance/prompts-evaluate"
+  /deploy,"setup/cicd-create/docker-create"
 ```
 
 ---
@@ -202,7 +207,7 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 ```toon
 resources[8]{name,location}:
   Agents (10),agents/
-  Commands (90),commands/
+  Commands (26),commands/
   Rules (45),rules/{core|agent|workflow}/
   Skills (44),skills/
   Hooks (28),hooks/

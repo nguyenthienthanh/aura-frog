@@ -1,107 +1,50 @@
-# Command: /quality
+# Quality Commands
 
-**Category:** Quality (Bundled)
-**Scope:** Session
-
----
-
-## Purpose
-
-Unified code quality command. Handles linting, complexity analysis, and code review.
+Unified code quality command. Handles linting, formatting, type checking, complexity analysis, technical debt tracking, and code review.
 
 ---
 
-## Usage
+## /quality
 
-```bash
-# Run all quality checks
-/quality
+**Trigger:** `/quality`, `/quality [subcommand]`
 
-# Specific subcommands
-/quality lint [path]
-/quality complexity [path]
-/quality review [path]
-/quality fix
-```
+Interactive quality menu. Runs all checks (lint, format, type check, coverage, complexity) and produces a scored report (0-100). Offers quick actions: run all checks, auto-fix issues, view report. Sub-checks: lint, complexity, security scan, dependency audit, full code review.
+
+**Usage:** `/quality`, `/quality lint src/`, `/quality fix`, `/quality review`
 
 ---
 
-## Subcommands
+## /quality:check
 
-| Subcommand | Description | Example |
-|------------|-------------|---------|
-| `lint [path]` | Run linters | `/quality lint src/` |
-| `complexity [path]` | Analyze code complexity | `/quality complexity` |
-| `review [path]` | Multi-agent code review | `/quality review` |
-| `fix` | Auto-fix linting issues | `/quality fix` |
-| `security` | Security-focused scan | `/quality security` |
-| `deps` | Check dependency health | `/quality deps` |
+**Trigger:** `quality:check [target]`
+
+Comprehensive quality checks: linting (ESLint/Pylint/PHPCS/golangci-lint), formatting (Prettier/Black/gofmt), type checking (tsc/mypy/phpstan), test coverage, and complexity analysis. Supports `--skip-tests` for linting only. Outputs a full report with pass/fail per category, issues found, and next steps with time estimates. Exit codes: 0 (pass), 1-5 (specific failures).
+
+**Usage:** `quality:check src/components`, `quality:check --skip-tests`
 
 ---
 
-## Interactive Menu
+## /quality:complexity
 
-```
-✨ Quality Commands
+**Trigger:** `quality:complexity [target]`
 
-Last scan: 2 issues found
+Analyze cyclomatic complexity, cognitive complexity, and maintainability index. Identifies functions needing refactoring. Scale: 1-5 simple, 6-10 moderate, 11-20 complex, 21+ critical. Reports per-function complexity, distribution chart, directory hotspots, and refactoring priorities with effort estimates and suggested patterns (extract method, guard clauses, strategy pattern).
 
-Quick Actions:
-  [1] Run all checks
-  [2] Auto-fix issues
-  [3] View report
-
-Specific Checks:
-  [4] Lint only
-  [5] Complexity analysis
-  [6] Security scan
-  [7] Dependency audit
-
-Review:
-  [8] Full code review
-
-Select [1-8] or type command:
-```
+**Usage:** `quality:complexity src/services/auth.ts --threshold 10 --export report.json`
 
 ---
 
-## Quality Report
+## /quality:debt
 
-```markdown
-## ✨ Quality Report
+**Trigger:** `quality:debt [target]`
 
-**Score:** 85/100 (Good)
+Track technical debt: TODO/FIXME/HACK comments, deprecated code, unused exports, code duplication (jscpd), and code smells (long methods, deep nesting, magic numbers, commented-out code). Categorizes by priority (high/medium/low) with age tracking, effort estimates, and debt ratio metrics. Provides sprint-sized remediation plans and JIRA ticket suggestions.
 
-### Linting
-- ✅ ESLint: 0 errors, 2 warnings
-- ✅ Prettier: Formatted
-- ✅ TypeScript: No type errors
-
-### Complexity
-- ⚠️ High complexity: auth.service.ts (12)
-- ✅ Average complexity: 4.2
-
-### Security
-- ✅ No vulnerabilities found
-- ✅ SAST scan passed
-
-### Dependencies
-- ⚠️ 3 outdated packages
-- ✅ No known vulnerabilities
-
-### Recommendations
-1. Simplify auth.service.ts (split into smaller functions)
-2. Update lodash to 4.17.21
-```
+**Usage:** `quality:debt src/components --priority high --export debt-report.md`
 
 ---
 
-## Related Files
+## Related
 
-- **Code Reviewer Skill:** `skills/code-reviewer/SKILL.md`
-- **Code Simplifier:** `skills/code-simplifier/SKILL.md`
-- **Quality Rules:** `rules/core/code-quality.md`, `rules/core/simplicity-over-complexity.md`
-- **Legacy Commands:** `commands/quality/*.md`
-
----
-
+- **Skills:** `code-reviewer`, `code-simplifier`, `refactor-expert`
+- **Rules:** `rules/core/code-quality.md`, `rules/core/simplicity-over-complexity.md`

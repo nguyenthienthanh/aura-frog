@@ -1,88 +1,43 @@
-# Command: /bugfix
+# Bugfix Commands
 
-**Category:** Bug Fixing (Bundled)
-**Scope:** Session
-
----
-
-## Purpose
-
-Unified bug fixing command with severity-based approach selection.
+Unified bug fixing with severity-based approach selection. Three modes: full structured workflow, quick lightweight fix, and emergency hotfix for production.
 
 ---
 
-## Usage
+## /bugfix
 
-```bash
-# Interactive mode
-/bugfix
+**Trigger:** `bugfix <description>`, `bugfix:start <JIRA-ID>`
 
-# Specific severity
-/bugfix quick "Login button not working"
-/bugfix full "Payment processing fails"
-/bugfix hotfix "Production crash"
-```
+Full 5-phase structured bug fix: analyze (reproduce + root cause), plan (fix + test strategy), RED (failing tests), GREEN (implement fix), REFACTOR (optimize), review, QA, document, notify. Produces BUG_ANALYSIS.md, BUG_FIX_PLAN.md, BUG_FIX_REVIEW.md, and BUG_FIX_SUMMARY.md. Enforces TDD throughout.
+
+**Usage:** `bugfix "Payment processing fails" --priority=critical --coverage=80`
+**Modes:** `bugfix:quick` (skip approvals), `bugfix:hotfix` (production critical), `bugfix:security` (private workflow)
 
 ---
 
-## Subcommands
+## /bugfix:quick
 
-| Subcommand | Description | When to Use |
-|------------|-------------|-------------|
-| `quick <desc>` | Lightweight 3-gate fix | Simple bugs, clear cause |
-| `full <desc>` | Full 5-phase workflow | Complex bugs, unclear cause |
-| `hotfix <desc>` | Emergency fix for production | Critical production issues |
+**Trigger:** `bugfix:quick <description>`
 
----
+Lightweight bug fix for obvious issues. Auto-executes Phase 1 (understand + design) without approval. Still enforces TDD (RED then GREEN then REFACTOR). Approval required only at implementation gates. Saves 30-60 minutes vs full bugfix. Best for: typos, obvious logic errors, simple validation fixes, import fixes, null checks.
 
-## Quick vs Full Decision
-
-```toon
-approach_selection[3]{approach,when,phases}:
-  quick,Clear scope + single file + known cause,Understand → Test → Fix → Verify
-  full,Multiple files + unclear cause + regression risk,Full 5-phase workflow
-  hotfix,Production down + critical path + emergency,Fix → Deploy → Document later
-```
+**Usage:** `bugfix:quick "Login button not disabled during loading"`
+**Time:** 1-2 hours (vs 2-4 hours full)
 
 ---
 
-## Interactive Menu
+## /bugfix:hotfix
 
-```
-🐛 Bug Fix Commands
+**Trigger:** `bugfix:hotfix <description>`, `bugfix:hotfix <JIRA-ID>`
 
-Describe the bug or select approach:
+Emergency production bug fix. Optimized for time-critical situations: 10-second auto-approve timeouts, minimal documentation, immediate Slack/Jira notifications, deploy guide + rollback steps auto-generated. Still enforces TDD and code review. Produces HOTFIX_ANALYSIS.md, HOTFIX_DEPLOY_GUIDE.md, HOTFIX_ROLLBACK_GUIDE.md. Auto-creates follow-up tickets for regression tests, code refactor, and post-mortem.
 
-  [1] Quick fix (simple, clear cause)
-  [2] Full investigation (complex, unclear)
-  [3] Hotfix (production emergency)
-
-Or describe the bug directly:
-> _
-```
+**Usage:** `bugfix:hotfix "API returning 500 errors for all users"`
+**Time target:** < 1.5 hours from start to deploy
 
 ---
 
-## Quick Fix Flow
+## Related
 
-```
-1. UNDERSTAND: Read error, reproduce issue
-   ↓
-2. TEST: Write failing test that captures bug
-   ↓
-3. FIX: Implement minimum fix to pass test
-   ↓
-4. VERIFY: Run full test suite, no regressions
-```
-
----
-
-## Related Files
-
-- **Bugfix Quick Skill:** `skills/bugfix-quick/SKILL.md`
-- **Workflow Orchestrator:** `skills/workflow-orchestrator/SKILL.md`
-- **Debugging Skill:** `skills/debugging/SKILL.md`
-- **Legacy Commands:** `commands/bugfix/*.md`
-
----
-
+- **Skills:** `bugfix-quick`, `debugging`, `workflow-orchestrator`
+- **Rules:** `rules/core/tdd-workflow.md`

@@ -244,7 +244,7 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 |-----------|:-----:|----------------|
 | **Agents** | 10 | Right expert auto-selected per task |
 | **Skills** | 44 | 8 auto-invoke on context, 36 on-demand |
-| **Commands** | 90 | 5 bundled menus — discoverability built in |
+| **Commands** | 26 | 10 bundled + 16 standalone — 71% consolidated |
 | **Rules** | 45 | 3-tier loading — only what's needed per phase |
 | **Hooks** | 28 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
@@ -271,7 +271,7 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 | **All Documentation** | [docs/README.md](docs/README.md) |
 | **Getting Started** | [GET_STARTED.md](docs/getting-started/GET_STARTED.md) |
 | **First Workflow Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](docs/getting-started/FIRST_WORKFLOW_TUTORIAL.md) |
-| **All Commands (90)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Commands (26)** | [commands/README.md](aura-frog/commands/README.md) |
 | **All Skills (44)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams Guide** | [AGENT_TEAMS_GUIDE.md](docs/guides/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](docs/operations/MCP_GUIDE.md) |
@@ -291,7 +291,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 aura-frog/
 ├── agents/         10 processes (auto-dispatched per task)
 ├── skills/         44 skills (8 auto-invoke + 36 on-demand)
-├── commands/       90 commands (5 bundled menus)
+├── commands/       26 commands (10 bundled + 16 standalone)
 ├── rules/          45 rules (13 core + 15 agent + 17 workflow)
 ├── hooks/          28 lifecycle hooks (conditional execution)
 ├── scripts/        43 utility scripts

@@ -14,7 +14,7 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "LLM OS for software engineering. 10 agents, 5-phase TDD, 45 rules, 44 skills, 90 commands, 28 hooks, 6 MCP servers",
+      "description": "LLM OS for software engineering. 10 agents, 5-phase TDD, 45 rules, 44 skills, 26 commands, 28 hooks, 6 MCP servers",
       "version": "3.3.0",
       "author": {
         "name": "Nguyen Thien Thanh",
