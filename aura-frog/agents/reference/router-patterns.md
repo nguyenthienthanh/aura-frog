@@ -186,4 +186,4 @@ fallbacks[3]{scenario,action}:
 
 - **Task-Based Selection:** `skills/agent-detector/task-based-agent-selection.md`
 - **Skill:** `skills/agent-detector/SKILL.md`
-- **Guide:** `../../docs/guides/AGENT_SELECTION_GUIDE.md`
+- **Guide:** `docs/guides/AGENT_SELECTION_GUIDE.md` (repo root)

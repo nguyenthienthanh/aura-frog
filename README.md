@@ -246,7 +246,7 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 | **Skills** | 44 | 8 auto-invoke on context, 36 on-demand |
 | **Commands** | 90 | 5 bundled menus — discoverability built in |
 | **Rules** | 45 | 3-tier loading — only what's needed per phase |
-| **Hooks** | 35 | Conditional — skip processing for non-code files |
+| **Hooks** | 28 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
@@ -293,7 +293,7 @@ aura-frog/
 ├── skills/         44 skills (8 auto-invoke + 36 on-demand)
 ├── commands/       90 commands (5 bundled menus)
 ├── rules/          45 rules (13 core + 15 agent + 17 workflow)
-├── hooks/          35 lifecycle hooks (conditional execution)
+├── hooks/          28 lifecycle hooks (conditional execution)
 ├── scripts/        43 utility scripts
 ├── docs/           AI reference docs (phases, TOON refs)
 └── .mcp.json       6 device drivers (MCP servers)

@@ -14,6 +14,7 @@ triggers:
   - "just build it"
   - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+effort: high
 ---
 
 # Workflow Orchestrator

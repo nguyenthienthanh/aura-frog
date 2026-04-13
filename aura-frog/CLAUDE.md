@@ -56,7 +56,7 @@ rules[7]{rule,detail}:
 🐸 AF v3.2.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
-Do NOT render banners in conversation. Setup: `project:sync-settings`
+Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `project:sync-settings`
 
 ---
 
@@ -108,7 +108,7 @@ skills[8]{name,trigger}:
   code-simplifier,Simplify/KISS
 ```
 
-35 reference skills loaded on-demand. Full list: `skills/README.md`
+36 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -189,7 +189,7 @@ commands[5]{cmd,subs}:
 ## Agent Teams (Experimental)
 
 Gate: Deep + 2+ domains → team. Otherwise → subagent.
-Guide: `../../docs/guides/AGENT_TEAMS_GUIDE.md`
+Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ## Learning System
 
@@ -205,10 +205,10 @@ resources[8]{name,location}:
   Commands (90),commands/
   Rules (45),rules/{core|agent|workflow}/
   Skills (44),skills/
-  Hooks (35),hooks/
+  Hooks (28),hooks/
   MCP (6),.mcp.json
   AI References,docs/
-  Human Docs,../../docs/README.md
+  Human Docs,docs/README.md (repo root)
 ```
 
 ---

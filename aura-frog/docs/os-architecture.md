@@ -1,6 +1,6 @@
 # OS Architecture — AI Reference
 
-**Format:** TOON | **Human version:** `../../docs/architecture/os-architecture.md`
+**Format:** TOON | **Human version:** `docs/architecture/os-architecture.md` (repo root)
 
 ---
 

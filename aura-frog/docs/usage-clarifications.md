@@ -1,6 +1,6 @@
 # Usage Clarifications — AI Reference
 
-**Format:** TOON | **Human version:** `../../docs/guides/USAGE_GUIDE.md`
+**Format:** TOON | **Human version:** `docs/guides/USAGE_GUIDE.md` (repo root)
 
 ---
 

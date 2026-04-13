@@ -10,7 +10,7 @@ The learning system enables Aura Frog to improve over time by:
 - **Automatic:** Collecting feedback, metrics, agent usage via hooks
 - **Manual:** Analyzing patterns and applying improvements via commands
 
-**Full Guide:** `../../docs/operations/LEARNING_SYSTEM.md`
+**Full Guide:** `docs/operations/LEARNING_SYSTEM.md` (repo root)
 
 ---
 

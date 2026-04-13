@@ -9,6 +9,7 @@ triggers:
   - "after Phase 4"
   - "before merge"
 allowed-tools: Read, Grep, Glob, Bash
+effort: high
 ---
 
 # Code Reviewer — 6-Aspect Analysis

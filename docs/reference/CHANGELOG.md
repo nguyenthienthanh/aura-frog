@@ -23,7 +23,7 @@ All notable changes to Aura Frog will be documented in this file.
   - Tier 3 (per phase): 4,461 → 1,384 lines (69% reduction)
 - **CLAUDE.md** — 293 → 216 lines (27%), compressed TOON tables and removed redundant sections
 - **Commands count** — 87 → 90 (3 new commands tracked)
-- **Hooks count** — 27 → 35 (8 new hooks tracked)
+- **Hooks count** — corrected to 27 (was incorrectly counting lib/ utilities)
 
 ### Added
 - `docs/README.md` — Central human documentation index with 6 categories
@@ -43,7 +43,7 @@ All notable changes to Aura Frog will be documented in this file.
 - `aura-frog/docs/guides/COMMANDS_GUIDE.md` — Content merged into commands/README.md
 
 ### Fixed
-- Component counts synced across all files (Commands: 90, Hooks: 35, Skills: 44, Rules: 45)
+- Component counts synced across all files (Commands: 90, Hooks: 27, Skills: 44, Rules: 45)
 - Cross-links added to 18 previously orphaned documentation files
 - Global CLAUDE.md version updated from 2.2.1 to 3.2.0
 

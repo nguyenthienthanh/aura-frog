@@ -10,6 +10,7 @@ triggers:
   - "broken"
   - "crash"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+effort: low
 ---
 
 # Aura Frog Quick Bugfix

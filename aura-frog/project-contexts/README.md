@@ -312,7 +312,7 @@ export CCPM_PROJECT_CONTEXT="project-contexts/another-project"
 ## 📚 Related Documentation
 
 - Main README: `../../README.md`
-- Getting Started: `../../docs/getting-started/GET_STARTED.md`
+- Getting Started: `docs/getting-started/GET_STARTED.md` (repo root)
 - Aura Frog Configuration: `ccpm-config.example.yaml`
 - Template Files: `.claude/project-contexts/template/`
 

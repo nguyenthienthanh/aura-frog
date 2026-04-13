@@ -31,7 +31,7 @@ Welcome to Aura Frog!
    | Approve phase | `approve` |
    | Check status | `workflow:status` |
 
-Need help? See `../../docs/operations/TROUBLESHOOTING.md` for common issues.
+Need help? See `docs/operations/TROUBLESHOOTING.md` (repo root) for common issues.
 ```
 
 ---

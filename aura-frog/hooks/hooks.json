@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '⚠️ Blocked: Potentially destructive command detected' >&2; exit 2; fi"
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '\u26a0\ufe0f Blocked: Potentially destructive command detected' >&2; exit 2; fi"
           },
           {
             "type": "command",
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '💡 Reminder: Run project:init to create project context before generating code' >&2; fi"
+            "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
           },
           {
             "type": "command",
@@ -99,7 +99,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"📄 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
+            "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"\ud83d\udcc4 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
           }
         ]
       },
@@ -230,6 +230,17 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" --pre-compact 2>&1"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-compact.cjs\"",
+            "timeout": 5000
           }
         ]
       }

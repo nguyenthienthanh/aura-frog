@@ -2,7 +2,8 @@
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/statusline.sh 2>/dev/null || bash aura-frog/scripts/statusline.sh 2>/dev/null",
-    "padding": 1
+    "padding": 1,
+    "refreshInterval": 30
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"

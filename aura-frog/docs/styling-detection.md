@@ -1,6 +1,6 @@
 # Styling Detection — AI Reference
 
-**Format:** TOON | **Human version:** `../../docs/guides/STYLING_DETECTION_GUIDE.md`
+**Format:** TOON | **Human version:** `docs/guides/STYLING_DETECTION_GUIDE.md` (repo root)
 
 **CRITICAL:** Adapt to project's existing styling approach. Project Context > Agent Preference.
 
