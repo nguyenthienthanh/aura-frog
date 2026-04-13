@@ -4,6 +4,21 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.2.2] - 2026-04-13
+
+### Fixed
+- **Deliverables not re-saved after modify/reject** — modify and reject commands updated workflow-state.json but never re-wrote deliverable .md files to disk. Added explicit RE-SAVE steps in modify/reject flows, enforcement in deliverables rule, and validation in post-phase hook.
+- **Hooks count 35→28** — Was incorrectly counting 8 lib/ utility files as hooks. Only 27 executable .cjs hooks + 1 new PostCompact = 28.
+- **Broken `../../docs/` paths** — 10 refs from plugin files resolved above repo root. Fixed to repo-root-relative with "(repo root)" note since human docs aren't shipped with plugin install.
+- **Stale component counts** — Synced across plugin.json, marketplace.json, README, CONTRIBUTING, CLAUDE.md, hooks/README, CHANGELOG.
+
+### Added
+- **PostCompact hook** (`hooks/post-compact.cjs`) — Verifies workflow state survived context compaction. Checks JSON validity, phase, and agent fields.
+- **statusline refreshInterval** — `refreshInterval: 30` in settings.example.json for 30s auto-refresh.
+- **effort frontmatter** — workflow-orchestrator (high), code-reviewer (high), bugfix-quick (low).
+
+---
+
 ## [3.2.1] - 2026-04-10
 
 ### Fixed
