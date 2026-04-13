@@ -311,8 +311,8 @@ export CCPM_PROJECT_CONTEXT="project-contexts/another-project"
 
 ## 📚 Related Documentation
 
-- Main README: `README.md`
-- Getting Started: `GET_STARTED.md`
+- Main README: `../../README.md`
+- Getting Started: `../../docs/getting-started/GET_STARTED.md`
 - Aura Frog Configuration: `ccpm-config.example.yaml`
 - Template Files: `.claude/project-contexts/template/`
 

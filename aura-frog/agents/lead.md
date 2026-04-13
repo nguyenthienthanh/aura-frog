@@ -79,10 +79,7 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 ## Related Documentation
 
 - **Phase Guides:** `docs/phases/` (Phase 1 through Phase 5)
-- **Approval Gates:** `docs/APPROVAL_GATES.md`
-- **Agent Selection:** `docs/AGENT_SELECTION_GUIDE.md`
-- **Workflow Skill:** `skills/workflow-orchestrator/workflow-execution.md`
-- **Agent Teams Guide:** `docs/AGENT_TEAMS_GUIDE.md`
+- **Workflow Skill:** `skills/workflow-orchestrator/SKILL.md`
 
 ---
 

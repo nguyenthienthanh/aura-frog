@@ -14,7 +14,6 @@
 **Read and follow:** Aura Frog plugin's `CLAUDE.md` (auto-loaded by plugin system)
 
 This plugin provides rules and skills that auto-load:
-- **Banner:** Follow `rules/core/agent-identification-banner.md` (includes MCP display)
 - **Execution:** Follow `rules/core/execution-rules.md`
 - **Skills:** Auto-invoke from `skills/`
 - **MCP:** Use bundled servers from `.mcp.json`
@@ -35,7 +34,7 @@ Bundled MCP servers auto-invoke based on context:
 | **vitest** | Unit test requests |
 | **slack** | Phase 5 notifications |
 
-**Setup:** Copy `.envrc.template` and set tokens. See `docs/MCP_GUIDE.md`.
+**Setup:** Copy `.envrc.template` and set tokens.
 
 <!-- AURA-FROG:END -->
 

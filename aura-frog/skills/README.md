@@ -17,8 +17,6 @@
 
 **Note:** Individual framework skills remain as reference documentation, loaded on-demand by the bundle skills. SEO/GEO and Godot skills have been externalized as separate addons.
 
-**Docs:** `docs/REFACTOR_ANALYSIS.md` for full optimization guide.
-
 ---
 
 ## New in 1.16.0

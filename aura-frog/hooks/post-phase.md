@@ -173,7 +173,7 @@ for (const section of requiredSections) {
 const hasDiagram = techContent.includes('```mermaid');
 if (!hasDiagram) {
   console.warn('⚠️  DIAGRAM REQUIRED: Tech spec should include architecture diagram');
-  console.warn('   See rules/diagram-requirements.md for requirements');
+  console.warn('   See rules/workflow/diagram-requirements.md for requirements');
 }
 ```
 
@@ -431,7 +431,7 @@ try {
 
 ## 📊 Diagram Validation (Phase 1)
 
-Complex phases MUST include Mermaid diagrams. See `rules/diagram-requirements.md`.
+Complex phases MUST include Mermaid diagrams. See `rules/workflow/diagram-requirements.md`.
 
 ```typescript
 function validateDiagrams(phase: number, deliverables: string[]): DiagramValidation {
@@ -467,7 +467,7 @@ function validateDiagrams(phase: number, deliverables: string[]): DiagramValidat
 const diagramValidation = validateDiagrams(currentPhase, phaseState.deliverables);
 if (!diagramValidation.valid) {
   diagramValidation.warnings.forEach(w => console.warn(w));
-  console.warn('   See: rules/diagram-requirements.md');
+  console.warn('   See: rules/workflow/diagram-requirements.md');
   console.warn('   Reference: docs/WORKFLOW_DIAGRAMS.md');
 }
 ```

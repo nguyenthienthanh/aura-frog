@@ -33,7 +33,7 @@ code_quality_merge[5]{priority,source,behavior}:
   5,Claude defaults,Applies where layers 1-4 are silent
 ```
 
-**See:** `rules/project-linting-precedence.md` for detailed merge strategy.
+**See:** `project-linting-precedence.md` for detailed merge strategy.
 
 ---
 

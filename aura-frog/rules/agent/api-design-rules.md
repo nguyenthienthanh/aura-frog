@@ -10,7 +10,7 @@
 
 Standards for designing consistent, maintainable APIs.
 
-**Full Guide:** See `skills/api-designer/api-design.md`
+**Full Guide:** See `skills/api-designer/SKILL.md`
 
 ---
 

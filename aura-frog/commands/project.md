@@ -104,9 +104,8 @@ Select [1-8] or type command:
 
 ## Related Files
 
-- **Project Manager Agent:** `agents/project-manager.md`
+- **Lead Agent:** `agents/lead.md`
 - **Project Cache:** `hooks/lib/af-project-cache.cjs`
-- **Cache Docs:** `docs/PROJECT_CACHE.md`
 - **Legacy Commands:** `commands/project/*.md`
 
 ---

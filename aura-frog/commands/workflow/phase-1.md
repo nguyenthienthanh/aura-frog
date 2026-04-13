@@ -282,8 +282,6 @@ Phase 1 is complete when:
 ## 📚 Related Documentation
 
 - **Phase Guide:** `docs/phases/PHASE_1_UNDERSTAND_DESIGN.MD`
-- **Approval Gates:** `docs/APPROVAL_GATES.md`
-- **Agent Identification:** `docs/AGENT_IDENTIFICATION.md`
 - **Next Phase:** `commands/workflow/phase-2.md`
 - **Workflow Start:** `commands/workflow/start.md`
 

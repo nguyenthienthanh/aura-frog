@@ -66,6 +66,6 @@ Auto-suggest `workflow:handoff` when:
 
 ---
 
-**See:** `skills/session-continuation/session-management.md`
+**See:** `skills/session-continuation/SKILL.md`
 
 **Last Updated:** 2025-11-29

@@ -15,7 +15,7 @@
 
 Use TOON for AI-readable documents (TECH_SPEC.md, TEST_PLAN.md). Use Markdown for human-readable (REQUIREMENTS.md, TECH_SPEC_CONFLUENCE.md). ~40% token savings.
 
-Syntax: `files[3]{path,action,purpose}:` for tabular data. See `docs/TOON_FORMAT_GUIDE.md`.
+Syntax: `files[3]{path,action,purpose}:` for tabular data. See `../../docs/guides/TOON_FORMAT_GUIDE.md`.
 
 ---
 

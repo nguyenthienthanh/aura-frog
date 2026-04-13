@@ -395,4 +395,3 @@ data/
 **Related:**
 - `commands/workflow/start.md`
 - `commands/workflow/budget.md`
-- `docs/WORKFLOW_ENHANCEMENTS_DESIGN.md`
