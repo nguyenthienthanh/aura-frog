@@ -4,6 +4,13 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.4.0] - 2026-04-13
+
+### Changed
+- **Commands consolidated 90→26** (71% reduction) — Merged sub-commands into 10 bundled parent files. Removed 14 redundant command files. 16 standalone files kept. Total lines: ~13,900 → ~613.
+
+---
+
 ## [3.3.0] - 2026-04-13
 
 ### Added
