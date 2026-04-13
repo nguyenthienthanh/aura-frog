@@ -4,6 +4,26 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.3.0] - 2026-04-13
+
+### Added
+- **Sprint Contract** — After Phase 1 approval, user confirms explicit "done" criteria (scope, acceptance criteria, exclusions, quality gate) before Phase 2 starts. Prevents scope drift. Skippable.
+- **Weighted Code Review** — 6 review aspects now weighted by impact: Security (CRITICAL), Architecture (HIGH), Error Handling (HIGH), Test Gaps (HIGH), Type Safety (MEDIUM), Simplification (LOW). 60% of review effort on architecture + edge cases. Syntax left to linters.
+- **Model-Aware Compact Strategy** — Sonnet prefers `/clear` + handoff/resume over `/compact` (reasoning degrades with compacted context). Opus handles compaction well. Haiku always prefers `/clear`.
+- **Evaluator Calibration** — Structured 10-point score breakdown per review aspect with anchored calibration (9-10 production-ready, 7-8 good, 5-6 needs work, <5 changes requested). Prevents "LGTM" drift.
+- **Builder ≠ Reviewer rule** — Phase 3 builder MUST NOT lead Phase 4 review. Security agent is PRIMARY reviewer, tester checks regression. Enforced in execution-rules, cross-review-workflow, code-reviewer, and Phase 4 guide.
+- **PostCompact hook** (`hooks/post-compact.cjs`) — Verifies workflow state survived context compaction.
+- **statusline refreshInterval** — 30s auto-refresh in settings.
+
+### Fixed
+- **Deliverables not re-saved after modify/reject** — Commands updated JSON state but never re-wrote `.md` files to disk.
+- **Hooks count** — Was 35 (counted lib/ utilities). Correct: 28 executable hooks.
+- **Broken `../../docs/` paths** — 10 refs from plugin files resolved above repo root.
+- **prompt-logger hook** — Was reading wrong stdin field (`user_prompt` → `prompt`).
+- **thinking-boost + auto-learn hooks** — Same stdin field bug.
+
+---
+
 ## [3.2.2] - 2026-04-13
 
 ### Fixed
