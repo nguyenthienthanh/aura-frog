@@ -6,6 +6,14 @@
 
 ---
 
+## Agent Assignment (Builder ≠ Reviewer)
+
+- **Refactor (builder):** Same agent as Phase 3 — they know the code
+- **Review (reviewer):** DIFFERENT agent — security (PRIMARY) + tester (regression check)
+- **Rule:** The Phase 3 builder must NOT lead the Phase 4 code review
+
+---
+
 ## Objectives
 
 1. Improve code quality

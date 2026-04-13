@@ -24,7 +24,7 @@ always[10]{rule}:
 ## NEVER
 
 ```toon
-never[12]{rule}:
+never[13]{rule}:
   Auto-commit without explicit user confirmation (show files + message then ask)
   Auto-push without explicit user confirmation
   Commit credentials/tokens
@@ -37,6 +37,7 @@ never[12]{rule}:
   Skip RED phase in TDD
   Ignore linter errors
   Leave any/unknown types (TypeScript strictness)
+  Let builder agent lead its own review (builder ≠ reviewer — see cross-review-workflow.md)
 ```
 
 ---

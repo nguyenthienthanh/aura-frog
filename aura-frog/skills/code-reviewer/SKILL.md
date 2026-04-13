@@ -16,6 +16,8 @@ effort: high
 
 Use after implementation, during Phase 4, or before merge.
 
+**Builder ≠ Reviewer.** The reviewing agent MUST differ from the agent that built the code. If architect built in Phase 3, security or tester leads the Phase 4 review — not architect.
+
 ## Process
 
 1. Get changed files: `git diff --name-only main...HEAD`

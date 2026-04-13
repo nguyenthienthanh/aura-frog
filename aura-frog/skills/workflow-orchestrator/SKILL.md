@@ -52,13 +52,15 @@ budget[5]{phase,max,format}:
 ## 5-Phase Workflow
 
 ```toon
-phases[5]{phase,name,gate,deliverable}:
-  1,"Understand + Design",APPROVAL,"Requirements (TOON) + technical design"
-  2,"Test RED",Auto,"Failing tests (TDD RED)"
-  3,"Build GREEN",APPROVAL,"Implementation (TDD GREEN)"
-  4,"Refactor + Review","Auto*","Clean code + quality/security check"
-  5,"Finalize",Auto,"Coverage ≥80% + docs + notification"
+phases[5]{phase,name,builder,reviewer,gate}:
+  1,"Understand + Design",architect,"tester + security + strategist",APPROVAL
+  2,"Test RED",tester,"architect (feasibility)",Auto
+  3,"Build GREEN","architect/frontend/mobile","tester + security",APPROVAL
+  4,"Refactor + Review","P3 builder refactors","security (PRIMARY) + tester — NOT the P3 builder","Auto*"
+  5,"Finalize",lead,—,Auto
 ```
+
+**Builder ≠ Reviewer.** Phase 4 reviewer MUST differ from Phase 3 builder. Details: `rules/workflow/cross-review-workflow.md`
 
 **Deep tasks:** Phase 1 uses collaborative planning (3-perspective deliberation). Details: `rules/workflow/collaborative-planning.md`
 
@@ -122,12 +124,12 @@ Stops on: tests pass in RED, 3 failed attempts in GREEN, critical security in P4
 Activates ONLY for Deep + 2+ domains + Agent Teams enabled. Otherwise: standard subagent behavior.
 
 ```toon
-teams[5]{phase,lead,teammates}:
-  1,lead → architect,"frontend + tester"
-  2,tester,architect
-  3,architect,"frontend + tester"
-  4,"architect + security","tester (reviewer)"
-  5,lead,—
+teams[5]{phase,builder,reviewer}:
+  1,"lead → architect","tester + security + strategist"
+  2,tester,"architect (feasibility review)"
+  3,"architect + frontend","tester + security (review after build)"
+  4,"P3 builder (refactor only)","security (PRIMARY) + tester — NOT P3 builder"
+  5,lead,"—"
 ```
 
 Teammate pattern: TaskList → claim → work → TaskUpdate(completed) → SendMessage(lead).

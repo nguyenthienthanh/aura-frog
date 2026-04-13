@@ -8,19 +8,21 @@
 
 ## Core Principle
 
-**Multiple agents review deliverables before proceeding to catch issues early.**
+**Builder ≠ Reviewer.** The agent that builds MUST NOT be the primary reviewer of its own work. Different perspective catches different issues.
 
 ---
 
 ## Review Matrix
 
 ```toon
-review_matrix[4]{phase,author,reviewers,focus}:
-  Phase 1 (Requirements),PM Orchestrator,"Dev (feasibility) + QA (testability) + UI (design, if UI)",Requirements quality
-  Phase 1 (Tech Planning),Lead Dev,"Secondary Dev (architecture) + QA (test feasibility)",Technical quality
-  Phase 2 (Test Plan),QA Agent,Dev (implementation feasibility),Test quality
-  Phase 4 (Code Review),Dev Agent(s),All active agents,Code quality
+review_matrix[4]{phase,builder,reviewer,focus}:
+  Phase 1 (Design),architect,"tester (testability) + security (risk) + strategist (scope)",Design quality
+  Phase 2 (Test RED),tester,"architect (feasibility) + frontend/mobile (coverage)",Test quality
+  Phase 3 (Build GREEN),architect/frontend/mobile,"tester (behavior) + security (vulnerabilities)",Implementation quality
+  Phase 4 (Refactor),architect/frontend/mobile,"security (PRIMARY reviewer) + tester (regression)",Code quality — builder must NOT lead review
 ```
+
+**Rule:** Phase 4 reviewer MUST be a different agent than Phase 3 builder. If architect built in P3, security or tester leads P4 review.
 
 ---
 
