@@ -21,7 +21,7 @@ Start with Tier 0+1. Load Tier 2 only when task requires it.
 
 Load framework/security/test/design patterns only when task triggers them. Never load all 12 framework skills at start — lazy-load via `skills/framework-expert/SKILL.md`.
 
-## Token Thresholds
+## Token Thresholds (Model-Aware)
 
 ```toon
 thresholds[4]{percent,action}:
@@ -30,6 +30,17 @@ thresholds[4]{percent,action}:
   70-85%,"/compact Focus on [task details]"
   >85%,Finish task then /clear
 ```
+
+### Model-Aware Compact Strategy
+
+```toon
+model_strategy[3]{model,strategy,reason}:
+  Haiku,"Prefer /clear + restart","Small context window — compaction loses too much"
+  Sonnet,"Prefer /clear + handoff over /compact","Sonnet reasoning degrades with compacted context — cleaner restart"
+  Opus,"Compaction OK — use /compact freely","Large context window — handles compacted context well"
+```
+
+**Rule:** Before compacting, check active model. If Sonnet: prefer `workflow:handoff` + `/clear` + `workflow:resume` over `/compact`. If Opus: `/compact` is fine.
 
 ## Session Boundaries
 

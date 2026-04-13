@@ -33,6 +33,22 @@ NOT for: bug fixes (→ bugfix-quick), quick refactors/config (→ direct edit),
 3. Verify complexity — suggest lighter approach if simple
 4. Socratic brainstorming (Standard/Deep only) — ask before building
 5. Challenge requirements (see `rules/workflow/requirement-challenger.md`)
+6. **Sprint Contract** — negotiate "done" criteria with user before Phase 2
+
+### Sprint Contract (after Phase 1 approval)
+
+Before starting Phase 2, present a contract:
+
+```
+Sprint Contract:
+- [ ] Scope: [list of deliverables from Phase 1]
+- [ ] Done when: [specific acceptance criteria]
+- [ ] Out of scope: [explicitly excluded items]
+- [ ] Quality gate: coverage ≥X%, 0 critical review findings
+```
+
+User must confirm contract. This prevents scope drift and makes Phase 5 "done" unambiguous.
+If user says "skip contract" → proceed without it.
 
 ---
 
