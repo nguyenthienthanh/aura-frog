@@ -80,6 +80,7 @@ Show deliverables → progress % → what auto-continues next → options (appro
 
 On reject: brainstorm first, then redo. On modify: light brainstorm, then adjust.
 Force skip brainstorming with "must do:" / "just do:".
+**After modify/reject:** RE-SAVE deliverable files to workflow log directory. Log the event in workflow-state.json and execution.log. Verify files on disk reflect updated content.
 Details: `rules/workflow/feedback-brainstorming.md`
 
 ## Auto-Stop Triggers

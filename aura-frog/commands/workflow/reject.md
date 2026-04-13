@@ -43,6 +43,11 @@ User chooses approach
     ↓
 Agent reworks deliverables
     ↓
+RE-SAVE deliverable files to workflow log directory:
+  - Overwrite the existing deliverable .md files with reworked content
+  - Log rejection in workflow-state.json (timestamp + reason + attempt count)
+  - Update execution.log with rejection + rework entry
+    ↓
 Show new approval gate
 ```
 

@@ -137,6 +137,24 @@ saveApprovalData(approvalData);
 
 ---
 
+## Re-Save After Modify / Reject
+
+When a phase is re-executed after modify or reject:
+
+1. **Verify deliverable files on disk match updated content** — don't just update in-memory
+2. **Log the event** to execution.log: `[timestamp] Phase N re-executed after [modify|reject]: <reason>`
+3. **Update workflow-state.json** with modification/rejection entry including timestamp, reason, and changes list
+4. **Check file mtimes** — deliverable files should have been updated more recently than the rejection timestamp
+
+```typescript
+// After re-executing modified/rejected phase:
+const deliverablePath = `${workflowDir}/${deliverableFilename}`;
+writeFileSync(deliverablePath, updatedContent); // MUST write to disk
+appendFileSync(executionLog, `[${timestamp}] Phase ${phase} re-saved: ${deliverableFilename}\n`);
+```
+
+---
+
 ## 📋 Phase-Specific Validation
 
 ### Phase 1: Understand + Design

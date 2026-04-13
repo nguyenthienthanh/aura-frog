@@ -63,6 +63,11 @@ Agent does LIGHT brainstorming:
     ↓
 Apply changes to deliverables
     ↓
+RE-SAVE deliverable files to workflow log directory:
+  - Overwrite the existing deliverable .md files with updated content
+  - Log modification in workflow-state.json (timestamp + instruction + changes)
+  - Update execution.log with modification entry
+    ↓
 Show updated approval gate
 ```
 
@@ -74,6 +79,8 @@ User types /workflow:modify just do: <instructions>
 Skip brainstorming
     ↓
 Apply changes directly
+    ↓
+RE-SAVE deliverable files (same as default flow)
     ↓
 Show updated approval gate
 ```

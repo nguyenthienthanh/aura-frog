@@ -66,6 +66,17 @@ Before phase transition: verify all required deliverables exist. Missing deliver
 
 At workflow end: verify all documents exist before closing.
 
+## On Modify / Reject
+
+**CRITICAL:** When a phase is modified or rejected, deliverable files MUST be re-saved:
+
+1. **Re-write** the updated deliverable `.md` files to the workflow log directory
+2. **Log** the modification/rejection in `workflow-state.json` with timestamp, reason, and changes list
+3. **Append** to `execution.log`: `[timestamp] Phase N modified/rejected: <reason>`
+4. **Verify** updated files exist before showing the new approval gate
+
+Do NOT just update in-memory state — the files on disk must reflect the latest version.
+
 ---
 
 ## Missing Deliverable Recovery
