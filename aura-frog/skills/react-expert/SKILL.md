@@ -1,131 +1,39 @@
 ---
 name: react-expert
-description: "React best practices expert. PROACTIVELY use when working with React components, hooks, state management. Triggers: React, JSX, hooks, useState, useEffect, component"
+description: "React gotchas and decision criteria. Covers conditional rendering traps, state management choices, and hooks pitfalls Claude commonly misses."
 autoInvoke: false
 priority: high
 triggers:
   - "react"
   - "jsx"
-  - "component"
+  - "hooks"
   - "useState"
   - "useEffect"
-  - "hooks"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 
-# React Expert Skill
+# React Expert — Gotchas & Decisions
 
-React patterns: hooks, performance, component architecture, state management.
+Use Context7 for full React docs.
 
----
-
-## 1. Component Patterns
-
-**Function components only.** Explicit props interface. Compound components for complex UI.
-
-```tsx
-interface UserCardProps {
-  user: User;
-  onSelect?: (user: User) => void;
-  children?: React.ReactNode;
-}
-
-function UserCard({ user, onSelect, children }: UserCardProps) {
-  return (
-    <div onClick={() => onSelect?.(user)}>
-      <h3>{user.name}</h3>
-      {children}
-    </div>
-  );
-}
-```
-
----
-
-## 2. Hooks Best Practices
-
-**useState:** Spread previous for object updates. Separate states for unrelated values. Lazy init for expensive computation.
-
-**useEffect:**
-- Include all dependencies
-- Cleanup subscriptions in return
-- AbortController for async fetches
-- Avoid objects/arrays in deps (infinite loop)
-
-**useMemo/useCallback:** Only for expensive computations or stable callbacks passed to memoized children. `React.memo` for preventing child re-renders.
-
-**Custom hooks:** Extract reusable logic (useDebounce, useFetch).
-
----
-
-## 3. Conditional Rendering
-
-```tsx
-// ❌ {count && <X/>}  -- renders "0" when count=0
-// ✅ {count > 0 && <X/>}
-// ✅ {title != null && title !== '' && <Header title={title} />}
-// ✅ Early return for null checks
-```
-
-**Keys:** Unique IDs, never indices.
-
----
-
-## 4. State Management
+## Key Decisions
 
 ```toon
-state_decision[5]{type,use_when,solution}:
-  Local state,Component-specific UI,useState
-  Lifted state,Shared between siblings,Lift to parent
-  Context,Theme/auth/deep props,React Context
-  Server state,API data,TanStack Query/SWR
-  Global state,Complex app state,Zustand/Redux
+decisions[5]{type,solution}:
+  Component-specific UI,useState
+  Shared between siblings,Lift to parent
+  Theme/auth/deep props,"Context + useMemo value + throw-if-outside-provider"
+  API/server data,TanStack Query or SWR
+  Complex global state,Zustand or Redux Toolkit
 ```
 
-**Context pattern:** Typed context + null check hook (`throw if outside provider`) + `useMemo` for value.
+## Gotchas
 
----
-
-## 5. Performance
-
-- `React.memo` for expensive components (custom comparator if needed)
-- Split components to isolate re-renders
-- `lazy(() => import(...))` + `Suspense` for code splitting
-
----
-
-## 6. Forms
-
-**Controlled components** with validation. Or **React Hook Form + Zod:**
-
-```tsx
-const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-  resolver: zodResolver(schema),
-});
-```
-
----
-
-## 7. Error Boundaries
-
-Class component with `getDerivedStateFromError` + `componentDidCatch`. Wrap at route level.
-
----
-
-## Quick Reference
-
-```toon
-checklist[10]{pattern,do_this}:
-  Component type,Function components only
-  Props,Interface with explicit types
-  Keys,Unique IDs not indices
-  useEffect deps,Include all dependencies
-  Conditional &&,Use explicit boolean check
-  State updates,Spread previous for objects
-  Memoization,Only for expensive operations
-  Context,Throw if used outside provider
-  Forms,Controlled with validation
-  Errors,Error boundaries at route level
-```
-
----
+- `{count && <X/>}` renders "0" when count=0 — use `{count > 0 && <X/>}`
+- `{title && <X/>}` renders empty string — use `{title != null && title !== '' && <X/>}`
+- Keys: unique IDs only, NEVER array indices (breaks on reorder/delete)
+- useEffect with object/array deps → infinite loop. Destructure or useMemo the dep
+- useEffect cleanup: return AbortController abort for async fetches
+- useMemo/useCallback: only for expensive ops or stable refs to memoized children. Don't wrap everything
+- Context: always `useMemo` the value object to prevent re-renders on every parent render
+- Error boundaries: class component only (no hook equivalent yet). Wrap at route level

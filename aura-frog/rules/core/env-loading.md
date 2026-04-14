@@ -7,13 +7,13 @@
 
 ## Rule
 
-Check environment variables FIRST. If not loaded → run `project:reload-env`.
+Check environment variables FIRST. If not loaded → run `/project reload-env`.
 
 ## Process
 
 1. Source `.envrc` (project root) or `.claude/.envrc` (fallback). Project root takes priority.
 2. Verify critical vars are set
-3. If missing → auto-run `project:reload-env`
+3. If missing → auto-run `/project reload-env`
 
 NEVER skip. NEVER respond without loading env first.
 
@@ -27,4 +27,4 @@ vars[2]{category,keys}:
 
 **Priority:** Environment Variable > Project Config > Global Config > Default
 
-**Commands:** `project:reload-env` (reload), `project:init` (creates template)
+**Commands:** `/project reload-env` (reload), `/project init` (creates template)

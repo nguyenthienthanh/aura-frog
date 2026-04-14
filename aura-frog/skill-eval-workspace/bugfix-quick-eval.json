@@ -1,0 +1,7 @@
+[
+  {"query": "Fix this bug: the login button doesn't respond when clicked on mobile Safari, works fine on Chrome", "should_trigger": true},
+  {"query": "The app crashes with a null pointer exception on line 42 of UserService.java when the email field is empty", "should_trigger": true},
+  {"query": "Something is broken - users are seeing a blank white screen after clicking 'Submit Order' instead of the confirmation page", "should_trigger": true},
+  {"query": "Build a new feature: add a dark mode toggle to the settings page with system preference detection", "should_trigger": false},
+  {"query": "Refactor the authentication module to use the new middleware pattern we discussed", "should_trigger": false}
+]

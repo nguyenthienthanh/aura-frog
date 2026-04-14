@@ -1,14 +1,14 @@
 ---
 name: test-writer
-description: "Write tests with TDD. Supports Jest, Cypress, Detox, PHPUnit, PyTest, Go testing."
+description: "Write tests with TDD following structured patterns. Ensures consistent AAA structure, proper coverage targets, and framework-specific conventions. Without this skill, tests lack consistent naming, miss coverage targets, and skip anti-pattern checks."
 autoInvoke: true
 priority: medium
 triggers:
   - "add tests"
   - "test coverage"
-  - "unit test"
-  - "E2E test"
   - "write tests"
+  - "TDD"
+  - "E2E test"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
@@ -16,32 +16,26 @@ allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 
 ## When to Use
 
-- Adding tests, improving coverage, creating test suites, TDD (Phase 2/3)
-- NOT for: bug fixes (→ bugfix-quick), full features (→ workflow-orchestrator)
+Adding tests, improving coverage, TDD (Phase 2/3). NOT for: bug fixes (bugfix-quick), features (workflow-orchestrator).
 
 ---
 
 ## Process
 
-1. **Load test patterns** from `.claude/cache/test-patterns.json` if exists (framework, imports, mock style, naming convention). Otherwise detect from package.json/pyproject.toml.
+1. **Detect framework** from package.json / pyproject.toml / go.mod
+2. **Analyze target** — read file, identify testable units, list deps to mock
+3. **Write tests** — TDD: RED (failing) → GREEN (implement) → refactor. Existing code: passing → edge cases → errors
+4. **Verify coverage** — run with coverage flag, check against targets
 
-2. **Analyze target** — read file, identify testable units, list dependencies to mock.
-
-3. **Write tests:**
-   - **TDD (new code):** Write failing tests (RED) → implement (GREEN) → refactor
-   - **Existing code:** Write passing tests → add edge cases → add error handling tests
-
-4. **Verify coverage** — run tests with coverage flag, check against 80% target (or project-specific).
-
----
-
-## Test Strategy
+## Principles
 
 ```toon
-types[3]{type,scope,when}:
-  Unit,"Single function/component with mocked deps","Default for most code"
-  Integration,"Module interactions + API calls","Data layers + service boundaries"
-  E2E,"Complete user flows with real deps","Critical paths (login checkout payment)"
+principles[5]{principle}:
+  AAA pattern: Arrange → Act → Assert
+  "should [action] when [condition]" naming
+  One concern per test — no shared state
+  Test behavior not implementation
+  Mock external deps only — use fakes for complex deps
 ```
 
 ## Coverage Targets
@@ -54,36 +48,25 @@ coverage[4]{scope,target}:
   Overall minimum,80%
 ```
 
----
-
-## Test Quality Rules
-
-- AAA pattern: Arrange, Act, Assert
-- "should...when..." naming: `it('should display error when API returns 400')`
-- One concern per test
-- Test behavior, not implementation
-- Mock external dependencies only
-- Cover: happy path + errors + edge cases + boundaries
-
-## File Naming
+## Anti-Patterns
 
 ```toon
-naming[6]{framework,pattern,location}:
-  Jest,"*.test.ts / *.spec.ts","__tests__/ or alongside"
-  PHPUnit,"*Test.php","tests/Unit/ tests/Feature/"
-  PyTest,"test_*.py","tests/"
-  Go,"*_test.go","Same package"
-  Detox,"*.e2e.ts","e2e/"
-  Cypress,"*.cy.ts","cypress/e2e/"
+avoid[5]{pattern,fix}:
+  Test implementation details,Test behavior/output only
+  Shared state between tests,Reset in beforeEach
+  Sleep/delays,Use waitFor/polling
+  Giant multi-assertion tests,One concern per test
+  No assertions,Always assert expected outcomes
 ```
 
-## Running Tests
+## Framework Detection
 
 ```toon
-commands[5]{framework,test,coverage}:
-  Jest/Vitest,"npm test","npm test -- --coverage"
-  PHPUnit,"./vendor/bin/phpunit","--coverage-html coverage"
-  PyTest,"pytest","pytest --cov=. --cov-report=html"
-  Go,"go test ./...","go test -coverprofile=coverage.out ./..."
-  Detox,"detox test --configuration ios.sim.debug",N/A
+frameworks[6]{framework,file_pattern,runner}:
+  Jest/Vitest,"*.test.ts *.spec.ts","npm test / npx vitest"
+  PHPUnit,"*Test.php","./vendor/bin/phpunit"
+  Pytest,"test_*.py","pytest --cov=."
+  Go,"*_test.go","go test -cover ./..."
+  Cypress,"*.cy.ts","npx cypress"
+  Detox,"*.e2e.ts","detox test"
 ```

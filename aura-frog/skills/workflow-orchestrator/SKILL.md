@@ -1,152 +1,65 @@
 ---
 name: workflow-orchestrator
-description: "Execute 5-phase workflow for complex features. Includes fasttrack mode for pre-approved specs. DO NOT use for simple bug fixes."
+description: "Execute 5-phase TDD workflow for complex features. Enforces phase gates, sprint contracts, and builder!=reviewer discipline. Without this skill, complex tasks skip TDD, lack approval gates, and have no scope control."
 autoInvoke: true
 priority: high
 triggers:
-  - "implement"
   - "build feature"
   - "create feature"
   - "workflow:start"
   - "complex task"
   - "fasttrack:"
-  - "fast-track"
-  - "just build it"
-  - "execute from specs"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 effort: high
 ---
 
 # Workflow Orchestrator
 
-## When to Use
-
-New features, complex implementations, multi-file changes, tasks requiring TDD.
-NOT for: bug fixes (→ bugfix-quick), quick refactors/config (→ direct edit), simple questions.
-
----
+For complex features / multi-file changes requiring TDD. NOT for: bug fixes (bugfix-quick), quick edits (direct).
 
 ## Pre-Execution
 
-1. agent-detector → select lead agent
+1. agent-detector → select lead
 2. Load project context
 3. Verify complexity — suggest lighter approach if simple
-4. Socratic brainstorming (Standard/Deep only) — ask before building
-5. Challenge requirements (see `rules/workflow/requirement-challenger.md`)
-6. **Sprint Contract** — negotiate "done" criteria with user before Phase 2
-
-### Sprint Contract (after Phase 1 approval)
-
-Before starting Phase 2, present a contract:
-
-```
-Sprint Contract:
-- [ ] Scope: [list of deliverables from Phase 1]
-- [ ] Done when: [specific acceptance criteria]
-- [ ] Out of scope: [explicitly excluded items]
-- [ ] Quality gate: coverage ≥X%, 0 critical review findings
-```
-
-User must confirm contract. This prevents scope drift and makes Phase 5 "done" unambiguous.
-If user says "skip contract" → proceed without it.
-
----
-
-## Token Budget (Target: ≤30K total)
-
-```toon
-budget[5]{phase,max,format}:
-  1,2000,"TOON tables + minimal prose"
-  2,1500,"Test code only"
-  3,2500,"Implementation code"
-  4,1000,"Refactor summary + review in TOON"
-  5,500,"Status only"
-```
-
----
+4. Socratic brainstorming (Standard/Deep)
+5. Challenge requirements (`rules/workflow/requirement-challenger.md`)
+6. **Sprint Contract** — negotiate "done" criteria before Phase 2
 
 ## 5-Phase Workflow
 
 ```toon
 phases[5]{phase,name,builder,reviewer,gate}:
-  1,"Understand + Design",architect,"tester + security + strategist",APPROVAL
+  1,"Understand + Design",architect,"tester+security+strategist",APPROVAL
   2,"Test RED",tester,"architect (feasibility)",Auto
-  3,"Build GREEN","architect/frontend/mobile","tester + security",APPROVAL
-  4,"Refactor + Review","P3 builder refactors","security (PRIMARY) + tester — NOT the P3 builder","Auto*"
+  3,"Build GREEN","architect/frontend/mobile","tester+security",APPROVAL
+  4,"Refactor + Review","P3 builder refactors","security+tester (NOT P3 builder)",Auto
   5,"Finalize",lead,—,Auto
 ```
 
-**Builder ≠ Reviewer.** Phase 4 reviewer MUST differ from Phase 3 builder. Details: `rules/workflow/cross-review-workflow.md`
-
-**Deep tasks:** Phase 1 uses collaborative planning (3-perspective deliberation). Details: `rules/workflow/collaborative-planning.md`
+**Builder != Reviewer.** Details: `rules/workflow/cross-review-workflow.md`
 
 ## Phase Transitions
 
 - P1→P2: Approval required. Blocker: no design approved.
-- P2→P3: Auto-continue if tests fail as expected. Blocker: tests pass (not testing new code).
+- P2→P3: Auto if tests fail as expected. Blocker: tests pass.
 - P3→P4: Approval required. Blocker: tests still failing.
-- P4→P5: Auto-continue if tests pass + no critical issues. Blocker: tests broken or critical security.
-- P5→Done: Auto-complete. Blocker: coverage <80%.
+- P4→P5: Auto if tests pass + no critical issues.
+- P5→Done: Auto. Blocker: coverage <80%.
 
-**Invalid:** Skip P1→P3 (no tests), P3 without P2 (no TDD), P5 with failing tests.
+## Approval Gates (Phase 1 & 3 only)
 
----
-
-## Approval Gates (Only 2: Phase 1 & 3)
-
-Show deliverables → progress % → what auto-continues next → options (approve/reject/modify/stop).
-
-On reject: brainstorm first, then redo. On modify: light brainstorm, then adjust.
-Force skip brainstorming with "must do:" / "just do:".
-**After modify/reject:** RE-SAVE deliverable files to workflow log directory. Log the event in workflow-state.json and execution.log. Verify files on disk reflect updated content.
-Details: `rules/workflow/feedback-brainstorming.md`
+Show deliverables → options: `/workflow approve` / `/workflow reject` / `/workflow modify`.
+On reject: brainstorm first. On modify: light brainstorm. Force skip with "must do:" / "just do:".
 
 ## Auto-Stop Triggers
 
-- P2: Tests pass when should fail
-- P4: Tests fail after refactor, critical security issues
-- P5: Coverage <80%
-- Any: Token limit (75%→warn, 85%→suggest handoff, 90%→force handoff)
+P2: tests pass when should fail. P4: tests fail after refactor. P5: coverage <80%. Any: token limit 75%→warn, 85%→handoff, 90%→force.
 
----
+## Files
 
-## Files to Load (ON-DEMAND)
+Load phase guide on-demand: `docs/phases/PHASE_[N]_*.MD`. Load rules only if referenced.
 
-Load phase guide only when entering that phase: `docs/phases/PHASE_[N]_*.MD`
-Load project config once at workflow start. Load rules only if referenced.
+## Fast-Track
 
----
-
-## State Management
-
-- `workflow:handoff` → save state to `.claude/logs/workflows/[id]/`
-- `workflow:resume <id>` → load state, continue from last phase
-- `workflow:status` → show current phase + progress
-
----
-
-## Fast-Track Mode
-
-Trigger: `fasttrack: <specs>` — skips Phase 1, auto-executes P2-P5 without gates.
-
-Required spec sections: Overview, Requirements, Technical Design, API/Interfaces, Data Model, Acceptance Criteria. Ask if missing.
-
-Stops on: tests pass in RED, 3 failed attempts in GREEN, critical security in P4, coverage <80% in P5.
-
----
-
-## Agent Teams Mode
-
-Activates ONLY for Deep + 2+ domains + Agent Teams enabled. Otherwise: standard subagent behavior.
-
-```toon
-teams[5]{phase,builder,reviewer}:
-  1,"lead → architect","tester + security + strategist"
-  2,tester,"architect (feasibility review)"
-  3,"architect + frontend","tester + security (review after build)"
-  4,"P3 builder (refactor only)","security (PRIMARY) + tester — NOT P3 builder"
-  5,lead,"—"
-```
-
-Teammate pattern: TaskList → claim → work → TaskUpdate(completed) → SendMessage(lead).
-Details: `rules/core/execution-rules.md` (Team Mode section)
+`fasttrack: <specs>` — skips P1, auto-executes P2-P5 without gates. Requires: Overview, Requirements, Technical Design, API, Data Model, Acceptance Criteria.

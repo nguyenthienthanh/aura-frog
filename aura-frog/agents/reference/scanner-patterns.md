@@ -62,7 +62,7 @@ cache_locations[3]{type,path}:
   Workspace,.claude/project-contexts/workspace-detection.json
 ```
 
-**Invalidation:** Config file mtime/size changed -> re-scan. Cache >24h -> re-scan. `/project:refresh` -> force re-scan.
+**Invalidation:** Config file mtime/size changed -> re-scan. Cache >24h -> re-scan. `/project refresh` -> force re-scan.
 
 **Fast path:** Use cached detection (~5ms) when valid. Full scan (~200ms) on cache miss, then save.
 

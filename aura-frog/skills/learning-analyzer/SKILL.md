@@ -4,7 +4,7 @@ description: "Analyze collected learning data from Supabase to identify success 
 autoInvoke: false
 priority: 30
 triggers:
-  - "/learn:analyze"
+  - "/learn analyze"
   - "learning analysis"
   - "pattern analysis"
 context: fork
@@ -19,11 +19,11 @@ Analyze learning data from Supabase: success/failure patterns, optimization oppo
 ## Usage
 
 ```bash
-/learn:analyze                      # Full analysis
-/learn:analyze --period 30d         # Last 30 days
-/learn:analyze --focus agents       # Agent performance
-/learn:analyze --focus workflows    # Workflow patterns
-/learn:analyze --focus feedback     # User feedback
+/learn analyze                      # Full analysis
+/learn analyze --period 30d         # Last 30 days
+/learn analyze --focus agents       # Agent performance
+/learn analyze --focus workflows    # Workflow patterns
+/learn analyze --focus feedback     # User feedback
 ```
 
 ---
@@ -81,6 +81,6 @@ SUPABASE_SERVICE_KEY=your-service-role-key
 
 ## Integration
 
-After analysis, improvements can be: reviewed (`/learn:review`), auto-applied (`/learn:apply --auto`, high confidence only), or saved as pending (`/learn:save`).
+After analysis, improvements can be: reviewed (`/learn review`), auto-applied (`/learn apply --auto`, high confidence only), or saved as pending (`/learn save`).
 
 ---

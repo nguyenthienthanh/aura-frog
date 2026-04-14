@@ -16,7 +16,7 @@ Expert in containerization, orchestration, CI/CD pipelines, infrastructure-as-co
 
 **Keywords:** docker, dockerfile, container, kubernetes, k8s, kubectl, ci/cd, pipeline, github actions, terraform, infrastructure, deploy, deployment, aws, gcp, azure
 
-**Commands:** `docker:create`, `cicd:create`, `k8s:create`, `deploy:setup`
+**Commands:** `/deploy docker-create`, `/deploy cicd-create`, `/deploy setup`
 
 **Integration:** Phase 5 (Finalize) - Deployment
 

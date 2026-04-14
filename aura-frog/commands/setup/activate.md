@@ -2,7 +2,7 @@
 
 **Category:** Setup
 **Priority:** High
-**Syntax:** `setup:activate`
+**Syntax:** `/setup activate`
 
 ---
 
@@ -12,13 +12,13 @@ Quick activation command to enable Aura Frog in any project. Creates the minimal
 
 **Use this when:**
 - You installed Aura Frog plugin but it's not activating
-- You want to quickly enable Aura Frog without full `project:init`
+- You want to quickly enable Aura Frog without full `/project init`
 - You see vanilla "Claude Code" responses instead of Aura Frog banners
 
 **Difference from other commands:**
-- `setup:activate` - Minimal activation (just CLAUDE.md)
-- `project:init` - Full initialization (context, config, everything)
-- `project:regen` - Re-generate existing project context
+- `/setup activate` - Minimal activation (just CLAUDE.md)
+- `/project init` - Full initialization (context, config, everything)
+- `/project regen` - Re-generate existing project context
 
 ---
 
@@ -204,7 +204,7 @@ fi
    Type "how are you" - you should see the Aura Frog banner
 
 3. **Optional - Full setup:**
-   Run `project:init` for complete project context
+   Run `/project init` for complete project context
 
 ✅ Aura Frog is now active in this project!
 ```
@@ -261,7 +261,7 @@ Claude:
 
 🎯 If you're not seeing banners, try:
    1. Start a new Claude Code session
-   2. Or run `project:regen` to refresh
+   2. Or run `/project regen` to refresh
 ```
 
 ### Example 3: Existing CLAUDE.md
@@ -312,9 +312,9 @@ With `.claude/CLAUDE.md`:
 
 | Command | Use When |
 |---------|----------|
-| `setup:activate` | Quick activation, testing, minimal setup |
-| `project:init` | First-time full setup with project context |
-| `project:regen` | Refresh existing project context |
+| `/setup activate` | Quick activation, testing, minimal setup |
+| `/project init` | First-time full setup with project context |
+| `/project regen` | Refresh existing project context |
 
 ### After Activation
 
@@ -324,9 +324,9 @@ With `.claude/CLAUDE.md`:
 
 ## Related Commands
 
-- `project:init` - Full project initialization
-- `project:regen` - Regenerate project context
-- `setup:integrations` - Configure JIRA/Slack/Figma
+- `/project init` - Full project initialization
+- `/project regen` - Regenerate project context
+- `/setup integrations` - Configure JIRA/Slack/Figma
 - `help` - Show all commands
 
 ---

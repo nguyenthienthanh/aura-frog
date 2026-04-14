@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
 **System:** Aura Frog v3.4.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 10 agents + 44 skills + 26 commands + 5-phase TDD workflow + 6 MCP servers
+**Purpose:** 10 agents + 38 skills + 26 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
 
@@ -31,7 +31,7 @@ boot[5]{step,action,cost}:
   5,Verify MCP servers,~100
 ```
 
-CRITICAL: Check env FIRST. If missing → `project:reload-env`.
+CRITICAL: Check env FIRST. If missing → `/project reload-env`.
 
 ---
 
@@ -56,7 +56,7 @@ rules[7]{rule,detail}:
 🐸 AF v3.4.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
-Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `project:sync-settings`
+Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync-settings`
 
 ---
 
@@ -97,10 +97,8 @@ agents[10]{pid,name,domain,budget}:
 ## Auto-Invoke Skills
 
 ```toon
-skills[8]{name,trigger}:
+skills[6]{name,trigger}:
   agent-detector,Every message
-  framework-expert,Framework task (lazy-loads patterns)
-  testing-patterns,Test task
   workflow-orchestrator,Complex feature
   bugfix-quick,Bug fix request
   test-writer,Test request
@@ -108,7 +106,7 @@ skills[8]{name,trigger}:
   code-simplifier,Simplify/KISS
 ```
 
-36 reference skills loaded on-demand. Full list: `skills/README.md`
+32 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -143,7 +141,7 @@ phases[5]{phase,name,gate,budget}:
 ```toon
 routing[3]{level,approach}:
   Quick,Direct edit — no workflow
-  Standard,plan mode → workflow:start or bugfix:quick
+  Standard,plan mode → /workflow start or /bugfix quick
   Deep,Full 5-phase + collaborative planning
 ```
 
@@ -209,7 +207,7 @@ resources[8]{name,location}:
   Agents (10),agents/
   Commands (26),commands/
   Rules (45),rules/{core|agent|workflow}/
-  Skills (44),skills/
+  Skills (38),skills/
   Hooks (28),hooks/
   MCP (6),.mcp.json
   AI References,docs/

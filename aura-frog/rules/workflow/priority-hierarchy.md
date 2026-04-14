@@ -56,7 +56,7 @@ code_quality_merge[5]{priority,source,behavior}:
 
 - Plugin not loading? Check global `~/.claude/CLAUDE.md` points to plugin
 - Overrides not working? Check priority order (project > plugin > global)
-- Context not applied? Run `project:init`, verify `.claude/project-contexts/` exists
+- Context not applied? Run `/project init`, verify `.claude/project-contexts/` exists
 
 ---
 

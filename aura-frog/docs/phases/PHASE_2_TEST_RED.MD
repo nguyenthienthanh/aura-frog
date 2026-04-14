@@ -171,9 +171,9 @@ Total: 53 tests
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 3
-Type "workflow:reject <reason>" → Revise tests
-Type "workflow:modify <changes>" → Adjust tests
+Type "/workflow approve" → Proceed to Phase 3
+Type "/workflow reject <reason>" → Revise tests
+Type "/workflow modify <changes>" → Adjust tests
 
 Your response:
 ═══════════════════════════════════════════════════════════

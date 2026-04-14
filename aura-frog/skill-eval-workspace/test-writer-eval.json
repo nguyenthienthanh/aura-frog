@@ -1,0 +1,7 @@
+[
+  {"query": "Write unit tests for the UserService class - cover the createUser, updateUser, and deleteUser methods", "should_trigger": true},
+  {"query": "Add test coverage for the authentication flow - we need tests for login, logout, and token refresh", "should_trigger": true},
+  {"query": "We need integration tests for the /api/orders endpoints - test CRUD operations and error handling", "should_trigger": true},
+  {"query": "Delete the old test file at tests/legacy/auth.test.ts - we migrated those tests already", "should_trigger": false},
+  {"query": "Explain the difference between unit testing and integration testing in microservices", "should_trigger": false}
+]

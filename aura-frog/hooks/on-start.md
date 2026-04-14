@@ -1,19 +1,19 @@
 # On-Start Hook - Workflow Initialization Check
 
 **Purpose:** Check project setup before workflow starts
-**Trigger:** Automatically run when `workflow:start` or any workflow command is executed
+**Trigger:** Automatically run when `/workflow start` or any workflow command is executed
 
 ---
 
 ## 🎯 Purpose
 
-Ensure the project is properly initialized with Aura Frog before executing workflows. Remind users to run `project:init` if setup is incomplete.
+Ensure the project is properly initialized with Aura Frog before executing workflows. Remind users to run `/project init` if setup is incomplete.
 
 **⚠️ Note:** This hook is different from the **Session Start Protocol** in `CLAUDE.md`:
 
 | Hook | When | What | Blocking |
 |------|------|------|----------|
-| **Session Start Protocol** | New conversation starts | Welcome message, suggest `project:init` | No - informational only |
+| **Session Start Protocol** | New conversation starts | Welcome message, suggest `/project init` | No - informational only |
 | **On-Start Hook (this file)** | User runs workflow command | Validate setup, offer to continue or cancel | Yes - user must choose |
 
 **Session Start Protocol** = Gentle reminder at session start
@@ -247,7 +247,7 @@ Your choice: _
 ## 🎯 Benefits
 
 1. **Proactive Guidance**
-   - Users discover `project:init` naturally
+   - Users discover `/project init` naturally
    - Clear instructions on what to do
    - Explains why setup is needed
 
@@ -273,8 +273,8 @@ Your choice: _
 ### Hook Activation
 
 This hook is triggered by:
-- `workflow:start`
-- `workflow:phase:*` commands
+- `/workflow start`
+- `/workflow phase:*` commands
 - Any command that begins a workflow
 
 ### State Management
@@ -318,7 +318,7 @@ When executing a workflow:
 
 If you see the reminder:
 1. Exit the workflow (n)
-2. Run `project:init`
+2. Run `/project init`
 3. Follow the setup instructions
 4. Try your workflow again
 

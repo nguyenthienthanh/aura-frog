@@ -238,7 +238,7 @@ Hook: ⚠️ Blocked: Potentially destructive command detected
 
 **Actions:**
 - ✅ Check if project context exists (`.claude/project-contexts/*/project-config.yaml`)
-- ✅ Remind user to run `project:init` if missing
+- ✅ Remind user to run `/project init` if missing
 - ✅ Helps prevent generating code without conventions
 
 **Example:**

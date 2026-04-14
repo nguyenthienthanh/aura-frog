@@ -4,6 +4,37 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.5.0] - 2026-04-14
+
+### Changed
+- **Skills optimized 44→38** — Merged overlapping skills, removed empty shells, compressed all to gotchas-only format
+- **Auto-invoke budget reduced 6,050→~2,850 tokens** — Removed framework-expert and testing-patterns from auto-invoke, compressed remaining 6 skills
+- **10 expert skills rewritten** — Angular, Flutter, Go, Laravel, Next.js, Node.js, Python, React, React Native, Vue now focus on gotchas & decisions (~300-500 tokens each, was 850-1800)
+- **6 reference skills compressed** — documentation, git-workflow, problem-solving, sequential-thinking, session-continuation, phase1-lite
+- **Workflow command format updated** — All phase docs and help now use `/workflow approve` format (was `workflow:approve`)
+- **Skill descriptions optimized** — Added "why this skill helps" to auto-invoke descriptions for better trigger rates
+
+### Added
+- **Merged test-writer + testing-patterns** — Single test-writer skill with AAA principles, anti-patterns, framework detection (~500 tokens)
+- **Merged debugging → bugfix-quick** — Root cause investigation + TDD fix process in one skill (~400 tokens)
+- **Merged design-expert + design-system-library** — Unified design skill with Context7 integration (~400 tokens)
+
+### Removed
+- **testing-patterns** — Merged into test-writer (60% content overlap eliminated)
+- **debugging** — Merged into bugfix-quick (overlapping triggers resolved)
+- **design-system-library** — Merged into design-expert
+- **qa-expert** — Empty shell, testing-patterns covered this better
+- **dev-expert** — Pure router, framework-expert handles routing
+- **pm-expert** — Empty shell with no actual content
+
+### Stats
+- Skills: 38 (was 44)
+- Auto-invoke skills: 6 (was 8)
+- Auto-invoke tokens: ~2,850 (was 6,050)
+- Total skill tokens: ~20,000 (was ~34,000)
+
+---
+
 ## [3.4.1] - 2026-04-13
 
 ### Added

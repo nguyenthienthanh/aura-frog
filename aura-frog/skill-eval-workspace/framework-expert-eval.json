@@ -1,0 +1,7 @@
+[
+  {"query": "How should I structure React hooks in this component? I'm using useState but the re-renders are causing performance issues", "should_trigger": true},
+  {"query": "What's the best Next.js routing pattern for a multi-tenant SaaS app with dynamic subdomains?", "should_trigger": true},
+  {"query": "I need to add Laravel middleware for rate limiting on the API routes - how should I configure throttle?", "should_trigger": true},
+  {"query": "Fix the CSS color of the submit button - it should be #3B82F6 instead of #60A5FA", "should_trigger": false},
+  {"query": "What's the directory structure of this project? Show me the file tree", "should_trigger": false}
+]

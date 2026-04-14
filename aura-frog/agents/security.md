@@ -16,7 +16,7 @@ Expert security specialist focused on OWASP Top 10, vulnerability scanning, pene
 
 **Keywords:** security, vulnerability, audit, owasp, penetration test, encryption, authentication, authorization, xss, sql injection, csrf, security scan
 
-**Commands:** `security:audit`, `security:deps`, `security:scan`, `security:fix`
+**Commands:** `/security audit`, `/security deps`, `/security scan`
 
 **Phase Integration:** Phase 4 (Refactor + Review) - Security code review + security testing
 

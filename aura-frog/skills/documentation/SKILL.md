@@ -9,92 +9,37 @@ triggers:
   - "architecture decision"
 ---
 
-# Skill: Documentation (ADR & Runbook)
+# Documentation (ADR & Runbook)
 
-Create ADRs and Runbooks for operational documentation.
+## When to Create
 
----
+- **ADR:** Technology choices, architectural changes, new patterns, deprecations
+- **Runbook:** Service deployment, common ops tasks, incident response
 
-## ADRs
-
-### When to Create
-- Choosing between technologies
-- Significant architectural changes
-- New patterns/conventions
-- Deprecating approaches
-
-### Template
+## ADR Template
 
 ```markdown
-# ADR-[NUMBER]: [TITLE]
-
-**Status:** [Proposed | Accepted | Deprecated | Superseded by ADR-XXX]
+# ADR-[N]: [TITLE]
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-X
 **Date:** YYYY-MM-DD
 
-## Context
-[Why do we need this decision?]
-
-## Decision
-[What is being decided?]
-
-## Options Considered
-### Option N: [Name]
-- **Pros:** [Benefits]
-- **Cons:** [Drawbacks]
-
-## Consequences
-- Positive: [Benefits]
-- Negative: [Tradeoffs]
-- Risks: [Risk] - Mitigation: [How]
+## Context — ## Decision — ## Options Considered — ## Consequences
 ```
 
-**Location:** `docs/adr/ADR-NNN-description.md`
+Location: `docs/adr/ADR-NNN-description.md`. Keep immutable — supersede, don't edit.
 
-**Rules:** Keep immutable (supersede, don't edit). Index in README.
-
----
-
-## Runbooks
-
-### When to Create
-- New service deployment
-- Common operational tasks
-- Incident response
-
-### Template
+## Runbook Template
 
 ```markdown
-# Runbook: [Service/Task Name]
+# Runbook: [Service]
+**Owner:** [Team] | **On-Call:** [Contact]
 
-**Service:** [Name] | **Owner:** [Team] | **On-Call:** [Contact]
-
-## Prerequisites
-- [ ] Access to [system]
-
-## Common Operations
-### Start/Stop/Health Check
-[Copy-paste-ready commands]
-
-## Troubleshooting
-### Issue: [Description]
-**Symptoms:** [What user sees]
-**Diagnosis:** [Commands]
-**Common Causes:** [List with fixes]
-
-## Alerts & Escalation
-| Alert | Severity | Action | Escalate After |
+## Prerequisites — ## Common Operations — ## Troubleshooting — ## Alerts & Escalation
 ```
 
-**Location:** `docs/runbooks/service-name.md`
+Location: `docs/runbooks/service-name.md`. Test commands before documenting.
 
-**Rules:** Test commands before documenting. Review after incidents.
+## Principles
 
----
-
-## Checklists
-
-**ADR:** Clear problem, options evaluated, decision stated, consequences documented, numbered/indexed.
-
-**Runbook:** Prerequisites listed, commands copy-paste-ready, issues documented, escalation path defined.
-
----
+- ADR: clear problem, options evaluated, consequences documented
+- Runbook: commands copy-paste-ready, escalation path defined

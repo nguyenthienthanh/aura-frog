@@ -16,7 +16,7 @@ Unified project management agent that handles detection, configuration loading, 
 
 **Always active** — runs on every session to detect project type, load config, and provide context to other agents.
 
-**Commands:** `/project:status`, `/project:refresh`, `/project:init`, `/project:switch [name]`, `/project:list`
+**Commands:** `/project status`, `/project refresh`, `/project init`, `/project switch [name]`, `/project list`
 
 ---
 

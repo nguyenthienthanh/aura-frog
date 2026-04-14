@@ -1,78 +1,56 @@
 ---
 name: design-expert
-description: "UI/UX design expertise - component design, design systems, responsive design, Figma analysis"
+description: "UI/UX design expertise — component design, design system selection, responsive layout. Includes auto-detection from package.json and Context7 integration for library docs."
 autoInvoke: false
 priority: medium
 triggers:
   - "design component"
-  - "UI breakdown"
   - "design system"
+  - "component library"
+  - "Material UI"
+  - "Tailwind"
+  - "shadcn"
   - "responsive layout"
 ---
 
-# Skill: Design Expert
-
-**Category:** Reference Skill
-**Used By:** frontend agent
-
----
-
-## Sub-Skills
-
-| File | Purpose |
-|------|---------|
-| `component-design.md` | Atomic design, component anatomy, specs |
-| `design-system.md` | Design tokens, theming, consistency |
-| `responsive-design.md` | Mobile-first, breakpoints, layouts |
-| `figma-analysis.md` | Figma file analysis techniques |
-
----
+# Design Expert
 
 ## When to Use
 
-- Phase 3 (UI Breakdown) - Component design decisions
-- UI/UX design tasks
-- Design system setup
-- Responsive layout planning
+Component design, design system selection/setup, responsive layouts, Figma analysis.
 
 ---
 
-## Quick Reference
+## Principles
 
-**Atomic Design:**
+```toon
+principles[4]{principle}:
+  Atomic design: Atoms → Molecules → Organisms → Templates → Pages
+  Mobile-first: design for smallest then enhance
+  Design tokens: colors/spacing/typography as variables not magic values
+  Consistency: one library per project — don't mix
 ```
-Atoms → Molecules → Organisms → Templates → Pages
+
+## Design System Selection
+
+```toon
+selection[4]{use_case,recommendation}:
+  Enterprise,"Ant Design, MUI, Mantine"
+  Modern Web,"Tailwind + shadcn/ui"
+  Mobile (RN),NativeWind
+  Prototyping,"Bootstrap, Tailwind"
 ```
 
-**Design Tokens:**
-- Colors, spacing, typography, shadows, borders
+## Auto-Detection
 
-**Responsive Breakpoints:**
-- Mobile: < 768px
-- Tablet: 768px - 1024px
-- Desktop: > 1024px
+Detect from package.json: `@mui/material` → MUI, `antd` → Ant Design, `tailwindcss` → Tailwind, `@chakra-ui/react` → Chakra, `nativewind` → NativeWind, `@mantine/core` → Mantine.
 
----
+## Implementation
 
-## Related Skills
-
-For implementation with specific design system libraries, use:
-
-**Design System Library:** `skills/design-system-library/`
-
-| System | File |
-|--------|------|
-| Material UI | `material-ui.md` |
-| Ant Design | `ant-design.md` |
-| Tailwind CSS | `tailwind-css.md` |
-| shadcn/ui | `shadcn-ui.md` |
-| Chakra UI | `chakra-ui.md` |
-| NativeWind | `nativewind.md` |
-| Bootstrap | `bootstrap.md` |
-| Mantine | `mantine.md` |
-| Radix UI | `radix-ui.md` |
-| Headless UI | `headless-ui.md` |
+**Use Context7** for current library docs. Add "use context7" to fetch version-specific API.
 
 ---
 
-**Load sub-skills as needed for detailed guidance.**
+## Responsive Breakpoints
+
+Mobile: <768px | Tablet: 768-1024px | Desktop: >1024px

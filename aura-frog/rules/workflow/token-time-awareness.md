@@ -41,14 +41,14 @@ At end of every phase:
 PHASE [N] SUMMARY
 Duration: ~[X] minutes
 Tokens: ~[X]K this phase | ~[Y]K total ([Z]%)
-[If >75%:] ⚠️ Consider `workflow:handoff`
+[If >75%:] ⚠️ Consider `/workflow handoff`
 ```
 
 ---
 
 ## Handoff Triggers
 
-Auto-suggest `workflow:handoff` when:
+Auto-suggest `/workflow handoff` when:
 - Token estimate >150K (75%)
 - Complex workflow with 3+ phases remaining
 - User working >2 hours
@@ -61,8 +61,8 @@ Auto-suggest `workflow:handoff` when:
 | Command | Action |
 |---------|--------|
 | `tokens` | Show current estimate |
-| `workflow:handoff` | Save state for later |
-| `workflow:resume <id>` | Resume saved workflow |
+| `/workflow handoff` | Save state for later |
+| `/workflow resume <id>` | Resume saved workflow |
 
 ---
 

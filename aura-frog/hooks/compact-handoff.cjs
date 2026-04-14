@@ -184,7 +184,7 @@ function saveHandoff() {
       workflow: workflowState,
       context: sessionContext,
       resume_hint: workflowState
-        ? `workflow:resume ${workflowState.workflow_id}`
+        ? `/workflow resume ${workflowState.workflow_id}`
         : null
     };
 

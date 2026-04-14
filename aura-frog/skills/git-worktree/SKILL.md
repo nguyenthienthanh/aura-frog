@@ -18,7 +18,7 @@ Auto-create git worktree when starting a workflow. All changes on isolated branc
 
 ## When to Use
 
-- **Auto:** `workflow:start` when `AF_WORKTREE=true`
+- **Auto:** `/workflow start` when `AF_WORKTREE=true`
 - **Manual:** User says "use a worktree"
 - **Skip:** Quick fixes, config changes, single-file edits
 

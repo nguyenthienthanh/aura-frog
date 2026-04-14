@@ -1,0 +1,7 @@
+[
+  {"query": "Simplify this function - it has 5 levels of nested if/else and I can't follow the logic anymore", "should_trigger": true},
+  {"query": "This code is way too complex for what it does. There are 3 layers of abstraction for a simple CRUD operation", "should_trigger": true},
+  {"query": "Can you reduce the complexity of the processOrder function? It's 120 lines with 15 different branches", "should_trigger": true},
+  {"query": "Add more features to the dashboard: notifications, real-time updates, and export to PDF", "should_trigger": false},
+  {"query": "Write comprehensive API documentation for all the endpoints in the payments module", "should_trigger": false}
+]

@@ -102,9 +102,9 @@ audit_phases[6]{phase,activities}:
 
 ```toon
 workflows[3]{command,scope}:
-  security:audit,"Full audit: automated scans + manual review + DAST + threat model + report"
-  security:deps,"Dep vuln scan: npm/yarn audit + Snyk + outdated check + upgrade recommendations"
-  security:scan,"Code scan: SAST + secret check + insecure patterns + hotspots + report"
+  /security audit,"Full audit: automated scans + manual review + DAST + threat model + report"
+  /security deps,"Dep vuln scan: npm/yarn audit + Snyk + outdated check + upgrade recommendations"
+  /security scan,"Code scan: SAST + secret check + insecure patterns + hotspots + report"
 ```
 
 ---

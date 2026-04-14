@@ -3,10 +3,10 @@ name: project-context-loader
 description: "Load project conventions and generate session context. Use EXPLICITLY when needed, not automatically."
 autoInvoke: false
 # TOKEN OPTIMIZATION: Disabled auto-invoke. Was causing ~15-25k tokens per session.
-# Invoke explicitly via /project:context or when project context is truly needed.
+# Invoke explicitly via /project context or when project context is truly needed.
 priority: high
 triggers:
-  - "/project:context"
+  - "/project context"
   - "load project context"
   - "load conventions"
 allowed-tools: Read, Write, Grep, Glob, Bash
@@ -20,7 +20,7 @@ Load project conventions and generate session context on demand.
 
 ## When to Use
 
-**Before:** `workflow:start`, code generation, refactoring, test writing.
+**Before:** `/workflow start`, code generation, refactoring, test writing.
 **Skip:** Simple questions (no code), when `session-context.toon` already loaded.
 
 ---

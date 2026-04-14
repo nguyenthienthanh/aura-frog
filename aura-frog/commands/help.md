@@ -41,25 +41,23 @@ Display help information for commands or topics.
 ## Aura Frog Team Agents - Command Reference
 
 **Workflow Commands:**
-- /workflow:start - Start new workflow
-- /workflow:status - Check progress
-- /workflow:approve - Approve phase
-- /workflow:reject - Reject phase
+- /workflow start - Start new workflow
+- /workflow status - Check progress
+- /workflow approve - Approve phase
+- /workflow reject - Reject phase
+- /workflow modify - Modify phase deliverables
 
 **Agent Commands:**
 - /agent:list - List agents
-- /agent:activate - Activate agent
 - /agent:info - Agent details
 
 **Project Commands:**
-- /project:switch - Switch project
-- /project:list - List projects
-- /project:info - Current project
+- /project init - Initialize project
+- /project status - Current project
+- /project detect - Detect tech stack
 
 **System Commands:**
 - /help - Show help
-- /version - Show version
-- /config - Show config
 
 **Need more help?**
 - Read: README.md

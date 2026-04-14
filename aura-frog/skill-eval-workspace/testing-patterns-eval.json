@@ -1,0 +1,7 @@
+[
+  {"query": "What's the best testing pattern for this async data fetching hook? Should I use msw or jest mocks?", "should_trigger": true},
+  {"query": "I need to mock the database connection in my service tests - what's the cleanest approach with Jest?", "should_trigger": true},
+  {"query": "How do I test this async function that calls multiple APIs in sequence? Need to handle race conditions", "should_trigger": true},
+  {"query": "Build a new React component for the user profile page with avatar upload and form validation", "should_trigger": false},
+  {"query": "Deploy the application to AWS using the Terraform configuration we set up", "should_trigger": false}
+]

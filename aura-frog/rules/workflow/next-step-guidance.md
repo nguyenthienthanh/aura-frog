@@ -18,7 +18,7 @@
 ```markdown
 ━━━ WHAT'S NEXT ━━━
 **Quick Actions:** `approve` | `reject: <reason>` | `skip`
-**Commands:** `workflow:status` | `workflow:handoff`
+**Commands:** `/workflow status` | `/workflow handoff`
 **Suggested:** → Type `approve` to continue to Phase 4
 ```
 
@@ -87,7 +87,7 @@ When errors occur, show recovery options: `fix`, `show failures`, `skip test: <n
 
 ## Non-Workflow Interactions
 
-Still provide guidance: follow-up questions, `workflow:start <task>`, `bugfix:quick <issue>`, `refactor: <target>`.
+Still provide guidance: follow-up questions, `/workflow start <task>`, `/bugfix quick <issue>`, `/refactor <target>`.
 
 ---
 

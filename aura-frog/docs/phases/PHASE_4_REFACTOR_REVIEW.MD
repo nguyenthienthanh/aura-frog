@@ -180,7 +180,7 @@ Code refactored, tests still green, quality improved ✅
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 5
+Type "/workflow approve" → Proceed to Phase 5
 
 Your response:
 ═══════════════════════════════════════════════════════════

@@ -49,4 +49,4 @@ standalone[16]{command,file,description}:
 ## Usage
 
 Type any bundled command without a subcommand to see its interactive menu.
-Example: `/workflow` shows menu, `/workflow:start "task"` runs directly.
+Example: `/workflow` shows menu, `/workflow start "task"` runs directly.

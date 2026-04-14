@@ -40,7 +40,7 @@ model_strategy[3]{model,strategy,reason}:
   Opus,"Compaction OK — use /compact freely","Large context window — handles compacted context well"
 ```
 
-**Rule:** Before compacting, check active model. If Sonnet: prefer `workflow:handoff` + `/clear` + `workflow:resume` over `/compact`. If Opus: `/compact` is fine.
+**Rule:** Before compacting, check active model. If Sonnet: prefer `/workflow handoff` + `/clear` + `/workflow resume` over `/compact`. If Opus: `/compact` is fine.
 
 ## Session Boundaries
 

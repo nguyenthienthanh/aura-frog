@@ -1,6 +1,6 @@
 ---
 name: vue-expert
-description: "Vue.js best practices expert. PROACTIVELY use when working with Vue 3, Composition API, Pinia, Nuxt. Triggers: vue, composition API, pinia, nuxt, .vue files"
+description: "Vue 3 gotchas and decision criteria. Covers reactivity traps, Composition API pitfalls, and Pinia patterns."
 autoInvoke: false
 priority: high
 triggers:
@@ -8,140 +8,31 @@ triggers:
   - "composition api"
   - "pinia"
   - "nuxt"
-  - ".vue file"
-  - "ref"
-  - "reactive"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 
-# Vue Expert Skill
+# Vue Expert — Gotchas & Decisions
 
-Vue 3 patterns: Composition API, Pinia, reactivity, performance.
+Use Context7 for full Vue/Nuxt docs.
 
----
-
-## 1. Composition API (Script Setup)
-
-```vue
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-
-interface Props { user: User; showAvatar?: boolean; }
-const props = withDefaults(defineProps<Props>(), { showAvatar: true });
-const emit = defineEmits<{ select: [user: User]; update: [id: string, data: Partial<User>]; }>();
-
-const isLoading = ref(false);
-const fullName = computed(() => `${props.user.firstName} ${props.user.lastName}`);
-</script>
-```
-
-### Composables
-
-Extract reusable logic into `composables/useX.ts`. Return `readonly()` refs. Use `watch()` with `{ immediate: true }` for auto-fetch.
-
-```typescript
-export function useUser(userId: Ref<string>) {
-  const user = ref<User | null>(null);
-  const isLoading = ref(false);
-  const error = ref<Error | null>(null);
-  // ... fetch logic with watch(userId, fetchUser, { immediate: true })
-  return { user: readonly(user), isLoading: readonly(isLoading), error: readonly(error), refetch };
-}
-```
-
----
-
-## 2. Reactivity
-
-- **ref** for all values (primitives and objects) -- consistent `.value`
-- **reactive** loses reactivity on reassignment -- avoid for replaceable objects
-- **watch:** Single ref, multiple `[ref1, ref2]`, or `watchEffect` for auto-tracking
-- **Cleanup:** Use `onCleanup` parameter for AbortController in async watchers
-
----
-
-## 3. Template Patterns
-
-- Explicit `v-if` checks: `v-if="userName != null && userName !== ''"`
-- `v-show` for frequent toggles, `v-if` for conditional render
-- Unique `:key="item.id"` (never index)
-- `computed` for filtering (not methods in template)
-- Event modifiers: `@submit.prevent`, `@keyup.enter`, `@click.stop`
-
----
-
-## 4. Component Design
-
-- **Props:** `withDefaults(defineProps<Props>(), { ... })`
-- **Emits:** `defineEmits<{ event: [payload] }>()`
-- **Slots:** Named slots with `$slots.header` check, scoped slots with `:canSubmit="isValid"`
-- **Expose:** `defineExpose({ focus, reset })` -- only what consumers need
-
----
-
-## 5. State Management (Pinia)
-
-**Setup store syntax** (Composition API style):
-
-```typescript
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null);
-  const isAuthenticated = computed(() => user.value != null);
-  async function login(credentials: Credentials) { /* ... */ }
-  return { user: readonly(user), isAuthenticated, login };
-});
-```
-
-Usage: `storeToRefs(store)` for reactive destructuring. Actions don't need storeToRefs.
-
----
-
-## 6. Performance
-
-- `computed` for derived state (cached vs method calls)
-- `v-once` for static content
-- `v-memo="[item.id, item.selected]"` for expensive list items
-- `defineAsyncComponent(() => import('./Heavy.vue'))` with loading/error states
-
----
-
-## 7. Forms (VeeValidate + Zod)
-
-```vue
-<script setup lang="ts">
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-const schema = toTypedSchema(z.object({ email: z.string().email(), password: z.string().min(8) }));
-const { handleSubmit, errors, defineField } = useForm({ validationSchema: schema });
-const [email, emailAttrs] = defineField('email');
-</script>
-```
-
----
-
-## 8. TypeScript
-
-- Template ref: `ref<InstanceType<typeof MyComponent> | null>(null)`
-- Global components: `declare module 'vue' { export interface GlobalComponents { ... } }`
-
----
-
-## Quick Reference
+## Key Decisions
 
 ```toon
-checklist[12]{pattern,best_practice}:
-  Script,Use script setup lang="ts"
-  State,ref for primitives and objects
-  Props,withDefaults + defineProps<Props>()
-  Emits,defineEmits with typed events
-  Computed,Use for derived reactive state
-  Watch,Use onCleanup for async
-  Templates,Explicit v-if checks
-  Keys,Unique IDs not indices
-  Store,Pinia setup store syntax
-  Store refs,storeToRefs for destructuring
-  Async,defineAsyncComponent for lazy load
-  Forms,VeeValidate + Zod
+decisions[4]{choice,use_when}:
+  ref vs reactive,"ref for primitives + single values. reactive for objects. Never destructure reactive — loses reactivity"
+  Pinia vs provide/inject,"Pinia for shared app state. provide/inject for component tree scoping"
+  Options vs Composition,"Always Composition API with <script setup>. Options only for legacy"
+  Composables vs mixins,"Always composables (use* functions). Mixins are deprecated pattern"
 ```
 
----
+## Gotchas
+
+- Destructuring `reactive()` object loses reactivity — use `toRefs()` or stick with `ref()`
+- `ref()` auto-unwraps in template but NOT in JS — use `.value` in script
+- `watch` vs `watchEffect`: watch needs explicit source, watchEffect auto-tracks. Use watch for old/new comparison
+- `computed` is readonly — don't assign to it. Use writable computed with get/set if needed
+- `<script setup>` auto-exposes to template but NOT to parent `$refs` — use `defineExpose()`
+- Props are readonly — never mutate. Emit event to parent instead
+- `v-for` + `v-if` on same element: `v-if` has higher priority in Vue 3 (opposite of Vue 2)
+- Pinia: use `storeToRefs()` for destructuring store state/getters. Actions don't need it
+- `nextTick()` needed after state change to access updated DOM

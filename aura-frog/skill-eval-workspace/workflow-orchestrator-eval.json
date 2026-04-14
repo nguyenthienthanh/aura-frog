@@ -1,0 +1,7 @@
+[
+  {"query": "Implement user authentication feature with email/password login, OAuth integration, and password reset flow", "should_trigger": true},
+  {"query": "Build the payment processing system with Stripe integration, webhook handling, and subscription management", "should_trigger": true},
+  {"query": "workflow:start Add a complete order management module with CRUD, status tracking, and email notifications", "should_trigger": true},
+  {"query": "Fix this typo in the README - change 'recieve' to 'receive'", "should_trigger": false},
+  {"query": "What does the getUserById function in UserService.ts do?", "should_trigger": false}
+]

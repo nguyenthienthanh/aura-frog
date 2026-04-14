@@ -125,7 +125,7 @@ When user runs `mcp:status`:
 ## Related Commands
 
 - `mcp:test <server>` - Test specific MCP server
-- `project:reload-env` - Reload environment variables
+- `/project reload-env` - Reload environment variables
 
 ---
 

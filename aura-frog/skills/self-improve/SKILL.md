@@ -4,7 +4,7 @@ description: "Apply learned improvements to the Aura Frog plugin. Updates rules,
 autoInvoke: false
 priority: 30
 triggers:
-  - "/learn:apply"
+  - "/learn apply"
   - "self improve"
   - "apply improvements"
 ---
@@ -18,10 +18,10 @@ Apply learned improvements: update rules, adjust agent routing, modify workflow 
 ## Usage
 
 ```bash
-/learn:apply                    # Review and apply pending
-/learn:apply --auto             # Auto-apply high-confidence (>=0.8)
-/learn:apply --preview          # Preview without applying
-/learn:apply --id <pattern_id>  # Apply specific pattern
+/learn apply                    # Review and apply pending
+/learn apply --auto             # Auto-apply high-confidence (>=0.8)
+/learn apply --preview          # Preview without applying
+/learn apply --id <pattern_id>  # Apply specific pattern
 ```
 
 ---
@@ -42,7 +42,7 @@ types[4]{type,target,example}:
 
 **Approval required** unless: `--auto` AND confidence >= 0.8 AND frequency >= 5.
 
-**Rollback:** Every change creates backup + log. `/learn:rollback <id>` or `--all`.
+**Rollback:** Every change creates backup + log. `/learn rollback <id>` or `--all`.
 
 **Validation:** Syntax check, conflict detection, impact assessment before applying.
 
@@ -60,9 +60,9 @@ types[4]{type,target,example}:
 ## Rollback
 
 ```bash
-/learn:rollback <change_id>     # Specific change
-/learn:rollback --list          # List recent changes
-/learn:rollback --all           # All changes from today
+/learn rollback <change_id>     # Specific change
+/learn rollback --list          # List recent changes
+/learn rollback --all           # All changes from today
 ```
 
 ---

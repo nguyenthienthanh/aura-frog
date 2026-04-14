@@ -1,0 +1,7 @@
+[
+  {"query": "Build a React dashboard with charts showing user analytics and a sidebar navigation component", "should_trigger": true},
+  {"query": "Fix the login bug where users get a 401 error after their JWT token expires but the refresh token is still valid", "should_trigger": true},
+  {"query": "Design the authentication system architecture with OAuth2 flows, session management, and role-based access control", "should_trigger": true},
+  {"query": "What's the weather like in San Francisco today?", "should_trigger": false},
+  {"query": "Explain the difference between quantum computing and classical computing in simple terms", "should_trigger": false}
+]

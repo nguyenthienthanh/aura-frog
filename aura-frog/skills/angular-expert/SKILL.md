@@ -1,150 +1,35 @@
 ---
 name: angular-expert
-description: "Angular/TypeScript frontend expert. PROACTIVELY use when working with Angular, RxJS, NgRx. Triggers: angular, ngrx, rxjs, component.ts"
+description: "Angular 17+ gotchas and decision criteria. Covers signals vs observables, standalone patterns, and common pitfalls Claude gets wrong."
 autoInvoke: false
 priority: high
 triggers:
   - "angular"
   - "ngrx"
   - "rxjs"
-  - "component.ts"
   - "angular.json"
-  - "ng serve"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 
-# Angular Expert Skill
+# Angular Expert — Gotchas & Decisions
 
-Angular 17+ patterns: standalone components, signals, RxJS, NgRx, performance.
+Use Context7 for full Angular docs.
 
----
-
-## 1. Component Best Practices
-
-### Standalone + Signals (Angular 17+)
-
-```typescript
-@Component({
-  selector: 'app-counter',
-  standalone: true,
-  template: `
-    <p>Count: {{ count() }}</p>
-    <p>Double: {{ doubleCount() }}</p>
-    <button (click)="increment()">+</button>
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class CounterComponent {
-  count = signal(0);
-  doubleCount = computed(() => this.count() * 2);
-  increment() { this.count.update(c => c + 1); }
-}
-```
-
-**Principle:** Always standalone, always OnPush, prefer signals over decorators. Separate Smart (container) from Dumb (presentational) components.
-
----
-
-## 2. Services & DI
-
-Use `inject()` function, `@Injectable({ providedIn: 'root' })`. Use `InjectionToken` for config values.
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class UserService {
-  private http = inject(HttpClient);
-  getUsers(): Observable<User[]> { return this.http.get<User[]>(`${this.baseUrl}/users`); }
-}
-```
-
----
-
-## 3. RxJS Best Practices
-
-- **Signals integration:** `toSignal()` and `toObservable()` for bridging
-- **Error handling:** `catchError` with recovery value
-- **Unsubscribe:** `takeUntilDestroyed(this.destroyRef)` or `async` pipe (auto-unsubscribes)
-
-```typescript
-user = toSignal(
-  toObservable(this.userId).pipe(
-    filter((id): id is string => id != null),
-    switchMap(id => this.userService.getUser(id)),
-  )
-);
-```
-
----
-
-## 4. State Management (NgRx)
-
-- **createFeature** with `createReducer` + `on()` handlers
-- **createActionGroup** for typed action sets
-- **Functional effects** with `createEffect` + `{ functional: true }`
-
-```typescript
-export const UsersActions = createActionGroup({
-  source: 'Users',
-  events: {
-    'Load Users': emptyProps(),
-    'Load Users Success': props<{ users: User[] }>(),
-    'Load Users Failure': props<{ error: string }>(),
-  },
-});
-```
-
----
-
-## 5. Forms
-
-Use `NonNullableFormBuilder` for typed reactive forms. Template: `[formGroup]`, `formControlName`, `@if (form.controls.email.errors?.['required'])`.
-
----
-
-## 6. Routing
-
-- **Lazy loading:** `loadComponent: () => import('./users.component').then(m => m.UsersComponent)`
-- **Functional guards:** `CanActivateFn` with `inject(AuthService)`
-- **Functional resolvers:** `ResolveFn<User>` with `inject(UserService)`
-
----
-
-## 7. Performance
-
-- Always `ChangeDetectionStrategy.OnPush`
-- `@for (item of items; track item.id)` for lists
-- `@defer (on viewport)` for heavy components with `@placeholder` and `@loading`
-
----
-
-## 8. HTTP Interceptors
-
-Use functional `HttpInterceptorFn`, register with `provideHttpClient(withInterceptors([authInterceptor]))`.
-
----
-
-## 9. Testing
-
-`TestBed.configureTestingModule({ imports: [Component] })` + `ComponentFixture` + `fixture.detectChanges()`.
-
----
-
-## Quick Reference
+## Key Decisions
 
 ```toon
-checklist[12]{pattern,best_practice}:
-  Components,Standalone + OnPush + Signals
-  State,Signals for local NgRx for global
-  Forms,NonNullableFormBuilder typed
-  RxJS,takeUntilDestroyed + async pipe
-  Routes,Lazy loading + functional guards
-  DI,inject() function
-  Lists,@for with track
-  Defer,@defer for heavy components
-  HTTP,Functional interceptors
-  Testing,ComponentFixture + TestBed
-  Errors,catchError with recovery
-  Smart/Dumb,Container vs presentational
+decisions[4]{choice,use_when}:
+  Signals vs Observables,"Signals for sync UI state. Observables for async streams/HTTP. Bridge with toSignal()/toObservable()"
+  NgRx vs Signals,"NgRx for complex shared state with effects. Signals for component/simple app state"
+  Standalone vs Module,"Always standalone (Angular 17+). Modules only for legacy"
+  OnPush vs Default,"Always OnPush. Requires immutable patterns"
 ```
 
----
+## Gotchas
+
+- `@for` requires `track` — use `track item.id` not `trackBy` function
+- `takeUntilDestroyed(this.destroyRef)` must be called in injection context (constructor or field init)
+- `toSignal()` returns `Signal<T | undefined>` — handle the undefined
+- `NonNullableFormBuilder` for typed forms — plain `FormBuilder` loses types
+- `@defer (on viewport)` needs `@placeholder` block or nothing renders
+- Functional guards/interceptors: use `inject()` not constructor DI

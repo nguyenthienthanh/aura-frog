@@ -7,7 +7,7 @@ Bundled workflow commands for the 5-phase TDD workflow.
 
 ---
 
-## /workflow:start <task>
+## /workflow start <task>
 
 Initialize a new 5-phase workflow. Generates a workflow ID from ticket number (e.g., `JIRA-123`) or a short name + date (e.g., `fix-payment-0122`). Detects project type and activates relevant agents. Runs Phase 1 (Understand + Design) automatically.
 
@@ -15,11 +15,11 @@ Initialize a new 5-phase workflow. Generates a workflow ID from ticket number (e
 - Challenges requirements before analysis (Standard/Deep complexity only)
 - Phase 1 deliverables: requirements analysis, implementation strategy, risk assessment, story points
 - Shows approval gate on completion: `approve`, `reject`, `modify`, or cancel
-- Auto-runs `workflow:predict` to show token estimate before starting
+- Auto-runs `/workflow predict` to show token estimate before starting
 
 ---
 
-## /workflow:status
+## /workflow status
 
 Display current workflow state: phase, progress percentage, deliverables count, active agents, time elapsed, and next actions. Reads from `workflow-state.json`.
 
@@ -29,19 +29,19 @@ Display current workflow state: phase, progress percentage, deliverables count, 
 
 ---
 
-## /workflow:approve
+## /workflow approve
 
 Approve the current phase and auto-advance to the next one. Only works at approval gates (Phase 1 and Phase 3).
 
 - Validates phase is complete, deliverables exist, and success criteria are met
 - Marks phase as "approved" with timestamp, increments `current_phase`
 - Auto-executes next phase (pre-hook, execution, post-hook, approval gate)
-- Optional comment: `/workflow:approve Looks good, proceed`
+- Optional comment: `/workflow approve Looks good, proceed`
 - At Phase 5 completion, shows final summary with duration, deliverables, and test coverage
 
 ---
 
-## /workflow:modify <instructions>
+## /workflow modify <instructions>
 
 Apply targeted modifications to current phase deliverables without restarting the phase. Faster than reject -- only changes specific things.
 
@@ -54,7 +54,7 @@ Apply targeted modifications to current phase deliverables without restarting th
 
 ---
 
-## /workflow:reject <reason>
+## /workflow reject <reason>
 
 Reject current phase and restart it with feedback context. Tracks retry count per phase.
 
@@ -66,7 +66,7 @@ Reject current phase and restart it with feedback context. Tracks retry count pe
 
 ---
 
-## /workflow:resume <workflow-id>
+## /workflow resume <workflow-id>
 
 Resume a workflow from a previous session.
 
@@ -77,18 +77,18 @@ Resume a workflow from a previous session.
 
 ---
 
-## /workflow:handoff
+## /workflow handoff
 
 Save workflow state for continuation in a new session.
 
 - Triggers: token usage > 75%, before breaks, multi-day projects
 - Saves: workflow state, HANDOFF_CONTEXT.md (human-readable summary), git state, deliverables, pending tasks
 - HANDOFF_CONTEXT.md sections: Summary, Current Phase, Pending Tasks, Key Decisions, Next Steps, Resume Command
-- Resume with: `workflow:resume {workflow-id}`
+- Resume with: `/workflow resume {workflow-id}`
 
 ---
 
-## /workflow:progress
+## /workflow progress
 
 Show visual progress timeline with phase completion, time estimates, and token usage.
 
@@ -99,7 +99,7 @@ Show visual progress timeline with phase completion, time estimates, and token u
 
 ---
 
-## /workflow:budget
+## /workflow budget
 
 Show real-time token usage versus prediction during an active workflow.
 
@@ -111,7 +111,7 @@ Show real-time token usage versus prediction during an active workflow.
 
 ---
 
-## /workflow:metrics
+## /workflow metrics
 
 Display workflow quality and performance metrics.
 
@@ -123,7 +123,7 @@ Display workflow quality and performance metrics.
 
 ---
 
-## /workflow:predict <task>
+## /workflow predict <task>
 
 Predict token usage before starting a workflow. Analyzes task type, complexity, scope, and tech stack.
 
@@ -135,7 +135,7 @@ Predict token usage before starting a workflow. Analyzes task type, complexity, 
 
 ---
 
-## /workflow:rollback [phase]
+## /workflow rollback [phase]
 
 Revert to a git checkpoint created before a specific phase.
 

@@ -1,0 +1,1832 @@
+{
+  "version": "3.4.1",
+  "evaluatedAt": "2026-04-14T10:00:00Z",
+  "evaluator": "claude-opus-4-6",
+  "summary": {
+    "totalSkills": 44,
+    "autoInvoke": 8,
+    "reference": 36,
+    "averageScore": 6.33,
+    "topSkills": [
+      { "name": "prompt-evaluator", "score": 7.86, "grade": "B" },
+      { "name": "code-reviewer", "score": 7.71, "grade": "B" },
+      { "name": "code-simplifier", "score": 7.71, "grade": "B" },
+      { "name": "agent-detector", "score": 7.57, "grade": "B" },
+      { "name": "project-context-loader", "score": 7.43, "grade": "B" }
+    ],
+    "needsWork": [
+      { "name": "qa-expert", "score": 4.86, "grade": "D", "issue": "Empty shell — just a directory listing with no actual instructions" },
+      { "name": "dev-expert", "score": 5.0, "grade": "C", "issue": "Pure router to other skills — no unique value" },
+      { "name": "framework-expert", "score": 5.0, "grade": "C", "issue": "Auto-invoke at 1300 tokens duplicating all individual expert skills" },
+      { "name": "api-designer", "score": 5.29, "grade": "C", "issue": "Claude already knows REST conventions — low added value" },
+      { "name": "nextjs-expert", "score": 5.29, "grade": "C", "issue": "Heaviest skill at 1800 tokens — Claude knows Next.js" },
+      { "name": "pm-expert", "score": 5.29, "grade": "C", "issue": "Empty shell — sub-skills may not exist" }
+    ],
+    "criticalIssues": [
+      "Auto-invoke token budget is 6050 tokens — 6x over the 1000 target",
+      "test-writer + testing-patterns are both auto-invoke with ~60% content overlap",
+      "framework-expert (auto-invoke, 1300 tokens) duplicates all 10 individual expert skills",
+      "10 expert skills teach Claude knowledge it already has — low ROI at ~10,000 tokens total",
+      "debugging and bugfix-quick have overlapping triggers causing ambiguous routing",
+      "CRITICAL: ALL 8 auto-invoke skills have 0% positive trigger rate — descriptions fail to make Claude consult the skill"
+    ]
+  },
+  "skills": [
+    {
+      "name": "agent-detector",
+      "path": "skills/agent-detector/SKILL.md",
+      "autoInvoke": true,
+      "lines": 109,
+      "estimatedTokens": 800,
+      "scores": {
+        "triggerAccuracy": 8,
+        "tokenEfficiency": 6,
+        "instructionClarity": 8,
+        "actionability": 9,
+        "deduplication": 7,
+        "principleVsChecklist": 6,
+        "integration": 9
+      },
+      "overall": 7.57,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Well-structured 4-layer detection with clear priority order",
+        "TOON tables for all structured data — good token density",
+        "Cache strategy prevents redundant detection",
+        "Clear output format"
+      ],
+      "weaknesses": [
+        "800 tokens for always-loaded skill — heavy for auto-invoke",
+        "agent_defaults table duplicates info that should live in agent files",
+        "Task triggers use fixed boost scores — rigid, not principle-based"
+      ],
+      "recommendations": [
+        "Reduce to ~500 tokens by removing agent_defaults (load from agent files)",
+        "Replace fixed boost scores with relative ranking principles"
+      ]
+    },
+    {
+      "name": "angular-expert",
+      "path": "skills/angular-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 150,
+      "estimatedTokens": 1100,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 6,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Covers Angular 17+ modern patterns (signals, standalone)",
+        "Good code examples for DI and RxJS patterns"
+      ],
+      "weaknesses": [
+        "1100 tokens of content Claude already knows",
+        "No decision criteria — when to use signals vs observables?",
+        "Overlaps with framework-expert angular section",
+        "Pure checklist/reference — doesn't expand Claude's capabilities"
+      ],
+      "recommendations": [
+        "Reduce to ~300 tokens of Angular-specific gotchas Claude gets wrong",
+        "Use Context7 for up-to-date Angular docs instead"
+      ]
+    },
+    {
+      "name": "api-designer",
+      "path": "skills/api-designer/SKILL.md",
+      "autoInvoke": false,
+      "lines": 85,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 6,
+        "instructionClarity": 6,
+        "actionability": 5,
+        "deduplication": 7,
+        "principleVsChecklist": 3,
+        "integration": 4
+      },
+      "overall": 5.29,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Good table format for REST conventions",
+        "Cursor vs offset pagination comparison"
+      ],
+      "weaknesses": [
+        "HTTP status codes and REST conventions are common knowledge for Claude",
+        "No API design PROCESS — just a reference sheet",
+        "No integration with workflow or other skills",
+        "Pure checklist, no principles for design decisions"
+      ],
+      "recommendations": [
+        "Replace with API design PRINCIPLES (when GraphQL, when RPC, etc.)",
+        "Focus on decision criteria not reference data"
+      ]
+    },
+    {
+      "name": "bugfix-quick",
+      "path": "skills/bugfix-quick/SKILL.md",
+      "autoInvoke": true,
+      "lines": 82,
+      "estimatedTokens": 550,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 8,
+        "actionability": 9,
+        "deduplication": 6,
+        "principleVsChecklist": 5,
+        "integration": 7
+      },
+      "overall": 7.0,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Clear 4-step TDD process with approval gates",
+        "Good boundary: 'NOT for new features → use workflow-orchestrator'",
+        "Template for output format",
+        "Compact at 550 tokens"
+      ],
+      "weaknesses": [
+        "Triggers overlap with debugging skill (both: bug, error, broken, crash)",
+        "Code examples in template add tokens without value",
+        "'error' and 'not working' triggers are too generic"
+      ],
+      "recommendations": [
+        "Remove code examples from template",
+        "Merge debugging skill's root-cause principle into this skill",
+        "Narrow triggers: remove 'error' (too broad)"
+      ]
+    },
+    {
+      "name": "code-reviewer",
+      "path": "skills/code-reviewer/SKILL.md",
+      "autoInvoke": true,
+      "lines": 87,
+      "estimatedTokens": 650,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 9,
+        "actionability": 9,
+        "deduplication": 7,
+        "principleVsChecklist": 6,
+        "integration": 9
+      },
+      "overall": 7.71,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Excellent 6-aspect weighted review structure",
+        "Calibration anchors with few-shot scoring prevent LGTM drift",
+        "Builder ≠ Reviewer principle",
+        "Clear decision criteria (APPROVED/CHANGES REQUESTED)"
+      ],
+      "weaknesses": [
+        "650 tokens for auto-invoke — could be trimmed",
+        "Builder ≠ Reviewer rule duplicated in workflow-orchestrator",
+        "Emoji summary format adds visual noise"
+      ],
+      "recommendations": [
+        "Remove Builder ≠ Reviewer from here (it's in workflow-orchestrator)",
+        "Remove emoji summary",
+        "Target ~450 tokens"
+      ]
+    },
+    {
+      "name": "code-simplifier",
+      "path": "skills/code-simplifier/SKILL.md",
+      "autoInvoke": true,
+      "lines": 47,
+      "estimatedTokens": 300,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 9,
+        "instructionClarity": 8,
+        "actionability": 8,
+        "deduplication": 7,
+        "principleVsChecklist": 8,
+        "integration": 7
+      },
+      "overall": 7.71,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Ultra-lean at 300 tokens — practices what it preaches",
+        "5 questions before writing code are principle-driven",
+        "Good delegation to rules file for full guide",
+        "MODEL SKILL — use as template for others"
+      ],
+      "weaknesses": [
+        "Targets table (complexity 10, nesting 3) is somewhat arbitrary",
+        "'simplify' trigger could fire when user means 'explain simply'"
+      ],
+      "recommendations": [
+        "Add negative trigger: 'explain' to avoid misfires",
+        "Use as template for rewriting other skills"
+      ]
+    },
+    {
+      "name": "debugging",
+      "path": "skills/debugging/SKILL.md",
+      "autoInvoke": false,
+      "lines": 142,
+      "estimatedTokens": 900,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 4,
+        "principleVsChecklist": 6,
+        "integration": 5
+      },
+      "overall": 5.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Strong 'NO FIXES WITHOUT ROOT CAUSE' principle",
+        "Iron Law verification protocol",
+        "Red Flags section catches premature claiming"
+      ],
+      "weaknesses": [
+        "Heavy overlap with bugfix-quick — both handle bugs",
+        "142 lines / 900 tokens — verbose with prose",
+        "References files that may not exist",
+        "Quick Reference duplicates the 4 phases above"
+      ],
+      "recommendations": [
+        "MERGE into bugfix-quick — add root cause emphasis there, remove this skill"
+      ]
+    },
+    {
+      "name": "design-expert",
+      "path": "skills/design-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 78,
+      "estimatedTokens": 500,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 7,
+        "instructionClarity": 5,
+        "actionability": 4,
+        "deduplication": 5,
+        "principleVsChecklist": 5,
+        "integration": 6
+      },
+      "overall": 5.43,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Good delegation pattern — indexes sub-skills"
+      ],
+      "weaknesses": [
+        "Library list duplicated in design-system-library",
+        "No actual design instructions — just pointers",
+        "Sub-skill files may not exist"
+      ],
+      "recommendations": [
+        "MERGE with design-system-library into one 'design' skill"
+      ]
+    },
+    {
+      "name": "design-system-library",
+      "path": "skills/design-system-library/SKILL.md",
+      "autoInvoke": false,
+      "lines": 87,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 6,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 6
+      },
+      "overall": 5.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Good Context7 integration",
+        "Auto-detection from package.json",
+        "Selection table for use cases"
+      ],
+      "weaknesses": [
+        "Library list duplicated in design-expert",
+        "'Use context7' repeated multiple times"
+      ],
+      "recommendations": [
+        "MERGE with design-expert into one 'design' skill"
+      ]
+    },
+    {
+      "name": "dev-expert",
+      "path": "skills/dev-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 68,
+      "estimatedTokens": 400,
+      "scores": {
+        "triggerAccuracy": 5,
+        "tokenEfficiency": 7,
+        "instructionClarity": 5,
+        "actionability": 4,
+        "deduplication": 4,
+        "principleVsChecklist": 5,
+        "integration": 5
+      },
+      "overall": 5.0,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Compact at 400 tokens",
+        "State types decision table"
+      ],
+      "weaknesses": [
+        "Pure router — just points to other expert skills",
+        "expert_skills table duplicates the skill registry",
+        "References sub-files that may not exist",
+        "Generic triggers fire on almost any coding task"
+      ],
+      "recommendations": [
+        "REMOVE — framework-expert already handles routing"
+      ]
+    },
+    {
+      "name": "documentation",
+      "path": "skills/documentation/SKILL.md",
+      "autoInvoke": false,
+      "lines": 100,
+      "estimatedTokens": 700,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 8,
+        "deduplication": 8,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 6.29,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Unique content — only skill covering ADRs and runbooks",
+        "Templates are directly usable"
+      ],
+      "weaknesses": [
+        "Templates are verbose at 700 tokens",
+        "No documentation decision principles"
+      ],
+      "recommendations": [
+        "Reduce templates to skeleton — Claude can fill sections",
+        "Add principles: when ADR vs inline comment vs README",
+        "Target ~400 tokens"
+      ]
+    },
+    {
+      "name": "flutter-expert",
+      "path": "skills/flutter-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 176,
+      "estimatedTokens": 1300,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 4,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.43,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Covers both Riverpod AND Bloc patterns",
+        "Result pattern with sealed classes"
+      ],
+      "weaknesses": [
+        "1300 tokens — heavy for a reference skill",
+        "Both Riverpod AND Bloc = double content without decision criteria",
+        "Overlaps with framework-expert flutter section"
+      ],
+      "recommendations": [
+        "Reduce to ~500 tokens by removing code examples",
+        "Add decision criteria: when Riverpod vs Bloc",
+        "Use Context7 for Flutter docs"
+      ]
+    },
+    {
+      "name": "framework-expert",
+      "path": "skills/framework-expert/SKILL.md",
+      "autoInvoke": true,
+      "lines": 179,
+      "estimatedTokens": 1300,
+      "scores": {
+        "triggerAccuracy": 5,
+        "tokenEfficiency": 5,
+        "instructionClarity": 6,
+        "actionability": 5,
+        "deduplication": 3,
+        "principleVsChecklist": 5,
+        "integration": 6
+      },
+      "overall": 5.0,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Lazy-loading concept is sound",
+        "Core patterns section has universal value",
+        "Cache detection strategy"
+      ],
+      "weaknesses": [
+        "CRITICAL: 1300 tokens auto-invoke — largest auto-invoke skill",
+        "Claims lazy-load but ALL framework content is IN the SKILL.md",
+        "11 frameworks × 6 rules = 66 TOON entries loaded every session",
+        "Directly contradicts individual expert skills"
+      ],
+      "recommendations": [
+        "CRITICAL: Remove from auto-invoke or reduce to ~200 tokens (core patterns only)",
+        "Implement ACTUAL lazy loading — SKILL.md has only core + detection, references load on demand",
+        "Consider removing entirely — individual expert skills + Context7 cover this"
+      ]
+    },
+    {
+      "name": "git-workflow",
+      "path": "skills/git-workflow/SKILL.md",
+      "autoInvoke": false,
+      "lines": 140,
+      "estimatedTokens": 950,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 8,
+        "actionability": 9,
+        "deduplication": 7,
+        "principleVsChecklist": 5,
+        "integration": 6
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Security scan before commit is excellent",
+        "Auto-split decision criteria",
+        "Token-efficient output format"
+      ],
+      "weaknesses": [
+        "Bash scripts take many tokens",
+        "Some overlap with Claude Code's built-in git commit behavior"
+      ],
+      "recommendations": [
+        "Reduce bash to pseudocode — Claude can generate commands",
+        "Focus on PRINCIPLES (security scan, split criteria) not exact commands",
+        "Target ~600 tokens"
+      ]
+    },
+    {
+      "name": "git-worktree",
+      "path": "skills/git-worktree/SKILL.md",
+      "autoInvoke": false,
+      "lines": 63,
+      "estimatedTokens": 400,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 8,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 8,
+        "principleVsChecklist": 6,
+        "integration": 8
+      },
+      "overall": 7.29,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Compact at 400 tokens",
+        "Clear lifecycle with TOON",
+        "Strong safety rules",
+        "Good workflow integration"
+      ],
+      "weaknesses": [
+        "Configuration assumes env vars not documented elsewhere"
+      ],
+      "recommendations": [
+        "Good skill — minor improvements only"
+      ]
+    },
+    {
+      "name": "go-expert",
+      "path": "skills/go-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 150,
+      "estimatedTokens": 1100,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Covers Go idioms (error wrapping, interfaces, concurrency)"
+      ],
+      "weaknesses": [
+        "1100 tokens of content Claude already knows",
+        "Overlaps with framework-expert go section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens of Go-specific gotchas",
+        "Use Context7 for Go framework docs"
+      ]
+    },
+    {
+      "name": "laravel-expert",
+      "path": "skills/laravel-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 124,
+      "estimatedTokens": 900,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "N+1 prevention patterns are useful",
+        "PHP 8.2+ patterns (readonly DTOs)"
+      ],
+      "weaknesses": [
+        "900 tokens — most is common Laravel knowledge",
+        "Overlaps with framework-expert laravel section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens focusing on Laravel gotchas",
+        "Use Context7 for Laravel docs"
+      ]
+    },
+    {
+      "name": "lazy-agent-loader",
+      "path": "skills/lazy-agent-loader/SKILL.md",
+      "autoInvoke": false,
+      "lines": 74,
+      "estimatedTokens": 500,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 5,
+        "principleVsChecklist": 6,
+        "integration": 8
+      },
+      "overall": 6.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Token savings comparison is compelling (97.5%)",
+        "Score-based loading strategy",
+        "Good integration with agent-detector"
+      ],
+      "weaknesses": [
+        "Agent index overlaps with agent-detector's agent_defaults",
+        "16-entry index includes agents that may not exist"
+      ],
+      "recommendations": [
+        "Consolidate agent index with agent-detector",
+        "Verify all 16 indexed agents exist"
+      ]
+    },
+    {
+      "name": "learning-analyzer",
+      "path": "skills/learning-analyzer/SKILL.md",
+      "autoInvoke": false,
+      "lines": 86,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 8,
+        "principleVsChecklist": 5,
+        "integration": 6
+      },
+      "overall": 6.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Unique functionality — learning from past sessions",
+        "Clear process: query → analyze → report",
+        "Good integration with self-improve"
+      ],
+      "weaknesses": [
+        "Requires Supabase setup",
+        "Supabase views may not exist"
+      ],
+      "recommendations": [
+        "Add fallback for when Supabase is not configured"
+      ]
+    },
+    {
+      "name": "migration-helper",
+      "path": "skills/migration-helper/SKILL.md",
+      "autoInvoke": false,
+      "lines": 83,
+      "estimatedTokens": 550,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 8,
+        "principleVsChecklist": 5,
+        "integration": 5
+      },
+      "overall": 6.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Unique content — migration safety strategies",
+        "Schema changes → safe approach mapping",
+        "Zero-downtime 6-phase process"
+      ],
+      "weaknesses": [
+        "Safety rules are generic",
+        "Migration script is TypeScript-specific"
+      ],
+      "recommendations": [
+        "Add framework detection for migration tools",
+        "Target ~400 tokens"
+      ]
+    },
+    {
+      "name": "nextjs-expert",
+      "path": "skills/nextjs-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 248,
+      "estimatedTokens": 1800,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 3,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.29,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Comprehensive Next.js 14+ coverage",
+        "Server vs Client component guidance"
+      ],
+      "weaknesses": [
+        "HEAVIEST skill at 1800 tokens",
+        "Claude knows Next.js 14+ — most content is redundant",
+        "Overlaps with framework-expert nextjs section",
+        "10 sections when 3-4 key principles would suffice"
+      ],
+      "recommendations": [
+        "CRITICAL: Reduce to ~500 tokens — keep only gotchas",
+        "Keep: server vs client boundary, caching strategy, data fetching",
+        "Remove: middleware, image optimization, API routes",
+        "Use Context7 for Next.js reference"
+      ]
+    },
+    {
+      "name": "nodejs-expert",
+      "path": "skills/nodejs-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 119,
+      "estimatedTokens": 850,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "asyncHandler wrapper pattern",
+        "Express + NestJS patterns combined"
+      ],
+      "weaknesses": [
+        "850 tokens of Node.js patterns Claude knows",
+        "Overlaps with framework-expert nodejs section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens of Node.js-specific gotchas",
+        "Focus on async pitfalls (forEach + async)"
+      ]
+    },
+    {
+      "name": "performance-optimizer",
+      "path": "skills/performance-optimizer/SKILL.md",
+      "autoInvoke": false,
+      "lines": 98,
+      "estimatedTokens": 650,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 7,
+        "principleVsChecklist": 7,
+        "integration": 5
+      },
+      "overall": 6.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Strong principle: 'Measure first, optimize second'",
+        "Good issue → solution tables",
+        "Core Web Vitals targets"
+      ],
+      "weaknesses": [
+        "Some common knowledge content",
+        "'slow' trigger is very generic"
+      ],
+      "recommendations": [
+        "Add profiling PROCESS — how to find bottlenecks"
+      ]
+    },
+    {
+      "name": "phase1-lite",
+      "path": "skills/phase1-lite/SKILL.md",
+      "autoInvoke": false,
+      "lines": 131,
+      "estimatedTokens": 900,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 9,
+        "actionability": 9,
+        "deduplication": 6,
+        "principleVsChecklist": 5,
+        "integration": 8
+      },
+      "overall": 7.14,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Excellent template — crystal clear output format",
+        "500 token cap is a good constraint",
+        "Anti-patterns prevent bloat",
+        "Example is perfect calibration"
+      ],
+      "weaknesses": [
+        "Ironic: '500 token cap' skill that itself is 900 tokens",
+        "Anti-patterns are inverse of rules (redundant)"
+      ],
+      "recommendations": [
+        "Practice what you preach — reduce to ~500 tokens",
+        "Merge example into template as comments"
+      ]
+    },
+    {
+      "name": "pm-expert",
+      "path": "skills/pm-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 54,
+      "estimatedTokens": 350,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 8,
+        "instructionClarity": 4,
+        "actionability": 3,
+        "deduplication": 7,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.29,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Compact at 350 tokens"
+      ],
+      "weaknesses": [
+        "Empty shell — just a directory listing",
+        "Sub-skills may not exist",
+        "No actual PM instructions"
+      ],
+      "recommendations": [
+        "Either add actual content or REMOVE"
+      ]
+    },
+    {
+      "name": "problem-solving",
+      "path": "skills/problem-solving/SKILL.md",
+      "autoInvoke": false,
+      "lines": 192,
+      "estimatedTokens": 1400,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 8,
+        "actionability": 8,
+        "deduplication": 8,
+        "principleVsChecklist": 8,
+        "integration": 5
+      },
+      "overall": 7.0,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Excellent principle-driven approach — 5 distinct techniques",
+        "Decision matrix maps symptoms → techniques",
+        "Expands Claude's problem-solving capabilities"
+      ],
+      "weaknesses": [
+        "1400 tokens — examples are verbose",
+        "Model selection in decision matrix may be outdated"
+      ],
+      "recommendations": [
+        "Reduce examples to 1-2 lines each",
+        "Target ~800 tokens",
+        "Remove model selection (handled by agent-detector)"
+      ]
+    },
+    {
+      "name": "project-context-loader",
+      "path": "skills/project-context-loader/SKILL.md",
+      "autoInvoke": false,
+      "lines": 86,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 8,
+        "actionability": 8,
+        "deduplication": 7,
+        "principleVsChecklist": 6,
+        "integration": 9
+      },
+      "overall": 7.43,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Smart loading strategy based on task type",
+        "Token budgets per scenario",
+        "Good that auto-invoke was disabled (TOKEN OPTIMIZATION note)",
+        "Well-integrated with workflow"
+      ],
+      "weaknesses": [
+        "Cache TTL (1 hour) is arbitrary"
+      ],
+      "recommendations": [
+        "Good skill — model for infrastructure skills"
+      ]
+    },
+    {
+      "name": "prompt-evaluator",
+      "path": "skills/prompt-evaluator/SKILL.md",
+      "autoInvoke": false,
+      "lines": 118,
+      "estimatedTokens": 850,
+      "scores": {
+        "triggerAccuracy": 8,
+        "tokenEfficiency": 7,
+        "instructionClarity": 9,
+        "actionability": 9,
+        "deduplication": 8,
+        "principleVsChecklist": 8,
+        "integration": 6
+      },
+      "overall": 7.86,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "HIGHEST SCORED SKILL — excellent design",
+        "Two clear modes with distinct triggers",
+        "4-step evaluation process is crystal clear",
+        "Anti-patterns section directly actionable",
+        "Principles section expands Claude's meta-cognition",
+        "JSON output format for parseable results"
+      ],
+      "weaknesses": [
+        "Mode 1 requires metrics infrastructure"
+      ],
+      "recommendations": [
+        "Use as MODEL for other skills",
+        "Add fallback for Mode 1 when no metrics data"
+      ]
+    },
+    {
+      "name": "python-expert",
+      "path": "skills/python-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 118,
+      "estimatedTokens": 850,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Covers FastAPI + Django + SQLAlchemy",
+        "Good async patterns"
+      ],
+      "weaknesses": [
+        "850 tokens of Python patterns Claude knows",
+        "Overlaps with framework-expert python section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens of Python-specific gotchas"
+      ]
+    },
+    {
+      "name": "qa-expert",
+      "path": "skills/qa-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 59,
+      "estimatedTokens": 350,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 8,
+        "instructionClarity": 4,
+        "actionability": 3,
+        "deduplication": 4,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 4.86,
+      "grade": "D",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Compact at 350 tokens"
+      ],
+      "weaknesses": [
+        "LOWEST SCORED SKILL — empty shell with no actual content",
+        "Testing pyramid and coverage targets duplicate testing-patterns",
+        "Sub-skills may not exist",
+        "'unit test' trigger overlaps with test-writer and testing-patterns"
+      ],
+      "recommendations": [
+        "REMOVE — testing-patterns and test-writer cover this better"
+      ]
+    },
+    {
+      "name": "react-expert",
+      "path": "skills/react-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 131,
+      "estimatedTokens": 950,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 5,
+        "principleVsChecklist": 5,
+        "integration": 5
+      },
+      "overall": 5.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Conditional rendering gotchas (count && <X/>) genuinely useful",
+        "State decision table is actionable"
+      ],
+      "weaknesses": [
+        "950 tokens — Claude knows React well",
+        "Overlaps with framework-expert react section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens: conditional gotchas, state decisions, hooks pitfalls"
+      ]
+    },
+    {
+      "name": "react-native-expert",
+      "path": "skills/react-native-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 128,
+      "estimatedTokens": 900,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "FlatList optimization props are specific and useful",
+        "FlashList recommendation",
+        "Storage hierarchy (AsyncStorage vs SecureStore vs MMKV)"
+      ],
+      "weaknesses": [
+        "900 tokens — most is common RN knowledge",
+        "Overlaps with framework-expert rn section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens: FlatList, FlashList, storage, platform gotchas"
+      ]
+    },
+    {
+      "name": "refactor-expert",
+      "path": "skills/refactor-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 81,
+      "estimatedTokens": 550,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 8,
+        "deduplication": 7,
+        "principleVsChecklist": 6,
+        "integration": 6
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Golden Rule: 'Never refactor and add features simultaneously'",
+        "Code smell → refactoring mapping",
+        "Commands with output files"
+      ],
+      "weaknesses": [
+        "Code smells list is standard knowledge"
+      ],
+      "recommendations": [
+        "Reduce smells table — keep only non-obvious ones",
+        "Add decision: when to refactor now vs leave it"
+      ]
+    },
+    {
+      "name": "response-analyzer",
+      "path": "skills/response-analyzer/SKILL.md",
+      "autoInvoke": false,
+      "lines": 89,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 8,
+        "deduplication": 8,
+        "principleVsChecklist": 5,
+        "integration": 7
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Unique token-saving pattern",
+        "Token savings comparison (87-96%)",
+        "Workflow phase integration"
+      ],
+      "weaknesses": [
+        "Threshold values are somewhat arbitrary"
+      ],
+      "recommendations": [
+        "Consider making this a PRINCIPLE in rules rather than a skill"
+      ]
+    },
+    {
+      "name": "scalable-thinking",
+      "path": "skills/scalable-thinking/SKILL.md",
+      "autoInvoke": false,
+      "lines": 73,
+      "estimatedTokens": 500,
+      "scores": {
+        "triggerAccuracy": 5,
+        "tokenEfficiency": 8,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 6,
+        "principleVsChecklist": 8,
+        "integration": 5
+      },
+      "overall": 6.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Excellent principle: 'Think Scalable, Build Simple'",
+        "Anti-patterns table is most valuable section",
+        "'When to Scale Up' criteria are specific and measurable"
+      ],
+      "weaknesses": [
+        "Triggers too broad — 'architecture', 'API design'",
+        "Some overlap with api-designer"
+      ],
+      "recommendations": [
+        "Narrow triggers: 'scale', 'scalability'",
+        "Consider merging anti-patterns into rules"
+      ]
+    },
+    {
+      "name": "self-improve",
+      "path": "skills/self-improve/SKILL.md",
+      "autoInvoke": false,
+      "lines": 82,
+      "estimatedTokens": 550,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 8,
+        "deduplication": 7,
+        "principleVsChecklist": 6,
+        "integration": 8
+      },
+      "overall": 7.14,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Safety guards well-designed",
+        "Clear 4-step process",
+        "Rollback commands included"
+      ],
+      "weaknesses": [
+        "Depends on Supabase infrastructure"
+      ],
+      "recommendations": [
+        "Good skill — minor improvements only"
+      ]
+    },
+    {
+      "name": "sequential-thinking",
+      "path": "skills/sequential-thinking/SKILL.md",
+      "autoInvoke": false,
+      "lines": 123,
+      "estimatedTokens": 850,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 6,
+        "instructionClarity": 8,
+        "actionability": 7,
+        "deduplication": 7,
+        "principleVsChecklist": 7,
+        "integration": 7
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Revision/branching concept genuinely useful",
+        "Dynamic adjustment rules",
+        "Phase integration table"
+      ],
+      "weaknesses": [
+        "Triggers too vague",
+        "Example takes ~200 tokens",
+        "Conceptual overlap with problem-solving"
+      ],
+      "recommendations": [
+        "Compress example to 3-4 lines",
+        "Target ~600 tokens"
+      ]
+    },
+    {
+      "name": "session-continuation",
+      "path": "skills/session-continuation/SKILL.md",
+      "autoInvoke": false,
+      "lines": 133,
+      "estimatedTokens": 900,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 8,
+        "actionability": 8,
+        "deduplication": 6,
+        "principleVsChecklist": 5,
+        "integration": 9
+      },
+      "overall": 7.0,
+      "grade": "B",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "TOON state format saves 73% vs JSON",
+        "Clear handoff and resume flows",
+        "Error handling for corrupted/missing states"
+      ],
+      "weaknesses": [
+        "900 tokens — some verbose sections"
+      ],
+      "recommendations": [
+        "Compress to ~600 tokens"
+      ]
+    },
+    {
+      "name": "stitch-design",
+      "path": "skills/stitch-design/SKILL.md",
+      "autoInvoke": false,
+      "lines": 79,
+      "estimatedTokens": 550,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 7,
+        "actionability": 7,
+        "deduplication": 9,
+        "principleVsChecklist": 5,
+        "integration": 6
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Unique functionality — Google Stitch AI integration",
+        "Clear 5-step workflow",
+        "Compact at 550 tokens"
+      ],
+      "weaknesses": [
+        "No API — relies on manual user interaction",
+        "Referenced template files need verification"
+      ],
+      "recommendations": [
+        "Verify referenced files exist"
+      ]
+    },
+    {
+      "name": "test-writer",
+      "path": "skills/test-writer/SKILL.md",
+      "autoInvoke": true,
+      "lines": 89,
+      "estimatedTokens": 600,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 7,
+        "instructionClarity": 8,
+        "actionability": 8,
+        "deduplication": 4,
+        "principleVsChecklist": 6,
+        "integration": 7
+      },
+      "overall": 6.71,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Good 4-step process: load patterns → analyze → write → verify",
+        "Coverage targets differentiated by scope",
+        "Framework-specific file naming and commands"
+      ],
+      "weaknesses": [
+        "CRITICAL: Heavy overlap with testing-patterns (both auto-invoke)",
+        "Coverage targets duplicated",
+        "Test quality rules duplicated",
+        "600 + 750 = 1350 tokens for overlapping auto-invoke skills"
+      ],
+      "recommendations": [
+        "CRITICAL: MERGE with testing-patterns into one skill (~500 tokens)"
+      ]
+    },
+    {
+      "name": "testing-patterns",
+      "path": "skills/testing-patterns/SKILL.md",
+      "autoInvoke": true,
+      "lines": 111,
+      "estimatedTokens": 750,
+      "scores": {
+        "triggerAccuracy": 5,
+        "tokenEfficiency": 6,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 3,
+        "principleVsChecklist": 7,
+        "integration": 5
+      },
+      "overall": 5.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Good principles section (AAA, isolated, deterministic)",
+        "Framework detection table",
+        "Anti-patterns are useful"
+      ],
+      "weaknesses": [
+        "CRITICAL: Broad triggers ('test', 'spec', 'mock') fire on almost everything",
+        "CRITICAL: ~60% content overlap with test-writer",
+        "Both auto-invoke = double token cost"
+      ],
+      "recommendations": [
+        "CRITICAL: MERGE with test-writer"
+      ]
+    },
+    {
+      "name": "typescript-expert",
+      "path": "skills/typescript-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 117,
+      "estimatedTokens": 850,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 6,
+        "instructionClarity": 8,
+        "actionability": 7,
+        "deduplication": 6,
+        "principleVsChecklist": 5,
+        "integration": 5
+      },
+      "overall": 6.29,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Nullish patterns table genuinely useful (bad/good/why)",
+        "Strict config recommendations",
+        "Type guard pattern"
+      ],
+      "weaknesses": [
+        "Modern patterns section teaches known things",
+        "Utility types list is standard knowledge"
+      ],
+      "recommendations": [
+        "Keep only: nullish patterns, strict config, type guards",
+        "Target ~400 tokens"
+      ]
+    },
+    {
+      "name": "vue-expert",
+      "path": "skills/vue-expert/SKILL.md",
+      "autoInvoke": false,
+      "lines": 147,
+      "estimatedTokens": 1050,
+      "scores": {
+        "triggerAccuracy": 7,
+        "tokenEfficiency": 5,
+        "instructionClarity": 7,
+        "actionability": 6,
+        "deduplication": 5,
+        "principleVsChecklist": 4,
+        "integration": 5
+      },
+      "overall": 5.57,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": false,
+        "triggerRate": null,
+        "falsePositives": null,
+        "falseNegatives": null,
+        "optimizationSuggestion": null,
+        "note": "skipped — not auto-invoke"
+      },
+      "strengths": [
+        "Good Composition API with script setup patterns",
+        "Reactivity gotchas (reactive loses reactivity)"
+      ],
+      "weaknesses": [
+        "1050 tokens — Claude knows Vue 3",
+        "Overlaps with framework-expert vue section"
+      ],
+      "recommendations": [
+        "Reduce to ~400 tokens: reactivity gotchas, composable pattern, Pinia setup"
+      ]
+    },
+    {
+      "name": "workflow-orchestrator",
+      "path": "skills/workflow-orchestrator/SKILL.md",
+      "autoInvoke": true,
+      "lines": 152,
+      "estimatedTokens": 1100,
+      "scores": {
+        "triggerAccuracy": 6,
+        "tokenEfficiency": 5,
+        "instructionClarity": 8,
+        "actionability": 9,
+        "deduplication": 5,
+        "principleVsChecklist": 6,
+        "integration": 9
+      },
+      "overall": 6.86,
+      "grade": "C",
+      "runtimeEval": {
+        "tested": true,
+        "triggerRate": 0,
+        "falsePositives": 0,
+        "falseNegatives": 3,
+        "optimizationSuggestion": "ALL descriptions need optimization — 0% positive trigger rate. Descriptions are not 'pushy' enough per skill-creator docs. Claude handles these tasks natively without consulting the skill. Descriptions should explain WHY consulting this skill produces better results than Claude's default behavior.",
+        "note": "skill-creator run_eval.py — 1 run per query, 5 queries (3 positive, 2 negative)"
+      },
+      "strengths": [
+        "Comprehensive 5-phase workflow with clear transitions",
+        "Sprint Contract concept is excellent",
+        "Builder ≠ Reviewer principle",
+        "Fast-track mode for pre-approved specs",
+        "Auto-stop triggers prevent runaway workflows"
+      ],
+      "weaknesses": [
+        "1100 tokens for auto-invoke — second heaviest",
+        "Broad triggers: 'implement', 'build feature' fire on simple tasks",
+        "Agent Teams section adds tokens for rare use case",
+        "Some content duplicated in phase1-lite and session-continuation"
+      ],
+      "recommendations": [
+        "Reduce to ~700 tokens: keep phases, transitions, gates",
+        "Move Agent Teams and Fast-Track to separate references",
+        "Narrow triggers: remove 'implement' (too broad)"
+      ]
+    }
+  ],
+  "crossCuttingIssues": [
+    {
+      "issue": "Auto-invoke token budget is 6050 tokens — 6x over the 1000 target",
+      "affectedSkills": ["agent-detector", "bugfix-quick", "code-reviewer", "code-simplifier", "framework-expert", "test-writer", "testing-patterns", "workflow-orchestrator"],
+      "recommendation": "Immediate: merge test-writer + testing-patterns (~500), remove framework-expert auto-invoke (~1300 saved), compress remaining. Target: ≤2000."
+    },
+    {
+      "issue": "10 framework expert skills duplicate knowledge Claude already has (~10,000 tokens total)",
+      "affectedSkills": ["angular-expert", "flutter-expert", "go-expert", "laravel-expert", "nextjs-expert", "nodejs-expert", "python-expert", "react-expert", "react-native-expert", "vue-expert"],
+      "recommendation": "Reduce each to ~300-400 tokens of GOTCHAS. Use Context7 for reference docs. Savings: ~6000 tokens."
+    },
+    {
+      "issue": "framework-expert (auto-invoke) duplicates all individual expert skills",
+      "affectedSkills": ["framework-expert", "angular-expert", "flutter-expert", "go-expert", "laravel-expert", "nextjs-expert", "nodejs-expert", "python-expert", "react-expert", "react-native-expert", "vue-expert"],
+      "recommendation": "Keep EITHER framework-expert OR individual experts, not both."
+    },
+    {
+      "issue": "test-writer and testing-patterns both auto-invoke with ~60% content overlap",
+      "affectedSkills": ["test-writer", "testing-patterns"],
+      "recommendation": "MERGE into single 'test-expert' skill (~500 tokens)."
+    },
+    {
+      "issue": "debugging and bugfix-quick overlap in triggers and process",
+      "affectedSkills": ["debugging", "bugfix-quick"],
+      "recommendation": "MERGE debugging root-cause principle into bugfix-quick. Remove debugging."
+    },
+    {
+      "issue": "3 empty shell skills point to sub-files that may not exist",
+      "affectedSkills": ["qa-expert", "pm-expert", "design-expert"],
+      "recommendation": "Add real content or REMOVE."
+    },
+    {
+      "issue": "No A-grade skills — highest is B (7.86)",
+      "affectedSkills": [],
+      "recommendation": "Use prompt-evaluator (7.86) and code-simplifier (7.71) as models for rewriting."
+    },
+    {
+      "issue": "Most expert skills are checklists, not principles that expand capabilities",
+      "affectedSkills": ["angular-expert", "api-designer", "flutter-expert", "go-expert", "laravel-expert", "nextjs-expert", "nodejs-expert", "python-expert", "react-native-expert", "vue-expert"],
+      "recommendation": "Rewrite to focus on GOTCHAS and DECISION CRITERIA, not reference material."
+    },
+    {
+      "issue": "ALL 8 auto-invoke skills have 0% positive trigger rate in runtime testing",
+      "affectedSkills": ["agent-detector", "bugfix-quick", "code-reviewer", "code-simplifier", "framework-expert", "test-writer", "testing-patterns", "workflow-orchestrator"],
+      "recommendation": "All descriptions need optimization via skill-creator's run_loop.py. Descriptions must explain WHY consulting the skill produces better output than Claude's native capabilities. Current descriptions are informational, not persuasive."
+    }
+  ],
+  "tokenBudget": {
+    "autoInvokeTotal": 6050,
+    "autoInvokeTarget": 1000,
+    "autoInvokeOverBudget": "505% over target",
+    "referenceAverage": 776,
+    "totalAllSkills": 34000,
+    "heaviestSkill": "nextjs-expert (1800 tokens)",
+    "lightestSkill": "code-simplifier (300 tokens)",
+    "heaviestAutoInvoke": "framework-expert (1300 tokens)",
+    "lightestAutoInvoke": "code-simplifier (300 tokens)",
+    "autoInvokeBreakdown": {
+      "agent-detector": 800,
+      "bugfix-quick": 550,
+      "code-reviewer": 650,
+      "code-simplifier": 300,
+      "framework-expert": 1300,
+      "test-writer": 600,
+      "testing-patterns": 750,
+      "workflow-orchestrator": 1100
+    },
+    "proposedOptimization": {
+      "mergeTestSkills": "test-writer + testing-patterns → test-expert (500 tokens, saves 850)",
+      "removeFrameworkAutoInvoke": "framework-expert off auto-invoke (saves 1300)",
+      "compressAgentDetector": "800 → 500 (saves 300)",
+      "compressWorkflowOrchestrator": "1100 → 700 (saves 400)",
+      "compressCodeReviewer": "650 → 450 (saves 200)",
+      "compressBugfixQuick": "550 → 400 (saves 150)",
+      "projectedTotal": 2850,
+      "projectedSavings": 3200
+    }
+  }
+}

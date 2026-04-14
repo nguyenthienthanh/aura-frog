@@ -1,7 +1,7 @@
 # Rule: Requirement Challenger
 
 **Priority:** HIGH
-**Applies:** Phase 1, workflow:modify, workflow:start
+**Applies:** Phase 1, /workflow modify, /workflow start
 
 ---
 
@@ -54,8 +54,8 @@ depth[3]{complexity,level,max_questions}:
 ## Integration
 
 - **Phase 1:** Fires BEFORE generating requirements output
-- **workflow:modify:** Fires when modification could expand scope
-- **workflow:start:** Fires immediately after task description
+- **/workflow modify:** Fires when modification could expand scope
+- **/workflow start:** Fires immediately after task description
 
 Complements `feedback-brainstorming.md`: Challenger validates WHAT, brainstorming validates HOW.
 

@@ -1,0 +1,7 @@
+[
+  {"query": "Review this code I just wrote for the payment processing module before I merge it to main", "should_trigger": true},
+  {"query": "Can you do a code review on the changes in PR #42? Check for security issues and test coverage", "should_trigger": true},
+  {"query": "Check the code quality of src/services/auth.ts - I want to make sure it follows best practices before release", "should_trigger": true},
+  {"query": "Write a new utility function that formats currency values with locale support", "should_trigger": false},
+  {"query": "Deploy the staging environment to production using our CI/CD pipeline", "should_trigger": false}
+]
