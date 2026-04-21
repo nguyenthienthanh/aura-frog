@@ -302,6 +302,46 @@ mcp:status
 
 ---
 
+## Behavioral Evaluation
+
+Every PR that touches `skills/`, `agents/`, `commands/`, or `rules/` automatically runs a **behavioral eval** via [`cc-plugin-eval`](https://github.com/sjnims/cc-plugin-eval) in GitHub Actions. This measures whether skills still trigger correctly when expected — catching regressions when a rewrite breaks the description-to-intent matching.
+
+### What runs
+
+- Auto-invoke skills only (the 5 skills with `autoInvoke: true`)
+- 5 scenarios per skill, auto-generated for diversity
+- Compared against `aura-frog/eval-baseline.json`
+
+### Thresholds
+
+- **Absolute:** trigger accuracy ≥ 85% per skill
+- **Relative:** no drop > 10% from baseline
+
+CI fails if either threshold breaks. If that happens, check the `eval-results.json` artifact uploaded by the Action for per-scenario detail.
+
+### Running locally before PR
+
+```bash
+# From repo root, after cc-plugin-eval is installed (see EVAL_SETUP.md)
+npx cc-plugin-eval run -p ./aura-frog \
+  --components skills --filter "autoInvoke:true" \
+  --output eval-results.json
+
+node aura-frog/scripts/ci/check-eval-regression.cjs \
+  --current eval-results.json \
+  --baseline aura-frog/eval-baseline.json
+```
+
+### Updating the baseline
+
+Regenerate `aura-frog/eval-baseline.json` when:
+- Adding a new auto-invoke skill
+- Substantially rewriting a skill description in a way that improves accuracy
+
+Full setup + troubleshooting: [docs/guides/EVAL_SETUP.md](docs/guides/EVAL_SETUP.md).
+
+---
+
 ## Submitting Changes
 
 ### Commit Message Format

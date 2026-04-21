@@ -1,0 +1,52 @@
+name: Behavioral Evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'aura-frog/skills/**'
+      - 'aura-frog/agents/**'
+      - 'aura-frog/commands/**'
+      - 'aura-frog/rules/**'
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install cc-plugin-eval
+        run: |
+          git clone https://github.com/sjnims/cc-plugin-eval /tmp/cc-plugin-eval
+          cd /tmp/cc-plugin-eval
+          npm install && npm run build
+
+      - name: Run evaluation (auto-invoke skills only)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cd /tmp/cc-plugin-eval
+          npx cc-plugin-eval run -p $GITHUB_WORKSPACE/aura-frog \
+            --components skills \
+            --filter "autoInvoke:true" \
+            --output $GITHUB_WORKSPACE/eval-results.json
+
+      - name: Check regression against baseline
+        run: |
+          node aura-frog/scripts/ci/check-eval-regression.cjs \
+            --current eval-results.json \
+            --baseline aura-frog/eval-baseline.json \
+            --threshold 0.85 \
+            --max-drop 0.10
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval-results.json
+          retention-days: 14
