@@ -6,16 +6,16 @@
 
 ### An Operating System for software engineering.
 
-The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — 9 agents, 5-phase TDD workflow, self-healing memory, and multi-agent orchestration. One kernel. Zero untested code.
+A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. 9 specialized agents, smart flow selection (direct edit · bugfix TDD · 5-phase workflow), self-healing memory, and multi-agent orchestration. Right effort matched to task risk.
 
 [![Version](https://img.shields.io/badge/version-3.6.1-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**LLM OS architecture. Memory that heals itself. TDD that never skips.**
+**Typos get direct edits. Bugs get 4-step TDD. Features get 5-phase workflow. You never pick — the plugin matches effort to risk.**
 
-**[Install in 30 seconds](#-install)** · **[See it in action](#-before--after)** · **[Why Aura Frog?](#-the-problem)**
+**[Install in 30 seconds](#-install)** · **[See it in action](#-before--after)** · **[Why Aura Frog?](#-the-problem)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
 </div>
 
@@ -31,9 +31,9 @@ No structure. No tests. No quality gates. Every session starts from scratch. Eve
 
 ## The Solution
 
-Aura Frog treats Claude Code as an **Operating System** — Claude is the kernel, agents are processes, and the context window is managed RAM. You describe the feature. Aura Frog dispatches the right agent, enforces a 5-phase TDD workflow, and compresses context automatically so you never lose decisions.
+Aura Frog treats Claude Code as an **Operating System** — Claude is the kernel, agents are processes, and the context window is managed RAM. You describe the task. Aura Frog classifies complexity, picks the right flow (direct edit · bugfix TDD · full 5-phase), dispatches the right agent, and compresses context automatically so you never lose decisions.
 
-**You approve twice. Aura Frog handles the rest.**
+**Right effort for every task. You only approve when it matters (0 gates for typos, up to 2 for architecture).**
 
 ---
 
@@ -411,9 +411,20 @@ Ready to commit? (yes / no)
 
 ## Why Teams Ship Faster With Aura Frog
 
-### 1. Every Feature Gets a TDD Workflow
+### 1. Smart Flow Selection — Right Effort for Every Task
 
-No more "write code and hope." Every feature follows RED → GREEN → REFACTOR automatically:
+**Not every task gets the 5-phase workflow.** Aura Frog's `agent-detector` classifies complexity on every message and picks the minimum viable flow:
+
+| Task type | Flow | Gates | Example |
+|-----------|------|:----:|---------|
+| **Typo, one-line fix** | Direct edit (no workflow) | 0 | `/run fix typo in login.ts` |
+| **Bug fix** | 4-step TDD (Investigate → RED → GREEN → Verify) | 0 | `/run fix login button not disabling` |
+| **Refactor** | Analyze → plan → test → refactor | 0 | `/run refactor auth service` |
+| **Add tests** | Detect framework → write → verify coverage | 0 | `/run add tests for payment` |
+| **Feature (≤5 files)** | Single-agent inline with TDD | 0–1 | `/run add email validation` |
+| **Feature (6+ files, architecture)** | **Full 5-phase workflow** | 2 | `/run implement user subscription` |
+
+**When the 5-phase workflow DOES fire** (Deep complexity only):
 
 ```
   ✋ Phase 1: Understand + Design    → You approve the plan
@@ -423,7 +434,20 @@ No more "write code and hope." Every feature follows RED → GREEN → REFACTOR 
   ⚡ Phase 5: Finalize               → Docs + notifications
 ```
 
-Two approvals. Five phases. Zero untested code.
+**Escape hatches** — you control rigor when the detector gets it wrong:
+
+- `/run fasttrack: <specs>` — skip Phase 1 if you've already designed
+- `/run must do: <task>` / `just do: <task>` — bypass brainstorming, execute literally
+- `/run reopen <phase>` — unfreeze an approved phase to revise
+- `/run reason: sc|tot|cove` — opt in to heavy reasoning (Self-Consistency / Tree of Thoughts / Chain-of-Verification) for hard decisions
+- `/run handoff` — save state, resume in a fresh session
+
+**What you get vs what you skip:**
+- 80% of tasks never see a gate — fast iteration
+- 20% that *matter* (architecture, multi-file, vague scope) get disciplined TDD + human approval
+- You never manually pick — the detector routes; you approve only when it matters
+
+Full strategy matrix: [Routing Strategies](#routing-strategies) below. Full benefits guide: [docs/reference/BENEFITS.md](docs/reference/BENEFITS.md).
 
 ### 2. The Right Expert for Every Task
 
