@@ -4,6 +4,53 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.7.0] - 2026-04-21
+
+### Added
+
+**Portability Positioning**
+- `docs/PORTABILITY.md` — Layer-by-layer portability analysis (~87% markdown weighted average), adapter architecture with Mermaid diagram, event mapping table (Claude Code / Cursor / Codex), porting guide for contributors
+- README "Works Across AI Coding Tools" section + Portable badge
+- BENEFITS.md Part 9: "Tool-Agnostic Investment" for teams evaluating multiple AI coding tools
+- Marketplace/plugin descriptions updated to mention adapter roadmap
+
+**Behavioral CI (cc-plugin-eval integration)**
+- `docs/guides/EVAL_SETUP.md` — install, config, run, troubleshooting guide
+- `aura-frog/.eval-config.yaml` — Sonnet, 5 scenarios per component, $10 budget cap, read-only mode
+- `aura-frog/scripts/ci/check-eval-regression.cjs` — compare against baseline, fail on <85% accuracy OR >10% drop; graceful handling of missing baseline (first-run mode)
+- `.github/workflows/behavioral-eval.yml` — PR workflow triggered on skills/agents/commands/rules changes; uploads eval-results.json as artifact
+- CONTRIBUTING.md "Behavioral Evaluation" section with local-run instructions + baseline-update policy
+- README "Trigger Accuracy" badge linking to EVAL_SETUP
+- Requires repo secret: ANTHROPIC_API_KEY
+
+**Coverage Skills (3 new)**
+- `skills/deep-debugging` — Scientific-method root-cause analysis for intermittent/flaky/race bugs. Protocol: reproduce → hypothesis tree (via tree-of-thoughts) → bisect → test one hypothesis → verify via chain-of-verification → regression test. Escalation from bugfix-quick.
+- `skills/monorepo` — pnpm/yarn/npm workspaces, Turborepo, Nx, Lerna, Rust/Go workspaces. Correct package scoping, cross-package coordination, build-graph awareness. Uses `paths:` frontmatter to auto-load on workspace file detection.
+- `skills/perf-profiling` — Measure-first optimization with Pareto bottleneck targeting. Language-specific profiler suggestions (clinic/py-spy/pprof/flamegraph), one-change-at-a-time discipline, flat-distribution detection for architectural calls.
+
+### Changed
+
+- Skills: 41 → **44** (5 auto-invoke unchanged, reference 36 → 39)
+- plugin.json + marketplace.json descriptions prefix "Portable" + adapter timeline
+- bugfix-quick SKILL escalates to deep-debugging for hard bugs
+- commands/check.md `/check perf` delegates to perf-profiling for deep analysis
+- commands/run.md documents auto-loaded skills (monorepo, perf-profiling) based on repo/task detection
+
+### Stats
+
+- Skills: **44** (was 41)
+- Rules: 57 (unchanged)
+- Agents: 9 (unchanged)
+- Commands: 6 (unchanged)
+- Hooks: 28 (unchanged)
+
+### Not yet shipped
+
+- cc-plugin-eval baseline (`aura-frog/eval-baseline.json`) — first generation requires ANTHROPIC_API_KEY; workflow handles missing baseline gracefully
+- Codex/Cursor adapters — documented roadmap, target Q2 2026
+
+---
+
 ## [3.6.1] - 2026-04-21
 
 ### Added

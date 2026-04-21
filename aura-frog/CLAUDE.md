@@ -1,6 +1,6 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.6.1 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.7.0 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** 9 agents + 44 skills + 6 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.6.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -243,4 +243,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.6.1
+**Version:** 3.7.0
