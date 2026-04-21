@@ -18,7 +18,7 @@
 ```markdown
 ━━━ WHAT'S NEXT ━━━
 **Quick Actions:** `approve` | `reject: <reason>` | `skip`
-**Commands:** `/workflow status` | `/workflow handoff`
+**Commands:** `status` | `handoff`
 **Suggested:** → Type `approve` to continue to Phase 4
 ```
 
@@ -58,11 +58,11 @@ workflow_commands[7]{command,description}:
 
 ```toon
 nav_commands[5]{command,description}:
-  workflow:status,Show progress
-  workflow:skip <phase>,Skip specific phase
-  workflow:force <phase>,Jump to phase
-  workflow:back,Go back one phase
-  workflow:restart,Start over
+  status,Show progress
+  skip <phase>,Skip specific phase
+  force <phase>,Jump to phase
+  back,Go back one phase
+  restart,Start over
 ```
 
 ### Speed Commands
@@ -87,7 +87,7 @@ When errors occur, show recovery options: `fix`, `show failures`, `skip test: <n
 
 ## Non-Workflow Interactions
 
-Still provide guidance: follow-up questions, `/workflow start <task>`, `/bugfix quick <issue>`, `/refactor <target>`.
+Still provide guidance: follow-up questions, `/run <task>`, `/run <issue>` (auto-detects bugfix), `/run <target>` (auto-detects refactor).
 
 ---
 

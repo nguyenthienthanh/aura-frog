@@ -7,7 +7,7 @@
  *
  * Monitors:
  * - .claude/cache/workflow-state.json
- * - .claude/logs/workflows/*.md
+ * - .claude/logs/runs/*.md (and legacy .claude/logs/workflows/)
  * - Any workflow deliverable files
  *
  * When user edits are detected, extracts:
@@ -33,7 +33,8 @@ const WORKFLOW_HASHES_FILE = path.join(CACHE_DIR, 'workflow-file-hashes.json');
 // Workflow-related paths to monitor
 const WORKFLOW_PATHS = [
   '.claude/cache/workflow-state.json',
-  '.claude/logs/workflows',
+  '.claude/logs/runs',
+  '.claude/logs/workflows', // legacy — kept for backwards compat
   'docs/workflow',
   'workflow'
 ];

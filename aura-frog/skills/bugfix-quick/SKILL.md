@@ -14,7 +14,7 @@ effort: low
 
 # Quick Bugfix
 
-For bugs only. Features/refactors → workflow-orchestrator.
+For bugs only. Features/refactors → run-orchestrator.
 
 ---
 
@@ -61,4 +61,12 @@ For bugs only. Features/refactors → workflow-orchestrator.
 **Verification:** Tests pass, no regressions
 ```
 
-If complex → switch to workflow-orchestrator.
+If complex → switch to run-orchestrator.
+
+---
+
+## Related Rules
+
+- `rules/core/tdd-workflow.md` — Failing test before fix
+- `rules/core/verification.md` — Run tests, read output, then claim
+- `rules/core/execution-rules.md` — Root-cause discipline

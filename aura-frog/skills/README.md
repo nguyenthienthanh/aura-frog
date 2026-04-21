@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 38 (6 auto-invoking + 32 reference)
+**Total Skills:** 41 (6 auto-invoking + 35 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -12,7 +12,7 @@ Loaded every session. Target budget: ~2,000 tokens.
 ```toon
 auto_invoke[6]{name,priority,trigger,tokens}:
   agent-detector,highest,ALWAYS — every message,~500
-  workflow-orchestrator,high,Complex features / multi-file,~700
+  run-orchestrator,high,Complex features / multi-file,~700
   bugfix-quick,medium,Bug fixes / errors / crashes,~400
   test-writer,medium,Test writing / TDD / coverage,~500
   code-reviewer,high,Code review / after implementation,~450
@@ -21,7 +21,7 @@ auto_invoke[6]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (32)
+## Reference Skills (35)
 
 Loaded on-demand when triggered.
 
@@ -100,6 +100,19 @@ thinking[2]{name,purpose}:
   sequential-thinking,Structured analysis with revision and branching
   problem-solving,5 techniques for different problem types
 ```
+
+### Reasoning Techniques (3)
+
+Advanced LLM reasoning from published research. Token-expensive — opt-in via `/run reason: <sc|tot|cove|all>` or auto-enabled in specific phases per their rules.
+
+```toon
+reasoning[3]{name,technique,paper,when_fires}:
+  self-consistency,"N independent paths + majority vote","Wang et al. 2022","P1 design when trade-off decision (Deep only)"
+  tree-of-thoughts,"Branch + evaluate + prune + backtrack","Yao et al. 2023","P1 architecture + P4 refactor planning (Deep only)"
+  chain-of-verification,"Draft + plan verifications + verify via tool + revise","Dhuliawala et al. 2023","P4 review (MANDATORY for factual claims)"
+```
+
+See governing rules: `rules/workflow/{self-consistency,tree-of-thoughts,chain-of-verification}.md`.
 
 ---
 

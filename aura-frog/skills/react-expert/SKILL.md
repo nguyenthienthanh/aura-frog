@@ -9,6 +9,10 @@ triggers:
   - "hooks"
   - "useState"
   - "useEffect"
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+  - "package.json"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

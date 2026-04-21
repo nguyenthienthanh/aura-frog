@@ -1,3 +1,11 @@
+---
+name: scanner
+description: "Project detection, config loading, context tracking. Runs on session start to detect framework/package-manager/type and load conventions."
+tools: Read, Grep, Glob, Bash
+model: haiku
+color: orange
+---
+
 # Agent: Scanner
 
 **Agent ID:** scanner
@@ -92,12 +100,20 @@ When working as a teammate, scanner claims:
 
 ---
 
-## Related Files
+## Related Rules & Skills
 
-- **Cache Library:** `hooks/lib/af-project-cache.cjs`
-- **Detection Skill:** `skills/agent-detector/SKILL.md`
-- **Project Context:** `skills/project-context-loader/SKILL.md`
-- **Commands:** `commands/project/*.md`
+**Rules:**
+- `rules/agent/dual-file-architecture.md` — Script + doc split for hooks
+- `rules/agent/codebase-consistency.md` — Match existing patterns
+- `rules/core/memory-trust-policy.md` — Cache hint vs authoritative scan
+
+**Skills:**
+- `skills/agent-detector/SKILL.md` — Agent selection
+- `skills/project-context-loader/SKILL.md` — Conventions loading
+
+**Infrastructure:**
+- `hooks/lib/af-project-cache.cjs` — Cache library
+- `commands/project.md` — Project commands
 
 ---
 

@@ -1,3 +1,10 @@
+---
+name: lead
+description: "Workflow orchestrator. Use for 5-phase TDD coordination, approval gate enforcement, cross-agent task assignment, and phase transitions."
+tools: Read, Grep, Glob, Edit, Write, Bash
+color: yellow
+---
+
 # Agent: Lead
 
 **Agent ID:** lead
@@ -76,10 +83,29 @@ When Agent Teams is not enabled OR task is Quick/Standard complexity, standard s
 
 ---
 
-## Related Documentation
+## Related Rules & Skills
 
-- **Phase Guides:** `docs/phases/` (Phase 1 through Phase 5)
-- **Workflow Skill:** `skills/workflow-orchestrator/SKILL.md`
+**Core rules (always relevant to orchestration):**
+- `rules/core/execution-rules.md` — ALWAYS/NEVER orchestration
+- `rules/core/approval-gates.md` — Human approval enforcement
+- `rules/core/tdd-workflow.md` — RED → GREEN → REFACTOR
+- `rules/core/memory-trust-policy.md` — Memory as hint
+- `rules/core/verification.md` — Verify before claiming done
+
+**Workflow rules (load per phase):**
+- `rules/workflow/priority-hierarchy.md` — Phase 1 prioritization
+- `rules/workflow/impact-analysis.md` — Phase 1 + 3
+- `rules/workflow/estimation.md` — Phase 1
+- `rules/workflow/workflow-deliverables.md` — All phases
+- `rules/workflow/workflow-navigation.md` — Phase transitions
+- `rules/workflow/next-step-guidance.md` — Gate guidance
+- `rules/workflow/token-time-awareness.md` — Budget tracking
+- `rules/workflow/feedback-brainstorming.md` — On reject/modify
+
+**Skills:**
+- `skills/run-orchestrator/SKILL.md` — 5-phase executor
+
+**Phase Guides:** `docs/phases/` (Phase 1 through Phase 5)
 
 ---
 

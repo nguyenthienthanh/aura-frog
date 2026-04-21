@@ -20,7 +20,7 @@ Load project conventions and generate session context on demand.
 
 ## When to Use
 
-**Before:** `/workflow start`, code generation, refactoring, test writing.
+**Before:** `/run`, code generation, refactoring, test writing.
 **Skip:** Simple questions (no code), when `session-context.toon` already loaded.
 
 ---

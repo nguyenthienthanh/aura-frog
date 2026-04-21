@@ -35,7 +35,7 @@ routing[3]{trigger,mode,reason}:
 
 ```toon
 logs[5]{dir,purpose}:
-  .claude/logs/workflows/{id}/,Workflow state + deliverables
+  .claude/logs/runs/{id}/,Workflow state + deliverables (was workflows/ pre-3.7)
   .claude/logs/documents/,Generated documentation
   .claude/logs/plans/,Saved execution plans
   .claude/logs/reviews/,Code review reports

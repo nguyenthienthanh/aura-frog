@@ -4,6 +4,48 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.6.0] - 2026-04-21
+
+### Added
+- **3 reasoning techniques from published research** (opt-in via `/run reason:` prefix; auto-enabled in specific phases)
+  - `self-consistency` — N independent paths + majority vote (Wang et al. 2022) — Phase 1 Deep trade-off decisions
+  - `tree-of-thoughts` — Branch/evaluate/prune/backtrack (Yao et al. 2023) — P1 architecture + P4 refactor planning
+  - `chain-of-verification` — Draft → verify via tool → revise (Dhuliawala et al. 2023) — **MANDATORY in Phase 4** for factual claims
+  - Each has a workflow-tier rule (policy) + reference skill (playbook)
+- **Prompt validation (6-dimension benchmark)** — New core rule `rules/core/prompt-validation.md`. Every actionable prompt scored on Precondition, Context, Requirement, Criteria, Expect/Actual, Output. Complexity-gated thresholds (Quick/Standard/Deep). Threshold fail → focused questions before execution.
+- **No-assumption rule** — New core rule `rules/core/no-assumption.md`. "If in doubt, ASK. Never guess, never fabricate." Concrete anti-patterns, ≤2 questions per turn, honors force-mode prefixes.
+- **Agent YAML frontmatter** — All 9 agents now declare `name`, `description`, `tools` (allowlist per role), `color`, optional `model`. Security + strategist are read-only (no Edit/Write/Bash). Scanner uses haiku. Architect/frontend/mobile/lead inherit session model (Opus sessions → Opus for design work).
+- **4 Mermaid diagrams in root README** — How It Works, Agent Detection, Routing Strategies, Walkthrough Sequence. High-contrast colors for GitHub light/dark mode.
+- **README sections** — Full Installation with verification, Walkthrough with mock terminal transcript, Command Reference (6 commands with examples), Agent Selection Examples (10 rows), Token Budget breakdown, Troubleshooting/FAQ (7 collapsed Q&As), Compared to Other Plugins (vs wshobson/agents, Superpowers).
+- **Branding image prompts** — `assets/BRANDING_PROMPTS.md` with 9 minimalist prompts for regenerating mascot/logo/banner assets via Midjourney/DALL-E/Imagen.
+- **Frontmatter maintenance rule** — Added to `.claude/CLAUDE.md` so future edits preserve YAML schema + audit script for orphan/dead-link check.
+
+### Changed
+- **Commands consolidated 26→6** — `/run` (universal entry), `/check` (verification), `/design` (pre-coding), `/project` (config), `/af` (system), `/help`
+- **`/run <task>` auto-detects intent** — bugfix, feature, refactor, test, deploy, review, security, quality — routes to right flow automatically
+- **Context-aware actions** — During active run, bare words work: `approve`, `reject`, `modify`, `handoff`, `status`, `progress`, `rollback`, `stop`
+- **Renamed workflow-orchestrator → run-orchestrator** — skill, folder, state files all updated
+- **Log folder: `.claude/logs/workflows/` → `.claude/logs/runs/`** — hook code aligned to match docs (was the source of "workflow state not saving" bug)
+- **Rule tier rebalanced (13/17/20)** — Frontend-specific rules moved from core to agent tier: `direct-hook-access`, `correct-file-extensions`. 3 new workflow rules (reasoning techniques). Core grew from 11 to 13 with `no-assumption` + `prompt-validation`.
+- **`api-design-rules.md` slimmed 187→55 lines** — Full design guidance now defers to `api-designer` skill (eliminates rule↔skill duplication).
+- **Agent framework experts add `paths:` frontmatter** — 11 framework experts (react/vue/nextjs/angular/flutter/react-native/typescript/nodejs/python/laravel/go) now auto-invoke only on matching file types for precision.
+- **Discoverability pass** — Every rule now has ≥1 inbound reference from an agent/skill/CLAUDE.md (was 30 orphaned rules out of 45). Zero dead links across agents/skills/rules.
+
+### Removed
+- **Router agent deleted** (`agents/router.md` + `agents/reference/router-patterns.md`) — Functionality already lived in `agent-detector` skill with more coverage and 13× more inbound refs. Unique content (Intent Detection, Tech Detection, Fallbacks) merged into `skills/agent-detector/task-based-agent-selection.md`.
+
+### Fixed
+- **Workflow state path drift** — Hook `.cjs` scripts were writing to `.claude/logs/workflows/` while skills read from `.claude/logs/runs/`. Aligned all hook code to `runs/` with legacy fallback for users migrating from pre-3.6 state.
+
+### Stats
+- Commands: 6 (was 26)
+- Agents: 9 (was 10 — router consolidated)
+- Skills: 41 (was 38 — 3 reasoning techniques)
+- Rules: 50 (13 core + 17 agent + 20 workflow; was 45)
+- Top-level parents: 5 bundled + 1 standalone (was 10 bundled + 16 standalone)
+
+---
+
 ## [3.5.0] - 2026-04-14
 
 ### Changed

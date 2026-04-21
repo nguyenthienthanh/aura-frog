@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.5.0 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 10 agents + 38 skills + 26 commands + 5-phase TDD workflow + 6 MCP servers
+**System:** Aura Frog v3.6.0 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 9 agents + 41 skills + 6 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
 
@@ -12,7 +12,7 @@ Claude is the **kernel** — orchestrates, dispatches, verifies. Does not execut
 ```toon
 os_map[5]{concept,implementation}:
   Kernel,Claude + orchestrator rules
-  Processes,10 agents (PID + state + budget)
+  Processes,9 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
   Drivers,6 MCP servers (auto-invoked)
@@ -31,17 +31,18 @@ boot[5]{step,action,cost}:
   5,Verify MCP servers,~100
 ```
 
-CRITICAL: Check env FIRST. If missing → `/project reload-env`.
+CRITICAL: Check env FIRST. If missing → `/project env`.
 
 ---
 
 ## Golden Rules
 
 ```toon
-rules[7]{rule,detail}:
+rules[8]{rule,detail}:
+  Never assume,"Ask when in doubt — see rules/core/no-assumption.md"
   Lazy load,"KERNEL on start — everything else on demand"
   One agent at a time,"Save state before switching"
-  TOON for data,"Workflow state + handoffs + MCP responses"
+  TOON for data,"Run state + handoffs + MCP responses"
   Compact proactively,"MicroCompact every 10 turns — AutoCompact at 80%"
   TDD mandatory,"RED → GREEN → REFACTOR"
   Memory as hint,"Verify against actual files before acting"
@@ -53,10 +54,10 @@ rules[7]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.5.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.6.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
-Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync-settings`
+Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
 
 ---
 
@@ -79,7 +80,7 @@ Auto-invoked by context. Config: `.mcp.json`
 ## Process Table
 
 ```toon
-agents[10]{pid,name,domain,budget}:
+agents[9]{pid,name,domain,budget}:
   01,lead,Workflow coordination,3K
   02,architect,System design + DB + backend,4K
   03,frontend,React/Vue/Angular/Next.js,4K
@@ -89,8 +90,9 @@ agents[10]{pid,name,domain,budget}:
   07,tester,Jest/Cypress/Playwright + coverage,4K
   08,devops,Docker/K8s/CI-CD,3K
   09,scanner,Project detection + context,2K
-  10,router,Agent + model selection,2K
 ```
+
+Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority highest, auto-invoke every message).
 
 ---
 
@@ -99,7 +101,7 @@ agents[10]{pid,name,domain,budget}:
 ```toon
 skills[6]{name,trigger}:
   agent-detector,Every message
-  workflow-orchestrator,Complex feature
+  run-orchestrator,Complex feature
   bugfix-quick,Bug fix request
   test-writer,Test request
   code-reviewer,Code review
@@ -140,8 +142,8 @@ phases[5]{phase,name,gate,budget}:
 
 ```toon
 routing[3]{level,approach}:
-  Quick,Direct edit — no workflow
-  Standard,plan mode → /workflow start or /bugfix quick
+  Quick,Direct edit — no run
+  Standard,plan mode → /run
   Deep,Full 5-phase + collaborative planning
 ```
 
@@ -165,26 +167,42 @@ Details: `rules/core/context-management.md`
 ```toon
 tiers[3]{tier,count,when}:
   Core (rules/core/),13,Every session
-  Agent (rules/agent/),15,Per-agent type
-  Workflow (rules/workflow/),17,Per-phase
+  Agent (rules/agent/),17,Per-agent type
+  Workflow (rules/workflow/),20,Per-phase
 ```
+
+**Core rule paths (read on-demand when the topic comes up):**
+
+```toon
+core_paths[13]{topic,path}:
+  TDD discipline,rules/core/tdd-workflow.md
+  Approval gates,rules/core/approval-gates.md
+  Execution rules,rules/core/execution-rules.md
+  No assumption,rules/core/no-assumption.md
+  Prompt validation (6-dim),rules/core/prompt-validation.md
+  Memory trust,rules/core/memory-trust-policy.md
+  Context mgmt,rules/core/context-management.md
+  Code quality,rules/core/code-quality.md
+  Naming,rules/core/naming-conventions.md
+  Simplicity,rules/core/simplicity-over-complexity.md
+  Verification,rules/core/verification.md
+  Env loading,rules/core/env-loading.md
+  Library choice,rules/core/prefer-established-libraries.md
+```
+
+**Agent & workflow rules:** listed in each agent's "Related Rules" section and in `run-orchestrator` SKILL.md per-phase index. Model loads them when the agent/phase activates.
 
 ---
 
-## Bundled Commands
+## Commands
 
 ```toon
-commands[10]{cmd,subs}:
-  /workflow,"start/status/approve/modify/reject/resume/handoff/rollback/predict/progress/budget/metrics"
-  /project,"init/detect/status/list/switch/refresh/regen/reload-env/sync-settings"
-  /learn,"status/feedback/analyze/apply/setup"
-  /test,"unit/e2e/coverage/document"
-  /bugfix,"fix/quick/hotfix"
-  /quality,"check/complexity/debt"
-  /security,"audit/scan/deps"
-  /perf,"analyze/bundle/lighthouse/optimize"
-  /metrics,"dashboard/hooks/performance/prompts-evaluate"
-  /deploy,"setup/cicd-create/docker-create"
+commands[5]{cmd,subs}:
+  /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
+  /check,"(all)/security/perf/complexity/debt/coverage/deps"
+  /design,"api/db/doc"
+  /project,"init/detect/status/list/switch/refresh/regen/env/sync"
+  /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
 ```
 
 ---
@@ -196,7 +214,7 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ## Learning System
 
-`/learn:status` | `/learn:feedback` | `/learn:analyze` | `/learn:apply`
+`/af learn status` | `/af learn feedback` | `/af learn analyze` | `/af learn apply`
 
 ---
 
@@ -204,8 +222,8 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ```toon
 resources[8]{name,location}:
-  Agents (10),agents/
-  Commands (26),commands/
+  Agents (9),agents/
+  Commands (6),commands/
   Rules (45),rules/{core|agent|workflow}/
   Skills (38),skills/
   Hooks (28),hooks/
@@ -216,4 +234,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.5.0
+**Version:** 3.6.0

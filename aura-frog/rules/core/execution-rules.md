@@ -45,7 +45,7 @@ never[13]{rule}:
 ## Plan Mode
 
 Use Claude Code's native plan mode for Quick/Standard tasks (brainstorm, design, evaluate).
-For Deep complexity: use `/workflow start` for structured 5-phase TDD.
+For Deep complexity: use `/run` for structured 5-phase TDD.
 
 ---
 

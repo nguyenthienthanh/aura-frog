@@ -1,3 +1,10 @@
+---
+name: frontend
+description: "Frontend frameworks (React/Vue/Angular/Next.js), design systems, accessibility. Use for UI implementation, component work, and responsive design."
+tools: Read, Grep, Glob, Edit, Write, Bash
+color: cyan
+---
+
 # Agent: Frontend
 
 **Agent ID:** frontend
@@ -33,12 +40,22 @@ Use for all frontend implementation, UI components, design system work, and user
 
 ---
 
-## Related Files
+## Related Rules & Skills
 
-- **Accessibility Rules:** `rules/agent/accessibility-rules.md`
-- **Frontend Excellence:** `rules/agent/frontend-excellence.md`
-- **Design System Skill:** `skills/design-system-library/SKILL.md`
-- **Framework Skills:** `skills/react-expert/`, `skills/vue-expert/`, etc.
+**Rules (load when working on frontend):**
+- `rules/agent/frontend-excellence.md` — UX laws, performance targets
+- `rules/agent/accessibility-rules.md` — WCAG, keyboard, screen reader
+- `rules/agent/design-system-usage.md` — Design system enforcement
+- `rules/agent/theme-consistency.md` — No hardcoded values
+- `rules/agent/direct-hook-access.md` — Hook access patterns
+- `rules/agent/correct-file-extensions.md` — .tsx vs .ts
+- `rules/agent/state-management.md` — State choices
+- `rules/agent/error-handling-standard.md` — Error handling
+- `rules/agent/codebase-consistency.md` — Match project patterns
+
+**Skills:**
+- `skills/design-expert/SKILL.md` — UI/UX, component design
+- `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
 
 ---
 

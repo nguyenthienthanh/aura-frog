@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 45 (13 core + 15 agent + 17 workflow)
+**Total Rules:** 50 (13 core + 17 agent + 20 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -12,11 +12,11 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 ```toon
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,13,ALWAYS — every session
-  Agent,rules/agent/,15,Per-agent — only when agent activates
-  Workflow,rules/workflow/,17,Per-phase — only during active workflow
+  Agent,rules/agent/,17,Per-agent — only when agent activates
+  Workflow,rules/workflow/,20,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 45 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 50 rules every message.
 
 ---
 
@@ -27,6 +27,8 @@ core[13]{rule,priority,purpose}:
   execution-rules,critical,ALWAYS/NEVER execution rules
   tdd-workflow,critical,RED → GREEN → REFACTOR
   approval-gates,critical,Human approval required
+  no-assumption,critical,Never guess — ask when in doubt
+  prompt-validation,critical,6-dimension benchmark for every actionable prompt
   memory-trust-policy,critical,Memory as hint + strict write discipline + retrieval hierarchy
   context-management,high,Token optimization + model selection + 3-tier compression
   code-quality,high,TypeScript strict + no any
@@ -34,20 +36,20 @@ core[13]{rule,priority,purpose}:
   simplicity-over-complexity,critical,YAGNI + DRY + KISS consolidated
   verification,critical,Fresh verification before claiming done
   env-loading,critical,Load .envrc at session start
-  correct-file-extensions,medium,Proper file naming
   prefer-established-libraries,high,Use lodash/es-toolkit over custom utils
-  direct-hook-access,medium,Lifecycle hooks
 ```
 
 ---
 
-## Agent Rules (15) — Loaded Per Agent
+## Agent Rules (17) — Loaded Per Agent
 
 ```toon
-agent[15]{rule,priority,agents}:
+agent[17]{rule,priority,agents}:
   frontend-excellence,critical,frontend/mobile
   design-system-usage,high,frontend
   theme-consistency,medium,frontend
+  direct-hook-access,medium,frontend/mobile
+  correct-file-extensions,medium,frontend/mobile
   api-design-rules,high,architect
   structured-data-schema,high,architect/frontend
   performance-rules,medium,All dev agents
@@ -64,10 +66,10 @@ agent[15]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (17) — Loaded Per Phase
+## Workflow Rules (20) — Loaded Per Phase
 
 ```toon
-workflow[17]{rule,priority,phases}:
+workflow[20]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -85,6 +87,9 @@ workflow[17]{rule,priority,phases}:
   git-workflow,high,Phase 5
   mcp-response-logging,medium,All phases
   project-linting-precedence,critical,Phase 3
+  self-consistency,high,Phase 1 (Deep architectural decisions only)
+  tree-of-thoughts,high,Phase 1 + Phase 4 (branching problems only)
+  chain-of-verification,critical,Phase 4 (mandatory for claims)
 ```
 
 ---
@@ -93,14 +98,15 @@ workflow[17]{rule,priority,phases}:
 
 ```toon
 loading[4]{scenario,rules_loaded,est_tokens}:
-  Quick fix (no workflow),Core only (13),~2200
-  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~4200
-  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3700
-  Deep (full workflow),Core + all Agent + current Phase Workflow,~5200
+  Quick fix (no workflow),Core only (11),~1800
+  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~3800
+  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3300
+  Deep (full workflow),Core + all Agent + current Phase Workflow,~5000
 ```
 
 **Agent detection determines which agent rules to load:**
-- `frontend` agent → loads: frontend-excellence, design-system-usage, theme-consistency, accessibility-rules, state-management
+- `frontend` agent → loads: frontend-excellence, design-system-usage, theme-consistency, direct-hook-access, correct-file-extensions, accessibility-rules, state-management
+- `mobile` agent → loads: frontend-excellence, direct-hook-access, correct-file-extensions, state-management
 - `architect` agent → loads: api-design-rules, structured-data-schema, logging-standards, error-handling-standard, dependency-management
 - `security` agent → loads: sast-security-scanning, safety-rules
 

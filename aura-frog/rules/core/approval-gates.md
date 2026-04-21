@@ -79,9 +79,9 @@ responses[5]{input,action}:
 
 ## State Tracking
 
-Workflow state saved to `.claude/logs/workflows/[workflow-id]/workflow-state.json`
+Run state saved to `.claude/logs/runs/[run-id]/run-state.json`
 
-**Full details:** `skills/workflow-orchestrator/SKILL.md`
+**Full details:** `skills/run-orchestrator/SKILL.md`
 
 ---
 

@@ -18,7 +18,7 @@ Auto-create git worktree when starting a workflow. All changes on isolated branc
 
 ## When to Use
 
-- **Auto:** `/workflow start` when `AF_WORKTREE=true`
+- **Auto:** `/run` when `AF_WORKTREE=true`
 - **Manual:** User says "use a worktree"
 - **Skip:** Quick fixes, config changes, single-file edits
 
@@ -28,11 +28,11 @@ Auto-create git worktree when starting a workflow. All changes on isolated branc
 
 ```toon
 worktree_lifecycle[5]{event,action}:
-  workflow:start,"git worktree add .worktrees/[id] -b af/[id]"
+  run:start,"git worktree add .worktrees/[id] -b af/[id]"
   Phase 1 approved,All edits in worktree directory
   Phase 5 complete,"Offer: merge / create PR / keep branch / discard"
-  workflow:cancel,"git worktree remove .worktrees/[id]"
-  workflow failed,Discard worktree — main untouched
+  run:cancel,"git worktree remove .worktrees/[id]"
+  run failed,Discard worktree — main untouched
 ```
 
 ---

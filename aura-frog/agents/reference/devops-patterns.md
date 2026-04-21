@@ -46,9 +46,9 @@ best_practices[4]{area,rules}:
 ```toon
 workflows[4]{command,steps,deliverables}:
   docker:create,"Analyze project → optimized Dockerfile → .dockerignore → health check → test","Dockerfile (multi-stage), .dockerignore, docker-compose.yml, build instructions"
-  /deploy cicd-create,"Detect platform → pipeline config → stages (lint/test/build/deploy) → security scan → secrets","Pipeline config, setup instructions, secret config guide"
-  /deploy docker-create,"Dockerfile → docker-compose → multi-stage → health checks → .dockerignore","Docker config, compose file, build guide"
-  /deploy setup,"Choose platform → IaC code → deploy scripts → env vars → monitoring","IaC code, deploy scripts, env config, monitoring setup"
+  /run deploy cicd,"Detect platform → pipeline config → stages (lint/test/build/deploy) → security scan → secrets","Pipeline config, setup instructions, secret config guide"
+  /run deploy docker,"Dockerfile → docker-compose → multi-stage → health checks → .dockerignore","Docker config, compose file, build guide"
+  /run deploy setup,"Choose platform → IaC code → deploy scripts → env vars → monitoring","IaC code, deploy scripts, env config, monitoring setup"
 ```
 
 ---

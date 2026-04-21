@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
   paths: {
     docs: 'docs',
     plans: 'plans',
-    workflows: '.claude/logs/workflows'
+    workflows: '.claude/logs/runs'
   },
   project: {
     type: 'auto',

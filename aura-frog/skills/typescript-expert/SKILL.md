@@ -8,6 +8,11 @@ triggers:
   - "type error"
   - "tsconfig"
   - "strict mode"
+paths:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "tsconfig.json"
+  - "tsconfig.*.json"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

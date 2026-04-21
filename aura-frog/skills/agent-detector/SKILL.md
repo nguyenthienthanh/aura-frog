@@ -20,7 +20,7 @@ allowed-tools: NONE
 complexity[3]{level,criteria,approach}:
   Quick,"Single file / simple fix / clear scope","Direct implementation"
   Standard,"2-5 files / feature / some unknowns","Scout then implement"
-  Deep,"6+ files / architecture / vague scope","workflow-orchestrator"
+  Deep,"6+ files / architecture / vague scope","run-orchestrator"
 ```
 
 ## Model Selection

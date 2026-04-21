@@ -8,6 +8,11 @@ triggers:
   - "php"
   - "eloquent"
   - "artisan"
+paths:
+  - "**/*.php"
+  - "composer.json"
+  - "artisan"
+  - "config/*.php"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

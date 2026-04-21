@@ -1,7 +1,7 @@
 # Skill: Smart Phase Skipping
 
 **Category:** Workflow Optimization
-**Used By:** lead, workflow-orchestrator
+**Used By:** lead, run-orchestrator
 
 ---
 

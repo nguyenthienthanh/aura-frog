@@ -1,3 +1,10 @@
+---
+name: mobile
+description: "React Native / Flutter / Expo mobile development. Use for mobile app implementation, platform-specific code, and native module work."
+tools: Read, Grep, Glob, Edit, Write, Bash
+color: purple
+---
+
 # Agent: Mobile
 
 **Agent ID:** mobile
@@ -108,4 +115,12 @@ When working as a teammate, mobile claims:
 
 ---
 
-**Rule Reference:** `rules/agent/frontend-excellence.md`
+## Related Rules
+
+- `rules/agent/frontend-excellence.md` — UX laws, performance, mobile patterns (MUST READ)
+- `rules/agent/direct-hook-access.md` — Hook access patterns
+- `rules/agent/correct-file-extensions.md` — .tsx vs .ts
+- `rules/agent/state-management.md` — State choices
+- `rules/agent/theme-consistency.md` — No hardcoded values
+- `rules/agent/accessibility-rules.md` — a11y for mobile
+- `rules/agent/codebase-consistency.md` — Match project patterns

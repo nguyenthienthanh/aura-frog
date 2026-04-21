@@ -23,7 +23,7 @@ Token ≥75% → suggest handoff. User says handoff/save → execute. User says 
 
 ## Handoff Flow
 
-1. Save to `.claude/logs/workflows/[id]/workflow-state.json`: workflow_id, status, current_phase, agents, phases_completed (with deliverables), key decisions, token_usage
+1. Save to `.claude/logs/runs/[id]/run-state.json`: workflow_id, status, current_phase, agents, phases_completed (with deliverables), key decisions, token_usage
 2. Output: workflow ID, phase progress, deliverables, resume command
 
 ## Resume Flow
@@ -48,7 +48,7 @@ agents[2]: architect,tester
 
 ## Error Handling
 
-Not found → show available, suggest `/workflow start`. Corrupted → restore from `.backup.json`.
+Not found → show available, suggest `/run`. Corrupted → restore from `.backup.json`.
 
 ## Cleanup
 

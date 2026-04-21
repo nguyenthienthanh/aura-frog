@@ -74,7 +74,7 @@ Include token status when >75%:
 ```
 Progress: ██████████░░░░░░ 60% (3/5 phases)
 Tokens: ████████████░░░░ 75% (~150K used)
-⚠️ Token usage high. Consider `/workflow handoff` after Phase 4.
+⚠️ Token usage high. Consider `handoff` after Phase 4.
 ```
 
 ---

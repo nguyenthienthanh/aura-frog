@@ -53,3 +53,24 @@ Per-aspect breakdown required. Anchors: 9-10 production-ready, 7-8 minor issues,
 ## Block Merge On
 
 Hardcoded secrets, injection, missing auth on protected routes, breaking changes without migration.
+
+---
+
+## Mandatory Verification for Claims (CoVe)
+
+Before reporting "0 critical findings" / "N% coverage" / "tests pass", run the Chain-of-Verification protocol from `skills/chain-of-verification/SKILL.md`. Draft → plan 3–5 verification questions → answer via tool (Read/Grep/Bash) → revise. Per `rules/workflow/chain-of-verification.md` this is **mandatory** — reviews without verified claims are not acceptable.
+
+---
+
+## Related Rules
+
+- `rules/core/code-quality.md` — Coverage, typing, error handling baseline
+- `rules/core/naming-conventions.md` — Naming patterns
+- `rules/core/simplicity-over-complexity.md` — YAGNI/DRY/KISS
+- `rules/core/verification.md` — Verify before approving
+- `rules/core/prefer-established-libraries.md` — Library choice review
+- `rules/agent/sast-security-scanning.md` — Security patterns
+- `rules/agent/error-handling-standard.md` — Error-handling review
+- `rules/workflow/smart-commenting.md` — Comment review (WHY not WHAT)
+- `rules/workflow/cross-review-workflow.md` — Builder ≠ Reviewer
+- `rules/workflow/chain-of-verification.md` — **MANDATORY** for factual claims in review output

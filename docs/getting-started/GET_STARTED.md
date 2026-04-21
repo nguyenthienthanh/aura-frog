@@ -12,7 +12,7 @@
 
 > **First time?** Follow the [Interactive Tutorial](FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
 
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 10 agents, 5-phase TDD workflows, and multi-agent orchestration.
+> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 9 agents, 5-phase TDD workflows, and multi-agent orchestration.
 
 ---
 
@@ -123,7 +123,7 @@ workflow:start Analyze the current component structure
 
 **Expected:**
 - **agent-detector** skill auto-invokes → Selects appropriate agent
-- **workflow-orchestrator** skill auto-invokes → Starts 5-phase workflow
+- **run-orchestrator** skill auto-invokes → Starts 5-phase workflow
 - Claude analyzes your code
 - Shows Phase 1: Understand + Design
 - Displays approval gate

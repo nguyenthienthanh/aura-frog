@@ -8,6 +8,11 @@ triggers:
   - "django"
   - "fastapi"
   - "flask"
+paths:
+  - "**/*.py"
+  - "pyproject.toml"
+  - "requirements.txt"
+  - "setup.py"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

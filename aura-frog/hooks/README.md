@@ -95,8 +95,8 @@ env_vars[16]{var,description}:
 - ✅ Record learnings automatically
 
 **Monitored Paths:**
-- `.claude/cache/workflow-state.json`
-- `.claude/logs/workflows/*.md`
+- `.claude/cache/run-state.json`
+- `.claude/logs/runs/*.md`
 - `docs/workflow/*.md`
 - Any `phase-*.md`, `plan.md`, `spec.md`, `requirements.md`
 
@@ -146,7 +146,7 @@ env_vars[16]{var,description}:
 
 ───────────────────────────────────────────────────────────
 📥 **To fully resume workflow:**
-   workflow:resume AUTH-123
+   /run resume AUTH-123
 
 💡 Context has been restored. Type "continue" to proceed.
 ═══════════════════════════════════════════════════════════
@@ -291,7 +291,7 @@ Hook: 🔴 [CRITICAL] This file likely contains secrets. Verify it is NOT commit
 **When:** After any Bash command completes
 
 **Actions:**
-- ✅ Log command execution to `.claude/logs/workflows/commands.log`
+- ✅ Log command execution to `.claude/logs/runs/commands.log`
 - ✅ Include timestamp and command
 - ✅ Useful for workflow tracking and debugging
 
@@ -645,7 +645,7 @@ User: "Implement JWT authentication for the API"
 
 **Files Saved:**
 - `.claude/cache/compact-handoff.json` - Quick resume state
-- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+- `.claude/logs/runs/[id]/run-state.json` - Full workflow state (if workflow active)
 
 **Example:**
 ```
@@ -667,7 +667,7 @@ User: "Implement JWT authentication for the API"
 
 **Files Saved:**
 - `.claude/cache/compact-handoff.json` - Pre-compact state snapshot
-- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+- `.claude/logs/runs/[id]/run-state.json` - Full workflow state (if workflow active)
 
 **Example:**
 ```

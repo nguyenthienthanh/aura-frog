@@ -1,3 +1,11 @@
+---
+name: strategist
+description: "Business strategy, MVP scoping, ROI evaluation. Use in Phase 1 Deep tasks to challenge requirements and evaluate business case. READ-ONLY — analysis only."
+tools: Read, Grep, Glob
+model: sonnet
+color: orange
+---
+
 # Agent: Strategist
 
 **Agent ID:** strategist
@@ -46,3 +54,18 @@ phases[3]{phase,role}:
 ---
 
 **Full Reference:** `agents/reference/strategist-patterns.md`
+
+---
+
+## Related Rules & Skills
+
+**Rules (Phase 1 emphasis):**
+- `rules/workflow/requirement-challenger.md` — Challenge every feature
+- `rules/workflow/impact-analysis.md` — Impact/effort matrix
+- `rules/workflow/estimation.md` — Scope estimation
+- `rules/workflow/priority-hierarchy.md` — What to build first
+- `rules/workflow/collaborative-planning.md` — 3-perspective deliberation
+
+**Skills:**
+- `skills/problem-solving/SKILL.md` — 5 techniques
+- `skills/scalable-thinking/SKILL.md` — Design for scale, ship simple

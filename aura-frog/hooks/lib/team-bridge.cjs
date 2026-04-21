@@ -58,15 +58,17 @@ const PHASE_TEAMS = {
 
 function resolveWorkflowDir(workflowId) {
   const possibleRoots = [
+    path.join(process.cwd(), '.claude', 'logs', 'runs'),
     path.join(process.cwd(), '.claude', 'logs', 'workflows'),
+    path.join(process.cwd(), 'logs', 'runs'),
     path.join(process.cwd(), 'logs', 'workflows')
   ];
   for (const root of possibleRoots) {
     const dir = path.join(root, workflowId);
     if (fs.existsSync(dir)) return dir;
   }
-  // Default to .claude/logs/workflows even if it doesn't exist yet
-  return path.join(process.cwd(), '.claude', 'logs', 'workflows', workflowId);
+  // Default to .claude/logs/runs even if it doesn't exist yet
+  return path.join(process.cwd(), '.claude', 'logs', 'runs', workflowId);
 }
 
 function resolveStateFile(workflowId) {

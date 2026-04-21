@@ -15,8 +15,8 @@ You: workflow:status
 
 Or use bundled slash commands:
 ```
-/workflow → Shows interactive submenu
-/workflow start "task" → Direct subcommand
+/run "task" → Auto-detect intent and start
+approve / reject / modify → Context-aware actions during run
 ```
 
 Claude AI reads the command text and executes the workflow.

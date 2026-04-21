@@ -20,6 +20,8 @@ allowed-tools: Read, Bash, Glob, Grep
 
 Two modes: **Usage Analytics** (how you use Claude Code) and **Prompt Quality** (evaluate/optimize a specific prompt).
 
+**For task-intake validation (before executing a user request), use the 6-dimension benchmark in `rules/core/prompt-validation.md`** — that's a different check (task completeness, not prompt craftsmanship) and should run at `/run` pre-execution per `rules/core/no-assumption.md`.
+
 ---
 
 ## Mode 1: Usage Analytics

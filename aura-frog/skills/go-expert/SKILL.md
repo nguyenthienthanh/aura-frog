@@ -9,6 +9,10 @@ triggers:
   - "gin"
   - "echo"
   - "fiber"
+paths:
+  - "**/*.go"
+  - "go.mod"
+  - "go.sum"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

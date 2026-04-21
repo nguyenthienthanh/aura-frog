@@ -9,6 +9,9 @@ triggers:
   - "widget"
   - "bloc"
   - "riverpod"
+paths:
+  - "**/*.dart"
+  - "pubspec.yaml"
 allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 

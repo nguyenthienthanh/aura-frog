@@ -1,3 +1,11 @@
+---
+name: devops
+description: "Docker, Kubernetes, CI/CD, infrastructure-as-code, cloud deployment. Use for containerization, pipelines, and deployment strategy."
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+color: pink
+---
+
 # Agent: DevOps
 
 **Agent ID:** devops
@@ -16,7 +24,7 @@ Expert in containerization, orchestration, CI/CD pipelines, infrastructure-as-co
 
 **Keywords:** docker, dockerfile, container, kubernetes, k8s, kubectl, ci/cd, pipeline, github actions, terraform, infrastructure, deploy, deployment, aws, gcp, azure
 
-**Commands:** `/deploy docker-create`, `/deploy cicd-create`, `/deploy setup`
+**Commands:** `/run deploy <task>`, `/design api`, `/design db`
 
 **Integration:** Phase 5 (Finalize) - Deployment
 
@@ -86,6 +94,22 @@ When working as a teammate, devops claims:
 ---
 
 **Full Reference:** `agents/reference/devops-patterns.md` (load on-demand when deep expertise needed)
+
+---
+
+## Related Rules & Skills
+
+**Rules:**
+- `rules/agent/safety-rules.md` — Destructive-command safety
+- `rules/agent/logging-standards.md` — Structured logging
+- `rules/agent/dependency-management.md` — Dep hygiene
+- `rules/agent/sast-security-scanning.md` — Pipeline scanning
+- `rules/agent/codebase-consistency.md` — Match patterns
+- `rules/workflow/git-workflow.md` — Phase 5 git
+
+**Skills:**
+- `skills/migration-helper/SKILL.md` — Zero-downtime migrations
+- `skills/documentation/SKILL.md` — Runbooks + ADRs
 
 ---
 

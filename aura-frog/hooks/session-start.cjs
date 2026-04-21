@@ -228,7 +228,7 @@ async function main() {
 
       // Paths
       writeEnv(envFile, 'AF_PLANS_PATH', config.paths?.plans || 'plans');
-      writeEnv(envFile, 'AF_WORKFLOWS_PATH', config.paths?.workflows || '.claude/logs/workflows');
+      writeEnv(envFile, 'AF_WORKFLOWS_PATH', config.paths?.workflows || '.claude/logs/runs');
 
       // Plan config
       writeEnv(envFile, 'AF_PLAN_NAMING', config.plan?.namingFormat || '{date}-{slug}');
@@ -280,7 +280,7 @@ async function main() {
       AF_SUGGESTED_PLAN: resolved.resolvedBy === 'branch' ? resolved.path : '',
       AF_REPORTS_PATH: reportsPath,
       AF_PLANS_PATH: config.paths?.plans || 'plans',
-      AF_WORKFLOWS_PATH: config.paths?.workflows || '.claude/logs/workflows',
+      AF_WORKFLOWS_PATH: config.paths?.workflows || '.claude/logs/runs',
       AF_GIT_BRANCH: staticEnv.gitBranch || '',
       AF_GIT_URL: staticEnv.gitUrl || '',
       AF_NODE_VERSION: staticEnv.nodeVersion || '',

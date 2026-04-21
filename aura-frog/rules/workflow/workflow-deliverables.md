@@ -44,7 +44,7 @@ deliverables[12]{phase,document,required,key_content}:
 ## Workflow Folder Structure
 
 ```
-.claude/logs/workflows/{workflow-id}/
+.claude/logs/runs/{run-id}/
 ├── REQUIREMENTS.md
 ├── TECH_SPEC.md              # AI reads this
 ├── TECH_SPEC_CONFLUENCE.md   # Human-readable
@@ -55,7 +55,7 @@ deliverables[12]{phase,document,required,key_content}:
 ├── IMPLEMENTATION_SUMMARY.md
 ├── DEPLOYMENT_GUIDE.md       # If deployment
 ├── CHANGELOG_ENTRY.md
-└── workflow-state.json
+└── run-state.json
 ```
 
 ---
@@ -71,7 +71,7 @@ At workflow end: verify all documents exist before closing.
 **CRITICAL:** When a phase is modified or rejected, deliverable files MUST be re-saved:
 
 1. **Re-write** the updated deliverable `.md` files to the workflow log directory
-2. **Log** the modification/rejection in `workflow-state.json` with timestamp, reason, and changes list
+2. **Log** the modification/rejection in `run-state.json` with timestamp, reason, and changes list
 3. **Append** to `execution.log`: `[timestamp] Phase N modified/rejected: <reason>`
 4. **Verify** updated files exist before showing the new approval gate
 
