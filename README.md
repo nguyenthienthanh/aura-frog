@@ -11,6 +11,7 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 [![Version](https://img.shields.io/badge/version-3.6.1-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
+[![Portable](https://img.shields.io/badge/portable-95%25_markdown-brightgreen)](docs/PORTABILITY.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Typos get direct edits. Bugs get 4-step TDD. Features get 5-phase workflow. You never pick — the plugin matches effort to risk.**
@@ -78,6 +79,22 @@ flowchart TB
 3. **Standard tasks** (one feature, clear scope) → single specialized agent runs inline.
 4. **Deep tasks** (feature + multi-file + TDD) → `run-orchestrator` spawns the 5-phase workflow with two human approval gates.
 5. Between phases, you either **approve**, **reject**, or **modify** — no commit happens until Phase 5 and you say so.
+
+---
+
+## Works Across AI Coding Tools
+
+Aura Frog's 57 rules, 41 skills, and 9 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+
+| Tool | Status | Coverage |
+|------|--------|:--------:|
+| ![Claude Code](https://img.shields.io/badge/Claude_Code-first_class-green) Fully tested | 100% |
+| ![Codex](https://img.shields.io/badge/Codex-adapter_planning-yellow) Q2 2026 | ~85% |
+| ![Cursor](https://img.shields.io/badge/Cursor-planned-lightgrey) Q2 2026 | ~80% |
+
+**Why this matters:** When you invest in Aura Frog's TDD discipline, gotcha-only expert skills, and agent architecture, that investment survives tool switches. Only the thin adapter layer changes.
+
+[Read the Portability Guide →](docs/PORTABILITY.md)
 
 ---
 

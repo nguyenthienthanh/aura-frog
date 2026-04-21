@@ -444,6 +444,37 @@
 
 ---
 
+## Part 9 — Tool-Agnostic Investment
+
+### 9.1. Portable Instruction Layer (`docs/PORTABILITY.md`)
+
+**What:** Most of the plugin (rules, skills, agent definitions, commands) is markdown. Only the hook layer is tool-specific. Weighted portability: **~87%**.
+
+**How applied:** Every rule and skill is written as tool-neutral prompting. Frontmatter fields that some tools don't support are treated as optional hints, not load-blockers. The hook layer sits behind a well-defined event interface that maps cleanly to Cursor, Codex, Windsurf, etc.
+
+**Why you need it:** AI coding tools are evolving fast. Claude Code may not be your team's primary tool in 12 months. The rules/skills/agents you craft now should survive — only the thin adapter changes.
+
+**Use cases:**
+- Team currently on Claude Code, considering Cursor for some workflows
+- Enterprise standardizing on one tool but wanting an exit strategy
+- Solo developer who wants to try multiple tools without maintaining multiple workflow libraries
+- Open-source project that wants contributors on any tool to get the same discipline
+
+**What you get on each tool:**
+
+| Tool | Install status | Coverage |
+|------|----------------|:--------:|
+| Claude Code | First-class, released | 100% |
+| Codex | Adapter in planning (Q2 2026) | ~85% — skills + commands + MCP, no hooks |
+| Cursor | Adapter planned (Q2 2026) | ~80% — rules + skills + agents, different extension model |
+| Windsurf | Community request, no committed timeline | ~75% estimated |
+
+**Porting cost:** ~1–2 days per target tool to write the hook adapter. The universal layer copies as-is.
+
+Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
+
+---
+
 ## Summary — When to Use Aura Frog
 
 ✅ **Yes, install if you:**

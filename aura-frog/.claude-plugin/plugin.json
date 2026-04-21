@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
   "version": "3.6.1",
-  "description": "LLM OS for software engineering. 9 agents, 5-phase TDD workflow, 57 rules (3-tier), 41 skills, 6 commands, 28 hooks, 6 MCP servers. /run auto-detects intent, context-aware actions, multi-agent orchestration.",
+  "description": "Portable LLM OS for software engineering. 9 agents, 5-phase TDD workflow, 57 rules (3-tier), 41 skills, 6 commands, 28 hooks, 6 MCP servers. ~87% markdown = works on Claude Code today; Codex/Cursor adapters planned Q2 2026.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
