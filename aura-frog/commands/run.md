@@ -101,6 +101,18 @@ phases[5]{phase,name,gate}:
 3. **Fix GREEN** — minimal fix at root cause
 4. **Verify** — full test suite, no regressions
 
+Escalate to `skills/deep-debugging/SKILL.md` when the bug is intermittent, race-condition-flavored, or resists quick fix.
+
+---
+
+## Auto-Loaded Skills Based on Repo
+
+When a run starts, `run-orchestrator` detects repo traits and loads relevant skills:
+
+- Detects `pnpm-workspace.yaml` / `turbo.json` / `nx.json` / `lerna.json` / `go.work` → loads `skills/monorepo/SKILL.md` for package-scope discipline
+- Performance keywords in task ("slow", "latency", "optimize speed") → loads `skills/perf-profiling/SKILL.md`
+- Detection happens via `skills/agent-detector/SKILL.md` every message
+
 ---
 
 ## Related

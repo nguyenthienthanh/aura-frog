@@ -157,7 +157,7 @@ npx cc-plugin-eval run -p ./aura-frog --components skills \
 
 ## Cost Management
 
-Per-run cost depends on component count and scenario count. For Aura Frog's 5 auto-invoke skills × 5 scenarios each = 25 scenarios, typical cost is ~$0.30–$1.00 on Sonnet. Full eval across all 41 skills is ~$5–$10.
+Per-run cost depends on component count and scenario count. For Aura Frog's 5 auto-invoke skills × 5 scenarios each = 25 scenarios, typical cost is ~$0.30–$1.00 on Sonnet. Full eval across all 44 skills is ~$5–$10.
 
 **Budget guards:**
 - `max_budget_usd: 10.0` in config hard-stops if exceeded

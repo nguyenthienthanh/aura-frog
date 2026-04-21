@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
 **System:** Aura Frog v3.6.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 9 agents + 41 skills + 6 commands + 5-phase TDD workflow + 6 MCP servers
+**Purpose:** 9 agents + 44 skills + 6 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
 

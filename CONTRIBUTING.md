@@ -94,7 +94,7 @@ aura-frog/                           # Repository root
 │   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
 │   ├── agents/                      # 9 specialized agents (consolidated)
 │   ├── commands/                    # 6 commands (/run /check /design /project /af /help)
-│   ├── skills/                      # 41 skills (5 auto-invoke + 36 reference)
+│   ├── skills/                      # 44 skills (5 auto-invoke + 39 reference)
 │   ├── rules/                       # 57 quality rules (18 core + 17 agent + 22 workflow)
 │   ├── hooks/                       # 28 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # AI reference docs + phase guides

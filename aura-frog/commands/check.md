@@ -27,6 +27,8 @@ Comprehensive security audit: dependency vulnerabilities (npm audit/pip-audit), 
 
 Performance analysis: Web (Lighthouse: FCP, LCP, TTI, CLS), Mobile (startup, memory), Backend (API response time, N+1), Bundle (size, chunks, duplicates). Scored 0-100 with prioritized recommendations.
 
+For deep profiling of a specific bottleneck (not just surface metrics), delegate to `skills/perf-profiling/SKILL.md` — measure → analyze flamegraph → one change → verify.
+
 **Usage:** `/check perf`, `/check perf --bundle`, `/check perf --lighthouse`
 
 ---
@@ -65,5 +67,5 @@ Dependency vulnerability scan. Auto-detects package manager. Reports affected pa
 
 ## Related
 
-- **Skills:** `code-reviewer`, `code-simplifier`, `performance-optimizer`
+- **Skills:** `code-reviewer`, `code-simplifier`, `performance-optimizer`, `perf-profiling`
 - **Rules:** `rules/core/code-quality.md`, `rules/core/simplicity-over-complexity.md`

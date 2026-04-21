@@ -3,7 +3,7 @@
   "generated": "2026-04-21T13:35:50Z",
   "components": {
     "agents": 9,
-    "skills": { "total": 41, "autoInvoke": 5 },
+    "skills": { "total": 44, "autoInvoke": 5 },
     "rules": { "total": 57, "core": 18, "agent": 17, "workflow": 22 },
     "commands": 6,
     "hooks": 28,

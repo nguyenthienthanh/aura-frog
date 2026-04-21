@@ -85,7 +85,7 @@ flowchart TB
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 57 rules, 41 skills, and 9 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 57 rules, 44 skills, and 9 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -162,7 +162,7 @@ Expected output:
 ```
 🐸 Aura Frog v3.6.0 — Ready
   Agents:   9 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner)
-  Skills:   41 available (5 auto-invoke, 36 on-demand)
+  Skills:   44 available (5 auto-invoke, 39 on-demand)
   Rules:    57 loaded (18 core + 17 agent + 22 workflow)
   Hooks:    28 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
@@ -996,7 +996,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         9 processes (auto-dispatched per task)
-├── skills/         41 skills (5 auto-invoke + 36 on-demand)
+├── skills/         44 skills (5 auto-invoke + 39 on-demand)
 ├── commands/       6 commands (/run, /check, /design, /project, /af, /help)
 ├── rules/          57 rules (18 core + 17 agent + 22 workflow)
 ├── hooks/          28 lifecycle hooks (conditional execution)

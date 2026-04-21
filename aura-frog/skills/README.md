@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 41 (5 auto-invoking + 36 reference)
+**Total Skills:** 44 (5 auto-invoking + 39 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -22,9 +22,19 @@ auto_invoke[5]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (35)
+## Reference Skills (39)
 
 Loaded on-demand when triggered.
+
+### Coverage — Deep Work (3)
+
+Added v3.7.0 to close gaps in hard debugging, monorepo handling, and performance profiling:
+
+| Skill | Purpose |
+|-------|---------|
+| `deep-debugging` | Scientific-method root-cause analysis for intermittent/flaky/race bugs |
+| `monorepo` | pnpm/yarn/npm workspaces + Turborepo/Nx/Lerna — correct package scoping |
+| `perf-profiling` | Measure before optimize; Pareto-driven bottleneck targeting |
 
 ### Framework Experts (11)
 

@@ -490,7 +490,7 @@ Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
 - Only do throwaway scripts / single-file edits
 - Don't want any workflow overhead
 - Have strict Haiku-only budgets (some features use Sonnet)
-- Prefer minimalist plugins (Aura Frog is substantial — 9 agents, 41 skills, 57 rules)
+- Prefer minimalist plugins (Aura Frog is substantial — 9 agents, 44 skills, 57 rules)
 
 🎯 **Best fit:** Teams shipping production features where quality + security + cost control all matter.
 

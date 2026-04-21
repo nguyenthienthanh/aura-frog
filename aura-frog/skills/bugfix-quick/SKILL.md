@@ -61,7 +61,9 @@ For bugs only. Features/refactors → run-orchestrator.
 **Verification:** Tests pass, no regressions
 ```
 
-If complex → switch to run-orchestrator.
+If complex → switch to `run-orchestrator`.
+
+**Escalation:** If the bug resists quick fix (intermittent, race condition, "works on my machine", multiple plausible causes), escalate to `skills/deep-debugging/SKILL.md` for scientific-method root-cause analysis.
 
 ---
 
