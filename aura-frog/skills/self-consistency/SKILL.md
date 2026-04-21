@@ -119,4 +119,4 @@ Per `rules/core/no-assumption.md` — when paths disagree, ask rather than pick.
 - `rules/workflow/self-consistency.md` — policy
 - `rules/workflow/tree-of-thoughts.md` — for branching exploration (different technique)
 - `rules/core/no-assumption.md` — when to escalate to user
-- `skills/chain-of-verification.md` — verify the SC winner's facts
+- `skills/chain-of-verification/SKILL.md` — verify the SC winner's facts

@@ -71,4 +71,4 @@ Full procedure: `skills/tree-of-thoughts/SKILL.md`
 - `rules/workflow/chain-of-verification.md` — CoVe verifies ToT's final answer post-hoc
 - `rules/core/no-assumption.md` — if all branches fail, ASK user rather than return lowest-scoring leaf
 - `skills/tree-of-thoughts/SKILL.md` — concrete playbook
-- `skills/debugging/SKILL.md` — applies ToT to hypothesis trees for bugs
+- `skills/bugfix-quick/SKILL.md` — applies ToT to hypothesis trees for bugs (debugging was merged into bugfix-quick in v3.5)

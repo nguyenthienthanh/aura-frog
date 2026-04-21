@@ -4,6 +4,32 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.6.1] - 2026-04-21
+
+### Added
+- **Security & discipline rules** — 7 new policy rules: `no-assumption`, `prompt-validation` (6-dim benchmark), `contextual-separation` (prompt-injection defense), `recursion-limit` (loop prevention), `observer-agent` (watchdog role), `prompt-caching` (Anthropic cache_control), `small-to-large-routing` (haiku→sonnet→opus), `dual-llm-review` (adversarial second-opinion), `immutable-workflow` (approved phases append-only)
+- **`skills/prompt-evaluator`** — added Mode 3: Output Variance (run N times, score stability 0-100%)
+- **`docs/reference/BENEFITS.md`** — full why-use-this-plugin doc (~460 lines, 8 parts, use cases)
+- **Reference Integrity Rule** in `.claude/CLAUDE.md` — audit script + enforcement policy for future refactors
+- **Reviewer cap = 2 per phase** in `cross-review-workflow.md` — analysis-paralysis defense
+
+### Changed
+- Core rule tier: 13 → 18 (added 5 rules)
+- Workflow rule tier: 20 → 22 (added 2 rules)
+- Total rules: 50 → 57 (18 core + 17 agent + 22 workflow)
+
+### Fixed
+- **CLAUDE.md discrepancies:** commands table was missing `/help` (now 6 commands); auto-invoke skill list incorrectly included `run-orchestrator` (which has no `autoInvoke: true` frontmatter — now correctly 5 skills)
+- **Skills README count mismatch:** propagated the 6→5 auto-invoke fix across 5 files (skills/README, docs/README, root README ×3, CONTRIBUTING)
+- **7 dead reference paths:** `skills/debugging/SKILL.md` → `skills/bugfix-quick/SKILL.md` (merged in v3.5); `skills/chain-of-verification.md` → `/SKILL.md` suffix; `rules/logging-standards.md` → `/agent/` tier; `rules/next-step-guidance.md` → `/workflow/` tier; `docs/WORKFLOW_DIAGRAMS.md` → `/architecture/` subdir
+
+### Stats
+- Rules: 57 (was 50)
+- Core rules: 18 (was 13)
+- Workflow rules: 22 (was 20)
+
+---
+
 ## [3.6.0] - 2026-04-21
 
 ### Added

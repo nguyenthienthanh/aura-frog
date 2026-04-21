@@ -142,4 +142,4 @@ Security review of /api/users endpoint:
 - `rules/core/verification.md` — the general principle CoVe implements concretely
 - `rules/core/no-assumption.md` — CoVe is what "never assume" looks like post-draft
 - `skills/code-reviewer/SKILL.md` — applies CoVe to each of 6 review aspects
-- `skills/debugging/SKILL.md` — verification step in root-cause diagnosis
+- `skills/bugfix-quick/SKILL.md` — verification step in root-cause diagnosis (debugging merged into bugfix-quick in v3.5)

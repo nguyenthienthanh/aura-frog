@@ -137,3 +137,5 @@ Skills (playbooks):
 - `rules/workflow/token-time-awareness.md` — Budget tracking
 - `rules/workflow/feedback-brainstorming.md` — On reject/modify
 - `rules/workflow/mcp-response-logging.md` — Log large MCP responses
+- `rules/workflow/immutable-workflow.md` — Approved phases are append-only
+- `rules/workflow/dual-llm-review.md` — Second LLM review for destructive ops / security-critical writes

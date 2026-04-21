@@ -107,6 +107,59 @@ principles[6]{principle}:
   Token budget awareness — every word costs money at scale
 ```
 
+---
+
+## Mode 3: Output Variance Check
+
+**Trigger:** user suspects a prompt is unstable, or before shipping a prompt to production.
+
+Run the prompt **N = 3 times** (separate contexts, identical input). Compare outputs.
+
+### Variance Scoring
+
+```
+variance_level  =  percentage_of_non_matching_content_across_runs
+
+- <10%   STABLE       — ship as-is
+- 10-30% LOW VARIANCE — minor differences, usually acceptable
+- 30-60% UNSTABLE     — prompt needs constraints to reduce ambiguity
+- >60%   CHAOS        — rewrite the prompt before any use
+```
+
+### What to Check
+
+| Dimension | What "same" means |
+|-----------|-------------------|
+| Structure | Same sections, same formatting, same order |
+| Key facts | Same numbers, names, file paths |
+| Decision | Same conclusion/recommendation |
+| Format | Same JSON keys, same table headers |
+
+### Example Report
+
+```
+Prompt: "Review this PR and list issues"
+Runs: 3
+Variance: 42% (UNSTABLE)
+
+Divergence:
+- Run 1 listed 5 issues (security, perf, style)
+- Run 2 listed 3 issues (missed perf and style findings)
+- Run 3 listed 7 issues (added subjective style nitpicks)
+
+Root cause: No constraint on issue categories or severity threshold.
+
+Recommendation: Change prompt to: "List issues at severity >= warning. Categories: security, correctness, performance. Skip style/formatting."
+```
+
+### When to Use
+
+- Before shipping a prompt that will run many times (automation, CI, customer-facing)
+- When user complains "sometimes it does X, sometimes Y"
+- Before locking a skill's SKILL.md content (stability of future invocations)
+
+**Cost:** 3× single-run. Worth it for prompts that will run 50+ times.
+
 ### Anti-Patterns to Flag
 
 ```toon

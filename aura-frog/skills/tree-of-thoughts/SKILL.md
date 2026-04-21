@@ -127,6 +127,6 @@ Verification: Check Redis CONFIG GET maxclients + monitor pool stats
 
 - `rules/workflow/tree-of-thoughts.md` — policy
 - `rules/workflow/self-consistency.md` — vote-based technique; ToT is structured search
-- `skills/chain-of-verification.md` — verify the ToT winning leaf's facts
-- `skills/debugging/SKILL.md` — uses ToT for hypothesis trees
+- `skills/chain-of-verification/SKILL.md` — verify the ToT winning leaf's facts
+- `skills/bugfix-quick/SKILL.md` — uses ToT for hypothesis trees (debugging merged into bugfix-quick in v3.5)
 - `skills/refactor-expert/SKILL.md` — uses ToT for refactor planning

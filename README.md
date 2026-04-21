@@ -8,7 +8,7 @@
 
 The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — 9 agents, 5-phase TDD workflow, self-healing memory, and multi-agent orchestration. One kernel. Zero untested code.
 
-[![Version](https://img.shields.io/badge/version-3.6.0-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.6.1-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -144,8 +144,8 @@ Expected output:
 ```
 🐸 Aura Frog v3.6.0 — Ready
   Agents:   9 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner)
-  Skills:   41 available (6 auto-invoke, 35 on-demand)
-  Rules:    50 loaded (13 core + 17 agent + 20 workflow)
+  Skills:   41 available (5 auto-invoke, 36 on-demand)
+  Rules:    57 loaded (18 core + 17 agent + 22 workflow)
   Hooks:    28 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
 ```
@@ -637,9 +637,9 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 9 | Right expert auto-selected per task |
-| **Skills** | 41 | 6 auto-invoke on context, 35 on-demand |
+| **Skills** | 41 | 5 auto-invoke on context, 36 on-demand |
 | **Commands** | 6 | `/run`, `/check`, `/design`, `/project`, `/af`, `/help` |
-| **Rules** | 50 | 3-tier loading (13 core + 17 agent + 20 workflow) — only what's needed |
+| **Rules** | 57 | 3-tier loading (18 core + 17 agent + 22 workflow) — only what's needed |
 | **Hooks** | 28 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 6 | Zero-config, auto-invoked |
 
@@ -954,9 +954,9 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         9 processes (auto-dispatched per task)
-├── skills/         41 skills (6 auto-invoke + 35 on-demand)
+├── skills/         41 skills (5 auto-invoke + 36 on-demand)
 ├── commands/       6 commands (/run, /check, /design, /project, /af, /help)
-├── rules/          50 rules (13 core + 17 agent + 20 workflow)
+├── rules/          57 rules (18 core + 17 agent + 22 workflow)
 ├── hooks/          28 lifecycle hooks (conditional execution)
 ├── scripts/        43 utility scripts
 ├── docs/           AI reference docs (phases, TOON refs)

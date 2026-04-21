@@ -74,3 +74,4 @@ Before reporting "0 critical findings" / "N% coverage" / "tests pass", run the C
 - `rules/workflow/smart-commenting.md` — Comment review (WHY not WHAT)
 - `rules/workflow/cross-review-workflow.md` — Builder ≠ Reviewer
 - `rules/workflow/chain-of-verification.md` — **MANDATORY** for factual claims in review output
+- `rules/workflow/dual-llm-review.md` — Second-opinion LLM for destructive-op / security-critical findings

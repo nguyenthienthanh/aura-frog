@@ -96,6 +96,8 @@ Security reviews but does not own files. Reviews: authentication/authorization, 
 - `rules/agent/sast-security-scanning.md` — Static analysis patterns
 - `rules/agent/safety-rules.md` — Destructive-op safety
 - `rules/agent/error-handling-standard.md` — Don't leak errors
+- `rules/workflow/dual-llm-review.md` — Mandatory second-LLM review for Phase 4 security conclusions
+- `rules/core/contextual-separation.md` — Prompt-injection defense via data/instruction split
 
 **Skills:**
 - `skills/code-reviewer/SKILL.md` — Security aspect of review

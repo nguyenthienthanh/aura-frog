@@ -1,23 +1,24 @@
 # Aura Frog Skills
 
-**Total Skills:** 41 (6 auto-invoking + 35 reference)
+**Total Skills:** 41 (5 auto-invoking + 36 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
 
-## Auto-Invoke Skills (6)
+## Auto-Invoke Skills (5)
 
-Loaded every session. Target budget: ~2,000 tokens.
+Skills with `autoInvoke: true` in frontmatter — fire on every message or matching intent. Target budget: ~2,150 tokens.
 
 ```toon
-auto_invoke[6]{name,priority,trigger,tokens}:
+auto_invoke[5]{name,priority,trigger,tokens}:
   agent-detector,highest,ALWAYS — every message,~500
-  run-orchestrator,high,Complex features / multi-file,~700
   bugfix-quick,medium,Bug fixes / errors / crashes,~400
   test-writer,medium,Test writing / TDD / coverage,~500
   code-reviewer,high,Code review / after implementation,~450
   code-simplifier,medium,Simplify / KISS / complexity,~300
 ```
+
+**Note:** `run-orchestrator` is NOT auto-invoke — it fires when `/run` is typed or intent matches its `when_to_use` string (build feature, complex task, `fasttrack:` prefix). Listing it as auto-invoke would cause it to wastefully fire on every message.
 
 ---
 

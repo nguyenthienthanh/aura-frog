@@ -1,6 +1,6 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.6.0 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.6.1 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** 9 agents + 41 skills + 6 commands + 5-phase TDD workflow + 6 MCP servers
 
 ---
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.6.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.6.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -98,17 +98,20 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 
 ## Auto-Invoke Skills
 
+Only skills with `autoInvoke: true` in frontmatter fire on every message.
+
 ```toon
-skills[6]{name,trigger}:
-  agent-detector,Every message
-  run-orchestrator,Complex feature
+skills[5]{name,trigger}:
+  agent-detector,Every message (priority highest, haiku)
   bugfix-quick,Bug fix request
   test-writer,Test request
   code-reviewer,Code review
   code-simplifier,Simplify/KISS
 ```
 
-32 reference skills loaded on-demand. Full list: `skills/README.md`
+**`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
+
+36 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -166,22 +169,27 @@ Details: `rules/core/context-management.md`
 
 ```toon
 tiers[3]{tier,count,when}:
-  Core (rules/core/),13,Every session
+  Core (rules/core/),18,Every session
   Agent (rules/agent/),17,Per-agent type
-  Workflow (rules/workflow/),20,Per-phase
+  Workflow (rules/workflow/),22,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
 
 ```toon
-core_paths[13]{topic,path}:
+core_paths[18]{topic,path}:
   TDD discipline,rules/core/tdd-workflow.md
   Approval gates,rules/core/approval-gates.md
   Execution rules,rules/core/execution-rules.md
   No assumption,rules/core/no-assumption.md
   Prompt validation (6-dim),rules/core/prompt-validation.md
+  Contextual separation (injection defense),rules/core/contextual-separation.md
+  Recursion limit,rules/core/recursion-limit.md
+  Observer role,rules/core/observer-agent.md
   Memory trust,rules/core/memory-trust-policy.md
   Context mgmt,rules/core/context-management.md
+  Prompt caching,rules/core/prompt-caching.md
+  Small-to-large routing,rules/core/small-to-large-routing.md
   Code quality,rules/core/code-quality.md
   Naming,rules/core/naming-conventions.md
   Simplicity,rules/core/simplicity-over-complexity.md
@@ -197,12 +205,13 @@ core_paths[13]{topic,path}:
 ## Commands
 
 ```toon
-commands[5]{cmd,subs}:
+commands[6]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
   /check,"(all)/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
   /project,"init/detect/status/list/switch/refresh/regen/env/sync"
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
+  /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
 ```
 
 ---
@@ -234,4 +243,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.6.0
+**Version:** 3.6.1

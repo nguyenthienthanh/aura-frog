@@ -71,7 +71,7 @@ location_rules[4]{scope,location}:
   Feature-specific,docs/features/[feature]/ inline
   Architecture-level,docs/architecture/ dedicated file
   API documentation,docs/api/ inline
-  Workflow/Process,docs/WORKFLOW_DIAGRAMS.md
+  Workflow/Process,docs/architecture/WORKFLOW_DIAGRAMS.md
 ```
 
 ---

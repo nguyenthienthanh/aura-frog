@@ -486,7 +486,7 @@ const diagramValidation = validateDiagrams(currentPhase, phaseState.deliverables
 if (!diagramValidation.valid) {
   diagramValidation.warnings.forEach(w => console.warn(w));
   console.warn('   See: rules/workflow/diagram-requirements.md');
-  console.warn('   Reference: docs/WORKFLOW_DIAGRAMS.md');
+  console.warn('   Reference: docs/architecture/WORKFLOW_DIAGRAMS.md');
 }
 ```
 
