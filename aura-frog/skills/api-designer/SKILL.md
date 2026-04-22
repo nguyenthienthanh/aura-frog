@@ -1,6 +1,6 @@
 ---
 name: api-designer
-description: "Design consistent, RESTful APIs with proper versioning, documentation, and error handling."
+description: "Designs RESTful APIs with endpoint naming, versioning strategies (URL path, header-based), pagination (offset and cursor), error response schemas, and OpenAPI conventions. Use when the user asks about REST API design, creating endpoints, URL structure, API versioning, status codes, Swagger, or OpenAPI specs."
 autoInvoke: false
 priority: medium
 triggers:
@@ -78,8 +78,10 @@ GET /users?status=active&sort=created_at:desc&q=john&page=1&page_size=20
 
 ---
 
+## Design Workflow
+
+1. Define resources and relationships → 2. Choose versioning strategy → 3. Define endpoints with RESTful naming → 4. Specify response/error schemas → 5. Add pagination, filtering, sorting → 6. Document with OpenAPI → 7. Add rate limiting headers
+
 ## Checklist
 
 RESTful naming, consistent response format, proper status codes, pagination for lists, error codes, versioning, OpenAPI docs, rate limiting headers.
-
----

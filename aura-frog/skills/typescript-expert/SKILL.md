@@ -1,6 +1,6 @@
 ---
 name: typescript-expert
-description: "TypeScript gotchas and decision criteria. Covers nullish traps, strict config, and type guard patterns Claude commonly misses."
+description: "TypeScript gotchas and decision criteria covering nullish coalescing pitfalls (|| vs ??), strict tsconfig settings (noUncheckedIndexedAccess, exactOptionalPropertyTypes), type guard patterns, discriminated unions, and as const vs enum. Use when writing TypeScript, configuring tsconfig, implementing type guards, or debugging null/undefined errors."
 autoInvoke: false
 priority: high
 triggers:

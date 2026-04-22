@@ -1,6 +1,6 @@
 ---
 name: performance-optimizer
-description: "Identify and resolve performance bottlenecks through profiling, measurement, and targeted optimization."
+description: "Identifies and resolves performance bottlenecks across frontend (Core Web Vitals, code splitting, lazy loading), backend (N+1 queries, async processing), and database (EXPLAIN ANALYZE, indexing strategies) layers. Use when the user reports slow code, latency issues, memory leaks, needs to speed up an application, or wants to benchmark and profile performance."
 autoInvoke: false
 priority: medium
 triggers:
@@ -90,9 +90,11 @@ Invalidation: time-based, event-based, or version-based.
 
 ---
 
-## Checklist
+## Optimization Workflow
 
-Before: baseline captured, bottleneck identified, target defined.
-After: metrics improved, no regressions, tests pass.
-
----
+1. Profile → capture baseline metrics
+2. Identify bottleneck → focus on hottest path
+3. Set target metric → define measurable goal
+4. Apply fix → implement targeted optimization
+5. Re-measure → compare against baseline
+6. Verify → confirm no regressions, tests pass
