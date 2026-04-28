@@ -6,34 +6,81 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [3.7.0] - Unreleased
 
-> **Status:** Active development toward v3.7.0 stable. v3.7.0 was previously tagged then deleted.
-> Currently shipped: **v3.6.1**. Latest WIP commits on main beyond v3.6.1.
+> **Status:** Active development toward v3.7.0 stable.
+> Latest pre-release tag: **v3.7.0-alpha.1** (Milestone A — Planning Foundation).
+> Last shipped to marketplace: **v3.6.1**.
 
-### Added (v3.7.0 hierarchical planning — pre-alpha.1, in-progress)
+## [3.7.0-alpha.1] - 2026-04-21 (Milestone A — Planning Foundation)
 
-- `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` — authoritative tech spec for hierarchical planning (summary form; §3-33 to be transcribed per milestone)
-- `docs/specs/V3.7.0_DECISIONS.md` — owner answers to spec §32 decision checklist (all 17 questions resolved with spec-recommended answers)
-- `.aura/plans/` skeleton (gitignored per Q2): mission.md, INIT-001.md (v3.7.0 release initiative), FEAT-A/feature.md (Milestone A planning foundation), .counters.json, active.json
-- `aura-frog/agents/master-planner.md` — kernel controller skeleton (decision engine arrives in Milestone B)
-- `aura-frog/scripts/plans/new-plan.sh` — idempotent plan tree initializer
-- `aura-frog/scripts/plans/validate-plan-tree.sh` — enforces 4 of 8 invariants from spec §6.7 (advanced invariants pending parser upgrade)
-- `aura-frog/scripts/plans/render-plan-tree.sh` — ASCII tree renderer with status icons
-- `aura-frog/skills/plan-loader/SKILL.md` — auto-invoke skill for hierarchical plan context loading (≤800 always-loaded tokens target)
-- `aura-frog/rules/core/plan-trust-policy.md` — new memory tier `trust: plan` between `trust: user` and `trust: file`
-- `aura-frog/commands/aura-plan.md` — interview-bootstrap T0/T1/T2
-- `aura-frog/commands/aura-plan-expand.md` — decompose node one tier down
-- `aura-frog/commands/aura-plan-next.md` — return next ready T4 leaf
-- `aura-frog/commands/aura-plan-status.md` — render plan tree + summary
+> Internal pre-release tag. Not published to marketplace. All 6 spec acceptance criteria green.
 
-### Pending for v3.7.0-alpha.1 acceptance
+### Added — Hierarchical planning foundation
 
-- 4 more commands: `/aura:plan:replan`, `:promote`, `:archive`, `:undo`
-- 3 more agents: strategist (T0-T1), feature-architect (T2), story-planner (T3)
-- 2 hooks: pre-execute-load-plan-context.cjs, session-start-restore-active.cjs
-- plan-lifecycle.md workflow rule
-- 4 advanced validation invariants (children array integrity, orphan detection, test ref check, DAG cycle detection)
-- Round-trip byte-identical test
-- Token budget measurement ≤ 13,500
+**Specs & decisions**
+- `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` — authoritative tech spec (summary form; §3-33 transcribed per milestone)
+- `docs/specs/V3.7.0_DECISIONS.md` — all 17 §32 decisions resolved with spec recommendations + env var inventory
+
+**Plan tree (gitignored, project-local per Q2)**
+- `.aura/plans/` skeleton: mission.md, INIT-001.md, FEAT-A/feature.md, .counters.json, active.json, history.jsonl
+
+**Agents (4 new — 9 → 12)**
+- `agents/master-planner.md` — kernel controller skeleton (decision engine arrives Milestone B)
+- `agents/strategist.md` — T0-T1 hierarchical-planning section appended (preserves original business-strategy role)
+- `agents/feature-architect.md` — T2 → T3 decomposition (read-only on code)
+- `agents/story-planner.md` — T3 → T4 decomposition, pairs with TDD Phase 1
+
+**Skills (1 new — auto-invoke)**
+- `skills/plan-loader/` — `user-invocable: false`, ≤800 always-loaded tokens, auto-degradation on size
+
+**Rules (2 new)**
+- `rules/core/plan-trust-policy.md` — `trust: plan` memory tier between `trust: user` and `trust: file`
+- `rules/workflow/plan-lifecycle.md` — state machine + Phase 4 reviewer ≠ Phase 3 builder hard rule
+
+**Commands (8 new — 6 → 14)**
+- `commands/aura-plan.md` — interview-bootstrap T0/T1/T2
+- `commands/aura-plan-expand.md` — decompose node one tier down
+- `commands/aura-plan-next.md` — return next ready T4 leaf
+- `commands/aura-plan-status.md` — render plan tree + summary
+- `commands/aura-plan-replan.md` — replan flow with budget enforcement (full impl Milestone B)
+- `commands/aura-plan-promote.md` — promote node tier
+- `commands/aura-plan-archive.md` — archive completed branch with summary
+- `commands/aura-plan-undo.md` — restore from checkpoint (full impl Milestone B)
+
+**Hooks (2 new — 28 → 30)**
+- `hooks/pre-execute-load-plan-context.cjs` — PreToolUse: emits `[plan-context | trust:plan]` to stderr (silent if no `.aura/plans/`)
+- `hooks/session-start-restore-active.cjs` — SessionStart: emits `🐸 Active plan` banner; appends `event: session_start` to history.jsonl
+
+**Scripts**
+- `scripts/plans/new-plan.sh` — idempotent skeleton initializer
+- `scripts/plans/validate-plan-tree.sh` — enforces all 8 invariants from spec §6.7 (parent existence, children integrity, no orphans, valid status, monotonic revision, test_ref existence, DAG no-cycles, freeze_reason)
+- `scripts/plans/render-plan-tree.sh` — ASCII tree renderer with status icons (○ planned, ▶ active, ✓ done, ■ blocked, ❄ frozen, ✗ discarded, ⌂ archived)
+- `scripts/plans/test-roundtrip.sh` — sha256-based byte-identical round-trip test
+- `scripts/plans/check-token-budget.sh` — counts plan-tree lines, hard limit 13,500
+
+### Acceptance criteria — all green
+
+- [x] new-plan.sh idempotent skeleton creation
+- [x] validate-plan-tree.sh enforces 8/8 invariants (was 4/8 pre-alpha.1)
+- [x] Plan tree byte-identical round-trip (3-node test passes)
+- [x] 8 commands defined with imperative protocol
+- [x] ASCII tree renders correctly
+- [x] Token budget 212 / 13,500 = 1% utilization (well under hard limit)
+
+### Stats (v3.6.1 → v3.7.0-alpha.1)
+
+- Agents: 9 → **12** (+3, master-planner extends to 4 if counting strategist's appended role)
+- Skills: 44 → **45** (+1 plan-loader; auto-invoke 5 → 5 unchanged in count, plan-loader replaces nothing)
+- Rules: 57 → **59** (+2)
+- Commands: 6 → **14** (+8)
+- Hooks: 28 → **30** (+2)
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone B (alpha.2)** — failure classifier F1-F6, replanner, reasoning trace, /aura:trace, replan-thresholds, checkpoint-discipline
+- **Milestone C (beta.1)** — session reset, pre-flight (Tier 1 bash + optional OPA Tier 2), epic-summarizer, permanent-memory-loader
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class, freeze cascade
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
 
 ### Added
 
