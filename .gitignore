@@ -42,3 +42,8 @@ aura-frog/archive/
 node_modules/
 package-lock.json
 coverage/
+
+# v3.7.0 hierarchical planning runtime data (per spec Q2)
+.aura/
+
+docs/specs/

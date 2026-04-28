@@ -6,7 +6,34 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [3.7.0] - Unreleased
 
-> **Note:** v3.7.0 was tagged then deleted. Content below is staged for the next release. Currently shipped: **v3.6.1**.
+> **Status:** Active development toward v3.7.0 stable. v3.7.0 was previously tagged then deleted.
+> Currently shipped: **v3.6.1**. Latest WIP commits on main beyond v3.6.1.
+
+### Added (v3.7.0 hierarchical planning — pre-alpha.1, in-progress)
+
+- `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` — authoritative tech spec for hierarchical planning (summary form; §3-33 to be transcribed per milestone)
+- `docs/specs/V3.7.0_DECISIONS.md` — owner answers to spec §32 decision checklist (all 17 questions resolved with spec-recommended answers)
+- `.aura/plans/` skeleton (gitignored per Q2): mission.md, INIT-001.md (v3.7.0 release initiative), FEAT-A/feature.md (Milestone A planning foundation), .counters.json, active.json
+- `aura-frog/agents/master-planner.md` — kernel controller skeleton (decision engine arrives in Milestone B)
+- `aura-frog/scripts/plans/new-plan.sh` — idempotent plan tree initializer
+- `aura-frog/scripts/plans/validate-plan-tree.sh` — enforces 4 of 8 invariants from spec §6.7 (advanced invariants pending parser upgrade)
+- `aura-frog/scripts/plans/render-plan-tree.sh` — ASCII tree renderer with status icons
+- `aura-frog/skills/plan-loader/SKILL.md` — auto-invoke skill for hierarchical plan context loading (≤800 always-loaded tokens target)
+- `aura-frog/rules/core/plan-trust-policy.md` — new memory tier `trust: plan` between `trust: user` and `trust: file`
+- `aura-frog/commands/aura-plan.md` — interview-bootstrap T0/T1/T2
+- `aura-frog/commands/aura-plan-expand.md` — decompose node one tier down
+- `aura-frog/commands/aura-plan-next.md` — return next ready T4 leaf
+- `aura-frog/commands/aura-plan-status.md` — render plan tree + summary
+
+### Pending for v3.7.0-alpha.1 acceptance
+
+- 4 more commands: `/aura:plan:replan`, `:promote`, `:archive`, `:undo`
+- 3 more agents: strategist (T0-T1), feature-architect (T2), story-planner (T3)
+- 2 hooks: pre-execute-load-plan-context.cjs, session-start-restore-active.cjs
+- plan-lifecycle.md workflow rule
+- 4 advanced validation invariants (children array integrity, orphan detection, test ref check, DAG cycle detection)
+- Round-trip byte-identical test
+- Token budget measurement ≤ 13,500
 
 ### Added
 
