@@ -69,3 +69,21 @@ phases[3]{phase,role}:
 **Skills:**
 - `skills/problem-solving/SKILL.md` — 5 techniques
 - `skills/scalable-thinking/SKILL.md` — Design for scale, ship simple
+
+---
+
+## v3.7.0 Extension — Hierarchical Planning T0/T1 Owner
+
+In addition to the Phase 1 business-strategy role above, strategist OWNS hierarchical planning Tier 0 (Mission) and Tier 1 (Initiative) per spec §8.2.
+
+**Activated when:** `/aura:plan` runs for first-time setup, on quarterly review, or when discovery contradicts current Initiative's `target_outcome`.
+
+**Constraints when in T0/T1 mode:**
+- Writes only to `.aura/plans/mission.md` and `.aura/plans/initiatives/INIT-NNN.md`
+- Does NOT decompose into Features (that's feature-architect's job for T2)
+- Mission output ≤ 50 tokens, Initiative ≤ 300 tokens body
+- Logs every plan-file write to `.aura/plans/history.jsonl` as `event: strategist_decompose`
+
+**Tools used in T0/T1 mode:** Read + Glob + Grep + Bash (NOT Write/Edit on code; Write only to .aura/plans/). The agent's frontmatter `tools` field stays read-only by default; planning skill grants narrow Write to plan files via context-scoped delegation.
+
+**Decisions tied:** Q1 (deterministic decision logic; LLM only when reasoning across alternatives needed).
