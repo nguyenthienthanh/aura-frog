@@ -9,6 +9,7 @@ triggers:
   - "improve code"
   - "refactor:analyze"
   - "refactor:plan"
+user-invocable: false
 ---
 
 # Skill: Refactor Expert

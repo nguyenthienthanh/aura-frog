@@ -8,6 +8,7 @@ triggers:
   - "learning analysis"
   - "pattern analysis"
 context: fork
+user-invocable: false
 ---
 
 # Learning Analyzer Skill

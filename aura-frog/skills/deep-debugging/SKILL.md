@@ -4,6 +4,7 @@ description: "Systematic debugging protocol for bugs that resist quick fixes. Us
 when_to_use: "bug not obvious, intermittent failure, production issue, bisect, systematic debugging, hard bug, root cause analysis, deep debug, flaky test, heisenbug, race condition"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Deep Debugging

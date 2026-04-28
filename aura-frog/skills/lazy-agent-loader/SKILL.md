@@ -7,6 +7,7 @@ triggers:
   - "when agent is selected"
   - "agent:load"
 allowed-tools: Read, Glob
+user-invocable: false
 ---
 
 # Lazy Agent Loader

@@ -10,6 +10,7 @@ triggers:
   - "load project context"
   - "load conventions"
 allowed-tools: Read, Write, Grep, Glob, Bash
+user-invocable: false
 ---
 
 # Project Context Loader

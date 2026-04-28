@@ -11,6 +11,7 @@ triggers:
   - "workflow:handoff"
   - "workflow:resume"
 allowed-tools: Read, Write, Bash
+user-invocable: false
 ---
 
 # Session Continuation

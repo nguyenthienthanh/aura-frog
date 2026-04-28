@@ -137,7 +137,14 @@ skills/[skill-name]/
 
 ## Invocation
 
-Skills auto-invoke based on description matching. Just describe what you want — Claude selects the right skill.
+**Skills are NOT slash-typeable.** Every skill carries `user-invocable: false` in frontmatter — they're hidden from the `/` menu by design. This keeps the slash menu reserved for actionable commands.
+
+Skills are still triggered three ways:
+1. **AI auto-invoke on intent match** — describe what you want ("evaluate my prompts", "review this code") and Claude picks the matching skill
+2. **Explicit prompt mention** — "use the chain-of-verification skill on this report"
+3. **Internal invocation** — a `commands/` file or another skill calls into it (e.g., `/af prompts` → `prompt-evaluator` skill)
+
+If a skill needs slash exposure for the user → wrap it in a thin `commands/<name>.md` file that delegates here. See `.claude/CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".
 
 ---
 

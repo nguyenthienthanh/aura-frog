@@ -14,6 +14,7 @@ paths:
   - "requirements.txt"
   - "setup.py"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Python Expert — Gotchas & Decisions

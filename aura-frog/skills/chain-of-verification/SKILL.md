@@ -4,6 +4,7 @@ description: "Draft → generate verification questions → answer independently
 when_to_use: "phase 4 review, security audit conclusions, test coverage claims, documentation with specific file or line references, reason: cove, before approval gate"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Chain-of-Verification

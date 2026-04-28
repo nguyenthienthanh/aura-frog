@@ -4,6 +4,7 @@ description: "Generate N independent reasoning paths and vote on the answer. Use
 when_to_use: "architectural trade-off, design decision, reason: sc, ambiguous trade-off, deep complexity design choice"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Self-Consistency

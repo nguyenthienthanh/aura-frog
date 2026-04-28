@@ -10,6 +10,7 @@ triggers:
   - "reduce complexity"
   - "KISS"
   - "over-engineered"
+user-invocable: false
 ---
 
 # Code Simplifier

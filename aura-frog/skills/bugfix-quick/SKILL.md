@@ -10,6 +10,7 @@ triggers:
   - "not working"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 effort: low
+user-invocable: false
 ---
 
 # Quick Bugfix

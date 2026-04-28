@@ -8,6 +8,7 @@ triggers:
   - "worktree"
   - "isolated branch"
 allowed-tools: Bash, Read, Write
+user-invocable: false
 ---
 
 # Git Worktree Integration

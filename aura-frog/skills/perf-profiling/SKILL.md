@@ -4,6 +4,7 @@ description: "Systematic performance profiling and optimization. Use when perfor
 when_to_use: "slow, performance, profile, optimize speed, latency, memory leak, cpu usage, bottleneck, pareto, flamegraph, p95, p99, SLO"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Performance Profiling

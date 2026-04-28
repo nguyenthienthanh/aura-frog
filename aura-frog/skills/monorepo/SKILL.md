@@ -9,6 +9,7 @@ paths:
   - "**/nx.json"
   - "**/lerna.json"
   - "**/go.work"
+user-invocable: false
 ---
 
 # Monorepo Handling

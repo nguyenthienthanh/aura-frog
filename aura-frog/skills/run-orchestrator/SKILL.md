@@ -4,6 +4,7 @@ description: "Execute 5-phase TDD workflow for complex features. Use when the us
 when_to_use: "/run, build feature, create feature, implement feature, complex task, multi-file implementation, fasttrack: <spec>"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 effort: high
+user-invocable: false
 ---
 
 # Run Orchestrator

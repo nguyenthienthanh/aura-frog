@@ -14,6 +14,7 @@ triggers:
   - "optimize this prompt"
 context: fork
 allowed-tools: Read, Bash, Glob, Grep
+user-invocable: false
 ---
 
 # Prompt Evaluator

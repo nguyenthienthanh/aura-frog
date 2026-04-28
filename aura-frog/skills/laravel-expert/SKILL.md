@@ -14,6 +14,7 @@ paths:
   - "artisan"
   - "config/*.php"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Laravel Expert — Gotchas & Decisions

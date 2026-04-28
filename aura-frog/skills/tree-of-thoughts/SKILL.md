@@ -4,6 +4,7 @@ description: "Branch, evaluate, prune, expand — structured search over solutio
 when_to_use: "architecture decision with branching, refactor planning, debug hypothesis tree, reason: tot, deep complexity multi-step design"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Tree of Thoughts

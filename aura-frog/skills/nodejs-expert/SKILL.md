@@ -15,6 +15,7 @@ paths:
   - "server.*"
   - "app.*"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Node.js Expert — Gotchas & Decisions

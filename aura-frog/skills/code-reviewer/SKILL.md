@@ -9,6 +9,7 @@ triggers:
   - "before merge"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
+user-invocable: false
 ---
 
 # Code Reviewer

@@ -7,6 +7,7 @@ triggers:
   - "API design"
   - "REST API"
   - "endpoint design"
+user-invocable: false
 ---
 
 # Skill: API Designer

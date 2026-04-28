@@ -28,3 +28,15 @@ standalone[1]{command,file,description}:
 
 Type `/run <task>` to start working — intent is auto-detected.
 During an active run, type bare words: `approve`, `reject`, `modify`, `handoff`.
+
+---
+
+## Architecture — Commands vs Skills
+
+`commands/` is the **slash surface**. Skills (`aura-frog/skills/`) are AI-discoverable knowledge with `user-invocable: false` — they don't appear in the slash menu, but Claude auto-invokes them on intent match.
+
+**Rule:** if a user types `/<name>`, the file MUST live here in `commands/`. If a skill needs slash exposure, wrap it in a thin command file that delegates to the skill (e.g., `/af prompts` → invokes `prompt-evaluator` skill).
+
+This keeps the `/` menu uncluttered (only actionable commands) while preserving full AI discoverability of skill content.
+
+See: `.claude/CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".

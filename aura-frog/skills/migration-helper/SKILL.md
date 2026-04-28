@@ -7,6 +7,7 @@ triggers:
   - "database migration"
   - "code migration"
   - "zero-downtime"
+user-invocable: false
 ---
 
 # Skill: Migration Helper

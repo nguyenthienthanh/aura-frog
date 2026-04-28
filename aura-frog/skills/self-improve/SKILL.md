@@ -7,6 +7,7 @@ triggers:
   - "/learn apply"
   - "self improve"
   - "apply improvements"
+user-invocable: false
 ---
 
 # Self-Improve Skill

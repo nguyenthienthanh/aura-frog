@@ -7,6 +7,7 @@ triggers:
   - "performance optimization"
   - "slow"
   - "bottleneck"
+user-invocable: false
 ---
 
 # Skill: Performance Optimizer

@@ -8,6 +8,7 @@ triggers:
   - "complex problem"
   - "need to think through"
   - "analyze step by step"
+user-invocable: false
 ---
 
 # Sequential Thinking

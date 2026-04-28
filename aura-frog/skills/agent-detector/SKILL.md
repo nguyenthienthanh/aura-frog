@@ -8,6 +8,7 @@ triggers:
   - "every message"
   - "always first"
 allowed-tools: NONE
+user-invocable: false
 ---
 
 # Agent Detector

@@ -14,6 +14,7 @@ paths:
   - "go.mod"
   - "go.sum"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Go Expert — Gotchas & Decisions

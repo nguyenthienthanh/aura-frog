@@ -10,6 +10,7 @@ triggers:
   - "TDD"
   - "E2E test"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+user-invocable: false
 ---
 
 # Test Writer

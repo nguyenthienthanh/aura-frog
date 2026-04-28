@@ -14,6 +14,7 @@ paths:
   - "next.config.*"
   - "middleware.*"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Next.js Expert — Gotchas & Decisions

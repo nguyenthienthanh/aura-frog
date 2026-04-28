@@ -9,6 +9,7 @@ triggers:
   - "generate UI"
   - "design with AI"
   - "stitch design"
+user-invocable: false
 ---
 
 # Skill: Google Stitch Design

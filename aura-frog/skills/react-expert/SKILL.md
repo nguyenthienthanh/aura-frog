@@ -14,6 +14,7 @@ paths:
   - "**/*.jsx"
   - "package.json"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # React Expert — Gotchas & Decisions
