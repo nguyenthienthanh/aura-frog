@@ -154,3 +154,4 @@ Bug without a regression test = bug that returns. Add a test that:
 - `skills/chain-of-verification/SKILL.md` — verify root cause claim
 - `rules/core/no-assumption.md` — don't guess at causes
 - `rules/core/verification.md` — prove before shipping
+- `rules/core/simplicity-over-complexity.md` — once root cause is known, the fix should be minimal — resist the urge to refactor "while we're here"

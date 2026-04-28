@@ -113,6 +113,7 @@ Claims: `tests/`, `__tests__/`, `spec/`, test configs (`jest.config.*`, `vitest.
 - `rules/core/code-quality.md` — Coverage targets
 - `rules/workflow/post-implementation-linting.md` — Phase 3 + 4 lint gates
 - `rules/workflow/workflow-deliverables.md` — What tester must deliver
+- `rules/core/simplicity-over-complexity.md` — KISS for tests — AAA, one concern per test, no shared mutable state, no over-mocked setups
 
 **Skills:**
 - `skills/test-writer/SKILL.md` — TDD patterns, AAA structure, framework detection

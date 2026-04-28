@@ -124,3 +124,4 @@ When working as a teammate, mobile claims:
 - `rules/agent/theme-consistency.md` — No hardcoded values
 - `rules/agent/accessibility-rules.md` — a11y for mobile
 - `rules/agent/codebase-consistency.md` — Match project patterns
+- `rules/core/simplicity-over-complexity.md` — YAGNI, DRY, KISS — flat components over premature HOCs, direct props over context until proven needed

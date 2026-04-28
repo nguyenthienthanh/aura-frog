@@ -146,3 +146,4 @@ These are architectural calls. Use `self-consistency` for trade-off analysis, `t
 - `skills/tree-of-thoughts/SKILL.md` — explore optimization branches
 - `rules/core/verification.md` — measure before + after, not just after
 - `commands/check.md` — `/check perf` uses this skill
+- `rules/core/simplicity-over-complexity.md` — the winning optimization is usually "do less," not "do the same thing with a clever structure"

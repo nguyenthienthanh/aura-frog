@@ -21,7 +21,9 @@ else
     CLAUDE_DIR="${HOME}/.claude"
 fi
 
-WORKFLOWS_DIR="${CLAUDE_DIR}/logs/workflows"
+# Primary path (v3.6+); fall back to legacy logs/workflows
+WORKFLOWS_DIR="${CLAUDE_DIR}/logs/runs"
+[ ! -d "${WORKFLOWS_DIR}" ] && [ -d "${CLAUDE_DIR}/logs/workflows" ] && WORKFLOWS_DIR="${CLAUDE_DIR}/logs/workflows"
 
 # Colors
 GREEN='\033[0;32m'

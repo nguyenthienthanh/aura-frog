@@ -72,3 +72,4 @@ If complex → switch to `run-orchestrator`.
 - `rules/core/tdd-workflow.md` — Failing test before fix
 - `rules/core/verification.md` — Run tests, read output, then claim
 - `rules/core/execution-rules.md` — Root-cause discipline
+- `rules/core/simplicity-over-complexity.md` — Minimal fix at root cause, no speculative refactoring during bug fix

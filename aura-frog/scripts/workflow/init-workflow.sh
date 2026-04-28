@@ -261,7 +261,7 @@ ${workflow_id}/
 
 ## Execution Logs
 
-See: \`logs/workflows/${workflow_id}/\`
+See: \`.claude/logs/runs/${workflow_id}/\`
 
 ---
 
@@ -354,8 +354,8 @@ show_summary() {
     echo "   Current Phase: 1 - Requirements Analysis"
     echo ""
     echo -e "${BLUE}📁 Directory Structure:${NC}"
-    echo "   Logs: logs/workflows/${workflow_id}/"
-    echo "   Context: logs/contexts/${workflow_id}/"
+    echo "   Logs: .claude/logs/runs/${workflow_id}/"
+    echo "   Context: .claude/logs/contexts/${workflow_id}/"
     echo ""
     echo -e "${BLUE}🤖 Activated Agents (${#agents[@]}):${NC}"
     for agent in "${agents[@]}"; do

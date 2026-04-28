@@ -79,3 +79,4 @@ frameworks[6]{framework,file_pattern,runner}:
 - `rules/core/verification.md` — Read output, then claim
 - `rules/core/code-quality.md` — Coverage targets per file type
 - `rules/workflow/post-implementation-linting.md` — Lint after tests added
+- `rules/core/simplicity-over-complexity.md` — One concern per test, no shared mutable state, no over-engineered mocks

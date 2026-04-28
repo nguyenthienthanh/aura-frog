@@ -79,3 +79,13 @@ Never multiple changes between test runs.
 **After:** All tests pass, code cleaner, behavior unchanged.
 
 ---
+
+## Related Rules
+
+- `rules/core/simplicity-over-complexity.md` — the point of refactoring: Rule of 3 before abstracting, delete before extracting, flatten before nesting
+- `rules/core/tdd-workflow.md` — refactor only when tests are green
+- `rules/core/verification.md` — tests must still pass after every step
+- `rules/workflow/cross-review-workflow.md` — refactorer ≠ reviewer
+- `skills/code-simplifier/SKILL.md` — companion skill for pure simplification passes
+
+---

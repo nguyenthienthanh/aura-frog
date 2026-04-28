@@ -24,7 +24,9 @@ NC='\033[0m'
 resolve_workflow_dir() {
     local workflow_id="$1"
     local candidates=(
+        ".claude/logs/runs/${workflow_id}"
         ".claude/logs/workflows/${workflow_id}"
+        "logs/runs/${workflow_id}"
         "logs/workflows/${workflow_id}"
     )
 

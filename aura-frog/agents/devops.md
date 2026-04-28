@@ -105,6 +105,7 @@ When working as a teammate, devops claims:
 - `rules/agent/dependency-management.md` — Dep hygiene
 - `rules/agent/sast-security-scanning.md` — Pipeline scanning
 - `rules/agent/codebase-consistency.md` — Match patterns
+- `rules/core/simplicity-over-complexity.md` — KISS for infra — prefer boring tech, reject speculative abstractions (yet-another-yaml-layer, k8s-for-everything)
 - `rules/workflow/git-workflow.md` — Phase 5 git
 
 **Skills:**

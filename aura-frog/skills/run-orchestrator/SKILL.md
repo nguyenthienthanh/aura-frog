@@ -10,7 +10,45 @@ effort: high
 
 For complex features / multi-file changes requiring TDD. NOT for: bug fixes (bugfix-quick), quick edits (direct).
 
-## Pre-Execution
+## Step 0 — Create the Run State (MANDATORY, BEFORE ANY OTHER WORK)
+
+The moment you decide a `/run` invocation will use this orchestrator, write the initial state file. **Do NOT proceed without it.** Without the file, `/run status`, `/run resume`, and `/run handoff` cannot work — they all read from this file.
+
+```bash
+# Generate run-id: ticket prefix (JIRA-123) or short-name + YYMMDD (auth-260424)
+RUN_ID="<derived from task or ticket>"
+mkdir -p ".claude/logs/runs/${RUN_ID}"
+```
+
+Then write `.claude/logs/runs/${RUN_ID}/run-state.json` with this skeleton:
+
+```json
+{
+  "run_id": "<RUN_ID>",
+  "task": "<verbatim user task>",
+  "status": "in_progress",
+  "complexity": "<Quick|Standard|Deep — from agent-detector>",
+  "flow": "<direct|bugfix|refactor|test|feature-standard|feature-deep>",
+  "started_at": "<ISO 8601 UTC>",
+  "current_phase": 1,
+  "phases": {},
+  "agents": [],
+  "deliverables": [],
+  "observations": [],
+  "approvals": [],
+  "tokens_used": 0
+}
+```
+
+**Announce to user transparently:**
+
+> "Detected: `<complexity>` complexity → `<flow>` flow. State file: `.claude/logs/runs/${RUN_ID}/run-state.json`. Say `deep` to escalate, `quick` to downgrade, or proceed."
+
+This step is non-negotiable. If you skip it, /run status will show nothing and the user loses observability.
+
+---
+
+## Pre-Execution (Phase 1 setup)
 
 1. agent-detector → select lead, complexity, model
 2. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)

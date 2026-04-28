@@ -85,7 +85,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
+            "command": "LOG_DIR=$(if [ -d .claude/logs/runs ]; then echo .claude/logs/runs; elif [ -d .claude/logs/workflows ]; then echo .claude/logs/workflows; else echo ''; fi); if [ -n \"$LOG_DIR\" ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> \"$LOG_DIR/commands.log\"; fi"
           },
           {
             "type": "command",

@@ -51,6 +51,7 @@ Use for architectural decisions, system design, database modeling, and complex b
 - `rules/agent/dependency-management.md` — Dep hygiene
 - `rules/agent/structured-data-schema.md` — Schema design
 - `rules/agent/codebase-consistency.md` — Match patterns
+- `rules/core/simplicity-over-complexity.md` — YAGNI, DRY, KISS for every design decision
 
 **Skills:**
 - `skills/api-designer/SKILL.md` — REST/GraphQL design

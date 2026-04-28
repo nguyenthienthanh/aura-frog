@@ -6,10 +6,12 @@
 
 set -euo pipefail
 
-CLAUDE_DIR="."
-WORKFLOW_STATE_FILE="${CLAUDE_DIR}/workflow-state.json"
-LOGS_DIR="${CLAUDE_DIR}/logs/workflows"
-ACTIVE_WORKFLOW_FILE="${CLAUDE_DIR}/active-workflow.txt"
+CLAUDE_DIR=".claude"
+WORKFLOW_STATE_FILE="${CLAUDE_DIR}/cache/workflow-state.json"
+# Primary path (v3.6+); legacy fallback if primary missing
+LOGS_DIR="${CLAUDE_DIR}/logs/runs"
+[ ! -d "${LOGS_DIR}" ] && [ -d "${CLAUDE_DIR}/logs/workflows" ] && LOGS_DIR="${CLAUDE_DIR}/logs/workflows"
+ACTIVE_WORKFLOW_FILE="${CLAUDE_DIR}/cache/active-workflow.txt"
 
 # Get active workflow ID
 get_active_workflow_id() {

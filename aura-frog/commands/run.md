@@ -7,6 +7,20 @@ The universal entry point. Type `/run <task>` and Aura Frog auto-detects intent:
 
 ---
 
+## EXECUTION PROTOCOL — FOLLOW IN ORDER
+
+When the user types `/run <task>`, Claude MUST execute these steps in order. Do NOT skip ahead to implementation.
+
+1. **Read `skills/run-orchestrator/SKILL.md` fully.** That skill carries the playbook. This command file is documentation about /run, not the playbook itself.
+2. **Run agent-detector** to classify complexity (Quick / Standard / Deep) and pick the flow per the detection table below.
+3. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0. **MANDATORY** — do not proceed without it.
+4. **Announce the chosen flow** to the user transparently: "Detected: Standard → single-agent inline (no plan). Say `deep` to escalate."
+5. **Then** execute the chosen flow. For Deep, follow the 5-phase workflow in run-orchestrator. For Standard/Quick, lighter flow per the table.
+
+If any step fails, surface the failure to the user — do not silently fall through to direct implementation.
+
+---
+
 ## /run <task>
 
 Start a new run. Auto-detects intent from task description:

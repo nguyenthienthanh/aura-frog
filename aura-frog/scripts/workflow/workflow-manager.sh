@@ -333,10 +333,10 @@ EXAMPLES:
     bash $0 archive AUTH-456
 
 LOCATION:
-    Workflows: logs/workflows/
-    Deliverables: logs/workflows/{id}/deliverables/
-    MCP Logs: logs/{jira|figma|confluence|slack}/
-    Active:    active-workflow.txt
+    Runs:         .claude/logs/runs/   (v3.6+, legacy: .claude/logs/workflows/)
+    Deliverables: .claude/logs/runs/{id}/deliverables/
+    MCP Logs:     .claude/logs/{jira|figma|confluence|slack}/
+    Active:       .claude/cache/active-workflow.txt
 EOF
 }
 

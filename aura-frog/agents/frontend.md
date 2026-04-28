@@ -52,6 +52,7 @@ Use for all frontend implementation, UI components, design system work, and user
 - `rules/agent/state-management.md` — State choices
 - `rules/agent/error-handling-standard.md` — Error handling
 - `rules/agent/codebase-consistency.md` — Match project patterns
+- `rules/core/simplicity-over-complexity.md` — YAGNI, DRY, KISS — no premature abstractions, no speculative state
 
 **Skills:**
 - `skills/design-expert/SKILL.md` — UI/UX, component design
