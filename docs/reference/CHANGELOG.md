@@ -4,7 +4,9 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [3.7.0] - 2026-04-21
+## [3.7.0] - Unreleased
+
+> **Note:** v3.7.0 was tagged then deleted. Content below is staged for the next release. Currently shipped: **v3.6.1**.
 
 ### Added
 

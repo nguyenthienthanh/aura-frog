@@ -8,7 +8,7 @@
 
 A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. 9 specialized agents, smart flow selection (direct edit · bugfix TDD · 5-phase workflow), self-healing memory, and multi-agent orchestration. Right effort matched to task risk.
 
-[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.6.1-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
