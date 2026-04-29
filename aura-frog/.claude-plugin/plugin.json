@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "3.7.0-alpha.1",
-  "description": "Portable LLM OS for software engineering with hierarchical planning (alpha). 12 agents, 5-phase TDD + planning T0-T4, 59 rules (3-tier), 45 skills, 14 commands, 30 hooks, 6 MCP servers. ~87% markdown.",
+  "version": "3.7.0-alpha.2",
+  "description": "Portable LLM OS for software engineering with hierarchical planning (alpha.2 — failure handling + reasoning trace). 13 agents, 5-phase TDD + planning T0-T4, 62 rules (3-tier), 48 skills, 15 commands, 33 hooks, 6 MCP servers. ~87% markdown.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

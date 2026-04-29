@@ -32,6 +32,10 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/test-pattern-extractor.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-restore-active.cjs\" 2>&1"
           }
         ]
       }
@@ -43,6 +47,14 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-execute-load-plan-context.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOK_PHASE=pre node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
           }
         ]
       },
@@ -139,6 +151,26 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/token-tracker.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-update-node.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "CLAUDE_HOOK_PHASE=post node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/tdd-red-failure-tracker.cjs\" 2>&1"
           }
         ]
       }

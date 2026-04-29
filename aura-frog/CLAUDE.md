@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-alpha.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 12 agents + 45 skills + 14 commands + 5-phase TDD + hierarchical planning (T0-T4) + 6 MCP servers
+**System:** Aura Frog v3.7.0-alpha.2 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 13 agents + 48 skills + 15 commands + 5-phase TDD + hierarchical planning (T0-T4) + 6 MCP servers
 
 ---
 
@@ -12,7 +12,7 @@ Claude is the **kernel** — orchestrates, dispatches, verifies. Does not execut
 ```toon
 os_map[5]{concept,implementation}:
   Kernel,Claude + orchestrator rules
-  Processes,9 agents (PID + state + budget)
+  Processes,13 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
   Drivers,6 MCP servers (auto-invoked)
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-alpha.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0-alpha.2 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -80,16 +80,20 @@ Auto-invoked by context. Config: `.mcp.json`
 ## Process Table
 
 ```toon
-agents[9]{pid,name,domain,budget}:
+agents[13]{pid,name,domain,budget}:
   01,lead,Workflow coordination,3K
   02,architect,System design + DB + backend,4K
   03,frontend,React/Vue/Angular/Next.js,4K
   04,mobile,React Native/Flutter/Expo,4K
-  05,strategist,ROI + MVP + scope creep,3K
+  05,strategist,ROI + MVP + scope creep + T0/T1,3K
   06,security,OWASP + vulnerability + SAST,3K
   07,tester,Jest/Cypress/Playwright + coverage,4K
   08,devops,Docker/K8s/CI-CD,3K
   09,scanner,Project detection + context,2K
+  10,master-planner,Plan tree owner + decisions,3K
+  11,feature-architect,T2 → T3 decomposition,3K
+  12,story-planner,T3 → T4 decomposition,3K
+  13,replanner,F2-F4 mutation proposals,3K
 ```
 
 Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority highest, auto-invoke every message).
@@ -101,17 +105,19 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 Only skills with `autoInvoke: true` in frontmatter fire on every message.
 
 ```toon
-skills[5]{name,trigger}:
+skills[7]{name,trigger}:
   agent-detector,Every message (priority highest, haiku)
   bugfix-quick,Bug fix request
   test-writer,Test request
   code-reviewer,Code review
   code-simplifier,Simplify/KISS
+  plan-loader,.aura/plans/ exists (auto)
+  reasoning-trace-recorder,active.task set during T4 execution (auto)
 ```
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
 
-36 reference skills loaded on-demand. Full list: `skills/README.md`
+40 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -169,15 +175,15 @@ Details: `rules/core/context-management.md`
 
 ```toon
 tiers[3]{tier,count,when}:
-  Core (rules/core/),18,Every session
+  Core (rules/core/),20,Every session
   Agent (rules/agent/),17,Per-agent type
-  Workflow (rules/workflow/),22,Per-phase
+  Workflow (rules/workflow/),25,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
 
 ```toon
-core_paths[18]{topic,path}:
+core_paths[20]{topic,path}:
   TDD discipline,rules/core/tdd-workflow.md
   Approval gates,rules/core/approval-gates.md
   Execution rules,rules/core/execution-rules.md
@@ -187,6 +193,8 @@ core_paths[18]{topic,path}:
   Recursion limit,rules/core/recursion-limit.md
   Observer role,rules/core/observer-agent.md
   Memory trust,rules/core/memory-trust-policy.md
+  Plan trust (hierarchical planning),rules/core/plan-trust-policy.md
+  Grounding discipline (anti-hallucination),rules/core/grounding-discipline.md
   Context mgmt,rules/core/context-management.md
   Prompt caching,rules/core/prompt-caching.md
   Small-to-large routing,rules/core/small-to-large-routing.md
@@ -205,13 +213,14 @@ core_paths[18]{topic,path}:
 ## Commands
 
 ```toon
-commands[6]{cmd,subs}:
+commands[7]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
   /check,"(all)/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
   /project,"init/detect/status/list/switch/refresh/regen/env/sync"
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
   /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
+  /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility)"
 ```
 
 ---
@@ -231,11 +240,11 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ```toon
 resources[8]{name,location}:
-  Agents (9),agents/
-  Commands (6),commands/
-  Rules (45),rules/{core|agent|workflow}/
-  Skills (38),skills/
-  Hooks (28),hooks/
+  Agents (13),agents/
+  Commands (15),commands/
+  Rules (62),rules/{core|agent|workflow}/
+  Skills (48),skills/
+  Hooks (33),hooks/
   MCP (6),.mcp.json
   AI References,docs/
   Human Docs,docs/README.md (repo root)
@@ -243,4 +252,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0-alpha.1
+**Version:** 3.7.0-alpha.2

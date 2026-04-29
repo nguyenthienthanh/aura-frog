@@ -7,8 +7,76 @@ All notable changes to Aura Frog will be documented in this file.
 ## [3.7.0] - Unreleased
 
 > **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-alpha.1** (Milestone A — Planning Foundation).
+> Latest pre-release tag: **v3.7.0-alpha.2** (Milestone B — Failure Handling + Reasoning Trace).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-alpha.2] - 2026-04-29 (Milestone B — Failure Handling + Reasoning Trace)
+
+> Internal pre-release tag. Not published to marketplace. All 11 acceptance criteria green.
+
+### Added — Failure handling + reasoning trace
+
+**Plan tree**
+- `.aura/plans/features/FEAT-B/feature.md` (Milestone B), INIT-001 children → `[FEAT-A, FEAT-B]`
+
+**Agents (1 new — 12 → 13)**
+- `agents/replanner.md` — F2-F4 mutation proposer (re-decompose / discard_task / reprioritize / promote / freeze). Read-only on code; only LLM-mediated planning agent (per Q1 decision).
+
+**Skills (3 new — 45 → 48; auto-invoke 5 → 7)**
+- `skills/failure-classifier/` — F1-F5 deterministic classifier. Outputs `{class, confidence, evidence, recommended_action}`. No LLM call.
+- `skills/reasoning-trace-recorder/` — auto-invoke. Emits `file_read | output_claim | tool_call | tool_result | decision | phase_transition` events to `.aura/plans/traces/{TASK_ID}.jsonl`.
+- `skills/plan-validator/` — wrapper over `validate-plan-tree.sh`; closes a reference gap from alpha.1 (was promised, never built).
+
+**Rules (3 new — 59 → 62; core 18 → 20, workflow 22 → 25)**
+- `rules/core/grounding-discipline.md` — `output_claim` must be preceded by a `file_read` for the named file/symbol; ungrounded claims surface in `/aura:trace --hallucinations`.
+- `rules/workflow/replan-thresholds.md` — `replan_budget` per tier (T2=2, T3=3, T4=0), `deviation_score` formula, freeze-on-exhaustion + cycle guard.
+- `rules/workflow/checkpoint-discipline.md` — pre-mutation snapshots in `.aura/plans/checkpoints/`, retention (5 per node / 30 days / 50 MB cap), idempotent restore semantics.
+
+**Commands (1 new — 14 → 15; +1 upgrade)**
+- `commands/aura-trace.md` — read traces by TASK_ID, filter by event type, surface ungrounded claims (`--hallucinations`).
+- `commands/aura-plan-undo.md` — full implementation (alpha.1 was a stub): LIFO checkpoint restore, idempotent (no-op on second run), refuses on missing checkpoint.
+
+**Hooks (3 new — 30 → 33; all 5 planning hooks now wired into hooks.json)**
+- `hooks/post-execute-update-node.cjs` — PostToolUse. Records execution_completed/execution_failed events to history.jsonl; surfaces failure-classifier hint on non-zero exit.
+- `hooks/tdd-red-failure-tracker.cjs` — Bash PostToolUse, P2_RED only. Distinguishes `red_as_designed` from `red_unexpectedly_green` (F2 candidate).
+- `hooks/tool-call-tracer.cjs` — PreToolUse + PostToolUse. Emits `tool_call`, `tool_result`, and (for Read) `file_read` events with sha256 truncated to 16 chars.
+- **Wired up** in `hooks/hooks.json`: alpha.1's two hooks (`pre-execute-load-plan-context`, `session-start-restore-active`) plus the three new alpha.2 hooks now fire on the appropriate Claude Code lifecycle events. All silent on projects without `.aura/plans/`.
+
+### Acceptance criteria — all green
+
+- [x] failure-classifier returns F1-F5 with confidence ≥ 0.6
+- [x] replanner emits proposals respecting `replan_budget`; refuses on exhaustion
+- [x] reasoning-trace-recorder writes append-only `traces/{TASK_ID}.jsonl`
+- [x] `/aura:trace` reads traces and surfaces ungrounded claims
+- [x] grounding-discipline rule defines `grounded:bool` semantics
+- [x] post-execute-update-node hook records execution events to history.jsonl
+- [x] tdd-red-failure-tracker hook distinguishes RED-as-designed from F2 candidate
+- [x] tool-call-tracer hook emits tool_call/tool_result/file_read events
+- [x] /aura:plan:undo full implementation honors checkpoint LIFO + idempotent
+- [x] checkpoint-discipline rule defines retention + restore semantics
+- [x] replan-thresholds rule defines deviation_score + budget enforcement
+
+### Verification
+
+- `validate-counts.sh`: 13 agents · 48 skills · 62 rules · 15 commands · 33 hooks — all OK
+- `validate-plan-tree.sh`: 4 nodes · 8/8 invariants pass
+- `check-token-budget.sh`: 212 / 13,500 tokens (1% utilization, well under hard limit)
+- Hook smoke test: all 5 silent-exit on no `.aura/plans/`; emit correct events on active plan tree
+
+### Stats (v3.7.0-alpha.1 → v3.7.0-alpha.2)
+
+- Agents: 12 → **13** (+1 replanner)
+- Skills: 45 → **48** (+3); auto-invoke 5 → **7** (+plan-loader was alpha.1, +reasoning-trace-recorder)
+- Rules: 59 → **62** (+3); core 18 → 20, workflow 22 → 25
+- Commands: 14 → **15** (+1 /aura:trace; /aura:plan:undo upgraded from stub to full)
+- Hooks: 30 → **33** (+3); all 5 planning hooks now wired in hooks.json
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone C (beta.1)** — session reset, pre-flight (Tier 1 bash + optional OPA Tier 2), epic-summarizer, permanent-memory-loader, prune-checkpoints.sh
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class, freeze cascade
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
 
 ## [3.7.0-alpha.1] - 2026-04-21 (Milestone A — Planning Foundation)
 

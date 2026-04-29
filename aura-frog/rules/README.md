@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 57 (18 core + 17 agent + 22 workflow)
+**Total Rules:** 62 (20 core + 17 agent + 25 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -11,19 +11,19 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 
 ```toon
 tiers[3]{tier,dir,count,when_loaded}:
-  Core,rules/core/,18,ALWAYS — every session
+  Core,rules/core/,20,ALWAYS — every session
   Agent,rules/agent/,17,Per-agent — only when agent activates
-  Workflow,rules/workflow/,22,Per-phase — only during active workflow
+  Workflow,rules/workflow/,25,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 57 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 62 rules every message.
 
 ---
 
-## Core Rules (18) — Always Loaded
+## Core Rules (20) — Always Loaded
 
 ```toon
-core[18]{rule,priority,purpose}:
+core[20]{rule,priority,purpose}:
   execution-rules,critical,ALWAYS/NEVER execution rules
   tdd-workflow,critical,RED → GREEN → REFACTOR
   approval-gates,critical,Human approval required
@@ -33,6 +33,8 @@ core[18]{rule,priority,purpose}:
   recursion-limit,critical,Depth+call caps — break runaway loops early
   observer-agent,high,Runtime watchdog role (lead plays observer)
   memory-trust-policy,critical,Memory as hint + strict write discipline + retrieval hierarchy
+  plan-trust-policy,critical,trust:plan tier — approved plan content vs trust:file vs trust:user
+  grounding-discipline,critical,output_claim must be preceded by file_read (anti-hallucination)
   context-management,high,Token optimization + model selection + 3-tier compression
   prompt-caching,high,Anthropic cache_control — place breakpoints intentionally
   small-to-large-routing,high,Escalate haiku→sonnet→opus only on concrete signals
@@ -71,10 +73,10 @@ agent[17]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (22) — Loaded Per Phase
+## Workflow Rules (25) — Loaded Per Phase
 
 ```toon
-workflow[22]{rule,priority,phases}:
+workflow[25]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -97,6 +99,9 @@ workflow[22]{rule,priority,phases}:
   self-consistency,high,Phase 1 (Deep architectural decisions only)
   tree-of-thoughts,high,Phase 1 + Phase 4 (branching problems only)
   chain-of-verification,critical,Phase 4 (mandatory for claims)
+  plan-lifecycle,critical,Hierarchical planning — state-machine + phase-role binding
+  replan-thresholds,high,Hierarchical planning — replan_budget + deviation_score
+  checkpoint-discipline,high,Hierarchical planning — pre-mutation snapshots + /aura:plan:undo
 ```
 
 ---

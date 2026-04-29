@@ -1,28 +1,32 @@
 # Aura Frog Skills
 
-**Total Skills:** 44 (5 auto-invoking + 39 reference)
+**Total Skills:** 48 (7 auto-invoking + 41 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
 
-## Auto-Invoke Skills (5)
+## Auto-Invoke Skills (7)
 
-Skills with `autoInvoke: true` in frontmatter — fire on every message or matching intent. Target budget: ~2,150 tokens.
+Skills with `autoInvoke: true` in frontmatter — fire on every message or matching intent. Target budget: ~2,800 tokens.
 
 ```toon
-auto_invoke[5]{name,priority,trigger,tokens}:
+auto_invoke[7]{name,priority,trigger,tokens}:
   agent-detector,highest,ALWAYS — every message,~500
   bugfix-quick,medium,Bug fixes / errors / crashes,~400
   test-writer,medium,Test writing / TDD / coverage,~500
   code-reviewer,high,Code review / after implementation,~450
   code-simplifier,medium,Simplify / KISS / complexity,~300
+  plan-loader,high,.aura/plans/ exists in cwd,~400 (≤800 hard cap)
+  reasoning-trace-recorder,medium,active.task set during T4 execution,~250
 ```
 
 **Note:** `run-orchestrator` is NOT auto-invoke — it fires when `/run` is typed or intent matches its `when_to_use` string (build feature, complex task, `fasttrack:` prefix). Listing it as auto-invoke would cause it to wastefully fire on every message.
 
+**New in v3.7.0-alpha (hierarchical planning):** `plan-loader` and `reasoning-trace-recorder` are silent on projects without `.aura/plans/` — zero overhead until users opt in via `/aura:plan`.
+
 ---
 
-## Reference Skills (39)
+## Reference Skills (41)
 
 Loaded on-demand when triggered.
 

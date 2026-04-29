@@ -1,12 +1,12 @@
 {
-  "version": "3.7.0-alpha.1",
-  "generated": "2026-04-21T13:35:50Z",
+  "version": "3.7.0-alpha.2",
+  "generated": "2026-04-29T14:00:00Z",
   "components": {
-    "agents": 9,
-    "skills": { "total": 44, "autoInvoke": 5 },
-    "rules": { "total": 57, "core": 18, "agent": 17, "workflow": 22 },
-    "commands": 6,
-    "hooks": 28,
+    "agents": 13,
+    "skills": { "total": 48, "autoInvoke": 7 },
+    "rules": { "total": 62, "core": 20, "agent": 17, "workflow": 25 },
+    "commands": 15,
+    "hooks": 33,
     "mcpServers": 6,
     "scripts": 43
   },
@@ -20,6 +20,6 @@
     "cjsLines": 10155,
     "mdLines": 19149,
     "shLines": 8445,
-    "totalFiles": 298
+    "totalFiles": 311
   }
 }
