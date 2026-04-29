@@ -44,6 +44,9 @@ Path: `.aura/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
   "captured_by": "master-planner",
   "trigger": "status_transition",
   "trigger_detail": "active → frozen (replan_budget_exhausted)",
+  "git_sha": "abc123def",
+  "git_branch": "feat/hierarchical-planning",
+  "git_dirty": false,
   "node_state_before": {
     "frontmatter": { ... full YAML ... },
     "body_sha256": "abc123...",
@@ -55,6 +58,10 @@ Path: `.aura/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
   "parent_children_before": ["TASK-00101", "TASK-00102", "TASK-00103"]
 }
 ```
+
+**git_sha tracking** (per spec §17.1): every checkpoint records the current `HEAD` sha and branch at capture time. This lets `/aura:plan:undo` restore not just the plan tree but also any file mutations the master-planner triggered while the node was active.
+
+If `git_dirty: true` (uncommitted changes present at capture), undo must warn the user before any `git reset --hard` — uncommitted work could be lost.
 
 ---
 
