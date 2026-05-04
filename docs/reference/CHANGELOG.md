@@ -7,8 +7,58 @@ All notable changes to Aura Frog will be documented in this file.
 ## [3.7.0] - Unreleased
 
 > **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-alpha.2** (Milestone B — Failure Handling + Reasoning Trace).
+> Latest pre-release tag: **v3.7.0-alpha.3** (Milestone C interim — Project-level Extension Creation).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-alpha.3] - 2026-05-04 (Milestone C interim — Project-level Extension Creation)
+
+> Internal pre-release tag. Not published to marketplace. Addresses user directive 2026-05-04: auto-detect when a new skill/rule/command would help, ask for confirmation, create at project-Claude level only.
+
+### Added — Project-level extension creation
+
+**Skills (1 new — 48 → 49; auto-invoke 7 → 8)**
+- `skills/extension-detector/` — auto-invoke. Detects strong/medium signals that a new skill/rule/command would reduce friction. NEVER writes files itself; surfaces a one-line proposal and waits for explicit `y` / `yes` confirmation. Detection budget: 1 proposal/turn, 3/session.
+
+**Commands (1 new — 15 → 16)**
+- `commands/aura-extend.md` — `/aura:extend propose|create|list|remove`. Always writes to `.claude/{skills,rules,commands}/` in the user's project — **NEVER to plugin's `aura-frog/` folder** (hard path-prefix check). Includes reference-integrity audit step + extensions.log append.
+
+**Rules (1 new — 62 → 63; workflow 25 → 26)**
+- `rules/workflow/extension-policy.md` — formalizes signal thresholds (strong/medium/weak with occurrence requirements), confirmation gate as non-negotiable, project-only write constraint, frontmatter requirements for project extensions, anti-fatigue budget caps.
+
+### Acceptance criteria — all green for alpha.3 sub-scope
+
+- [x] extension-detector auto-invokes only on signal threshold match (3+ for medium, 1 for strong)
+- [x] /aura:extend supports propose/create/list/remove
+- [x] extension-policy formalizes thresholds + confirmation gate + project-only writes
+- [x] Hard guardrail: write paths starting with `aura-frog/` rejected immediately
+- [x] Mandatory user confirmation before any file creation
+- [x] Detection budget: 1/turn, 3/session
+- [x] Reference-integrity audit runs after every create
+
+### Why ship as interim alpha.3
+
+FEAT-C (Milestone C) standard scope is large: epic-summarizer, permanent-memory, 7 Tier 1 linters, 5 OPA policies, session reset flow. The user directive (auto-detect skills/rules/commands) is a smaller orthogonal capability. Splitting:
+
+- **alpha.3** ships extension-detector standalone — fast feedback on the new feature
+- **beta.1** ships full FEAT-C standard scope + deferred FEAT-B fixture suites
+
+This keeps each pre-release reviewable and avoids bundling unrelated changes.
+
+### Stats (v3.7.0-alpha.2 → v3.7.0-alpha.3)
+
+- Agents: 13 (unchanged)
+- Skills: 48 → **49** (+1 extension-detector); auto-invoke 7 → **8**
+- Rules: 62 → **63** (+1 extension-policy); workflow 25 → **26**
+- Commands: 15 → **16** (+1 /aura:extend)
+- Hooks: 33 (unchanged)
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone C remainder (beta.1)** — epic-summarizer, plan-archivist, permanent-memory-loader, preflight-validator, /aura:reset-session, /aura:preflight, session-reset-policy + preflight-policies rules, 3 hooks (feature-done-trigger-archive, pre-flight-validate, session-reset-trigger), 7 Tier 1 linters, OPA install + 5 Rego policies
+- **Deferred from FEAT-B** — classifier 80-fixture suite, hallucination/logic-error fixture suites, deviation_score auto-update, trace-event latency benchmark
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
 
 ## [3.7.0-alpha.2] - 2026-04-29 (Milestone B — Failure Handling + Reasoning Trace)
 

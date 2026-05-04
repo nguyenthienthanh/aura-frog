@@ -1,6 +1,6 @@
 # Aura Frog Commands
 
-**Total:** 15 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands)
+**Total:** 16 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension slash command)
 
 ---
 
@@ -38,6 +38,15 @@ planning[9]{command,file,purpose}:
 ```
 
 These commands are **silent on projects without `.aura/plans/`**. Initialize with `/aura:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
+
+## Project Extension (alpha.3 — opt-in)
+
+```toon
+extension[1]{command,file,purpose}:
+  /aura:extend,aura-extend.md,"Create project-level skills/rules/commands at .claude/ — never plugin-level. Subcommands: propose / create / list / remove."
+```
+
+`extension-detector` skill auto-invokes when patterns suggest a new skill/rule/command would help; surfaces a confirmation question; only `/aura:extend` actually writes files. Hard guardrail: writes are blocked from any path inside `aura-frog/`.
 
 ---
 
