@@ -14,7 +14,7 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "Portable LLM OS with hierarchical planning (alpha.3 — project-level extension creation). 13 agents, 5-phase TDD + T0-T4 planning, 63 rules, 49 skills, 16 commands, 33 hooks, 6 MCP servers.",
+      "description": "Portable LLM OS with hierarchical planning (alpha.3 — project-level extension creation). 13 agents, 5-phase TDD + T0-T4 planning, 63 rules, 49 skills, 16 commands, 34 hooks, 6 MCP servers.",
       "version": "3.7.0-alpha.3",
       "author": {
         "name": "Nguyen Thien Thanh",

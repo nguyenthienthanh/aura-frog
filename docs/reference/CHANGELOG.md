@@ -10,6 +10,10 @@ All notable changes to Aura Frog will be documented in this file.
 > Latest pre-release tag: **v3.7.0-alpha.3** (Milestone C interim — Project-level Extension Creation).
 > Last shipped to marketplace: **v3.6.1**.
 
+### Fixed (post-alpha.3)
+
+- **JIRA auto-fetch wired** — `jira-fetch.sh` existed but had no UserPromptSubmit hook driving it. Added `hooks/jira-auto-fetch.cjs`: detects `[A-Z]{2,10}-[0-9]{1,6}` patterns in the user prompt, fetches via curl directly to the Atlassian REST API, caches per-project at `.claude/logs/jira/{TICKET_ID}.json` with 24h TTL, surfaces a one-line summary per ticket to stderr. Silent if JIRA env vars unset (one-time hint per session). Cap: 3 tickets/prompt. Optional `JIRA_PROJECT_PREFIXES` env (comma-separated) acts as an allowlist to filter false positives like `RFC-123` / `UTF-8`. Credentials never leak in error output. `run-orchestrator` skill updated to consume the cache as a canonical requirements source. Hooks: 33 → **34**.
+
 ## [3.7.0-alpha.3] - 2026-05-04 (Milestone C interim — Project-level Extension Creation)
 
 > Internal pre-release tag. Not published to marketplace. Addresses user directive 2026-05-04: auto-detect when a new skill/rule/command would help, ask for confirmation, create at project-Claude level only.

@@ -200,6 +200,11 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-logger.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
           }
         ]
       }

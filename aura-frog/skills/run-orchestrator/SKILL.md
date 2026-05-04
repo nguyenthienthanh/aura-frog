@@ -53,11 +53,12 @@ This step is non-negotiable. If you skip it, /run status will show nothing and t
 
 1. agent-detector → select lead, complexity, model
 2. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)
-3. Load project context
-4. Verify complexity — suggest lighter approach if simple
-5. Socratic brainstorming (Standard/Deep only)
-6. Challenge requirements (`rules/workflow/requirement-challenger.md`)
-7. **Sprint Contract** — negotiate "done" criteria before Phase 2
+3. **Check for JIRA ticket context** — if user prompt or `RUN_ID` matches a JIRA ticket pattern, the `jira-auto-fetch` hook will have written `.claude/logs/jira/{TICKET_ID}.json`. Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
+4. Load project context
+5. Verify complexity — suggest lighter approach if simple
+6. Socratic brainstorming (Standard/Deep only)
+7. Challenge requirements (`rules/workflow/requirement-challenger.md`)
+8. **Sprint Contract** — negotiate "done" criteria before Phase 2
 
 ## 5-Phase Workflow
 
