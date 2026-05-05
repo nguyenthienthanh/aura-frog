@@ -10,6 +10,10 @@ All notable changes to Aura Frog will be documented in this file.
 > Latest pre-release tag: **v3.7.0-alpha.4** (Milestone C interim — Memory Tier).
 > Last shipped to marketplace: **v3.6.1**.
 
+### Added (post-alpha.4)
+
+- **Deterministic JSON → TOON projection** — `scripts/json-to-toon.cjs` (CLI + library) projects JSON via built-in schemas (`jira` / `mcp` / `tests` / `pr` / `pkg` / `generic`) or custom dotpaths, encodes as TOON. `hooks/json-toon-projector.cjs` (PostToolUse Read | mcp__.*) shape-sniffs incoming JSON, runs the converter, emits TOON to stderr alongside the raw output. Skips small payloads (<2KB), plugin config files, non-JSON. **No AI involvement** — projection is script-side, saving the round-trip + tokens that an AI-side rule would have cost. `hooks/jira-auto-fetch.cjs` updated to call the converter for stderr emission. Hooks: 36 → **37**. Spec rationale: an originally drafted `rules/core/json-to-toon.md` rule was deleted in favor of the hook because rules are always-loaded (token cost) and ask the model to convert AFTER receiving raw JSON — a deterministic hook does the work BEFORE the model sees anything.
+
 ### Fixed (post-alpha.4)
 
 - **Anti-overload context discipline** — added `rules/core/context-economy.md` (Critical priority, always-loaded). Addresses upstream `overloaded_error` from large context: locate-before-Read ladder (Glob → Grep paths → Grep content → targeted Read with offset+limit → full Read as last resort), skip rules for build artifacts / lockfiles / minified files, no-re-Read discipline, recovery procedure on overload error (do NOT retry with same context — distill, then resume), token budget per session class (Quick <10K / Standard <60K / Deep <150K tool-results total). Cited from run-orchestrator (Phase 1 setup), bugfix-quick (investigation step), code-reviewer (review evidence). Rules: 64 → **65** (core 20 → **21**).

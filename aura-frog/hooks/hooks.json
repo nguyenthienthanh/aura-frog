@@ -188,6 +188,16 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reset-trigger.cjs\" 2>&1"
           }
         ]
+      },
+      {
+        "matcher": "Read|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/json-toon-projector.cjs\" 2>&1"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

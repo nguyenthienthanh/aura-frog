@@ -22,9 +22,9 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (36 Total)
+## Active Hooks (37 Total)
 
-> **v3.7.0-alpha additions:** `pre-execute-load-plan-context.cjs` and `session-start-restore-active.cjs` (alpha.1, planning context); `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs` (alpha.2, failure handling + reasoning trace); `jira-auto-fetch.cjs` (alpha.3 fix, JIRA ticket auto-fetch); `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs` (alpha.4, memory tier). All silent on projects without `.aura/plans/` (or `.aura/memory/` for memory-tier hooks).
+> **v3.7.0-alpha additions:** `pre-execute-load-plan-context.cjs` and `session-start-restore-active.cjs` (alpha.1, planning context); `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs` (alpha.2, failure handling + reasoning trace); `jira-auto-fetch.cjs` (alpha.3 fix, JIRA ticket auto-fetch); `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs` (alpha.4, memory tier); `json-toon-projector.cjs` (alpha.4 fix, deterministic JSON→TOON projection on Read|mcp__.* — replaces a would-be AI rule with a hook to save context tokens). All silent on small payloads / config files / non-JSON.
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)

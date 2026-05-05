@@ -33,8 +33,15 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
+const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
+const TOON_CONVERTER = path.join(PLUGIN_ROOT, 'scripts', 'json-to-toon.cjs');
 const PROJECT_CACHE_DIR = path.join(process.cwd(), '.claude', 'logs', 'jira');
 const SESSION_HINT_FLAG = path.join(process.cwd(), '.claude', 'logs', '.jira-env-hint-shown');
+
+let toonConverter = null;
+try {
+  toonConverter = require(TOON_CONVERTER);
+} catch {/* converter unavailable; will fall back to one-line summary */}
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_TICKETS_PER_PROMPT = 3;
@@ -115,15 +122,12 @@ function fetchTicket(ticketId) {
   }
 }
 
-function readCachedSummary(ticketId) {
+function readCachedJson(ticketId) {
   try {
     const raw = fs.readFileSync(cachePath(ticketId), 'utf-8');
-    const data = JSON.parse(raw);
-    const summary = data?.fields?.summary || data.summary || '';
-    const status = data?.fields?.status?.name || data.status || '';
-    return { summary, status };
+    return JSON.parse(raw);
   } catch {
-    return { summary: '', status: '' };
+    return null;
   }
 }
 
@@ -159,25 +163,46 @@ function main() {
     safeExit(0);
   }
 
-  const lines = [];
+  const projectedTickets = [];
+  const failedTickets = [];
+
   for (const ticketId of limited) {
     if (!cacheFresh(ticketId)) {
       const out = fetchTicket(ticketId);
       if (out) writeCacheFromFetch(ticketId, out);
     }
-    const { summary, status } = readCachedSummary(ticketId);
+    const cached = readCachedJson(ticketId);
+    if (!cached) { failedTickets.push(ticketId); continue; }
+
+    if (toonConverter && cached) {
+      try {
+        const toon = toonConverter.convert(cached, { schema: 'jira' });
+        projectedTickets.push(toon);
+        continue;
+      } catch {/* fall through to one-line summary */}
+    }
+
+    // Fallback if converter unavailable: minimal one-line summary
+    const summary = cached?.fields?.summary || '';
+    const status = cached?.fields?.status?.name || '?';
     if (summary) {
-      lines.push(`  ${ticketId} [${status || '?'}] ${summary.slice(0, 120)}`);
+      projectedTickets.push(`ticket{key,status,summary}:\n  ${ticketId},${status},"${summary.replace(/"/g, '""').slice(0, 120)}"`);
     } else {
-      lines.push(`  ${ticketId} (fetch failed or empty cache)`);
+      failedTickets.push(ticketId);
     }
   }
 
+  const blocks = [];
+  for (const t of projectedTickets) blocks.push(t);
+  for (const f of failedTickets) blocks.push(`# ${f} — fetch failed or empty cache`);
+
   if (tickets.length > MAX_TICKETS_PER_PROMPT) {
-    lines.push(`  ... ${tickets.length - MAX_TICKETS_PER_PROMPT} more ticket(s) detected; cap at ${MAX_TICKETS_PER_PROMPT}/prompt`);
+    blocks.push(`# ... ${tickets.length - MAX_TICKETS_PER_PROMPT} more ticket(s) detected; cap at ${MAX_TICKETS_PER_PROMPT}/prompt`);
   }
 
-  process.stderr.write(`[jira-auto-fetch | trust:file]\n${lines.join('\n')}\n`);
+  if (blocks.length === 0) safeExit(0);
+
+  process.stderr.write(`[jira-auto-fetch | trust:file]\n${blocks.join('\n\n')}\n`);
   safeExit(0);
 }
 

@@ -250,7 +250,7 @@ resources[8]{name,location}:
   Commands (17),commands/
   Rules (65),rules/{core|agent|workflow}/
   Skills (51),skills/
-  Hooks (36),hooks/
+  Hooks (37),hooks/
   MCP (6),.mcp.json
   AI References,docs/
   Human Docs,docs/README.md (repo root)

@@ -6,7 +6,7 @@
     "skills": { "total": 51, "autoInvoke": 9 },
     "rules": { "total": 65, "core": 21, "agent": 17, "workflow": 27 },
     "commands": 17,
-    "hooks": 36,
+    "hooks": 37,
     "mcpServers": 6,
     "scripts": 43
   },
