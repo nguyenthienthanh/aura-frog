@@ -7,12 +7,71 @@ All notable changes to Aura Frog will be documented in this file.
 ## [3.7.0] - Unreleased
 
 > **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-alpha.3** (Milestone C interim — Project-level Extension Creation).
+> Latest pre-release tag: **v3.7.0-alpha.4** (Milestone C interim — Memory Tier).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-alpha.4] - 2026-05-05 (Milestone C interim — Memory Tier)
+
+> Internal pre-release tag. Not published to marketplace. Ships the memory half of FEAT-C: epic-summarizer + permanent_memory + session reset. Pre-flight half + 7 Tier 1 linters + OPA optional + deferred FEAT-B fixtures land in beta.1.
+
+### Added — Memory tier
+
+**Agents (1 new — 13 → 14)**
+- `agents/epic-summarizer.md` — distills T2 done into a permanent_memory.md section. Confidence-scored output (items <0.7 → Tentative subsection). Hard cap: 500 tokens/Epic. Writes ONLY to `.aura/memory/`. Never includes verbatim file content (sha256 references instead).
+
+**Skills (2 new — 49 → 51; auto-invoke 8 → 9)**
+- `skills/permanent-memory-loader/` — auto-invoke. Loads permanent_memory.md summary lines (≤120 tokens always-loaded; 200 hard cap). Silent if no `.aura/memory/`. Auto-degrades by dropping Tentative → Patterns → Epic-IDs-only.
+- `skills/plan-archivist/` — on-demand. Compresses completed plan-tree branches to `.aura/plans/archive/{NODE_ID}.summary.md`. Optional `--prune` removes original Story/Task files (always preserved in checkpoints).
+
+**Commands (1 new — 16 → 17)**
+- `commands/aura-reset-session.md` — distills active Epic via epic-summarizer → permanent_memory.md → optional reset prompt. Preserves history.jsonl, plan tree, conflict cache, manual_overrides.md. Supports `--feature`, `--initiative`, `--dry-run`, `--no-prompt`.
+
+**Rules (1 new — 63 → 64; workflow 26 → 27)**
+- `rules/workflow/session-reset-policy.md` — formalizes triggers (T2 done default, T1 quarterly, manual), distillation include/exclude rules, 500/8000 token caps, confidence-tiered output, what's preserved across reset.
+
+**Hooks (2 new — 34 → 36)**
+- `hooks/feature-done-trigger-archive.cjs` — PostToolUse Edit|Write. Detects T2 status transition `active → done` via history.jsonl tail. Surfaces `/aura:reset-session` suggestion.
+- `hooks/session-reset-trigger.cjs` — PostToolUse Edit|Write. After epic-summarizer writes a section (within 60s window), prompts user to actually reset the session. Per-feature flag prevents spam.
+
+### Acceptance criteria — alpha.4 sub-scope
+
+- [x] epic-summarizer agent defined with 500-token cap + confidence tiers + .aura/memory/ write-only
+- [x] permanent-memory-loader auto-invokes, ≤120 tokens, silent without `.aura/memory/`
+- [x] plan-archivist defined with --prune opt-in
+- [x] /aura:reset-session distills and offers reset; preserves what spec §19.5 says it should
+- [x] session-reset-policy formalizes triggers + caps + preservation list
+- [x] feature-done-trigger-archive emits hint on T2 done detection
+- [x] session-reset-trigger prompts user post-distillation (anti-spam flag)
+- [x] All 4 hook scenarios tested (no plans / done detection / no recent summarize / recent summarize)
+
+### Verification
+
+- `validate-counts.sh`: 14 / 51 / 64 / 17 / 36 — all OK
+- `validate-plan-tree.sh`: 5 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- Hook smoke test: silent without `.aura/plans/`, fires correctly with active.json + history.jsonl events
+
+### Stats (v3.7.0-alpha.3 → v3.7.0-alpha.4)
+
+- Agents: 13 → **14** (+1 epic-summarizer)
+- Skills: 49 → **51** (+2); auto-invoke 8 → **9** (+permanent-memory-loader)
+- Rules: 63 → **64** (+1 session-reset-policy); workflow 26 → **27**
+- Commands: 16 → **17** (+1 /aura:reset-session)
+- Hooks: 34 → **36** (+2)
+- MCP servers: 6 (unchanged)
+
+### Pending for beta.1 (rest of FEAT-C)
+
+- preflight-validator skill + /aura:preflight command + preflight-policies workflow rule
+- pre-flight-validate.cjs hook
+- 7 Tier 1 bash linters + install-opa.sh (sha256 verified)
+- 5 OPA Rego policies (plan_structure, mutation_safety, grounding, token_budget, conflict_respect)
+- **Deferred from FEAT-B** — classifier 80-fixture suite, hallucination/logic-error fixture suites, deviation_score auto-update, trace-event latency benchmark
+- Post-reset session-load benchmark (<2s target)
 
 ### Fixed (post-alpha.3)
 
-- **JIRA auto-fetch wired** — `jira-fetch.sh` existed but had no UserPromptSubmit hook driving it. Added `hooks/jira-auto-fetch.cjs`: detects `[A-Z]{2,10}-[0-9]{1,6}` patterns in the user prompt, fetches via curl directly to the Atlassian REST API, caches per-project at `.claude/logs/jira/{TICKET_ID}.json` with 24h TTL, surfaces a one-line summary per ticket to stderr. Silent if JIRA env vars unset (one-time hint per session). Cap: 3 tickets/prompt. Optional `JIRA_PROJECT_PREFIXES` env (comma-separated) acts as an allowlist to filter false positives like `RFC-123` / `UTF-8`. Credentials never leak in error output. `run-orchestrator` skill updated to consume the cache as a canonical requirements source. Hooks: 33 → **34**.
+- **JIRA auto-fetch wired** — `jira-fetch.sh` existed but had no UserPromptSubmit hook driving it. Added `hooks/jira-auto-fetch.cjs`: detects `[A-Z]{2,10}-[0-9]{1,6}` patterns in the user prompt, fetches via curl directly to the Atlassian REST API, caches per-project at `.claude/logs/jira/{TICKET_ID}.json` with 24h TTL, surfaces a one-line summary per ticket to stderr. Silent if JIRA env vars unset (one-time hint per session). Cap: 3 tickets/prompt. Optional `JIRA_PROJECT_PREFIXES` env (comma-separated) acts as an allowlist to filter false positives like `RFC-123` / `UTF-8`. Credentials never leak in error output. `run-orchestrator` skill updated to consume the cache as a canonical requirements source. Hooks: 33 → **34** (rolled into alpha.4 count of 36).
 
 ## [3.7.0-alpha.3] - 2026-05-04 (Milestone C interim — Project-level Extension Creation)
 

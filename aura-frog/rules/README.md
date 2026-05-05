@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 63 (20 core + 17 agent + 26 workflow)
+**Total Rules:** 64 (20 core + 17 agent + 27 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -13,10 +13,10 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,20,ALWAYS — every session
   Agent,rules/agent/,17,Per-agent — only when agent activates
-  Workflow,rules/workflow/,26,Per-phase — only during active workflow
+  Workflow,rules/workflow/,27,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 63 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 64 rules every message.
 
 ---
 
@@ -73,10 +73,10 @@ agent[17]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (26) — Loaded Per Phase
+## Workflow Rules (27) — Loaded Per Phase
 
 ```toon
-workflow[26]{rule,priority,phases}:
+workflow[27]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -103,6 +103,7 @@ workflow[26]{rule,priority,phases}:
   replan-thresholds,high,Hierarchical planning — replan_budget + deviation_score
   checkpoint-discipline,high,Hierarchical planning — pre-mutation snapshots + /aura:plan:undo
   extension-policy,high,"Project-level skill/rule/command authoring — confirmation gate + .claude/-only writes"
+  session-reset-policy,high,"Memory tier — Epic distillation triggers + 500/8000 token caps + what's preserved"
 ```
 
 ---

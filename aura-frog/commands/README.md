@@ -1,6 +1,6 @@
 # Aura Frog Commands
 
-**Total:** 16 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension slash command)
+**Total:** 17 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension + 1 session-reset)
 
 ---
 
@@ -47,6 +47,15 @@ extension[1]{command,file,purpose}:
 ```
 
 `extension-detector` skill auto-invokes when patterns suggest a new skill/rule/command would help; surfaces a confirmation question; only `/aura:extend` actually writes files. Hard guardrail: writes are blocked from any path inside `aura-frog/`.
+
+## Memory Tier (alpha.4 — opt-in)
+
+```toon
+memory[1]{command,file,purpose}:
+  /aura:reset-session,aura-reset-session.md,"Distill active Epic via epic-summarizer → permanent_memory.md → optional reset. Preserves history.jsonl, plan tree, conflict cache, manual_overrides."
+```
+
+`epic-summarizer` agent runs on T2 done (auto via `feature-done-trigger-archive` hook) or manually via this command. `permanent-memory-loader` skill auto-loads distilled summaries (≤120 tokens always-loaded) in subsequent sessions.
 
 ---
 

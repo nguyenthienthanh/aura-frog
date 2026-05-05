@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-alpha.3 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 13 agents + 49 skills + 16 commands + 5-phase TDD + hierarchical planning (T0-T4) + project-level extension creation + 6 MCP servers
+**System:** Aura Frog v3.7.0-alpha.4 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 14 agents + 51 skills + 17 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier (Epic distillation + permanent_memory) + project-level extension creation + 6 MCP servers
 
 ---
 
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-alpha.3 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0-alpha.4 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -80,7 +80,7 @@ Auto-invoked by context. Config: `.mcp.json`
 ## Process Table
 
 ```toon
-agents[13]{pid,name,domain,budget}:
+agents[14]{pid,name,domain,budget}:
   01,lead,Workflow coordination,3K
   02,architect,System design + DB + backend,4K
   03,frontend,React/Vue/Angular/Next.js,4K
@@ -94,6 +94,7 @@ agents[13]{pid,name,domain,budget}:
   11,feature-architect,T2 → T3 decomposition,3K
   12,story-planner,T3 → T4 decomposition,3K
   13,replanner,F2-F4 mutation proposals,3K
+  14,epic-summarizer,T2 done → permanent_memory distillation,3K
 ```
 
 Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority highest, auto-invoke every message).
@@ -105,7 +106,7 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 Only skills with `autoInvoke: true` in frontmatter fire on every message.
 
 ```toon
-skills[8]{name,trigger}:
+skills[9]{name,trigger}:
   agent-detector,Every message (priority highest, haiku)
   bugfix-quick,Bug fix request
   test-writer,Test request
@@ -114,6 +115,7 @@ skills[8]{name,trigger}:
   plan-loader,.aura/plans/ exists (auto)
   reasoning-trace-recorder,active.task set during T4 execution (auto)
   extension-detector,Repeated patterns or 'we should have a skill for X' signals (auto)
+  permanent-memory-loader,.aura/memory/permanent_memory.md exists (auto)
 ```
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
@@ -178,7 +180,7 @@ Details: `rules/core/context-management.md`
 tiers[3]{tier,count,when}:
   Core (rules/core/),20,Every session
   Agent (rules/agent/),17,Per-agent type
-  Workflow (rules/workflow/),26,Per-phase
+  Workflow (rules/workflow/),27,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
@@ -214,7 +216,7 @@ core_paths[20]{topic,path}:
 ## Commands
 
 ```toon
-commands[8]{cmd,subs}:
+commands[9]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
   /check,"(all)/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
@@ -223,6 +225,7 @@ commands[8]{cmd,subs}:
   /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
   /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility)"
   /aura:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
+  /aura:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
 ```
 
 ---
@@ -242,11 +245,11 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ```toon
 resources[8]{name,location}:
-  Agents (13),agents/
-  Commands (16),commands/
-  Rules (63),rules/{core|agent|workflow}/
-  Skills (49),skills/
-  Hooks (34),hooks/
+  Agents (14),agents/
+  Commands (17),commands/
+  Rules (64),rules/{core|agent|workflow}/
+  Skills (51),skills/
+  Hooks (36),hooks/
   MCP (6),.mcp.json
   AI References,docs/
   Human Docs,docs/README.md (repo root)
@@ -254,4 +257,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0-alpha.3
+**Version:** 3.7.0-alpha.4

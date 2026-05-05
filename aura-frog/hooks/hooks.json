@@ -173,6 +173,21 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/tdd-red-failure-tracker.cjs\" 2>&1"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/feature-done-trigger-archive.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reset-trigger.cjs\" 2>&1"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

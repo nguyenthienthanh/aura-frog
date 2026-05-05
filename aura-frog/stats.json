@@ -1,12 +1,12 @@
 {
-  "version": "3.7.0-alpha.3",
-  "generated": "2026-05-04T00:00:00Z",
+  "version": "3.7.0-alpha.4",
+  "generated": "2026-05-05T00:00:00Z",
   "components": {
-    "agents": 13,
-    "skills": { "total": 49, "autoInvoke": 8 },
-    "rules": { "total": 63, "core": 20, "agent": 17, "workflow": 26 },
-    "commands": 16,
-    "hooks": 34,
+    "agents": 14,
+    "skills": { "total": 51, "autoInvoke": 9 },
+    "rules": { "total": 64, "core": 20, "agent": 17, "workflow": 27 },
+    "commands": 17,
+    "hooks": 36,
     "mcpServers": 6,
     "scripts": 43
   },
