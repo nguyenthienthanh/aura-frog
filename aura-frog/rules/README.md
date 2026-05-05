@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 64 (20 core + 17 agent + 27 workflow)
+**Total Rules:** 65 (21 core + 17 agent + 27 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -11,19 +11,19 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 
 ```toon
 tiers[3]{tier,dir,count,when_loaded}:
-  Core,rules/core/,20,ALWAYS — every session
+  Core,rules/core/,21,ALWAYS — every session
   Agent,rules/agent/,17,Per-agent — only when agent activates
   Workflow,rules/workflow/,27,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 64 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 65 rules every message.
 
 ---
 
-## Core Rules (20) — Always Loaded
+## Core Rules (21) — Always Loaded
 
 ```toon
-core[20]{rule,priority,purpose}:
+core[21]{rule,priority,purpose}:
   execution-rules,critical,ALWAYS/NEVER execution rules
   tdd-workflow,critical,RED → GREEN → REFACTOR
   approval-gates,critical,Human approval required
@@ -36,6 +36,7 @@ core[20]{rule,priority,purpose}:
   plan-trust-policy,critical,trust:plan tier — approved plan content vs trust:file vs trust:user
   grounding-discipline,critical,output_claim must be preceded by file_read (anti-hallucination)
   context-management,high,Token optimization + model selection + 3-tier compression
+  context-economy,critical,"Smallest effective context — locate before Read, slice large files, drop noise; recovery from overloaded_error"
   prompt-caching,high,Anthropic cache_control — place breakpoints intentionally
   small-to-large-routing,high,Escalate haiku→sonnet→opus only on concrete signals
   code-quality,high,TypeScript strict + no any

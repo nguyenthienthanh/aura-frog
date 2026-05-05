@@ -14,7 +14,7 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "Portable LLM OS with hierarchical planning (alpha.4 — memory tier: epic distillation + permanent_memory). 14 agents, 5-phase TDD + T0-T4 planning, 64 rules, 51 skills, 17 commands, 36 hooks, 6 MCP servers.",
+      "description": "Portable LLM OS with hierarchical planning (alpha.4 — memory tier: epic distillation + permanent_memory). 14 agents, 5-phase TDD + T0-T4 planning, 65 rules, 51 skills, 17 commands, 36 hooks, 6 MCP servers.",
       "version": "3.7.0-alpha.4",
       "author": {
         "name": "Nguyen Thien Thanh",

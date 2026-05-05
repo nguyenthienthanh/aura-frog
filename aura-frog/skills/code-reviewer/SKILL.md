@@ -70,6 +70,7 @@ Before reporting "0 critical findings" / "N% coverage" / "tests pass", run the C
 - `rules/core/simplicity-over-complexity.md` — YAGNI/DRY/KISS
 - `rules/core/verification.md` — Verify before approving
 - `rules/core/prefer-established-libraries.md` — Library choice review
+- `rules/core/context-economy.md` — Read only the diff hunks + immediate callers/callees, not whole files; use Grep to scope review evidence
 - `rules/agent/sast-security-scanning.md` — Security patterns
 - `rules/agent/error-handling-standard.md` — Error-handling review
 - `rules/workflow/smart-commenting.md` — Comment review (WHY not WHAT)

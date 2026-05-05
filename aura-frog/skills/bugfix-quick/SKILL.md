@@ -30,6 +30,7 @@ For bugs only. Features/refactors → run-orchestrator.
 - Reproduce the bug
 - `git log` / `git diff` for recent changes
 - Trace backward: where did bad data originate?
+- **Context economy** (`rules/core/context-economy.md`) — Grep for the failing symbol first, then Read with `offset`+`limit` on the matched lines only. Don't read the full file unless the bug spans it.
 
 ### 2. Write Failing Test (RED)
 - Test that reproduces the bug exactly

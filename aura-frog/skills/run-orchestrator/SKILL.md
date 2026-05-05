@@ -52,7 +52,8 @@ This step is non-negotiable. If you skip it, /run status will show nothing and t
 ## Pre-Execution (Phase 1 setup)
 
 1. agent-detector → select lead, complexity, model
-2. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)
+2. **Apply context-economy** — locate before Read, use Glob/Grep first, slice large files with `offset`+`limit`, delegate broad exploration to Explore subagent. See `rules/core/context-economy.md`. **If you hit `overloaded_error`, do NOT retry with the same context — distill, then resume.**
+3. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)
 3. **Check for JIRA ticket context** — if user prompt or `RUN_ID` matches a JIRA ticket pattern, the `jira-auto-fetch` hook will have written `.claude/logs/jira/{TICKET_ID}.json`. Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
 4. Load project context
 5. Verify complexity — suggest lighter approach if simple

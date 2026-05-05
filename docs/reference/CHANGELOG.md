@@ -10,6 +10,10 @@ All notable changes to Aura Frog will be documented in this file.
 > Latest pre-release tag: **v3.7.0-alpha.4** (Milestone C interim — Memory Tier).
 > Last shipped to marketplace: **v3.6.1**.
 
+### Fixed (post-alpha.4)
+
+- **Anti-overload context discipline** — added `rules/core/context-economy.md` (Critical priority, always-loaded). Addresses upstream `overloaded_error` from large context: locate-before-Read ladder (Glob → Grep paths → Grep content → targeted Read with offset+limit → full Read as last resort), skip rules for build artifacts / lockfiles / minified files, no-re-Read discipline, recovery procedure on overload error (do NOT retry with same context — distill, then resume), token budget per session class (Quick <10K / Standard <60K / Deep <150K tool-results total). Cited from run-orchestrator (Phase 1 setup), bugfix-quick (investigation step), code-reviewer (review evidence). Rules: 64 → **65** (core 20 → **21**).
+
 ## [3.7.0-alpha.4] - 2026-05-05 (Milestone C interim — Memory Tier)
 
 > Internal pre-release tag. Not published to marketplace. Ships the memory half of FEAT-C: epic-summarizer + permanent_memory + session reset. Pre-flight half + 7 Tier 1 linters + OPA optional + deferred FEAT-B fixtures land in beta.1.
