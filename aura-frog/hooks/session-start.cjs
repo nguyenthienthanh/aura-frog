@@ -156,6 +156,15 @@ async function main() {
         if (value) writeEnv(envFile, key, value);
       }
       console.log(`🐸 Session ${source} (cached). ${cached.contextSummary || ''}`);
+      // Emit plugin prefix banner on cached fast-path too
+      try {
+        const pluginJsonPath = path.join(__dirname, '..', '.claude-plugin', 'plugin.json');
+        if (fs.existsSync(pluginJsonPath)) {
+          const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+          const pluginPrefix = pluginData.name || 'aura-frog';
+          console.log(`🔌 plugin-prefix: ${pluginPrefix} (use as subagent_type prefix: \`${pluginPrefix}:<agent-id>\` — see rules/core/agent-namespacing.md)`);
+        }
+      } catch {/* best-effort */}
       process.exit(0);
     }
 
@@ -308,6 +317,18 @@ async function main() {
     } else {
       console.log(`🐸 Session ${source}.`);
     }
+
+    // Emit plugin prefix banner — single source of truth for Agent tool dispatch.
+    // Skills/rules MUST use this prefix when invoking plugin agents (not the
+    // hardcoded string "aura-frog"). See rules/core/agent-namespacing.md.
+    try {
+      const pluginJsonPath = path.join(__dirname, '..', '.claude-plugin', 'plugin.json');
+      if (fs.existsSync(pluginJsonPath)) {
+        const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+        const pluginPrefix = pluginData.name || 'aura-frog';
+        console.log(`🔌 plugin-prefix: ${pluginPrefix} (use as subagent_type prefix: \`${pluginPrefix}:<agent-id>\` — see rules/core/agent-namespacing.md)`);
+      }
+    } catch {/* best-effort; silent on failure */}
 
     // Check if statusLine is configured — one-time hint
     const statusHintFile = path.join(process.cwd(), '.claude', 'cache', 'statusline-hint-shown');

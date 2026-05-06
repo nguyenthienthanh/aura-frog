@@ -37,7 +37,7 @@ core[22]{rule,priority,purpose}:
   grounding-discipline,critical,output_claim must be preceded by file_read (anti-hallucination)
   context-management,high,Token optimization + model selection + 3-tier compression
   context-economy,critical,"Smallest effective context — locate before Read, slice large files, drop noise; recovery from overloaded_error"
-  agent-namespacing,critical,"Plugin agents need aura-frog: prefix for Agent tool — bare name errors with 'agent type X not found'"
+  agent-namespacing,critical,"Plugin agents need <plugin>: prefix (derived from plugin.json#name) — bare name errors with 'agent type X not found'"
   prompt-caching,high,Anthropic cache_control — place breakpoints intentionally
   small-to-large-routing,high,Escalate haiku→sonnet→opus only on concrete signals
   code-quality,high,TypeScript strict + no any

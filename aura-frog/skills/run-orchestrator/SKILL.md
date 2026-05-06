@@ -80,16 +80,20 @@ Context pollution is the #1 failure mode for multi-phase TDD: P1 research artifa
 
 **For Deep complexity runs, each phase spawns a fresh subagent via the Agent tool.** The orchestrator (main thread) stays lean — it dispatches, verifies deliverables, and holds approval gates. It does NOT do the phase work itself.
 
-> **Critical: plugin agents are namespaced.** When you invoke the Agent tool, `subagent_type` MUST be `aura-frog:<name>` for every plugin agent. Bare `architect` is NOT a valid subagent_type — it resolves to nothing and the tool errors with `agent type 'architect' not found`. Built-in Claude Code agents (general-purpose, Explore, Plan) stay unprefixed. See `rules/core/agent-namespacing.md`.
+> **Critical: plugin agents are namespaced — by the plugin's runtime name, not a hardcoded string.** When you invoke the Agent tool, `subagent_type` is `${PLUGIN_PREFIX}:<id>` where `PLUGIN_PREFIX` comes from `plugin.json#name` (or run `bash scripts/get-plugin-prefix.sh`). Bare `architect` is NOT valid — the tool errors with `agent type 'architect' not found`. Built-in Claude Code agents (general-purpose, Explore, Plan, statusline-setup) stay unprefixed. See `rules/core/agent-namespacing.md` for full details.
+
+The dispatch table below uses **bare agent IDs**. Apply the runtime prefix at the moment you call the Agent tool — don't bake the literal "aura-frog" into your call.
 
 ```toon
-execution[5]{phase,subagent_type,main_thread_role}:
-  1,aura-frog:architect,"dispatch + hold gate"
-  2,aura-frog:tester,"verify tests fail as expected"
-  3,"aura-frog:architect or aura-frog:frontend or aura-frog:mobile (per artifact)","dispatch + hold gate"
-  4,"aura-frog:security (primary) + aura-frog:tester","verify builder≠reviewer"
+execution[5]{phase,agent_id,main_thread_role}:
+  1,architect,"dispatch + hold gate"
+  2,tester,"verify tests fail as expected"
+  3,"architect or frontend or mobile (per artifact)","dispatch + hold gate"
+  4,"security (primary) + tester","verify builder≠reviewer"
   5,inline (lead),"finalize — no fork needed"
 ```
+
+When you call Agent: read the prefix once per session (cheapest: from the session-start banner emitted by `hooks/session-start.cjs`), then compose `subagent_type: ${prefix}:${agent_id}`.
 
 Each subagent returns a concise report. Main thread does NOT re-read phase research files. For Standard/Quick runs, inline execution is fine — the isolation cost only pays off when phases would otherwise compete for the same context budget.
 
