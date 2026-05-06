@@ -4,7 +4,7 @@
   "components": {
     "agents": 14,
     "skills": { "total": 52, "autoInvoke": 9 },
-    "rules": { "total": 66, "core": 21, "agent": 17, "workflow": 28 },
+    "rules": { "total": 67, "core": 22, "agent": 17, "workflow": 28 },
     "commands": 18,
     "hooks": 38,
     "mcpServers": 6,

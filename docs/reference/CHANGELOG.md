@@ -10,6 +10,10 @@ All notable changes to Aura Frog will be documented in this file.
 > Latest pre-release tag: **v3.7.0-beta.1** (Milestone C complete — Pre-flight Tier 1).
 > Last shipped to marketplace: **v3.6.1**.
 
+### Fixed (post-beta.1)
+
+- **Agent dispatch namespacing bug** — `skills/run-orchestrator/SKILL.md` execution[5] table told the AI to invoke `subagent_type: architect` (and similar bare names), causing `agent type 'architect' not found` errors. Plugin agents from a marketplace plugin must use the namespaced form `aura-frog:<name>` when invoked via the Agent tool. Updated the dispatch table to use namespaced types (e.g., `aura-frog:architect`, `aura-frog:tester`, `aura-frog:security`). Added new core rule `rules/core/agent-namespacing.md` (Critical priority) that documents the namespacing requirement, the authoritative list of all 14 plugin subagent_type values, the 4 built-in unprefixed agents (`general-purpose`, `Explore`, `Plan`, `statusline-setup`), and verification checklist before dispatch. Rules: 66 → **67** (core 21 → **22**).
+
 ## [3.7.0-beta.1] - 2026-05-06 (Milestone C complete — Pre-flight Tier 1)
 
 > Internal pre-release tag. Not published to marketplace. Completes FEAT-C with the pre-flight half. Tier 2 OPA Rego policies deferred to rc.1 per spec §20.4 (Tier 2 is optional).

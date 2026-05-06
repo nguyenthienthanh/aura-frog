@@ -178,7 +178,7 @@ Details: `rules/core/context-management.md`
 
 ```toon
 tiers[3]{tier,count,when}:
-  Core (rules/core/),21,Every session
+  Core (rules/core/),22,Every session
   Agent (rules/agent/),17,Per-agent type
   Workflow (rules/workflow/),28,Per-phase
 ```
@@ -186,7 +186,7 @@ tiers[3]{tier,count,when}:
 **Core rule paths (read on-demand when the topic comes up):**
 
 ```toon
-core_paths[21]{topic,path}:
+core_paths[22]{topic,path}:
   TDD discipline,rules/core/tdd-workflow.md
   Approval gates,rules/core/approval-gates.md
   Execution rules,rules/core/execution-rules.md
@@ -200,6 +200,7 @@ core_paths[21]{topic,path}:
   Grounding discipline (anti-hallucination),rules/core/grounding-discipline.md
   Context mgmt,rules/core/context-management.md
   Context economy (anti-overload),rules/core/context-economy.md
+  Agent namespacing (Agent tool calls),rules/core/agent-namespacing.md
   Prompt caching,rules/core/prompt-caching.md
   Small-to-large routing,rules/core/small-to-large-routing.md
   Code quality,rules/core/code-quality.md
@@ -249,7 +250,7 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 resources[8]{name,location}:
   Agents (14),agents/
   Commands (18),commands/
-  Rules (66),rules/{core|agent|workflow}/
+  Rules (67),rules/{core|agent|workflow}/
   Skills (52),skills/
   Hooks (38),hooks/
   MCP (6),.mcp.json
