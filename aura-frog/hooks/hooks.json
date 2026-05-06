@@ -55,6 +55,10 @@
           {
             "type": "command",
             "command": "CLAUDE_HOOK_PHASE=pre node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-flight-validate.cjs\""
           }
         ]
       },

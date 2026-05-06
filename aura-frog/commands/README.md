@@ -1,6 +1,6 @@
 # Aura Frog Commands
 
-**Total:** 17 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension + 1 session-reset)
+**Total:** 18 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight)
 
 ---
 
@@ -56,6 +56,15 @@ memory[1]{command,file,purpose}:
 ```
 
 `epic-summarizer` agent runs on T2 done (auto via `feature-done-trigger-archive` hook) or manually via this command. `permanent-memory-loader` skill auto-loads distilled summaries (≤120 tokens always-loaded) in subsequent sessions.
+
+## Pre-flight (beta.1 — auto-on)
+
+```toon
+preflight[1]{command,file,purpose}:
+  /aura:preflight,aura-preflight.md,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter, tool input/output)"
+```
+
+`hooks/pre-flight-validate.cjs` auto-fires on every PreToolUse for Bash|Edit|Write|Read. Hard-blocks `rm -rf /`, system paths, credential leaks. Warns on `git push --force`, `DROP TABLE`, etc. Bypass per-call only with `/aura:preflight bypass <reason ≥10 chars>`. Tier 2 OPA Rego policies deferred to v3.7.0-rc.1.
 
 ---
 

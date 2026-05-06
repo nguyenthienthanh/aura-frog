@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 65 (21 core + 17 agent + 27 workflow)
+**Total Rules:** 66 (21 core + 17 agent + 28 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -13,10 +13,10 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,21,ALWAYS — every session
   Agent,rules/agent/,17,Per-agent — only when agent activates
-  Workflow,rules/workflow/,27,Per-phase — only during active workflow
+  Workflow,rules/workflow/,28,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 65 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 66 rules every message.
 
 ---
 
@@ -74,10 +74,10 @@ agent[17]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (27) — Loaded Per Phase
+## Workflow Rules (28) — Loaded Per Phase
 
 ```toon
-workflow[27]{rule,priority,phases}:
+workflow[28]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -105,6 +105,7 @@ workflow[27]{rule,priority,phases}:
   checkpoint-discipline,high,Hierarchical planning — pre-mutation snapshots + /aura:plan:undo
   extension-policy,high,"Project-level skill/rule/command authoring — confirmation gate + .claude/-only writes"
   session-reset-policy,high,"Memory tier — Epic distillation triggers + 500/8000 token caps + what's preserved"
+  preflight-policies,critical,"Pre-flight Tier 1 — when, what, exit-code semantics, bypass policy + 3-bypasses-warn"
 ```
 
 ---

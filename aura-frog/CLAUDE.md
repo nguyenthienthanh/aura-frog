@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-alpha.4 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 14 agents + 51 skills + 17 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier (Epic distillation + permanent_memory) + project-level extension creation + 6 MCP servers
+**System:** Aura Frog v3.7.0-beta.1 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 14 agents + 52 skills + 18 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight Tier 1 + project-level extension creation + 6 MCP servers
 
 ---
 
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-alpha.4 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0-beta.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -180,7 +180,7 @@ Details: `rules/core/context-management.md`
 tiers[3]{tier,count,when}:
   Core (rules/core/),21,Every session
   Agent (rules/agent/),17,Per-agent type
-  Workflow (rules/workflow/),27,Per-phase
+  Workflow (rules/workflow/),28,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
@@ -217,7 +217,7 @@ core_paths[21]{topic,path}:
 ## Commands
 
 ```toon
-commands[9]{cmd,subs}:
+commands[10]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
   /check,"(all)/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
@@ -227,6 +227,7 @@ commands[9]{cmd,subs}:
   /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility)"
   /aura:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
   /aura:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
+  /aura:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
 ```
 
 ---
@@ -247,10 +248,10 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 ```toon
 resources[8]{name,location}:
   Agents (14),agents/
-  Commands (17),commands/
-  Rules (65),rules/{core|agent|workflow}/
-  Skills (51),skills/
-  Hooks (37),hooks/
+  Commands (18),commands/
+  Rules (66),rules/{core|agent|workflow}/
+  Skills (52),skills/
+  Hooks (38),hooks/
   MCP (6),.mcp.json
   AI References,docs/
   Human Docs,docs/README.md (repo root)
@@ -258,4 +259,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0-alpha.4
+**Version:** 3.7.0-beta.1

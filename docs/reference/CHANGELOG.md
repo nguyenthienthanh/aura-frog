@@ -7,8 +7,82 @@ All notable changes to Aura Frog will be documented in this file.
 ## [3.7.0] - Unreleased
 
 > **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-alpha.4** (Milestone C interim — Memory Tier).
+> Latest pre-release tag: **v3.7.0-beta.1** (Milestone C complete — Pre-flight Tier 1).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-beta.1] - 2026-05-06 (Milestone C complete — Pre-flight Tier 1)
+
+> Internal pre-release tag. Not published to marketplace. Completes FEAT-C with the pre-flight half. Tier 2 OPA Rego policies deferred to rc.1 per spec §20.4 (Tier 2 is optional).
+
+### Added — Pre-flight Tier 1 (7 bash linters + dispatcher hook)
+
+**Scripts (7 new under `scripts/preflight/`)**
+- `validate-frontmatter.sh` — YAML frontmatter validation on plan/skill/agent/rule/command markdown
+- `validate-tool-input.sh` — tool input shape sanity (required fields, absolute paths, no-op edits)
+- `validate-tool-output.sh` — ANSI-escape volume, prompt-injection phrase detection, JSON sanity
+- `check-path-safety.sh` — reject path traversal + system files (`/etc/passwd`, `~/.ssh/`, `~/.aws/`) + credential dirs
+- `check-command-allowlist.sh` — hard-block destructive (`rm -rf /`, `mkfs.*`, fork bomb, pipe-to-sudo-shell, etc.); warn on risky (`git push --force`, `DROP TABLE`)
+- `check-secret-patterns.sh` — high-confidence credential patterns (AWS/GitHub PAT/OpenAI/JWT/private keys); warn on heuristic patterns
+- `run-all.sh` — orchestrator. Auto-dispatches based on `CLAUDE_TOOL_NAME` + `CLAUDE_TOOL_ARGS`. Returns highest exit code from any linter
+
+Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
+
+**Hook (1 new — 37 → 38)**
+- `hooks/pre-flight-validate.cjs` — PreToolUse on Bash | Edit | Write | Read. Invokes `run-all.sh`. Exit 2 → blocks tool call. Exit 1 → warn but proceed. Exit 0 → silent. Honors `AF_PREFLIGHT_DISABLED=true` and single-use bypass via `.claude/logs/.preflight-bypass` flag file (per-call only, per spec Q7). After 3 bypasses in one session, prints warning banner.
+
+**Skill (1 new — 51 → 52)**
+- `skills/preflight-validator/` — programmatic wrapper for on-demand invocation (CI, contributor workflow, batch validation). On-demand only.
+
+**Command (1 new — 17 → 18)**
+- `commands/aura-preflight.md` — `/aura:preflight check|policies|bypass|status`. `bypass <reason>` requires reason ≥10 chars (refuses vague "test it"). Logs to history.jsonl.
+
+**Rule (1 new — 65 → 66; workflow 27 → 28)**
+- `rules/workflow/preflight-policies.md` — formalizes triggers, hard-block vs warn pattern classes, exit-code semantics, bypass policy (per-call only), 3-bypasses-warn threshold, escalation order (per-call → per-session env → permanent — strongly discouraged).
+
+### Acceptance criteria — beta.1 sub-scope
+
+- [x] All 7 Tier 1 linters defined; each returns 0/1/2 per spec §20.2
+- [x] `pre-flight-validate.cjs` blocks tool call on exit 2; warns on exit 1
+- [x] `/aura:preflight bypass` is single-use (consumed on next PreToolUse)
+- [x] After 3 bypasses in a session: warning banner emitted
+- [x] Hook silent if `AF_PREFLIGHT_DISABLED=true`
+- [x] Hook silent if `run-all.sh` missing
+- [x] Smoke tests: 10/10 pass (hard-block / warn / pass for each linter; dispatcher correctness)
+
+### Verification
+
+- `validate-counts.sh`: 14 / 52 / 66 / 18 / 38 — all OK
+- `validate-plan-tree.sh`: 5 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- Linter smoke tests: rm -rf / blocked, force-push warned, ls passed, /etc/passwd blocked, traversal blocked, AWS key detected, GitHub PAT detected, clean content passed, run-all dispatch correct
+- Hook smoke tests: hard-block exit 2, warn exit 0 with stderr, pass exit 0 silent, AF_PREFLIGHT_DISABLED skips entirely
+
+### Stats (v3.7.0-alpha.4 → v3.7.0-beta.1)
+
+- Agents: 14 (unchanged)
+- Skills: 51 → **52** (+1 preflight-validator); auto-invoke 9 (unchanged)
+- Rules: 65 → **66** (+1 preflight-policies); workflow 27 → **28**
+- Commands: 17 → **18** (+1 /aura:preflight)
+- Hooks: 37 → **38** (+1 pre-flight-validate)
+- MCP servers: 6 (unchanged)
+
+### Pending for v3.7.0-rc.1 (Milestone E remainder)
+
+- **Pre-flight Tier 2 (OPA, optional)** — `install-opa.sh` (sha256-verified) + 5 default Rego policies (plan_structure / mutation_safety / grounding / token_budget / conflict_respect)
+- **Self-healing orchestrator** — F2/F3 propose patch, never auto-apply
+- **MCP security tier** — per-agent allowlist (`mcp_servers:` frontmatter), `mcp-call-gate.cjs` hook, audit log, rate limits
+- **Phase-Role binding** — Phase 4 reviewer ≠ Phase 3 builder hard rule enforcement
+- **CLI dashboard** — `/aura:dashboard`
+
+### Pending for v3.7.0-beta.2 (Milestone D)
+
+- L1-L4 conflict detection + conflict-arbiter agent + F6 class
+- 3 conflict commands (`/aura:plan:freeze`, `:thaw`, `:conflicts`)
+- Branch freeze cascade + auto-thaw
+
+### Pending — deferred FEAT-B work (rolling)
+
+- Classifier 80-fixture suite + hallucination/logic-error fixture suites + deviation_score auto-update + trace-event latency benchmark
 
 ### Added (post-alpha.4)
 
