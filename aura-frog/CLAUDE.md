@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-beta.2 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 15 agents + 53 skills + 21 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight Tier 1 + L1/L2 conflict detection + freeze cascade + 6 MCP servers
+**System:** Aura Frog v3.7.0-rc.1 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-beta.2 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0-rc.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -64,13 +64,15 @@ Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` 
 ## MCP Servers
 
 ```toon
-mcp[6]{name,purpose,requires}:
-  context7,Library docs,None
-  playwright,Browser automation + E2E,None
-  vitest,Test execution + coverage,None
-  firebase,Firebase management,firebase login
-  figma,Design files,FIGMA_API_TOKEN
-  slack,Notifications,SLACK_BOT_TOKEN
+mcp[8]{name,purpose,requires,enabled}:
+  context7,Library docs,None,enabled
+  playwright,Browser automation + E2E,None,enabled
+  vitest,Test execution + coverage,None,enabled
+  firebase,Firebase management,firebase login,enabled
+  figma,Design files,FIGMA_API_TOKEN,enabled
+  slack,Notifications,SLACK_BOT_TOKEN,enabled
+  postgres,Database queries (read-only default),POSTGRES_CONNECTION_STRING,disabled (opt-in)
+  redis,Cache + queue,REDIS_URL,disabled (opt-in)
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
@@ -180,7 +182,7 @@ Details: `rules/core/context-management.md`
 ```toon
 tiers[3]{tier,count,when}:
   Core (rules/core/),22,Every session
-  Agent (rules/agent/),17,Per-agent type
+  Agent (rules/agent/),19,Per-agent type
   Workflow (rules/workflow/),29,Per-phase
 ```
 
@@ -219,7 +221,7 @@ core_paths[22]{topic,path}:
 ## Commands
 
 ```toon
-commands[10]{cmd,subs}:
+commands[13]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
   /check,"(all)/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
@@ -227,6 +229,9 @@ commands[10]{cmd,subs}:
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
   /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
   /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility) + freeze/thaw/conflicts (L1-L4 + arbiter)"
+  /aura:heal,"diagnose/status/disable/enable/accept/decline — self-healing F2/F3 with confidence ≥0.7 + user approval"
+  /aura:mcp,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit log"
+  /aura:dashboard,"static / --live / --json / --section — CLI status backed by scripts/dashboard.sh"
   /aura:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
   /aura:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
   /aura:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
@@ -250,15 +255,15 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 ```toon
 resources[8]{name,location}:
   Agents (15),agents/
-  Commands (21),commands/
-  Rules (68),rules/{core|agent|workflow}/
-  Skills (53),skills/
-  Hooks (41),hooks/
-  MCP (6),.mcp.json
+  Commands (24),commands/
+  Rules (70),rules/{core|agent|workflow}/
+  Skills (55),skills/
+  Hooks (42),hooks/
+  MCP (8),.mcp.json (postgres + redis disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```
 
 ---
 
-**Version:** 3.7.0-beta.2
+**Version:** 3.7.0-rc.1

@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 68 (22 core + 17 agent + 29 workflow)
+**Total Rules:** 70 (22 core + 19 agent + 29 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -12,11 +12,11 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 ```toon
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,22,ALWAYS — every session
-  Agent,rules/agent/,17,Per-agent — only when agent activates
+  Agent,rules/agent/,19,Per-agent — only when agent activates
   Workflow,rules/workflow/,29,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 68 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 70 rules every message.
 
 ---
 
@@ -50,10 +50,10 @@ core[22]{rule,priority,purpose}:
 
 ---
 
-## Agent Rules (17) — Loaded Per Agent
+## Agent Rules (19) — Loaded Per Agent
 
 ```toon
-agent[17]{rule,priority,agents}:
+agent[19]{rule,priority,agents}:
   frontend-excellence,critical,frontend/mobile
   design-system-usage,high,frontend
   theme-consistency,medium,frontend
@@ -71,6 +71,8 @@ agent[17]{rule,priority,agents}:
   error-handling-standard,critical,All dev agents
   dependency-management,high,architect/devops
   codebase-consistency,high,All agents
+  db-access-policy,critical,"DB MCPs — architect/tdd-engineer only, read-only default, destructive ops hard-blocked (rc.1)"
+  mcp-security-policy,critical,"All MCPs — per-agent allowlist + sanitized audit + soft/hard rate limits (rc.1)"
 ```
 
 ---

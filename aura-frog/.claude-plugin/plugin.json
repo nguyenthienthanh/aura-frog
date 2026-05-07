@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "3.7.0-beta.2",
-  "description": "Portable LLM OS for software engineering with hierarchical planning (beta.2 — L1+L2 conflict detection, freeze cascade, conflict-arbiter, F6 class). 15 agents, 5-phase TDD + planning T0-T4, 68 rules (3-tier), 53 skills, 21 commands, 41 hooks, 6 MCP servers. ~87% markdown.",
+  "version": "3.7.0-rc.1",
+  "description": "Portable LLM OS for software engineering with hierarchical planning (rc.1 — self-healing safety gates + MCP security tier + phase-role hard rule + CLI dashboard). 15 agents, 5-phase TDD + planning T0-T4, 70 rules (3-tier), 55 skills, 24 commands, 42 hooks, 8 MCP servers. ~87% markdown.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -23,5 +23,16 @@
     "laravel",
     "nextjs",
     "flutter"
-  ]
+  ],
+  "mcp_rate_limits": {
+    "context7": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "postgres": { "max_calls_per_minute": 10, "max_calls_per_session": 100 },
+    "redis":    { "max_calls_per_minute": 20, "max_calls_per_session": 200 },
+    "playwright": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "vitest":   { "max_calls_per_minute": 60, "max_calls_per_session": 500 },
+    "figma":    { "max_calls_per_minute": 20, "max_calls_per_session": 100 },
+    "firebase": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "slack":    { "max_calls_per_minute": 20, "max_calls_per_session": 100 },
+    "default":  { "max_calls_per_minute": 30, "max_calls_per_session": 200 }
+  }
 }

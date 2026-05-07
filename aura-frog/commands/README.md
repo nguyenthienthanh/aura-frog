@@ -1,6 +1,6 @@
 # Aura Frog Commands
 
-**Total:** 21 command files (5 bundled + 1 standalone + 12 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight)
+**Total:** 24 command files (5 bundled + 1 standalone + 12 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight + 3 self-healing/MCP-security/dashboard)
 
 ---
 
@@ -68,6 +68,17 @@ preflight[1]{command,file,purpose}:
 ```
 
 `hooks/pre-flight-validate.cjs` auto-fires on every PreToolUse for Bash|Edit|Write|Read. Hard-blocks `rm -rf /`, system paths, credential leaks. Warns on `git push --force`, `DROP TABLE`, etc. Bypass per-call only with `/aura:preflight bypass <reason ≥10 chars>`. Tier 2 OPA Rego policies deferred to v3.7.0-rc.1.
+
+## Self-Healing + MCP Security + Dashboard (rc.1)
+
+```toon
+rc1[3]{command,file,purpose}:
+  /aura:heal,aura-heal.md,"diagnose/status/disable/enable/accept/decline — F2/F3 only, confidence ≥0.7, user approval"
+  /aura:mcp,aura-mcp.md,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit"
+  /aura:dashboard,aura-dashboard.md,"--live / --json / --section — terse one-screen view of plan + conflicts + memory + MCP + preflight"
+```
+
+`hooks/mcp-call-gate.cjs` auto-fires on every PreToolUse for `mcp__.*`. Enforces per-agent allowlist (frontmatter `mcp_servers:`), rate limits (soft 80% warn / hard 100% block), and writes sanitized audit to `.aura/security/mcp-audit.jsonl`. `scripts/security/sanitize-mcp-input.sh` strips Authorization headers + redacts tokens before logging.
 
 ---
 

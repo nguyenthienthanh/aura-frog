@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 53 (9 auto-invoking + 44 reference)
+**Total Skills:** 55 (9 auto-invoking + 46 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -28,7 +28,7 @@ auto_invoke[9]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (44)
+## Reference Skills (46)
 
 Loaded on-demand when triggered.
 

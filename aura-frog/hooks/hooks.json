@@ -73,6 +73,15 @@
         ]
       },
       {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/mcp-call-gate.cjs\""
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {

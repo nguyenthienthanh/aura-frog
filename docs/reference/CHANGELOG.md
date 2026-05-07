@@ -6,9 +6,89 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [3.7.0] - Unreleased
 
-> **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-beta.2** (Milestone D — L1+L2 conflict detection + freeze cascade).
+> **Status:** Final pre-release before v3.7.0 stable.
+> Latest pre-release tag: **v3.7.0-rc.1** (Milestone E — Self-Healing + MCP Security + Dashboard).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-rc.1] - 2026-05-07 (Milestone E — Self-Healing + MCP Security + Dashboard)
+
+> Final internal pre-release. All 5 milestones (A-E) complete. Next ship target is v3.7.0 stable (marketplace publish).
+
+### Added — Self-healing safety gates + MCP security tier + phase-role hard rule + CLI dashboard
+
+**Skills (2 new — 53 → 55)**
+- `skills/self-healing-orchestrator/` — F2/F3 ONLY (refuses F1/F4-F6). Confidence ≥0.7 required to propose; below threshold escalates raw findings. NEVER auto-applies; user approval mandatory. Counts toward replan_budget. Per-task max 1; session cap 5. Disable via `AF_SELF_HEAL_DISABLED=true` env or `/aura:heal disable` (session flag). Cross-checks ONLY context7 + permanent_memory + traces — no random web sources.
+- `skills/mcp-security-auditor/` — read-side companion to `mcp-call-gate` hook. Reads `.aura/security/mcp-audit.jsonl`, projects to TOON via `json-to-toon.cjs`, surfaces blocked calls / rate-limit hits / suspicious patterns.
+
+**Commands (3 new — 21 → 24)**
+- `/aura:heal diagnose|status|disable|enable|accept|decline` — self-healing orchestration. `accept <HEAL-ID>` applies a proposal as a NEW T4 task (not in-place patch). Bypass-counter + cycle-guard hardening.
+- `/aura:mcp status|audit|reset-limits|test` — MCP security operations. `audit --blocked-only` for forensics. `reset-limits` is logged event. `test <server>` is single-call connectivity check.
+- `/aura:dashboard` — terse one-screen CLI status (plan tree, active task, conflicts, memory, MCP, pre-flight). `--live` (5s refresh), `--json` (machine-readable, sanitized), `--section <name>` for slot integration.
+
+**Rules (2 new agent-tier — workflow 29 unchanged; agent 17 → 19)**
+- `rules/agent/db-access-policy.md` — DB MCPs locked down: architect + tdd-engineer only (default-deny for everyone else). Read-only by default; writes require explicit `--allow-write`. Destructive ops (DROP/TRUNCATE/DELETE without WHERE) HARD-BLOCKED unconditionally regardless of allowlist.
+- `rules/agent/mcp-security-policy.md` — broader MCP framework: per-agent `mcp_servers:` allowlist (default = all backward-compat), sanitized audit log (Authorization stripped, tokens redacted), rate limits (soft 80% warn / hard 100% block), retention (`AF_MCP_AUDIT_RETENTION_DAYS=30` default).
+
+**Rule update**
+- `rules/workflow/plan-lifecycle.md` — Phase-Role binding promoted from advisory to **HARD RULE** (per spec §24, decision Q17). Phase 4 reviewer MUST NOT be the same agent as Phase 3 builder. Run-orchestrator refuses dispatch on violation; falls back to next-best reviewer; blocks phase transition if no eligible reviewer remains. Generator/Evaluator separation per Anthropic harness research.
+
+**Hooks (1 new — 41 → 42)**
+- `hooks/mcp-call-gate.cjs` — PreToolUse on `mcp__.*`. Parses `mcp__plugin_<plugin>_<server>__<method>` tool names. Enforces per-agent allowlist (reads `mcp_servers:` from agent frontmatter; null = backward-compat default of all-allowed). Tracks per-server per-session counters in `.claude/logs/.mcp-rate-counter.json`. Rate limit thresholds: soft 80% warn, hard 100% block. Runs `scripts/security/sanitize-mcp-input.sh` before audit append.
+
+**Scripts (2 new)**
+- `scripts/security/sanitize-mcp-input.sh` — strips Authorization headers, redacts AWS/GitHub/OpenAI/JWT/Bearer tokens, truncates >1KB strings. jq-based when available; sed-fallback otherwise.
+- `scripts/dashboard.sh` — implementation behind `/aura:dashboard`. Static / `--live` (5s loop) / `--json` / `--section` modes. Read-only — never mutates state.
+
+**Config**
+- `.mcp.json` — added `postgres` + `redis` servers (both `disabled: true` by default per spec §14.1, decision Q14 — opt-in for security)
+- `plugin.json` — added `mcp_rate_limits` block with per-server overrides + `default` fallback (per spec §14.2)
+
+### Acceptance criteria — rc.1 sub-scope
+
+- [x] Self-healing only triggers F2/F3 (hard-coded refusal in skill body for F1/F4-F6)
+- [x] Confidence < 0.7 escalates raw findings, doesn't propose
+- [x] User approval required before patch applied (NEVER auto-applies — verified by skill spec)
+- [x] Self-heal counts toward replan_budget
+- [x] Per-agent MCP allowlist enforced by mcp-call-gate.cjs (allowlist parsed from agent frontmatter)
+- [x] MCP audit log captures all calls with sanitization (smoke-tested with AWS key + GitHub PAT + Authorization header redaction)
+- [x] Rate limits enforced (soft 80% warn + hard 100% block) — verified with 35-call stress test
+- [x] Postgres MCP destructive ops blocked unconditionally (per `db-access-policy.md`)
+- [x] AF_SELF_HEAL_DISABLED=true disables self-healing
+- [x] Phase 4 reviewer ≠ Phase 3 builder formalized as HARD RULE in plan-lifecycle.md
+- [x] /aura:dashboard renders without errors (static + JSON modes verified)
+
+### Verification
+
+- `validate-counts.sh`: 15 / 55 / 70 / 24 / 42 — all OK
+- `validate-plan-tree.sh`: 7 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- mcp-call-gate smoke tests: allowlist enforcement (rc 2 on violation), rate limit (35-call stress hits hard block correctly), sanitizer (AWS keys + GitHub PATs + Bearer tokens redacted in audit log)
+- Dashboard: static + JSON modes both render cleanly
+
+### Stats (v3.7.0-beta.2 → v3.7.0-rc.1)
+
+- Agents: 15 (unchanged)
+- Skills: 53 → **55** (+2: self-healing-orchestrator, mcp-security-auditor); auto-invoke 9 (unchanged)
+- Rules: 68 → **70** (+2 agent-tier: db-access-policy, mcp-security-policy); workflow 29 unchanged but plan-lifecycle.md hard-rule promotion
+- Commands: 21 → **24** (+3: /aura:heal, /aura:mcp, /aura:dashboard)
+- Hooks: 41 → **42** (+1 mcp-call-gate)
+- Scripts: 52 → **55** (+3: sanitize-mcp-input + dashboard + get-plugin-prefix)
+- MCP servers: 6 → **8** (+2 disabled: postgres, redis)
+
+### Pending for v3.7.0 stable (final ship)
+
+- 17 documentation deliverables per spec §30 (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, llm-os update, 8 guides, 3 troubleshooting, MIGRATION_TO_V3.7)
+- README.md update — lead with `/aura:plan`, document `/run` as lightweight mode
+- Marketplace listing update with v3.7.0 description
+- Public release announcement
+- Add `mcp_servers:` allowlists to existing 9 baseline agents (gate works but most currently default to all-allowed)
+
+### Pending — deferred (will land in v3.7.x patch releases or as opt-in features)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + conflict_cache.jsonl LRU
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus
+- Pre-flight Tier 2 (OPA, optional) — install-opa.sh + 5 default Rego policies (plan_structure, mutation_safety, grounding, token_budget, conflict_respect)
+- FEAT-B deferred fixtures: classifier 80-suite + hallucination 20 + logic-error 15 + deviation_score auto-update + trace-event latency benchmark
 
 ## [3.7.0-beta.2] - 2026-05-07 (Milestone D — Conflict Detection + Freeze)
 

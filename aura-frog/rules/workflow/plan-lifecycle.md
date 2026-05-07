@@ -71,9 +71,9 @@ Children inherit `status: frozen` with `frozen_by_ancestor: <ancestor-id>`. Sibl
 
 ---
 
-## phase_role_map (TDD ↔ T3 binding)
+## phase_role_map (TDD ↔ T3 binding) — HARD RULE
 
-Per spec §24 and decision Q17, Phase 4 reviewer **MUST** differ from Phase 3 builder. Hard rule.
+Per spec §24 and decision Q17, **Phase 4 reviewer MUST NOT be the same agent as Phase 3 builder.** This formalizes the Generator/Evaluator separation per Anthropic's harness design.
 
 ```toon
 phase_role_map[5]{phase,primary,consultants,output}:
@@ -84,7 +84,24 @@ phase_role_map[5]{phase,primary,consultants,output}:
   phase_5,tdd-engineer,code-reviewer,"integration verified"
 ```
 
-When inside an active phase, `agent-detector` skill prefers `phase_role_map` over content scoring.
+### Enforcement (rc.1 hard rule, was advisory in earlier alphas)
+
+When run-orchestrator is about to dispatch Phase 4:
+
+1. Read `run-state.json` for the run's Phase 3 builder agent
+2. Refuse if the proposed Phase 4 reviewer == Phase 3 builder
+3. Prefer `code-reviewer` as primary; if it WAS the Phase 3 builder (rare), fall back to a different reviewer (next in `agent-detector`'s ranked list)
+4. Append history.jsonl: `event: phase_role_enforced` with the chosen reviewer
+5. If no eligible reviewer remains, **block the phase transition** and surface to user — do not silently bypass
+
+When inside an active phase, `agent-detector` skill MUST prefer `phase_role_map` over content scoring AND apply the Phase 4 ≠ Phase 3 builder check.
+
+### Rationale
+
+- Generator-only validation has well-known coverage gaps: the agent that wrote the code is more likely to miss the same flaw twice
+- Evaluator separation forces a fresh read with adversarial intent
+- Cost: ~10% extra dispatch overhead in Phase 4; benefit: catches code-self-review blind spots
+- Per Anthropic harness research: Generator≠Evaluator is one of the highest-leverage discipline rules
 
 ---
 
