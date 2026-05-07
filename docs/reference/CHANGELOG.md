@@ -7,8 +7,83 @@ All notable changes to Aura Frog will be documented in this file.
 ## [3.7.0] - Unreleased
 
 > **Status:** Active development toward v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-beta.1** (Milestone C complete — Pre-flight Tier 1).
+> Latest pre-release tag: **v3.7.0-beta.2** (Milestone D — L1+L2 conflict detection + freeze cascade).
 > Last shipped to marketplace: **v3.6.1**.
+
+## [3.7.0-beta.2] - 2026-05-07 (Milestone D — Conflict Detection + Freeze)
+
+> Internal pre-release tag. Not published to marketplace. Ships L1+L2 conflict detection (deterministic bash, fast), freeze cascade, conflict-arbiter agent, F6 failure class, 3 conflict commands, 3 hooks. L3+L4 (LLM-driven semantic + architectural detection) stubbed for rc.1.
+
+### Added — Conflict detection + freeze state machine
+
+**Scripts (2 new under `scripts/conflicts/`)**
+- `check-l1-files.sh` — file-set intersection between proposed task artifacts and pending-confirm sibling artifacts. Returns JSON `{layer, overlap, confidence, files, with}`. p95 well under 100ms (no LLM, no network).
+- `check-l2-syntactic.sh` — function/class/def overlap via regex within files L1 flagged. Confidence 0.85 (lower than L1's 1.0 because regex on symbol names has false-positive risk).
+
+**Agents (1 new — 14 → 15)**
+- `agents/conflict-arbiter.md` — adjudicates conflicts. Decision table: auto_thaw / auto_discard / sequential_reorder / replan / escalate / user_priority. L3+L4 routes to user_priority (never auto-applied). Cycle guard: refuses 4th arbitration of same conflict_id.
+
+**Skills (1 new — 52 → 53)**
+- `skills/conflict-detector/SKILL.md` — orchestrates L1-L4 dispatch per spec §21.3. L1+L2 functional via the bash scripts; L3+L4 return stub findings pending rc.1 LLM dispatchers. Writes records to `.aura/plans/conflicts.jsonl` (append-only, schema per spec §21.4).
+
+**Commands (3 new — 18 → 21)**
+- `/aura:plan:freeze <NODE_ID> [reason]` — manual freeze with descendant cascade (per spec §13.1, decision Q10 — descendants only, NOT siblings)
+- `/aura:plan:thaw <NODE_ID>` — reverse freeze with compatibility check (`git diff <blocker.git_sha>..HEAD` vs frozen sibling's planned artifacts). `--partial` keeps descendants frozen; `--discard` finalizes as discarded; `--grant-replan-budget N` overrides budget reset
+- `/aura:plan:conflicts list|show|resolve|history|check` — full conflict lifecycle UX. `resolve <CONFLICT-ID> <choice>` supports accept-proposed / accept-blocker / sequential / freeze-both / escalate
+
+**Rule (1 new — 67 → 68; workflow 28 → 29)**
+- `rules/workflow/conflict-arbitration-policy.md` — formalizes auto vs manual boundary (L1/L2 auto, L3/L4 manual), freeze cascade rules (Q10: descendants only), replan_budget interaction, cycle guard (3-arbitration limit), compatibility-check pseudocode
+
+**Hooks (3 new — 38 → 41)**
+- `pre-dispatch-conflict-check.cjs` — PreToolUse async on Edit|Write|Bash. Resolves siblings under same Story, runs L1, drills to L2 on low-confidence overlap. Mints CONFLICT-NNNNN, appends conflicts.jsonl + history.jsonl, emits stderr hint with `/aura:plan:conflicts show` next step. Anti-block: informational only; arbiter applies actual mutations
+- `post-execute-conflict-rescan.cjs` — PostToolUse async on Edit|Write. Detects recent execution_completed events, looks up frozen siblings tied to same conflict, runs `git diff <blocker.checkpoint.git_sha>..HEAD` vs frozen sibling planned artifacts, emits auto_thaw / auto_discard recommendation
+- `pending-confirm-timeout.cjs` — SessionStart async. Walks T4 nodes, surfaces those in `planned`/`frozen`/`blocked` status idle >24h (configurable via `AF_PENDING_TIMEOUT_HOURS`). Cap: 5 surfaced + tail count
+
+**Skill update**
+- `skills/failure-classifier/SKILL.md` — F6 class formalized (was a TODO note). Decision rule #2: `cause: conflict OR conflict_id non-null → F6`. Output: `routes_to: conflict-arbiter` (NOT replanner).
+
+### Acceptance criteria — beta.2 sub-scope
+
+- [x] L1 detects file overlap on smoke fixture (1/1; 30-fixture suite deferred to rc.1)
+- [x] L2 drills into overlapping files when L1 confidence < 0.95 (1/1)
+- [x] CONFLICT-NNNNN records minted with proper schema; conflicts.jsonl append-only
+- [x] Frozen node remains frozen until explicit thaw
+- [x] Branch freeze cascades to descendants only (NOT siblings) — per spec §13.1, Q10
+- [x] /aura:plan:thaw runs compatibility check via git_sha
+- [x] F6 class added to failure-classifier with conflict-arbiter dispatch
+- [x] L1 detection well under 100ms p95 (bash + comm + sort, no LLM)
+- [x] End-to-end tested: artifact map → L1 hit → CONFLICT-00001 minted → conflicts.jsonl + history.jsonl + counters.json all updated
+
+### Verification
+
+- `validate-counts.sh`: 15 / 53 / 68 / 21 / 41 — all OK
+- `validate-plan-tree.sh`: 6 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- L1 + L2 smoke tests pass (4 scenarios)
+- End-to-end conflict detection: TASK-00125 vs TASK-00120 sharing src/auth.py → CONFLICT-00001 logged correctly
+
+### Stats (v3.7.0-beta.1 → v3.7.0-beta.2)
+
+- Agents: 14 → **15** (+1 conflict-arbiter)
+- Skills: 52 → **53** (+1 conflict-detector); auto-invoke 9 (unchanged)
+- Rules: 67 → **68** (+1 conflict-arbitration-policy); workflow 28 → **29**
+- Commands: 18 → **21** (+3: /aura:plan:freeze, /aura:plan:thaw, /aura:plan:conflicts)
+- Hooks: 38 → **41** (+3)
+- MCP servers: 6 (unchanged)
+
+### Pending for v3.7.0-rc.1 (Milestone E)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + conflict_cache.jsonl LRU
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus
+- Pre-flight Tier 2 (OPA, optional) — install-opa.sh + 5 default Rego policies
+- Self-healing orchestrator — F2/F3 propose patch, never auto-apply
+- MCP security tier — per-agent allowlist, audit log, rate limits
+- Phase-Role binding hard rule (Phase 4 reviewer ≠ Phase 3 builder)
+- /aura:dashboard CLI
+
+### Pending — deferred FEAT-B work (rolling)
+
+- Classifier 80-fixture suite + hallucination/logic-error fixture suites + deviation_score auto-update + trace-event latency benchmark
 
 ### Fixed (post-beta.1)
 

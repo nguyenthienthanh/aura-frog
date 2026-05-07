@@ -23,7 +23,7 @@ Classifies T4 task failures so master-planner can decide: retry, self-heal, repl
 | **F4** | story-level | Sibling tasks broken, dependency contract violated, deviation_score ≥ 0.7 | Replan feature (re-decompose T2) |
 | **F5** | architectural | Cross-feature impact, mission-level constraint violated | Freeze + escalate to user |
 
-(F6 conflict ships in Milestone D.)
+**F6** — conflict-induced (added in v3.7.0-beta.2): when `cause: conflict` is set on the failure signal OR `conflict_id` is non-null, classifier returns class F6 with confidence 0.95 and routes to `conflict-arbiter` agent (NOT `replanner`). The arbiter applies the decision table from `rules/workflow/conflict-arbitration-policy.md`.
 
 ## Classifier inputs
 
@@ -36,13 +36,14 @@ Classifies T4 task failures so master-planner can decide: retry, self-heal, repl
 
 ```
 1. exit_code == 0 → not a failure; abort classification
-2. stderr matches /ECONNRESET|ETIMEDOUT|EAI_AGAIN|429|503|rate limit/i → F1
-3. failed_attempts >= 3 AND same stderr_hash as last 2 attempts → F3
-4. files_touched intersects sibling task's files_touched (from history) → F4
-5. failed_attempts == 1 AND stderr matches /TypeError|SyntaxError|test failed|assertion/ → F2
-6. deviation_score(node) >= 0.7 → F4
-7. ancestor_T1.intent contradicted by failure evidence → F5
-8. default → F2
+2. failure.cause == "conflict" OR failure.conflict_id is non-null → F6
+3. stderr matches /ECONNRESET|ETIMEDOUT|EAI_AGAIN|429|503|rate limit/i → F1
+4. failed_attempts >= 3 AND same stderr_hash as last 2 attempts → F3
+5. files_touched intersects sibling task's files_touched (from history) → F4
+6. failed_attempts == 1 AND stderr matches /TypeError|SyntaxError|test failed|assertion/ → F2
+7. deviation_score(node) >= 0.7 → F4
+8. ancestor_T1.intent contradicted by failure evidence → F5
+9. default → F2
 ```
 
 ## Output schema
@@ -79,7 +80,7 @@ If confidence < 0.6 → emit `class: F2` with the action `single_retry_then_esca
 - Does NOT call an LLM (deterministic only — see Q1 decision)
 - Does NOT decide retry/replan itself (that's master-planner)
 - Does NOT mutate the plan tree
-- Does NOT classify F6 (conflict) — Milestone D ships that
+- Does NOT itself dispatch arbitration on F6 — emits the class with `recommended_action: arbitrate` and `routes_to: conflict-arbiter`; master-planner picks up the dispatch
 
 ## Tie-Ins
 

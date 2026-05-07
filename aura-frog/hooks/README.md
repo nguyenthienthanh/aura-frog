@@ -22,9 +22,9 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (38 Total)
+## Active Hooks (41 Total)
 
-> **v3.7.0 additions:** `pre-execute-load-plan-context.cjs` and `session-start-restore-active.cjs` (alpha.1, planning context); `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs` (alpha.2, failure handling + reasoning trace); `jira-auto-fetch.cjs` (alpha.3 fix, JIRA ticket auto-fetch); `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs` (alpha.4, memory tier); `json-toon-projector.cjs` (alpha.4 fix, deterministic JSON→TOON projection); `pre-flight-validate.cjs` (beta.1, Tier 1 bash linter dispatcher — blocks destructive ops, traversal paths, credential leaks).
+> **v3.7.0 additions:** alpha.1: `pre-execute-load-plan-context.cjs`, `session-start-restore-active.cjs`. alpha.2: `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs`. alpha.3: `jira-auto-fetch.cjs`. alpha.4: `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs`, `json-toon-projector.cjs`. beta.1: `pre-flight-validate.cjs`. beta.2: `pre-dispatch-conflict-check.cjs`, `post-execute-conflict-rescan.cjs`, `pending-confirm-timeout.cjs` — L1+L2 conflict detection, auto-thaw recommendations on blocker done, stale T4 timeout warnings.
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)

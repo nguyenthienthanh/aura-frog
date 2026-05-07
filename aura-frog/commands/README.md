@@ -1,6 +1,6 @@
 # Aura Frog Commands
 
-**Total:** 18 command files (5 bundled + 1 standalone + 9 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight)
+**Total:** 21 command files (5 bundled + 1 standalone + 12 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight)
 
 ---
 
@@ -25,7 +25,7 @@ standalone[1]{command,file,description}:
 ## Hierarchical Planning (alpha — opt-in)
 
 ```toon
-planning[9]{command,file,purpose}:
+planning[12]{command,file,purpose}:
   /aura:plan,aura-plan.md,"Bootstrap T0/T1/T2 via interview"
   /aura:plan:expand,aura-plan-expand.md,"Decompose node one tier down"
   /aura:plan:next,aura-plan-next.md,"Return next ready T4 leaf"
@@ -33,7 +33,10 @@ planning[9]{command,file,purpose}:
   /aura:plan:promote,aura-plan-promote.md,"Promote node to higher tier"
   /aura:plan:archive,aura-plan-archive.md,"Archive completed branch"
   /aura:plan:status,aura-plan-status.md,"Render plan tree + summary"
-  /aura:plan:undo,aura-plan-undo.md,"Restore latest checkpoint (LIFO)"
+  /aura:plan:undo,aura-plan-undo.md,"Restore latest checkpoint (LIFO) + git_sha rollback"
+  /aura:plan:freeze,aura-plan-freeze.md,"Manual freeze + descendant cascade (beta.2)"
+  /aura:plan:thaw,aura-plan-thaw.md,"Reverse freeze + compatibility check (beta.2)"
+  /aura:plan:conflicts,aura-plan-conflicts.md,"list/show/resolve/history/check L1-L4 conflicts (beta.2)"
   /aura:trace,aura-trace.md,"Reasoning trace + hallucination surface (alpha.2)"
 ```
 

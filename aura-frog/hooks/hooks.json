@@ -36,6 +36,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-restore-active.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pending-confirm-timeout.cjs\" 2>&1"
           }
         ]
       }
@@ -59,6 +64,11 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-flight-validate.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-dispatch-conflict-check.cjs\" 2>&1"
           }
         ]
       },
@@ -190,6 +200,11 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reset-trigger.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-conflict-rescan.cjs\" 2>&1"
           }
         ]
       },

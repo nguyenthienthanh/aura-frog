@@ -1,9 +1,9 @@
 # Aura Frog Agents
 
-**14 specialized agents**, auto-selected by `agent-detector` skill.
+**15 specialized agents**, auto-selected by `agent-detector` skill.
 
 ```toon
-agents[14]{name,file,expertise}:
+agents[15]{name,file,expertise}:
   architect,architect.md,System design + database + backend architecture
   frontend,frontend.md,Frontend frameworks + design systems + accessibility
   mobile,mobile.md,React Native + Flutter + mobile platforms
@@ -18,6 +18,7 @@ agents[14]{name,file,expertise}:
   story-planner,story-planner.md,T3 (Story) → T4 (Task) decomposition
   replanner,replanner.md,F2-F4 mutation proposals (re-decompose / discard / promote)
   epic-summarizer,epic-summarizer.md,T2 done → permanent_memory.md distillation
+  conflict-arbiter,conflict-arbiter.md,Adjudicates L1-L4 conflicts (auto/manual decisions per spec §21.5)
 ```
 
 **Routing:** `skills/agent-detector/SKILL.md` (haiku, auto-invoke every message) handles agent + complexity + model selection. The former `router` agent was removed in favor of this skill.
@@ -48,7 +49,7 @@ categories[7]{category,agents}:
   Infrastructure,devops
   Management,lead
   System,scanner
-  Hierarchical-Planning,"master-planner, feature-architect, story-planner, replanner, epic-summarizer"
+  Hierarchical-Planning,"master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter"
 ```
 
 ## Selection

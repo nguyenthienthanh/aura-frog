@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-beta.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 14 agents + 52 skills + 18 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight Tier 1 + project-level extension creation + 6 MCP servers
+**System:** Aura Frog v3.7.0-beta.2 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** 15 agents + 53 skills + 21 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight Tier 1 + L1/L2 conflict detection + freeze cascade + 6 MCP servers
 
 ---
 
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-beta.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0-beta.2 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -80,7 +80,7 @@ Auto-invoked by context. Config: `.mcp.json`
 ## Process Table
 
 ```toon
-agents[14]{pid,name,domain,budget}:
+agents[15]{pid,name,domain,budget}:
   01,lead,Workflow coordination,3K
   02,architect,System design + DB + backend,4K
   03,frontend,React/Vue/Angular/Next.js,4K
@@ -95,6 +95,7 @@ agents[14]{pid,name,domain,budget}:
   12,story-planner,T3 → T4 decomposition,3K
   13,replanner,F2-F4 mutation proposals,3K
   14,epic-summarizer,T2 done → permanent_memory distillation,3K
+  15,conflict-arbiter,Adjudicates L1-L4 conflicts (auto/manual decisions),3K
 ```
 
 Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority highest, auto-invoke every message).
@@ -180,7 +181,7 @@ Details: `rules/core/context-management.md`
 tiers[3]{tier,count,when}:
   Core (rules/core/),22,Every session
   Agent (rules/agent/),17,Per-agent type
-  Workflow (rules/workflow/),28,Per-phase
+  Workflow (rules/workflow/),29,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
@@ -225,7 +226,7 @@ commands[10]{cmd,subs}:
   /project,"init/detect/status/list/switch/refresh/regen/env/sync"
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
   /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
-  /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility)"
+  /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility) + freeze/thaw/conflicts (L1-L4 + arbiter)"
   /aura:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
   /aura:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
   /aura:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
@@ -248,11 +249,11 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ```toon
 resources[8]{name,location}:
-  Agents (14),agents/
-  Commands (18),commands/
-  Rules (67),rules/{core|agent|workflow}/
-  Skills (52),skills/
-  Hooks (38),hooks/
+  Agents (15),agents/
+  Commands (21),commands/
+  Rules (68),rules/{core|agent|workflow}/
+  Skills (53),skills/
+  Hooks (41),hooks/
   MCP (6),.mcp.json
   AI References,docs/
   Human Docs,docs/README.md (repo root)
@@ -260,4 +261,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0-beta.1
+**Version:** 3.7.0-beta.2

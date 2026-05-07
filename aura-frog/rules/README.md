@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 67 (22 core + 17 agent + 28 workflow)
+**Total Rules:** 68 (22 core + 17 agent + 29 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -13,10 +13,10 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,22,ALWAYS — every session
   Agent,rules/agent/,17,Per-agent — only when agent activates
-  Workflow,rules/workflow/,28,Per-phase — only during active workflow
+  Workflow,rules/workflow/,29,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 67 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 68 rules every message.
 
 ---
 
@@ -75,10 +75,10 @@ agent[17]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (28) — Loaded Per Phase
+## Workflow Rules (29) — Loaded Per Phase
 
 ```toon
-workflow[28]{rule,priority,phases}:
+workflow[29]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -107,6 +107,7 @@ workflow[28]{rule,priority,phases}:
   extension-policy,high,"Project-level skill/rule/command authoring — confirmation gate + .claude/-only writes"
   session-reset-policy,high,"Memory tier — Epic distillation triggers + 500/8000 token caps + what's preserved"
   preflight-policies,critical,"Pre-flight Tier 1 — when, what, exit-code semantics, bypass policy + 3-bypasses-warn"
+  conflict-arbitration-policy,critical,"L1-L4 conflict decision table — auto/manual boundary, freeze cascade, replan_budget interaction, cycle guard"
 ```
 
 ---

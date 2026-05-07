@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "3.7.0-beta.1",
-  "description": "Portable LLM OS for software engineering with hierarchical planning (beta.1 — pre-flight Tier 1: 7 bash linters block destructive ops, traversal paths, credential leaks; warn on risky ops). 14 agents, 5-phase TDD + planning T0-T4, 67 rules (3-tier), 52 skills, 18 commands, 38 hooks, 6 MCP servers. ~87% markdown.",
+  "version": "3.7.0-beta.2",
+  "description": "Portable LLM OS for software engineering with hierarchical planning (beta.2 — L1+L2 conflict detection, freeze cascade, conflict-arbiter, F6 class). 15 agents, 5-phase TDD + planning T0-T4, 68 rules (3-tier), 53 skills, 21 commands, 41 hooks, 6 MCP servers. ~87% markdown.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
