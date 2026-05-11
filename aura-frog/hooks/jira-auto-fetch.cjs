@@ -3,28 +3,28 @@
  * Aura Frog — JIRA Auto-Fetch
  *
  * Fires: UserPromptSubmit (async)
- * Purpose: Detect JIRA ticket patterns ([A-Z]{2,}-[0-9]+) in user prompts and
- *          fetch ticket data via scripts/jira-fetch.sh. Caches per-project at
- *          .claude/logs/jira/{TICKET_ID}.json with 24h TTL. Surfaces a 1-line
- *          summary per ticket to stderr (Claude reads stderr; user usually doesn't).
+ * Purpose: Detect JIRA ticket patterns ([A-Z]{2,10}-[0-9]{1,6}) in user prompts,
+ *          fetch the ticket via the Atlassian REST API, and cache per-project
+ *          at .claude/logs/jira/{TICKET_ID}.json with 24h TTL. Surfaces a
+ *          1-line TOON summary per ticket to stderr (Claude reads stderr; the
+ *          user typically does not).
  *
  * Behavior:
- *   - Silent if no [A-Z]{2,}-[0-9]+ tokens in prompt
+ *   - Silent if no [A-Z]{2,10}-[0-9]{1,6} tokens in prompt
  *   - Silent if JIRA env not configured (one-time hint per session via flag file)
  *   - Cap: 3 unique tickets per prompt (anti-fatigue)
- *   - Cache 24h TTL per ticket
+ *   - Cache 24h TTL per ticket; subsequent prompts reuse the cache silently
  *   - Optional JIRA_PROJECT_PREFIXES env (comma-separated allowlist) to filter
  *     out false positives like UTF-8, RFC-123, HTTP-200
  *
- * Why this hook exists:
- *   Prior to v3.7.0-alpha.4, the jira-fetch.sh script was unwired — users had
- *   to invoke it manually. Hook docs (pre-phase.md, post-phase.md) referenced
- *   state.context.jira_ticket as if auto-populated, but nothing populated it.
+ * Single source of truth:
+ *   This hook is the only JIRA-fetch path in Aura Frog. There is no standalone
+ *   CLI script — credentials, curl call, and TOON projection all live here.
  *
  * Exit codes:
  *   0 — always (non-blocking; this is informational context, not a guard)
  *
- * @version 1.0.0 (v3.7.0-alpha.4)
+ * @version 1.1.0 (jira-fetch.sh removed; hook is now the sole JIRA path)
  */
 
 'use strict';

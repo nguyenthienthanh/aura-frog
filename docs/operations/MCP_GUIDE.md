@@ -129,12 +129,11 @@ export JIRA_API_TOKEN="your-api-token"
 
 ### Usage
 
-```bash
-# Jira
-./scripts/jira-fetch.sh PROJ-123
-./scripts/jira-fetch.sh PROJ-123 --verbose  # Include comments
+**Jira** is auto-fetched by the `jira-auto-fetch.cjs` hook — just mention the ticket key in any prompt (e.g. *"please look at PROJ-123"*) and the cache populates at `.claude/logs/jira/{TICKET_ID}.json` (24h TTL). No CLI command needed.
 
-# Confluence
+**Confluence** still uses the CLI script:
+
+```bash
 ./scripts/confluence-fetch.sh 123456789                        # By page ID
 ./scripts/confluence-fetch.sh --space PROJ --title "API Docs"  # By space/title
 ./scripts/confluence-fetch.sh 123456789 --verbose              # Include comments

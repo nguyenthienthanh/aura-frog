@@ -21,9 +21,9 @@ bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/workflow/save-mcp
 ```
 
 **Or in Claude's workflow:**
-1. Fetch ticket via `./scripts/jira-fetch.sh TICKET-ID`
-2. Output is already in TOON format
-3. Redirect to `.claude/logs/jira/{ticket-id}_latest.toon`
+1. Mention the ticket key (e.g. `PROJ-123`) in any user prompt
+2. `hooks/jira-auto-fetch.cjs` fires on UserPromptSubmit, fetches the ticket, and writes raw JSON to `.claude/logs/jira/{TICKET_ID}.json` (24h TTL)
+3. Claude reads the cache via `state.context.jira_ticket` during pre-phase setup
 
 ---
 

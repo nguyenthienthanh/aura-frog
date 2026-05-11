@@ -22,8 +22,7 @@ scripts/
 ## Quick Reference
 
 ```toon
-scripts[27]{category,script,purpose}:
-  integration,jira-fetch.sh,Fetch Jira tickets with TOON output
+scripts[26]{category,script,purpose}:
   integration,confluence-fetch.sh,Fetch Confluence pages with TOON output
   integration,setup-integrations.sh,Interactive integration setup (Jira/Confluence/Slack/Figma)
   integration,test-integrations.sh,Test all configured integrations
@@ -66,15 +65,7 @@ scripts[27]{category,script,purpose}:
 
 ### Jira Integration
 
-```bash
-# Fetch a Jira ticket
-./scripts/jira-fetch.sh PROJ-123
-
-# Fetch with comments
-./scripts/jira-fetch.sh PROJ-123 --verbose
-
-# Output: TOON format for token efficiency
-```
+JIRA auto-fetch is built in — no CLI script needed. The `jira-auto-fetch.cjs` hook fires on every prompt, detects `[A-Z]{2,10}-[0-9]{1,6}` ticket patterns, fetches them, and caches them at `.claude/logs/jira/{TICKET_ID}.json` with a 24h TTL. A 1-line TOON summary is surfaced to Claude on stderr; the user normally sees nothing.
 
 **Requirements:**
 ```bash
@@ -82,7 +73,12 @@ scripts[27]{category,script,purpose}:
 export JIRA_BASE_URL="https://company.atlassian.net"
 export JIRA_EMAIL="your-email@company.com"
 export JIRA_API_TOKEN="your-api-token"
+
+# Optional allowlist — filters out false positives like RFC-123, UTF-8
+export JIRA_PROJECT_PREFIXES="PROJ,ENG"
 ```
+
+Just mention the ticket in your prompt (e.g. *"please look at PROJ-123"*) and the hook populates the cache before Claude reads it.
 
 ### Confluence Integration
 

@@ -365,7 +365,7 @@ Aura Frog includes utility scripts for common operations:
 
 | Category | Scripts | Purpose |
 |----------|---------|---------|
-| **Integration** | `jira-fetch.sh`, `confluence-fetch.sh`, `setup-integrations.sh` | Fetch Atlassian data, configure integrations |
+| **Integration** | `confluence-fetch.sh`, `setup-integrations.sh` (JIRA is auto-fetched via `hooks/jira-auto-fetch.cjs`) | Fetch Atlassian data, configure integrations |
 | **Workflow** | `workflow/workflow-manager.sh`, `workflow/track-tokens.sh` | Manage workflows |
 | **Learning** | `learn/submit-feedback.sh`, `supabase/setup.sh` | Learning system |
 | **Visual** | `visual/visual-test.sh`, `visual/snapshot-compare.sh` | Visual testing |
@@ -375,10 +375,11 @@ Aura Frog includes utility scripts for common operations:
 ### Quick Examples
 
 ```bash
-# Fetch Jira ticket
-./scripts/jira-fetch.sh PROJ-123
+# Jira tickets — just mention them in a prompt; the hook fetches automatically.
+#   "review PROJ-123 and tell me what changed"
+# Cached at .claude/logs/jira/PROJ-123.json (24h TTL).
 
-# Set up integrations interactively
+# Set up integrations interactively (Confluence, Slack, Figma)
 ./scripts/setup-integrations.sh
 
 # Set up Supabase for learning system

@@ -645,6 +645,9 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 #### Performance by Design
 3-tier rule loading (~75% less context), conditional hooks (~40% fewer executions), agent detection caching, session start caching (<1s repeat sessions).
 
+#### JIRA Ticket Auto-Fetch
+Mention a ticket key in any prompt (e.g. *"please look at PROJ-123"*) and the `jira-auto-fetch.cjs` hook pulls the ticket on `UserPromptSubmit`, caches it at `.claude/logs/jira/{TICKET_ID}.json` (24h TTL), and surfaces a 1-line TOON summary so Claude reads it as canonical requirements. Silent if no key is found or if `JIRA_BASE_URL` / `JIRA_EMAIL` / `JIRA_API_TOKEN` env vars are unset (one-time hint per session). Cap: 3 tickets per prompt; optional `JIRA_PROJECT_PREFIXES` allowlist filters out false positives like `RFC-123` or `UTF-8`. No CLI command needed — the hook is the single source of truth.
+
 </details>
 
 ---
