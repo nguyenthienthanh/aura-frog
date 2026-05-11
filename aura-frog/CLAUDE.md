@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
 **System:** Aura Frog v3.7.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** Planning-first LLM OS. 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
+**Purpose:** Planning-first LLM OS. 15 agents + 56 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 

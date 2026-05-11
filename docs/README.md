@@ -69,7 +69,7 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 These live in `aura-frog/` and are optimized for Claude to read:
 
 - [Agents](../aura-frog/agents/README.md) — 15 agents with capabilities
-- [Skills](../aura-frog/skills/README.md) — 55 skills (9 auto-invoke + 46 on-demand)
+- [Skills](../aura-frog/skills/README.md) — 56 skills (9 auto-invoke + 47 on-demand)
 - [Commands](../aura-frog/commands/README.md) — 24 commands (core `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite)
 - [Rules](../aura-frog/rules/README.md) — 71 rules (3-tier loading: 22 core / 19 agent / 30 workflow)
 - [Hooks](../aura-frog/hooks/README.md) — 42 lifecycle hooks

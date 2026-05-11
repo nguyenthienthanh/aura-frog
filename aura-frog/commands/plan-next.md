@@ -1,6 +1,6 @@
 # /aura-frog:plan-next
 
-**Return the next ready T4 task** (leaf node) for execution.
+**Return and activate the next ready T4 task.** Alias for `/aura-frog:plan next` (v3.7.2+).
 
 ---
 
@@ -10,45 +10,16 @@
 /aura-frog:plan-next
 ```
 
-## Protocol
+## Delegation
 
-1. **Load** `.aura/plans/active.json` and read `ready_queue`.
-2. If `ready_queue` is empty:
-   - Walk active T3 (Story) → list T4 children with `status: planned` AND all `depends_on` satisfied
-   - Populate `ready_queue` with these IDs
-   - If still empty: report "No ready tasks. Run `/aura-frog:plan-expand <story-id>` to decompose."
-3. **Pop** first ID from `ready_queue`.
-4. **Read** the task file `.aura/plans/features/.../tasks/TASK-NNNNN.md`.
-5. **Update node:** `status: active`, `started_at: <now>`.
-6. **Update active.json:** `active.task = TASK-NNNNN`.
-7. **Append history.jsonl:** `event: task_dispatch` with task ID + dispatching agent.
-8. **Surface to user:** task ID, intent, agent, depends_on (proven satisfied), context_budget.
-
-## Output format
-
-```markdown
-Next ready task:
-
-**TASK-00101** — implement plan-loader skill skeleton
-- Agent: tdd-engineer
-- Story: STORY-0042
-- Context budget: 2000 tokens
-- Acceptance: AC-1 in story.md
-- Depends on: (none)
-
-To execute: `/aura-frog:run <one-line description>` — the run will auto-anchor
-to this task via the Run ↔ Plan bridge (see `rules/workflow/run-plan-bridge.md`).
-Or dispatch the agent manually via the Agent tool.
+```bash
+bash aura-frog/scripts/plans/next-task.sh [--plans-dir <path>] [--dry-run]
 ```
 
-## Constraints
+The script pops `active.json#ready_queue` (refilling from active T3 if empty — collect T4 children with `status: planned` AND all `depends_on` in `{done, active}`), mutates the task to `status: active`, sets `active.task`, and appends `history.jsonl event=next`.
 
-- A task is "ready" only if ALL `depends_on` siblings have `status: done`.
-- Frozen tasks (status: frozen) are excluded — must be thawed first via `/aura-frog:plan-thaw`.
-- If conflict-detector flags conflicts (Milestone D+), `/aura-frog:plan-next` may return a frozen task with a freeze reason instead of dispatching.
+Then surface to the user: `Next ready: <TASK-ID> (<intent>). To execute: /aura-frog:run <one-line description> — auto-anchors via the Run ↔ Plan bridge.`
 
-## Tie-Ins
+Full protocol in `commands/plan.md`. Frozen tasks are excluded — thaw via `/aura-frog:plan thaw` first.
 
-- **Spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §10.1, §13 (state machine)
-- **Updates:** `active.json`, target task's frontmatter, `history.jsonl`
-- **Hook:** `post-execute-update-node.cjs` (Milestone A part 2) updates status when task completes
+**Deprecation timeline:** soft-deprecated v3.7.2, warning v4.0, removed v5.0.

@@ -403,7 +403,7 @@ Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AU
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 71 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 71 rules, 56 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -1318,7 +1318,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
-├── skills/         55 skills (9 auto-invoke + 46 on-demand)
+├── skills/         56 skills (9 auto-invoke + 47 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          71 rules (22 core + 19 agent + 30 workflow)
 ├── hooks/          42 lifecycle hooks (conditional execution)

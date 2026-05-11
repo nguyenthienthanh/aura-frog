@@ -1,6 +1,6 @@
 # /aura-frog:plan-expand &lt;id&gt;
 
-**Decompose a plan node one tier down.** T1→T2, T2→T3, T3→T4.
+**Decompose a plan node one tier down** (T1→T2, T2→T3, T3→T4). Alias for `/aura-frog:plan expand <id>` (v3.7.2+).
 
 ---
 
@@ -12,37 +12,18 @@
 /aura-frog:plan-expand INIT-001           # decompose Initiative into Features
 ```
 
-## Protocol
+## Delegation
 
-1. **Read** target node by ID. Abort if not found.
-2. **Validate** target tier supports expansion (T0 cannot expand directly; expand its T1).
-3. **Detect dispatching agent:**
-   - T1→T2: feature-architect
-   - T2→T3: story-planner
-   - T3→T4: story-planner (Phase 1 of TDD pairs here)
-4. **Mint child IDs** via `.aura/plans/.counters.json` (atomic increment).
-5. **Write child node files** with frontmatter per spec §6.
-6. **Update parent's `children: [...]`** array.
-7. **Append history.jsonl:** `event: plan_expand` with parent ID, child IDs, dispatching agent.
-8. **Update active.json** if expansion happened on the active path.
-9. **Render** tree showing the new branch.
+This file is a thin alias. Claude MUST translate the invocation to:
 
-## What gets generated
+```bash
+bash aura-frog/scripts/plans/expand-node.sh <ID> [--dry-run] [--plans-dir <path>]
+```
 
-| From → To | Generated content |
-|-----------|-------------------|
-| T1 → T2 (Features) | 1–4 features with `intent`, `acceptance_summary`, `context_budget` |
-| T2 → T3 (Stories) | 2–6 stories per feature, TDD-bounded; each has acceptance criteria + agents |
-| T3 → T4 (Tasks) | 1–6 atomic tasks per story with `agent`, `depends_on` (DAG), `artifacts` |
+Then dispatch the appropriate agent (`feature-architect` for T1→T2, `story-planner` for T2→T3 or T3→T4) to write the child node files using the prepared checkpoint and counter. Full protocol in `commands/plan.md` and `skills/plan-orchestrator/SKILL.md`.
 
-## Constraints
+## Why an alias?
 
-- Don't fabricate detail. If user input is sparse, generate fewer children with explicit "TBD" placeholders.
-- Respect `replan_budget` — re-expansion that fails repeatedly should escalate.
-- Never expand a node with `status: discarded` or `status: frozen`.
+Backwards-compatible from pre-v3.7.2 — old muscle memory still works. New users should prefer `/aura-frog:plan expand <id>` (consolidated form).
 
-## Tie-Ins
-
-- **Spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §10.1, §8.3 (feature-architect), §8.4 (story-planner)
-- **Companion:** `/aura-frog:plan-promote <note>` — bubble T4 discoveries up
-- **Companion:** `/aura-frog:plan-replan <id>` — rewrite an existing decomposition
+**Deprecation timeline:** soft-deprecated v3.7.2, warning v4.0, removed v5.0.

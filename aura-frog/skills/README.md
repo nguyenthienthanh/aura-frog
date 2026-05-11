@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 55 (9 auto-invoking + 46 reference)
+**Total Skills:** 56 (9 auto-invoking + 47 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -28,7 +28,7 @@ auto_invoke[9]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (46)
+## Reference Skills (47)
 
 Loaded on-demand when triggered.
 
@@ -76,10 +76,10 @@ design[2]{name,purpose}:
   stitch-design,Google Stitch AI prompt generation
 ```
 
-### Workflow & Infrastructure (8)
+### Workflow & Infrastructure (9)
 
 ```toon
-workflow[8]{name,purpose}:
+workflow[9]{name,purpose}:
   project-context-loader,Load project conventions and context
   session-continuation,Workflow state handoff and resume
   phase1-lite,Ultra-compact Phase 1 requirements (500 token cap)
@@ -88,6 +88,7 @@ workflow[8]{name,purpose}:
   self-improve,Apply learned improvements to plugin
   learning-analyzer,Analyze session feedback from Supabase
   prompt-evaluator,Evaluate prompt patterns and feature usage
+  plan-orchestrator,Route 11 plan verbs to backing scripts (v3.7.2+)
 ```
 
 ### Code Quality (5)

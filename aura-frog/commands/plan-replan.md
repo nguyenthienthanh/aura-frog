@@ -1,38 +1,32 @@
 # /aura-frog:plan-replan &lt;id&gt;
 
-**Force replan of a node and all descendants.** Increments revision, decrements replan_budget.
+**Force replan of a node and all descendants.** Alias for `/aura-frog:plan replan <id>` (v3.7.2+).
 
 ---
 
 ## Usage
 
 ```
-/aura-frog:plan-replan TASK-00101                    # Replan single task
-/aura-frog:plan-replan STORY-0042                    # Replan story (descendants discarded)
-/aura-frog:plan-replan FEAT-A --reason "discovered X"  # With justification
-/aura-frog:plan-replan TASK-00101 --avoid src/auth.py  # Constrain replan
+/aura-frog:plan-replan TASK-00101
+/aura-frog:plan-replan STORY-0042 --reason "design pivot"
+/aura-frog:plan-replan FEAT-A --avoid src/legacy
 ```
 
-## Protocol
+## Delegation
 
-1. **Validate** target ID exists; abort if not found.
-2. **Check `replan_budget`** — if `replan_count >= replan_budget`, escalate to user before proceeding.
-3. **Snapshot** current node + descendants → `.aura/plans/checkpoints/<id>.R-<timestamp>.json`.
-4. **Mark descendants** as `status: discarded` (preserves IDs but excludes from active flow).
-5. **Increment** target node's `revision` and `replan_count`.
-6. **Dispatch** to replanner agent (Milestone B+) OR escalate to user with template (Milestone A).
-7. **Append history.jsonl:** `event: replan` with reason, scope, signals.
-8. **Render** new tree showing what changed.
+```bash
+bash aura-frog/scripts/plans/replan-node.sh <ID> [--reason "..."] [--avoid <path-or-id>] [--force]
+```
 
-## Constraints
+The script:
+1. Refuses on `replan_count >= replan_budget` unless `--force`.
+2. Saves a per-node checkpoint.
+3. Marks all descendants `status: discarded` (preserves IDs).
+4. Bumps target's `revision` + `replan_count`, records `last_replan_at` / `last_replan_reason`.
+5. Appends `history.jsonl event=replan`.
 
-- Cannot replan `status: done` (use `/aura-frog:plan-undo` first to revert)
-- Cannot replan `status: archived`
-- Replan does NOT delete nodes — descendants get `discarded`, preserve in archive after acceptance
-- Each replan counts toward parent's `replan_budget` if escalated upward
+The caller (or `replanner` agent in Milestone B+) is then responsible for proposing the new subtree shape.
 
-## Tie-Ins
+Full protocol in `commands/plan.md`. Cannot replan `done|archived` — use `/aura-frog:plan undo` first if you need to revert.
 
-- **Spec:** §10.1, §16 (replan decision engine), §17 (checkpoints)
-- **Agent:** replanner (Milestone B — full implementation)
-- **Companion:** `/aura-frog:plan-undo` — revert the replan
+**Deprecation timeline:** soft-deprecated v3.7.2, warning v4.0, removed v5.0.

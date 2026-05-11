@@ -1,47 +1,33 @@
 # /aura-frog:plan-archive &lt;id&gt;
 
-**Compress a completed branch** (T2 Feature or higher with all descendants `done`) into a single summary file.
+**Compress a completed branch.** Alias for `/aura-frog:plan archive <id>` (v3.7.2+).
 
 ---
 
 ## Usage
 
 ```
-/aura-frog:plan-archive FEAT-005                  # archive completed feature
-/aura-frog:plan-archive INIT-001                  # archive after all features done
+/aura-frog:plan-archive FEAT-005
+/aura-frog:plan-archive INIT-001 --summary-text "..."
+/aura-frog:plan-archive FEAT-005 --force
 ```
 
-## Protocol
+## Delegation
 
-1. **Validate** target node exists and `status: done`.
-2. **Verify all descendants** are `status: done` or `status: discarded` — abort if any active/blocked/frozen.
-3. **Run epic-summarizer** (Milestone C+) to produce a summary, OR generate basic stats summary inline:
-   - Stories completed, tasks executed
-   - Total trace events, hallucination count, logic error count
-   - Files touched
-   - Time elapsed (created_at → done_at)
-4. **Write** `.aura/plans/archive/<id>.summary.md` with the summary.
-5. **Move** original node files into `.aura/plans/archive/<id>.original/` (preserves audit trail).
-6. **Update** parent's `children` array — replace with summary file ref.
-7. **Update** node `status: archived`.
-8. **Append history.jsonl:** `event: archive` with id, file_count, total_tokens.
-9. If T2 archived: trigger session-reset prompt per spec §19 (Milestone C+).
+```bash
+bash aura-frog/scripts/plans/archive-feature.sh <ID> [--summary-text "..."] [--force]
+```
 
-## What gets archived
+The script:
+1. Refuses on non-`done` target status.
+2. Walks descendants — refuses unless all are in `{done, discarded, archived}` (override with `--force`).
+3. Writes `.aura/plans/archive/<id>.summary.md` (frontmatter + stats + node-list body).
+4. Copies originals to `.aura/plans/archive/<id>.original/` (audit trail).
+5. Sets target to `status: archived`, bumps revision.
+6. Appends `history.jsonl event=archive`.
 
-- All node `.md` files in subtree → moved to `archive/<id>.original/`
-- `traces/<task-id>.jsonl` → kept (compressed `.gz` after 30 days per §27)
-- `checkpoints/<id>.*.json` → kept until storage cap
+The `epic-summarizer` agent (Milestone C+) may be dispatched in lieu of inline `--summary-text` for richer summaries. T2 archival triggers session-reset prompt per Tech Spec §19 (Milestone C+).
 
-## Constraints
+Full protocol in `commands/plan.md`. Archive is one-way; `archived → *` is a forbidden state transition.
 
-- Archive is one-way (forbidden state transition: `archived → *`)
-- Archived nodes do NOT participate in plan-loader's always-loaded context
-- Storage cap on archive is unlimited (user manages)
-
-## Tie-Ins
-
-- **Spec:** §10.1, §13 (state machine — archived terminal), §19 (session reset triggers on T2 archive)
-- **Skill:** plan-archivist (Milestone C+)
-- **Agent:** epic-summarizer (Milestone C+)
-- **Companion:** `/aura-frog:reset-session` — what runs after T2 archive
+**Deprecation timeline:** soft-deprecated v3.7.2, warning v4.0, removed v5.0.
