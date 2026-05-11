@@ -15,7 +15,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// Default blocked patterns
+// Default blocked patterns.
+// Note: `bin` and `obj` are NOT included by default — they collide with
+// legitimate Node `bin/` entrypoints, Go cmd/, and committed compiled assets.
+// Projects that want them blocked can add them in `.afignore`.
 const DEFAULT_BLOCKED = [
   'node_modules',
   '__pycache__',
@@ -29,8 +32,6 @@ const DEFAULT_BLOCKED = [
   '.cache',
   '.turbo',
   'target', // Rust
-  'bin',    // Go
-  'obj',    // .NET
 ];
 
 // Build commands that should be allowed

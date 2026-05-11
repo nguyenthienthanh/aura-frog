@@ -49,13 +49,35 @@ const ts = new Date().toISOString();
 if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
 const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
 
+// Event counter — cached after first read to avoid O(n²) full-file scans.
+// Increments in-memory for each event appended during this hook invocation;
+// a fresh hook process re-reads once, then increments. taskSlug keeps the
+// id safe for taskIds like "T2.3" (would otherwise collide with "T23").
+let _eventCount = null;
+const taskSlug = taskId.replace(/[^A-Za-z0-9]+/g, '-');
 function nextEventId() {
-  let n = 0;
-  if (fs.existsSync(traceFile)) {
-    n = fs.readFileSync(traceFile, 'utf8').split('\n').filter(Boolean).length;
+  if (_eventCount === null) {
+    _eventCount = 0;
+    if (fs.existsSync(traceFile)) {
+      const buf = fs.readFileSync(traceFile, 'utf8');
+      // Count newlines instead of split/filter — O(n) but no array allocation.
+      for (let i = 0; i < buf.length; i++) if (buf.charCodeAt(i) === 10) _eventCount++;
+    }
   }
-  const taskNum = taskId.replace(/[^0-9]/g, '');
-  return `TR-${taskNum}-${String(n + 1).padStart(3, '0')}`;
+  _eventCount++;
+  return `TR-${taskSlug}-${String(_eventCount).padStart(3, '0')}`;
+}
+
+// Cap file hashing to keep huge binaries from blocking the hook.
+const MAX_HASH_BYTES = 1024 * 1024; // 1 MB
+function hashFileBounded(filePath) {
+  try {
+    const stat = fs.statSync(filePath);
+    if (stat.size > MAX_HASH_BYTES) return `oversize-${stat.size}`;
+    return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex').slice(0, 16);
+  } catch {
+    return null;
+  }
 }
 
 function hash(s) {
@@ -94,10 +116,7 @@ if (phase === 'pre') {
       if (m) filePath = m[1];
     }
     if (filePath && fs.existsSync(filePath)) {
-      let sha = null;
-      try {
-        sha = crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex').slice(0, 16);
-      } catch {/* ignore */}
+      const sha = hashFileBounded(filePath);
       append({
         ts,
         event_id: nextEventId(),

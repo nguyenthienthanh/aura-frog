@@ -86,10 +86,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '\u26a0\ufe0f Blocked: Potentially destructive command detected' >&2; exit 2; fi"
-          },
-          {
-            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-attribution.cjs\""
           }
         ]
@@ -99,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
+            "command": "if ! compgen -G '.claude/project-contexts/*/project-config.yaml' > /dev/null 2>&1; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
           },
           {
             "type": "command",
@@ -148,6 +144,7 @@
           },
           {
             "type": "command",
+            "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/lint-autofix.cjs\" 2>&1"
           },
           {

@@ -359,11 +359,92 @@ async function main() {
       });
     }
 
+    // Retention sweep — prune audit/trace JSONL entries older than
+    // AF_AUDIT_RETENTION_DAYS (default 30). Async (fire and forget).
+    try { sweepRetention(); } catch { /* non-blocking */ }
+
     process.exit(0);
   } catch (error) {
     console.error(`🐸 SessionStart hook error: ${error.message}`);
     process.exit(0); // Non-blocking
   }
+}
+
+/**
+ * Prune append-only JSONL stores (mcp-audit, plan traces, metrics sessions) to
+ * keep them from growing unbounded. Filters in-place by parsing each line's
+ * `ts` field (ISO-8601) and dropping entries older than the retention window.
+ * Drops the entire file if every line is expired.
+ *
+ * Disable: AF_AUDIT_RETENTION_DAYS=0 keeps everything.
+ * Tune:    AF_AUDIT_RETENTION_DAYS=N (default 30).
+ */
+function sweepRetention() {
+  const retentionDays = parseInt(process.env.AF_AUDIT_RETENTION_DAYS || '30', 10);
+  if (!retentionDays || retentionDays <= 0) return;
+  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+
+  const targets = [
+    path.join(process.cwd(), '.aura', 'security', 'mcp-audit.jsonl'),
+    ...listFiles(path.join(process.cwd(), '.aura', 'plans', 'traces')),
+    ...listFiles(path.join(process.cwd(), '.claude', 'metrics', 'sessions')),
+  ];
+
+  for (const file of targets) {
+    pruneJsonlByTimestamp(file, cutoff);
+  }
+}
+
+function listFiles(dir) {
+  try {
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir)
+      .filter(f => f.endsWith('.jsonl') || f.endsWith('.json'))
+      .map(f => path.join(dir, f));
+  } catch {
+    return [];
+  }
+}
+
+function pruneJsonlByTimestamp(file, cutoffMs) {
+  try {
+    if (!fs.existsSync(file)) return;
+    const stat = fs.statSync(file);
+    // Cheap pre-check: if mtime is recent, nothing has aged out since last sweep.
+    if (stat.mtimeMs > cutoffMs && stat.size < 1024 * 1024) return;
+
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    const kept = [];
+    let dropped = 0;
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      let ts;
+      try {
+        const obj = JSON.parse(line);
+        ts = obj.ts || obj.timestamp || obj.lastUpdated;
+      } catch {
+        // Malformed line — keep it (don't silently destroy unparseable data).
+        kept.push(line);
+        continue;
+      }
+      const ms = ts ? Date.parse(ts) : NaN;
+      if (Number.isFinite(ms) && ms < cutoffMs) {
+        dropped++;
+      } else {
+        kept.push(line);
+      }
+    }
+    if (dropped === 0) return;
+
+    if (kept.length === 0) {
+      fs.unlinkSync(file);
+    } else {
+      // Atomic write — never half-replace a JSONL store.
+      const tmp = `${file}.tmp-${process.pid}`;
+      fs.writeFileSync(tmp, kept.join('\n') + '\n');
+      fs.renameSync(tmp, file);
+    }
+  } catch { /* best-effort; never block startup */ }
 }
 
 main();

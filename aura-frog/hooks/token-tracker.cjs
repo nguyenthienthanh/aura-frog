@@ -1,25 +1,36 @@
 #!/usr/bin/env node
 /**
- * token-tracker.cjs - Track and display estimated token usage
+ * token-tracker.cjs - Approximate cumulative tool-call cost
  *
  * PostToolUse hook (all tools). Runs async.
- * Estimates cumulative token usage and warns at thresholds.
  *
- * Estimation: Tracks tool calls and file sizes to approximate token consumption.
- * Displays warnings at 50%, 70%, 85% of estimated 200K limit.
- * Saves per-session metrics to .claude/metrics/sessions/ for dashboard.
+ * IMPORTANT — these numbers are HEURISTIC, not authoritative. Claude Code does
+ * not currently expose actual API usage to hooks via stdin; this tracker uses
+ * static per-tool estimates as a rough proxy for "session is getting heavy".
+ *
+ * Behaviour:
+ *   - Aggregates tool-call counts + crude byte/token estimates per session
+ *   - Warns at 50/70/85% of a configurable budget (AF_TOKEN_BUDGET, default
+ *     200K — set to 1000000 for Sonnet-4.5 1M contexts)
+ *   - Writes session metrics to .claude/metrics/sessions/ for the dashboard
+ *   - NEVER displays % numbers as if they were real API counts — the warning
+ *     copy says "approx" so users know it's a heuristic
+ *
+ * Disable: AF_TOKEN_TRACKER_DISABLED=true
  *
  * Exit codes:
  * - 0: Always (informational only)
  *
- * @version 1.1.0
+ * @version 1.2.0 (honest about estimation; budget now env-configurable)
  */
 
 const fs = require('fs');
 const path = require('path');
 
+if (process.env.AF_TOKEN_TRACKER_DISABLED === 'true') process.exit(0);
+
 const CACHE_FILE = path.join(process.cwd(), '.claude', 'cache', 'token-tracker.json');
-const CONTEXT_LIMIT = 200000;
+const CONTEXT_LIMIT = parseInt(process.env.AF_TOKEN_BUDGET || '200000', 10);
 
 // Token estimation per operation type
 const TOKEN_COSTS = {
@@ -152,9 +163,10 @@ try {
   // Check thresholds
   const currentPct = Math.round((tracker.totalEstimate / CONTEXT_LIMIT) * 100);
 
+  const budgetK = Math.round(CONTEXT_LIMIT / 1000);
   for (const threshold of THRESHOLDS) {
     if (currentPct >= threshold.pct && tracker.lastWarningPct < threshold.pct) {
-      console.error(`${threshold.icon} Token usage: ~${Math.round(tracker.totalEstimate / 1000)}K / 200K (${currentPct}%) [${threshold.label}]`);
+      console.error(`${threshold.icon} Approx token usage: ~${Math.round(tracker.totalEstimate / 1000)}K / ${budgetK}K (~${currentPct}%, heuristic) [${threshold.label}]`);
       console.error(`   ${threshold.msg}`);
       tracker.lastWarningPct = threshold.pct;
       break;

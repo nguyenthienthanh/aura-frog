@@ -12,10 +12,10 @@ Claude is the **kernel** — orchestrates, dispatches, verifies. Does not execut
 ```toon
 os_map[5]{concept,implementation}:
   Kernel,Claude + orchestrator rules
-  Processes,13 agents (PID + state + budget)
+  Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,6 MCP servers (auto-invoked)
+  Drivers,8 MCP servers (auto-invoked; 6 enabled + postgres/redis opt-in)
 ```
 
 ---

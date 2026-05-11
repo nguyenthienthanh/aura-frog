@@ -50,11 +50,25 @@ function safeExit(code = 0) { process.exit(code); }
 const toolName = process.env.CLAUDE_TOOL_NAME || '';
 if (!toolName.startsWith('mcp__')) safeExit(0);
 
-// Parse mcp__plugin_<plugin>_<server>__<method> or mcp__<server>__<method>
+// Parse mcp__plugin_<plugin>_<server>__<method> or mcp__<server>__<method>.
+// Server names MAY contain single underscores (e.g. "my_server"). Method names
+// MAY contain double underscores; we anchor on the LAST literal "__" as the
+// server↔method separator, then peel the plugin prefix from the head.
 function parseMcpToolName(name) {
   const stripped = name.replace(/^mcp__/, '');
-  const m = stripped.match(/^plugin_[^_]+_([^_]+)__(.+)$/) || stripped.match(/^([^_]+)__(.+)$/);
-  return m ? { server: m[1], method: m[2] } : null;
+  const sepIndex = stripped.lastIndexOf('__');
+  if (sepIndex <= 0) return null;
+  const head = stripped.slice(0, sepIndex);
+  const method = stripped.slice(sepIndex + 2);
+  if (!method) return null;
+
+  // Plugin-prefixed form: "plugin_<plugin>_<server>"
+  // The plugin token cannot contain an underscore in Claude Code conventions,
+  // so we strip exactly one token after "plugin_" to get the plugin id; the
+  // rest is the server name (which may legally contain underscores).
+  const pluginMatch = head.match(/^plugin_([^_]+)_(.+)$/);
+  if (pluginMatch) return { server: pluginMatch[2], method };
+  return { server: head, method };
 }
 
 const parsed = parseMcpToolName(toolName);
