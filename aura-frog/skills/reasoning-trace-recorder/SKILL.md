@@ -1,7 +1,7 @@
 ---
 name: reasoning-trace-recorder
-description: "Auto-invokes for every Claude turn during active T4 task execution. Emits append-only trace events (file_read, output_claim, tool_call, decision) to .aura/plans/traces/{TASK_ID}.jsonl. Source of grounding-discipline checks."
-when_to_use: "Every Claude turn during active T4 execution; silent if no .aura/plans/active.json or no active.task"
+description: "Auto-invokes for every Claude turn during active T4 task execution. Emits append-only trace events (file_read, output_claim, tool_call, decision) to .aura/plans/traces/{TASK_ID}.jsonl. Source of grounding-discipline checks. Disable: AF_TRACE_DISABLED=true."
+when_to_use: "Every Claude turn during active T4 execution; silent if no .aura/plans/active.json or no active.task or AF_TRACE_DISABLED=true"
 autoInvoke: true
 allowed-tools: Read, Bash
 effort: low

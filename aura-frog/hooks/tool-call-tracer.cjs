@@ -12,10 +12,13 @@
  *   - Post-phase: emits `tool_result` event with exit_code + result_hash + duration_ms
  *   - For Read: also emits a `file_read` event with path + sha256 (cheap, exact)
  *
+ * Disable:
+ *   AF_TRACE_DISABLED=true — no trace events emitted; .aura/plans/traces/ stays empty.
+ *
  * Exit codes:
  *   0 — success (always; this is a recorder)
  *
- * @version 1.0.0 (v3.7.0-alpha.2)
+ * @version 1.1.0 (AF_TRACE_DISABLED wired)
  */
 
 'use strict';
@@ -30,6 +33,7 @@ const TRACES_DIR = path.join(PLANS_DIR, 'traces');
 
 function safeExit(code = 0) { process.exit(code); }
 
+if (process.env.AF_TRACE_DISABLED === 'true') safeExit(0);
 if (!fs.existsSync(ACTIVE_FILE)) safeExit(0);
 
 let active;
