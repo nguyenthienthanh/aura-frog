@@ -35,11 +35,12 @@ jobs:
           # Verify expected counts from plugin.json
           DESC=$(grep '"description"' aura-frog/.claude-plugin/plugin.json)
 
-          EXPECTED_AGENTS=$(echo "$DESC" | grep -oP '\d+ specialized agents' | grep -oP '\d+')
-          EXPECTED_SKILLS=$(echo "$DESC" | grep -oP '\d+ skills' | grep -oP '\d+')
-          EXPECTED_COMMANDS=$(echo "$DESC" | grep -oP '\d+ commands' | grep -oP '\d+')
-          EXPECTED_HOOKS=$(echo "$DESC" | grep -oP '\d+ hooks' | grep -oP '\d+')
-          EXPECTED_RULES=$(echo "$DESC" | grep -oP '\d+ rules' | grep -oP '\d+')
+          # plugin.json description uses "15 agents" not "15 specialized agents" — fixed in v3.7.2.
+          EXPECTED_AGENTS=$(echo "$DESC" | grep -oP '\d+ agents' | grep -oP '\d+' | head -1)
+          EXPECTED_SKILLS=$(echo "$DESC" | grep -oP '\d+ skills' | grep -oP '\d+' | head -1)
+          EXPECTED_COMMANDS=$(echo "$DESC" | grep -oP '\d+ commands' | grep -oP '\d+' | head -1)
+          EXPECTED_HOOKS=$(echo "$DESC" | grep -oP '\d+ hooks' | grep -oP '\d+' | head -1)
+          EXPECTED_RULES=$(echo "$DESC" | grep -oP '\d+ rules' | grep -oP '\d+' | head -1)
 
           PASS=true
           [ "$AGENTS" != "$EXPECTED_AGENTS" ] && echo "❌ Agents: expected $EXPECTED_AGENTS, got $AGENTS" && PASS=false
@@ -108,17 +109,22 @@ jobs:
             fi
           }
 
+          # File-structure spot check (v3.7.2): point at files that actually
+          # exist on the current tree. Routing-related deletions/renames since
+          # earlier versions: router.md removed (agent-detector skill owns
+          # routing); workflow-orchestrator → run-orchestrator (renamed);
+          # CHANGELOG.md lives at docs/reference/, not aura-frog/.
           check_exists "aura-frog/.claude-plugin/plugin.json"
           check_exists "aura-frog/CLAUDE.md"
-          check_exists "aura-frog/CHANGELOG.md"
+          check_exists "docs/reference/CHANGELOG.md"
           check_exists "aura-frog/hooks/hooks.json"
           check_exists "aura-frog/rules/core/"
           check_exists "aura-frog/rules/agent/"
           check_exists "aura-frog/rules/workflow/"
           check_exists "aura-frog/agents/lead.md"
-          check_exists "aura-frog/agents/router.md"
           check_exists "aura-frog/skills/agent-detector/SKILL.md"
-          check_exists "aura-frog/skills/workflow-orchestrator/SKILL.md"
+          check_exists "aura-frog/skills/run-orchestrator/SKILL.md"
+          check_exists "aura-frog/skills/plan-orchestrator/SKILL.md"
           check_exists ".mcp.json"
 
           [ "$PASS" = false ] && exit 1
