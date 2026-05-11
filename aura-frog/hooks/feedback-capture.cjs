@@ -20,8 +20,9 @@ const fs = require('fs');
 const path = require('path');
 const { recordFeedback, recordAgentPerformance, isFeedbackEnabled } = require('./lib/af-learning.cjs');
 
-// Track recent AI operations for correction detection
-const STATE_FILE = path.join(process.env.HOME || '/tmp', '.aura-frog-recent-ops.json');
+// Track recent AI operations for correction detection.
+// Project-scoped (conversation happens within a project; corrections are per-project).
+const STATE_FILE = path.join(process.cwd(), '.claude', 'cache', 'aura-frog-recent-ops.json');
 
 /**
  * Load recent operations state
@@ -45,6 +46,8 @@ function saveRecentOps(ops) {
   try {
     // Keep only last 50 operations
     const trimmed = ops.slice(-50);
+    const dir = path.dirname(STATE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(STATE_FILE, JSON.stringify(trimmed));
   } catch { /* fs/cache write - non-blocking, ops tracking is best-effort */ }
 }
