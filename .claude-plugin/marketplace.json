@@ -1,7 +1,7 @@
 {
   "name": "aurafrog",
   "description": "Official Aura Frog marketplace - AI-powered development with specialized agents, structured workflows, and self-improving learning system",
-  "version": "3.7.0-rc.1",
+  "version": "3.7.0",
   "owner": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -14,8 +14,8 @@
     {
       "name": "aura-frog",
       "source": "./aura-frog",
-      "description": "Portable LLM OS with hierarchical planning (rc.1 — self-healing safety gates + MCP security tier + phase-role hard rule + CLI dashboard). 15 agents, 5-phase TDD + T0-T4 planning, 70 rules, 55 skills, 24 commands, 42 hooks, 8 MCP servers.",
-      "version": "3.7.0-rc.1",
+      "description": "Planning-first LLM OS for software engineering. Hierarchical planning (T0-T4) survives session reset · forensic reasoning traces · L1+L2 conflict detection · self-healing safety gates · per-agent MCP security · CLI dashboard. 15 agents, 5-phase TDD, 70 rules, 55 skills, 24 commands, 42 hooks, 8 MCP servers. Backward-compatible — /run unchanged.",
+      "version": "3.7.0",
       "author": {
         "name": "Nguyen Thien Thanh",
         "url": "https://github.com/nguyenthienthanh"

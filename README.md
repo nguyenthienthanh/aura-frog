@@ -4,20 +4,33 @@
 
 # Aura Frog
 
-### An Operating System for software engineering.
+### A planning-first LLM Operating System for software engineering.
 
-A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. 9 specialized agents, smart flow selection (direct edit · bugfix TDD · 5-phase workflow), self-healing memory, and multi-agent orchestration. Right effort matched to task risk.
+A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.6.1-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
-[![Trigger Accuracy](https://img.shields.io/badge/skill_trigger_accuracy-baseline_pending-blue)](docs/guides/EVAL_SETUP.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Typos get direct edits. Bugs get 4-step TDD. Features get 5-phase workflow. You never pick — the plugin matches effort to risk.**
+**Two entry points, one continuum.** `/aura:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[See it in action](#-before--after)** · **[Why Aura Frog?](#-the-problem)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+**[Install in 30 seconds](#-install)** · **[v3.7.0 highlights](#-whats-new-in-v370)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+
+---
+
+## 🆕 What's new in v3.7.0
+
+| System | Opt-in via | What it solves |
+|---|---|---|
+| Hierarchical planning | `/aura:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
+| Reasoning trace + grounding | `/aura:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
+| Conflict detection (L1+L2) | `/aura:plan:conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
+| Memory tier + session reset | `/aura:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
+| Self-healing + MCP security | `/aura:heal` + `/aura:mcp` | F2/F3 patch proposals (NEVER auto-apply); per-agent allowlists + audit + rate limits |
+
+**Backward-compatible MINOR bump** — your existing `/run` workflow continues unchanged. Everything new is opt-in. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for details.
 
 </div>
 

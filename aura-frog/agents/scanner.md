@@ -2,6 +2,7 @@
 name: scanner
 description: "Project detection, config loading, context tracking. Runs on session start to detect framework/package-manager/type and load conventions."
 tools: Read, Grep, Glob, Bash
+mcp_servers: []
 model: haiku
 color: orange
 ---

@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0-rc.1 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
+**System:** Aura Frog v3.7.0 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** Planning-first LLM OS. 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
@@ -54,7 +54,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0-rc.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -266,4 +266,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0-rc.1
+**Version:** 3.7.0

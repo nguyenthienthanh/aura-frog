@@ -2,6 +2,7 @@
 name: tester
 description: "Test strategy, automation, TDD enforcement, coverage analysis. Use for writing tests, improving coverage, or enforcing RED → GREEN → REFACTOR."
 tools: Read, Grep, Glob, Edit, Write, Bash
+mcp_servers: [vitest, playwright]
 model: sonnet
 color: green
 ---

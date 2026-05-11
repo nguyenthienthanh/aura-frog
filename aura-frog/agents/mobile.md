@@ -2,6 +2,7 @@
 name: mobile
 description: "React Native / Flutter / Expo mobile development. Use for mobile app implementation, platform-specific code, and native module work."
 tools: Read, Grep, Glob, Edit, Write, Bash
+mcp_servers: [context7, figma, playwright]
 color: purple
 ---
 

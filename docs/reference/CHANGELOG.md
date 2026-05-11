@@ -4,11 +4,96 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [3.7.0] - Unreleased
+## [3.7.0] - 2026-05-11 (Stable — Marketplace Publish)
 
-> **Status:** Final pre-release before v3.7.0 stable.
-> Latest pre-release tag: **v3.7.0-rc.1** (Milestone E — Self-Healing + MCP Security + Dashboard).
-> Last shipped to marketplace: **v3.6.1**.
+> **First stable release of the v3.7.0 hierarchical-planning track.** All 5 milestones (A-E) shipped through 7 internal pre-releases (alpha.1, alpha.2, alpha.3, alpha.4, beta.1, beta.2, rc.1). This is the marketplace publish.
+
+### Headline
+
+**A planning-first LLM OS for software engineering.** Plans persist across sessions; every Claude decision is forensically reproducible; conflicts are detected before silent overwrites; backward-compatible — your existing `/run` workflow continues unchanged.
+
+### Stats (v3.6.1 → v3.7.0)
+
+| Component | v3.6.1 | v3.7.0 | Delta |
+|---|---:|---:|---:|
+| Agents | 9 | **15** | +6 |
+| Skills | 44 | **55** | +11 |
+| Auto-invoke skills | 5 | **9** | +4 |
+| Rules | 57 | **70** | +13 |
+| Commands | 6 | **24** | +18 |
+| Hooks | 28 | **42** | +14 |
+| MCP servers | 6 | **8** | +2 |
+| Scripts | ~43 | **55** | +12 |
+
+### What shipped (across the 7 internal pre-releases)
+
+- **alpha.1** — Hierarchical planning foundation: T0-T4 schema, plan-loader (auto-invoke), `master-planner` / `feature-architect` / `story-planner` agents, 8 planning commands, plan-tree validator with 8 invariants, byte-identical round-trip
+- **alpha.2** — Failure handling + reasoning trace: F1-F5 deterministic classifier, `replanner` agent, `reasoning-trace-recorder` (auto-invoke), `/aura:trace` with hallucination surface, grounding-discipline rule, checkpoint discipline + `/aura:plan:undo` with git_sha rollback
+- **alpha.3** — Project-level extension creation: `extension-detector` (auto-invoke), `/aura:extend` command, `extension-policy` rule — auto-detect when a new skill/rule/command would help, confirm with user, create at `.claude/` (NEVER plugin-level)
+- **alpha.4** — Memory tier: `epic-summarizer` agent (T2 done → permanent_memory), `permanent-memory-loader` (auto-invoke, ≤120 tokens), `plan-archivist`, `/aura:reset-session`. **Plus: deterministic JSON→TOON projection hook** (saves tokens vs. AI-side projection rule)
+- **beta.1** — Pre-flight Tier 1: 7 bash linters (frontmatter, tool-input, tool-output, path-safety, command-allowlist, secret-patterns, run-all), `pre-flight-validate.cjs` hook (blocks `rm -rf /`, hostile paths, credential leaks), single-use bypass with `/aura:preflight bypass`
+- **beta.2** — Conflict detection + freeze: L1 (file overlap) + L2 (function overlap) bash detectors, `conflict-arbiter` agent, F6 class, 3 conflict commands (`/aura:plan:freeze`, `:thaw`, `:conflicts`), branch freeze cascade (descendants only per spec §13.1)
+- **rc.1** — Self-healing + MCP security: `self-healing-orchestrator` (F2/F3 only, ≥0.7 confidence, NEVER auto-applies), `mcp-call-gate.cjs` (per-agent allowlist, rate limits, sanitized audit), `db-access-policy` + `mcp-security-policy` rules, Phase 4 ≠ Phase 3 builder HARD RULE, `/aura:dashboard`
+
+### Stable polish (this release)
+
+- **MCP allowlists on all 9 baseline agents** (security=[], scanner=[], lead=[], strategist=[context7], devops=[firebase,slack], tester=[vitest,playwright], frontend=[context7,figma,playwright], mobile=[context7,figma,playwright], architect=[context7,postgres,redis]) — gate now actually enforces, not just defaulted to backward-compat
+- **README rewrite** — lead with `/aura:plan` + v3.7.0 systems overview; `/run` documented as lightweight mode for one-off tasks
+- **`MIGRATION_TO_V3.7.md`** — single comprehensive migration doc: what's new, what's backward-compat, opt-in features, breaking-ish changes, env var inventory, deferred work
+- Version files bumped 3.7.0-rc.1 → **3.7.0**
+
+### Backward compatibility (per spec §2 — MINOR bump)
+
+- `/run <task>` works exactly as before
+- Existing 9 agents continue to work (now with explicit `mcp_servers:` allowlists)
+- Existing 6 commands unchanged
+- 5-phase TDD workflow preserved (now maps to T3 Story lifecycle when planning is active)
+- `.envrc` env vars all preserved; new ones added (see migration guide)
+- `.mcp.json` schema preserved; 2 new servers added (postgres, redis) both `disabled: true` by default
+- All existing skills/rules/hooks preserved
+
+### Disable mechanisms (every new feature has one)
+
+```
+AF_SELF_HEAL_DISABLED=true       — disable self-healing
+AF_MCP_AUDIT_DISABLED=true       — disable MCP audit log (still enforces)
+AF_TRACE_DISABLED=true            — disable reasoning trace
+AF_PREFLIGHT_DISABLED=true        — disable pre-flight (strongly discouraged)
+AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
+AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
+```
+
+### Deferred (will land in v3.7.x patch releases — NOT blockers)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + `conflict_cache.jsonl` LRU
+- Pre-flight Tier 2 (OPA, optional) — `install-opa.sh` + 5 default Rego policies
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus per spec §28.7
+- FEAT-B fixture suites: classifier 80-suite + hallucination 20 + logic-error 15 + deviation_score auto-update + trace-event latency benchmark
+- 16 remaining spec §30 docs (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, 8 guides, 3 troubleshooting) — covered in summary form by `MIGRATION_TO_V3.7.md`; standalone files in v3.7.1+
+
+### Verification
+
+- `validate-counts.sh`: 15 / 55 / 70 / 24 / 42 — all OK
+- `validate-plan-tree.sh`: 7 nodes · 8/8 invariants (all 5 milestones ✓)
+- Reference integrity: zero orphans
+- Allowlist enforcement: confirmed `security` agent now blocked from `postgres` MCP (rc=2)
+- Sanitizer: AWS keys / GitHub PATs / OpenAI keys / Bearer tokens all redacted
+- Rate limit: 30/min hard block fires at 30th call (stress-tested)
+
+### Pre-release tag history (internal)
+
+```
+v3.7.0-alpha.1   2026-04-29   Milestone A — Planning foundation
+v3.7.0-alpha.2   2026-04-29   Milestone B — Failure + reasoning trace
+v3.7.0-alpha.3   2026-05-04   Milestone C interim — Project-level extensions
+v3.7.0-alpha.4   2026-05-05   Milestone C interim — Memory tier
+v3.7.0-beta.1    2026-05-06   Milestone C complete — Pre-flight Tier 1
+v3.7.0-beta.2    2026-05-07   Milestone D — L1+L2 conflict detection + freeze
+v3.7.0-rc.1      2026-05-07   Milestone E — Self-healing + MCP security
+v3.7.0           2026-05-11   Stable — marketplace publish
+```
+
+---
 
 ## [3.7.0-rc.1] - 2026-05-07 (Milestone E — Self-Healing + MCP Security + Dashboard)
 

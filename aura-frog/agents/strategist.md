@@ -2,6 +2,7 @@
 name: strategist
 description: "Business strategy, MVP scoping, ROI evaluation. Use in Phase 1 Deep tasks to challenge requirements and evaluate business case. READ-ONLY — analysis only."
 tools: Read, Grep, Glob
+mcp_servers: [context7]
 model: sonnet
 color: orange
 ---
