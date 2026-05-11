@@ -230,6 +230,36 @@ v3.7.0           Stable — marketplace publish     (2026-05-11)
 
 ---
 
+## Known issues (and fixes)
+
+### "Stop hook error: Plugin directory does not exist" referencing an old version
+
+**Symptom:**
+
+```
+Stop hook error: Failed to run: Plugin directory does not exist:
+/Users/<you>/.claude/plugins/cache/aurafrog/aura-frog/3.6.1
+(aura-frog@aurafrog — run /plugin to reinstall)
+```
+
+**Cause:** This is a Claude Code session-state issue, not a plugin code bug. When a Claude Code session starts, it captures `CLAUDE_PLUGIN_ROOT` as an env var pointing at the currently-installed plugin cache directory (e.g., `.../aura-frog/3.6.1/`). If that plugin version is later uninstalled or replaced (e.g., when you update from v3.6.1 → v3.7.0), the env var in the existing session points at a deleted directory. The session's PostToolUse / Stop hooks then fail when they try to spawn `node "${CLAUDE_PLUGIN_ROOT}/hooks/..."`.
+
+**Fix (2 steps):**
+
+```
+# In Claude Code:
+/plugin update aura-frog
+
+# Then close the current session and start a new one.
+# The new session will capture a fresh CLAUDE_PLUGIN_ROOT pointing at v3.7.0.
+```
+
+**Why the plugin can't auto-fix this:** the broken path resolution happens in Claude Code's runtime *before* any plugin code runs. By the time our hook would have a chance to handle it, the spawn has already failed. Restarting the session is the only clean recovery.
+
+**Prevention:** when upgrading the plugin, restart your Claude Code session afterward. The `/plugin update` command refreshes the install pin but does not retroactively update env vars in already-running sessions.
+
+---
+
 ## What's deferred (intentional — ships in v3.7.x patch releases)
 
 - **L3 (semantic LLM) + L4 (architectural LLM) full implementations** — currently stubbed; LLM dispatch + `conflict_cache.jsonl` LRU pending real-world tuning data
