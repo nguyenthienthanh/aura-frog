@@ -22,39 +22,52 @@ const PROMPTS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'prompts');
 const SESSIONS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'sessions');
 
 // All available skills (44 total as of v3.7.0 — see aura-frog/skills/)
+// Available skills — categorized list used for prompt-evaluation heuristics.
+// Authoritative count lives on disk under aura-frog/skills/*/SKILL.md; this list
+// powers suggestion rules and need not be exhaustive.
 const AVAILABLE_SKILLS = [
-  // Auto-invoke (5)
+  // Auto-invoke
   'agent-detector', 'bugfix-quick', 'code-reviewer', 'code-simplifier', 'test-writer',
+  'plan-loader', 'reasoning-trace-recorder', 'extension-detector', 'permanent-memory-loader',
   // Orchestration & workflow
   'run-orchestrator', 'session-continuation', 'phase1-lite', 'self-improve',
   'lazy-agent-loader', 'project-context-loader', 'response-analyzer', 'learning-analyzer',
-  // Reasoning techniques (v3.6.0+)
+  // Reasoning techniques
   'self-consistency', 'tree-of-thoughts', 'chain-of-verification',
   // Code-writing
   'refactor-expert', 'api-designer', 'migration-helper', 'documentation',
   'git-workflow', 'git-worktree',
-  // Coverage skills (v3.7.0+)
+  // Coverage skills
   'deep-debugging', 'monorepo', 'perf-profiling', 'performance-optimizer',
   // Thinking
   'sequential-thinking', 'problem-solving', 'scalable-thinking', 'prompt-evaluator',
   // Design & UI
   'design-expert', 'stitch-design',
-  // Framework experts (11)
+  // Framework experts
   'framework-expert',
   'react-expert', 'react-native-expert', 'vue-expert', 'angular-expert',
   'nextjs-expert', 'nodejs-expert', 'python-expert', 'laravel-expert',
   'go-expert', 'flutter-expert', 'typescript-expert',
+  // Hierarchical planning + safety
+  'plan-validator', 'plan-archivist', 'failure-classifier',
+  'self-healing-orchestrator', 'conflict-detector', 'mcp-security-auditor',
+  'preflight-validator',
 ];
 
-// Available commands — v3.6.0 consolidated to 6 top-level commands
+// Available command top-level categories. The core surface stays small (6 verbs)
+// so users never face discovery paralysis; specialized /aura:* commands layer on
+// top for hierarchical planning and safety ops.
 const AVAILABLE_COMMAND_CATEGORIES = [
-  'run', 'check', 'design', 'project', 'af', 'help',
+  'run', 'check', 'design', 'project', 'af', 'help', 'aura',
 ];
 
-// Available agents (9 — router consolidated into agent-detector skill in v3.6.0)
+// Available agents. Router was consolidated into the agent-detector skill, so this
+// list reflects the specialist roster (build/review + planning + safety).
 const AVAILABLE_AGENTS = [
   'lead', 'architect', 'frontend', 'mobile', 'strategist',
   'security', 'tester', 'devops', 'scanner',
+  'master-planner', 'feature-architect', 'story-planner', 'replanner',
+  'epic-summarizer', 'conflict-arbiter',
 ];
 
 // Suggestion rules

@@ -63,6 +63,13 @@ AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
 AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 ```
 
+### Fixed (post-release polish — 2026-05-11)
+
+- **Doc count drift** — synced stale v3.6.x counts in `README.md` (L101 / L533 / L697-700 / L708 / L1011-1019), `CONTRIBUTING.md` (project-structure block), `docs/README.md` (Plugin Internals list), `docs/reference/BENEFITS.md` (§4.3, §5.1, §6.1, §7.x) to v3.7.0 reality (15 / 55 / 70 / 24 / 42)
+- **`install.sh` removed** — deprecated since v3.6 marketplace publish; only historical reference retained in this changelog. Use `/plugin install aura-frog@aurafrog` instead.
+- **`evaluate-prompts.cjs` refresh** — version-agnostic comments for command/agent surface; `AVAILABLE_AGENTS` array updated for the 15-agent roster (added master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter); `AVAILABLE_COMMAND_CATEGORIES` adds `aura` namespace; `AVAILABLE_SKILLS` extended with auto-invoke planners + hierarchical-planning/safety skills
+- **Audit clean** — zero orphan rules, zero dead markdown links, all 55 skills carry `user-invocable: false`
+
 ### Deferred (will land in v3.7.x patch releases — NOT blockers)
 
 - L3 (semantic LLM) + L4 (architectural LLM) full implementations + `conflict_cache.jsonl` LRU

@@ -91,18 +91,19 @@ cp .envrc.template .envrc
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── CLAUDE.md                    # Core AI instructions
-│   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
-│   ├── agents/                      # 9 specialized agents (consolidated)
-│   ├── commands/                    # 6 commands (/run /check /design /project /af /help)
-│   ├── skills/                      # 44 skills (5 auto-invoke + 39 reference)
-│   ├── rules/                       # 57 quality rules (18 core + 17 agent + 22 workflow)
-│   ├── hooks/                       # 28 lifecycle hooks (.cjs scripts)
+│   ├── .mcp.json                    # Bundled MCP servers config (8 servers — 6 enabled, postgres+redis opt-in)
+│   ├── agents/                      # 15 specialized agents
+│   ├── commands/                    # 24 commands (core /run /check /design /project /af /help + /aura:* hierarchical-planning suite)
+│   ├── skills/                      # 55 skills (9 auto-invoke + 46 reference)
+│   ├── rules/                       # 70 quality rules (22 core + 19 agent + 29 workflow)
+│   ├── hooks/                       # 42 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # AI reference docs + phase guides
 │   ├── templates/                   # Document templates
-│   ├── scripts/                     # Bash integration scripts
+│   ├── scripts/                     # Bash + Node integration scripts (CI, plans, preflight, workflow, security)
 │   └── project-contexts/            # Project templates
 ├── assets/                          # Logo and images
 ├── scripts/                         # Development scripts
+│   ├── af                           # CLI wrapper
 │   └── sync-version.sh              # Version synchronization
 ├── CONTRIBUTING.md                  # This file
 └── README.md                        # Project overview

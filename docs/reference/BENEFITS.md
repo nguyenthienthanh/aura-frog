@@ -245,9 +245,9 @@
 
 **What:** Rules split into Core (always) / Agent (per-agent) / Workflow (per-phase). Lazy load only what's needed.
 
-**How applied:** 18 core rules load every session (~3K tokens). Agent rules load when that agent activates. Workflow rules load when that phase runs.
+**How applied:** 22 core rules load every session (~3.5K tokens). Agent rules load when that agent activates. Workflow rules load when that phase runs.
 
-**Why you need it:** Loading all 57 rules every session would be ~15K tokens. 3-tier reduces to ~3K always + ~5K conditional = 50% reduction.
+**Why you need it:** Loading all 70 rules every session would be ~18K tokens. 3-tier reduces to ~3.5K always + ~5K conditional = ~50% reduction.
 
 **Use cases:**
 - Sessions where you only edit frontend code (architect rules never load)
@@ -273,9 +273,9 @@
 
 ## Part 5 — Agent System
 
-### 5.1. 9 Specialized Agents with Proper Frontmatter
+### 5.1. 15 Specialized Agents with Proper Frontmatter
 
-**What:** 9 agents with official Anthropic YAML frontmatter (`name`, `description`, `tools` allowlist, `color`, optional `model`). Security + strategist are read-only.
+**What:** 15 agents with official Anthropic YAML frontmatter (`name`, `description`, `tools` allowlist, `color`, optional `model`). Security + strategist are read-only; planning agents (master-planner, feature-architect, story-planner, replanner, conflict-arbiter, epic-summarizer) are read-only on code and only write under `.aura/plans/`.
 
 **How applied:** Each agent's `.md` file has frontmatter. Claude Code respects tool restrictions and color coding. Agent-detector picks the right one per task.
 
@@ -320,17 +320,18 @@
 
 ## Part 6 — Developer Experience
 
-### 6.1. Six-Command Surface
+### 6.1. Consolidated Command Surface
 
-**What:** `/run` (universal) + `/check` (quality) + `/design` (pre-code) + `/project` (config) + `/af` (system) + `/help`. Down from 26 commands pre-v3.6.
+**What:** A 6-command core (`/run` universal + `/check` quality + `/design` pre-code + `/project` config + `/af` system + `/help`) covers the everyday workflow. v3.7.0 layered an `/aura:*` suite on top (plan, expand, freeze, conflicts, heal, mcp, dashboard, preflight, …) for hierarchical planning and safety operations. Total: 24 slash commands.
 
-**How applied:** Commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow.
+**How applied:** Core commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow. `/aura:*` commands operate on the plan tree at `.aura/plans/` and never compete with the core surface.
 
-**Why you need it:** 26 commands cause discovery paralysis. 6 covers every workflow. `/run` alone handles 80% of uses.
+**Why you need it:** Discovery paralysis is real (some plugins ship 25+ verbs). 6 core commands cover 80%+ of daily use; specialized `/aura:*` verbs surface only when you actually use hierarchical planning.
 
 **Use cases:**
-- New user — can memorize 6 commands in 30 seconds
+- New user — memorize the 6 core commands in 30 seconds
 - Experienced user — muscle memory for `/run` on everything
+- Planner — opt-in to `/aura:plan` only when a feature warrants T0-T4 decomposition
 
 ---
 
@@ -490,7 +491,7 @@ Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
 - Only do throwaway scripts / single-file edits
 - Don't want any workflow overhead
 - Have strict Haiku-only budgets (some features use Sonnet)
-- Prefer minimalist plugins (Aura Frog is substantial — 9 agents, 44 skills, 57 rules)
+- Prefer minimalist plugins (Aura Frog is substantial — 15 agents, 55 skills, 70 rules)
 
 🎯 **Best fit:** Teams shipping production features where quality + security + cost control all matter.
 

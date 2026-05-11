@@ -98,7 +98,7 @@ flowchart TB
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 57 rules, 44 skills, and 9 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 70 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -530,7 +530,7 @@ flowchart LR
 Details: `skills/agent-detector/SKILL.md` + `skills/agent-detector/task-based-agent-selection.md`.
 
 <details>
-<summary>All 9 agents</summary>
+<summary>All 15 agents</summary>
 
 | Agent | Model | Tools | When it activates |
 |-------|-------|-------|-------------------|
@@ -692,12 +692,12 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
-| **Agents** | 9 | Right expert auto-selected per task |
-| **Skills** | 41 | 5 auto-invoke on context, 36 on-demand |
-| **Commands** | 6 | `/run`, `/check`, `/design`, `/project`, `/af`, `/help` |
-| **Rules** | 57 | 3-tier loading (18 core + 17 agent + 22 workflow) — only what's needed |
-| **Hooks** | 28 | Conditional — skip processing for non-code files |
-| **MCP Servers** | 6 | Zero-config, auto-invoked |
+| **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
+| **Skills** | 55 | 9 auto-invoke on context, 46 on-demand |
+| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura:*` hierarchical-planning suite |
+| **Rules** | 70 | 3-tier loading (22 core + 19 agent + 29 workflow) — only what's needed |
+| **Hooks** | 42 | Conditional — skip processing for non-code files |
+| **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
 
@@ -705,7 +705,7 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 
 ## Command Reference
 
-Six commands cover every workflow. Each auto-detects intent and dispatches the right skills/agents.
+Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. Specialized `/aura:*` commands (plan, freeze, conflicts, heal, mcp, dashboard, preflight) layer on for hierarchical planning and safety operations.
 
 ### `/run <task>` — The main entry point
 
@@ -1009,14 +1009,14 @@ Agents = Processes       5-Phase TDD = Scheduler        MCP = Device Drivers
 TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
-├── agents/         9 processes (auto-dispatched per task)
-├── skills/         44 skills (5 auto-invoke + 39 on-demand)
-├── commands/       6 commands (/run, /check, /design, /project, /af, /help)
-├── rules/          57 rules (18 core + 17 agent + 22 workflow)
-├── hooks/          28 lifecycle hooks (conditional execution)
-├── scripts/        43 utility scripts
+├── agents/         15 processes (auto-dispatched per task)
+├── skills/         55 skills (9 auto-invoke + 46 on-demand)
+├── commands/       24 commands (core /run /check /design /project /af /help + /aura:* hierarchical-planning suite)
+├── rules/          70 rules (22 core + 19 agent + 29 workflow)
+├── hooks/          42 lifecycle hooks (conditional execution)
+├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
-└── .mcp.json       6 device drivers (MCP servers)
+└── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)
 ```
 
 ---
