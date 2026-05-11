@@ -80,6 +80,17 @@ AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
 AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 ```
 
+### Fixed (deliverable scaffolding — 2026-05-11)
+
+Real user-reported gap: `/run` created `run-state.json` but never materialised the per-phase markdown deliverables the `workflow-deliverables.md` rule requires (REQUIREMENTS.md, TECH_SPEC.md, TEST_PLAN.md, etc.). Run dirs were empty except for run-state.json — the orchestrator's `deliverables[]` array tracked metadata but no actual .md files hit disk.
+
+- **NEW `aura-frog/scripts/workflow/scaffold-phase-deliverables.sh`** — idempotent script. `bash scaffold-phase-deliverables.sh <run-id> <phase|all>` creates the phase's markdown skeletons from `aura-frog/templates/` (or a minimal frontmatter+sections fallback). Phase 1 → REQUIREMENTS / TECH_SPEC / TECH_SPEC_CONFLUENCE / DESIGN_DECISIONS. Phase 2 → TEST_PLAN / TEST_CASES. Phase 3 → IMPLEMENTATION_NOTES / FILES_CHANGED. Phase 4 → CODE_REVIEW / REFACTOR_LOG. Phase 5 → QA_REPORT / IMPLEMENTATION_SUMMARY / CHANGELOG_ENTRY. Total 13 files / 5 phases.
+- **5 new templates added** to bring template count 15 → **20**: `code-review.md`, `qa-report.md`, `changelog-entry.md`, `implementation-notes.md`, `files-changed.md` (frontmatter + section headers + TODO markers, ready to fill in).
+- **run-orchestrator/SKILL.md gets Step 0.5** — runs the scaffold after run-state.json is written (Phase 1) and on every phase transition. Skip for Quick/direct-edit runs only.
+- **workflow-deliverables.md rule** updated with the new scaffold workflow + backfill instructions for pre-v3.7.1 runs.
+- **3 existing runs in this repo backfilled** (`cleanup-260511`, `review-fix-260511`, `marketing-doc-260511`) — each now has 14 files (run-state.json + 13 phase deliverables) vs. the pre-fix 1 file.
+- **Idempotent** — running the scaffold twice on the same phase prints "0 added", so it's safe to call on phase re-entry / resume / modify / reject without trashing user content.
+
 ### Fixed (re-review polish — 2026-05-11, ~4h after first patch batch)
 
 A second senior review pulled the post-fix tree and flagged 7 remaining findings (1 hot: test theater; 2 cold; 4 polish). This commit closes the highest-ROI ones.

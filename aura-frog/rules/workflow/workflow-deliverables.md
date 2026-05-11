@@ -60,9 +60,23 @@ deliverables[12]{phase,document,required,key_content}:
 
 ---
 
+## Scaffolding (MANDATORY)
+
+Deliverable files are auto-created by the orchestrator at phase entry, NOT silently expected to appear. The scaffolder lives at:
+
+```
+aura-frog/scripts/workflow/scaffold-phase-deliverables.sh <run-id> <phase|all>
+```
+
+- **Idempotent.** Never overwrites — safe to call on phase re-entry, resume, modify, reject.
+- **Copies from `aura-frog/templates/`** when a matching template exists; falls back to a minimal skeleton (frontmatter + section headers + TODO markers) otherwise.
+- Called by `run-orchestrator` Step 0.5 (Phase 1) and on every phase transition.
+
+If you find a run dir with `run-state.json` but no `*.md` files, the run was started before this scaffolder existed (pre-v3.7.1) — run `bash aura-frog/scripts/workflow/scaffold-phase-deliverables.sh <run-id> all` to backfill.
+
 ## Enforcement
 
-Before phase transition: verify all required deliverables exist. Missing deliverable = cannot proceed.
+Before phase transition: verify all required deliverables exist AND have non-template content. Missing or template-byte-identical deliverable = cannot proceed.
 
 At workflow end: verify all documents exist before closing.
 

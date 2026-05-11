@@ -49,6 +49,47 @@ This step is non-negotiable. If you skip it, /run status will show nothing and t
 
 ---
 
+## Step 0.5 — Scaffold Phase-1 Deliverables (MANDATORY for Standard/Deep)
+
+Run-state.json tracks metadata; **the real deliverables are markdown files on disk**. Before announcing Phase 1, scaffold the Phase-1 documents so the work has a place to land:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/workflow/scaffold-phase-deliverables.sh" "${RUN_ID}" 1
+```
+
+This creates (idempotent — never overwrites):
+
+```toon
+phase1_files[4]{filename,purpose}:
+  REQUIREMENTS.md,User stories + acceptance criteria + scope
+  TECH_SPEC.md,AI-readable TOON: architecture + files + APIs + risks
+  TECH_SPEC_CONFLUENCE.md,Human-readable spec for Confluence / PRs
+  DESIGN_DECISIONS.md,Low-level design choices + tradeoffs
+```
+
+**On each phase transition**, re-invoke the scaffold for the next phase:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/workflow/scaffold-phase-deliverables.sh" "${RUN_ID}" <next_phase>
+```
+
+Phase mapping the scaffold creates:
+
+```toon
+scaffold_map[5]{phase,files}:
+  1,"REQUIREMENTS · TECH_SPEC · TECH_SPEC_CONFLUENCE · DESIGN_DECISIONS"
+  2,"TEST_PLAN · TEST_CASES"
+  3,"IMPLEMENTATION_NOTES · FILES_CHANGED"
+  4,"CODE_REVIEW · REFACTOR_LOG"
+  5,"QA_REPORT · IMPLEMENTATION_SUMMARY · CHANGELOG_ENTRY"
+```
+
+**Skip Step 0.5 only for Quick/direct-edit runs** — those don't have phase deliverables. Bugfix/refactor/test/feature runs all use it.
+
+**Gate enforcement** (per `rules/workflow/workflow-deliverables.md`): before showing a Phase N approval gate, verify the Phase N files exist AND have non-template content. Files that still match the template byte-for-byte mean the work wasn't done — block the gate and prompt the user to fill them in.
+
+---
+
 ## Pre-Execution (Phase 1 setup)
 
 1. agent-detector → select lead, complexity, model
