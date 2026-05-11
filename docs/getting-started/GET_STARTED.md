@@ -12,7 +12,9 @@
 
 > **First time?** Follow the [Interactive Tutorial](FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
 
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 9 agents, 5-phase TDD workflows, and multi-agent orchestration.
+> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a planning-first LLM OS with 15 agents, 5-phase TDD workflows, hierarchical planning that survives session resets, forensic reasoning traces, conflict detection between parallel work, and per-agent MCP security.
+
+> **What v3.7.0 ships:** Eight composable pillars — Hierarchical Planning, Reasoning Trace Audit, Semantic Session Reset, Pre-flight Validation, Semantic Conflict Detection, Self-Healing Orchestrator, MCP Security Layer, Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
 
 ---
 

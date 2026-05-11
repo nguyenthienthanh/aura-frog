@@ -96,6 +96,311 @@ flowchart TB
 
 ---
 
+## 🐸 The 8 Pillars of the Planning-First LLM OS
+
+v3.7.0 ships **eight features** that compose into one cohesive OS. Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped in v3.7.0 · 🚧 ships behind a flag or queued for v3.7.1+.
+
+| # | Pillar | One-liner | Status |
+|---|---|---|---|
+| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart | ✅ |
+| 2 | **Reasoning Trace Audit** | Every Claude decision is forensically recorded with grounded evidence | ✅ |
+| 3 | **Semantic Session Reset** | Finished an Epic? Distill it into permanent memory, then reset cleanly | ✅ |
+| 4 | **Pre-flight Validation** | Bash linters block bad AI output before it hits disk | ✅ Tier 1 · 🚧 Tier 2 OPA |
+| 5 | **Semantic Conflict Detection** | L1-L4 layered detection prevents silent overwrites between parallel tasks | ✅ L1+L2 · 🚧 L3+L4 LLM |
+| 6 | **Self-Healing Orchestrator** | Auto-diagnose F2/F3 failures, propose patches — never auto-apply | ✅ manual · 🚧 auto-trigger |
+| 7 | **MCP Security Layer** | Per-agent allowlist, audit log, rate limits — defense for external integrations | ✅ |
+| 8 | **Phase-Role Binding** | Phase 4 reviewer MUST differ from Phase 3 builder (Generator ≠ Evaluator) | ✅ |
+
+```mermaid
+flowchart LR
+    subgraph "Structure"
+        P1[1. Hierarchical Planning<br/>T0→T4 tree]:::struct
+        P8[8. Phase-Role Binding<br/>builder ≠ reviewer]:::struct
+    end
+    subgraph "Accountability"
+        P2[2. Reasoning Trace<br/>grounded audit]:::acct
+        P4[4. Pre-flight<br/>linters + OPA]:::acct
+    end
+    subgraph "Resilience"
+        P5[5. Conflict Detection<br/>L1-L4 layered]:::res
+        P6[6. Self-Healing<br/>F2/F3 proposals]:::res
+    end
+    subgraph "Memory & Security"
+        P3[3. Session Reset<br/>permanent memory]:::mem
+        P7[7. MCP Security<br/>allowlist + audit]:::mem
+    end
+    classDef struct fill:#6366f1,stroke:#3730a3,color:#fff
+    classDef acct fill:#10b981,stroke:#065f46,color:#fff
+    classDef res fill:#f59e0b,stroke:#b45309,color:#000
+    classDef mem fill:#ec4899,stroke:#9d174d,color:#fff
+```
+
+---
+
+### 1 · Hierarchical Planning  ✅
+
+**What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.aura/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
+
+```bash
+/aura-frog:plan                # Interview-bootstraps T0 → T1 → T2
+/aura-frog:plan-expand FEAT-7  # Decompose T2 → Stories (T3)
+/aura-frog:plan-next           # Claim next ready Task; /run auto-anchors to it
+/aura-frog:plan-status         # Render ASCII tree
+```
+
+```mermaid
+flowchart TB
+    M([T0: Mission]):::t0 --> I[T1: Initiative INIT-001]:::t1
+    I --> F1[T2: Feature FEAT-007]:::t2
+    I --> F2[T2: Feature FEAT-008]:::t2
+    F1 --> S1[T3: Story STORY-0042]:::t3
+    F1 --> S2[T3: Story STORY-0043]:::t3
+    S1 --> T1[T4: Task 00101]:::t4
+    S1 --> T2[T4: Task 00102]:::t4
+    classDef t0 fill:#1e293b,color:#fff
+    classDef t1 fill:#475569,color:#fff
+    classDef t2 fill:#6366f1,color:#fff
+    classDef t3 fill:#10b981,color:#fff
+    classDef t4 fill:#f59e0b,color:#000
+```
+
+**Why it matters:** Long-running projects no longer lose decisions to context compaction. Team handoffs become trivial — read `mission.md` + `active.json` and you're caught up. Multi-week features get explicit decomposition.
+
+---
+
+### 2 · Reasoning Trace Audit  ✅
+
+**What you get:** Every Claude tool call writes an append-only event to `.aura/plans/traces/{TASK_ID}.jsonl` — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
+
+```bash
+/aura-frog:trace                              # Full trace for active task
+/aura-frog:trace --hallucinations             # Only ungrounded claims
+/aura-frog:trace --filter file_read           # Filter by event type
+/aura-frog:trace --tail 20                    # Last 20 events
+AF_TRACE_DISABLED=true                        # Opt out per session
+```
+
+```mermaid
+sequenceDiagram
+    participant U as You
+    participant C as Claude
+    participant H as Tracer hook
+    participant J as traces/T4.jsonl
+    U->>C: implement payment redirect
+    C->>H: Read src/checkout.ts
+    H->>J: file_read {path, sha256, lines}
+    C->>H: Write src/redirect.ts
+    H->>J: tool_call {tool, args_hash}
+    Note over C: makes a claim
+    C->>U: "Stripe uses query param session_id"
+    H->>J: output_claim {grounded_in: ev-12, conf: 0.95}
+    Note right of J: /aura-frog:trace --hallucinations<br/>finds ungrounded claims later
+```
+
+**Why it matters:** AI-generated code reviews used to trust the AI. Now every factual statement has a sha256-anchored evidence trail. Debugging "why did Claude do that?" three months later becomes a single `/aura-frog:trace` call.
+
+---
+
+### 3 · Semantic Session Reset  ✅
+
+**What you get:** When a Feature (T2) reaches `done`, the `epic-summarizer` agent distills the most valuable findings — architectural decisions, gotchas, anti-patterns — into `.aura/memory/permanent_memory.md`. Then Master Planner offers you a clean session restart: working context wipes, permanent memory anchors.
+
+```bash
+/aura-frog:reset-session                      # Distill + prompt to reset
+/aura-frog:reset-session --feature FEAT-007   # Distill specific feature
+/aura-frog:reset-session --dry-run            # Preview what gets written
+/aura-frog:reset-session --no-prompt          # CI-friendly
+```
+
+```mermaid
+flowchart LR
+    Feat[FEAT-007 done] --> Sum[epic-summarizer]:::agent
+    Sum --> PM[(permanent_memory.md<br/>≤500 tok/Epic<br/>≤8K total)]:::pm
+    Sum -.proposes.-> User{Reset?}:::user
+    User -- yes --> Reset[Wipe working context<br/>Anchor permanent memory]:::reset
+    User -- no --> Cont[Continue current session]:::cont
+    classDef agent fill:#6366f1,color:#fff
+    classDef pm fill:#ec4899,color:#fff
+    classDef user fill:#f59e0b,color:#000
+    classDef reset fill:#10b981,color:#fff
+    classDef cont fill:#475569,color:#fff
+```
+
+**Why it matters:** 3-month projects accumulate decision drift; long sessions exceed any context window. Distillation captures *what mattered* (decisions, gotchas) and discards *what was noise* (tool output verbatim, transcripts). Quarterly retrospectives reduce to reading 8K tokens of permanent memory.
+
+---
+
+### 4 · Pre-flight Validation  ✅ Tier 1 · 🚧 Tier 2
+
+**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.7.1+).
+
+```bash
+/aura-frog:preflight check                              # Manual run
+/aura-frog:preflight policies                           # List active rules
+/aura-frog:preflight bypass <reason ≥ 10 chars>         # Per-call escape
+AF_PREFLIGHT_DISABLED=true                              # Per-session disable
+```
+
+```mermaid
+flowchart LR
+    Tool[Claude tool call]:::input --> Pre[pre-flight-validate.cjs]:::gate
+    Pre --> T1{Tier 1<br/>bash linters}:::tier
+    T1 -- pass --> Tool2[Execute]:::ok
+    T1 -- warn --> Log[stderr warn, proceed]:::warn
+    T1 -- block --> Stop[Refuse]:::block
+    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.7.1+}:::tier2
+    classDef input fill:#6366f1,color:#fff
+    classDef gate fill:#475569,color:#fff
+    classDef tier fill:#10b981,color:#fff
+    classDef tier2 fill:#9ca3af,color:#000
+    classDef ok fill:#059669,color:#fff
+    classDef warn fill:#f59e0b,color:#000
+    classDef block fill:#dc2626,color:#fff
+```
+
+**Why it matters:** AI-coded `rm -rf $HOME` is real. Path-traversal in generated configs is real. Hardcoded credentials in generated code are real. Pre-flight catches them before the tool fires — no rollback needed because the damage never happened.
+
+---
+
+### 5 · Semantic Conflict Detection  ✅ L1+L2 · 🚧 L3+L4
+
+**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.7.1+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
+
+```bash
+/aura-frog:plan-conflicts check          # Manually re-scan
+/aura-frog:plan-conflicts list           # Active conflicts
+/aura-frog:plan-conflicts resolve <id>   # User-pick resolution
+/aura-frog:plan-freeze FEAT-007 "reason" # Manual freeze
+/aura-frog:plan-thaw FEAT-007            # Reverse
+AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.7.1+)
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> planned
+    planned --> active: dispatch
+    active --> done: success
+    planned --> frozen: L1+L2 detect overlap
+    active --> frozen: pending-confirm sibling conflicts
+    frozen --> planned: blocker done + compatible
+    frozen --> discarded: replan-required
+    done --> [*]
+```
+
+**Why it matters:** Parallel agents on the same codebase used to clobber each other's work silently. Now overlap is detected *before* dispatch; the blocked task freezes; when the blocker finishes, conflict-detector re-checks against *actual* changes (not just planned scope) before auto-thawing.
+
+---
+
+### 6 · Self-Healing Orchestrator  ✅ manual · 🚧 auto-trigger
+
+**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.7.1+.
+
+```bash
+/aura-frog:heal diagnose <task-id>       # Manual diagnosis
+/aura-frog:heal status                   # Recent attempts + outcomes
+/aura-frog:heal disable                  # Per-session
+AF_SELF_HEAL_DISABLED=true               # Permanent
+```
+
+```mermaid
+flowchart LR
+    Fail[Task fails<br/>F2 or F3]:::fail --> Cls[failure-classifier]:::cls
+    Cls --> Heal[/aura-frog:heal diagnose]:::heal
+    Heal --> Q1[context7 query]:::src
+    Heal --> Q2[permanent_memory.md]:::src
+    Q1 --> Diag[Diagnosis + patch<br/>confidence ≥ 0.7]:::diag
+    Q2 --> Diag
+    Diag --> User{Approve?}:::user
+    User -- yes --> Apply[New T4 with<br/>own approval flow]:::apply
+    User -- no --> Skip[Surface raw findings]:::skip
+    classDef fail fill:#dc2626,color:#fff
+    classDef cls fill:#475569,color:#fff
+    classDef heal fill:#6366f1,color:#fff
+    classDef src fill:#10b981,color:#fff
+    classDef diag fill:#f59e0b,color:#000
+    classDef user fill:#ec4899,color:#fff
+    classDef apply fill:#059669,color:#fff
+    classDef skip fill:#9ca3af,color:#000
+```
+
+**Why it matters:** "Cannot read property of undefined at line 42" used to send you to Stack Overflow for 20 minutes. Now you get a diagnosis citing the official Stripe docs *and* DEC-007 from your own past Epic — with the exact one-line patch ready to apply on your approval.
+
+---
+
+### 7 · MCP Security Layer  ✅
+
+**What you get:** Per-agent MCP allowlist via frontmatter (`mcp_servers: [context7, postgres]`). Every MCP call audited to `.aura/security/mcp-audit.jsonl` with secrets sanitized. Per-server rate limits in `plugin.json` (soft warn at 80%, hard block at 100%). Two new opt-in MCPs: `postgres` and `redis`, both `disabled: true` by default, destructive operations (`DROP TABLE`, `FLUSHDB`) blocked unconditionally.
+
+```bash
+/aura-frog:mcp status                # Per-agent allowlists + current state
+/aura-frog:mcp audit                 # Recent calls + blocked attempts
+/aura-frog:mcp audit --week          # 7-day window
+/aura-frog:mcp reset-limits          # Manual rate-limit reset
+AF_MCP_AUDIT_DISABLED=true           # Disable audit log (enforcement still on)
+```
+
+```mermaid
+flowchart LR
+    Agent[architect agent]:::ag --> Gate[mcp-call-gate.cjs]:::gate
+    Gate --> A{Allowlist?<br/>context7,postgres,redis}:::check
+    A -- yes --> R{Rate limit?<br/>≤30/min · ≤200/session}:::check
+    A -- no --> Block1[Refuse + audit]:::block
+    R -- under --> Call[MCP call]:::ok
+    R -- soft 80% --> Warn[Stderr warn, proceed]:::warn
+    R -- hard 100% --> Block2[Refuse + audit]:::block
+    Call --> Audit[(mcp-audit.jsonl<br/>sanitized, append-only)]:::audit
+    classDef ag fill:#6366f1,color:#fff
+    classDef gate fill:#475569,color:#fff
+    classDef check fill:#10b981,color:#fff
+    classDef ok fill:#059669,color:#fff
+    classDef warn fill:#f59e0b,color:#000
+    classDef block fill:#dc2626,color:#fff
+    classDef audit fill:#ec4899,color:#fff
+```
+
+**Why it matters:** Before v3.7.0, every agent could hit every MCP. A frontend agent could query your production Postgres. Now the architect gets DB access; the frontend gets Figma + Playwright; the security agent gets nothing because it's read-only on code. Audit log gives compliance + forensics — "why did the agent query the DB 1000 times?" gets a JSONL answer.
+
+---
+
+### 8 · Phase-Role Binding  ✅
+
+**What you get:** The 5-phase TDD workflow now hard-enforces **Phase 4 reviewer ≠ Phase 3 builder**. Same agent reviewing its own code drifts toward "LGTM"; different agents provide fresh perspective. Aura Frog's Phase 4 dispatches `security` + `tester` (never the Phase 3 builder), formalizing Anthropic's Generator/Evaluator separation insight.
+
+```mermaid
+flowchart LR
+    P1[Phase 1<br/>architect]:::p1 --> P2[Phase 2<br/>tester writes RED]:::p2
+    P2 --> P3[Phase 3<br/>architect/frontend builds GREEN]:::p3
+    P3 -. NEVER same agent .-> P4
+    P3 --> P4[Phase 4<br/>security + tester review]:::p4
+    P4 --> P5[Phase 5<br/>lead finalize]:::p5
+    classDef p1 fill:#6366f1,color:#fff
+    classDef p2 fill:#10b981,color:#fff
+    classDef p3 fill:#f59e0b,color:#000
+    classDef p4 fill:#ec4899,color:#fff
+    classDef p5 fill:#475569,color:#fff
+```
+
+**Why it matters:** Self-reviewed code has blind spots — confirmation bias is real, even in agents. PR reviews exist for the same reason in human teams. Generator ≠ Evaluator is non-negotiable in Phase 4; it's what makes the workflow produce shippable code, not just code that *passes its own tests*.
+
+---
+
+### Status snapshot — what ships now vs queued
+
+| Pillar | v3.7.0 ships | v3.7.1+ queued |
+|---|---|---|
+| 1 — Planning | T0-T4 tree, 8 commands, 5 agents, 2 hooks | — |
+| 2 — Reasoning Trace | tracer hook, grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
+| 3 — Session Reset | epic-summarizer, permanent-memory-loader, `/reset-session` | — |
+| 4 — Pre-flight | 7 Tier-1 bash linters, hook, bypass with 3-warn | Tier 2 OPA + 5 `.rego` policies |
+| 5 — Conflict Detection | L1 (file) + L2 (function) + freeze cascade + arbitration | L3 (semantic LLM) + L4 (architectural LLM) |
+| 6 — Self-Healing | manual `/heal diagnose`, ≥0.7 confidence, never auto-apply | auto-trigger hook on F2/F3 classification |
+| 7 — MCP Security | per-agent allowlist + audit + rate limits + sanitizer | SQLite WAL for audit ([issue #8](https://github.com/nguyenthienthanh/aura-frog/issues/8)) |
+| 8 — Phase-Role | hard rule in `cross-review-workflow.md` + run-orchestrator | — |
+
+Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`. All eight pillars are opt-in friendly.
+
+---
+
 ## Works Across AI Coding Tools
 
 Aura Frog's 71 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.

@@ -2,6 +2,8 @@
 
 Central index for all human-readable documentation. AI-consumed docs live in `aura-frog/`.
 
+> **New in v3.7.0:** [The 8 Pillars](../README.md#-the-8-pillars-of-the-planning-first-llm-os) — Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Full marketing breakdown with examples + diagrams in the project README; engineering depth in [BENEFITS.md Part 9](reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
+
 ---
 
 ## Getting Started

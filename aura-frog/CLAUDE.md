@@ -5,6 +5,24 @@
 
 ---
 
+## 🐸 The 8 Pillars (v3.7.0)
+
+Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
+
+```toon
+pillars[8]{n,name,theme,status,disable_env}:
+  1,Hierarchical Planning,Structure,shipped,—
+  2,Reasoning Trace Audit,Accountability,shipped,AF_TRACE_DISABLED
+  3,Semantic Session Reset,Memory,shipped,—
+  4,Pre-flight Validation,Accountability,"shipped (Tier 1); Tier 2 OPA v3.7.1+",AF_PREFLIGHT_DISABLED
+  5,Semantic Conflict Detection,Resilience,"shipped (L1+L2); L3+L4 LLM v3.7.1+",AF_CONFLICT_LLM_DISABLED
+  6,Self-Healing Orchestrator,Resilience,"shipped (manual); auto-trigger v3.7.1+",AF_SELF_HEAL_DISABLED
+  7,MCP Security Layer,Security,shipped,AF_MCP_AUDIT_DISABLED (audit only)
+  8,Phase-Role Binding,Structure,shipped,—
+```
+
+---
+
 ## OS Mental Model
 
 Claude is the **kernel** — orchestrates, dispatches, verifies. Does not execute everything directly.

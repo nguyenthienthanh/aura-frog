@@ -23,6 +23,23 @@ What's new (all opt-in):
 
 ---
 
+## 🐸 The 8 Pillars at a glance
+
+| # | Pillar | Theme | v3.7.0 ships | v3.7.1+ queued |
+|---|---|---|---|---|
+| 1 | Hierarchical Planning | Structure | T0-T4 tree · 8 commands · 5 planning agents · 2 hooks | — |
+| 2 | Reasoning Trace Audit | Accountability | tracer hook · grounding-discipline rule · `/aura-frog:trace` | helper CLI scripts ([#6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
+| 3 | Semantic Session Reset | Memory | epic-summarizer · permanent-memory-loader · `/aura-frog:reset-session` | — |
+| 4 | Pre-flight Validation | Accountability | 7 Tier-1 bash linters + bypass-with-3-warn | Tier 2 OPA + 5 .rego policies |
+| 5 | Semantic Conflict Detection | Resilience | L1 (file) + L2 (function) + freeze cascade + arbiter | L3 (semantic LLM) + L4 (architectural LLM) |
+| 6 | Self-Healing Orchestrator | Resilience | manual `/aura-frog:heal diagnose` · ≥0.7 confidence · never auto-applies | auto-trigger hook on F2/F3 classification |
+| 7 | MCP Security Layer | Security | per-agent allowlist + audit + rate limits + sanitizer | SQLite WAL ([#8](https://github.com/nguyenthienthanh/aura-frog/issues/8)) |
+| 8 | Phase-Role Binding | Structure | hard rule in `cross-review-workflow.md` + run-orchestrator | — |
+
+Full marketing-quality breakdown with examples + diagrams: [README.md § The 8 Pillars](README.md#-the-8-pillars-of-the-planning-first-llm-os).
+
+---
+
 ## What's new (the bigger story)
 
 v3.7.0 turns Aura Frog from a "5-phase TDD workflow with agents" into a **planning-first LLM Operating System**. The five major systems shipped across alpha → beta → rc → stable:

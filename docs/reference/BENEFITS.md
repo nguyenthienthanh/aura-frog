@@ -497,6 +497,116 @@ Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
 
 ---
 
+## Part 9 — The 8 Pillars of the Planning-First LLM OS (v3.7.0)
+
+v3.7.0 ships eight composable features organized into four themes. Each pillar is opt-in (a single env var disables it) and addresses a specific failure mode of shipping with an AI agent. The pillars share data — plan tree underpins trace audit, trace audit underpins grounding-discipline, conflict detection reads from the plan tree, permanent memory feeds self-healing. Together they form an OS; individually each pays for itself.
+
+### 9.1. Hierarchical Planning (Structure)
+
+**What:** Plans persist to `.aura/plans/` as a five-tier tree (Mission → Initiative → Feature → Story → Task). `plan-loader` auto-loads minimum context per turn (mission + active branch + ancestors); the rest stays on disk. Five planning agents (`master-planner`, `strategist`, `feature-architect`, `story-planner`, `replanner`) decompose tier by tier.
+
+**How applied:** `/aura-frog:plan` interview-bootstraps T0-T2. `/aura-frog:plan-expand <id>` drills one tier deeper. `/aura-frog:plan-next` returns the next ready Task; `/aura-frog:run` auto-anchors to it via the run-plan bridge (`rules/workflow/run-plan-bridge.md`).
+
+**Why you need it:** Long-running projects no longer lose decisions to `/compact`. Multi-week features get explicit decomposition. Team handoffs reduce to *"read `mission.md` and `active.json`"*.
+
+**Use cases:** 3+ month projects · multi-feature releases · team handovers · resumable work after machine restarts.
+
+---
+
+### 9.2. Reasoning Trace Audit (Accountability)
+
+**What:** Every Claude tool call writes an append-only event to `.aura/plans/traces/{TASK_ID}.jsonl` with sha256-anchored evidence. Events include `tool_call`, `file_read` (path + sha256 + lines), `tool_result`, `output_claim` (claim + `grounded_in` references + confidence), `decision`, `plan_deviation`, `acceptance_check`. The `grounding-discipline` rule rejects any `output_claim` not backed by a prior `file_read`.
+
+**How applied:** `tool-call-tracer.cjs` fires PreToolUse + PostToolUse. `reasoning-trace-recorder` (auto-invoke) captures claims. `/aura-frog:trace --hallucinations` surfaces ungrounded claims; `--filter file_read --tail 20` shows recent reads.
+
+**Why you need it:** Catches hallucinations *before* they ship. "Why did Claude do that?" three months later resolves to a single `/aura-frog:trace` call. Audit trail for compliance / SOC2 / quality reviews.
+
+**Use cases:** debugging hallucinations · audit trails · comparing approaches between attempts · onboarding (read past traces) · safety-critical code where evidence matters.
+
+**Disable:** `AF_TRACE_DISABLED=true`.
+
+---
+
+### 9.3. Semantic Session Reset (Memory)
+
+**What:** When a Feature (T2) reaches `done`, `epic-summarizer` agent distills architectural decisions, gotchas, anti-patterns, and successful patterns into a structured Epic section in `.aura/memory/permanent_memory.md`. Hard caps: ≤500 tokens per Epic, ≤8K total. `permanent-memory-loader` (auto-invoke) loads only the summary lines (≤120 always-loaded tokens). Master Planner then offers a clean session restart.
+
+**How applied:** `feature-done-trigger-archive.cjs` hook fires on T2 done. `/aura-frog:reset-session` manually invokes. `--dry-run` previews; `--no-prompt` is CI-friendly.
+
+**Why you need it:** Distillation captures *what mattered* (decisions, gotchas) and discards *what was noise* (transcripts, tool output). Long projects no longer drift; quarterly retros become "read 8K tokens of permanent memory."
+
+**Use cases:** 3+ month projects · quarterly retrospectives · team handoffs · architectural archaeology.
+
+---
+
+### 9.4. Pre-flight Validation (Accountability)
+
+**What:** Two-tier validation runs before any state-mutating tool call. Tier 1 (always available, zero deps): 7 bash linters — frontmatter, tool input/output, path safety, command allowlist, secret patterns, run-all aggregator. Tier 2 (v3.7.1+): 5 OPA Rego policies for plan structure, mutation safety, grounding, token budget, conflict respect.
+
+**How applied:** `pre-flight-validate.cjs` fires on PreToolUse. Exit codes: 0 pass, 1 warn (log + proceed), 2 fail (block). `/aura-frog:preflight bypass <reason ≥10 chars>` for per-call escape; warns after 3 bypasses/session.
+
+**Why you need it:** AI-generated `rm -rf $HOME` is real. Hardcoded credentials in generated code are real. Pre-flight catches them before the tool fires — no rollback needed because the damage never happened.
+
+**Use cases:** regulated environments · team consistency · custom org policies (add your own `.rego` once Tier 2 lands) · defense-in-depth.
+
+**Disable:** `AF_PREFLIGHT_DISABLED=true`.
+
+---
+
+### 9.5. Semantic Conflict Detection (Resilience)
+
+**What:** Four detection layers gate every task dispatch. L1 lexical (file-set intersection, <100ms, free). L2 syntactic (function/region overlap via tree-sitter, <300ms, cheap). L3 semantic (LLM intent comparison, deferred to v3.7.1+). L4 architectural (LLM vs `permanent_memory.md`, deferred to v3.7.1+). Conflicting branches **freeze**; descendants cascade; siblings stay free. Five resolution paths: auto-thaw on compatible-blocker-done, auto-discard-with-replan on incompatible, user-priority, sequential reorder, full replan.
+
+**How applied:** `pre-dispatch-conflict-check.cjs` runs L1+L2 before T4 dispatch. `post-execute-conflict-rescan.cjs` re-checks frozen tasks against *actual* changes when blockers finish (not just planned scope — the conservative path). `conflict-arbiter` agent adjudicates per `conflict-arbitration-policy.md`. New `frozen` state on plan nodes; F6 failure class for conflict-induced failures.
+
+**Why you need it:** Parallel agents used to silently clobber each other's work. Now overlap is detected *before* dispatch.
+
+**Use cases:** parallel agent work · approval-gate workflows · architectural consistency · audit trails (`conflicts.jsonl`).
+
+**Disable:** `AF_CONFLICT_LLM_DISABLED=true` (no-op in v3.7.0 since L3+L4 are stubs; future-compatible).
+
+---
+
+### 9.6. Self-Healing Orchestrator (Resilience)
+
+**What:** When a Task fails with class F2 (local logic) or F3 (local design), `self-healing-orchestrator` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` "Gotchas discovered" section, and produces a **proposed** patch with confidence ≥ 0.7 (below threshold escalates raw findings). Master Planner presents to user with source citations; user approves → patch applied as a new T4 with its own approval flow. **Never auto-applies.** Counts toward `replan_budget` (max 1/task, 5/session).
+
+**How applied:** `/aura-frog:heal diagnose <task-id>` manual invocation. `/aura-frog:heal status` shows recent attempts. Sources limited to context7 (official docs) and `permanent_memory.md` (project's own learning) — never random web sources.
+
+**Why you need it:** "Cannot read property of undefined at line 42" stops sending you to Stack Overflow. Patches arrive with provenance — official docs + your project's own past gotchas.
+
+**Use cases:** stack trace explanations · repeating bugs · library version mismatches · patches with audit trail.
+
+**Disable:** `AF_SELF_HEAL_DISABLED=true` permanent · `/aura-frog:heal disable` per-session.
+
+---
+
+### 9.7. MCP Security Layer (Security)
+
+**What:** Per-agent MCP allowlist via frontmatter `mcp_servers: [...]`. Audit log to `.aura/security/mcp-audit.jsonl` with secrets sanitized (Authorization headers, Bearer tokens, AWS keys, OpenAI/Anthropic keys all redacted; content >1KB truncated). Per-server rate limits in `plugin.json` — soft warn at 80%, hard block at 100%. Two new MCPs (postgres, redis) ship `disabled: true` by default; destructive operations (`DROP TABLE`, `FLUSHDB`) blocked unconditionally regardless of approval.
+
+**How applied:** `mcp-call-gate.cjs` fires on every `mcp__*` PreToolUse. Reads agent identity (currently env var; stdin-JSON migration tracked in [issue #7](https://github.com/nguyenthienthanh/aura-frog/issues/7)). Sliding-window rate limit (60s). Retention sweep on session start: entries older than `AF_AUDIT_RETENTION_DAYS` (default 30) pruned.
+
+**Why you need it:** Before v3.7.0, every agent hit every MCP — frontend agent could query production DB. Now architect gets DB; frontend gets Figma + Playwright; security gets nothing (read-only on code). Compliance + forensics for free.
+
+**Use cases:** team environments · compliance · cost control (rate limits) · forensic debugging.
+
+**Disable audit only:** `AF_MCP_AUDIT_DISABLED=true` (enforcement still on).
+
+---
+
+### 9.8. Phase-Role Binding (Structure)
+
+**What:** The 5-phase TDD workflow hard-enforces **Phase 4 reviewer ≠ Phase 3 builder**. `cross-review-workflow.md` is the source of truth; `run-orchestrator/SKILL.md` dispatches Phase 4 to `security` + `tester` (never the Phase 3 builder). Encoded in `plan-lifecycle.md` as `phase_role_map` for future T3-Story role binding.
+
+**How applied:** Phase 4 spawns reviewer agents in fork contexts; `agent-detector` prefers `phase_role_map` over content scoring inside an active phase.
+
+**Why you need it:** Self-reviewed code has blind spots — confirmation bias hits agents too. Generator ≠ Evaluator is Anthropic's harness design insight; PR reviews exist for the same reason in human teams.
+
+**Use cases:** code-quality enforcement · bias reduction · security review consultation for auth/data code · team-mode workflows.
+
+---
+
 ## Related Docs
 
 - [README.md](../../README.md) — Quick start + walkthrough

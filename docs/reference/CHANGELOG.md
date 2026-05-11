@@ -12,6 +12,23 @@ All notable changes to Aura Frog will be documented in this file.
 
 **A planning-first LLM OS for software engineering.** Plans persist across sessions; every Claude decision is forensically reproducible; conflicts are detected before silent overwrites; backward-compatible — your existing `/run` workflow continues unchanged.
 
+### 🐸 The 8 Pillars (feature highlights)
+
+v3.7.0 lands eight composable features organized into four themes. Full marketing breakdown in [README.md § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os) and engineering depth in [BENEFITS.md Part 9](BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
+
+| # | Pillar | Status | What it solves |
+|---|---|---|---|
+| 1 | **Hierarchical Planning** | ✅ | Plans survive session reset · `/compact` · machine restart |
+| 2 | **Reasoning Trace Audit** | ✅ | Hallucinations caught before they ship (sha256-anchored evidence) |
+| 3 | **Semantic Session Reset** | ✅ | Distill an Epic into permanent memory, then reset cleanly |
+| 4 | **Pre-flight Validation** | ✅ Tier 1 · 🚧 Tier 2 OPA | Block bad AI output before it hits disk |
+| 5 | **Semantic Conflict Detection** | ✅ L1+L2 · 🚧 L3+L4 LLM | Prevent silent overwrites between parallel tasks |
+| 6 | **Self-Healing Orchestrator** | ✅ manual · 🚧 auto-trigger | Auto-diagnose F2/F3 failures; propose patches, never auto-apply |
+| 7 | **MCP Security Layer** | ✅ | Per-agent allowlist + audit + rate limits for external integrations |
+| 8 | **Phase-Role Binding** | ✅ | Phase 4 reviewer MUST differ from Phase 3 builder (Generator ≠ Evaluator) |
+
+Each pillar is independently disable-able via env var. See *Disable mechanisms* section below.
+
 ### Stats (v3.6.1 → v3.7.0)
 
 | Component | v3.6.1 | v3.7.0 | Delta |
