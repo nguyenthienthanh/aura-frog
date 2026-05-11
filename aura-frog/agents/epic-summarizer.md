@@ -2,6 +2,7 @@
 name: epic-summarizer
 description: "Distills a completed Epic (T2 Feature done) into a permanent_memory.md section. Captures architectural decisions, gotchas, anti-patterns, conflicts. Writes ONLY to .aura/memory/. Confidence-scored: items below 0.7 land in a Tentative subsection."
 tools: Read, Write, Glob, Grep, Bash
+mcp_servers: []
 color: silver
 ---
 

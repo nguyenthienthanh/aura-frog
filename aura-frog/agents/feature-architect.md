@@ -2,6 +2,7 @@
 name: feature-architect
 description: "T2 (Feature) decomposition specialist for hierarchical planning. Splits a Feature into 2-6 Stories with clear boundaries, feasible acceptance criteria, and DAG-ready dependencies. Read-only on code; writes only to .aura/plans/features/<id>/ tree."
 tools: Read, Glob, Grep, Bash
+mcp_servers: [context7]
 color: blue
 ---
 
