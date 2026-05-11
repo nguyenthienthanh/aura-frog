@@ -98,7 +98,7 @@ flowchart TB
 
 ## 🐸 The 8 Pillars of the Planning-First LLM OS
 
-v3.7.0 ships **eight features** that compose into one cohesive OS. Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped in v3.7.0 · 🚧 ships behind a flag or queued for v3.7.1+.
+v3.7.0 ships **eight features** that compose into one cohesive OS. Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped in v3.7.0 · 🚧 ships behind a flag or queued for v3.7.2+.
 
 | # | Pillar | One-liner | Status |
 |---|---|---|---|
@@ -232,7 +232,7 @@ flowchart LR
 
 ### 4 · Pre-flight Validation  ✅ Tier 1 · 🚧 Tier 2
 
-**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.7.1+).
+**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.7.2+).
 
 ```bash
 /aura-frog:preflight check                              # Manual run
@@ -248,7 +248,7 @@ flowchart LR
     T1 -- pass --> Tool2[Execute]:::ok
     T1 -- warn --> Log[stderr warn, proceed]:::warn
     T1 -- block --> Stop[Refuse]:::block
-    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.7.1+}:::tier2
+    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.7.2+}:::tier2
     classDef input fill:#6366f1,color:#fff
     classDef gate fill:#475569,color:#fff
     classDef tier fill:#10b981,color:#fff
@@ -264,7 +264,7 @@ flowchart LR
 
 ### 5 · Semantic Conflict Detection  ✅ L1+L2 · 🚧 L3+L4
 
-**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.7.1+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
+**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.7.2+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
 
 ```bash
 /aura-frog:plan-conflicts check          # Manually re-scan
@@ -272,7 +272,7 @@ flowchart LR
 /aura-frog:plan-conflicts resolve <id>   # User-pick resolution
 /aura-frog:plan-freeze FEAT-007 "reason" # Manual freeze
 /aura-frog:plan-thaw FEAT-007            # Reverse
-AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.7.1+)
+AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.7.2+)
 ```
 
 ```mermaid
@@ -293,7 +293,7 @@ stateDiagram-v2
 
 ### 6 · Self-Healing Orchestrator  ✅ manual · 🚧 auto-trigger
 
-**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.7.1+.
+**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.7.2+.
 
 ```bash
 /aura-frog:heal diagnose <task-id>       # Manual diagnosis
@@ -386,7 +386,7 @@ flowchart LR
 
 ### Status snapshot — what ships now vs queued
 
-| Pillar | v3.7.0 ships | v3.7.1+ queued |
+| Pillar | v3.7.0 ships | v3.7.2+ queued |
 |---|---|---|
 | 1 — Planning | T0-T4 tree, 8 commands, 5 agents, 2 hooks | — |
 | 2 — Reasoning Trace | tracer hook, grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |

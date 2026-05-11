@@ -20,7 +20,7 @@
 mcp_status{servers_enabled,total_audited_today,blocked_today,sessions_limited}:
   6,142,3,1
 
-per_server[6]{server,enabled,calls_today,used_pct,rate_limit}:
+per_server[8]{server,enabled,calls_today,used_pct,rate_limit}:
   context7,true,87,29% of 200,30/min · 200/session
   playwright,true,12,—,30/min · 200/session
   vitest,true,18,—,30/min · 200/session

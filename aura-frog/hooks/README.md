@@ -801,7 +801,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[28]{event,name,purpose}:
+hooks[29]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files

@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch",
-    "lint": "eslint aura-frog/hooks/ --ext .cjs"
+    "lint": "eslint aura-frog/hooks/"
   },
   "devDependencies": {
     "jest": "^29.7.0",

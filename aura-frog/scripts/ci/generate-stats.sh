@@ -17,6 +17,15 @@ COMMANDS=$(find "$BASE_DIR/commands" -name '*.md' ! -name 'README.md' | wc -l | 
 HOOKS=$(find "$BASE_DIR/hooks" -maxdepth 1 -name '*.cjs' | wc -l | tr -d ' ')
 SCRIPTS=$(find "$BASE_DIR/scripts" -type f \( -name '*.sh' -o -name '*.cjs' \) | wc -l | tr -d ' ')
 
+# MCP servers: total entries in .mcp.json vs enabled (not disabled). Use 0 as
+# fallback if .mcp.json isn't grep-able (jq would be cleaner but plugin is
+# zero-dep — grep on the canonical 2-space-indent JSON is reliable enough).
+MCP_TOTAL=$(grep -cE '^    "[a-z][a-z0-9_-]*":' "$BASE_DIR/.mcp.json" 2>/dev/null | tr -d ' ')
+MCP_DISABLED=$(grep -c '"disabled": *true' "$BASE_DIR/.mcp.json" 2>/dev/null | tr -d ' ')
+[ -z "$MCP_TOTAL" ] && MCP_TOTAL=8
+[ -z "$MCP_DISABLED" ] && MCP_DISABLED=2
+MCP_ENABLED=$((MCP_TOTAL - MCP_DISABLED))
+
 # Auto-invoke skills count
 AUTO_INVOKE=0
 for dir in "$BASE_DIR/skills/"*/; do
@@ -72,7 +81,7 @@ cat > "$OUTPUT" << EOF
     "rules": { "total": $RULES_TOTAL, "core": $RULES_CORE, "agent": $RULES_AGENT, "workflow": $RULES_WORKFLOW },
     "commands": $COMMANDS,
     "hooks": $HOOKS,
-    "mcpServers": 6,
+    "mcpServers": { "total": $MCP_TOTAL, "enabled": $MCP_ENABLED },
     "scripts": $SCRIPTS
   },
   "performance": {

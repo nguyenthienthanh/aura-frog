@@ -25,7 +25,7 @@ What's new (all opt-in):
 
 ## 🐸 The 8 Pillars at a glance
 
-| # | Pillar | Theme | v3.7.0 ships | v3.7.1+ queued |
+| # | Pillar | Theme | v3.7.0 ships | v3.7.2+ queued |
 |---|---|---|---|---|
 | 1 | Hierarchical Planning | Structure | T0-T4 tree · 8 commands · 5 planning agents · 2 hooks | — |
 | 2 | Reasoning Trace Audit | Accountability | tracer hook · grounding-discipline rule · `/aura-frog:trace` | helper CLI scripts ([#6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
@@ -281,7 +281,7 @@ Stop hook error: Failed to run: Plugin directory does not exist:
 
 - **L3 (semantic LLM) + L4 (architectural LLM) full implementations** — currently stubbed; LLM dispatch + `conflict_cache.jsonl` LRU pending real-world tuning data
 - **Pre-flight Tier 2 (OPA, optional)** — bash linters (Tier 1) ship and cover 90% of value; OPA Rego policies are opt-in for power users with policy-as-code workflows
-- **Acceptance fixture suites** — 80-case classifier, 20-case hallucination, 15-case logic-error, 30-case L1, 20-case L2 corpora per spec §28.7; full fixtures generate from real usage in v3.7.1+
+- **Acceptance fixture suites** — 80-case classifier, 20-case hallucination, 15-case logic-error, 30-case L1, 20-case L2 corpora per spec §28.7; full fixtures generate from real usage in v3.7.2+
 - **Trace-event latency benchmark** — spec target <100ms per emission; works in practice but no formal benchmark suite yet
 - **deviation_score auto-update** — formula in `replan-thresholds.md` is defined and used by `replanner` but the post-execute hook does not yet auto-compute; manual setting only
 - **/aura-frog:plan-promote and /aura-frog:plan-replan full impl** — protocols documented, basic execution works, advanced features (LLM-driven alternative generation in replan) deferred

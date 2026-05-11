@@ -93,7 +93,9 @@ team_always[6]{rule}:
   Claim files before editing via TaskUpdate
   Use SendMessage for handoffs
   Spawn teammates in parallel (one message)
+```
 
+```toon
 team_never[5]{rule}:
   Team mode for Quick/Standard tasks
   Teammates commit independently (only lead manages git)

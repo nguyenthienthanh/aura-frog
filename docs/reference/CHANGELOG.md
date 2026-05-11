@@ -4,6 +4,31 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.7.1] - 2026-05-11 (CI stabilization)
+
+> **Patch release.** An external senior review pulled HEAD post-v3.7.0 and found CI was red — the `|| true` masks we removed in v3.7.0 polish exposed three pre-existing script bugs and one ESLint v9 break. v3.7.1 closes them so CI is green on `main` and contributor PRs don't fail spurious checks. Zero behavioural change to runtime; this is plumbing.
+
+### Fixed
+
+- **`validate-toon.sh` exits cleanly under `set -e`** — nine occurrences of `((var++))` rewritten as `var=$((var+1))`. `((expr))` returns exit code based on the *evaluated* value, so post-incrementing from 0 returned 1 → `set -e` aborted silent. Counters survived in a subshell when the `find | while` pattern was used — rewrote as `while … < <(find …)` so `FILES_CHECKED` / `ERRORS` propagate. Default target is now `aura-frog/` instead of `.` (skips `node_modules/`, `.claude/`, `.aura/`, `.git/`, `coverage/`). Result: 221 files scanned, 0 errors locally.
+- **`validate-config.sh` skips when file absent** — `ccpm-config.yaml` only exists in user projects, never in the plugin repo. Previously hard-failed; now exits 0 with an informational "skipping (normal for the plugin repo)" message. Still fails properly when the file exists and is malformed.
+- **ESLint v9 flat config migration** — `.eslintrc.cjs` (legacy format, deprecated in v9.0) replaced with `eslint.config.js`. `package.json#scripts.lint` drops the `--ext .cjs` flag (no longer supported in flat config). Rule set unchanged. `npm run lint` now exits 0 with 93 informational warnings, 0 errors.
+- **`generate-stats.sh` emits object form for `mcpServers`** — was hardcoded `"mcpServers": 6` which got out of sync with the `{total: 8, enabled: 6}` schema we standardised on. Now grep-counts entries + `disabled: true` flags in `.mcp.json` and emits the object. Regex fix: `[a-z0-9_-]` (includes digit + underscore) so `context7` doesn't get missed.
+- **TOON drift across 6 files** — exposed once `validate-toon.sh` actually ran: `hooks[28]` → `[29]`, `scripts[26]` → `[34]`, `signals[4]` → `[5]`, `final_plan[8]` → `[9]`, `per_server[6]` → `[8]`, `patterns[12]` → `[7]`. Multi-table-in-one-fence patterns (which the validator's state machine doesn't handle) split into separate fences in `execution-rules.md`, `theme-consistency.md`, `mcp-response-logging.md`.
+- **Forward-version markers** — `v3.7.1+` queued labels updated to `v3.7.2+` (since v3.7.1 *is* this release; Tier 2 OPA + L3/L4 LLM conflict + auto-trigger self-heal are queued for v3.7.2+).
+
+### Verified locally — all 5 CI steps green
+
+| Step | Result |
+|---|---|
+| `validate-toon.sh` | exit 0 · 221 files · 0 errors |
+| `validate-config.sh` | exit 0 (skipped — file absent, normal) |
+| `validate-counts.sh` | exit 0 · all counts match |
+| `npm run lint` | exit 0 · 93 warnings · 0 errors |
+| `npm test -- --coverage` | exit 0 · 215 tests · coverage above threshold |
+
+---
+
 ## [3.7.0] - 2026-05-11 (Stable — Marketplace Publish)
 
 > **First stable release of the v3.7.0 hierarchical-planning track.** All 5 milestones (A-E) shipped through 7 internal pre-releases (alpha.1, alpha.2, alpha.3, alpha.4, beta.1, beta.2, rc.1). This is the marketplace publish.
@@ -126,7 +151,7 @@ A second senior review pulled the post-fix tree and flagged 7 remaining findings
 - Pre-flight Tier 2 (OPA, optional) — `install-opa.sh` + 5 default Rego policies
 - 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus per spec §28.7
 - FEAT-B fixture suites: classifier 80-suite + hallucination 20 + logic-error 15 + deviation_score auto-update + trace-event latency benchmark
-- 16 remaining spec §30 docs (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, 8 guides, 3 troubleshooting) — covered in summary form by `MIGRATION_TO_V3.7.md`; standalone files in v3.7.1+
+- 16 remaining spec §30 docs (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, 8 guides, 3 troubleshooting) — covered in summary form by `MIGRATION_TO_V3.7.md`; standalone files in v3.7.2+
 
 ### Verification
 

@@ -73,7 +73,7 @@ Output as table: `scenario | status (PASS/PARTIAL/FAIL) | notes`
 Lead synthesizes final plan by merging best ideas, resolving disagreements, incorporating simulation findings, documenting dissent.
 
 ```toon
-final_plan[8]{section,source}:
+final_plan[9]{section,source}:
   Requirements (Final),Merged from all analyses + simulation findings
   Architecture Decision,Best approach from debate (with justification)
   Dissenting Views,Logged disagreements that weren't resolved

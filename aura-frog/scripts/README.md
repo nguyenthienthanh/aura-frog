@@ -22,7 +22,7 @@ scripts/
 ## Quick Reference
 
 ```toon
-scripts[26]{category,script,purpose}:
+scripts[34]{category,script,purpose}:
   integration,confluence-fetch.sh,Fetch Confluence pages with TOON output
   integration,setup-integrations.sh,Interactive integration setup (Jira/Confluence/Slack/Figma)
   integration,test-integrations.sh,Test all configured integrations

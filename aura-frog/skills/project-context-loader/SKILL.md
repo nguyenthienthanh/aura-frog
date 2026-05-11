@@ -67,7 +67,7 @@ project:
   name: {name}
   stack: {detected}
 
-patterns[12]{type,convention,example}:
+patterns[7]{type,convention,example}:
   file_naming,PascalCase,UserProfile.tsx
   imports,absolute @/,import { Button } from '@/components/Button'
   exports,named,export const UserCard = ...

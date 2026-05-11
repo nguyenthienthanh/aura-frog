@@ -18,7 +18,9 @@ bad_patterns[3]{category,example}:
   Colors,"backgroundColor: '#FF0000'"
   Spacing,"padding: 16"
   Sizes,"fontSize: 16"
+```
 
+```toon
 good_patterns[3]{category,example}:
   Colors,"backgroundColor: colors.error"
   Spacing,"padding: space[4]"

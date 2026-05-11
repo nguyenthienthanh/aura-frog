@@ -541,7 +541,7 @@ v3.7.0 ships eight composable features organized into four themes. Each pillar i
 
 ### 9.4. Pre-flight Validation (Accountability)
 
-**What:** Two-tier validation runs before any state-mutating tool call. Tier 1 (always available, zero deps): 7 bash linters — frontmatter, tool input/output, path safety, command allowlist, secret patterns, run-all aggregator. Tier 2 (v3.7.1+): 5 OPA Rego policies for plan structure, mutation safety, grounding, token budget, conflict respect.
+**What:** Two-tier validation runs before any state-mutating tool call. Tier 1 (always available, zero deps): 7 bash linters — frontmatter, tool input/output, path safety, command allowlist, secret patterns, run-all aggregator. Tier 2 (v3.7.2+): 5 OPA Rego policies for plan structure, mutation safety, grounding, token budget, conflict respect.
 
 **How applied:** `pre-flight-validate.cjs` fires on PreToolUse. Exit codes: 0 pass, 1 warn (log + proceed), 2 fail (block). `/aura-frog:preflight bypass <reason ≥10 chars>` for per-call escape; warns after 3 bypasses/session.
 
@@ -555,7 +555,7 @@ v3.7.0 ships eight composable features organized into four themes. Each pillar i
 
 ### 9.5. Semantic Conflict Detection (Resilience)
 
-**What:** Four detection layers gate every task dispatch. L1 lexical (file-set intersection, <100ms, free). L2 syntactic (function/region overlap via tree-sitter, <300ms, cheap). L3 semantic (LLM intent comparison, deferred to v3.7.1+). L4 architectural (LLM vs `permanent_memory.md`, deferred to v3.7.1+). Conflicting branches **freeze**; descendants cascade; siblings stay free. Five resolution paths: auto-thaw on compatible-blocker-done, auto-discard-with-replan on incompatible, user-priority, sequential reorder, full replan.
+**What:** Four detection layers gate every task dispatch. L1 lexical (file-set intersection, <100ms, free). L2 syntactic (function/region overlap via tree-sitter, <300ms, cheap). L3 semantic (LLM intent comparison, deferred to v3.7.2+). L4 architectural (LLM vs `permanent_memory.md`, deferred to v3.7.2+). Conflicting branches **freeze**; descendants cascade; siblings stay free. Five resolution paths: auto-thaw on compatible-blocker-done, auto-discard-with-replan on incompatible, user-priority, sequential reorder, full replan.
 
 **How applied:** `pre-dispatch-conflict-check.cjs` runs L1+L2 before T4 dispatch. `post-execute-conflict-rescan.cjs` re-checks frozen tasks against *actual* changes when blockers finish (not just planned scope — the conservative path). `conflict-arbiter` agent adjudicates per `conflict-arbitration-policy.md`. New `frozen` state on plan nodes; F6 failure class for conflict-induced failures.
 

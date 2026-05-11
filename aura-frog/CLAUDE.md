@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.0 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.7.1 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
-## 🐸 The 8 Pillars (v3.7.0)
+## 🐸 The 8 Pillars (v3.7.1)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -14,9 +14,9 @@ pillars[8]{n,name,theme,status,disable_env}:
   1,Hierarchical Planning,Structure,shipped,—
   2,Reasoning Trace Audit,Accountability,shipped,AF_TRACE_DISABLED
   3,Semantic Session Reset,Memory,shipped,—
-  4,Pre-flight Validation,Accountability,"shipped (Tier 1); Tier 2 OPA v3.7.1+",AF_PREFLIGHT_DISABLED
-  5,Semantic Conflict Detection,Resilience,"shipped (L1+L2); L3+L4 LLM v3.7.1+",AF_CONFLICT_LLM_DISABLED
-  6,Self-Healing Orchestrator,Resilience,"shipped (manual); auto-trigger v3.7.1+",AF_SELF_HEAL_DISABLED
+  4,Pre-flight Validation,Accountability,"shipped (Tier 1); Tier 2 OPA v3.7.2+",AF_PREFLIGHT_DISABLED
+  5,Semantic Conflict Detection,Resilience,"shipped (L1+L2); L3+L4 LLM v3.7.2+",AF_CONFLICT_LLM_DISABLED
+  6,Self-Healing Orchestrator,Resilience,"shipped (manual); auto-trigger v3.7.2+",AF_SELF_HEAL_DISABLED
   7,MCP Security Layer,Security,shipped,AF_MCP_AUDIT_DISABLED (audit only)
   8,Phase-Role Binding,Structure,shipped,—
 ```
@@ -72,7 +72,7 @@ rules[8]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.7.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
@@ -284,4 +284,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.0
+**Version:** 3.7.1

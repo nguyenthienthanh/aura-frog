@@ -36,12 +36,12 @@ usage() {
 
 log_error() {
     echo -e "${RED}ERROR${NC}: $1"
-    ((ERRORS++))
+    ERRORS=$((ERRORS + 1))
 }
 
 log_warning() {
     echo -e "${YELLOW}WARN${NC}: $1"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 }
 
 log_success() {
@@ -96,7 +96,7 @@ validate_toon_block() {
                 log_warning "$file:$line_num - Row has $row_columns columns, expected $column_count"
             fi
         fi
-        ((line_num++))
+        line_num=$((line_num + 1))
     done <<< "$content"
 
     return 0
@@ -112,7 +112,7 @@ validate_file() {
         return 1
     fi
 
-    ((FILES_CHECKED++))
+    FILES_CHECKED=$((FILES_CHECKED + 1))
 
     log_info "Checking $file"
 
@@ -127,14 +127,14 @@ validate_file() {
     local line_num=0
 
     while IFS= read -r line || [[ -n "$line" ]]; do
-        ((line_num++))
+        line_num=$((line_num + 1))
 
         # Check for TOON block header: name[N]{col1,col2}:
         if [[ "$line" =~ ^([a-zA-Z_][a-zA-Z0-9_]*)\[([0-9]+)\]\{([^}]+)\}:$ ]]; then
             # If we were in a block, validate the previous one
             if [ "$in_toon_block" = true ]; then
                 validate_toon_block "$file" "$block_start" "$block_name" "$declared_count" "$columns" "$block_content"
-                [ $? -ne 0 ] && ((file_errors++))
+                [ $? -ne 0 ] && file_errors=$((file_errors + 1))
             fi
 
             # Start new block
@@ -157,7 +157,7 @@ validate_file() {
             else
                 # Non-indented content - end of block
                 validate_toon_block "$file" "$block_start" "$block_name" "$declared_count" "$columns" "$block_content"
-                [ $? -ne 0 ] && ((file_errors++))
+                [ $? -ne 0 ] && file_errors=$((file_errors + 1))
                 in_toon_block=false
                 block_content=""
             fi
@@ -167,7 +167,7 @@ validate_file() {
     # Validate last block if file ends with one
     if [ "$in_toon_block" = true ]; then
         validate_toon_block "$file" "$block_start" "$block_name" "$declared_count" "$columns" "$block_content"
-        [ $? -ne 0 ] && ((file_errors++))
+        [ $? -ne 0 ] && file_errors=$((file_errors + 1))
     fi
 
     if [ $file_errors -eq 0 ]; then
@@ -181,9 +181,17 @@ validate_file() {
 validate_directory() {
     local dir="$1"
 
-    find "$dir" -type f \( -name "*.md" -o -name "*.toon" \) | while read -r file; do
-        validate_file "$file"
-    done
+    # Use process substitution (NOT a pipe) so the while-loop runs in the
+    # parent shell — FILES_CHECKED + ERRORS counters need to survive.
+    # Skip dependency + runtime + cache trees we don't own.
+    while IFS= read -r file; do
+        validate_file "$file" || true
+    done < <(find "$dir" -type f \( -name "*.md" -o -name "*.toon" \) \
+        ! -path "*/node_modules/*" \
+        ! -path "*/.claude/*" \
+        ! -path "*/.aura/*" \
+        ! -path "*/.git/*" \
+        ! -path "*/coverage/*")
 }
 
 # Fix array length declarations
@@ -229,7 +237,7 @@ fix_toon_file() {
 
         elif [ "$in_toon_block" = true ]; then
             if [[ "$line" =~ ^[[:space:]]+[^[:space:]] ]]; then
-                ((block_rows++))
+                block_rows=$((block_rows + 1))
                 echo "$line" >> "$temp_file"
             elif [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*$ ]]; then
                 echo "$line" >> "$temp_file"
@@ -290,8 +298,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z "$TARGET" ]; then
-    # Default to current directory
-    TARGET="."
+    # Default to plugin content only — skips node_modules, .claude/ runtime
+    # artefacts, and other project-local state that isn't ours to validate.
+    if [ -d "aura-frog" ]; then
+        TARGET="aura-frog"
+    else
+        TARGET="."
+    fi
 fi
 
 echo "TOON Validator v1.0.0"

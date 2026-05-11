@@ -21,7 +21,7 @@ This rule formalizes:
 ## When to detect (signal thresholds)
 
 ```toon
-signals[4]{strength,trigger,occurrences_required}:
+signals[5]{strength,trigger,occurrences_required}:
   Strong,"User explicitly says 'we should have a skill/rule/command for X'",1
   Strong,"User says 'add a rule that…' or 'make this a skill'",1
   Medium,"Same correction repeats across recent turns",3

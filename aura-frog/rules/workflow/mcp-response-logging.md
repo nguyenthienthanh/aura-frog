@@ -34,10 +34,16 @@ JIRA responses are automatically converted to TOON:
 ```toon
 ticket[1]{key,summary,type,status,priority}:
   PROJ-123,Fix login bug,Bug,In Progress,High
+```
 
+```toon
 metadata[1]{assignee,reporter,created,updated}:
   John Doe,Jane Smith,2025-01-15,2025-01-20
+```
 
+Plus inline scalar fields:
+
+```
 labels: frontend, urgent
 components: authentication
 ```
