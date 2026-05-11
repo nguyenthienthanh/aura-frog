@@ -14,8 +14,13 @@ When the user types `/run <task>`, Claude MUST execute these steps in order. Do 
 1. **Read `skills/run-orchestrator/SKILL.md` fully.** That skill carries the playbook. This command file is documentation about /run, not the playbook itself.
 2. **Run agent-detector** to classify complexity (Quick / Standard / Deep) and pick the flow per the detection table below.
 3. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0. **MANDATORY** — do not proceed without it.
-4. **Announce the chosen flow** to the user transparently: "Detected: Standard → single-agent inline (no plan). Say `deep` to escalate."
-5. **Then** execute the chosen flow. For Deep, follow the 5-phase workflow in run-orchestrator. For Standard/Quick, lighter flow per the table.
+4. **Apply the Run ↔ Plan bridge** (`rules/workflow/run-plan-bridge.md`):
+   - `.aura/plans/active.json#active.task` set → auto-anchor; deliverables sync back to the plan tree on Phase 5.
+   - Active feature without claimed task → suggest `/aura-frog:plan-next`.
+   - No plan + multi-feature/epic/shipping signals (weight ≥ 3) → suggest `/aura-frog:plan` bootstrap.
+   - User can always reply `proceed` to override; `AF_RUN_PLAN_BRIDGE_DISABLED=true` disables the check entirely.
+5. **Announce the chosen flow** to the user transparently: "Detected: Standard → single-agent inline (no plan). Say `deep` to escalate." When anchored, also state the anchor: "Anchored to TASK-00101 (story STORY-0042, feature FEAT-A)."
+6. **Then** execute the chosen flow. For Deep, follow the 5-phase workflow in run-orchestrator. For Standard/Quick, lighter flow per the table.
 
 If any step fails, surface the failure to the user — do not silently fall through to direct implementation.
 

@@ -98,7 +98,7 @@ flowchart TB
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 70 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 71 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -177,7 +177,7 @@ Expected output:
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   55 available (9 auto-invoke, 46 on-demand)
-  Rules:    70 loaded (22 core + 19 agent + 29 workflow)
+  Rules:    70 loaded (22 core + 19 agent + 30 workflow)
   Hooks:    42 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
 ```
@@ -698,7 +698,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
 | **Skills** | 55 | 9 auto-invoke on context, 46 on-demand |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite |
-| **Rules** | 70 | 3-tier loading (22 core + 19 agent + 29 workflow) — only what's needed |
+| **Rules** | 70 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
 | **Hooks** | 42 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
 
@@ -1015,7 +1015,7 @@ aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
 ├── skills/         55 skills (9 auto-invoke + 46 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
-├── rules/          70 rules (22 core + 19 agent + 29 workflow)
+├── rules/          71 rules (22 core + 19 agent + 30 workflow)
 ├── hooks/          42 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)

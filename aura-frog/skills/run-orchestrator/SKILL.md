@@ -54,12 +54,17 @@ This step is non-negotiable. If you skip it, /run status will show nothing and t
 1. agent-detector → select lead, complexity, model
 2. **Apply context-economy** — locate before Read, use Glob/Grep first, slice large files with `offset`+`limit`, delegate broad exploration to Explore subagent. See `rules/core/context-economy.md`. **If you hit `overloaded_error`, do NOT retry with the same context — distill, then resume.**
 3. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)
-3. **Check for JIRA ticket context** — if user prompt or `RUN_ID` matches a JIRA ticket pattern, the `jira-auto-fetch` hook will have written `.claude/logs/jira/{TICKET_ID}.json`. Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
-4. Load project context
-5. Verify complexity — suggest lighter approach if simple
-6. Socratic brainstorming (Standard/Deep only)
-7. Challenge requirements (`rules/workflow/requirement-challenger.md`)
-8. **Sprint Contract** — negotiate "done" criteria before Phase 2
+4. **Check for JIRA ticket context** — if user prompt or `RUN_ID` matches a JIRA ticket pattern, the `jira-auto-fetch` hook will have written `.claude/logs/jira/{TICKET_ID}.json`. Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
+5. **Run ↔ Plan bridge** — apply `rules/workflow/run-plan-bridge.md`:
+   - If `.aura/plans/active.json#active.task` is set → **auto-anchor** run-state to that T4; Sprint Contract seeds from the task's acceptance criteria; Phase 5 syncs status back to the plan tree.
+   - If `active.feature` is set but `active.task` is null → suggest `/aura-frog:plan-next` to claim a task first (user may reply `proceed` to run inline).
+   - If no plan exists and the task description triggers ≥3 escalation weight (multi-feature, multi-week, shipping/rollout/epic keywords) → suggest `/aura-frog:plan` to bootstrap T0-T2 first. Honor `proceed` to run inline.
+   - Disable with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. Force-mode prefixes (`must do:`, `just do:`, `exactly:`) skip the bridge.
+6. Load project context
+7. Verify complexity — suggest lighter approach if simple
+8. Socratic brainstorming (Standard/Deep only)
+9. Challenge requirements (`rules/workflow/requirement-challenger.md`)
+10. **Sprint Contract** — negotiate "done" criteria before Phase 2 (anchor-aware: cannot weaken plan acceptance without `manual_override.json` audit entry)
 
 ## 5-Phase Workflow
 

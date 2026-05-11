@@ -247,7 +247,7 @@
 
 **How applied:** 22 core rules load every session (~3.5K tokens). Agent rules load when that agent activates. Workflow rules load when that phase runs.
 
-**Why you need it:** Loading all 70 rules every session would be ~18K tokens. 3-tier reduces to ~3.5K always + ~5K conditional = ~50% reduction.
+**Why you need it:** Loading all 71 rules every session would be ~18K tokens. 3-tier reduces to ~3.5K always + ~5K conditional = ~50% reduction.
 
 **Use cases:**
 - Sessions where you only edit frontend code (architect rules never load)
@@ -491,7 +491,7 @@ Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
 - Only do throwaway scripts / single-file edits
 - Don't want any workflow overhead
 - Have strict Haiku-only budgets (some features use Sonnet)
-- Prefer minimalist plugins (Aura Frog is substantial — 15 agents, 55 skills, 70 rules)
+- Prefer minimalist plugins (Aura Frog is substantial — 15 agents, 55 skills, 71 rules)
 
 🎯 **Best fit:** Teams shipping production features where quality + security + cost control all matter.
 

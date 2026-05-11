@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 70 (22 core + 19 agent + 29 workflow)
+**Total Rules:** 71 (22 core + 19 agent + 30 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -13,10 +13,10 @@ Rules are organized into tiers to reduce context overhead. Only load what's need
 tiers[3]{tier,dir,count,when_loaded}:
   Core,rules/core/,22,ALWAYS — every session
   Agent,rules/agent/,19,Per-agent — only when agent activates
-  Workflow,rules/workflow/,29,Per-phase — only during active workflow
+  Workflow,rules/workflow/,30,Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 70 rules every message.
+**Token savings:** ~30-50% reduction vs loading all 71 rules every message.
 
 ---
 
@@ -77,10 +77,10 @@ agent[19]{rule,priority,agents}:
 
 ---
 
-## Workflow Rules (29) — Loaded Per Phase
+## Workflow Rules (30) — Loaded Per Phase
 
 ```toon
-workflow[29]{rule,priority,phases}:
+workflow[30]{rule,priority,phases}:
   workflow-deliverables,critical,All phases
   requirement-challenger,high,Phase 1
   collaborative-planning,high,Phase 1 (Deep only)
@@ -110,6 +110,7 @@ workflow[29]{rule,priority,phases}:
   session-reset-policy,high,"Memory tier — Epic distillation triggers + 500/8000 token caps + what's preserved"
   preflight-policies,critical,"Pre-flight Tier 1 — when, what, exit-code semantics, bypass policy + 3-bypasses-warn"
   conflict-arbitration-policy,critical,"L1-L4 conflict decision table — auto/manual boundary, freeze cascade, replan_budget interaction, cycle guard"
+  run-plan-bridge,high,"/run ↔ /plan auto-anchor + escalation heuristic — Phase 1 setup (between agent-detector and Sprint Contract)"
 ```
 
 ---

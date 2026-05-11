@@ -36,7 +36,9 @@ Next ready task:
 - Acceptance: AC-1 in story.md
 - Depends on: (none)
 
-Dispatching to tdd-engineer...
+To execute: `/aura-frog:run <one-line description>` — the run will auto-anchor
+to this task via the Run ↔ Plan bridge (see `rules/workflow/run-plan-bridge.md`).
+Or dispatch the agent manually via the Agent tool.
 ```
 
 ## Constraints

@@ -63,6 +63,10 @@ AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
 AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 ```
 
+### Added (post-release polish — 2026-05-11)
+
+- **Run ↔ Plan bridge** — `/aura-frog:run` now auto-anchors to the active T4 task when `.aura/plans/active.json#active.task` is set; deliverables sync back to the plan tree on Phase 5. If a Feature is active but no task is claimed, suggests `/aura-frog:plan-next`. If no plan exists and the task description hits multi-feature/epic/shipping heuristics (escalation weight ≥ 3 across 6 signals), suggests `/aura-frog:plan` bootstrap first. Reverse direction: `/aura-frog:plan-next` surfaces a `/aura-frog:run` hint when it claims a task. Force modes (`must do:`, `just do:`, `exactly:`) skip the bridge; disable globally with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. New rule: `rules/workflow/run-plan-bridge.md`. Updates: `skills/run-orchestrator/SKILL.md` Phase 1 setup, `commands/run.md` protocol, `commands/plan-next.md` output template. Rule count 70 → **71** (workflow 29 → 30).
+
 ### Fixed (post-release polish — 2026-05-11)
 
 - **Command namespace consistency** — renamed 18 `aura-*.md` command files to drop the redundant `aura-` prefix; the slash form was displaying as `/aura-frog:aura-plan` (plugin prefix + filename redundancy). New slash forms match the core `/aura-frog:run` convention: `/aura-frog:plan`, `/aura-frog:plan-expand`, `/aura-frog:trace`, `/aura-frog:heal`, `/aura-frog:mcp`, `/aura-frog:dashboard`, `/aura-frog:extend`, `/aura-frog:preflight`, `/aura-frog:reset-session`, plus 10 `plan-*` subcommands. Updated ~140 references across docs, agents, hooks, rules, scripts, READMEs to long-form (e.g. `/aura:plan:expand` → `/aura-frog:plan-expand`). `git mv` preserved history. Audit clean.

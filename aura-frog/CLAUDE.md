@@ -183,7 +183,7 @@ Details: `rules/core/context-management.md`
 tiers[3]{tier,count,when}:
   Core (rules/core/),22,Every session
   Agent (rules/agent/),19,Per-agent type
-  Workflow (rules/workflow/),29,Per-phase
+  Workflow (rules/workflow/),30,Per-phase
 ```
 
 **Core rule paths (read on-demand when the topic comes up):**
