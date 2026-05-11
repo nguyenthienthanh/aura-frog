@@ -7,7 +7,7 @@
     "rules": { "total": 71, "core": 22, "agent": 19, "workflow": 30 },
     "commands": 24,
     "hooks": 42,
-    "mcpServers": 6,
+    "mcpServers": { "total": 8, "enabled": 6 },
     "scripts": 62
   },
   "performance": {

@@ -48,49 +48,59 @@ const SCANNABLE = new Set([
   '.vue', '.svelte',
 ]);
 
-try {
-  const filePath = process.env.CLAUDE_FILE_PATHS || '';
-  if (!filePath) process.exit(0);
-
-  const ext = path.extname(filePath).toLowerCase();
-  if (!SCANNABLE.has(ext)) process.exit(0);
-
-  if (!fs.existsSync(filePath)) process.exit(0);
-
-  const content = fs.readFileSync(filePath, 'utf-8');
+// Pure function — scan content + return findings. No I/O, no exit.
+function scanContent(content) {
   const lines = content.split('\n');
   const findings = [];
-
   for (const [category, patterns] of Object.entries(PATTERNS)) {
     for (const { re, msg } of patterns) {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        // Skip comments and test files
         if (line.trimStart().startsWith('//') || line.trimStart().startsWith('#')) continue;
         if (line.trimStart().startsWith('*')) continue;
-
         if (re.test(line)) {
           findings.push({ category, msg, line: i + 1 });
-          break; // One finding per pattern per file
+          break;
         }
       }
     }
   }
+  return findings;
+}
 
-  if (findings.length > 0) {
-    const icon = findings.some(f => f.category === 'secrets') ? '🔴' : '🟡';
-    console.error(`${icon} Security scan: ${findings.length} issue(s) in ${path.basename(filePath)}`);
-    for (const f of findings.slice(0, 5)) {
-      console.error(`   L${f.line}: [${f.category}] ${f.msg}`);
+function isScannable(filePath) {
+  return SCANNABLE.has(path.extname(filePath).toLowerCase());
+}
+
+function main() {
+  try {
+    const filePath = process.env.CLAUDE_FILE_PATHS || '';
+    if (!filePath) process.exit(0);
+    if (!isScannable(filePath)) process.exit(0);
+    if (!fs.existsSync(filePath)) process.exit(0);
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const findings = scanContent(content);
+
+    if (findings.length > 0) {
+      const icon = findings.some(f => f.category === 'secrets') ? '🔴' : '🟡';
+      console.error(`${icon} Security scan: ${findings.length} issue(s) in ${path.basename(filePath)}`);
+      for (const f of findings.slice(0, 5)) {
+        console.error(`   L${f.line}: [${f.category}] ${f.msg}`);
+      }
+      if (findings.length > 5) {
+        console.error(`   ... and ${findings.length - 5} more`);
+      }
+      process.exit(1);
     }
-    if (findings.length > 5) {
-      console.error(`   ... and ${findings.length - 5} more`);
-    }
-    process.exit(1); // Warning
+    process.exit(0);
+  } catch {
+    process.exit(0);
   }
+}
 
-  process.exit(0);
-
-} catch (error) {
-  process.exit(0); // Fail open
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { PATTERNS, SCANNABLE, scanContent, isScannable };
 }

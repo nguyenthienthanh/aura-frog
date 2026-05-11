@@ -80,6 +80,17 @@ AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
 AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 ```
 
+### Fixed (re-review polish — 2026-05-11, ~4h after first patch batch)
+
+A second senior review pulled the post-fix tree and flagged 7 remaining findings (1 hot: test theater; 2 cold; 4 polish). This commit closes the highest-ROI ones.
+
+- **Test theater killed.** All 6 hook tests (`scout-block`, `prompt-reminder`, `scope-drift`, `security-scan`, `smart-learn`, `token-tracker`) now `require()` the production hooks directly instead of re-declaring the functions inline. Each hook source got a `if (require.main === module) main(); else module.exports = {...};` guard so `main()` only runs when the file is invoked as a script. Verified end-to-end: `npx jest --coverage` reports **31.76% statement coverage** across the 6 hooks (was **0%** before — review's #1 concern). 215 tests pass against real source.
+- **Coverage gate in CI.** `jest.config.cjs` gains `coverageThreshold` (statements 25 / branches 20 / functions 40 / lines 25 — set as no-regression floor at current measured level). `ci.yml` now runs `npm test -- --coverage` so the threshold gates builds. As more hooks get tests (issue [#5](https://github.com/nguyenthienthanh/aura-frog/issues/5)), the floor ratchets up toward the senior review's 60% target.
+- **`tool-call-tracer` real O(1) fix.** Replaced the half-measure in-memory counter (which the reviewer correctly identified as a per-invocation cache, not an actual O(n²) fix because each hook is a fresh Node process) with a sibling `.aura/plans/traces/{TASK_ID}.count` file. Atomic write via tmp+rename. Each event reads 4 bytes, not the full trace. True O(1) per event over a task lifetime.
+- **`mcp-call-gate` no longer fails open silently when agent identity is unknown.** Order: stdin JSON `data.agent / data.agent_name / data.subagent_type` → `CLAUDE_AGENT_NAME` env var → fallback `'main'` (backward-compat). When BOTH stdin and env are absent, a one-time stderr warning is emitted (`.claude/logs/.mcp-agent-hint-shown` flag-file prevents spam) so admins notice the gate is in allow-all mode rather than mistakenly trusting the "per-agent security" claim. Smoke-tested: stdin `{"agent":"architect"}` against a non-allowlisted MCP blocks correctly.
+- **`hooks.json` duplicate `"async": true`** on the lint-autofix entry — removed. Caused by an earlier copy-paste; JSON.parse tolerated it but it signalled missing linter discipline.
+- **`stats.json` mcpServers semantic** — changed from scalar `6` (enabled-only) to `{ total: 8, enabled: 6 }` so the same number doesn't mean two different things across `stats.json` and `CLAUDE.md`/manifest.
+
 ### Security (post-release polish — 2026-05-11)
 
 - **`.envrc` trust gate (HIGH-severity fix)** — closes the auto-source-of-untrusted-file finding from the senior review. New helper `aura-frog/scripts/envrc-guarded-source.sh` only sources `$PWD/.envrc` when its sha256 matches an entry in `~/.config/aura-frog/envrc-trust.json`. All 8 inline `if [ -f .envrc ]; then set -a; source .envrc; …; fi` hook commands in `hooks.json` now call the gate. New CLI: `af envrc allow|revoke|status|list`. Tampering with a previously-trusted `.envrc` invalidates the trust (hash mismatch → skip). Opt-out for legacy behavior: `AF_ENVRC_UNSAFE_AUTO_SOURCE=true`. `af doctor` surfaces the trust state. Verified end-to-end: untrusted .envrc skipped, approved .envrc sourced, tampered .envrc re-skipped.

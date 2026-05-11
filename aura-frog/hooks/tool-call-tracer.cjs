@@ -53,23 +53,28 @@ const ts = new Date().toISOString();
 if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
 const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
 
-// Event counter — cached after first read to avoid O(n²) full-file scans.
-// Increments in-memory for each event appended during this hook invocation;
-// a fresh hook process re-reads once, then increments. taskSlug keeps the
-// id safe for taskIds like "T2.3" (would otherwise collide with "T23").
-let _eventCount = null;
+// Event counter — persisted in a sibling .count file so each fresh Node
+// process reads at most 4 bytes (not the full trace). True O(1) per event;
+// fixes the prior O(n²) over a task lifetime that the half-measure
+// in-memory cache only solved within a single invocation.
+// Atomic-ish: read counter → +1 → write counter (no flock; single-driver
+// assumption per spec §2.1.6, and the JSONL append below would race anyway).
+// taskSlug keeps the id safe for taskIds like "T2.3" vs "T23".
 const taskSlug = taskId.replace(/[^A-Za-z0-9]+/g, '-');
+const counterFile = path.join(TRACES_DIR, `${taskId}.count`);
 function nextEventId() {
-  if (_eventCount === null) {
-    _eventCount = 0;
-    if (fs.existsSync(traceFile)) {
-      const buf = fs.readFileSync(traceFile, 'utf8');
-      // Count newlines instead of split/filter — O(n) but no array allocation.
-      for (let i = 0; i < buf.length; i++) if (buf.charCodeAt(i) === 10) _eventCount++;
-    }
-  }
-  _eventCount++;
-  return `TR-${taskSlug}-${String(_eventCount).padStart(3, '0')}`;
+  let n = 0;
+  try {
+    n = parseInt(fs.readFileSync(counterFile, 'utf8'), 10) || 0;
+  } catch {/* fresh task or unreadable — start from 0 */}
+  n++;
+  try {
+    // Atomic write so a kill -9 mid-write doesn't corrupt the counter.
+    const tmp = `${counterFile}.tmp-${process.pid}`;
+    fs.writeFileSync(tmp, String(n));
+    fs.renameSync(tmp, counterFile);
+  } catch {/* best-effort; never block trace emission on counter persist */}
+  return `TR-${taskSlug}-${String(n).padStart(3, '0')}`;
 }
 
 // Cap file hashing to keep huge binaries from blocking the hook.

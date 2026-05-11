@@ -63,8 +63,11 @@ jobs:
       - name: Install dev dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage gate
+        # `npm test -- --coverage` enforces the threshold in jest.config.cjs.
+        # CI fails if any of statements / branches / functions / lines drops
+        # below the floor. Tracks no-regression discipline.
+        run: npm test -- --coverage
 
       - name: Security audit (advisory)
         run: npm audit --audit-level=high || true

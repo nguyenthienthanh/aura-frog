@@ -1,65 +1,19 @@
 /**
- * Tests for scout-block.cjs
+ * Tests for aura-frog/hooks/scout-block.cjs
  *
- * Tests: isBlocked logic, allowed build commands, custom .afignore patterns
+ * Imports pure functions directly from the production hook — NO re-declaration.
+ * Coverage reports under `npx jest --coverage` reflect real source touched.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Replicate pure functions from source for unit testing
-
-const DEFAULT_BLOCKED = [
-  'node_modules',
-  '__pycache__',
-  '.git',
-  'dist',
-  'build',
-  'vendor',
-  '.next',
-  '.nuxt',
-  'coverage',
-  '.cache',
-  '.turbo',
-  'target',
-  'bin',
-  'obj',
-];
-
-const ALLOWED_COMMANDS = [
-  'npm build',
-  'npm run build',
-  'yarn build',
-  'pnpm build',
-  'npx build',
-  'go build',
-  'cargo build',
-  'dotnet build',
-];
-
-function isBlocked(targetPath, patterns) {
-  const normalized = targetPath.replace(/\\/g, '/').toLowerCase();
-  const segments = normalized.split('/');
-  return patterns.some(pattern => {
-    const lowerPattern = pattern.toLowerCase();
-    return segments.some(segment => segment === lowerPattern);
-  });
-}
-
-function isAllowedBuildCommand(command) {
-  return ALLOWED_COMMANDS.some(allowed => command.includes(allowed));
-}
-
-function loadCustomPatterns(projectRoot) {
-  const ignoreFile = path.join(projectRoot, '.afignore');
-  if (fs.existsSync(ignoreFile)) {
-    return fs.readFileSync(ignoreFile, 'utf-8')
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line && !line.startsWith('#'));
-  }
-  return [];
-}
+const {
+  DEFAULT_BLOCKED,
+  isBlocked,
+  isAllowedBuildCommand,
+  loadCustomPatterns,
+} = require('../../aura-frog/hooks/scout-block.cjs');
 
 describe('scout-block', () => {
   describe('isBlocked', () => {
@@ -111,12 +65,19 @@ describe('scout-block', () => {
       expect(isBlocked('/project/target/debug/binary', DEFAULT_BLOCKED)).toBe(true);
     });
 
-    it('blocks path containing bin (Go)', () => {
-      expect(isBlocked('/project/bin/server', DEFAULT_BLOCKED)).toBe(true);
+    // Reflects current behavior: bin/ and obj/ are NOT in DEFAULT_BLOCKED anymore
+    // (they collided with Node bin/ entrypoints, Go cmd/, committed binaries).
+    // Projects that want them blocked add to .afignore.
+    it('does NOT block path containing bin by default (Node/Go bin/ collide)', () => {
+      expect(isBlocked('/project/bin/server', DEFAULT_BLOCKED)).toBe(false);
     });
 
-    it('blocks path containing obj (.NET)', () => {
-      expect(isBlocked('/project/obj/Debug/net6.0/app.dll', DEFAULT_BLOCKED)).toBe(true);
+    it('does NOT block path containing obj by default', () => {
+      expect(isBlocked('/project/obj/Debug/net6.0/app.dll', DEFAULT_BLOCKED)).toBe(false);
+    });
+
+    it('blocks bin when added via custom patterns', () => {
+      expect(isBlocked('/project/bin/server', [...DEFAULT_BLOCKED, 'bin'])).toBe(true);
     });
 
     it('allows normal source paths', () => {
@@ -137,7 +98,6 @@ describe('scout-block', () => {
     });
 
     it('matches exact segments only', () => {
-      // "builder" contains "build" but is a different segment
       expect(isBlocked('/project/builder/output.js', DEFAULT_BLOCKED)).toBe(false);
     });
 
@@ -189,6 +149,7 @@ describe('scout-block', () => {
     });
 
     it('blocks commands that partially match', () => {
+      // 'echo build' contains substring 'build' but not any ALLOWED entry verbatim.
       expect(isAllowedBuildCommand('echo build')).toBe(false);
     });
   });

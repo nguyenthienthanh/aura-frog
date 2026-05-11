@@ -74,8 +74,47 @@ function parseMcpToolName(name) {
 const parsed = parseMcpToolName(toolName);
 if (!parsed) safeExit(0);
 
-// Resolve calling agent — Claude Code passes this via env when an agent is active
-const agentName = process.env.CLAUDE_AGENT_NAME || 'main';
+// Resolve calling agent. Claude Code's documented hook contract passes a JSON
+// payload via stdin (session_id, tool_name, tool_input, …). Agent identity is
+// not yet a documented field, so we try multiple stdin shapes first, then fall
+// back to CLAUDE_AGENT_NAME env var, then warn-once if neither is set so the
+// per-agent allowlist failure mode is visible rather than silent.
+//
+// Fail-open (agentName='main' → all MCPs allowed) is intentional for the
+// backward-compat path: agents that haven't declared `mcp_servers:` frontmatter
+// stay permissive. The warn-once message tells admins to either set env var or
+// declare allowlists per agent.
+function readAgentFromStdin() {
+  try {
+    const buf = fs.readFileSync(0, 'utf8').trim();
+    if (!buf) return null;
+    const data = JSON.parse(buf);
+    return data.agent || data.agent_name || data.subagent_type || null;
+  } catch {
+    return null;
+  }
+}
+const stdinAgent = readAgentFromStdin();
+const envAgent = process.env.CLAUDE_AGENT_NAME;
+const agentName = stdinAgent || envAgent || 'main';
+
+// One-time stderr hint when we couldn't resolve the agent. Helps the user
+// notice that the per-agent gate is in backward-compat mode (allow-all)
+// instead of failing-closed silently.
+if (!stdinAgent && !envAgent) {
+  const flagFile = path.join(process.cwd(), '.claude', 'logs', '.mcp-agent-hint-shown');
+  try {
+    if (!fs.existsSync(flagFile)) {
+      fs.mkdirSync(path.dirname(flagFile), { recursive: true });
+      fs.writeFileSync(flagFile, new Date().toISOString());
+      process.stderr.write(
+        `[mcp-call-gate] WARN: agent identity unknown (no stdin .agent / no CLAUDE_AGENT_NAME).\n` +
+        `  Per-agent MCP allowlist is in backward-compat mode (allow-all). To enforce:\n` +
+        `  set CLAUDE_AGENT_NAME in your wrapper OR declare mcp_servers: [...] in agent frontmatter.\n`
+      );
+    }
+  } catch {/* best-effort; never block on hint */}
+}
 
 // Look up allowlist from agent file
 function getAllowlist(agentId) {

@@ -55,4 +55,9 @@ function main() {
   }
 }
 
-main();
+// Export pure functions for tests; execute main() only when invoked directly.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { needsTddReminder, needsApprovalReminder, main };
+}

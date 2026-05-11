@@ -126,57 +126,62 @@ function estimateFileTokens(filePath) {
   return 0;
 }
 
-try {
-  const input = fs.readFileSync(0, 'utf-8').trim();
-  if (!input) process.exit(0);
+function main() {
+  try {
+    const input = fs.readFileSync(0, 'utf-8').trim();
+    if (!input) process.exit(0);
 
-  const data = JSON.parse(input);
-  const toolName = data.tool_name || 'default';
-  const toolInput = data.tool_input || {};
+    const data = JSON.parse(input);
+    const toolName = data.tool_name || 'default';
+    const toolInput = data.tool_input || {};
 
-  const tracker = loadTracker();
+    const tracker = loadTracker();
 
-  // Reset if new session
-  const currentSession = process.ppid?.toString();
-  if (tracker.sessionId !== currentSession) {
-    tracker.sessionId = currentSession;
-    tracker.totalEstimate = 5000;
-    tracker.toolCalls = 0;
-    tracker.lastWarningPct = 0;
-    tracker.startedAt = Date.now();
-  }
-
-  // Estimate tokens for this operation
-  let tokensUsed = TOKEN_COSTS[toolName] || TOKEN_COSTS.default;
-
-  // Add file-specific estimate for Read operations
-  if (toolName === 'Read') {
-    tokensUsed += estimateFileTokens(toolInput.file_path);
-  }
-
-  // Add response estimate (tool output)
-  tokensUsed += 200; // Average Claude response per tool call
-
-  tracker.totalEstimate += tokensUsed;
-  tracker.toolCalls++;
-
-  // Check thresholds
-  const currentPct = Math.round((tracker.totalEstimate / CONTEXT_LIMIT) * 100);
-
-  const budgetK = Math.round(CONTEXT_LIMIT / 1000);
-  for (const threshold of THRESHOLDS) {
-    if (currentPct >= threshold.pct && tracker.lastWarningPct < threshold.pct) {
-      console.error(`${threshold.icon} Approx token usage: ~${Math.round(tracker.totalEstimate / 1000)}K / ${budgetK}K (~${currentPct}%, heuristic) [${threshold.label}]`);
-      console.error(`   ${threshold.msg}`);
-      tracker.lastWarningPct = threshold.pct;
-      break;
+    const currentSession = process.ppid?.toString();
+    if (tracker.sessionId !== currentSession) {
+      tracker.sessionId = currentSession;
+      tracker.totalEstimate = 5000;
+      tracker.toolCalls = 0;
+      tracker.lastWarningPct = 0;
+      tracker.startedAt = Date.now();
     }
+
+    let tokensUsed = TOKEN_COSTS[toolName] || TOKEN_COSTS.default;
+    if (toolName === 'Read') {
+      tokensUsed += estimateFileTokens(toolInput.file_path);
+    }
+    tokensUsed += 200;
+
+    tracker.totalEstimate += tokensUsed;
+    tracker.toolCalls++;
+
+    const currentPct = Math.round((tracker.totalEstimate / CONTEXT_LIMIT) * 100);
+    const budgetK = Math.round(CONTEXT_LIMIT / 1000);
+    for (const threshold of THRESHOLDS) {
+      if (currentPct >= threshold.pct && tracker.lastWarningPct < threshold.pct) {
+        console.error(`${threshold.icon} Approx token usage: ~${Math.round(tracker.totalEstimate / 1000)}K / ${budgetK}K (~${currentPct}%, heuristic) [${threshold.label}]`);
+        console.error(`   ${threshold.msg}`);
+        tracker.lastWarningPct = threshold.pct;
+        break;
+      }
+    }
+
+    saveTracker(tracker);
+    saveSessionMetrics(tracker, toolName);
+    process.exit(0);
+  } catch {
+    process.exit(0);
   }
+}
 
-  saveTracker(tracker);
-  saveSessionMetrics(tracker, toolName);
-  process.exit(0);
-
-} catch (error) {
-  process.exit(0); // Fail open
+if (require.main === module) {
+  main();
+} else {
+  module.exports = {
+    TOKEN_COSTS,
+    THRESHOLDS,
+    CONTEXT_LIMIT,
+    estimateFileTokens,
+    loadTracker,
+  };
 }
