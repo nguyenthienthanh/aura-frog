@@ -11,7 +11,48 @@ user-invocable: false
 
 For complex features / multi-file changes requiring TDD. NOT for: bug fixes (bugfix-quick), quick edits (direct).
 
-## Step 0 — Create the Run State (MANDATORY, BEFORE ANY OTHER WORK)
+## Step 0 — Escalation Check (precondition, v3.7.2+)
+
+Before creating run-state.json, screen the task description for project-level scope via the bridge heuristic in `rules/workflow/run-plan-bridge.md`. The 8-trigger rubric (multi_feature, multi_week, shipping_scope, scale_words, cross_session, user_explicit, word_count, scope_verbs) sums to a weight; if weight ≥ 3 AND no plan tree exists (`.aura/plans/active.json` missing), emit this 3-option prompt:
+
+```
+Your task scores ≥3 on the escalation heuristic — multi-feature / multi-session scope.
+Options:
+  plan    — bootstrap /aura-frog:plan first (writes pending-plan-bootstrap.json)
+  deep    — proceed with normal Deep flow (escalation_declined: true recorded)
+  details — show breakdown of which signals fired, re-ask
+```
+
+**Honour the answer:**
+
+- `plan` → write `.claude/cache/pending-plan-bootstrap.json` (schema below) and invoke `/aura-frog:plan`. Do NOT proceed to Step 0b until the plan returns.
+- `deep` (or legacy alias `proceed`) → set `escalation_declined: true` in the run-state when it's created. Continue.
+- `details` → render which signals fired with weights, then re-ask.
+
+**Skip the prompt when:**
+
+- `.aura/plans/active.json` exists → fall through to Step 1 (plan_anchored / plan_idle states from `run-plan-bridge.md` apply).
+- `AF_ESCALATION_DISABLED=true` env var is set.
+- Task description has an override prefix: `task:` (force task mode, skip ask) or `project:` (force project mode, skip ask + write scratch file).
+- Force prefixes `must do:` / `just do:` / `exactly:` are present (these bypass the entire bridge per the bridge rule).
+
+### pending-plan-bootstrap.json schema
+
+```json
+{
+  "schema_version": 1,
+  "from_run_id": "auth-260511",
+  "mission_seed": "<verbatim user task description>",
+  "feature_seeds": ["auth", "billing", "dashboard"],
+  "created_at": "2026-05-11T16:00:00Z",
+  "trigger_weight": 5,
+  "signals_fired": ["multi_feature", "shipping_scope", "scope_verbs"]
+}
+```
+
+`feature_seeds` are extracted as comma-or-plus-separated noun phrases from the task; the plan command interview-confirms before minting Feature nodes. The file is deleted by `commands/plan.md` after consumption.
+
+## Step 0b — Create the Run State (MANDATORY, BEFORE ANY OTHER WORK)
 
 The moment you decide a `/run` invocation will use this orchestrator, write the initial state file. **Do NOT proceed without it.** Without the file, `/run status`, `/run resume`, and `/run handoff` cannot work — they all read from this file.
 

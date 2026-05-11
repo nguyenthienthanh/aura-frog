@@ -12,15 +12,19 @@ The universal entry point. Type `/run <task>` and Aura Frog auto-detects intent:
 When the user types `/run <task>`, Claude MUST execute these steps in order. Do NOT skip ahead to implementation.
 
 1. **Read `skills/run-orchestrator/SKILL.md` fully.** That skill carries the playbook. This command file is documentation about /run, not the playbook itself.
-2. **Run agent-detector** to classify complexity (Quick / Standard / Deep) and pick the flow per the detection table below.
-3. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0. **MANDATORY** — do not proceed without it.
-4. **Apply the Run ↔ Plan bridge** (`rules/workflow/run-plan-bridge.md`):
+2. **Run agent-detector** to classify complexity (Quick / Standard / Deep / Project) and pick the flow per the detection table below.
+3. **Escalation check (v3.7.2+)** — Before creating the run state, evaluate the escalation heuristic from `rules/workflow/run-plan-bridge.md`. If the task scores weight ≥ 3 AND no plan tree exists, emit the 3-option prompt (`plan` / `deep` / `details`). See `skills/run-orchestrator/SKILL.md` Step 0 for full semantics. Override prefixes:
+   - `/run task: <desc>` — force task mode (Quick/Standard/Deep), skip escalation.
+   - `/run project: <desc>` — force project mode; write `.claude/cache/pending-plan-bootstrap.json` and invoke `/aura-frog:plan` directly.
+   - `AF_ESCALATION_DISABLED=true` — opts out per-session.
+4. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0b. **MANDATORY** — do not proceed without it. If escalation ran and the user picked `deep`, record `escalation_declined: true` in run-state.
+5. **Apply the Run ↔ Plan bridge** (`rules/workflow/run-plan-bridge.md`):
    - `.aura/plans/active.json#active.task` set → auto-anchor; deliverables sync back to the plan tree on Phase 5.
-   - Active feature without claimed task → suggest `/aura-frog:plan-next`.
-   - No plan + multi-feature/epic/shipping signals (weight ≥ 3) → suggest `/aura-frog:plan` bootstrap.
-   - User can always reply `proceed` to override; `AF_RUN_PLAN_BRIDGE_DISABLED=true` disables the check entirely.
-5. **Announce the chosen flow** to the user transparently: "Detected: Standard → single-agent inline (no plan). Say `deep` to escalate." When anchored, also state the anchor: "Anchored to TASK-00101 (story STORY-0042, feature FEAT-A)."
-6. **Then** execute the chosen flow. For Deep, follow the 5-phase workflow in run-orchestrator. For Standard/Quick, lighter flow per the table.
+   - Active feature without claimed task → suggest `/aura-frog:plan next`.
+   - No plan + escalation prompt was emitted in Step 3 (the trigger heuristic owns this case now).
+   - `AF_RUN_PLAN_BRIDGE_DISABLED=true` disables the bridge entirely (also disables Step 3 escalation).
+6. **Announce the chosen flow** to the user transparently: "Detected: Standard → single-agent inline (no plan). Say `deep` to escalate." When anchored, also state the anchor: "Anchored to TASK-00101 (story STORY-0042, feature FEAT-A)."
+7. **Then** execute the chosen flow. For Deep, follow the 5-phase workflow in run-orchestrator. For Standard/Quick, lighter flow per the table. For Project (escalated via Step 3), the run handed off to `/aura-frog:plan` and this invocation terminates.
 
 If any step fails, surface the failure to the user — do not silently fall through to direct implementation.
 
@@ -68,6 +72,12 @@ actions[8]{input,action}:
 ```
 
 Force mode (skip brainstorming): prefix with `must do:`, `just do:`, `exactly:`.
+
+**Mode-override prefixes** (v3.7.2+, control the escalation check):
+
+- `/run task: <desc>` — force task mode; skip the project-mode escalation check.
+- `/run project: <desc>` — force project mode; write `pending-plan-bootstrap.json` and route to `/aura-frog:plan`.
+- `AF_ESCALATION_DISABLED=true` — per-session opt-out of the escalation check.
 
 ---
 

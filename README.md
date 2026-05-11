@@ -141,12 +141,19 @@ flowchart LR
 
 **What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.aura/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
 
+**v3.7.2+ consolidated form** — one command, 11 verbs:
+
 ```bash
-/aura-frog:plan                # Interview-bootstraps T0 → T1 → T2
-/aura-frog:plan-expand FEAT-7  # Decompose T2 → Stories (T3)
-/aura-frog:plan-next           # Claim next ready Task; /run auto-anchors to it
-/aura-frog:plan-status         # Render ASCII tree
+/aura-frog:plan                          # Interview-bootstraps T0 → T1 → T2
+/aura-frog:plan expand FEAT-7            # Decompose one tier down
+/aura-frog:plan next                     # Claim next ready Task; /run auto-anchors
+/aura-frog:plan status                   # ASCII tree
+/aura-frog:plan {replan,promote,archive,undo,freeze,thaw,conflicts} <args>
 ```
+
+Bare-word activation when a plan is active: just type `next`, `expand FEAT-A`, etc. — the bare-word-router hook treats short verb-first prompts as `/aura-frog:plan <prompt>`. Legacy `/aura-frog:plan-<verb>` aliases still work (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0).
+
+**`/run` escalation:** Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt 3 options — `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details` (show signals). Force with `/run task: …` or `/run project: …`; opt out via `AF_ESCALATION_DISABLED=true`.
 
 ```mermaid
 flowchart TB
@@ -403,7 +410,7 @@ Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AU
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 71 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 71 rules, 56 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -1318,10 +1325,10 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
-├── skills/         55 skills (9 auto-invoke + 46 on-demand)
+├── skills/         56 skills (9 auto-invoke + 47 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          71 rules (22 core + 19 agent + 30 workflow)
-├── hooks/          42 lifecycle hooks (conditional execution)
+├── hooks/          43 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
 └── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)

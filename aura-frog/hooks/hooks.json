@@ -255,6 +255,11 @@
             "type": "command",
             "async": true,
             "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bare-word-router.cjs\""
           }
         ]
       }
