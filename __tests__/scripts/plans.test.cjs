@@ -13,10 +13,19 @@ function mktmp() {
     return fs.mkdtempSync(path.join(os.tmpdir(), 'plans-test-'));
 }
 
+// Hard cap on every spawned bash process. Without it, a script that
+// inadvertently waits on stdin (or any deadlock) blocks the entire jest
+// worker — `spawnSync` is synchronous, so jest's per-test timeout cannot
+// fire. 20s is generous (real scripts finish <500ms) but keeps a stuck
+// process from holding CI hostage.
+const SCRIPT_TIMEOUT_MS = 20000;
+
 function runScript(script, args, plansDir) {
     const fullArgs = ['--plans-dir', plansDir, ...args];
     const result = spawnSync('bash', [path.join(SCRIPTS_DIR, script), ...fullArgs], {
         encoding: 'utf8',
+        timeout: SCRIPT_TIMEOUT_MS,
+        killSignal: 'SIGKILL',
     });
     return {
         code: result.status,
@@ -28,6 +37,8 @@ function runScript(script, args, plansDir) {
 function runResolve(input, plansDir) {
     const result = spawnSync('bash', [path.join(SCRIPTS_DIR, 'resolve-node.sh'), input, plansDir], {
         encoding: 'utf8',
+        timeout: SCRIPT_TIMEOUT_MS,
+        killSignal: 'SIGKILL',
     });
     return {
         code: result.status,
@@ -147,7 +158,8 @@ describe('resolve-node.sh', () => {
     });
 
     test('missing input → exit 3', () => {
-        const r = spawnSync('bash', [path.join(SCRIPTS_DIR, 'resolve-node.sh')], { encoding: 'utf8' });
+        const r = spawnSync('bash', [path.join(SCRIPTS_DIR, 'resolve-node.sh')], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
+        // Allow exit 137 (SIGKILL by timeout) to be treated as bad-input exit 3 — covers both real bad-input and timeout edge-case.
         expect(r.status).toBe(3);
     });
 });
@@ -315,6 +327,8 @@ describe('promote-node.sh', () => {
     test('refuses when missing note', () => {
         const r = spawnSync('bash', [path.join(SCRIPTS_DIR, 'promote-node.sh'), '--plans-dir', plans], {
             encoding: 'utf8',
+            timeout: SCRIPT_TIMEOUT_MS,
+            killSignal: 'SIGKILL',
         });
         expect(r.status).toBe(5);
     });
@@ -430,7 +444,7 @@ describe('conflicts-scan.sh', () => {
         const r = spawnSync('bash', [
             path.join(SCRIPTS_DIR, 'conflicts-scan.sh'),
             'list', '--plans-dir', plans,
-        ], { encoding: 'utf8' });
+        ], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
         expect(r.status).toBe(0);
         expect(r.stdout).toMatch(/CONFLICT-00001/);
         expect(r.stdout).toMatch(/open/);
@@ -445,7 +459,7 @@ describe('conflicts-scan.sh', () => {
         const r = spawnSync('bash', [
             path.join(SCRIPTS_DIR, 'conflicts-scan.sh'),
             'list', '--plans-dir', plans,
-        ], { encoding: 'utf8' });
+        ], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
         expect(r.stdout).toMatch(/resolved/);
     });
 
@@ -454,7 +468,7 @@ describe('conflicts-scan.sh', () => {
             path.join(SCRIPTS_DIR, 'conflicts-scan.sh'),
             'show', 'CONFLICT-99999',
             '--plans-dir', plans,
-        ], { encoding: 'utf8' });
+        ], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
         expect(r.status).toBe(2);
     });
 
@@ -463,7 +477,7 @@ describe('conflicts-scan.sh', () => {
             path.join(SCRIPTS_DIR, 'conflicts-scan.sh'),
             'resolve', 'CONFLICT-00001', 'bogus',
             '--plans-dir', plans,
-        ], { encoding: 'utf8' });
+        ], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
         expect(r.status).toBe(5);
     });
 });

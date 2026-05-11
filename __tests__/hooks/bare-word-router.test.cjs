@@ -226,6 +226,8 @@ describe('end-to-end hook invocation', () => {
             cwd: opts.cwd || tmpDir,
             encoding: 'utf8',
             env: { ...process.env, ...opts.env },
+            timeout: 10000,
+            killSignal: 'SIGKILL',
         });
     }
 
@@ -269,6 +271,8 @@ describe('end-to-end hook invocation', () => {
             input: 'not-json-at-all next',
             cwd: tmpDir,
             encoding: 'utf8',
+            timeout: 10000,
+            killSignal: 'SIGKILL',
         });
         expect(r.status).toBe(0);
         // Falls back to treating raw input as the prompt; 'not-json-at-all next'
