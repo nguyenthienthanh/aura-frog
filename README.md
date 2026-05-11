@@ -173,12 +173,13 @@ You: "approve"
 Expected output:
 
 ```
-🐸 Aura Frog v3.6.0 — Ready
-  Agents:   9 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner)
-  Skills:   44 available (5 auto-invoke, 39 on-demand)
-  Rules:    57 loaded (18 core + 17 agent + 22 workflow)
-  Hooks:    28 registered
-  MCP:      context7, playwright, vitest, firebase, figma, slack
+🐸 Aura Frog v3.7.0 — Ready
+  Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
+                       master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
+  Skills:   55 available (9 auto-invoke, 46 on-demand)
+  Rules:    70 loaded (22 core + 19 agent + 29 workflow)
+  Hooks:    42 registered
+  MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
 ```
 
 ### Initialize Your Project (Recommended — one time)
