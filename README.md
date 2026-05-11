@@ -141,12 +141,19 @@ flowchart LR
 
 **What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.aura/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
 
+**v3.7.2+ consolidated form** — one command, 11 verbs:
+
 ```bash
-/aura-frog:plan                # Interview-bootstraps T0 → T1 → T2
-/aura-frog:plan-expand FEAT-7  # Decompose T2 → Stories (T3)
-/aura-frog:plan-next           # Claim next ready Task; /run auto-anchors to it
-/aura-frog:plan-status         # Render ASCII tree
+/aura-frog:plan                          # Interview-bootstraps T0 → T1 → T2
+/aura-frog:plan expand FEAT-7            # Decompose one tier down
+/aura-frog:plan next                     # Claim next ready Task; /run auto-anchors
+/aura-frog:plan status                   # ASCII tree
+/aura-frog:plan {replan,promote,archive,undo,freeze,thaw,conflicts} <args>
 ```
+
+Bare-word activation when a plan is active: just type `next`, `expand FEAT-A`, etc. — the bare-word-router hook treats short verb-first prompts as `/aura-frog:plan <prompt>`. Legacy `/aura-frog:plan-<verb>` aliases still work (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0).
+
+**`/run` escalation:** Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt 3 options — `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details` (show signals). Force with `/run task: …` or `/run project: …`; opt out via `AF_ESCALATION_DISABLED=true`.
 
 ```mermaid
 flowchart TB

@@ -4,6 +4,55 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.7.2] - 2026-05-11 (Plan consolidation)
+
+> Consolidates `/aura-frog:plan-*` (10 verbs) under a single dispatcher backed by the new `plan-orchestrator` skill. Ships the 9 backing scripts the existing command files always promised. Adds bare-word activation when a plan is active, plus `/run` intelligent escalation for project-scope tasks.
+
+### Added
+
+- **`skills/plan-orchestrator/SKILL.md`** — verb_table[11], intent_keywords[11], 3-stage routing pipeline (explicit verb → intent classifier → LLM fallback). Single owner of the plan-vocabulary dispatch.
+- **`scripts/plans/_lib.sh`** — shared helpers (atomic write, get/set frontmatter, save_checkpoint, append_history, next_counter, bump_revision) with macOS BSD sed compatibility (Python fallback for JSON ops).
+- **`scripts/plans/resolve-node.sh`** — node lookup: exact ID, lowercase normalisation, title-substring fallback, `--active`/`--feature`/`--story`/`--initiative` special tokens. Exit 0 single / 1 multi / 2 none.
+- **9 new backing scripts** under `scripts/plans/` — `expand-node` (T1→T2→T3→T4 prep), `next-task` (pop next ready T4), `freeze-branch` (cascade-freeze descendants), `thaw-branch` (reverse freeze with conflict-resolution gate), `archive-feature` (compress completed T2+), `conflicts-scan` (list/show/resolve/history/check), `replan-node` (budget-aware), `promote-node` (bubble T4 discovery up), `undo-decision` (LIFO checkpoint restore).
+- **`hooks/bare-word-router.cjs`** — UserPromptSubmit hook that fires only when `.aura/plans/active.json` exists. Routes verb-first prompts (≤5 words, first token ∈ 11-verb vocab) to `/aura-frog:plan <prompt>`. Async, ≤100ms cold-start, never blocks. Opt-out via `AF_BARE_WORD_ROUTER_DISABLED=true`.
+- **`/run` intelligent escalation** — `rules/workflow/run-plan-bridge.md` extended to 8 triggers (added `word_count` weight 1 + `scope_verbs` weight 2). At weight ≥ 3 without an active plan, `run-orchestrator` Step 0 emits a 3-option prompt (`plan` / `deep` / `details`). On `plan`, writes `.claude/cache/pending-plan-bootstrap.json` with mission seed + feature seeds, then invokes `/aura-frog:plan`. Override prefixes: `/run task: <desc>`, `/run project: <desc>`. Opt-out: `AF_ESCALATION_DISABLED=true`.
+- **`Project` complexity level** in `agent-detector` (only fires when bridge weight ≥ 3 + no plan; Quick/Standard/Deep classification unchanged otherwise).
+
+### Updated
+
+- **`commands/plan.md`** — rewritten as the single dispatcher. Documents 3-stage routing, power-user shortcuts, bare-word activation, override prefixes (`must do:` / `just do:` / `exactly:`), and the pending-plan-bootstrap.json consumption flow.
+- **`commands/plan-{expand,next,status,replan,promote,archive,undo,freeze,thaw,conflicts}.md`** — collapsed to ~20-line alias stubs that delegate to `plan.md`. Each file documents the deprecation timeline (soft v3.7.2 → warning v4.0 → removed v5.0).
+- **`commands/run.md`** — documents the new escalation step, override prefixes, and `AF_ESCALATION_DISABLED` env var.
+- **`skills/run-orchestrator/SKILL.md`** — adds Step 0 (Escalation Check) before run-state creation (renamed Step 0b). Documents the `pending-plan-bootstrap.json` schema.
+
+### Tests
+
+- **`__tests__/scripts/plans.test.cjs`** — 38 unit tests against the 9 backing scripts + resolve-node.sh, using temp `.aura/plans/` fixtures. All scripts shelled out via spawnSync; assertions on observable file/JSON state.
+- **`__tests__/hooks/bare-word-router.test.cjs`** — 64 tests (8 verbs × 3 cases each per the issue spec + override/plan-active/latency/crash recovery). 85% statements / 100% functions coverage. Imports via `require()` from production source (no test theater).
+- Full suite: 255 + new tests pass; coverage gate unchanged at 25% floor.
+
+### Stats diff
+
+| | v3.7.1 | v3.7.2 |
+|---|---:|---:|
+| Skills | 55 | **56** (+plan-orchestrator) |
+| Hooks | 42 | **43** (+bare-word-router) |
+| Commands | 24 | 24 (alias stubs retained for backwards compat) |
+| Backing scripts | 3 | **12** (resolve-node + _lib + 9 new) |
+| Tests | 215 | **317** (+102 plan + bare-word) |
+
+### Deprecation timeline
+
+- `/aura-frog:plan-{expand,next,status,replan,promote,archive,undo,freeze,thaw,conflicts}` (10 aliases): **soft-deprecated v3.7.2**, warning emitted v4.0, removed v5.0. New users should prefer the consolidated `/aura-frog:plan <verb>` form. The bare-word activation (`next`, `expand FEAT-A`, etc.) works with both.
+
+### Migration notes
+
+- No breaking changes. Every legacy `/aura-frog:plan-<verb>` invocation continues to work via the alias stubs, which now delegate to the new backing scripts.
+- Projects with `.aura/plans/active.json` will see the bare-word router suggest routes for verb-first prompts. To opt out: `export AF_BARE_WORD_ROUTER_DISABLED=true`.
+- Multi-feature `/run` invocations will see the escalation prompt. To opt out per-session: `export AF_ESCALATION_DISABLED=true`. To force-bypass for one invocation: prefix with `task:` or `project:`.
+
+---
+
 ## [3.7.1] - 2026-05-11 (CI stabilization)
 
 > **Patch release.** An external senior review pulled HEAD post-v3.7.0 and found CI was red — the `|| true` masks we removed in v3.7.0 polish exposed three pre-existing script bugs and one ESLint v9 break. v3.7.1 closes them so CI is green on `main` and contributor PRs don't fail spurious checks. Zero behavioural change to runtime; this is plumbing.
