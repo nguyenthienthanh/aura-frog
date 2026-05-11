@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
   "version": "3.7.1",
-  "description": "Planning-first LLM OS for software engineering. Hierarchical planning (T0-T4) survives session reset · forensic reasoning traces · L1+L2 conflict detection · self-healing safety gates · per-agent MCP security · CLI dashboard. 15 agents, 5-phase TDD, 71 rules (3-tier), 56 skills, 24 commands, 42 hooks, 8 MCP servers. ~87% markdown. Backward-compatible with /run.",
+  "description": "Planning-first LLM OS for software engineering. Hierarchical planning (T0-T4) survives session reset · forensic reasoning traces · L1+L2 conflict detection · self-healing safety gates · per-agent MCP security · CLI dashboard. 15 agents, 5-phase TDD, 71 rules (3-tier), 56 skills, 24 commands, 43 hooks, 8 MCP servers. ~87% markdown. Backward-compatible with /run.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",

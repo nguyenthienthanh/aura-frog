@@ -57,22 +57,37 @@ Wait for user input. `proceed` skips the bridge; anything else routes through `/
 When `.aura/plans/` doesn't exist, scan the task description against these triggers:
 
 ```toon
-escalation_triggers[6]{signal,weight}:
+escalation_triggers[8]{signal,weight}:
   multi_feature,"contains 2+ distinct user-facing capabilities (e.g. 'auth + billing + dashboard')",2
   multi_week,"contains 'roadmap', 'epic', 'initiative', 'multi-week', 'over N weeks/months', 'phase 1 of'",2
   shipping_scope,"contains 'ship v', 'v2.0', 'rollout', 'migrate from X to Y', 'launch'",2
   scale_words,"contains 'across N teams', '50+ files', 'monorepo migration', 'org-wide'",1
   cross_session,"contains 'continue from yesterday', 'session reset', 'come back to'",1
   user_explicit,"contains 'plan first', 'decompose', 'hierarchical'",3
+  word_count,"task description exceeds 80 words (length-as-complexity proxy)",1
+  scope_verbs,"contains 'rebuild', 'redesign', 'rewrite', 'from-scratch', 'overhaul'",2
 ```
 
 **Suggest planning if total weight ≥ 3.**
 
-The suggestion is a soft prompt:
+The suggestion is a 3-option prompt (v3.7.2+):
 
-> Your task looks like multi-session/multi-feature scope. Recommend `/aura-frog:plan` first to bootstrap T0→T2, then `/aura-frog:plan-expand` for Stories/Tasks. Reply `plan` to bootstrap, or `proceed` to run inline anyway.
+> Your task scores ≥3 on the escalation heuristic — multi-feature / multi-session scope.
+> Options:
+>   `plan` — bootstrap `/aura-frog:plan` first (writes pending-plan-bootstrap.json with mission + feature seeds)
+>   `deep` — proceed with normal Deep flow (`escalation_declined: true` recorded in run-state)
+>   `details` — show the breakdown of which signals fired, re-ask
 
-Honor `proceed` immediately. Default to inline if no signals match.
+Honor `proceed` (legacy alias for `deep`) immediately. Default to inline if no signals match. Phase C of v3.7.2 wires `run-orchestrator` to emit this prompt and consume the answer.
+
+When the user picks `plan`, run-orchestrator writes `.claude/cache/pending-plan-bootstrap.json` then invokes `/aura-frog:plan` — see "Pending bootstrap from /run escalation" section in `commands/plan.md` for the consumption schema.
+
+### Override prefixes (skip the heuristic)
+
+- `/run task: <desc>` — force task mode, skip escalation entirely (treat as Quick/Standard).
+- `/run project: <desc>` — force project mode, skip ask (writes pending-plan-bootstrap.json and routes to `/aura-frog:plan`).
+
+These bypass the heuristic; combine with `AF_ESCALATION_DISABLED=true` for full per-session opt-out.
 
 ---
 
@@ -99,10 +114,11 @@ The user can also dispatch a different agent manually via the Agent tool — anc
 ## Disable
 
 ```
-export AF_RUN_PLAN_BRIDGE_DISABLED=true
+export AF_RUN_PLAN_BRIDGE_DISABLED=true     # disable all three states (anchor/idle/heuristic)
+export AF_ESCALATION_DISABLED=true          # disable just the escalation heuristic (v3.7.2+)
 ```
 
-Bypasses all three states. `/run` behaves exactly as in v3.7.0-rc.1 (no plan awareness).
+`AF_RUN_PLAN_BRIDGE_DISABLED` makes `/run` behave exactly as in v3.7.0-rc.1 (no plan awareness). `AF_ESCALATION_DISABLED` is narrower — it skips the weight-≥-3 prompt but still allows anchoring to an existing active task.
 
 ---
 

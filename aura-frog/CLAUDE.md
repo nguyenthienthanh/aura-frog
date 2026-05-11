@@ -275,8 +275,8 @@ resources[8]{name,location}:
   Agents (15),agents/
   Commands (24),commands/
   Rules (70),rules/{core|agent|workflow}/
-  Skills (55),skills/
-  Hooks (42),hooks/
+  Skills (56),skills/
+  Hooks (43),hooks/
   MCP (8),.mcp.json (postgres + redis disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)

@@ -1321,7 +1321,7 @@ aura-frog/
 ├── skills/         56 skills (9 auto-invoke + 47 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          71 rules (22 core + 19 agent + 30 workflow)
-├── hooks/          42 lifecycle hooks (conditional execution)
+├── hooks/          43 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
 └── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)
