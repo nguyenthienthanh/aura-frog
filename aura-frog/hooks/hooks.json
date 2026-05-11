@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
           },
           {
             "type": "command",
@@ -121,7 +121,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -140,10 +140,11 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
           },
           {
             "type": "command",
+            "async": true,
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/lint-autofix.cjs\" 2>&1"
           },
@@ -155,12 +156,12 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
           },
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -239,7 +240,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
           },
           {
             "type": "command",
@@ -254,7 +255,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
           }
         ]
       }
@@ -302,7 +303,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
           },
           {
             "type": "command",

@@ -63,6 +63,11 @@ AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
 AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 ```
 
+### Security (post-release polish — 2026-05-11)
+
+- **`.envrc` trust gate (HIGH-severity fix)** — closes the auto-source-of-untrusted-file finding from the senior review. New helper `aura-frog/scripts/envrc-guarded-source.sh` only sources `$PWD/.envrc` when its sha256 matches an entry in `~/.config/aura-frog/envrc-trust.json`. All 8 inline `if [ -f .envrc ]; then set -a; source .envrc; …; fi` hook commands in `hooks.json` now call the gate. New CLI: `af envrc allow|revoke|status|list`. Tampering with a previously-trusted `.envrc` invalidates the trust (hash mismatch → skip). Opt-out for legacy behavior: `AF_ENVRC_UNSAFE_AUTO_SOURCE=true`. `af doctor` surfaces the trust state. Verified end-to-end: untrusted .envrc skipped, approved .envrc sourced, tampered .envrc re-skipped.
+- **`escapeShellValue` backtick escape (HIGH-severity fix)** — env-file values now escape backticks, closing the path where a git branch/remote URL containing backticks would survive double-quote shell escape and command-substitute on next source. Verified: `feat/test\`curl evil\`` → `feat/test\\\`curl evil\\\``.
+
 ### Added (post-release polish — 2026-05-11)
 
 - **Run ↔ Plan bridge** — `/aura-frog:run` now auto-anchors to the active T4 task when `.aura/plans/active.json#active.task` is set; deliverables sync back to the plan tree on Phase 5. If a Feature is active but no task is claimed, suggests `/aura-frog:plan-next`. If no plan exists and the task description hits multi-feature/epic/shipping heuristics (escalation weight ≥ 3 across 6 signals), suggests `/aura-frog:plan` bootstrap first. Reverse direction: `/aura-frog:plan-next` surfaces a `/aura-frog:run` hint when it claims a task. Force modes (`must do:`, `just do:`, `exactly:`) skip the bridge; disable globally with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. New rule: `rules/workflow/run-plan-bridge.md`. Updates: `skills/run-orchestrator/SKILL.md` Phase 1 setup, `commands/run.md` protocol, `commands/plan-next.md` output template. Rule count 70 → **71** (workflow 29 → 30).

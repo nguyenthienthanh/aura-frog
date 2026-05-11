@@ -245,8 +245,31 @@ case "${1:-help}" in
     else
       echo "ℹ️  No project context (run project:init)"
     fi
-    # Check env
-    [ -f ".envrc" ] && echo "✅ .envrc found" || echo "ℹ️  No .envrc (optional)"
+    # Check env + trust state
+    if [ -f ".envrc" ]; then
+      trust_file="${HOME}/.config/aura-frog/envrc-trust.json"
+      if [ -f "$trust_file" ] && command -v jq >/dev/null 2>&1; then
+        expected=$(jq -r --arg p "$PWD/.envrc" '.[$p].sha256 // empty' "$trust_file" 2>/dev/null)
+        if [ -n "$expected" ]; then
+          if command -v sha256sum >/dev/null 2>&1; then
+            current=$(sha256sum .envrc | awk '{print $1}')
+          else
+            current=$(shasum -a 256 .envrc | awk '{print $1}')
+          fi
+          if [ "$current" = "$expected" ]; then
+            echo "✅ .envrc found + trusted"
+          else
+            echo "⚠️  .envrc found but hash changed since approval (run: af envrc allow)"
+          fi
+        else
+          echo "⚠️  .envrc found but NOT trusted (auto-source disabled — run: af envrc allow)"
+        fi
+      else
+        echo "⚠️  .envrc found but NOT trusted (auto-source disabled — run: af envrc allow)"
+      fi
+    else
+      echo "ℹ️  No .envrc (optional)"
+    fi
     # Check git
     git rev-parse --is-inside-work-tree &>/dev/null && echo "✅ Git repo" || echo "⚠️  Not a git repo"
     # Check CLI install
@@ -273,6 +296,134 @@ case "${1:-help}" in
     fi
     ;;
 
+  envrc)
+    # Trust-file management for .envrc auto-sourcing.
+    # Aura Frog hooks call envrc-guarded-source.sh which only sources
+    # .envrc files whose sha256 matches an entry in ~/.config/aura-frog/envrc-trust.json.
+    trust_dir="${HOME}/.config/aura-frog"
+    trust_file="${trust_dir}/envrc-trust.json"
+    envrc_path="$PWD/.envrc"
+
+    _compute_hash() {
+      if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$1" | awk '{print $1}'
+      elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$1" | awk '{print $1}'
+      else
+        return 1
+      fi
+    }
+
+    case "${2:-status}" in
+      allow)
+        if [ ! -f "$envrc_path" ]; then
+          echo "❌ No .envrc found in $(pwd)"
+          exit 1
+        fi
+        hash=$(_compute_hash "$envrc_path") || { echo "❌ Need sha256sum or shasum"; exit 1; }
+        mkdir -p "$trust_dir"
+        [ -f "$trust_file" ] || echo '{}' > "$trust_file"
+        now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        if command -v jq >/dev/null 2>&1; then
+          tmp=$(mktemp)
+          jq --arg p "$envrc_path" --arg s "$hash" --arg t "$now" \
+            '.[$p] = { sha256: $s, approved_at: $t }' "$trust_file" > "$tmp" && mv "$tmp" "$trust_file"
+        elif command -v python3 >/dev/null 2>&1; then
+          python3 -c "
+import json, sys, os
+p, s, t, tf = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+data = json.load(open(tf)) if os.path.exists(tf) else {}
+data[p] = {'sha256': s, 'approved_at': t}
+json.dump(data, open(tf, 'w'), indent=2)
+" "$envrc_path" "$hash" "$now" "$trust_file"
+        else
+          echo "❌ Need jq or python3 to update trust file"
+          exit 1
+        fi
+        echo "✅ Approved: $envrc_path"
+        echo "   sha256:  $hash"
+        echo "   stored:  $trust_file"
+        ;;
+      revoke)
+        if [ ! -f "$trust_file" ]; then
+          echo "ℹ️  No trust file at $trust_file"
+          exit 0
+        fi
+        if command -v jq >/dev/null 2>&1; then
+          tmp=$(mktemp)
+          jq --arg p "$envrc_path" 'del(.[$p])' "$trust_file" > "$tmp" && mv "$tmp" "$trust_file"
+        elif command -v python3 >/dev/null 2>&1; then
+          python3 -c "
+import json, sys, os
+p, tf = sys.argv[1], sys.argv[2]
+data = json.load(open(tf)) if os.path.exists(tf) else {}
+data.pop(p, None)
+json.dump(data, open(tf, 'w'), indent=2)
+" "$envrc_path" "$trust_file"
+        else
+          echo "❌ Need jq or python3"
+          exit 1
+        fi
+        echo "✅ Revoked: $envrc_path"
+        ;;
+      status)
+        echo "🐸 .envrc trust status"
+        echo "===================="
+        echo "Current dir: $(pwd)"
+        if [ ! -f "$envrc_path" ]; then
+          echo "  .envrc:    ❌ not present"
+        else
+          current_hash=$(_compute_hash "$envrc_path" 2>/dev/null)
+          echo "  .envrc:    ✅ present"
+          echo "  sha256:    $current_hash"
+        fi
+        if [ ! -f "$trust_file" ]; then
+          echo "  Trust file: ❌ not created (run: af envrc allow)"
+          exit 0
+        fi
+        echo "  Trust file: ✅ $trust_file"
+        if [ -f "$envrc_path" ]; then
+          if command -v jq >/dev/null 2>&1; then
+            expected=$(jq -r --arg p "$envrc_path" '.[$p].sha256 // empty' "$trust_file" 2>/dev/null)
+          else
+            expected=""
+          fi
+          if [ -z "$expected" ]; then
+            echo "  This .envrc: ❌ NOT trusted → auto-source disabled (run: af envrc allow)"
+          elif [ "$expected" = "$current_hash" ]; then
+            echo "  This .envrc: ✅ trusted (hash matches) → auto-source enabled"
+          else
+            echo "  This .envrc: ⚠️  trusted hash MISMATCH (file changed since approval)"
+            echo "                  Re-approve with: af envrc allow"
+          fi
+        fi
+        ;;
+      list)
+        if [ ! -f "$trust_file" ]; then
+          echo "ℹ️  No trust file"
+          exit 0
+        fi
+        if command -v jq >/dev/null 2>&1; then
+          jq -r 'to_entries[] | "  \(.value.approved_at)  \(.key)"' "$trust_file"
+        else
+          cat "$trust_file"
+        fi
+        ;;
+      *)
+        echo "Usage: af envrc <allow|revoke|status|list>"
+        echo ""
+        echo "  allow    Compute sha256 of \$PWD/.envrc and store in trust file"
+        echo "  revoke   Remove the trust entry for \$PWD/.envrc"
+        echo "  status   Show whether \$PWD/.envrc is trusted (default)"
+        echo "  list     List all trusted .envrc paths"
+        echo ""
+        echo "Background: hooks source .envrc only when its hash matches a"
+        echo "stored entry. Closes a HIGH-severity finding where cloning a"
+        echo "hostile repo would auto-execute arbitrary code."
+        ;;
+    esac
+    ;;
+
   help|-h|--help|*)
     echo "🐸 Aura Frog CLI v$VERSION"
     echo ""
@@ -284,6 +435,7 @@ case "${1:-help}" in
     echo "  update     Check for updates"
     echo "  version    Show current version"
     echo "  doctor     Health check"
+    echo "  envrc      Manage .envrc trust (allow/revoke/status/list)"
     echo "  measure    Run performance measurement"
     echo "  profile    Profile hook execution times"
     echo "  help       Show this help"
