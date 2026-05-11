@@ -143,7 +143,7 @@ When a phase is re-executed after modify or reject:
 
 1. **Verify deliverable files on disk match updated content** — don't just update in-memory
 2. **Log the event** to execution.log: `[timestamp] Phase N re-executed after [modify|reject]: <reason>`
-3. **Update workflow-state.json** with modification/rejection entry including timestamp, reason, and changes list
+3. **Update run-state.json** with modification/rejection entry including timestamp, reason, and changes list
 4. **Check file mtimes** — deliverable files should have been updated more recently than the rejection timestamp
 
 ```typescript
@@ -486,7 +486,7 @@ const diagramValidation = validateDiagrams(currentPhase, phaseState.deliverables
 if (!diagramValidation.valid) {
   diagramValidation.warnings.forEach(w => console.warn(w));
   console.warn('   See: rules/workflow/diagram-requirements.md');
-  console.warn('   Reference: docs/WORKFLOW_DIAGRAMS.md');
+  console.warn('   Reference: docs/architecture/WORKFLOW_DIAGRAMS.md');
 }
 ```
 

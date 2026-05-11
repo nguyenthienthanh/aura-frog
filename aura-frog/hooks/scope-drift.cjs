@@ -59,39 +59,41 @@ function calculateOverlap(taskKeywords, promptKeywords) {
   return matched.length / promptKeywords.length;
 }
 
-try {
-  const userPrompt = process.env.CLAUDE_USER_PROMPT || '';
-  if (!userPrompt || userPrompt.length < 20) process.exit(0);
+function main() {
+  try {
+    const userPrompt = process.env.CLAUDE_USER_PROMPT || '';
+    if (!userPrompt || userPrompt.length < 20) process.exit(0);
 
-  // Skip workflow commands
-  if (userPrompt.startsWith('/') || userPrompt.startsWith('workflow:')) {
+    if (userPrompt.startsWith('/') || userPrompt.startsWith('workflow:')) {
+      process.exit(0);
+    }
+
+    const sessionId = process.ppid?.toString();
+    const state = readSessionState(sessionId);
+    const taskDescription = state?.taskDescription || state?.task || '';
+    if (!taskDescription) process.exit(0);
+
+    const hasFeatureTrigger = FEATURE_TRIGGERS.some(re => re.test(userPrompt));
+
+    const taskKeywords = extractKeywords(taskDescription);
+    const promptKeywords = extractKeywords(userPrompt);
+    const overlap = calculateOverlap(taskKeywords, promptKeywords);
+
+    if (hasFeatureTrigger && overlap < 0.2) {
+      console.error('🔀 Scope drift detected: This looks like a new feature outside the current workflow.');
+      console.error(`   Current task: "${taskDescription.substring(0, 60)}"`);
+      console.error('   Consider starting a separate workflow for better focus and token efficiency.');
+      process.exit(1);
+    }
+
+    process.exit(0);
+  } catch {
     process.exit(0);
   }
+}
 
-  // Check for active workflow
-  const sessionId = process.ppid?.toString();
-  const state = readSessionState(sessionId);
-  const taskDescription = state?.taskDescription || state?.task || '';
-  if (!taskDescription) process.exit(0);
-
-  // Check for feature-trigger phrases
-  const hasFeatureTrigger = FEATURE_TRIGGERS.some(re => re.test(userPrompt));
-
-  // Calculate keyword overlap
-  const taskKeywords = extractKeywords(taskDescription);
-  const promptKeywords = extractKeywords(userPrompt);
-  const overlap = calculateOverlap(taskKeywords, promptKeywords);
-
-  // Warn if: low overlap AND feature trigger phrase detected
-  if (hasFeatureTrigger && overlap < 0.2) {
-    console.error('🔀 Scope drift detected: This looks like a new feature outside the current workflow.');
-    console.error(`   Current task: "${taskDescription.substring(0, 60)}"`);
-    console.error('   Consider starting a separate workflow for better focus and token efficiency.');
-    process.exit(1); // Warning
-  }
-
-  process.exit(0);
-
-} catch (error) {
-  process.exit(0); // Fail open
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { extractKeywords, calculateOverlap, FEATURE_TRIGGERS, STOPWORDS };
 }

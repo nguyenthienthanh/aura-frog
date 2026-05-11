@@ -8,7 +8,13 @@ triggers:
   - "php"
   - "eloquent"
   - "artisan"
+paths:
+  - "**/*.php"
+  - "composer.json"
+  - "artisan"
+  - "config/*.php"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Laravel Expert — Gotchas & Decisions

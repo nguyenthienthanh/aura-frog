@@ -1,3 +1,12 @@
+---
+name: tester
+description: "Test strategy, automation, TDD enforcement, coverage analysis. Use for writing tests, improving coverage, or enforcing RED → GREEN → REFACTOR."
+tools: Read, Grep, Glob, Edit, Write, Bash
+mcp_servers: [vitest, playwright]
+model: sonnet
+color: green
+---
+
 # Agent: Tester
 
 **Agent ID:** `tester`
@@ -94,6 +103,21 @@ Claims: `tests/`, `__tests__/`, `spec/`, test configs (`jest.config.*`, `vitest.
 ---
 
 **Full Reference:** `agents/reference/tester-patterns.md` (load on-demand when deep expertise needed)
+
+---
+
+## Related Rules & Skills
+
+**Rules:**
+- `rules/core/tdd-workflow.md` — RED → GREEN → REFACTOR
+- `rules/core/verification.md` — Verify before claiming done
+- `rules/core/code-quality.md` — Coverage targets
+- `rules/workflow/post-implementation-linting.md` — Phase 3 + 4 lint gates
+- `rules/workflow/workflow-deliverables.md` — What tester must deliver
+- `rules/core/simplicity-over-complexity.md` — KISS for tests — AAA, one concern per test, no shared mutable state, no over-mocked setups
+
+**Skills:**
+- `skills/test-writer/SKILL.md` — TDD patterns, AAA structure, framework detection
 
 ---
 

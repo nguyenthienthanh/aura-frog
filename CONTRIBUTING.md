@@ -91,18 +91,19 @@ cp .envrc.template .envrc
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── CLAUDE.md                    # Core AI instructions
-│   ├── .mcp.json                    # Bundled MCP servers config (6 servers)
-│   ├── agents/                      # 10 specialized agents (consolidated)
-│   ├── commands/                    # 26 commands (5 bundled entry points)
-│   ├── skills/                      # 44 skills (8 auto-invoke + 36 reference)
-│   ├── rules/                       # 45 quality rules
-│   ├── hooks/                       # 28 lifecycle hooks (.cjs scripts)
+│   ├── .mcp.json                    # Bundled MCP servers config (8 servers — 6 enabled, postgres+redis opt-in)
+│   ├── agents/                      # 15 specialized agents
+│   ├── commands/                    # 24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
+│   ├── skills/                      # 55 skills (9 auto-invoke + 46 reference)
+│   ├── rules/                       # 70 quality rules (22 core + 19 agent + 30 workflow)
+│   ├── hooks/                       # 42 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # AI reference docs + phase guides
 │   ├── templates/                   # Document templates
-│   ├── scripts/                     # Bash integration scripts
+│   ├── scripts/                     # Bash + Node integration scripts (CI, plans, preflight, workflow, security)
 │   └── project-contexts/            # Project templates
 ├── assets/                          # Logo and images
 ├── scripts/                         # Development scripts
+│   ├── af                           # CLI wrapper
 │   └── sync-version.sh              # Version synchronization
 ├── CONTRIBUTING.md                  # This file
 └── README.md                        # Project overview
@@ -299,6 +300,46 @@ mcp:status
 ```
 
 **See:** [MCP Guide](docs/operations/MCP_GUIDE.md) for complete MCP setup
+
+---
+
+## Behavioral Evaluation
+
+Every PR that touches `skills/`, `agents/`, `commands/`, or `rules/` automatically runs a **behavioral eval** via [`cc-plugin-eval`](https://github.com/sjnims/cc-plugin-eval) in GitHub Actions. This measures whether skills still trigger correctly when expected — catching regressions when a rewrite breaks the description-to-intent matching.
+
+### What runs
+
+- Auto-invoke skills only (the 5 skills with `autoInvoke: true`)
+- 5 scenarios per skill, auto-generated for diversity
+- Compared against `aura-frog/eval-baseline.json`
+
+### Thresholds
+
+- **Absolute:** trigger accuracy ≥ 85% per skill
+- **Relative:** no drop > 10% from baseline
+
+CI fails if either threshold breaks. If that happens, check the `eval-results.json` artifact uploaded by the Action for per-scenario detail.
+
+### Running locally before PR
+
+```bash
+# From repo root, after cc-plugin-eval is installed (see EVAL_SETUP.md)
+npx cc-plugin-eval run -p ./aura-frog \
+  --components skills --filter "autoInvoke:true" \
+  --output eval-results.json
+
+node aura-frog/scripts/ci/check-eval-regression.cjs \
+  --current eval-results.json \
+  --baseline aura-frog/eval-baseline.json
+```
+
+### Updating the baseline
+
+Regenerate `aura-frog/eval-baseline.json` when:
+- Adding a new auto-invoke skill
+- Substantially rewriting a skill description in a way that improves accuracy
+
+Full setup + troubleshooting: [docs/guides/EVAL_SETUP.md](docs/guides/EVAL_SETUP.md).
 
 ---
 

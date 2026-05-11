@@ -130,8 +130,8 @@ All 53 tests passing, 87% coverage achieved ✅
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "/workflow approve" → Proceed to Phase 4
-Type "/workflow reject <reason>" → Revise implementation
+Type "approve" → Proceed to Phase 4
+Type "reject <reason>" → Revise implementation
 
 Your response:
 ═══════════════════════════════════════════════════════════

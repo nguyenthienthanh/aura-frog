@@ -1,67 +1,34 @@
 # Command: help
 
-**Category:** System  
-**Priority:** Low  
+**Category:** System
 **Syntax:** `/help [command|topic]`
-
----
-
-## Description
-
-Display help information for commands or topics.
-
----
-
-## Usage
-
-### General Help
-```bash
-/help
-```
-
-### Command Help
-```bash
-/help workflow:start
-/help agent:list
-```
-
-### Topic Help
-```bash
-/help workflows
-/help agents
-/help approval-gates
-```
 
 ---
 
 ## Output
 
-### General Help
 ```markdown
-## Aura Frog Team Agents - Command Reference
+## Aura Frog — Command Reference
 
-**Workflow Commands:**
-- /workflow start - Start new workflow
-- /workflow status - Check progress
-- /workflow approve - Approve phase
-- /workflow reject - Reject phase
-- /workflow modify - Modify phase deliverables
+**Core:**
+- /run <task> — Auto-detect and execute (feature/bugfix/refactor/test/deploy/review)
+- approve / reject / modify — Context-aware actions during active run
 
-**Agent Commands:**
-- /agent:list - List agents
-- /agent:info - Agent details
+**Verify:**
+- /check — Run all quality checks
+- /check security / perf / complexity / debt / coverage / deps
 
-**Project Commands:**
-- /project init - Initialize project
-- /project status - Current project
-- /project detect - Detect tech stack
+**Design:**
+- /design api / db / doc — Design before coding
 
-**System Commands:**
-- /help - Show help
+**Project:**
+- /project init / status / refresh / detect / env / sync
 
-**Need more help?**
-- Read: README.md
-- Conversational: Just ask naturally!
+**System:**
+- /af status / agents / metrics / learn / setup / update / mcp
+
+**Help:**
+- /help — Show this reference
 ```
 
 ---
@@ -69,8 +36,3 @@ Display help information for commands or topics.
 ## Aliases
 
 - `/?` (short form)
-- `/docs`
-
----
-
-

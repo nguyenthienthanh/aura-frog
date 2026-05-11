@@ -10,7 +10,7 @@
 
 **Build for everyone. Use semantic HTML first, ARIA sparingly, and test with keyboard + screen reader.**
 
-**Full Guide:** See `skills/qa-expert/accessibility-testing.md`
+**Related:** `rules/agent/frontend-excellence.md` (UX laws), `skills/design-expert/SKILL.md` (component design), `skills/test-writer/SKILL.md` (test patterns).
 
 ---
 

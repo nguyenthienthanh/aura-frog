@@ -93,11 +93,15 @@ show_token_usage() {
 # Log token usage to file
 log_token_usage() {
     local workflow_id=$(jq -r '.workflow_id' "$WORKFLOW_STATE" 2>/dev/null || echo "unknown")
-    local log_file="logs/workflows/$workflow_id/tokens.log"
+    # Primary path (v3.6+); fall back to legacy logs/workflows
+    local run_dir=".claude/logs/runs/$workflow_id"
+    [[ ! -d "$run_dir" ]] && [[ -d ".claude/logs/workflows/$workflow_id" ]] && run_dir=".claude/logs/workflows/$workflow_id"
+    [[ ! -d "$run_dir" ]] && [[ -d "logs/workflows/$workflow_id" ]] && run_dir="logs/workflows/$workflow_id"
 
-    if [[ ! -d "logs/workflows/$workflow_id" ]]; then
+    if [[ ! -d "$run_dir" ]]; then
         return
     fi
+    local log_file="$run_dir/tokens.log"
 
     local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     local total_tokens=$(jq -r '.total_tokens_used // 0' "$WORKFLOW_STATE")

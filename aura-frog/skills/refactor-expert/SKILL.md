@@ -9,6 +9,7 @@ triggers:
   - "improve code"
   - "refactor:analyze"
   - "refactor:plan"
+user-invocable: false
 ---
 
 # Skill: Refactor Expert
@@ -77,5 +78,15 @@ Never multiple changes between test runs.
 **Before:** Tests exist and pass, understand current behavior, identify smell.
 **During:** One change at a time, test after each, commit frequently.
 **After:** All tests pass, code cleaner, behavior unchanged.
+
+---
+
+## Related Rules
+
+- `rules/core/simplicity-over-complexity.md` — the point of refactoring: Rule of 3 before abstracting, delete before extracting, flatten before nesting
+- `rules/core/tdd-workflow.md` — refactor only when tests are green
+- `rules/core/verification.md` — tests must still pass after every step
+- `rules/workflow/cross-review-workflow.md` — refactorer ≠ reviewer
+- `skills/code-simplifier/SKILL.md` — companion skill for pure simplification passes
 
 ---

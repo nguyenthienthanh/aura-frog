@@ -1,18 +1,23 @@
 #!/bin/bash
 
 # Script: validate-config.sh
-# Purpose: Validate ccpm-config.yaml syntax and content
+# Purpose: Validate ccpm-config.yaml syntax and content (when present).
+#
+# This file only exists at the user-project level, not in the plugin repo.
+# CI runs this on the plugin repo and would always fail without this guard —
+# we treat "no file" as "nothing to validate" and exit 0.
 
 set -e
 
-CONFIG_FILE="ccpm-config.yaml"
+CONFIG_FILE="${1:-ccpm-config.yaml}"
 
 echo "🔍 Validating Aura Frog configuration..."
 
-# Check if file exists
+# Skip silently when the file is absent — this is the normal state for the
+# plugin repo itself (only user projects have a runtime ccpm-config.yaml).
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "❌ Error: $CONFIG_FILE not found"
-  exit 1
+  echo "ℹ️  No $CONFIG_FILE in CWD — skipping (normal for the plugin repo)."
+  exit 0
 fi
 
 # Validate YAML syntax

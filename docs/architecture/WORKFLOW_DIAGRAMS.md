@@ -63,7 +63,7 @@ graph TB
         end
 
         subgraph "Skills"
-            SK1[workflow-orchestrator]
+            SK1[run-orchestrator]
             SK2[agent-detector]
             SK3[project-context-loader]
             SK4[bugfix-quick]
@@ -118,7 +118,7 @@ graph LR
     end
 
     subgraph "Task Skills"
-        WO[workflow-orchestrator<br/>Complex features]
+        WO[run-orchestrator<br/>Complex features]
         BF[bugfix-quick<br/>Bug fixes]
         TW[test-writer<br/>Test requests]
     end

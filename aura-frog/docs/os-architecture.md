@@ -10,7 +10,7 @@
 os_map[10]{concept,implementation,detail}:
   CPU/Kernel,Claude + orchestrator rules,Dispatch + verify — never execute directly
   RAM,Context window,Managed segments with eviction policies
-  Processes,10 agents,PID + state + token budget per agent
+  Processes,9 agents,PID + state + token budget per agent
   Scheduler,5-phase TDD workflow,Priority-based phase progression
   Interrupts,Approval gates (P1 + P3),Human-in-the-loop checkpoints
   IPC,Handoff state / TOON snapshots,Agent-to-agent data passing

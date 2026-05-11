@@ -77,5 +77,5 @@ planning_role[4]{round,strategist_focus}:
 integrations[3]{with,how}:
   requirement-challenger rule,Adds business-level questions to challenge flow
   collaborative-planning rule,4th perspective in multi-team deliberation
-  workflow-orchestrator,Participates in Phase 1 and Phase 4 review
+  run-orchestrator,Participates in Phase 1 and Phase 4 review
 ```

@@ -8,7 +8,11 @@ triggers:
   - "composition api"
   - "pinia"
   - "nuxt"
+paths:
+  - "**/*.vue"
+  - "nuxt.config.*"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Vue Expert — Gotchas & Decisions

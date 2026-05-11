@@ -7,6 +7,7 @@ triggers:
   - "/learn apply"
   - "self improve"
   - "apply improvements"
+user-invocable: false
 ---
 
 # Self-Improve Skill
@@ -18,10 +19,10 @@ Apply learned improvements: update rules, adjust agent routing, modify workflow 
 ## Usage
 
 ```bash
-/learn apply                    # Review and apply pending
-/learn apply --auto             # Auto-apply high-confidence (>=0.8)
-/learn apply --preview          # Preview without applying
-/learn apply --id <pattern_id>  # Apply specific pattern
+/af learn apply                    # Review and apply pending
+/af learn apply --auto             # Auto-apply high-confidence (>=0.8)
+/af learn apply --preview          # Preview without applying
+/af learn apply --id <pattern_id>  # Apply specific pattern
 ```
 
 ---
@@ -42,7 +43,7 @@ types[4]{type,target,example}:
 
 **Approval required** unless: `--auto` AND confidence >= 0.8 AND frequency >= 5.
 
-**Rollback:** Every change creates backup + log. `/learn rollback <id>` or `--all`.
+**Rollback:** Every change creates backup + log. `/af learn rollback <id>` or `--all`.
 
 **Validation:** Syntax check, conflict detection, impact assessment before applying.
 
@@ -60,9 +61,9 @@ types[4]{type,target,example}:
 ## Rollback
 
 ```bash
-/learn rollback <change_id>     # Specific change
-/learn rollback --list          # List recent changes
-/learn rollback --all           # All changes from today
+/af learn rollback <change_id>     # Specific change
+/af learn rollback --list          # List recent changes
+/af learn rollback --all           # All changes from today
 ```
 
 ---

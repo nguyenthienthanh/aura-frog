@@ -10,13 +10,14 @@ triggers:
   - "TDD"
   - "E2E test"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
+user-invocable: false
 ---
 
 # Test Writer
 
 ## When to Use
 
-Adding tests, improving coverage, TDD (Phase 2/3). NOT for: bug fixes (bugfix-quick), features (workflow-orchestrator).
+Adding tests, improving coverage, TDD (Phase 2/3). NOT for: bug fixes (bugfix-quick), features (run-orchestrator).
 
 ---
 
@@ -70,3 +71,13 @@ frameworks[6]{framework,file_pattern,runner}:
   Cypress,"*.cy.ts","npx cypress"
   Detox,"*.e2e.ts","detox test"
 ```
+
+---
+
+## Related Rules
+
+- `rules/core/tdd-workflow.md` — RED → GREEN → REFACTOR
+- `rules/core/verification.md` — Read output, then claim
+- `rules/core/code-quality.md` — Coverage targets per file type
+- `rules/workflow/post-implementation-linting.md` — Lint after tests added
+- `rules/core/simplicity-over-complexity.md` — One concern per test, no shared mutable state, no over-engineered mocks

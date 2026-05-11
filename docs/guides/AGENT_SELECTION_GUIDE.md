@@ -411,7 +411,7 @@ Confidence: 85% (High)
 ## 📚 Related Documentation
 
 - **Agent Definitions:** `agents/`
-- **Smart Agent Detector:** `agents/router.md`
+- **Smart Agent Detector:** `skills/agent-detector/SKILL.md` (replaced legacy `agents/router.md`)
 - **Project Detector:** `agents/scanner.md`
 - **Agent Identification:** `docs/AGENT_IDENTIFICATION_GUIDE.md`
 

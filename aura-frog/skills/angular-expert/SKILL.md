@@ -8,7 +8,13 @@ triggers:
   - "ngrx"
   - "rxjs"
   - "angular.json"
+paths:
+  - "**/*.component.ts"
+  - "**/*.service.ts"
+  - "**/*.module.ts"
+  - "angular.json"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Angular Expert — Gotchas & Decisions

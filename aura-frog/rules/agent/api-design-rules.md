@@ -2,186 +2,54 @@
 
 **Category:** Code Quality
 **Priority:** High
-**Applies To:** All API development
+**Applies To:** architect agent, all API development
 
 ---
 
-## Overview
+## Where to Find Detail
 
-Standards for designing consistent, maintainable APIs.
-
-**Full Guide:** See `skills/api-designer/SKILL.md`
+Full design guidance lives in the **api-designer skill**: `skills/api-designer/SKILL.md`.
+This rule is the short enforcement checklist; the skill carries examples.
 
 ---
 
-## 1. RESTful Conventions
+## Hard Requirements
 
 ```toon
-rest_methods[5]{method,action,success,failure}:
-  GET,Read,200,404
-  POST,Create,201,400/409
-  PUT,Replace,200,404
-  PATCH,Update,200,404
-  DELETE,Delete,204,404
+must[7]{requirement}:
+  RESTful resource naming — plural nouns, no verbs in endpoints
+  Consistent response envelope — { data, meta } on success, { error } on failure
+  Proper status codes — 200/201/204/400/401/403/404/409/422/429/500
+  Pagination on lists — offset or cursor, always with meta
+  Versioning from day 1 — URL path /api/v1/...
+  Documented error codes — every error has a stable code
+  OpenAPI spec checked into repo
 ```
 
 ---
 
-## 2. Naming Rules
+## Naming
 
 ```toon
-naming_rules[4]{element,convention,example}:
+naming[4]{element,convention,example}:
   Endpoints,Plural nouns,/users /orders
   Query params,snake_case,?page_size=20
   Request body,camelCase,{ "firstName": "John" }
   Response body,camelCase,{ "createdAt": "..." }
 ```
 
-```
-✅ GET /users/:id/orders
-❌ GET /getUser/:id/getOrders
-❌ GET /user/:id/order
-```
+---
+
+## Anti-Patterns (Blockers in Review)
+
+- Verbs in paths: `/getAllUsers`, `/createUser`
+- Inconsistent response shapes across endpoints
+- Missing pagination on list endpoints
+- Exposing internal DB IDs in public payloads
+- No versioning strategy
 
 ---
 
-## 3. Response Format
+## When Reviewing an API
 
-### Success
-```json
-{
-  "data": { "id": "123", "name": "John" },
-  "meta": { "requestId": "req_abc" }
-}
-```
-
-### List with Pagination
-```json
-{
-  "data": [...],
-  "meta": { "page": 1, "pageSize": 20, "total": 100 }
-}
-```
-
-### Error
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input",
-    "fields": { "email": "Required" }
-  }
-}
-```
-
----
-
-## 4. Versioning
-
-**Recommended:** URL path versioning
-
-```
-/api/v1/users
-/api/v2/users
-```
-
-```toon
-versioning[2]{strategy,example,use_when}:
-  URL path,/v1/users,Default choice
-  Header,Accept-Version: 1,Clean URLs needed
-```
-
----
-
-## 5. Pagination
-
-```
-# Offset-based (simple)
-GET /users?page=2&page_size=20
-
-# Cursor-based (scalable)
-GET /users?cursor=abc123&limit=20
-```
-
-Always include pagination metadata in response.
-
----
-
-## 6. Filtering & Sorting
-
-```
-# Filter
-GET /users?status=active&role=admin
-
-# Sort
-GET /users?sort=created_at:desc
-
-# Combined
-GET /users?status=active&sort=name:asc&page=1
-```
-
----
-
-## 7. Status Codes Quick Reference
-
-```toon
-status_codes[11]{code,meaning}:
-  200,OK
-  201,Created
-  204,No Content (DELETE)
-  400,Bad Request
-  401,Unauthorized
-  403,Forbidden
-  404,Not Found
-  409,Conflict
-  422,Validation Failed
-  429,Rate Limited
-  500,Server Error
-```
-
----
-
-## 8. API Checklist
-
-- [ ] RESTful resource naming
-- [ ] Consistent response format
-- [ ] Proper status codes
-- [ ] Pagination for lists
-- [ ] Versioning from start
-- [ ] Error codes documented
-- [ ] Rate limiting headers
-- [ ] OpenAPI documentation
-
----
-
-## Anti-Patterns
-
-```
-❌ GET /getAllUsers
-❌ POST /createUser
-❌ GET /users?action=delete&id=123
-❌ Different response formats per endpoint
-❌ Exposing internal database IDs
-❌ No pagination on large lists
-```
-
----
-
-## Best Practices
-
-### Do's
-- Use plural nouns
-- Return created resource on POST
-- Include total count in list responses
-- Document with OpenAPI
-- Use standard error codes
-
-### Don'ts
-- Verbs in endpoints
-- Expose implementation details
-- Mix response formats
-- Skip versioning
-- Return arrays without wrapper
-
----
-
+Load `api-designer` skill for full checklists, status-code guidance, and request/response examples.

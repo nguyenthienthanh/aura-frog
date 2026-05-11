@@ -15,6 +15,7 @@ triggers:
   - "go"
   - "flutter"
 context: fork
+user-invocable: false
 ---
 
 # Framework Expert (Bundle)

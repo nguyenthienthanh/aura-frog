@@ -1,52 +1,100 @@
 # Aura Frog Commands
 
-**Total:** 26 command files (10 bundled + 16 standalone)
+**Total:** 24 command files (5 bundled + 1 standalone + 12 hierarchical-planning slash commands + 1 project-extension + 1 session-reset + 1 pre-flight + 3 self-healing/MCP-security/dashboard)
 
 ---
 
 ## Bundled Commands
 
-Each file contains multiple sub-commands with interactive menus:
-
 ```toon
-bundled[10]{command,subs,count}:
-  /workflow,"start/status/approve/modify/reject/resume/handoff/rollback/predict/progress/budget/metrics",12
-  /project,"init/detect/status/list/switch/refresh/regen/reload-env/sync-settings",9
-  /learn,"status/feedback/analyze/apply/setup",5
-  /test,"unit/e2e/coverage/document",4
-  /bugfix,"fix/quick/hotfix",3
-  /quality,"check/complexity/debt",3
-  /security,"audit/scan/deps",3
-  /perf,"analyze/bundle/lighthouse/optimize",4
-  /metrics,"dashboard/hooks/performance/prompts-evaluate",4
-  /deploy,"setup/cicd-create/docker-create",3
+bundled[5]{command,subs,count}:
+  /run,"<task>/status/resume/progress/rollback + context-aware: approve/reject/modify/handoff/stop",10
+  /check,"(all)/security/perf/complexity/debt/coverage/deps",7
+  /design,"api/db/doc",3
+  /project,"init/detect/status/list/switch/refresh/regen/env/sync",9
+  /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill",9
 ```
 
 ## Standalone Commands
 
 ```toon
-standalone[16]{command,file,description}:
+standalone[1]{command,file,description}:
   help,help.md,Show help and available commands
-  document,document.md,Generate feature/API/component documentation
-  refactor,refactor.md,Structured code refactoring workflow
-  agent:list,agent/list.md,List all available agents
-  agent:info,agent/info.md,Show agent details and capabilities
-  api:design,api/design.md,Design API endpoints + OpenAPI spec
-  api:test,api/test.md,Generate API test suite
-  db:design,db/design.md,Design database schema + ERD + migrations
-  db:optimize,db/optimize.md,Query optimization + N+1 detection
-  mcp:status,mcp/status.md,Show MCP server status
-  plugin:update,plugin/update.md,Check for plugin updates
-  review:fix,review/fix.md,Auto-fix code review issues
-  setup:activate,setup/activate.md,Quick-activate Aura Frog for project
-  setup:cli,setup/cli.md,Install af CLI globally
-  setup:integrations,setup/integrations.md,Configure JIRA/Confluence/Slack/Figma
-  skill:create,skill/create.md,Create reusable skill template
 ```
+
+## Hierarchical Planning (alpha — opt-in)
+
+```toon
+planning[12]{command,file,purpose}:
+  /aura-frog:plan,plan.md,"Bootstrap T0/T1/T2 via interview"
+  /aura-frog:plan-expand,plan-expand.md,"Decompose node one tier down"
+  /aura-frog:plan-next,plan-next.md,"Return next ready T4 leaf"
+  /aura-frog:plan-replan,plan-replan.md,"Replan with budget enforcement"
+  /aura-frog:plan-promote,plan-promote.md,"Promote node to higher tier"
+  /aura-frog:plan-archive,plan-archive.md,"Archive completed branch"
+  /aura-frog:plan-status,plan-status.md,"Render plan tree + summary"
+  /aura-frog:plan-undo,plan-undo.md,"Restore latest checkpoint (LIFO) + git_sha rollback"
+  /aura-frog:plan-freeze,plan-freeze.md,"Manual freeze + descendant cascade (beta.2)"
+  /aura-frog:plan-thaw,plan-thaw.md,"Reverse freeze + compatibility check (beta.2)"
+  /aura-frog:plan-conflicts,plan-conflicts.md,"list/show/resolve/history/check L1-L4 conflicts (beta.2)"
+  /aura-frog:trace,trace.md,"Reasoning trace + hallucination surface (alpha.2)"
+```
+
+These commands are **silent on projects without `.aura/plans/`**. Initialize with `/aura-frog:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
+
+## Project Extension (alpha.3 — opt-in)
+
+```toon
+extension[1]{command,file,purpose}:
+  /aura-frog:extend,extend.md,"Create project-level skills/rules/commands at .claude/ — never plugin-level. Subcommands: propose / create / list / remove."
+```
+
+`extension-detector` skill auto-invokes when patterns suggest a new skill/rule/command would help; surfaces a confirmation question; only `/aura-frog:extend` actually writes files. Hard guardrail: writes are blocked from any path inside `aura-frog/`.
+
+## Memory Tier (alpha.4 — opt-in)
+
+```toon
+memory[1]{command,file,purpose}:
+  /aura-frog:reset-session,reset-session.md,"Distill active Epic via epic-summarizer → permanent_memory.md → optional reset. Preserves history.jsonl, plan tree, conflict cache, manual_overrides."
+```
+
+`epic-summarizer` agent runs on T2 done (auto via `feature-done-trigger-archive` hook) or manually via this command. `permanent-memory-loader` skill auto-loads distilled summaries (≤120 tokens always-loaded) in subsequent sessions.
+
+## Pre-flight (beta.1 — auto-on)
+
+```toon
+preflight[1]{command,file,purpose}:
+  /aura-frog:preflight,preflight.md,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter, tool input/output)"
+```
+
+`hooks/pre-flight-validate.cjs` auto-fires on every PreToolUse for Bash|Edit|Write|Read. Hard-blocks `rm -rf /`, system paths, credential leaks. Warns on `git push --force`, `DROP TABLE`, etc. Bypass per-call only with `/aura-frog:preflight bypass <reason ≥10 chars>`. Tier 2 OPA Rego policies deferred to v3.7.0-rc.1.
+
+## Self-Healing + MCP Security + Dashboard (rc.1)
+
+```toon
+rc1[3]{command,file,purpose}:
+  /aura-frog:heal,heal.md,"diagnose/status/disable/enable/accept/decline — F2/F3 only, confidence ≥0.7, user approval"
+  /aura-frog:mcp,mcp.md,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit"
+  /aura-frog:dashboard,dashboard.md,"--live / --json / --section — terse one-screen view of plan + conflicts + memory + MCP + preflight"
+```
+
+`hooks/mcp-call-gate.cjs` auto-fires on every PreToolUse for `mcp__.*`. Enforces per-agent allowlist (frontmatter `mcp_servers:`), rate limits (soft 80% warn / hard 100% block), and writes sanitized audit to `.aura/security/mcp-audit.jsonl`. `scripts/security/sanitize-mcp-input.sh` strips Authorization headers + redacts tokens before logging.
 
 ---
 
 ## Usage
 
-Type any bundled command without a subcommand to see its interactive menu.
-Example: `/workflow` shows menu, `/workflow start "task"` runs directly.
+Type `/run <task>` to start working — intent is auto-detected.
+During an active run, type bare words: `approve`, `reject`, `modify`, `handoff`.
+
+---
+
+## Architecture — Commands vs Skills
+
+`commands/` is the **slash surface**. Skills (`aura-frog/skills/`) are AI-discoverable knowledge with `user-invocable: false` — they don't appear in the slash menu, but Claude auto-invokes them on intent match.
+
+**Rule:** if a user types `/<name>`, the file MUST live here in `commands/`. If a skill needs slash exposure, wrap it in a thin command file that delegates to the skill (e.g., `/af prompts` → invokes `prompt-evaluator` skill).
+
+This keeps the `/` menu uncluttered (only actionable commands) while preserving full AI discoverability of skill content.
+
+See: `.claude/CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".

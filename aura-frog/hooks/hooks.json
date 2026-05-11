@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
           },
           {
             "type": "command",
@@ -32,6 +32,15 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/test-pattern-extractor.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-restore-active.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pending-confirm-timeout.cjs\" 2>&1"
           }
         ]
       }
@@ -43,16 +52,38 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-execute-load-plan-context.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOK_PHASE=pre node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-flight-validate.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-dispatch-conflict-check.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/mcp-call-gate.cjs\""
           }
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|mkfs|dd if=|:(){|fork|shutdown|reboot|halt)'; then echo '\u26a0\ufe0f Blocked: Potentially destructive command detected' >&2; exit 2; fi"
-          },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-attribution.cjs\""
@@ -64,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ ! -f .claude/project-contexts/*/project-config.yaml ]; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
+            "command": "if ! compgen -G '.claude/project-contexts/*/project-config.yaml' > /dev/null 2>&1; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
           },
           {
             "type": "command",
@@ -85,12 +116,12 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -d .claude/logs/workflows ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> .claude/logs/workflows/commands.log; fi"
+            "command": "LOG_DIR=$(if [ -d .claude/logs/runs ]; then echo .claude/logs/runs; elif [ -d .claude/logs/workflows ]; then echo .claude/logs/workflows; else echo ''; fi); if [ -n \"$LOG_DIR\" ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> \"$LOG_DIR/commands.log\"; fi"
           },
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -109,10 +140,11 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
           },
           {
             "type": "command",
+            "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/lint-autofix.cjs\" 2>&1"
           },
           {
@@ -123,12 +155,12 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
           },
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -139,6 +171,56 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/token-tracker.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-update-node.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "CLAUDE_HOOK_PHASE=post node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/tdd-red-failure-tracker.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/feature-done-trigger-archive.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reset-trigger.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-conflict-rescan.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/json-toon-projector.cjs\" 2>&1"
           }
         ]
       }
@@ -157,7 +239,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
           },
           {
             "type": "command",
@@ -168,6 +250,11 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-logger.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
           }
         ]
       }
@@ -215,7 +302,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "if [ -f .envrc ]; then set -a; source .envrc 2>/dev/null; set +a; fi; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
           },
           {
             "type": "command",

@@ -22,7 +22,9 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (28 Total)
+## Active Hooks (42 Total)
+
+> **v3.7.0 additions:** alpha.1: `pre-execute-load-plan-context.cjs`, `session-start-restore-active.cjs`. alpha.2: `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs`. alpha.3: `jira-auto-fetch.cjs`. alpha.4: `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs`, `json-toon-projector.cjs`. beta.1: `pre-flight-validate.cjs`. beta.2: `pre-dispatch-conflict-check.cjs`, `post-execute-conflict-rescan.cjs`, `pending-confirm-timeout.cjs`. **rc.1: `mcp-call-gate.cjs`** — PreToolUse on `mcp__.*` enforces per-agent allowlist + rate limits, writes sanitized audit to `.aura/security/mcp-audit.jsonl`.
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)
@@ -95,8 +97,8 @@ env_vars[16]{var,description}:
 - ✅ Record learnings automatically
 
 **Monitored Paths:**
-- `.claude/cache/workflow-state.json`
-- `.claude/logs/workflows/*.md`
+- `.claude/cache/run-state.json`
+- `.claude/logs/runs/*.md`
 - `docs/workflow/*.md`
 - Any `phase-*.md`, `plan.md`, `spec.md`, `requirements.md`
 
@@ -146,7 +148,7 @@ env_vars[16]{var,description}:
 
 ───────────────────────────────────────────────────────────
 📥 **To fully resume workflow:**
-   workflow:resume AUTH-123
+   /run resume AUTH-123
 
 💡 Context has been restored. Type "continue" to proceed.
 ═══════════════════════════════════════════════════════════
@@ -291,7 +293,7 @@ Hook: 🔴 [CRITICAL] This file likely contains secrets. Verify it is NOT commit
 **When:** After any Bash command completes
 
 **Actions:**
-- ✅ Log command execution to `.claude/logs/workflows/commands.log`
+- ✅ Log command execution to `.claude/logs/runs/commands.log`
 - ✅ Include timestamp and command
 - ✅ Useful for workflow tracking and debugging
 
@@ -645,7 +647,7 @@ User: "Implement JWT authentication for the API"
 
 **Files Saved:**
 - `.claude/cache/compact-handoff.json` - Quick resume state
-- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+- `.claude/logs/runs/[id]/run-state.json` - Full workflow state (if workflow active)
 
 **Example:**
 ```
@@ -667,7 +669,7 @@ User: "Implement JWT authentication for the API"
 
 **Files Saved:**
 - `.claude/cache/compact-handoff.json` - Pre-compact state snapshot
-- `.claude/logs/workflows/[id]/workflow-state.json` - Full workflow state (if workflow active)
+- `.claude/logs/runs/[id]/run-state.json` - Full workflow state (if workflow active)
 
 **Example:**
 ```
@@ -799,7 +801,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[28]{event,name,purpose}:
+hooks[29]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files

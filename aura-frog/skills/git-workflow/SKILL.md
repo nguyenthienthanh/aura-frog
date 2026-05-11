@@ -9,6 +9,7 @@ triggers:
   - "push"
   - "create PR"
 allowed-tools: Bash, Read
+user-invocable: false
 ---
 
 # Git Workflow

@@ -26,6 +26,27 @@ review_matrix[4]{phase,builder,reviewer,focus}:
 
 ---
 
+## Reviewer Cap — Analysis Paralysis Defense
+
+**Max 2 reviewers per phase.** No exceptions without explicit user approval.
+
+| Phase | Builder | Reviewer slots | Cap |
+|-------|---------|----------------|:---:|
+| Phase 1 | architect | tester + security (strategist optional 3rd if Deep) | 2, exceptionally 3 |
+| Phase 2 | tester | architect (feasibility only) | 1 |
+| Phase 3 | builder (arch/front/mobile) | tester + security | 2 |
+| Phase 4 | builder (refactor only) | security (primary) + tester | 2 |
+
+**Why the cap:**
+- 3+ reviewers → conflicting feedback, decision stalls, "design-by-committee" effect
+- 2 reviewers cover complementary angles (feasibility + security / tests + risk)
+- A third reviewer is usually asking the same questions differently
+- For Deep complexity with truly cross-functional concerns, user can explicitly add a 3rd via `/run add-reviewer <name>`
+
+**If 3+ reviewers seem needed:** lead must present justification and ask user. Default answer: trim to 2.
+
+---
+
 ## Review Focus Areas
 
 ### Dev Review

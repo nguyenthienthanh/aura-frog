@@ -21,33 +21,53 @@ const path = require('path');
 const PROMPTS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'prompts');
 const SESSIONS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'sessions');
 
-// All available skills (from plugin)
+// All available skills (44 total as of v3.7.0 — see aura-frog/skills/)
+// Available skills — categorized list used for prompt-evaluation heuristics.
+// Authoritative count lives on disk under aura-frog/skills/*/SKILL.md; this list
+// powers suggestion rules and need not be exhaustive.
 const AVAILABLE_SKILLS = [
-  'workflow-orchestrator', 'agent-detector', 'framework-expert', 'testing-patterns',
-  'code-reviewer', 'bugfix-quick', 'test-writer', 'code-simplifier',
-  'project-context-loader', 'session-continuation', 'response-analyzer',
-  'learning-analyzer', 'self-improve', 'lazy-agent-loader', 'phase1-lite',
-  'design-system-library', 'stitch-design', 'design-expert',
-  'api-designer', 'debugging', 'migration-helper', 'performance-optimizer',
-  'sequential-thinking', 'problem-solving', 'scalable-thinking',
-  'dev-expert', 'documentation', 'git-workflow', 'git-worktree', 'pm-expert',
-  'qa-expert', 'refactor-expert',
+  // Auto-invoke
+  'agent-detector', 'bugfix-quick', 'code-reviewer', 'code-simplifier', 'test-writer',
+  'plan-loader', 'reasoning-trace-recorder', 'extension-detector', 'permanent-memory-loader',
+  // Orchestration & workflow
+  'run-orchestrator', 'session-continuation', 'phase1-lite', 'self-improve',
+  'lazy-agent-loader', 'project-context-loader', 'response-analyzer', 'learning-analyzer',
+  // Reasoning techniques
+  'self-consistency', 'tree-of-thoughts', 'chain-of-verification',
+  // Code-writing
+  'refactor-expert', 'api-designer', 'migration-helper', 'documentation',
+  'git-workflow', 'git-worktree',
+  // Coverage skills
+  'deep-debugging', 'monorepo', 'perf-profiling', 'performance-optimizer',
+  // Thinking
+  'sequential-thinking', 'problem-solving', 'scalable-thinking', 'prompt-evaluator',
+  // Design & UI
+  'design-expert', 'stitch-design',
+  // Framework experts
+  'framework-expert',
   'react-expert', 'react-native-expert', 'vue-expert', 'angular-expert',
   'nextjs-expert', 'nodejs-expert', 'python-expert', 'laravel-expert',
   'go-expert', 'flutter-expert', 'typescript-expert',
+  // Hierarchical planning + safety
+  'plan-validator', 'plan-archivist', 'failure-classifier',
+  'self-healing-orchestrator', 'conflict-detector', 'mcp-security-auditor',
+  'preflight-validator',
 ];
 
-// Available commands (top-level categories)
+// Available command top-level categories. The core surface stays small (6 verbs)
+// so users never face discovery paralysis; specialized /aura-frog:* commands layer on
+// top for hierarchical planning and safety ops.
 const AVAILABLE_COMMAND_CATEGORIES = [
-  'workflow', 'project', 'test', 'quality', 'bugfix', 'agent', 'api',
-  'db', 'deploy', 'design', 'learn', 'logs', 'mcp', 'monitor', 'perf',
-  'plan', 'planning', 'review', 'security', 'setup', 'skill',
+  'run', 'check', 'design', 'project', 'af', 'help', 'aura',
 ];
 
-// Available agents
+// Available agents. Router was consolidated into the agent-detector skill, so this
+// list reflects the specialist roster (build/review + planning + safety).
 const AVAILABLE_AGENTS = [
   'lead', 'architect', 'frontend', 'mobile', 'strategist',
-  'security', 'tester', 'devops', 'scanner', 'router',
+  'security', 'tester', 'devops', 'scanner',
+  'master-planner', 'feature-architect', 'story-planner', 'replanner',
+  'epic-summarizer', 'conflict-arbiter',
 ];
 
 // Suggestion rules
@@ -70,7 +90,7 @@ const SUGGESTION_RULES = [
     id: 'low_workflow_usage',
     check: (stats) => stats.workflowUsage < 15 && stats.implementCount > 5,
     title: 'Use workflows for complex tasks',
-    detail: `Only ${'{workflowUsage}'}% of implementation tasks use /workflow:start. Structured workflows improve quality with TDD and code review phases.`,
+    detail: `Only ${'{workflowUsage}'}% of implementation tasks use /run. Structured workflows improve quality with TDD and code review phases.`,
     priority: 'medium',
   },
   {
@@ -84,14 +104,14 @@ const SUGGESTION_RULES = [
     id: 'no_testing',
     check: (stats) => stats.testPercent < 5 && stats.implementCount > 3,
     title: 'Add testing to your workflow',
-    detail: `Only ${'{testPercent}'}% of prompts involve testing. Try /test-writer for automatic test generation or /bugfix-quick for TDD bug fixes.`,
+    detail: `Only ${'{testPercent}'}% of prompts involve testing. Try /run "add tests for <module>" — the test-writer skill auto-fires.`,
     priority: 'high',
   },
   {
     id: 'high_debug_ratio',
     check: (stats) => stats.debugPercent > 35,
     title: 'High debugging ratio — try systematic debugging',
-    detail: `${'{debugPercent}'}% of prompts are debug-related. Use /debugging for systematic root cause analysis or /bugfix-quick for structured fixes.`,
+    detail: `${'{debugPercent}'}% of prompts are debug-related. Use /run "fix <bug>" — bugfix-quick auto-fires; escalates to deep-debugging for hard cases.`,
     priority: 'medium',
   },
   {
@@ -429,8 +449,8 @@ function generateGaps(stats) {
     gaps.push({
       area: 'Workflow Adoption',
       gap: 'No structured workflows used for implementation tasks',
-      unused: '/workflow:start',
-      suggestion: 'Workflows enforce TDD and code review — try /workflow:start for your next feature',
+      unused: '/run',
+      suggestion: 'Workflows enforce TDD and code review — try /run "<task>" for your next feature',
     });
   }
 

@@ -1,7 +1,25 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.5.0 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** 10 agents + 38 skills + 26 commands + 5-phase TDD workflow + 6 MCP servers
+**System:** Aura Frog v3.7.1 | **Format:** [TOON](https://github.com/toon-format/toon)
+**Purpose:** Planning-first LLM OS. 15 agents + 55 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
+
+---
+
+## 🐸 The 8 Pillars (v3.7.1)
+
+Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
+
+```toon
+pillars[8]{n,name,theme,status,disable_env}:
+  1,Hierarchical Planning,Structure,shipped,—
+  2,Reasoning Trace Audit,Accountability,shipped,AF_TRACE_DISABLED
+  3,Semantic Session Reset,Memory,shipped,—
+  4,Pre-flight Validation,Accountability,"shipped (Tier 1); Tier 2 OPA v3.7.2+",AF_PREFLIGHT_DISABLED
+  5,Semantic Conflict Detection,Resilience,"shipped (L1+L2); L3+L4 LLM v3.7.2+",AF_CONFLICT_LLM_DISABLED
+  6,Self-Healing Orchestrator,Resilience,"shipped (manual); auto-trigger v3.7.2+",AF_SELF_HEAL_DISABLED
+  7,MCP Security Layer,Security,shipped,AF_MCP_AUDIT_DISABLED (audit only)
+  8,Phase-Role Binding,Structure,shipped,—
+```
 
 ---
 
@@ -12,10 +30,10 @@ Claude is the **kernel** — orchestrates, dispatches, verifies. Does not execut
 ```toon
 os_map[5]{concept,implementation}:
   Kernel,Claude + orchestrator rules
-  Processes,10 agents (PID + state + budget)
+  Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,6 MCP servers (auto-invoked)
+  Drivers,8 MCP servers (auto-invoked; 6 enabled + postgres/redis opt-in)
 ```
 
 ---
@@ -31,17 +49,18 @@ boot[5]{step,action,cost}:
   5,Verify MCP servers,~100
 ```
 
-CRITICAL: Check env FIRST. If missing → `/project reload-env`.
+CRITICAL: Check env FIRST. If missing → `/project env`.
 
 ---
 
 ## Golden Rules
 
 ```toon
-rules[7]{rule,detail}:
+rules[8]{rule,detail}:
+  Never assume,"Ask when in doubt — see rules/core/no-assumption.md"
   Lazy load,"KERNEL on start — everything else on demand"
   One agent at a time,"Save state before switching"
-  TOON for data,"Workflow state + handoffs + MCP responses"
+  TOON for data,"Run state + handoffs + MCP responses"
   Compact proactively,"MicroCompact every 10 turns — AutoCompact at 80%"
   TDD mandatory,"RED → GREEN → REFACTOR"
   Memory as hint,"Verify against actual files before acting"
@@ -53,23 +72,25 @@ rules[7]{rule,detail}:
 ## Status Line (0 tokens)
 
 ```
-🐸 AF v3.5.0 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.1 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
 ```
 
-Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync-settings`
+Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
 
 ---
 
 ## MCP Servers
 
 ```toon
-mcp[6]{name,purpose,requires}:
-  context7,Library docs,None
-  playwright,Browser automation + E2E,None
-  vitest,Test execution + coverage,None
-  firebase,Firebase management,firebase login
-  figma,Design files,FIGMA_API_TOKEN
-  slack,Notifications,SLACK_BOT_TOKEN
+mcp[8]{name,purpose,requires,enabled}:
+  context7,Library docs,None,enabled
+  playwright,Browser automation + E2E,None,enabled
+  vitest,Test execution + coverage,None,enabled
+  firebase,Firebase management,firebase login,enabled
+  figma,Design files,FIGMA_API_TOKEN,enabled
+  slack,Notifications,SLACK_BOT_TOKEN,enabled
+  postgres,Database queries (read-only default),POSTGRES_CONNECTION_STRING,disabled (opt-in)
+  redis,Cache + queue,REDIS_URL,disabled (opt-in)
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
@@ -79,34 +100,48 @@ Auto-invoked by context. Config: `.mcp.json`
 ## Process Table
 
 ```toon
-agents[10]{pid,name,domain,budget}:
+agents[15]{pid,name,domain,budget}:
   01,lead,Workflow coordination,3K
   02,architect,System design + DB + backend,4K
   03,frontend,React/Vue/Angular/Next.js,4K
   04,mobile,React Native/Flutter/Expo,4K
-  05,strategist,ROI + MVP + scope creep,3K
+  05,strategist,ROI + MVP + scope creep + T0/T1,3K
   06,security,OWASP + vulnerability + SAST,3K
   07,tester,Jest/Cypress/Playwright + coverage,4K
   08,devops,Docker/K8s/CI-CD,3K
   09,scanner,Project detection + context,2K
-  10,router,Agent + model selection,2K
+  10,master-planner,Plan tree owner + decisions,3K
+  11,feature-architect,T2 → T3 decomposition,3K
+  12,story-planner,T3 → T4 decomposition,3K
+  13,replanner,F2-F4 mutation proposals,3K
+  14,epic-summarizer,T2 done → permanent_memory distillation,3K
+  15,conflict-arbiter,Adjudicates L1-L4 conflicts (auto/manual decisions),3K
 ```
+
+Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority highest, auto-invoke every message).
 
 ---
 
 ## Auto-Invoke Skills
 
+Only skills with `autoInvoke: true` in frontmatter fire on every message.
+
 ```toon
-skills[6]{name,trigger}:
-  agent-detector,Every message
-  workflow-orchestrator,Complex feature
+skills[9]{name,trigger}:
+  agent-detector,Every message (priority highest, haiku)
   bugfix-quick,Bug fix request
   test-writer,Test request
   code-reviewer,Code review
   code-simplifier,Simplify/KISS
+  plan-loader,.aura/plans/ exists (auto)
+  reasoning-trace-recorder,active.task set during T4 execution (auto)
+  extension-detector,Repeated patterns or 'we should have a skill for X' signals (auto)
+  permanent-memory-loader,.aura/memory/permanent_memory.md exists (auto)
 ```
 
-32 reference skills loaded on-demand. Full list: `skills/README.md`
+**`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
+
+40 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -140,8 +175,8 @@ phases[5]{phase,name,gate,budget}:
 
 ```toon
 routing[3]{level,approach}:
-  Quick,Direct edit — no workflow
-  Standard,plan mode → /workflow start or /bugfix quick
+  Quick,Direct edit — no run
+  Standard,plan mode → /run
   Deep,Full 5-phase + collaborative planning
 ```
 
@@ -164,27 +199,60 @@ Details: `rules/core/context-management.md`
 
 ```toon
 tiers[3]{tier,count,when}:
-  Core (rules/core/),13,Every session
-  Agent (rules/agent/),15,Per-agent type
-  Workflow (rules/workflow/),17,Per-phase
+  Core (rules/core/),22,Every session
+  Agent (rules/agent/),19,Per-agent type
+  Workflow (rules/workflow/),30,Per-phase
 ```
+
+**Core rule paths (read on-demand when the topic comes up):**
+
+```toon
+core_paths[22]{topic,path}:
+  TDD discipline,rules/core/tdd-workflow.md
+  Approval gates,rules/core/approval-gates.md
+  Execution rules,rules/core/execution-rules.md
+  No assumption,rules/core/no-assumption.md
+  Prompt validation (6-dim),rules/core/prompt-validation.md
+  Contextual separation (injection defense),rules/core/contextual-separation.md
+  Recursion limit,rules/core/recursion-limit.md
+  Observer role,rules/core/observer-agent.md
+  Memory trust,rules/core/memory-trust-policy.md
+  Plan trust (hierarchical planning),rules/core/plan-trust-policy.md
+  Grounding discipline (anti-hallucination),rules/core/grounding-discipline.md
+  Context mgmt,rules/core/context-management.md
+  Context economy (anti-overload),rules/core/context-economy.md
+  Agent namespacing (Agent tool calls),rules/core/agent-namespacing.md
+  Prompt caching,rules/core/prompt-caching.md
+  Small-to-large routing,rules/core/small-to-large-routing.md
+  Code quality,rules/core/code-quality.md
+  Naming,rules/core/naming-conventions.md
+  Simplicity,rules/core/simplicity-over-complexity.md
+  Verification,rules/core/verification.md
+  Env loading,rules/core/env-loading.md
+  Library choice,rules/core/prefer-established-libraries.md
+```
+
+**Agent & workflow rules:** listed in each agent's "Related Rules" section and in `run-orchestrator` SKILL.md per-phase index. Model loads them when the agent/phase activates.
 
 ---
 
-## Bundled Commands
+## Commands
 
 ```toon
-commands[10]{cmd,subs}:
-  /workflow,"start/status/approve/modify/reject/resume/handoff/rollback/predict/progress/budget/metrics"
-  /project,"init/detect/status/list/switch/refresh/regen/reload-env/sync-settings"
-  /learn,"status/feedback/analyze/apply/setup"
-  /test,"unit/e2e/coverage/document"
-  /bugfix,"fix/quick/hotfix"
-  /quality,"check/complexity/debt"
-  /security,"audit/scan/deps"
-  /perf,"analyze/bundle/lighthouse/optimize"
-  /metrics,"dashboard/hooks/performance/prompts-evaluate"
-  /deploy,"setup/cicd-create/docker-create"
+commands[13]{cmd,subs}:
+  /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
+  /check,"(all)/security/perf/complexity/debt/coverage/deps"
+  /design,"api/db/doc"
+  /project,"init/detect/status/list/switch/refresh/regen/env/sync"
+  /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
+  /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
+  /aura-frog:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura-frog:trace (forensic reproducibility) + freeze/thaw/conflicts (L1-L4 + arbiter)"
+  /aura-frog:heal,"diagnose/status/disable/enable/accept/decline — self-healing F2/F3 with confidence ≥0.7 + user approval"
+  /aura-frog:mcp,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit log"
+  /aura-frog:dashboard,"static / --live / --json / --section — CLI status backed by scripts/dashboard.sh"
+  /aura-frog:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
+  /aura-frog:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
+  /aura-frog:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
 ```
 
 ---
@@ -196,7 +264,7 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ## Learning System
 
-`/learn:status` | `/learn:feedback` | `/learn:analyze` | `/learn:apply`
+`/af learn status` | `/af learn feedback` | `/af learn analyze` | `/af learn apply`
 
 ---
 
@@ -204,16 +272,16 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 
 ```toon
 resources[8]{name,location}:
-  Agents (10),agents/
-  Commands (26),commands/
-  Rules (45),rules/{core|agent|workflow}/
-  Skills (38),skills/
-  Hooks (28),hooks/
-  MCP (6),.mcp.json
+  Agents (15),agents/
+  Commands (24),commands/
+  Rules (70),rules/{core|agent|workflow}/
+  Skills (55),skills/
+  Hooks (42),hooks/
+  MCP (8),.mcp.json (postgres + redis disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```
 
 ---
 
-**Version:** 3.5.0
+**Version:** 3.7.1

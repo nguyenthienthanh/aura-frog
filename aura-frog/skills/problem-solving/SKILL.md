@@ -9,6 +9,7 @@ triggers:
   - "can't figure out"
   - "need breakthrough"
   - "multiple approaches"
+user-invocable: false
 ---
 
 # Problem Solving Techniques

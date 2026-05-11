@@ -20,7 +20,7 @@ workflow:start Add input validation to the login form
 
 **Behind the scenes:**
 1. `agent-detector` → selects `frontend` agent
-2. `workflow-orchestrator` → begins Phase 1
+2. `run-orchestrator` → begins Phase 1
 
 **You see:** Phase 1 design with requirements, technical approach, and an approval gate.
 

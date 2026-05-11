@@ -8,7 +8,14 @@ triggers:
   - "express"
   - "nestjs"
   - "fastify"
+paths:
+  - "**/*.js"
+  - "**/*.ts"
+  - "package.json"
+  - "server.*"
+  - "app.*"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Node.js Expert — Gotchas & Decisions

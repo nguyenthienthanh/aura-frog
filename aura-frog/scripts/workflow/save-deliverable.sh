@@ -294,7 +294,8 @@ EXAMPLES:
     bash $0 list 1
 
 OUTPUT LOCATION:
-    .claude/logs/workflows/{workflow-id}/deliverables/{phase}/
+    .claude/logs/runs/{run-id}/deliverables/{phase}/   # v3.6+
+    .claude/logs/workflows/{run-id}/deliverables/{phase}/   # legacy fallback
 
 EOF
 }

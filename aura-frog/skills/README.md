@@ -1,29 +1,46 @@
 # Aura Frog Skills
 
-**Total Skills:** 38 (6 auto-invoking + 32 reference)
+**Total Skills:** 55 (9 auto-invoking + 46 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
 
-## Auto-Invoke Skills (6)
+## Auto-Invoke Skills (9)
 
-Loaded every session. Target budget: ~2,000 tokens.
+Skills with `autoInvoke: true` in frontmatter — fire on every message or matching intent. Target budget: ~3,150 tokens.
 
 ```toon
-auto_invoke[6]{name,priority,trigger,tokens}:
+auto_invoke[9]{name,priority,trigger,tokens}:
   agent-detector,highest,ALWAYS — every message,~500
-  workflow-orchestrator,high,Complex features / multi-file,~700
   bugfix-quick,medium,Bug fixes / errors / crashes,~400
   test-writer,medium,Test writing / TDD / coverage,~500
   code-reviewer,high,Code review / after implementation,~450
   code-simplifier,medium,Simplify / KISS / complexity,~300
+  plan-loader,high,.aura/plans/ exists in cwd,~400 (≤800 hard cap)
+  reasoning-trace-recorder,medium,active.task set during T4 execution,~250
+  extension-detector,medium,Repeated patterns or 'add a skill/rule for X' signals,~200
+  permanent-memory-loader,high,.aura/memory/permanent_memory.md exists,~120 (≤200 hard cap)
 ```
+
+**Note:** `run-orchestrator` is NOT auto-invoke — it fires when `/run` is typed or intent matches its `when_to_use` string (build feature, complex task, `fasttrack:` prefix). Listing it as auto-invoke would cause it to wastefully fire on every message.
+
+**New in v3.7.0-alpha (hierarchical planning):** `plan-loader` and `reasoning-trace-recorder` are silent on projects without `.aura/plans/` — zero overhead until users opt in via `/aura-frog:plan`.
 
 ---
 
-## Reference Skills (32)
+## Reference Skills (46)
 
 Loaded on-demand when triggered.
+
+### Coverage — Deep Work (3)
+
+Added v3.7.0 to close gaps in hard debugging, monorepo handling, and performance profiling:
+
+| Skill | Purpose |
+|-------|---------|
+| `deep-debugging` | Scientific-method root-cause analysis for intermittent/flaky/race bugs |
+| `monorepo` | pnpm/yarn/npm workspaces + Turborepo/Nx/Lerna — correct package scoping |
+| `perf-profiling` | Measure before optimize; Pareto-driven bottleneck targeting |
 
 ### Framework Experts (11)
 
@@ -101,6 +118,19 @@ thinking[2]{name,purpose}:
   problem-solving,5 techniques for different problem types
 ```
 
+### Reasoning Techniques (3)
+
+Advanced LLM reasoning from published research. Token-expensive — opt-in via `/run reason: <sc|tot|cove|all>` or auto-enabled in specific phases per their rules.
+
+```toon
+reasoning[3]{name,technique,paper,when_fires}:
+  self-consistency,"N independent paths + majority vote","Wang et al. 2022","P1 design when trade-off decision (Deep only)"
+  tree-of-thoughts,"Branch + evaluate + prune + backtrack","Yao et al. 2023","P1 architecture + P4 refactor planning (Deep only)"
+  chain-of-verification,"Draft + plan verifications + verify via tool + revise","Dhuliawala et al. 2023","P4 review (MANDATORY for factual claims)"
+```
+
+See governing rules: `rules/workflow/{self-consistency,tree-of-thoughts,chain-of-verification}.md`.
+
 ---
 
 ## Skill File Structure
@@ -113,7 +143,14 @@ skills/[skill-name]/
 
 ## Invocation
 
-Skills auto-invoke based on description matching. Just describe what you want — Claude selects the right skill.
+**Skills are NOT slash-typeable.** Every skill carries `user-invocable: false` in frontmatter — they're hidden from the `/` menu by design. This keeps the slash menu reserved for actionable commands.
+
+Skills are still triggered three ways:
+1. **AI auto-invoke on intent match** — describe what you want ("evaluate my prompts", "review this code") and Claude picks the matching skill
+2. **Explicit prompt mention** — "use the chain-of-verification skill on this report"
+3. **Internal invocation** — a `commands/` file or another skill calls into it (e.g., `/af prompts` → `prompt-evaluator` skill)
+
+If a skill needs slash exposure for the user → wrap it in a thin `commands/<name>.md` file that delegates here. See `.claude/CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".
 
 ---
 

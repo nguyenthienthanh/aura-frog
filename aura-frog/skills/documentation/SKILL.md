@@ -7,6 +7,7 @@ triggers:
   - "ADR"
   - "runbook"
   - "architecture decision"
+user-invocable: false
 ---
 
 # Documentation (ADR & Runbook)

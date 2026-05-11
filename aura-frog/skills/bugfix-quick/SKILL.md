@@ -10,11 +10,12 @@ triggers:
   - "not working"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 effort: low
+user-invocable: false
 ---
 
 # Quick Bugfix
 
-For bugs only. Features/refactors → workflow-orchestrator.
+For bugs only. Features/refactors → run-orchestrator.
 
 ---
 
@@ -29,6 +30,7 @@ For bugs only. Features/refactors → workflow-orchestrator.
 - Reproduce the bug
 - `git log` / `git diff` for recent changes
 - Trace backward: where did bad data originate?
+- **Context economy** (`rules/core/context-economy.md`) — Grep for the failing symbol first, then Read with `offset`+`limit` on the matched lines only. Don't read the full file unless the bug spans it.
 
 ### 2. Write Failing Test (RED)
 - Test that reproduces the bug exactly
@@ -61,4 +63,15 @@ For bugs only. Features/refactors → workflow-orchestrator.
 **Verification:** Tests pass, no regressions
 ```
 
-If complex → switch to workflow-orchestrator.
+If complex → switch to `run-orchestrator`.
+
+**Escalation:** If the bug resists quick fix (intermittent, race condition, "works on my machine", multiple plausible causes), escalate to `skills/deep-debugging/SKILL.md` for scientific-method root-cause analysis.
+
+---
+
+## Related Rules
+
+- `rules/core/tdd-workflow.md` — Failing test before fix
+- `rules/core/verification.md` — Run tests, read output, then claim
+- `rules/core/execution-rules.md` — Root-cause discipline
+- `rules/core/simplicity-over-complexity.md` — Minimal fix at root cause, no speculative refactoring during bug fix

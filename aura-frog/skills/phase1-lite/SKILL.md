@@ -6,6 +6,7 @@ priority: normal
 triggers:
   - "phase 1 lite"
 allowed-tools: NONE
+user-invocable: false
 ---
 
 # Phase 1 LITE — Requirements Analysis

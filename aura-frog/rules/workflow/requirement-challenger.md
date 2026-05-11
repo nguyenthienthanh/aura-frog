@@ -1,13 +1,20 @@
 # Rule: Requirement Challenger
 
 **Priority:** HIGH
-**Applies:** Phase 1, /workflow modify, /workflow start
+**Applies:** Phase 1, `modify`, `/run`
+
+**Pairs with:** `rules/core/prompt-validation.md` (6-dim benchmark — run that FIRST) and `rules/core/no-assumption.md` (never guess — ask).
 
 ---
 
 ## Core Rule
 
 **Think critically before accepting requirements. Analyze gaps, assumptions, and ambiguities.**
+
+**Order of operations at Phase 1 start:**
+1. Score the prompt via `rules/core/prompt-validation.md` (6 dimensions, threshold by complexity)
+2. If score fails → ask focused questions per `rules/core/no-assumption.md`
+3. Once the prompt passes validation, apply this rule's deeper challenge (scope, edge cases, feasibility below)
 
 ---
 
@@ -54,8 +61,8 @@ depth[3]{complexity,level,max_questions}:
 ## Integration
 
 - **Phase 1:** Fires BEFORE generating requirements output
-- **/workflow modify:** Fires when modification could expand scope
-- **/workflow start:** Fires immediately after task description
+- **`modify`:** Fires when modification could expand scope
+- **`/run`:** Fires immediately after task description
 
 Complements `feedback-brainstorming.md`: Challenger validates WHAT, brainstorming validates HOW.
 

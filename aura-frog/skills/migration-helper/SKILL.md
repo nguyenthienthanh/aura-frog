@@ -7,6 +7,7 @@ triggers:
   - "database migration"
   - "code migration"
   - "zero-downtime"
+user-invocable: false
 ---
 
 # Skill: Migration Helper
@@ -22,6 +23,15 @@ Safe database and code migrations with zero-downtime strategies.
 3. Make migrations reversible
 4. Deploy in small batches
 5. Monitor during migration
+
+---
+
+## Related Rules
+
+- `rules/core/simplicity-over-complexity.md` — smallest migration that closes the gap; no "while we're here" schema expansions
+- `rules/core/verification.md` — verify each migration step before advancing
+- `rules/workflow/immutable-workflow.md` — migrations are append-only records
+- `rules/workflow/dual-llm-review.md` — destructive migrations (DROP COLUMN/TABLE) trigger dual-LLM review
 
 ---
 

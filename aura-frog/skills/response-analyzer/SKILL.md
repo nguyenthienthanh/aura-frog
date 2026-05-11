@@ -8,6 +8,7 @@ triggers:
   - "analyze output"
   - "response:save"
 allowed-tools: Read, Write, Bash
+user-invocable: false
 ---
 
 # MCP Response Analyzer

@@ -18,44 +18,59 @@ jobs:
           node-version: '20'
 
       - name: Validate TOON format
-        run: bash aura-frog/scripts/ci/validate-toon.sh || true
+        run: bash aura-frog/scripts/ci/validate-toon.sh
 
       - name: Validate config
-        run: bash aura-frog/scripts/ci/validate-config.sh || true
+        run: bash aura-frog/scripts/ci/validate-config.sh
 
       - name: Validate counts consistency
         run: bash aura-frog/scripts/ci/validate-counts.sh
 
       - name: Check for broken markdown links
         run: |
+          set -euo pipefail
           errors=0
-          for file in $(find aura-frog -name "*.md" -not -path "*/node_modules/*"); do
-            grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | sed 's/\](//' | sed 's/)//' | while read -r link; do
+          while IFS= read -r file; do
+            while IFS= read -r link; do
+              [ -z "$link" ] && continue
               dir=$(dirname "$file")
               target="$dir/$link"
               if [ ! -e "$target" ] && [ ! -e "$link" ]; then
                 echo "Broken link in $file: $link"
                 errors=$((errors + 1))
               fi
-            done
-          done
-          echo "Link check complete"
+            done < <(grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | sed 's/\](//' | sed 's/)//' || true)
+          done < <(find aura-frog -name "*.md" -not -path "*/node_modules/*")
+          if [ "$errors" -gt 0 ]; then
+            echo "Found $errors broken link(s)"
+            exit 1
+          fi
+          echo "Link check complete: 0 broken"
 
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['18', '20', '22']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dev dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage gate
+        # `npm test -- --coverage` enforces the threshold in jest.config.cjs.
+        # CI fails if any of statements / branches / functions / lines drops
+        # below the floor. Tracks no-regression discipline.
+        run: npm test -- --coverage
+
+      - name: Security audit (advisory)
+        run: npm audit --audit-level=high || true
 
   lint:
     runs-on: ubuntu-latest
@@ -71,13 +86,17 @@ jobs:
         run: npm install
 
       - name: Lint hooks
-        run: npm run lint || true
+        run: npm run lint
 
   stats:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate stats.json
         run: bash aura-frog/scripts/ci/generate-stats.sh

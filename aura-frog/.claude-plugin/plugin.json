@@ -1,7 +1,7 @@
 {
   "name": "aura-frog",
-  "version": "3.5.0",
-  "description": "LLM OS for software engineering. 10 agents, 5-phase TDD workflow, 45 rules (3-tier), 38 skills, 26 commands, 28 hooks, 6 MCP servers. Memory-as-hint architecture, 3-tier context compression, multi-agent orchestration.",
+  "version": "3.7.1",
+  "description": "Planning-first LLM OS for software engineering. Hierarchical planning (T0-T4) survives session reset · forensic reasoning traces · L1+L2 conflict detection · self-healing safety gates · per-agent MCP security · CLI dashboard. 15 agents, 5-phase TDD, 71 rules (3-tier), 55 skills, 24 commands, 42 hooks, 8 MCP servers. ~87% markdown. Backward-compatible with /run.",
   "author": {
     "name": "Nguyen Thien Thanh",
     "email": "nguyenthienthanh.kiyoshi@gmail.com",
@@ -23,5 +23,16 @@
     "laravel",
     "nextjs",
     "flutter"
-  ]
+  ],
+  "mcp_rate_limits": {
+    "context7": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "postgres": { "max_calls_per_minute": 10, "max_calls_per_session": 100 },
+    "redis":    { "max_calls_per_minute": 20, "max_calls_per_session": 200 },
+    "playwright": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "vitest":   { "max_calls_per_minute": 60, "max_calls_per_session": 500 },
+    "figma":    { "max_calls_per_minute": 20, "max_calls_per_session": 100 },
+    "firebase": { "max_calls_per_minute": 30, "max_calls_per_session": 200 },
+    "slack":    { "max_calls_per_minute": 20, "max_calls_per_session": 100 },
+    "default":  { "max_calls_per_minute": 30, "max_calls_per_session": 200 }
+  }
 }

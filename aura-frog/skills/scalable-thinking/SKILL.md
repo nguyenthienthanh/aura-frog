@@ -8,6 +8,7 @@ triggers:
   - "API design"
   - "data modeling"
   - "database schema"
+user-invocable: false
 ---
 
 # Skill: Scalable Thinking

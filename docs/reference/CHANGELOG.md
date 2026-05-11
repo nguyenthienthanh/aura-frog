@@ -4,6 +4,786 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.7.1] - 2026-05-11 (CI stabilization)
+
+> **Patch release.** An external senior review pulled HEAD post-v3.7.0 and found CI was red — the `|| true` masks we removed in v3.7.0 polish exposed three pre-existing script bugs and one ESLint v9 break. v3.7.1 closes them so CI is green on `main` and contributor PRs don't fail spurious checks. Zero behavioural change to runtime; this is plumbing.
+
+### Fixed
+
+- **`validate-toon.sh` exits cleanly under `set -e`** — nine occurrences of `((var++))` rewritten as `var=$((var+1))`. `((expr))` returns exit code based on the *evaluated* value, so post-incrementing from 0 returned 1 → `set -e` aborted silent. Counters survived in a subshell when the `find | while` pattern was used — rewrote as `while … < <(find …)` so `FILES_CHECKED` / `ERRORS` propagate. Default target is now `aura-frog/` instead of `.` (skips `node_modules/`, `.claude/`, `.aura/`, `.git/`, `coverage/`). Result: 221 files scanned, 0 errors locally.
+- **`validate-config.sh` skips when file absent** — `ccpm-config.yaml` only exists in user projects, never in the plugin repo. Previously hard-failed; now exits 0 with an informational "skipping (normal for the plugin repo)" message. Still fails properly when the file exists and is malformed.
+- **ESLint v9 flat config migration** — `.eslintrc.cjs` (legacy format, deprecated in v9.0) replaced with `eslint.config.js`. `package.json#scripts.lint` drops the `--ext .cjs` flag (no longer supported in flat config). Rule set unchanged. `npm run lint` now exits 0 with 93 informational warnings, 0 errors.
+- **`generate-stats.sh` emits object form for `mcpServers`** — was hardcoded `"mcpServers": 6` which got out of sync with the `{total: 8, enabled: 6}` schema we standardised on. Now grep-counts entries + `disabled: true` flags in `.mcp.json` and emits the object. Regex fix: `[a-z0-9_-]` (includes digit + underscore) so `context7` doesn't get missed.
+- **TOON drift across 6 files** — exposed once `validate-toon.sh` actually ran: `hooks[28]` → `[29]`, `scripts[26]` → `[34]`, `signals[4]` → `[5]`, `final_plan[8]` → `[9]`, `per_server[6]` → `[8]`, `patterns[12]` → `[7]`. Multi-table-in-one-fence patterns (which the validator's state machine doesn't handle) split into separate fences in `execution-rules.md`, `theme-consistency.md`, `mcp-response-logging.md`.
+- **Forward-version markers** — `v3.7.1+` queued labels updated to `v3.7.2+` (since v3.7.1 *is* this release; Tier 2 OPA + L3/L4 LLM conflict + auto-trigger self-heal are queued for v3.7.2+).
+
+### Verified locally — all 5 CI steps green
+
+| Step | Result |
+|---|---|
+| `validate-toon.sh` | exit 0 · 221 files · 0 errors |
+| `validate-config.sh` | exit 0 (skipped — file absent, normal) |
+| `validate-counts.sh` | exit 0 · all counts match |
+| `npm run lint` | exit 0 · 93 warnings · 0 errors |
+| `npm test -- --coverage` | exit 0 · 215 tests · coverage above threshold |
+
+---
+
+## [3.7.0] - 2026-05-11 (Stable — Marketplace Publish)
+
+> **First stable release of the v3.7.0 hierarchical-planning track.** All 5 milestones (A-E) shipped through 7 internal pre-releases (alpha.1, alpha.2, alpha.3, alpha.4, beta.1, beta.2, rc.1). This is the marketplace publish.
+
+### Headline
+
+**A planning-first LLM OS for software engineering.** Plans persist across sessions; every Claude decision is forensically reproducible; conflicts are detected before silent overwrites; backward-compatible — your existing `/run` workflow continues unchanged.
+
+### 🐸 The 8 Pillars (feature highlights)
+
+v3.7.0 lands eight composable features organized into four themes. Full marketing breakdown in [README.md § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os) and engineering depth in [BENEFITS.md Part 9](BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
+
+| # | Pillar | Status | What it solves |
+|---|---|---|---|
+| 1 | **Hierarchical Planning** | ✅ | Plans survive session reset · `/compact` · machine restart |
+| 2 | **Reasoning Trace Audit** | ✅ | Hallucinations caught before they ship (sha256-anchored evidence) |
+| 3 | **Semantic Session Reset** | ✅ | Distill an Epic into permanent memory, then reset cleanly |
+| 4 | **Pre-flight Validation** | ✅ Tier 1 · 🚧 Tier 2 OPA | Block bad AI output before it hits disk |
+| 5 | **Semantic Conflict Detection** | ✅ L1+L2 · 🚧 L3+L4 LLM | Prevent silent overwrites between parallel tasks |
+| 6 | **Self-Healing Orchestrator** | ✅ manual · 🚧 auto-trigger | Auto-diagnose F2/F3 failures; propose patches, never auto-apply |
+| 7 | **MCP Security Layer** | ✅ | Per-agent allowlist + audit + rate limits for external integrations |
+| 8 | **Phase-Role Binding** | ✅ | Phase 4 reviewer MUST differ from Phase 3 builder (Generator ≠ Evaluator) |
+
+Each pillar is independently disable-able via env var. See *Disable mechanisms* section below.
+
+### Stats (v3.6.1 → v3.7.0)
+
+| Component | v3.6.1 | v3.7.0 | Delta |
+|---|---:|---:|---:|
+| Agents | 9 | **15** | +6 |
+| Skills | 44 | **55** | +11 |
+| Auto-invoke skills | 5 | **9** | +4 |
+| Rules | 57 | **70** | +13 |
+| Commands | 6 | **24** | +18 |
+| Hooks | 28 | **42** | +14 |
+| MCP servers | 6 | **8** | +2 |
+| Scripts | ~43 | **55** | +12 |
+
+### What shipped (across the 7 internal pre-releases)
+
+- **alpha.1** — Hierarchical planning foundation: T0-T4 schema, plan-loader (auto-invoke), `master-planner` / `feature-architect` / `story-planner` agents, 8 planning commands, plan-tree validator with 8 invariants, byte-identical round-trip
+- **alpha.2** — Failure handling + reasoning trace: F1-F5 deterministic classifier, `replanner` agent, `reasoning-trace-recorder` (auto-invoke), `/aura-frog:trace` with hallucination surface, grounding-discipline rule, checkpoint discipline + `/aura-frog:plan-undo` with git_sha rollback
+- **alpha.3** — Project-level extension creation: `extension-detector` (auto-invoke), `/aura-frog:extend` command, `extension-policy` rule — auto-detect when a new skill/rule/command would help, confirm with user, create at `.claude/` (NEVER plugin-level)
+- **alpha.4** — Memory tier: `epic-summarizer` agent (T2 done → permanent_memory), `permanent-memory-loader` (auto-invoke, ≤120 tokens), `plan-archivist`, `/aura-frog:reset-session`. **Plus: deterministic JSON→TOON projection hook** (saves tokens vs. AI-side projection rule)
+- **beta.1** — Pre-flight Tier 1: 7 bash linters (frontmatter, tool-input, tool-output, path-safety, command-allowlist, secret-patterns, run-all), `pre-flight-validate.cjs` hook (blocks `rm -rf /`, hostile paths, credential leaks), single-use bypass with `/aura-frog:preflight bypass`
+- **beta.2** — Conflict detection + freeze: L1 (file overlap) + L2 (function overlap) bash detectors, `conflict-arbiter` agent, F6 class, 3 conflict commands (`/aura-frog:plan-freeze`, `:thaw`, `:conflicts`), branch freeze cascade (descendants only per spec §13.1)
+- **rc.1** — Self-healing + MCP security: `self-healing-orchestrator` (F2/F3 only, ≥0.7 confidence, NEVER auto-applies), `mcp-call-gate.cjs` (per-agent allowlist, rate limits, sanitized audit), `db-access-policy` + `mcp-security-policy` rules, Phase 4 ≠ Phase 3 builder HARD RULE, `/aura-frog:dashboard`
+
+### Stable polish (this release)
+
+- **MCP allowlists on all 9 baseline agents** (security=[], scanner=[], lead=[], strategist=[context7], devops=[firebase,slack], tester=[vitest,playwright], frontend=[context7,figma,playwright], mobile=[context7,figma,playwright], architect=[context7,postgres,redis]) — gate now actually enforces, not just defaulted to backward-compat
+- **README rewrite** — lead with `/aura-frog:plan` + v3.7.0 systems overview; `/run` documented as lightweight mode for one-off tasks
+- **`MIGRATION_TO_V3.7.md`** — single comprehensive migration doc: what's new, what's backward-compat, opt-in features, breaking-ish changes, env var inventory, deferred work
+- Version files bumped 3.7.0-rc.1 → **3.7.0**
+
+### Backward compatibility (per spec §2 — MINOR bump)
+
+- `/run <task>` works exactly as before
+- Existing 9 agents continue to work (now with explicit `mcp_servers:` allowlists)
+- Existing 6 commands unchanged
+- 5-phase TDD workflow preserved (now maps to T3 Story lifecycle when planning is active)
+- `.envrc` env vars all preserved; new ones added (see migration guide)
+- `.mcp.json` schema preserved; 2 new servers added (postgres, redis) both `disabled: true` by default
+- All existing skills/rules/hooks preserved
+
+### Disable mechanisms (every new feature has one)
+
+```
+AF_SELF_HEAL_DISABLED=true       — disable self-healing
+AF_MCP_AUDIT_DISABLED=true       — disable MCP audit log (still enforces)
+AF_TRACE_DISABLED=true            — disable reasoning trace
+AF_PREFLIGHT_DISABLED=true        — disable pre-flight (strongly discouraged)
+AF_CONFLICT_LLM_DISABLED=true     — already off in rc.1 (L3/L4 stubs)
+AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
+```
+
+### Fixed (deliverable scaffolding — 2026-05-11)
+
+Real user-reported gap: `/run` created `run-state.json` but never materialised the per-phase markdown deliverables the `workflow-deliverables.md` rule requires (REQUIREMENTS.md, TECH_SPEC.md, TEST_PLAN.md, etc.). Run dirs were empty except for run-state.json — the orchestrator's `deliverables[]` array tracked metadata but no actual .md files hit disk.
+
+- **NEW `aura-frog/scripts/workflow/scaffold-phase-deliverables.sh`** — idempotent script. `bash scaffold-phase-deliverables.sh <run-id> <phase|all>` creates the phase's markdown skeletons from `aura-frog/templates/` (or a minimal frontmatter+sections fallback). Phase 1 → REQUIREMENTS / TECH_SPEC / TECH_SPEC_CONFLUENCE / DESIGN_DECISIONS. Phase 2 → TEST_PLAN / TEST_CASES. Phase 3 → IMPLEMENTATION_NOTES / FILES_CHANGED. Phase 4 → CODE_REVIEW / REFACTOR_LOG. Phase 5 → QA_REPORT / IMPLEMENTATION_SUMMARY / CHANGELOG_ENTRY. Total 13 files / 5 phases.
+- **5 new templates added** to bring template count 15 → **20**: `code-review.md`, `qa-report.md`, `changelog-entry.md`, `implementation-notes.md`, `files-changed.md` (frontmatter + section headers + TODO markers, ready to fill in).
+- **run-orchestrator/SKILL.md gets Step 0.5** — runs the scaffold after run-state.json is written (Phase 1) and on every phase transition. Skip for Quick/direct-edit runs only.
+- **workflow-deliverables.md rule** updated with the new scaffold workflow + backfill instructions for pre-v3.7.1 runs.
+- **3 existing runs in this repo backfilled** (`cleanup-260511`, `review-fix-260511`, `marketing-doc-260511`) — each now has 14 files (run-state.json + 13 phase deliverables) vs. the pre-fix 1 file.
+- **Idempotent** — running the scaffold twice on the same phase prints "0 added", so it's safe to call on phase re-entry / resume / modify / reject without trashing user content.
+
+### Fixed (re-review polish — 2026-05-11, ~4h after first patch batch)
+
+A second senior review pulled the post-fix tree and flagged 7 remaining findings (1 hot: test theater; 2 cold; 4 polish). This commit closes the highest-ROI ones.
+
+- **Test theater killed.** All 6 hook tests (`scout-block`, `prompt-reminder`, `scope-drift`, `security-scan`, `smart-learn`, `token-tracker`) now `require()` the production hooks directly instead of re-declaring the functions inline. Each hook source got a `if (require.main === module) main(); else module.exports = {...};` guard so `main()` only runs when the file is invoked as a script. Verified end-to-end: `npx jest --coverage` reports **31.76% statement coverage** across the 6 hooks (was **0%** before — review's #1 concern). 215 tests pass against real source.
+- **Coverage gate in CI.** `jest.config.cjs` gains `coverageThreshold` (statements 25 / branches 20 / functions 40 / lines 25 — set as no-regression floor at current measured level). `ci.yml` now runs `npm test -- --coverage` so the threshold gates builds. As more hooks get tests (issue [#5](https://github.com/nguyenthienthanh/aura-frog/issues/5)), the floor ratchets up toward the senior review's 60% target.
+- **`tool-call-tracer` real O(1) fix.** Replaced the half-measure in-memory counter (which the reviewer correctly identified as a per-invocation cache, not an actual O(n²) fix because each hook is a fresh Node process) with a sibling `.aura/plans/traces/{TASK_ID}.count` file. Atomic write via tmp+rename. Each event reads 4 bytes, not the full trace. True O(1) per event over a task lifetime.
+- **`mcp-call-gate` no longer fails open silently when agent identity is unknown.** Order: stdin JSON `data.agent / data.agent_name / data.subagent_type` → `CLAUDE_AGENT_NAME` env var → fallback `'main'` (backward-compat). When BOTH stdin and env are absent, a one-time stderr warning is emitted (`.claude/logs/.mcp-agent-hint-shown` flag-file prevents spam) so admins notice the gate is in allow-all mode rather than mistakenly trusting the "per-agent security" claim. Smoke-tested: stdin `{"agent":"architect"}` against a non-allowlisted MCP blocks correctly.
+- **`hooks.json` duplicate `"async": true`** on the lint-autofix entry — removed. Caused by an earlier copy-paste; JSON.parse tolerated it but it signalled missing linter discipline.
+- **`stats.json` mcpServers semantic** — changed from scalar `6` (enabled-only) to `{ total: 8, enabled: 6 }` so the same number doesn't mean two different things across `stats.json` and `CLAUDE.md`/manifest.
+
+### Security (post-release polish — 2026-05-11)
+
+- **`.envrc` trust gate (HIGH-severity fix)** — closes the auto-source-of-untrusted-file finding from the senior review. New helper `aura-frog/scripts/envrc-guarded-source.sh` only sources `$PWD/.envrc` when its sha256 matches an entry in `~/.config/aura-frog/envrc-trust.json`. All 8 inline `if [ -f .envrc ]; then set -a; source .envrc; …; fi` hook commands in `hooks.json` now call the gate. New CLI: `af envrc allow|revoke|status|list`. Tampering with a previously-trusted `.envrc` invalidates the trust (hash mismatch → skip). Opt-out for legacy behavior: `AF_ENVRC_UNSAFE_AUTO_SOURCE=true`. `af doctor` surfaces the trust state. Verified end-to-end: untrusted .envrc skipped, approved .envrc sourced, tampered .envrc re-skipped.
+- **`escapeShellValue` backtick escape (HIGH-severity fix)** — env-file values now escape backticks, closing the path where a git branch/remote URL containing backticks would survive double-quote shell escape and command-substitute on next source. Verified: `feat/test\`curl evil\`` → `feat/test\\\`curl evil\\\``.
+
+### Added (post-release polish — 2026-05-11)
+
+- **Run ↔ Plan bridge** — `/aura-frog:run` now auto-anchors to the active T4 task when `.aura/plans/active.json#active.task` is set; deliverables sync back to the plan tree on Phase 5. If a Feature is active but no task is claimed, suggests `/aura-frog:plan-next`. If no plan exists and the task description hits multi-feature/epic/shipping heuristics (escalation weight ≥ 3 across 6 signals), suggests `/aura-frog:plan` bootstrap first. Reverse direction: `/aura-frog:plan-next` surfaces a `/aura-frog:run` hint when it claims a task. Force modes (`must do:`, `just do:`, `exactly:`) skip the bridge; disable globally with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. New rule: `rules/workflow/run-plan-bridge.md`. Updates: `skills/run-orchestrator/SKILL.md` Phase 1 setup, `commands/run.md` protocol, `commands/plan-next.md` output template. Rule count 70 → **71** (workflow 29 → 30).
+
+### Fixed (post-release polish — 2026-05-11)
+
+- **Command namespace consistency** — renamed 18 `aura-*.md` command files to drop the redundant `aura-` prefix; the slash form was displaying as `/aura-frog:aura-plan` (plugin prefix + filename redundancy). New slash forms match the core `/aura-frog:run` convention: `/aura-frog:plan`, `/aura-frog:plan-expand`, `/aura-frog:trace`, `/aura-frog:heal`, `/aura-frog:mcp`, `/aura-frog:dashboard`, `/aura-frog:extend`, `/aura-frog:preflight`, `/aura-frog:reset-session`, plus 10 `plan-*` subcommands. Updated ~140 references across docs, agents, hooks, rules, scripts, READMEs to long-form (e.g. `/aura:plan:expand` → `/aura-frog:plan-expand`). `git mv` preserved history. Audit clean.
+- **Doc count drift** — synced stale v3.6.x counts in `README.md` (L101 / L533 / L697-700 / L708 / L1011-1019), `CONTRIBUTING.md` (project-structure block), `docs/README.md` (Plugin Internals list), `docs/reference/BENEFITS.md` (§4.3, §5.1, §6.1, §7.x) to v3.7.0 reality (15 / 55 / 70 / 24 / 42)
+- **`install.sh` removed** — deprecated since v3.6 marketplace publish; only historical reference retained in this changelog. Use `/plugin install aura-frog@aurafrog` instead.
+- **`scripts/jira-fetch.sh` removed** — `hooks/jira-auto-fetch.cjs` already calls the JIRA REST API directly (verified end-to-end against `IGNT-1975` on `fwdnextgen.atlassian.net`), so the standalone CLI script duplicated logic with no callers. Hook is now the single source of truth for JIRA fetching. Updated refs in `scripts/README.md`, `rules/workflow/mcp-response-logging.md`, `docs/operations/MCP_GUIDE.md`, `docs/getting-started/GET_STARTED.md`. Confluence fetch script kept (no equivalent hook). README gains a "JIRA Ticket Auto-Fetch" entry in the *More features* section.
+- **`evaluate-prompts.cjs` refresh** — version-agnostic comments for command/agent surface; `AVAILABLE_AGENTS` array updated for the 15-agent roster (added master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter); `AVAILABLE_COMMAND_CATEGORIES` adds `aura` namespace; `AVAILABLE_SKILLS` extended with auto-invoke planners + hierarchical-planning/safety skills
+- **Audit clean** — zero orphan rules, zero dead markdown links, all 55 skills carry `user-invocable: false`
+
+### Deferred (will land in v3.7.x patch releases — NOT blockers)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + `conflict_cache.jsonl` LRU
+- Pre-flight Tier 2 (OPA, optional) — `install-opa.sh` + 5 default Rego policies
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus per spec §28.7
+- FEAT-B fixture suites: classifier 80-suite + hallucination 20 + logic-error 15 + deviation_score auto-update + trace-event latency benchmark
+- 16 remaining spec §30 docs (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, 8 guides, 3 troubleshooting) — covered in summary form by `MIGRATION_TO_V3.7.md`; standalone files in v3.7.2+
+
+### Verification
+
+- `validate-counts.sh`: 15 / 55 / 70 / 24 / 42 — all OK
+- `validate-plan-tree.sh`: 7 nodes · 8/8 invariants (all 5 milestones ✓)
+- Reference integrity: zero orphans
+- Allowlist enforcement: confirmed `security` agent now blocked from `postgres` MCP (rc=2)
+- Sanitizer: AWS keys / GitHub PATs / OpenAI keys / Bearer tokens all redacted
+- Rate limit: 30/min hard block fires at 30th call (stress-tested)
+
+### Pre-release tag history (internal)
+
+```
+v3.7.0-alpha.1   2026-04-29   Milestone A — Planning foundation
+v3.7.0-alpha.2   2026-04-29   Milestone B — Failure + reasoning trace
+v3.7.0-alpha.3   2026-05-04   Milestone C interim — Project-level extensions
+v3.7.0-alpha.4   2026-05-05   Milestone C interim — Memory tier
+v3.7.0-beta.1    2026-05-06   Milestone C complete — Pre-flight Tier 1
+v3.7.0-beta.2    2026-05-07   Milestone D — L1+L2 conflict detection + freeze
+v3.7.0-rc.1      2026-05-07   Milestone E — Self-healing + MCP security
+v3.7.0           2026-05-11   Stable — marketplace publish
+```
+
+---
+
+## [3.7.0-rc.1] - 2026-05-07 (Milestone E — Self-Healing + MCP Security + Dashboard)
+
+> Final internal pre-release. All 5 milestones (A-E) complete. Next ship target is v3.7.0 stable (marketplace publish).
+
+### Added — Self-healing safety gates + MCP security tier + phase-role hard rule + CLI dashboard
+
+**Skills (2 new — 53 → 55)**
+- `skills/self-healing-orchestrator/` — F2/F3 ONLY (refuses F1/F4-F6). Confidence ≥0.7 required to propose; below threshold escalates raw findings. NEVER auto-applies; user approval mandatory. Counts toward replan_budget. Per-task max 1; session cap 5. Disable via `AF_SELF_HEAL_DISABLED=true` env or `/aura-frog:heal disable` (session flag). Cross-checks ONLY context7 + permanent_memory + traces — no random web sources.
+- `skills/mcp-security-auditor/` — read-side companion to `mcp-call-gate` hook. Reads `.aura/security/mcp-audit.jsonl`, projects to TOON via `json-to-toon.cjs`, surfaces blocked calls / rate-limit hits / suspicious patterns.
+
+**Commands (3 new — 21 → 24)**
+- `/aura-frog:heal diagnose|status|disable|enable|accept|decline` — self-healing orchestration. `accept <HEAL-ID>` applies a proposal as a NEW T4 task (not in-place patch). Bypass-counter + cycle-guard hardening.
+- `/aura-frog:mcp status|audit|reset-limits|test` — MCP security operations. `audit --blocked-only` for forensics. `reset-limits` is logged event. `test <server>` is single-call connectivity check.
+- `/aura-frog:dashboard` — terse one-screen CLI status (plan tree, active task, conflicts, memory, MCP, pre-flight). `--live` (5s refresh), `--json` (machine-readable, sanitized), `--section <name>` for slot integration.
+
+**Rules (2 new agent-tier — workflow 29 unchanged; agent 17 → 19)**
+- `rules/agent/db-access-policy.md` — DB MCPs locked down: architect + tdd-engineer only (default-deny for everyone else). Read-only by default; writes require explicit `--allow-write`. Destructive ops (DROP/TRUNCATE/DELETE without WHERE) HARD-BLOCKED unconditionally regardless of allowlist.
+- `rules/agent/mcp-security-policy.md` — broader MCP framework: per-agent `mcp_servers:` allowlist (default = all backward-compat), sanitized audit log (Authorization stripped, tokens redacted), rate limits (soft 80% warn / hard 100% block), retention (`AF_MCP_AUDIT_RETENTION_DAYS=30` default).
+
+**Rule update**
+- `rules/workflow/plan-lifecycle.md` — Phase-Role binding promoted from advisory to **HARD RULE** (per spec §24, decision Q17). Phase 4 reviewer MUST NOT be the same agent as Phase 3 builder. Run-orchestrator refuses dispatch on violation; falls back to next-best reviewer; blocks phase transition if no eligible reviewer remains. Generator/Evaluator separation per Anthropic harness research.
+
+**Hooks (1 new — 41 → 42)**
+- `hooks/mcp-call-gate.cjs` — PreToolUse on `mcp__.*`. Parses `mcp__plugin_<plugin>_<server>__<method>` tool names. Enforces per-agent allowlist (reads `mcp_servers:` from agent frontmatter; null = backward-compat default of all-allowed). Tracks per-server per-session counters in `.claude/logs/.mcp-rate-counter.json`. Rate limit thresholds: soft 80% warn, hard 100% block. Runs `scripts/security/sanitize-mcp-input.sh` before audit append.
+
+**Scripts (2 new)**
+- `scripts/security/sanitize-mcp-input.sh` — strips Authorization headers, redacts AWS/GitHub/OpenAI/JWT/Bearer tokens, truncates >1KB strings. jq-based when available; sed-fallback otherwise.
+- `scripts/dashboard.sh` — implementation behind `/aura-frog:dashboard`. Static / `--live` (5s loop) / `--json` / `--section` modes. Read-only — never mutates state.
+
+**Config**
+- `.mcp.json` — added `postgres` + `redis` servers (both `disabled: true` by default per spec §14.1, decision Q14 — opt-in for security)
+- `plugin.json` — added `mcp_rate_limits` block with per-server overrides + `default` fallback (per spec §14.2)
+
+### Acceptance criteria — rc.1 sub-scope
+
+- [x] Self-healing only triggers F2/F3 (hard-coded refusal in skill body for F1/F4-F6)
+- [x] Confidence < 0.7 escalates raw findings, doesn't propose
+- [x] User approval required before patch applied (NEVER auto-applies — verified by skill spec)
+- [x] Self-heal counts toward replan_budget
+- [x] Per-agent MCP allowlist enforced by mcp-call-gate.cjs (allowlist parsed from agent frontmatter)
+- [x] MCP audit log captures all calls with sanitization (smoke-tested with AWS key + GitHub PAT + Authorization header redaction)
+- [x] Rate limits enforced (soft 80% warn + hard 100% block) — verified with 35-call stress test
+- [x] Postgres MCP destructive ops blocked unconditionally (per `db-access-policy.md`)
+- [x] AF_SELF_HEAL_DISABLED=true disables self-healing
+- [x] Phase 4 reviewer ≠ Phase 3 builder formalized as HARD RULE in plan-lifecycle.md
+- [x] /aura-frog:dashboard renders without errors (static + JSON modes verified)
+
+### Verification
+
+- `validate-counts.sh`: 15 / 55 / 70 / 24 / 42 — all OK
+- `validate-plan-tree.sh`: 7 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- mcp-call-gate smoke tests: allowlist enforcement (rc 2 on violation), rate limit (35-call stress hits hard block correctly), sanitizer (AWS keys + GitHub PATs + Bearer tokens redacted in audit log)
+- Dashboard: static + JSON modes both render cleanly
+
+### Stats (v3.7.0-beta.2 → v3.7.0-rc.1)
+
+- Agents: 15 (unchanged)
+- Skills: 53 → **55** (+2: self-healing-orchestrator, mcp-security-auditor); auto-invoke 9 (unchanged)
+- Rules: 68 → **70** (+2 agent-tier: db-access-policy, mcp-security-policy); workflow 29 unchanged but plan-lifecycle.md hard-rule promotion
+- Commands: 21 → **24** (+3: /aura-frog:heal, /aura-frog:mcp, /aura-frog:dashboard)
+- Hooks: 41 → **42** (+1 mcp-call-gate)
+- Scripts: 52 → **55** (+3: sanitize-mcp-input + dashboard + get-plugin-prefix)
+- MCP servers: 6 → **8** (+2 disabled: postgres, redis)
+
+### Pending for v3.7.0 stable (final ship)
+
+- 17 documentation deliverables per spec §30 (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, llm-os update, 8 guides, 3 troubleshooting, MIGRATION_TO_V3.7)
+- README.md update — lead with `/aura-frog:plan`, document `/run` as lightweight mode
+- Marketplace listing update with v3.7.0 description
+- Public release announcement
+- Add `mcp_servers:` allowlists to existing 9 baseline agents (gate works but most currently default to all-allowed)
+
+### Pending — deferred (will land in v3.7.x patch releases or as opt-in features)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + conflict_cache.jsonl LRU
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus
+- Pre-flight Tier 2 (OPA, optional) — install-opa.sh + 5 default Rego policies (plan_structure, mutation_safety, grounding, token_budget, conflict_respect)
+- FEAT-B deferred fixtures: classifier 80-suite + hallucination 20 + logic-error 15 + deviation_score auto-update + trace-event latency benchmark
+
+## [3.7.0-beta.2] - 2026-05-07 (Milestone D — Conflict Detection + Freeze)
+
+> Internal pre-release tag. Not published to marketplace. Ships L1+L2 conflict detection (deterministic bash, fast), freeze cascade, conflict-arbiter agent, F6 failure class, 3 conflict commands, 3 hooks. L3+L4 (LLM-driven semantic + architectural detection) stubbed for rc.1.
+
+### Added — Conflict detection + freeze state machine
+
+**Scripts (2 new under `scripts/conflicts/`)**
+- `check-l1-files.sh` — file-set intersection between proposed task artifacts and pending-confirm sibling artifacts. Returns JSON `{layer, overlap, confidence, files, with}`. p95 well under 100ms (no LLM, no network).
+- `check-l2-syntactic.sh` — function/class/def overlap via regex within files L1 flagged. Confidence 0.85 (lower than L1's 1.0 because regex on symbol names has false-positive risk).
+
+**Agents (1 new — 14 → 15)**
+- `agents/conflict-arbiter.md` — adjudicates conflicts. Decision table: auto_thaw / auto_discard / sequential_reorder / replan / escalate / user_priority. L3+L4 routes to user_priority (never auto-applied). Cycle guard: refuses 4th arbitration of same conflict_id.
+
+**Skills (1 new — 52 → 53)**
+- `skills/conflict-detector/SKILL.md` — orchestrates L1-L4 dispatch per spec §21.3. L1+L2 functional via the bash scripts; L3+L4 return stub findings pending rc.1 LLM dispatchers. Writes records to `.aura/plans/conflicts.jsonl` (append-only, schema per spec §21.4).
+
+**Commands (3 new — 18 → 21)**
+- `/aura-frog:plan-freeze <NODE_ID> [reason]` — manual freeze with descendant cascade (per spec §13.1, decision Q10 — descendants only, NOT siblings)
+- `/aura-frog:plan-thaw <NODE_ID>` — reverse freeze with compatibility check (`git diff <blocker.git_sha>..HEAD` vs frozen sibling's planned artifacts). `--partial` keeps descendants frozen; `--discard` finalizes as discarded; `--grant-replan-budget N` overrides budget reset
+- `/aura-frog:plan-conflicts list|show|resolve|history|check` — full conflict lifecycle UX. `resolve <CONFLICT-ID> <choice>` supports accept-proposed / accept-blocker / sequential / freeze-both / escalate
+
+**Rule (1 new — 67 → 68; workflow 28 → 29)**
+- `rules/workflow/conflict-arbitration-policy.md` — formalizes auto vs manual boundary (L1/L2 auto, L3/L4 manual), freeze cascade rules (Q10: descendants only), replan_budget interaction, cycle guard (3-arbitration limit), compatibility-check pseudocode
+
+**Hooks (3 new — 38 → 41)**
+- `pre-dispatch-conflict-check.cjs` — PreToolUse async on Edit|Write|Bash. Resolves siblings under same Story, runs L1, drills to L2 on low-confidence overlap. Mints CONFLICT-NNNNN, appends conflicts.jsonl + history.jsonl, emits stderr hint with `/aura-frog:plan-conflicts show` next step. Anti-block: informational only; arbiter applies actual mutations
+- `post-execute-conflict-rescan.cjs` — PostToolUse async on Edit|Write. Detects recent execution_completed events, looks up frozen siblings tied to same conflict, runs `git diff <blocker.checkpoint.git_sha>..HEAD` vs frozen sibling planned artifacts, emits auto_thaw / auto_discard recommendation
+- `pending-confirm-timeout.cjs` — SessionStart async. Walks T4 nodes, surfaces those in `planned`/`frozen`/`blocked` status idle >24h (configurable via `AF_PENDING_TIMEOUT_HOURS`). Cap: 5 surfaced + tail count
+
+**Skill update**
+- `skills/failure-classifier/SKILL.md` — F6 class formalized (was a TODO note). Decision rule #2: `cause: conflict OR conflict_id non-null → F6`. Output: `routes_to: conflict-arbiter` (NOT replanner).
+
+### Acceptance criteria — beta.2 sub-scope
+
+- [x] L1 detects file overlap on smoke fixture (1/1; 30-fixture suite deferred to rc.1)
+- [x] L2 drills into overlapping files when L1 confidence < 0.95 (1/1)
+- [x] CONFLICT-NNNNN records minted with proper schema; conflicts.jsonl append-only
+- [x] Frozen node remains frozen until explicit thaw
+- [x] Branch freeze cascades to descendants only (NOT siblings) — per spec §13.1, Q10
+- [x] /aura-frog:plan-thaw runs compatibility check via git_sha
+- [x] F6 class added to failure-classifier with conflict-arbiter dispatch
+- [x] L1 detection well under 100ms p95 (bash + comm + sort, no LLM)
+- [x] End-to-end tested: artifact map → L1 hit → CONFLICT-00001 minted → conflicts.jsonl + history.jsonl + counters.json all updated
+
+### Verification
+
+- `validate-counts.sh`: 15 / 53 / 68 / 21 / 41 — all OK
+- `validate-plan-tree.sh`: 6 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- L1 + L2 smoke tests pass (4 scenarios)
+- End-to-end conflict detection: TASK-00125 vs TASK-00120 sharing src/auth.py → CONFLICT-00001 logged correctly
+
+### Stats (v3.7.0-beta.1 → v3.7.0-beta.2)
+
+- Agents: 14 → **15** (+1 conflict-arbiter)
+- Skills: 52 → **53** (+1 conflict-detector); auto-invoke 9 (unchanged)
+- Rules: 67 → **68** (+1 conflict-arbitration-policy); workflow 28 → **29**
+- Commands: 18 → **21** (+3: /aura-frog:plan-freeze, /aura-frog:plan-thaw, /aura-frog:plan-conflicts)
+- Hooks: 38 → **41** (+3)
+- MCP servers: 6 (unchanged)
+
+### Pending for v3.7.0-rc.1 (Milestone E)
+
+- L3 (semantic LLM) + L4 (architectural LLM) full implementations + conflict_cache.jsonl LRU
+- 30+20+15+10 conflict fixture suites for L1-L4 acceptance corpus
+- Pre-flight Tier 2 (OPA, optional) — install-opa.sh + 5 default Rego policies
+- Self-healing orchestrator — F2/F3 propose patch, never auto-apply
+- MCP security tier — per-agent allowlist, audit log, rate limits
+- Phase-Role binding hard rule (Phase 4 reviewer ≠ Phase 3 builder)
+- /aura-frog:dashboard CLI
+
+### Pending — deferred FEAT-B work (rolling)
+
+- Classifier 80-fixture suite + hallucination/logic-error fixture suites + deviation_score auto-update + trace-event latency benchmark
+
+### Fixed (post-beta.1)
+
+- **Agent dispatch namespacing — derived not hardcoded.** First fix wired the `aura-frog:` prefix into the dispatch table (worked, but fragile across forks/renames). Refactored to derivation: the prefix is now read at runtime from `plugin.json#name` via `scripts/get-plugin-prefix.sh` (new helper, falls back to grep when `jq` unavailable). The session-start hook (`hooks/session-start.cjs`) emits the prefix in its banner: `🔌 plugin-prefix: aura-frog (use as subagent_type prefix: \`aura-frog:<agent-id>\`)` — so the AI sees it once per session, no per-call lookup. `skills/run-orchestrator/SKILL.md` dispatch table now uses bare agent IDs (`architect`, `tester`, etc.) with a note to apply the runtime prefix at the moment of Agent tool invocation. `rules/core/agent-namespacing.md` rewritten as derivation-based: lists agent IDs (stable) and looks up the prefix from plugin.json (variable). Skills/rules/docs are now fork-safe — only `plugin.json` + `marketplace.json` need updating on rename. Rules: 66 → **67** (core 21 → **22**).
+
+## [3.7.0-beta.1] - 2026-05-06 (Milestone C complete — Pre-flight Tier 1)
+
+> Internal pre-release tag. Not published to marketplace. Completes FEAT-C with the pre-flight half. Tier 2 OPA Rego policies deferred to rc.1 per spec §20.4 (Tier 2 is optional).
+
+### Added — Pre-flight Tier 1 (7 bash linters + dispatcher hook)
+
+**Scripts (7 new under `scripts/preflight/`)**
+- `validate-frontmatter.sh` — YAML frontmatter validation on plan/skill/agent/rule/command markdown
+- `validate-tool-input.sh` — tool input shape sanity (required fields, absolute paths, no-op edits)
+- `validate-tool-output.sh` — ANSI-escape volume, prompt-injection phrase detection, JSON sanity
+- `check-path-safety.sh` — reject path traversal + system files (`/etc/passwd`, `~/.ssh/`, `~/.aws/`) + credential dirs
+- `check-command-allowlist.sh` — hard-block destructive (`rm -rf /`, `mkfs.*`, fork bomb, pipe-to-sudo-shell, etc.); warn on risky (`git push --force`, `DROP TABLE`)
+- `check-secret-patterns.sh` — high-confidence credential patterns (AWS/GitHub PAT/OpenAI/JWT/private keys); warn on heuristic patterns
+- `run-all.sh` — orchestrator. Auto-dispatches based on `CLAUDE_TOOL_NAME` + `CLAUDE_TOOL_ARGS`. Returns highest exit code from any linter
+
+Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
+
+**Hook (1 new — 37 → 38)**
+- `hooks/pre-flight-validate.cjs` — PreToolUse on Bash | Edit | Write | Read. Invokes `run-all.sh`. Exit 2 → blocks tool call. Exit 1 → warn but proceed. Exit 0 → silent. Honors `AF_PREFLIGHT_DISABLED=true` and single-use bypass via `.claude/logs/.preflight-bypass` flag file (per-call only, per spec Q7). After 3 bypasses in one session, prints warning banner.
+
+**Skill (1 new — 51 → 52)**
+- `skills/preflight-validator/` — programmatic wrapper for on-demand invocation (CI, contributor workflow, batch validation). On-demand only.
+
+**Command (1 new — 17 → 18)**
+- `commands/preflight.md` — `/aura-frog:preflight check|policies|bypass|status`. `bypass <reason>` requires reason ≥10 chars (refuses vague "test it"). Logs to history.jsonl.
+
+**Rule (1 new — 65 → 66; workflow 27 → 28)**
+- `rules/workflow/preflight-policies.md` — formalizes triggers, hard-block vs warn pattern classes, exit-code semantics, bypass policy (per-call only), 3-bypasses-warn threshold, escalation order (per-call → per-session env → permanent — strongly discouraged).
+
+### Acceptance criteria — beta.1 sub-scope
+
+- [x] All 7 Tier 1 linters defined; each returns 0/1/2 per spec §20.2
+- [x] `pre-flight-validate.cjs` blocks tool call on exit 2; warns on exit 1
+- [x] `/aura-frog:preflight bypass` is single-use (consumed on next PreToolUse)
+- [x] After 3 bypasses in a session: warning banner emitted
+- [x] Hook silent if `AF_PREFLIGHT_DISABLED=true`
+- [x] Hook silent if `run-all.sh` missing
+- [x] Smoke tests: 10/10 pass (hard-block / warn / pass for each linter; dispatcher correctness)
+
+### Verification
+
+- `validate-counts.sh`: 14 / 52 / 66 / 18 / 38 — all OK
+- `validate-plan-tree.sh`: 5 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- Linter smoke tests: rm -rf / blocked, force-push warned, ls passed, /etc/passwd blocked, traversal blocked, AWS key detected, GitHub PAT detected, clean content passed, run-all dispatch correct
+- Hook smoke tests: hard-block exit 2, warn exit 0 with stderr, pass exit 0 silent, AF_PREFLIGHT_DISABLED skips entirely
+
+### Stats (v3.7.0-alpha.4 → v3.7.0-beta.1)
+
+- Agents: 14 (unchanged)
+- Skills: 51 → **52** (+1 preflight-validator); auto-invoke 9 (unchanged)
+- Rules: 65 → **66** (+1 preflight-policies); workflow 27 → **28**
+- Commands: 17 → **18** (+1 /aura-frog:preflight)
+- Hooks: 37 → **38** (+1 pre-flight-validate)
+- MCP servers: 6 (unchanged)
+
+### Pending for v3.7.0-rc.1 (Milestone E remainder)
+
+- **Pre-flight Tier 2 (OPA, optional)** — `install-opa.sh` (sha256-verified) + 5 default Rego policies (plan_structure / mutation_safety / grounding / token_budget / conflict_respect)
+- **Self-healing orchestrator** — F2/F3 propose patch, never auto-apply
+- **MCP security tier** — per-agent allowlist (`mcp_servers:` frontmatter), `mcp-call-gate.cjs` hook, audit log, rate limits
+- **Phase-Role binding** — Phase 4 reviewer ≠ Phase 3 builder hard rule enforcement
+- **CLI dashboard** — `/aura-frog:dashboard`
+
+### Pending for v3.7.0-beta.2 (Milestone D)
+
+- L1-L4 conflict detection + conflict-arbiter agent + F6 class
+- 3 conflict commands (`/aura-frog:plan-freeze`, `:thaw`, `:conflicts`)
+- Branch freeze cascade + auto-thaw
+
+### Pending — deferred FEAT-B work (rolling)
+
+- Classifier 80-fixture suite + hallucination/logic-error fixture suites + deviation_score auto-update + trace-event latency benchmark
+
+### Added (post-alpha.4)
+
+- **Deterministic JSON → TOON projection** — `scripts/json-to-toon.cjs` (CLI + library) projects JSON via built-in schemas (`jira` / `mcp` / `tests` / `pr` / `pkg` / `generic`) or custom dotpaths, encodes as TOON. `hooks/json-toon-projector.cjs` (PostToolUse Read | mcp__.*) shape-sniffs incoming JSON, runs the converter, emits TOON to stderr alongside the raw output. Skips small payloads (<2KB), plugin config files, non-JSON. **No AI involvement** — projection is script-side, saving the round-trip + tokens that an AI-side rule would have cost. `hooks/jira-auto-fetch.cjs` updated to call the converter for stderr emission. Hooks: 36 → **37**. Spec rationale: an originally drafted `rules/core/json-to-toon.md` rule was deleted in favor of the hook because rules are always-loaded (token cost) and ask the model to convert AFTER receiving raw JSON — a deterministic hook does the work BEFORE the model sees anything.
+
+### Fixed (post-alpha.4)
+
+- **Anti-overload context discipline** — added `rules/core/context-economy.md` (Critical priority, always-loaded). Addresses upstream `overloaded_error` from large context: locate-before-Read ladder (Glob → Grep paths → Grep content → targeted Read with offset+limit → full Read as last resort), skip rules for build artifacts / lockfiles / minified files, no-re-Read discipline, recovery procedure on overload error (do NOT retry with same context — distill, then resume), token budget per session class (Quick <10K / Standard <60K / Deep <150K tool-results total). Cited from run-orchestrator (Phase 1 setup), bugfix-quick (investigation step), code-reviewer (review evidence). Rules: 64 → **65** (core 20 → **21**).
+
+## [3.7.0-alpha.4] - 2026-05-05 (Milestone C interim — Memory Tier)
+
+> Internal pre-release tag. Not published to marketplace. Ships the memory half of FEAT-C: epic-summarizer + permanent_memory + session reset. Pre-flight half + 7 Tier 1 linters + OPA optional + deferred FEAT-B fixtures land in beta.1.
+
+### Added — Memory tier
+
+**Agents (1 new — 13 → 14)**
+- `agents/epic-summarizer.md` — distills T2 done into a permanent_memory.md section. Confidence-scored output (items <0.7 → Tentative subsection). Hard cap: 500 tokens/Epic. Writes ONLY to `.aura/memory/`. Never includes verbatim file content (sha256 references instead).
+
+**Skills (2 new — 49 → 51; auto-invoke 8 → 9)**
+- `skills/permanent-memory-loader/` — auto-invoke. Loads permanent_memory.md summary lines (≤120 tokens always-loaded; 200 hard cap). Silent if no `.aura/memory/`. Auto-degrades by dropping Tentative → Patterns → Epic-IDs-only.
+- `skills/plan-archivist/` — on-demand. Compresses completed plan-tree branches to `.aura/plans/archive/{NODE_ID}.summary.md`. Optional `--prune` removes original Story/Task files (always preserved in checkpoints).
+
+**Commands (1 new — 16 → 17)**
+- `commands/reset-session.md` — distills active Epic via epic-summarizer → permanent_memory.md → optional reset prompt. Preserves history.jsonl, plan tree, conflict cache, manual_overrides.md. Supports `--feature`, `--initiative`, `--dry-run`, `--no-prompt`.
+
+**Rules (1 new — 63 → 64; workflow 26 → 27)**
+- `rules/workflow/session-reset-policy.md` — formalizes triggers (T2 done default, T1 quarterly, manual), distillation include/exclude rules, 500/8000 token caps, confidence-tiered output, what's preserved across reset.
+
+**Hooks (2 new — 34 → 36)**
+- `hooks/feature-done-trigger-archive.cjs` — PostToolUse Edit|Write. Detects T2 status transition `active → done` via history.jsonl tail. Surfaces `/aura-frog:reset-session` suggestion.
+- `hooks/session-reset-trigger.cjs` — PostToolUse Edit|Write. After epic-summarizer writes a section (within 60s window), prompts user to actually reset the session. Per-feature flag prevents spam.
+
+### Acceptance criteria — alpha.4 sub-scope
+
+- [x] epic-summarizer agent defined with 500-token cap + confidence tiers + .aura/memory/ write-only
+- [x] permanent-memory-loader auto-invokes, ≤120 tokens, silent without `.aura/memory/`
+- [x] plan-archivist defined with --prune opt-in
+- [x] /aura-frog:reset-session distills and offers reset; preserves what spec §19.5 says it should
+- [x] session-reset-policy formalizes triggers + caps + preservation list
+- [x] feature-done-trigger-archive emits hint on T2 done detection
+- [x] session-reset-trigger prompts user post-distillation (anti-spam flag)
+- [x] All 4 hook scenarios tested (no plans / done detection / no recent summarize / recent summarize)
+
+### Verification
+
+- `validate-counts.sh`: 14 / 51 / 64 / 17 / 36 — all OK
+- `validate-plan-tree.sh`: 5 nodes · 8/8 invariants
+- Reference integrity: zero orphans
+- Hook smoke test: silent without `.aura/plans/`, fires correctly with active.json + history.jsonl events
+
+### Stats (v3.7.0-alpha.3 → v3.7.0-alpha.4)
+
+- Agents: 13 → **14** (+1 epic-summarizer)
+- Skills: 49 → **51** (+2); auto-invoke 8 → **9** (+permanent-memory-loader)
+- Rules: 63 → **64** (+1 session-reset-policy); workflow 26 → **27**
+- Commands: 16 → **17** (+1 /aura-frog:reset-session)
+- Hooks: 34 → **36** (+2)
+- MCP servers: 6 (unchanged)
+
+### Pending for beta.1 (rest of FEAT-C)
+
+- preflight-validator skill + /aura-frog:preflight command + preflight-policies workflow rule
+- pre-flight-validate.cjs hook
+- 7 Tier 1 bash linters + install-opa.sh (sha256 verified)
+- 5 OPA Rego policies (plan_structure, mutation_safety, grounding, token_budget, conflict_respect)
+- **Deferred from FEAT-B** — classifier 80-fixture suite, hallucination/logic-error fixture suites, deviation_score auto-update, trace-event latency benchmark
+- Post-reset session-load benchmark (<2s target)
+
+### Fixed (post-alpha.3)
+
+- **JIRA auto-fetch wired** — `jira-fetch.sh` existed but had no UserPromptSubmit hook driving it. Added `hooks/jira-auto-fetch.cjs`: detects `[A-Z]{2,10}-[0-9]{1,6}` patterns in the user prompt, fetches via curl directly to the Atlassian REST API, caches per-project at `.claude/logs/jira/{TICKET_ID}.json` with 24h TTL, surfaces a one-line summary per ticket to stderr. Silent if JIRA env vars unset (one-time hint per session). Cap: 3 tickets/prompt. Optional `JIRA_PROJECT_PREFIXES` env (comma-separated) acts as an allowlist to filter false positives like `RFC-123` / `UTF-8`. Credentials never leak in error output. `run-orchestrator` skill updated to consume the cache as a canonical requirements source. Hooks: 33 → **34** (rolled into alpha.4 count of 36).
+
+## [3.7.0-alpha.3] - 2026-05-04 (Milestone C interim — Project-level Extension Creation)
+
+> Internal pre-release tag. Not published to marketplace. Addresses user directive 2026-05-04: auto-detect when a new skill/rule/command would help, ask for confirmation, create at project-Claude level only.
+
+### Added — Project-level extension creation
+
+**Skills (1 new — 48 → 49; auto-invoke 7 → 8)**
+- `skills/extension-detector/` — auto-invoke. Detects strong/medium signals that a new skill/rule/command would reduce friction. NEVER writes files itself; surfaces a one-line proposal and waits for explicit `y` / `yes` confirmation. Detection budget: 1 proposal/turn, 3/session.
+
+**Commands (1 new — 15 → 16)**
+- `commands/extend.md` — `/aura-frog:extend propose|create|list|remove`. Always writes to `.claude/{skills,rules,commands}/` in the user's project — **NEVER to plugin's `aura-frog/` folder** (hard path-prefix check). Includes reference-integrity audit step + extensions.log append.
+
+**Rules (1 new — 62 → 63; workflow 25 → 26)**
+- `rules/workflow/extension-policy.md` — formalizes signal thresholds (strong/medium/weak with occurrence requirements), confirmation gate as non-negotiable, project-only write constraint, frontmatter requirements for project extensions, anti-fatigue budget caps.
+
+### Acceptance criteria — all green for alpha.3 sub-scope
+
+- [x] extension-detector auto-invokes only on signal threshold match (3+ for medium, 1 for strong)
+- [x] /aura-frog:extend supports propose/create/list/remove
+- [x] extension-policy formalizes thresholds + confirmation gate + project-only writes
+- [x] Hard guardrail: write paths starting with `aura-frog/` rejected immediately
+- [x] Mandatory user confirmation before any file creation
+- [x] Detection budget: 1/turn, 3/session
+- [x] Reference-integrity audit runs after every create
+
+### Why ship as interim alpha.3
+
+FEAT-C (Milestone C) standard scope is large: epic-summarizer, permanent-memory, 7 Tier 1 linters, 5 OPA policies, session reset flow. The user directive (auto-detect skills/rules/commands) is a smaller orthogonal capability. Splitting:
+
+- **alpha.3** ships extension-detector standalone — fast feedback on the new feature
+- **beta.1** ships full FEAT-C standard scope + deferred FEAT-B fixture suites
+
+This keeps each pre-release reviewable and avoids bundling unrelated changes.
+
+### Stats (v3.7.0-alpha.2 → v3.7.0-alpha.3)
+
+- Agents: 13 (unchanged)
+- Skills: 48 → **49** (+1 extension-detector); auto-invoke 7 → **8**
+- Rules: 62 → **63** (+1 extension-policy); workflow 25 → **26**
+- Commands: 15 → **16** (+1 /aura-frog:extend)
+- Hooks: 33 (unchanged)
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone C remainder (beta.1)** — epic-summarizer, plan-archivist, permanent-memory-loader, preflight-validator, /aura-frog:reset-session, /aura-frog:preflight, session-reset-policy + preflight-policies rules, 3 hooks (feature-done-trigger-archive, pre-flight-validate, session-reset-trigger), 7 Tier 1 linters, OPA install + 5 Rego policies
+- **Deferred from FEAT-B** — classifier 80-fixture suite, hallucination/logic-error fixture suites, deviation_score auto-update, trace-event latency benchmark
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
+
+## [3.7.0-alpha.2] - 2026-04-29 (Milestone B — Failure Handling + Reasoning Trace)
+
+> Internal pre-release tag. Not published to marketplace. All 11 acceptance criteria green.
+
+### Added — Failure handling + reasoning trace
+
+**Plan tree**
+- `.aura/plans/features/FEAT-B/feature.md` (Milestone B), INIT-001 children → `[FEAT-A, FEAT-B]`
+
+**Agents (1 new — 12 → 13)**
+- `agents/replanner.md` — F2-F4 mutation proposer (re-decompose / discard_task / reprioritize / promote / freeze). Read-only on code; only LLM-mediated planning agent (per Q1 decision).
+
+**Skills (3 new — 45 → 48; auto-invoke 5 → 7)**
+- `skills/failure-classifier/` — F1-F5 deterministic classifier. Outputs `{class, confidence, evidence, recommended_action}`. No LLM call.
+- `skills/reasoning-trace-recorder/` — auto-invoke. Emits `file_read | output_claim | tool_call | tool_result | decision | phase_transition` events to `.aura/plans/traces/{TASK_ID}.jsonl`.
+- `skills/plan-validator/` — wrapper over `validate-plan-tree.sh`; closes a reference gap from alpha.1 (was promised, never built).
+
+**Rules (3 new — 59 → 62; core 18 → 20, workflow 22 → 25)**
+- `rules/core/grounding-discipline.md` — `output_claim` must be preceded by a `file_read` for the named file/symbol; ungrounded claims surface in `/aura-frog:trace --hallucinations`.
+- `rules/workflow/replan-thresholds.md` — `replan_budget` per tier (T2=2, T3=3, T4=0), `deviation_score` formula, freeze-on-exhaustion + cycle guard.
+- `rules/workflow/checkpoint-discipline.md` — pre-mutation snapshots in `.aura/plans/checkpoints/`, retention (5 per node / 30 days / 50 MB cap), idempotent restore semantics.
+
+**Commands (1 new — 14 → 15; +1 upgrade)**
+- `commands/trace.md` — read traces by TASK_ID, filter by event type, surface ungrounded claims (`--hallucinations`).
+- `commands/plan-undo.md` — full implementation (alpha.1 was a stub): LIFO checkpoint restore, idempotent (no-op on second run), refuses on missing checkpoint.
+
+**Hooks (3 new — 30 → 33; all 5 planning hooks now wired into hooks.json)**
+- `hooks/post-execute-update-node.cjs` — PostToolUse. Records execution_completed/execution_failed events to history.jsonl; surfaces failure-classifier hint on non-zero exit.
+- `hooks/tdd-red-failure-tracker.cjs` — Bash PostToolUse, P2_RED only. Distinguishes `red_as_designed` from `red_unexpectedly_green` (F2 candidate).
+- `hooks/tool-call-tracer.cjs` — PreToolUse + PostToolUse. Emits `tool_call`, `tool_result`, and (for Read) `file_read` events with sha256 truncated to 16 chars.
+- **Wired up** in `hooks/hooks.json`: alpha.1's two hooks (`pre-execute-load-plan-context`, `session-start-restore-active`) plus the three new alpha.2 hooks now fire on the appropriate Claude Code lifecycle events. All silent on projects without `.aura/plans/`.
+
+### Acceptance criteria — all green
+
+- [x] failure-classifier returns F1-F5 with confidence ≥ 0.6
+- [x] replanner emits proposals respecting `replan_budget`; refuses on exhaustion
+- [x] reasoning-trace-recorder writes append-only `traces/{TASK_ID}.jsonl`
+- [x] `/aura-frog:trace` reads traces and surfaces ungrounded claims
+- [x] grounding-discipline rule defines `grounded:bool` semantics
+- [x] post-execute-update-node hook records execution events to history.jsonl
+- [x] tdd-red-failure-tracker hook distinguishes RED-as-designed from F2 candidate
+- [x] tool-call-tracer hook emits tool_call/tool_result/file_read events
+- [x] /aura-frog:plan-undo full implementation honors checkpoint LIFO + idempotent
+- [x] checkpoint-discipline rule defines retention + restore semantics
+- [x] replan-thresholds rule defines deviation_score + budget enforcement
+
+### Verification
+
+- `validate-counts.sh`: 13 agents · 48 skills · 62 rules · 15 commands · 33 hooks — all OK
+- `validate-plan-tree.sh`: 4 nodes · 8/8 invariants pass
+- `check-token-budget.sh`: 212 / 13,500 tokens (1% utilization, well under hard limit)
+- Hook smoke test: all 5 silent-exit on no `.aura/plans/`; emit correct events on active plan tree
+
+### Stats (v3.7.0-alpha.1 → v3.7.0-alpha.2)
+
+- Agents: 12 → **13** (+1 replanner)
+- Skills: 45 → **48** (+3); auto-invoke 5 → **7** (+plan-loader was alpha.1, +reasoning-trace-recorder)
+- Rules: 59 → **62** (+3); core 18 → 20, workflow 22 → 25
+- Commands: 14 → **15** (+1 /aura-frog:trace; /aura-frog:plan-undo upgraded from stub to full)
+- Hooks: 30 → **33** (+3); all 5 planning hooks now wired in hooks.json
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone C (beta.1)** — session reset, pre-flight (Tier 1 bash + optional OPA Tier 2), epic-summarizer, permanent-memory-loader, prune-checkpoints.sh
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class, freeze cascade
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
+
+## [3.7.0-alpha.1] - 2026-04-21 (Milestone A — Planning Foundation)
+
+> Internal pre-release tag. Not published to marketplace. All 6 spec acceptance criteria green.
+
+### Added — Hierarchical planning foundation
+
+**Specs & decisions**
+- `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` — authoritative tech spec (summary form; §3-33 transcribed per milestone)
+- `docs/specs/V3.7.0_DECISIONS.md` — all 17 §32 decisions resolved with spec recommendations + env var inventory
+
+**Plan tree (gitignored, project-local per Q2)**
+- `.aura/plans/` skeleton: mission.md, INIT-001.md, FEAT-A/feature.md, .counters.json, active.json, history.jsonl
+
+**Agents (4 new — 9 → 12)**
+- `agents/master-planner.md` — kernel controller skeleton (decision engine arrives Milestone B)
+- `agents/strategist.md` — T0-T1 hierarchical-planning section appended (preserves original business-strategy role)
+- `agents/feature-architect.md` — T2 → T3 decomposition (read-only on code)
+- `agents/story-planner.md` — T3 → T4 decomposition, pairs with TDD Phase 1
+
+**Skills (1 new — auto-invoke)**
+- `skills/plan-loader/` — `user-invocable: false`, ≤800 always-loaded tokens, auto-degradation on size
+
+**Rules (2 new)**
+- `rules/core/plan-trust-policy.md` — `trust: plan` memory tier between `trust: user` and `trust: file`
+- `rules/workflow/plan-lifecycle.md` — state machine + Phase 4 reviewer ≠ Phase 3 builder hard rule
+
+**Commands (8 new — 6 → 14)**
+- `commands/plan.md` — interview-bootstrap T0/T1/T2
+- `commands/plan-expand.md` — decompose node one tier down
+- `commands/plan-next.md` — return next ready T4 leaf
+- `commands/plan-status.md` — render plan tree + summary
+- `commands/plan-replan.md` — replan flow with budget enforcement (full impl Milestone B)
+- `commands/plan-promote.md` — promote node tier
+- `commands/plan-archive.md` — archive completed branch with summary
+- `commands/plan-undo.md` — restore from checkpoint (full impl Milestone B)
+
+**Hooks (2 new — 28 → 30)**
+- `hooks/pre-execute-load-plan-context.cjs` — PreToolUse: emits `[plan-context | trust:plan]` to stderr (silent if no `.aura/plans/`)
+- `hooks/session-start-restore-active.cjs` — SessionStart: emits `🐸 Active plan` banner; appends `event: session_start` to history.jsonl
+
+**Scripts**
+- `scripts/plans/new-plan.sh` — idempotent skeleton initializer
+- `scripts/plans/validate-plan-tree.sh` — enforces all 8 invariants from spec §6.7 (parent existence, children integrity, no orphans, valid status, monotonic revision, test_ref existence, DAG no-cycles, freeze_reason)
+- `scripts/plans/render-plan-tree.sh` — ASCII tree renderer with status icons (○ planned, ▶ active, ✓ done, ■ blocked, ❄ frozen, ✗ discarded, ⌂ archived)
+- `scripts/plans/test-roundtrip.sh` — sha256-based byte-identical round-trip test
+- `scripts/plans/check-token-budget.sh` — counts plan-tree lines, hard limit 13,500
+
+### Acceptance criteria — all green
+
+- [x] new-plan.sh idempotent skeleton creation
+- [x] validate-plan-tree.sh enforces 8/8 invariants (was 4/8 pre-alpha.1)
+- [x] Plan tree byte-identical round-trip (3-node test passes)
+- [x] 8 commands defined with imperative protocol
+- [x] ASCII tree renders correctly
+- [x] Token budget 212 / 13,500 = 1% utilization (well under hard limit)
+
+### Stats (v3.6.1 → v3.7.0-alpha.1)
+
+- Agents: 9 → **12** (+3, master-planner extends to 4 if counting strategist's appended role)
+- Skills: 44 → **45** (+1 plan-loader; auto-invoke 5 → 5 unchanged in count, plan-loader replaces nothing)
+- Rules: 57 → **59** (+2)
+- Commands: 6 → **14** (+8)
+- Hooks: 28 → **30** (+2)
+- MCP servers: 6 (unchanged)
+
+### Pending for subsequent milestones
+
+- **Milestone B (alpha.2)** — failure classifier F1-F6, replanner, reasoning trace, /aura-frog:trace, replan-thresholds, checkpoint-discipline
+- **Milestone C (beta.1)** — session reset, pre-flight (Tier 1 bash + optional OPA Tier 2), epic-summarizer, permanent-memory-loader
+- **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class, freeze cascade
+- **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
+
+### Added
+
+**Portability Positioning**
+- `docs/PORTABILITY.md` — Layer-by-layer portability analysis (~87% markdown weighted average), adapter architecture with Mermaid diagram, event mapping table (Claude Code / Cursor / Codex), porting guide for contributors
+- README "Works Across AI Coding Tools" section + Portable badge
+- BENEFITS.md Part 9: "Tool-Agnostic Investment" for teams evaluating multiple AI coding tools
+- Marketplace/plugin descriptions updated to mention adapter roadmap
+
+**Behavioral CI (cc-plugin-eval integration)**
+- `docs/guides/EVAL_SETUP.md` — install, config, run, troubleshooting guide
+- `aura-frog/.eval-config.yaml` — Sonnet, 5 scenarios per component, $10 budget cap, read-only mode
+- `aura-frog/scripts/ci/check-eval-regression.cjs` — compare against baseline, fail on <85% accuracy OR >10% drop; graceful handling of missing baseline (first-run mode)
+- `.github/workflows/behavioral-eval.yml` — PR workflow triggered on skills/agents/commands/rules changes; uploads eval-results.json as artifact
+- CONTRIBUTING.md "Behavioral Evaluation" section with local-run instructions + baseline-update policy
+- README "Trigger Accuracy" badge linking to EVAL_SETUP
+- Requires repo secret: ANTHROPIC_API_KEY
+
+**Coverage Skills (3 new)**
+- `skills/deep-debugging` — Scientific-method root-cause analysis for intermittent/flaky/race bugs. Protocol: reproduce → hypothesis tree (via tree-of-thoughts) → bisect → test one hypothesis → verify via chain-of-verification → regression test. Escalation from bugfix-quick.
+- `skills/monorepo` — pnpm/yarn/npm workspaces, Turborepo, Nx, Lerna, Rust/Go workspaces. Correct package scoping, cross-package coordination, build-graph awareness. Uses `paths:` frontmatter to auto-load on workspace file detection.
+- `skills/perf-profiling` — Measure-first optimization with Pareto bottleneck targeting. Language-specific profiler suggestions (clinic/py-spy/pprof/flamegraph), one-change-at-a-time discipline, flat-distribution detection for architectural calls.
+
+### Changed
+
+- Skills: 41 → **44** (5 auto-invoke unchanged, reference 36 → 39)
+- plugin.json + marketplace.json descriptions prefix "Portable" + adapter timeline
+- bugfix-quick SKILL escalates to deep-debugging for hard bugs
+- commands/check.md `/check perf` delegates to perf-profiling for deep analysis
+- commands/run.md documents auto-loaded skills (monorepo, perf-profiling) based on repo/task detection
+
+### Stats
+
+- Skills: **44** (was 41)
+- Rules: 57 (unchanged)
+- Agents: 9 (unchanged)
+- Commands: 6 (unchanged)
+- Hooks: 28 (unchanged)
+
+### Not yet shipped
+
+- cc-plugin-eval baseline (`aura-frog/eval-baseline.json`) — first generation requires ANTHROPIC_API_KEY; workflow handles missing baseline gracefully
+- Codex/Cursor adapters — documented roadmap, target Q2 2026
+
+---
+
+## [3.6.1] - 2026-04-21
+
+### Added
+- **Security & discipline rules** — 7 new policy rules: `no-assumption`, `prompt-validation` (6-dim benchmark), `contextual-separation` (prompt-injection defense), `recursion-limit` (loop prevention), `observer-agent` (watchdog role), `prompt-caching` (Anthropic cache_control), `small-to-large-routing` (haiku→sonnet→opus), `dual-llm-review` (adversarial second-opinion), `immutable-workflow` (approved phases append-only)
+- **`skills/prompt-evaluator`** — added Mode 3: Output Variance (run N times, score stability 0-100%)
+- **`docs/reference/BENEFITS.md`** — full why-use-this-plugin doc (~460 lines, 8 parts, use cases)
+- **Reference Integrity Rule** in `.claude/CLAUDE.md` — audit script + enforcement policy for future refactors
+- **Reviewer cap = 2 per phase** in `cross-review-workflow.md` — analysis-paralysis defense
+
+### Changed
+- Core rule tier: 13 → 18 (added 5 rules)
+- Workflow rule tier: 20 → 22 (added 2 rules)
+- Total rules: 50 → 57 (18 core + 17 agent + 22 workflow)
+
+### Fixed
+- **CLAUDE.md discrepancies:** commands table was missing `/help` (now 6 commands); auto-invoke skill list incorrectly included `run-orchestrator` (which has no `autoInvoke: true` frontmatter — now correctly 5 skills)
+- **Skills README count mismatch:** propagated the 6→5 auto-invoke fix across 5 files (skills/README, docs/README, root README ×3, CONTRIBUTING)
+- **7 dead reference paths:** `skills/debugging/SKILL.md` → `skills/bugfix-quick/SKILL.md` (merged in v3.5); `skills/chain-of-verification.md` → `/SKILL.md` suffix; `rules/logging-standards.md` → `/agent/` tier; `rules/next-step-guidance.md` → `/workflow/` tier; `docs/WORKFLOW_DIAGRAMS.md` → `/architecture/` subdir
+
+### Stats
+- Rules: 57 (was 50)
+- Core rules: 18 (was 13)
+- Workflow rules: 22 (was 20)
+
+---
+
+## [3.6.0] - 2026-04-21
+
+### Added
+- **3 reasoning techniques from published research** (opt-in via `/run reason:` prefix; auto-enabled in specific phases)
+  - `self-consistency` — N independent paths + majority vote (Wang et al. 2022) — Phase 1 Deep trade-off decisions
+  - `tree-of-thoughts` — Branch/evaluate/prune/backtrack (Yao et al. 2023) — P1 architecture + P4 refactor planning
+  - `chain-of-verification` — Draft → verify via tool → revise (Dhuliawala et al. 2023) — **MANDATORY in Phase 4** for factual claims
+  - Each has a workflow-tier rule (policy) + reference skill (playbook)
+- **Prompt validation (6-dimension benchmark)** — New core rule `rules/core/prompt-validation.md`. Every actionable prompt scored on Precondition, Context, Requirement, Criteria, Expect/Actual, Output. Complexity-gated thresholds (Quick/Standard/Deep). Threshold fail → focused questions before execution.
+- **No-assumption rule** — New core rule `rules/core/no-assumption.md`. "If in doubt, ASK. Never guess, never fabricate." Concrete anti-patterns, ≤2 questions per turn, honors force-mode prefixes.
+- **Agent YAML frontmatter** — All 9 agents now declare `name`, `description`, `tools` (allowlist per role), `color`, optional `model`. Security + strategist are read-only (no Edit/Write/Bash). Scanner uses haiku. Architect/frontend/mobile/lead inherit session model (Opus sessions → Opus for design work).
+- **4 Mermaid diagrams in root README** — How It Works, Agent Detection, Routing Strategies, Walkthrough Sequence. High-contrast colors for GitHub light/dark mode.
+- **README sections** — Full Installation with verification, Walkthrough with mock terminal transcript, Command Reference (6 commands with examples), Agent Selection Examples (10 rows), Token Budget breakdown, Troubleshooting/FAQ (7 collapsed Q&As), Compared to Other Plugins (vs wshobson/agents, Superpowers).
+- **Branding image prompts** — `assets/BRANDING_PROMPTS.md` with 9 minimalist prompts for regenerating mascot/logo/banner assets via Midjourney/DALL-E/Imagen.
+- **Frontmatter maintenance rule** — Added to `.claude/CLAUDE.md` so future edits preserve YAML schema + audit script for orphan/dead-link check.
+
+### Changed
+- **Commands consolidated 26→6** — `/run` (universal entry), `/check` (verification), `/design` (pre-coding), `/project` (config), `/af` (system), `/help`
+- **`/run <task>` auto-detects intent** — bugfix, feature, refactor, test, deploy, review, security, quality — routes to right flow automatically
+- **Context-aware actions** — During active run, bare words work: `approve`, `reject`, `modify`, `handoff`, `status`, `progress`, `rollback`, `stop`
+- **Renamed workflow-orchestrator → run-orchestrator** — skill, folder, state files all updated
+- **Log folder: `.claude/logs/workflows/` → `.claude/logs/runs/`** — hook code aligned to match docs (was the source of "workflow state not saving" bug)
+- **Rule tier rebalanced (13/17/20)** — Frontend-specific rules moved from core to agent tier: `direct-hook-access`, `correct-file-extensions`. 3 new workflow rules (reasoning techniques). Core grew from 11 to 13 with `no-assumption` + `prompt-validation`.
+- **`api-design-rules.md` slimmed 187→55 lines** — Full design guidance now defers to `api-designer` skill (eliminates rule↔skill duplication).
+- **Agent framework experts add `paths:` frontmatter** — 11 framework experts (react/vue/nextjs/angular/flutter/react-native/typescript/nodejs/python/laravel/go) now auto-invoke only on matching file types for precision.
+- **Discoverability pass** — Every rule now has ≥1 inbound reference from an agent/skill/CLAUDE.md (was 30 orphaned rules out of 45). Zero dead links across agents/skills/rules.
+
+### Removed
+- **Router agent deleted** (`agents/router.md` + `agents/reference/router-patterns.md`) — Functionality already lived in `agent-detector` skill with more coverage and 13× more inbound refs. Unique content (Intent Detection, Tech Detection, Fallbacks) merged into `skills/agent-detector/task-based-agent-selection.md`.
+
+### Fixed
+- **Workflow state path drift** — Hook `.cjs` scripts were writing to `.claude/logs/workflows/` while skills read from `.claude/logs/runs/`. Aligned all hook code to `runs/` with legacy fallback for users migrating from pre-3.6 state.
+
+### Stats
+- Commands: 6 (was 26)
+- Agents: 9 (was 10 — router consolidated)
+- Skills: 41 (was 38 — 3 reasoning techniques)
+- Rules: 50 (13 core + 17 agent + 20 workflow; was 45)
+- Top-level parents: 5 bundled + 1 standalone (was 10 bundled + 16 standalone)
+
+---
+
 ## [3.5.0] - 2026-04-14
 
 ### Changed

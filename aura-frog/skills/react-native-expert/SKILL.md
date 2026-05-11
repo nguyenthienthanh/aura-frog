@@ -8,7 +8,14 @@ triggers:
   - "expo"
   - "mobile"
   - "nativewind"
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+  - "app.json"
+  - "metro.config.*"
+  - "expo.json"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # React Native Expert — Gotchas & Decisions

@@ -10,6 +10,7 @@ triggers:
   - "load project context"
   - "load conventions"
 allowed-tools: Read, Write, Grep, Glob, Bash
+user-invocable: false
 ---
 
 # Project Context Loader
@@ -20,7 +21,7 @@ Load project conventions and generate session context on demand.
 
 ## When to Use
 
-**Before:** `/workflow start`, code generation, refactoring, test writing.
+**Before:** `/run`, code generation, refactoring, test writing.
 **Skip:** Simple questions (no code), when `session-context.toon` already loaded.
 
 ---
@@ -66,7 +67,7 @@ project:
   name: {name}
   stack: {detected}
 
-patterns[12]{type,convention,example}:
+patterns[7]{type,convention,example}:
   file_naming,PascalCase,UserProfile.tsx
   imports,absolute @/,import { Button } from '@/components/Button'
   exports,named,export const UserCard = ...

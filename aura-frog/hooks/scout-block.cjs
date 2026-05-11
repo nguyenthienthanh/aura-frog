@@ -15,7 +15,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// Default blocked patterns
+// Default blocked patterns.
+// Note: `bin` and `obj` are NOT included by default — they collide with
+// legitimate Node `bin/` entrypoints, Go cmd/, and committed compiled assets.
+// Projects that want them blocked can add them in `.afignore`.
 const DEFAULT_BLOCKED = [
   'node_modules',
   '__pycache__',
@@ -29,8 +32,6 @@ const DEFAULT_BLOCKED = [
   '.cache',
   '.turbo',
   'target', // Rust
-  'bin',    // Go
-  'obj',    // .NET
 ];
 
 // Build commands that should be allowed
@@ -78,79 +79,82 @@ function isAllowedBuildCommand(command) {
   return ALLOWED_COMMANDS.some(allowed => command.includes(allowed));
 }
 
-try {
-  // Read hook input from stdin
-  const input = fs.readFileSync(0, 'utf-8').trim();
-  if (!input) {
-    process.exit(0); // Allow if no input
-  }
-
-  const data = JSON.parse(input);
-  const toolInput = data.tool_input || {};
-
-  // Get project root (current working directory)
-  const projectRoot = process.cwd();
-
-  // Load patterns
-  const customPatterns = loadCustomPatterns(projectRoot);
-  const allPatterns = [...DEFAULT_BLOCKED, ...customPatterns];
-
-  // Check file_path parameter (Read, Write, Edit tools)
-  const filePath = toolInput.file_path || toolInput.path || '';
-  if (filePath && isBlocked(filePath, allPatterns)) {
-    console.error(`⛔ Blocked: ${filePath} (contains blocked directory)`);
-    process.exit(2);
-  }
-
-  // Check command parameter (Bash tool)
-  const command = toolInput.command || '';
-  if (command) {
-    // Allow build commands
-    if (isAllowedBuildCommand(command)) {
-      process.exit(0);
+function main() {
+  try {
+    // Read hook input from stdin
+    const input = fs.readFileSync(0, 'utf-8').trim();
+    if (!input) {
+      process.exit(0); // Allow if no input
     }
 
-    // Block directory access commands — only check the first line (actual command),
-    // not heredoc/multiline content (e.g. release notes containing "coverage")
-    const firstLine = command.split('\n')[0];
-    const accessPatterns = ['cd ', 'ls ', 'cat ', 'head ', 'tail ', 'find ', 'grep '];
-    const isAccessCommand = accessPatterns.some(p => firstLine.includes(p));
+    const data = JSON.parse(input);
+    const toolInput = data.tool_input || {};
 
-    if (isAccessCommand) {
-      // Extract paths from command — split on spaces, filter path-like tokens
-      const tokens = firstLine.split(/\s+/);
-      for (const token of tokens) {
-        if (token.includes('/') || token.includes('\\')) {
-          // Skip absolute system paths (not project-relative)
-          if (token.startsWith('/usr/') || token.startsWith('/opt/') || token.startsWith('/etc/') || token.startsWith('/tmp/')) {
-            continue;
-          }
-          // Use segment-based matching (same as file paths)
-          if (isBlocked(token, allPatterns)) {
-            const matched = allPatterns.find(p => {
-              const segments = token.replace(/\\/g, '/').toLowerCase().split('/');
-              return segments.some(s => s === p.toLowerCase());
-            });
-            console.error(`⛔ Blocked: command accesses ${matched}`);
-            process.exit(2);
+    // Get project root (current working directory)
+    const projectRoot = process.cwd();
+
+    // Load patterns
+    const customPatterns = loadCustomPatterns(projectRoot);
+    const allPatterns = [...DEFAULT_BLOCKED, ...customPatterns];
+
+    // Check file_path parameter (Read, Write, Edit tools)
+    const filePath = toolInput.file_path || toolInput.path || '';
+    if (filePath && isBlocked(filePath, allPatterns)) {
+      console.error(`⛔ Blocked: ${filePath} (contains blocked directory)`);
+      process.exit(2);
+    }
+
+    // Check command parameter (Bash tool)
+    const command = toolInput.command || '';
+    if (command) {
+      if (isAllowedBuildCommand(command)) {
+        process.exit(0);
+      }
+      const firstLine = command.split('\n')[0];
+      const accessPatterns = ['cd ', 'ls ', 'cat ', 'head ', 'tail ', 'find ', 'grep '];
+      const isAccessCommand = accessPatterns.some(p => firstLine.includes(p));
+      if (isAccessCommand) {
+        const tokens = firstLine.split(/\s+/);
+        for (const token of tokens) {
+          if (token.includes('/') || token.includes('\\')) {
+            if (token.startsWith('/usr/') || token.startsWith('/opt/') || token.startsWith('/etc/') || token.startsWith('/tmp/')) {
+              continue;
+            }
+            if (isBlocked(token, allPatterns)) {
+              const matched = allPatterns.find(p => {
+                const segments = token.replace(/\\/g, '/').toLowerCase().split('/');
+                return segments.some(s => s === p.toLowerCase());
+              });
+              console.error(`⛔ Blocked: command accesses ${matched}`);
+              process.exit(2);
+            }
           }
         }
       }
     }
+
+    // Check pattern parameter (Glob, Grep tools)
+    const pattern = toolInput.pattern || '';
+    if (pattern && isBlocked(pattern, allPatterns)) {
+      console.error(`⛔ Blocked: pattern ${pattern} (contains blocked directory)`);
+      process.exit(2);
+    }
+    process.exit(0);
+  } catch (error) {
+    console.error('scout-block error:', error.message);
+    process.exit(0);
   }
+}
 
-  // Check pattern parameter (Glob, Grep tools)
-  const pattern = toolInput.pattern || '';
-  if (pattern && isBlocked(pattern, allPatterns)) {
-    console.error(`⛔ Blocked: pattern ${pattern} (contains blocked directory)`);
-    process.exit(2);
-  }
-
-  // Allow the command
-  process.exit(0);
-
-} catch (error) {
-  // On error, allow (fail open for safety)
-  console.error('scout-block error:', error.message);
-  process.exit(0);
+// Run main only when invoked as a script; export pure fns when require()'d.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = {
+    DEFAULT_BLOCKED,
+    ALLOWED_COMMANDS,
+    isBlocked,
+    isAllowedBuildCommand,
+    loadCustomPatterns,
+  };
 }

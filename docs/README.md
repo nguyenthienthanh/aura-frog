@@ -2,6 +2,8 @@
 
 Central index for all human-readable documentation. AI-consumed docs live in `aura-frog/`.
 
+> **New in v3.7.0:** [The 8 Pillars](../README.md#-the-8-pillars-of-the-planning-first-llm-os) — Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Full marketing breakdown with examples + diagrams in the project README; engineering depth in [BENEFITS.md Part 9](reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
+
 ---
 
 ## Getting Started
@@ -66,10 +68,10 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 
 These live in `aura-frog/` and are optimized for Claude to read:
 
-- [Agents](../aura-frog/agents/README.md) — 10 agents with capabilities
-- [Skills](../aura-frog/skills/README.md) — 44 skills (8 auto-invoke + 36 on-demand)
-- [Commands](../aura-frog/commands/README.md) — 26 commands
-- [Rules](../aura-frog/rules/README.md) — 45 rules (3-tier loading)
-- [Hooks](../aura-frog/hooks/README.md) — 28 lifecycle hooks
-- [Templates](../aura-frog/templates/README.md) — 15 document templates
+- [Agents](../aura-frog/agents/README.md) — 15 agents with capabilities
+- [Skills](../aura-frog/skills/README.md) — 55 skills (9 auto-invoke + 46 on-demand)
+- [Commands](../aura-frog/commands/README.md) — 24 commands (core `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite)
+- [Rules](../aura-frog/rules/README.md) — 71 rules (3-tier loading: 22 core / 19 agent / 30 workflow)
+- [Hooks](../aura-frog/hooks/README.md) — 42 lifecycle hooks
+- [Templates](../aura-frog/templates/README.md) — 20 document templates (incl. phase deliverable skeletons)
 - [Scripts](../aura-frog/scripts/README.md) — Utility scripts

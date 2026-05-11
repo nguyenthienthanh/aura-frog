@@ -12,7 +12,9 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const CACHE_FILE = path.join(process.env.HOME || '', '.claude', 'af-update-cache.json');
+// Per-project: update-check cache lives with the project's other Aura Frog state.
+// Aura Frog plugin NEVER writes to ~/.claude/ — only to the user's currently-active project.
+const CACHE_FILE = path.join(process.cwd(), '.claude', 'cache', 'aura-frog', 'update-cache.json');
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const REPO = 'nguyenthienthanh/aura-frog';
 

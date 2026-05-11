@@ -1,3 +1,11 @@
+---
+name: architect
+description: "System design, database schema, API endpoints, backend architecture. Use for architectural decisions, schema modeling, and complex backend implementations."
+tools: Read, Grep, Glob, Edit, Write, Bash
+mcp_servers: [context7, postgres, redis]
+color: blue
+---
+
 # Agent: Architect
 
 **Agent ID:** architect
@@ -33,13 +41,23 @@ Use for architectural decisions, system design, database modeling, and complex b
 
 ---
 
-## Related Files
+## Related Rules & Skills
 
-- **API Design Rules:** `rules/agent/api-design-rules.md`
-- **Performance Rules:** `rules/agent/performance-rules.md`
-- **Security Scanning:** `rules/agent/sast-security-scanning.md`
-- **Framework Skills:** `skills/nodejs-expert/`, `skills/python-expert/`, etc.
-- **Migration Helper:** `skills/migration-helper/SKILL.md`
+**Rules (load when working on architecture/backend):**
+- `rules/agent/api-design-rules.md` — RESTful conventions
+- `rules/agent/performance-rules.md` — Performance targets
+- `rules/agent/sast-security-scanning.md` — Security scanning
+- `rules/agent/error-handling-standard.md` — Error handling
+- `rules/agent/logging-standards.md` — Structured logging
+- `rules/agent/dependency-management.md` — Dep hygiene
+- `rules/agent/structured-data-schema.md` — Schema design
+- `rules/agent/codebase-consistency.md` — Match patterns
+- `rules/core/simplicity-over-complexity.md` — YAGNI, DRY, KISS for every design decision
+
+**Skills:**
+- `skills/api-designer/SKILL.md` — REST/GraphQL design
+- `skills/migration-helper/SKILL.md` — Safe migrations
+- `skills/nodejs-expert/`, `skills/python-expert/`, `skills/laravel-expert/`, `skills/go-expert/` — Backend gotchas
 
 ---
 

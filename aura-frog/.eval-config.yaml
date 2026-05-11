@@ -1,0 +1,27 @@
+# Aura Frog — cc-plugin-eval configuration
+# Docs: docs/guides/EVAL_SETUP.md
+
+execution:
+  model: "claude-sonnet-4-5-20250929"
+  max_turns: 5
+  timeout_ms: 60000
+  max_budget_usd: 10.0
+  # Eval must be read-only — no side effects on the plugin repo
+  disallowed_tools:
+    - Write
+    - Edit
+    - Bash
+
+evaluation:
+  # Prefer programmatic detection (regex/glob on frontmatter) before falling back to LLM
+  detection_mode: "programmatic_first"
+  num_samples: 1
+
+generation:
+  # Auto-generate 5 trigger scenarios per skill/agent
+  scenarios_per_component: 5
+  # Diversity 0.0 = identical, 1.0 = maximally varied. 0.7 = sensible default.
+  diversity: 0.7
+
+# Detect when multiple components fire on the same prompt (routing ambiguity)
+conflict_detection: true

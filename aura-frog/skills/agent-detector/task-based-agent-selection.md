@@ -440,7 +440,7 @@ TEAM_ACTIVATION(complexity, scores):
     mode = "team"
     lead = agent with highest score
     primary = agents with score 50-79
-    // Handoff to workflow-orchestrator for parallel startup:
+    // Handoff to run-orchestrator for parallel startup:
     // TeamCreate → TaskCreate × N → Task × N (parallel spawn)
   ELSE:
     mode = "subagent" (standard)
@@ -448,4 +448,70 @@ TEAM_ACTIVATION(complexity, scores):
 
 ---
 
-**Related:** `agent-detector/SKILL.md`, `agents/router.md`
+---
+
+## Intent Detection (merged from legacy router)
+
+```toon
+intents[11]{intent,keywords,primary,secondary}:
+  Implementation,"implement, create, add, build",Dev agent,"tester, frontend"
+  Bug Fix,"fix, bug, error, broken, debug",Dev agent,tester
+  Refactoring,"refactor, improve, optimize, clean up",Dev agent,tester
+  Testing,"test, QA, coverage, spec",tester,Dev agent
+  Design/UI,"design, UI, UX, figma, styling",frontend,Dev agent
+  Documentation,"document, docs, README",lead,-
+  Database,"database, schema, migration, SQL",architect,Backend agent
+  Security,"security, vulnerability, audit, OWASP",security,Dev agent
+  Performance,"performance, slow, optimize, lighthouse",devops,Dev agent
+  Deployment,"deploy, docker, kubernetes, CI/CD",devops,-
+  Monitoring,"monitor, errors, logs, sentry",devops,-
+```
+
+---
+
+## Technology Detection (merged from legacy router)
+
+```toon
+mobile_detection[2]{framework,keywords,files}:
+  React Native,"react-native, expo, RN","app.json (expo), package.json"
+  Flutter,"flutter, dart, bloc, riverpod",pubspec.yaml
+```
+
+```toon
+web_detection[4]{framework,keywords,files}:
+  Angular,"angular, ngrx, rxjs, signals",angular.json
+  Vue.js,"vue, pinia, nuxt, composition api","*.vue files"
+  React,"react, hooks, context","package.json (react, no next)"
+  Next.js,"next, nextjs, ssr, app router",next.config.js
+```
+
+```toon
+backend_detection[4]{framework,keywords,files}:
+  Node.js,"nodejs, express, nestjs, fastify",package.json
+  Python,"python, django, fastapi, flask","requirements.txt, pyproject.toml"
+  Go,"go, golang, gin, fiber, grpc","go.mod, go.sum"
+  Laravel,"laravel, php, eloquent, artisan","artisan, composer.json"
+```
+
+```toon
+specialized_detection[4]{agent,keywords,files}:
+  architect,"database, schema, migration, SQL, architecture","migrations/, schema.sql"
+  security,"security, vulnerability, OWASP, XSS, pentest",-
+  devops,"docker, kubernetes, terraform, pipeline","Dockerfile, .github/workflows/"
+  tester,"test, coverage, jest, pytest","*.test.ts, __tests__/"
+```
+
+---
+
+## Fallback Strategies (merged from legacy router)
+
+```toon
+fallbacks[3]{scenario,action}:
+  No agents >=30 pts,Ask user for clarification
+  Multiple agents tie,Prefer higher base priority
+  Context unclear,Show top 3 options — let user choose
+```
+
+---
+
+**Related:** `agent-detector/SKILL.md`

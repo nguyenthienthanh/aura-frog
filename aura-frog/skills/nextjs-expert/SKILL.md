@@ -8,7 +8,13 @@ triggers:
   - "next.js"
   - "app router"
   - "server component"
+paths:
+  - "app/**/*"
+  - "pages/**/*"
+  - "next.config.*"
+  - "middleware.*"
 allowed-tools: Read, Grep, Glob, Edit, Write
+user-invocable: false
 ---
 
 # Next.js Expert — Gotchas & Decisions

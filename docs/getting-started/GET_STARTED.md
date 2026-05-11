@@ -12,7 +12,9 @@
 
 > **First time?** Follow the [Interactive Tutorial](FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
 
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a structured AI development platform with 10 agents, 5-phase TDD workflows, and multi-agent orchestration.
+> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a planning-first LLM OS with 15 agents, 5-phase TDD workflows, hierarchical planning that survives session resets, forensic reasoning traces, conflict detection between parallel work, and per-agent MCP security.
+
+> **What v3.7.0 ships:** Eight composable pillars — Hierarchical Planning, Reasoning Trace Audit, Semantic Session Reset, Pre-flight Validation, Semantic Conflict Detection, Self-Healing Orchestrator, MCP Security Layer, Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
 
 ---
 
@@ -123,7 +125,7 @@ workflow:start Analyze the current component structure
 
 **Expected:**
 - **agent-detector** skill auto-invokes → Selects appropriate agent
-- **workflow-orchestrator** skill auto-invokes → Starts 5-phase workflow
+- **run-orchestrator** skill auto-invokes → Starts 5-phase workflow
 - Claude analyzes your code
 - Shows Phase 1: Understand + Design
 - Displays approval gate
@@ -365,7 +367,7 @@ Aura Frog includes utility scripts for common operations:
 
 | Category | Scripts | Purpose |
 |----------|---------|---------|
-| **Integration** | `jira-fetch.sh`, `confluence-fetch.sh`, `setup-integrations.sh` | Fetch Atlassian data, configure integrations |
+| **Integration** | `confluence-fetch.sh`, `setup-integrations.sh` (JIRA is auto-fetched via `hooks/jira-auto-fetch.cjs`) | Fetch Atlassian data, configure integrations |
 | **Workflow** | `workflow/workflow-manager.sh`, `workflow/track-tokens.sh` | Manage workflows |
 | **Learning** | `learn/submit-feedback.sh`, `supabase/setup.sh` | Learning system |
 | **Visual** | `visual/visual-test.sh`, `visual/snapshot-compare.sh` | Visual testing |
@@ -375,10 +377,11 @@ Aura Frog includes utility scripts for common operations:
 ### Quick Examples
 
 ```bash
-# Fetch Jira ticket
-./scripts/jira-fetch.sh PROJ-123
+# Jira tickets — just mention them in a prompt; the hook fetches automatically.
+#   "review PROJ-123 and tell me what changed"
+# Cached at .claude/logs/jira/PROJ-123.json (24h TTL).
 
-# Set up integrations interactively
+# Set up integrations interactively (Confluence, Slack, Figma)
 ./scripts/setup-integrations.sh
 
 # Set up Supabase for learning system

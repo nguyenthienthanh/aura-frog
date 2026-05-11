@@ -4,18 +4,33 @@
 
 # Aura Frog
 
-### An Operating System for software engineering.
+### A planning-first LLM Operating System for software engineering.
 
-The most powerful plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — 10 agents, 5-phase TDD workflow, self-healing memory, and multi-agent orchestration. One kernel. Zero untested code.
+A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.4.1-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
+[![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**LLM OS architecture. Memory that heals itself. TDD that never skips.**
+**Two entry points, one continuum.** `/aura-frog:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[See it in action](#-before--after)** · **[Why Aura Frog?](#-the-problem)**
+**[Install in 30 seconds](#-install)** · **[v3.7.0 highlights](#-whats-new-in-v370)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+
+---
+
+## 🆕 What's new in v3.7.0
+
+| System | Opt-in via | What it solves |
+|---|---|---|
+| Hierarchical planning | `/aura-frog:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
+| Reasoning trace + grounding | `/aura-frog:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
+| Conflict detection (L1+L2) | `/aura-frog:plan-conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
+| Memory tier + session reset | `/aura-frog:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
+| Self-healing + MCP security | `/aura-frog:heal` + `/aura-frog:mcp` | F2/F3 patch proposals (NEVER auto-apply); per-agent allowlists + audit + rate limits |
+
+**Backward-compatible MINOR bump** — your existing `/run` workflow continues unchanged. Everything new is opt-in. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for details.
 
 </div>
 
@@ -31,9 +46,374 @@ No structure. No tests. No quality gates. Every session starts from scratch. Eve
 
 ## The Solution
 
-Aura Frog treats Claude Code as an **Operating System** — Claude is the kernel, agents are processes, and the context window is managed RAM. You describe the feature. Aura Frog dispatches the right agent, enforces a 5-phase TDD workflow, and compresses context automatically so you never lose decisions.
+Aura Frog treats Claude Code as an **Operating System** — Claude is the kernel, agents are processes, and the context window is managed RAM. You describe the task. Aura Frog classifies complexity, picks the right flow (direct edit · bugfix TDD · full 5-phase), dispatches the right agent, and compresses context automatically so you never lose decisions.
 
-**You approve twice. Aura Frog handles the rest.**
+**Right effort for every task. You only approve when it matters (0 gates for typos, up to 2 for architecture).**
+
+---
+
+## How It Works
+
+```mermaid
+flowchart TB
+    User([👤 User prompt]):::user --> CC[Claude Code CLI]:::cc
+    CC -->|every message| AD[🔍 agent-detector skill<br/>model: haiku · auto-invoke]:::skill
+    AD --> Cx{Complexity<br/>detected?}:::gate
+
+    Cx -->|Quick<br/>1 file / clear scope| Direct[✏️ Direct edit<br/>no workflow]:::quick
+    Cx -->|Standard<br/>2-5 files / feature| SingleAgent[🛠 Single agent<br/>agent-detector picks one]:::std
+    Cx -->|Deep<br/>6+ files / architecture| RO[🎯 run-orchestrator skill<br/>5-phase TDD]:::deep
+
+    RO --> P1[📐 P1: Understand + Design<br/>architect]:::phase
+    P1 --> G1{{✋ Approve?}}:::gate
+    G1 -->|approve| P2[🧪 P2: Test RED<br/>tester writes failing tests]:::phase
+    P2 --> P3[⚙️ P3: Build GREEN<br/>architect/frontend/mobile]:::phase
+    P3 --> G2{{✋ Approve?}}:::gate
+    G2 -->|approve| P4[🔒 P4: Refactor + Review<br/>security + tester NOT builder]:::phase
+    P4 --> P5[📦 P5: Finalize<br/>lead — docs + commit]:::phase
+    P5 --> Done([✅ Production-ready]):::done
+
+    SingleAgent --> Done
+    Direct --> Done
+
+    classDef user fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#000000
+    classDef cc fill:#6366f1,stroke:#3730a3,stroke-width:2px,color:#ffffff
+    classDef skill fill:#ec4899,stroke:#9d174d,stroke-width:2px,color:#ffffff
+    classDef gate fill:#dc2626,stroke:#7f1d1d,stroke-width:2px,color:#ffffff
+    classDef quick fill:#10b981,stroke:#065f46,stroke-width:2px,color:#ffffff
+    classDef std fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#ffffff
+    classDef deep fill:#8b5cf6,stroke:#5b21b6,stroke-width:2px,color:#ffffff
+    classDef phase fill:#475569,stroke:#1e293b,stroke-width:2px,color:#ffffff
+    classDef done fill:#059669,stroke:#064e3b,stroke-width:2px,color:#ffffff
+```
+
+**The flow, explained:**
+1. **Every message** you send goes through the `agent-detector` skill (runs on haiku for cost) — it classifies complexity + picks the right agent + suggests the right model.
+2. **Quick tasks** (typo, one-line fix) → direct edit, no workflow overhead.
+3. **Standard tasks** (one feature, clear scope) → single specialized agent runs inline.
+4. **Deep tasks** (feature + multi-file + TDD) → `run-orchestrator` spawns the 5-phase workflow with two human approval gates.
+5. Between phases, you either **approve**, **reject**, or **modify** — no commit happens until Phase 5 and you say so.
+
+---
+
+## 🐸 The 8 Pillars of the Planning-First LLM OS
+
+v3.7.0 ships **eight features** that compose into one cohesive OS. Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped in v3.7.0 · 🚧 ships behind a flag or queued for v3.7.2+.
+
+| # | Pillar | One-liner | Status |
+|---|---|---|---|
+| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart | ✅ |
+| 2 | **Reasoning Trace Audit** | Every Claude decision is forensically recorded with grounded evidence | ✅ |
+| 3 | **Semantic Session Reset** | Finished an Epic? Distill it into permanent memory, then reset cleanly | ✅ |
+| 4 | **Pre-flight Validation** | Bash linters block bad AI output before it hits disk | ✅ Tier 1 · 🚧 Tier 2 OPA |
+| 5 | **Semantic Conflict Detection** | L1-L4 layered detection prevents silent overwrites between parallel tasks | ✅ L1+L2 · 🚧 L3+L4 LLM |
+| 6 | **Self-Healing Orchestrator** | Auto-diagnose F2/F3 failures, propose patches — never auto-apply | ✅ manual · 🚧 auto-trigger |
+| 7 | **MCP Security Layer** | Per-agent allowlist, audit log, rate limits — defense for external integrations | ✅ |
+| 8 | **Phase-Role Binding** | Phase 4 reviewer MUST differ from Phase 3 builder (Generator ≠ Evaluator) | ✅ |
+
+```mermaid
+flowchart LR
+    subgraph "Structure"
+        P1[1. Hierarchical Planning<br/>T0→T4 tree]:::struct
+        P8[8. Phase-Role Binding<br/>builder ≠ reviewer]:::struct
+    end
+    subgraph "Accountability"
+        P2[2. Reasoning Trace<br/>grounded audit]:::acct
+        P4[4. Pre-flight<br/>linters + OPA]:::acct
+    end
+    subgraph "Resilience"
+        P5[5. Conflict Detection<br/>L1-L4 layered]:::res
+        P6[6. Self-Healing<br/>F2/F3 proposals]:::res
+    end
+    subgraph "Memory & Security"
+        P3[3. Session Reset<br/>permanent memory]:::mem
+        P7[7. MCP Security<br/>allowlist + audit]:::mem
+    end
+    classDef struct fill:#6366f1,stroke:#3730a3,color:#fff
+    classDef acct fill:#10b981,stroke:#065f46,color:#fff
+    classDef res fill:#f59e0b,stroke:#b45309,color:#000
+    classDef mem fill:#ec4899,stroke:#9d174d,color:#fff
+```
+
+---
+
+### 1 · Hierarchical Planning  ✅
+
+**What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.aura/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
+
+```bash
+/aura-frog:plan                # Interview-bootstraps T0 → T1 → T2
+/aura-frog:plan-expand FEAT-7  # Decompose T2 → Stories (T3)
+/aura-frog:plan-next           # Claim next ready Task; /run auto-anchors to it
+/aura-frog:plan-status         # Render ASCII tree
+```
+
+```mermaid
+flowchart TB
+    M([T0: Mission]):::t0 --> I[T1: Initiative INIT-001]:::t1
+    I --> F1[T2: Feature FEAT-007]:::t2
+    I --> F2[T2: Feature FEAT-008]:::t2
+    F1 --> S1[T3: Story STORY-0042]:::t3
+    F1 --> S2[T3: Story STORY-0043]:::t3
+    S1 --> T1[T4: Task 00101]:::t4
+    S1 --> T2[T4: Task 00102]:::t4
+    classDef t0 fill:#1e293b,color:#fff
+    classDef t1 fill:#475569,color:#fff
+    classDef t2 fill:#6366f1,color:#fff
+    classDef t3 fill:#10b981,color:#fff
+    classDef t4 fill:#f59e0b,color:#000
+```
+
+**Why it matters:** Long-running projects no longer lose decisions to context compaction. Team handoffs become trivial — read `mission.md` + `active.json` and you're caught up. Multi-week features get explicit decomposition.
+
+---
+
+### 2 · Reasoning Trace Audit  ✅
+
+**What you get:** Every Claude tool call writes an append-only event to `.aura/plans/traces/{TASK_ID}.jsonl` — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
+
+```bash
+/aura-frog:trace                              # Full trace for active task
+/aura-frog:trace --hallucinations             # Only ungrounded claims
+/aura-frog:trace --filter file_read           # Filter by event type
+/aura-frog:trace --tail 20                    # Last 20 events
+AF_TRACE_DISABLED=true                        # Opt out per session
+```
+
+```mermaid
+sequenceDiagram
+    participant U as You
+    participant C as Claude
+    participant H as Tracer hook
+    participant J as traces/T4.jsonl
+    U->>C: implement payment redirect
+    C->>H: Read src/checkout.ts
+    H->>J: file_read {path, sha256, lines}
+    C->>H: Write src/redirect.ts
+    H->>J: tool_call {tool, args_hash}
+    Note over C: makes a claim
+    C->>U: "Stripe uses query param session_id"
+    H->>J: output_claim {grounded_in: ev-12, conf: 0.95}
+    Note right of J: /aura-frog:trace --hallucinations<br/>finds ungrounded claims later
+```
+
+**Why it matters:** AI-generated code reviews used to trust the AI. Now every factual statement has a sha256-anchored evidence trail. Debugging "why did Claude do that?" three months later becomes a single `/aura-frog:trace` call.
+
+---
+
+### 3 · Semantic Session Reset  ✅
+
+**What you get:** When a Feature (T2) reaches `done`, the `epic-summarizer` agent distills the most valuable findings — architectural decisions, gotchas, anti-patterns — into `.aura/memory/permanent_memory.md`. Then Master Planner offers you a clean session restart: working context wipes, permanent memory anchors.
+
+```bash
+/aura-frog:reset-session                      # Distill + prompt to reset
+/aura-frog:reset-session --feature FEAT-007   # Distill specific feature
+/aura-frog:reset-session --dry-run            # Preview what gets written
+/aura-frog:reset-session --no-prompt          # CI-friendly
+```
+
+```mermaid
+flowchart LR
+    Feat[FEAT-007 done] --> Sum[epic-summarizer]:::agent
+    Sum --> PM[(permanent_memory.md<br/>≤500 tok/Epic<br/>≤8K total)]:::pm
+    Sum -.proposes.-> User{Reset?}:::user
+    User -- yes --> Reset[Wipe working context<br/>Anchor permanent memory]:::reset
+    User -- no --> Cont[Continue current session]:::cont
+    classDef agent fill:#6366f1,color:#fff
+    classDef pm fill:#ec4899,color:#fff
+    classDef user fill:#f59e0b,color:#000
+    classDef reset fill:#10b981,color:#fff
+    classDef cont fill:#475569,color:#fff
+```
+
+**Why it matters:** 3-month projects accumulate decision drift; long sessions exceed any context window. Distillation captures *what mattered* (decisions, gotchas) and discards *what was noise* (tool output verbatim, transcripts). Quarterly retrospectives reduce to reading 8K tokens of permanent memory.
+
+---
+
+### 4 · Pre-flight Validation  ✅ Tier 1 · 🚧 Tier 2
+
+**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.7.2+).
+
+```bash
+/aura-frog:preflight check                              # Manual run
+/aura-frog:preflight policies                           # List active rules
+/aura-frog:preflight bypass <reason ≥ 10 chars>         # Per-call escape
+AF_PREFLIGHT_DISABLED=true                              # Per-session disable
+```
+
+```mermaid
+flowchart LR
+    Tool[Claude tool call]:::input --> Pre[pre-flight-validate.cjs]:::gate
+    Pre --> T1{Tier 1<br/>bash linters}:::tier
+    T1 -- pass --> Tool2[Execute]:::ok
+    T1 -- warn --> Log[stderr warn, proceed]:::warn
+    T1 -- block --> Stop[Refuse]:::block
+    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.7.2+}:::tier2
+    classDef input fill:#6366f1,color:#fff
+    classDef gate fill:#475569,color:#fff
+    classDef tier fill:#10b981,color:#fff
+    classDef tier2 fill:#9ca3af,color:#000
+    classDef ok fill:#059669,color:#fff
+    classDef warn fill:#f59e0b,color:#000
+    classDef block fill:#dc2626,color:#fff
+```
+
+**Why it matters:** AI-coded `rm -rf $HOME` is real. Path-traversal in generated configs is real. Hardcoded credentials in generated code are real. Pre-flight catches them before the tool fires — no rollback needed because the damage never happened.
+
+---
+
+### 5 · Semantic Conflict Detection  ✅ L1+L2 · 🚧 L3+L4
+
+**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.7.2+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
+
+```bash
+/aura-frog:plan-conflicts check          # Manually re-scan
+/aura-frog:plan-conflicts list           # Active conflicts
+/aura-frog:plan-conflicts resolve <id>   # User-pick resolution
+/aura-frog:plan-freeze FEAT-007 "reason" # Manual freeze
+/aura-frog:plan-thaw FEAT-007            # Reverse
+AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.7.2+)
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> planned
+    planned --> active: dispatch
+    active --> done: success
+    planned --> frozen: L1+L2 detect overlap
+    active --> frozen: pending-confirm sibling conflicts
+    frozen --> planned: blocker done + compatible
+    frozen --> discarded: replan-required
+    done --> [*]
+```
+
+**Why it matters:** Parallel agents on the same codebase used to clobber each other's work silently. Now overlap is detected *before* dispatch; the blocked task freezes; when the blocker finishes, conflict-detector re-checks against *actual* changes (not just planned scope) before auto-thawing.
+
+---
+
+### 6 · Self-Healing Orchestrator  ✅ manual · 🚧 auto-trigger
+
+**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.7.2+.
+
+```bash
+/aura-frog:heal diagnose <task-id>       # Manual diagnosis
+/aura-frog:heal status                   # Recent attempts + outcomes
+/aura-frog:heal disable                  # Per-session
+AF_SELF_HEAL_DISABLED=true               # Permanent
+```
+
+```mermaid
+flowchart LR
+    Fail[Task fails<br/>F2 or F3]:::fail --> Cls[failure-classifier]:::cls
+    Cls --> Heal[/aura-frog:heal diagnose]:::heal
+    Heal --> Q1[context7 query]:::src
+    Heal --> Q2[permanent_memory.md]:::src
+    Q1 --> Diag[Diagnosis + patch<br/>confidence ≥ 0.7]:::diag
+    Q2 --> Diag
+    Diag --> User{Approve?}:::user
+    User -- yes --> Apply[New T4 with<br/>own approval flow]:::apply
+    User -- no --> Skip[Surface raw findings]:::skip
+    classDef fail fill:#dc2626,color:#fff
+    classDef cls fill:#475569,color:#fff
+    classDef heal fill:#6366f1,color:#fff
+    classDef src fill:#10b981,color:#fff
+    classDef diag fill:#f59e0b,color:#000
+    classDef user fill:#ec4899,color:#fff
+    classDef apply fill:#059669,color:#fff
+    classDef skip fill:#9ca3af,color:#000
+```
+
+**Why it matters:** "Cannot read property of undefined at line 42" used to send you to Stack Overflow for 20 minutes. Now you get a diagnosis citing the official Stripe docs *and* DEC-007 from your own past Epic — with the exact one-line patch ready to apply on your approval.
+
+---
+
+### 7 · MCP Security Layer  ✅
+
+**What you get:** Per-agent MCP allowlist via frontmatter (`mcp_servers: [context7, postgres]`). Every MCP call audited to `.aura/security/mcp-audit.jsonl` with secrets sanitized. Per-server rate limits in `plugin.json` (soft warn at 80%, hard block at 100%). Two new opt-in MCPs: `postgres` and `redis`, both `disabled: true` by default, destructive operations (`DROP TABLE`, `FLUSHDB`) blocked unconditionally.
+
+```bash
+/aura-frog:mcp status                # Per-agent allowlists + current state
+/aura-frog:mcp audit                 # Recent calls + blocked attempts
+/aura-frog:mcp audit --week          # 7-day window
+/aura-frog:mcp reset-limits          # Manual rate-limit reset
+AF_MCP_AUDIT_DISABLED=true           # Disable audit log (enforcement still on)
+```
+
+```mermaid
+flowchart LR
+    Agent[architect agent]:::ag --> Gate[mcp-call-gate.cjs]:::gate
+    Gate --> A{Allowlist?<br/>context7,postgres,redis}:::check
+    A -- yes --> R{Rate limit?<br/>≤30/min · ≤200/session}:::check
+    A -- no --> Block1[Refuse + audit]:::block
+    R -- under --> Call[MCP call]:::ok
+    R -- soft 80% --> Warn[Stderr warn, proceed]:::warn
+    R -- hard 100% --> Block2[Refuse + audit]:::block
+    Call --> Audit[(mcp-audit.jsonl<br/>sanitized, append-only)]:::audit
+    classDef ag fill:#6366f1,color:#fff
+    classDef gate fill:#475569,color:#fff
+    classDef check fill:#10b981,color:#fff
+    classDef ok fill:#059669,color:#fff
+    classDef warn fill:#f59e0b,color:#000
+    classDef block fill:#dc2626,color:#fff
+    classDef audit fill:#ec4899,color:#fff
+```
+
+**Why it matters:** Before v3.7.0, every agent could hit every MCP. A frontend agent could query your production Postgres. Now the architect gets DB access; the frontend gets Figma + Playwright; the security agent gets nothing because it's read-only on code. Audit log gives compliance + forensics — "why did the agent query the DB 1000 times?" gets a JSONL answer.
+
+---
+
+### 8 · Phase-Role Binding  ✅
+
+**What you get:** The 5-phase TDD workflow now hard-enforces **Phase 4 reviewer ≠ Phase 3 builder**. Same agent reviewing its own code drifts toward "LGTM"; different agents provide fresh perspective. Aura Frog's Phase 4 dispatches `security` + `tester` (never the Phase 3 builder), formalizing Anthropic's Generator/Evaluator separation insight.
+
+```mermaid
+flowchart LR
+    P1[Phase 1<br/>architect]:::p1 --> P2[Phase 2<br/>tester writes RED]:::p2
+    P2 --> P3[Phase 3<br/>architect/frontend builds GREEN]:::p3
+    P3 -. NEVER same agent .-> P4
+    P3 --> P4[Phase 4<br/>security + tester review]:::p4
+    P4 --> P5[Phase 5<br/>lead finalize]:::p5
+    classDef p1 fill:#6366f1,color:#fff
+    classDef p2 fill:#10b981,color:#fff
+    classDef p3 fill:#f59e0b,color:#000
+    classDef p4 fill:#ec4899,color:#fff
+    classDef p5 fill:#475569,color:#fff
+```
+
+**Why it matters:** Self-reviewed code has blind spots — confirmation bias is real, even in agents. PR reviews exist for the same reason in human teams. Generator ≠ Evaluator is non-negotiable in Phase 4; it's what makes the workflow produce shippable code, not just code that *passes its own tests*.
+
+---
+
+### Status snapshot — what ships now vs queued
+
+| Pillar | v3.7.0 ships | v3.7.2+ queued |
+|---|---|---|
+| 1 — Planning | T0-T4 tree, 8 commands, 5 agents, 2 hooks | — |
+| 2 — Reasoning Trace | tracer hook, grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
+| 3 — Session Reset | epic-summarizer, permanent-memory-loader, `/reset-session` | — |
+| 4 — Pre-flight | 7 Tier-1 bash linters, hook, bypass with 3-warn | Tier 2 OPA + 5 `.rego` policies |
+| 5 — Conflict Detection | L1 (file) + L2 (function) + freeze cascade + arbitration | L3 (semantic LLM) + L4 (architectural LLM) |
+| 6 — Self-Healing | manual `/heal diagnose`, ≥0.7 confidence, never auto-apply | auto-trigger hook on F2/F3 classification |
+| 7 — MCP Security | per-agent allowlist + audit + rate limits + sanitizer | SQLite WAL for audit ([issue #8](https://github.com/nguyenthienthanh/aura-frog/issues/8)) |
+| 8 — Phase-Role | hard rule in `cross-review-workflow.md` + run-orchestrator | — |
+
+Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`. All eight pillars are opt-in friendly.
+
+---
+
+## Works Across AI Coding Tools
+
+Aura Frog's 71 rules, 55 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+
+| Tool | Status | Coverage |
+|------|--------|:--------:|
+| ![Claude Code](https://img.shields.io/badge/Claude_Code-first_class-green) Fully tested | 100% |
+| ![Codex](https://img.shields.io/badge/Codex-adapter_planning-yellow) Q2 2026 | ~85% |
+| ![Cursor](https://img.shields.io/badge/Cursor-planned-lightgrey) Q2 2026 | ~80% |
+
+**Why this matters:** When you invest in Aura Frog's TDD discipline, gotcha-only expert skills, and agent architecture, that investment survives tool switches. Only the thin adapter layer changes.
+
+[Read the Portability Guide →](docs/PORTABILITY.md)
 
 ---
 
@@ -74,56 +454,314 @@ You: "approve"
 
 ---
 
-## Install
+## Installation
+
+### Prerequisites
+
+- **Claude Code CLI** installed → [install guide](https://docs.anthropic.com/en/docs/claude-code)
+- **Node.js ≥ 18** (for hook scripts)
+- **Git** (for phase checkpoint commits)
+
+### Install in Claude Code (30 seconds)
 
 ```bash
-# In Claude Code (takes 30 seconds):
+# 1. Add the marketplace
 /plugin marketplace add nguyenthienthanh/aura-frog
+
+# 2. Install the plugin
 /plugin install aura-frog@aurafrog
+
+# 3. Verify
+/af status
 ```
 
-Start your first workflow:
+Expected output:
+
+```
+🐸 Aura Frog v3.7.0 — Ready
+  Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
+                       master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
+  Skills:   55 available (9 auto-invoke, 46 on-demand)
+  Rules:    70 loaded (22 core + 19 agent + 30 workflow)
+  Hooks:    42 registered
+  MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
+```
+
+### Initialize Your Project (Recommended — one time)
 
 ```bash
-workflow:start "Your task here"
+/project init
 ```
+
+Scans your codebase and creates 7 context files (framework, conventions, rules, examples, architecture, etc.) in `.claude/project-contexts/<name>/`. Takes 30–60 seconds; saves minutes on every future session.
+
+### Optional Setup
 
 <details>
-<summary>Optional: Install the <code>af</code> CLI for health checks outside Claude Code</summary>
+<summary>Install <code>af</code> CLI for health checks outside Claude Code</summary>
 
 ```bash
-# In Claude Code:
-setup:cli
+# Inside Claude Code:
+/af setup cli
 
 # Or manually:
 sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
 ```
 
-Then use anywhere: `af doctor`, `af setup remote`, `af measure`.
+Then use anywhere: `af doctor`, `af measure`, `af setup remote`.
 
 </details>
 
 <details>
-<summary>Works on other platforms (skills-only mode)</summary>
+<summary>MCP tokens (Figma, Slack, Firebase)</summary>
 
-| Platform | Install | What Works |
+```bash
+cp .envrc.template .envrc
+# Edit .envrc — add FIGMA_API_TOKEN, SLACK_BOT_TOKEN, FIREBASE_TOKEN, etc.
+direnv allow   # if using direnv
+```
+
+Without tokens, `figma` / `slack` / `firebase` MCP servers stay inactive. `context7`, `playwright`, `vitest` need no config.
+
+</details>
+
+<details>
+<summary>Skills-only mode on other platforms</summary>
+
+| Platform | Install | What works |
 |----------|---------|------------|
 | **Claude Code** | `/plugin marketplace add nguyenthienthanh/aura-frog` | Everything |
 | **OpenAI Codex** | `cp -r aura-frog/skills/* ~/.codex/skills/` | Skills + commands |
 | **Gemini CLI** | `cp -r aura-frog/skills/* ~/.gemini/skills/` | Skills + commands |
 | **OpenCode** | `cp -r aura-frog/skills/* .opencode/skills/` | Skills + commands |
 
-Hooks, agent detection, and MCP servers are Claude Code exclusive.
+Hooks, agent detection, subagent spawning, and MCP servers are Claude Code exclusive.
 
 </details>
+
+### Start Your First Workflow
+
+```bash
+/run "Your task here"
+```
+
+See the [Walkthrough](#walkthrough-a-real-workflow-in-action) below for a complete transcript of what this looks like.
+
+### Common Install Issues
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| `/plugin install` fails | Marketplace cache | Run `/plugin marketplace refresh` |
+| Hooks not firing | `.claude/settings.json` missing hook config | `/af setup integrations` re-installs |
+| `af: command not found` | PATH missing plugin scripts dir | Add `$HOME/.claude/plugins/marketplaces/aurafrog/scripts` to `$PATH` |
+| State not saving during `/run` | Hook path drift (pre-v3.7) | Upgrade to 3.7+ (state path fixed) |
+| Claude uses wrong agent | No `/project init` yet | Run `/project init` to load conventions |
+
+Full guide: [GET_STARTED.md](docs/getting-started/GET_STARTED.md).
+
+---
+
+## Walkthrough: A Real Workflow in Action
+
+A complete transcript of implementing user authentication with `/run`. This is what you actually see.
+
+### Interaction Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 👤 You
+    participant CC as Claude Code
+    participant AD as agent-detector<br/>(haiku)
+    participant RO as run-orchestrator<br/>skill
+    participant Lead as lead agent
+    participant Arch as architect
+    participant Tester as tester
+    participant Sec as security
+
+    U->>CC: /run "Add JWT authentication"
+    CC->>AD: classify (auto-invoke)
+    AD-->>CC: Deep · multi-file · sonnet
+    CC->>RO: spawn 5-phase workflow
+    RO->>Lead: coordinate
+    Lead->>Arch: Phase 1 — design
+    Arch-->>Lead: requirements.md + tech_spec.md
+    Lead-->>U: ✋ Approve Phase 1?
+    U-->>Lead: approve
+    Lead->>Tester: Phase 2 — write failing tests
+    Tester-->>Lead: 5 tests · all RED
+    Lead->>Arch: Phase 3 — build GREEN
+    Arch-->>Lead: implementation · 5 tests pass
+    Lead-->>U: ✋ Approve Phase 3?
+    U-->>Lead: approve
+    Lead->>Sec: Phase 4 — security review
+    Lead->>Tester: Phase 4 — coverage review
+    Sec-->>Lead: ✓ 0 critical
+    Tester-->>Lead: ✓ 94% coverage
+    Lead->>Lead: Phase 5 — finalize
+    Lead-->>U: ✅ Production-ready
+```
+
+### Mock Terminal Transcript
+
+```
+$ /run "Add JWT authentication to the /api routes"
+
+🐸 agent-detector (haiku):
+   Complexity: Deep · Agent: architect (primary), security (reviewer)
+   Model: sonnet · Estimated tokens: ~95K
+
+🐸 Sprint Contract — confirm before Phase 2:
+   Scope:     JWT middleware, /login + /refresh endpoints, user model
+   Done when: 5 tests passing, 0 critical security findings, coverage ≥80%
+   Out of scope: password reset, 2FA, social auth
+
+Confirm contract? (yes / modify / skip)
+
+> yes
+
+═══════════════════════════════════════════════
+Phase 1: Understand + Design  (architect)
+═══════════════════════════════════════════════
+
+📋 Requirements analyzed:
+   • POST /auth/login  → issues JWT (15m) + refresh token (7d)
+   • POST /auth/refresh → rotates access token
+   • Middleware verifies JWT on protected routes
+   • User.passwordHash stored as bcrypt (cost 12)
+
+🎯 Technical Design:
+   • Stack: express-jwt, bcrypt, crypto.randomUUID for jti
+   • Token storage: httpOnly cookie (refresh) + Authorization header (access)
+   • Refresh token rotation on every use (prevents replay)
+   • RS256 signing (public/private keypair)
+
+⚠️  Risks flagged by strategist:
+   • Secret leak → env var with rotation plan
+   • No rate-limit → add bucket before deploy (Phase 5 followup)
+
+📁 Saved:
+   .claude/logs/runs/250421-jwt-auth/phase-1/requirements.md
+   .claude/logs/runs/250421-jwt-auth/phase-1/tech-spec.md
+
+──────────────────────────────────────────────
+✋ APPROVAL GATE — Phase 1
+
+Options:
+  approve            Continue to Phase 2 (write tests)
+  modify <changes>   Adjust design without restart
+  reject <reason>    Full redesign
+──────────────────────────────────────────────
+
+> approve
+
+═══════════════════════════════════════════════
+Phase 2: Test RED  (tester)
+═══════════════════════════════════════════════
+
+🧪 Writing failing tests (TDD RED)...
+   ✓ auth.test.ts:  login returns JWT for valid creds         [FAIL — no implementation]
+   ✓ auth.test.ts:  login rejects invalid password            [FAIL]
+   ✓ auth.test.ts:  refresh rotates token on use              [FAIL]
+   ✓ middleware.test.ts: rejects missing Authorization header [FAIL]
+   ✓ middleware.test.ts: rejects expired JWT                  [FAIL]
+
+📊 Status: 5 failing, 0 passing (correct for RED)
+
+Auto-continue → Phase 3 (tests fail as expected) ✓
+
+═══════════════════════════════════════════════
+Phase 3: Build GREEN  (architect)
+═══════════════════════════════════════════════
+
+⚙️  Implementing...
+   ✓ src/auth/jwt-service.ts    (new · 67 lines)
+   ✓ src/auth/middleware.ts     (new · 42 lines)
+   ✓ src/routes/auth.ts         (new · 58 lines)
+   ✓ src/models/user.ts         (modified · added passwordHash)
+   ✓ .env.example               (modified · added JWT_PRIVATE_KEY)
+
+🧪 Running tests...
+   ✓ 5 passing, 0 failing
+   ✓ Coverage: 94% (target: 80%)
+
+──────────────────────────────────────────────
+✋ APPROVAL GATE — Phase 3
+
+> approve
+
+═══════════════════════════════════════════════
+Phase 4: Refactor + Review  (security + tester)
+═══════════════════════════════════════════════
+
+🔒 Security review (reviewer ≠ builder):
+   ✓ No hardcoded secrets (env var pattern correct)
+   ✓ bcrypt cost 12 (OWASP minimum: 10)
+   ✓ httpOnly cookie flag set on refresh token
+   ⚠️  INFO: Consider CSP header on /login response (not blocking)
+
+🧪 Test coverage review:
+   ✓ 94% coverage (target: 80%) ✓
+   ✓ All critical paths covered
+   ✓ No flaky tests detected
+
+Auto-continue → Phase 5 (0 critical findings) ✓
+
+═══════════════════════════════════════════════
+Phase 5: Finalize  (lead)
+═══════════════════════════════════════════════
+
+📦 Deliverables:
+   ✓ 4 new files, 2 modified
+   ✓ 5 tests passing, 94% coverage
+   ✓ 0 critical security findings
+   ✓ ADR saved: docs/adr/0007-jwt-auth.md
+   ✓ Deployment note: add rate-limit middleware (tracked in phase-1/risks.md)
+
+📊 Workflow stats:
+   Duration: 18m · Tokens: 82K · Budget: 30K target → 2.7x (Deep tier norm)
+
+Ready to commit? (yes / no)
+
+> yes
+
+💾 Committed: 7a3b9c2 · feat(auth): JWT authentication with refresh rotation
+
+✅ Workflow complete — JWT auth shipped.
+```
+
+### What You Just Saw
+
+| Step | Who ran it | Your role |
+|------|------------|-----------|
+| 1. Detection | `agent-detector` skill (haiku, auto) | Nothing — zero friction |
+| 2. Sprint Contract | Orchestrator proposed | Confirm scope |
+| 3. Phase 1 design | `architect` in forked context | Approve design |
+| 4. Phase 2 RED | `tester` (auto-continues) | Nothing |
+| 5. Phase 3 GREEN | `architect` implements | Approve implementation |
+| 6. Phase 4 review | `security` + `tester` (NOT architect) | Nothing |
+| 7. Phase 5 finalize | `lead` | Confirm commit |
+
+**Two approvals. 18 minutes. Production-ready JWT auth with 94% coverage and security review.**
 
 ---
 
 ## Why Teams Ship Faster With Aura Frog
 
-### 1. Every Feature Gets a TDD Workflow
+### 1. Smart Flow Selection — Right Effort for Every Task
 
-No more "write code and hope." Every feature follows RED → GREEN → REFACTOR automatically:
+**Not every task gets the 5-phase workflow.** Aura Frog's `agent-detector` classifies complexity on every message and picks the minimum viable flow:
+
+| Task type | Flow | Gates | Example |
+|-----------|------|:----:|---------|
+| **Typo, one-line fix** | Direct edit (no workflow) | 0 | `/run fix typo in login.ts` |
+| **Bug fix** | 4-step TDD (Investigate → RED → GREEN → Verify) | 0 | `/run fix login button not disabling` |
+| **Refactor** | Analyze → plan → test → refactor | 0 | `/run refactor auth service` |
+| **Add tests** | Detect framework → write → verify coverage | 0 | `/run add tests for payment` |
+| **Feature (≤5 files)** | Single-agent inline with TDD | 0–1 | `/run add email validation` |
+| **Feature (6+ files, architecture)** | **Full 5-phase workflow** | 2 | `/run implement user subscription` |
+
+**When the 5-phase workflow DOES fire** (Deep complexity only):
 
 ```
   ✋ Phase 1: Understand + Design    → You approve the plan
@@ -133,11 +771,24 @@ No more "write code and hope." Every feature follows RED → GREEN → REFACTOR 
   ⚡ Phase 5: Finalize               → Docs + notifications
 ```
 
-Two approvals. Five phases. Zero untested code.
+**Escape hatches** — you control rigor when the detector gets it wrong:
+
+- `/run fasttrack: <specs>` — skip Phase 1 if you've already designed
+- `/run must do: <task>` / `just do: <task>` — bypass brainstorming, execute literally
+- `/run reopen <phase>` — unfreeze an approved phase to revise
+- `/run reason: sc|tot|cove` — opt in to heavy reasoning (Self-Consistency / Tree of Thoughts / Chain-of-Verification) for hard decisions
+- `/run handoff` — save state, resume in a fresh session
+
+**What you get vs what you skip:**
+- 80% of tasks never see a gate — fast iteration
+- 20% that *matter* (architecture, multi-file, vague scope) get disciplined TDD + human approval
+- You never manually pick — the detector routes; you approve only when it matters
+
+Full strategy matrix: [Routing Strategies](#routing-strategies) below. Full benefits guide: [docs/reference/BENEFITS.md](docs/reference/BENEFITS.md).
 
 ### 2. The Right Expert for Every Task
 
-10 specialized agents activate automatically — no configuration:
+9 specialized agents activate automatically — no configuration:
 
 ```
 "Build a React dashboard"     → frontend
@@ -147,23 +798,88 @@ Two approvals. Five phases. Zero untested code.
 "Run a security audit"        → security
 ```
 
-<details>
-<summary>All 10 agents</summary>
+#### How Agent Detection Works
 
-| Agent | When it activates |
-|-------|-------------------|
-| `lead` | Coordinates workflows, team orchestration |
-| `architect` | System design, databases, backend (Node, Python, Laravel, Go) |
-| `frontend` | React, Vue, Angular, Next.js + design systems |
-| `mobile` | React Native, Flutter, Expo, NativeWind |
-| `strategist` | ROI evaluation, MVP scoping, scope creep detection |
-| `security` | OWASP audits, vulnerability scanning, SAST |
-| `tester` | Jest, Cypress, Playwright, Detox, coverage |
-| `devops` | Docker, K8s, CI/CD, monitoring |
-| `scanner` | Project detection, config, context |
-| `router` | Agent + model selection |
+```mermaid
+flowchart LR
+    Msg([User message]):::m --> L0[Layer 0<br/>Task content<br/>+50-60]:::l
+    Msg --> L1[Layer 1<br/>Explicit tech<br/>+60]:::l
+    Msg --> L2[Layer 2<br/>Intent verb<br/>+50]:::l
+    Msg --> L3[Layer 3<br/>Project context<br/>+40]:::l
+    Msg --> L4[Layer 4<br/>File patterns<br/>+20]:::l
+
+    L0 --> Score[[Sum per agent]]:::s
+    L1 --> Score
+    L2 --> Score
+    L3 --> Score
+    L4 --> Score
+
+    Score --> T{Threshold?}:::g
+    T -->|≥80| Primary[PRIMARY agent]:::p
+    T -->|50-79| Secondary[SECONDARY agent]:::sec
+    T -->|30-49| Optional[OPTIONAL agent]:::opt
+    T -->|<30| Skip[Ask user]:::skip
+
+    classDef m fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#000000
+    classDef l fill:#6366f1,stroke:#3730a3,stroke-width:2px,color:#ffffff
+    classDef s fill:#ec4899,stroke:#9d174d,stroke-width:2px,color:#ffffff
+    classDef g fill:#dc2626,stroke:#7f1d1d,stroke-width:2px,color:#ffffff
+    classDef p fill:#059669,stroke:#064e3b,stroke-width:2px,color:#ffffff
+    classDef sec fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#ffffff
+    classDef opt fill:#8b5cf6,stroke:#5b21b6,stroke-width:2px,color:#ffffff
+    classDef skip fill:#475569,stroke:#1e293b,stroke-width:2px,color:#ffffff
+```
+
+**Why 5 layers instead of one?** A backend repo can contain frontend work (Blade/Jinja templates, email HTML, PDF styling), and a frontend repo can need backend work (API rate-limits, auth logic). Repo type alone lies. **Task content (Layer 0) overrides repo context** — so `"Fix email template styling"` in a Laravel repo correctly routes to `frontend`, not `architect`.
+
+Details: `skills/agent-detector/SKILL.md` + `skills/agent-detector/task-based-agent-selection.md`.
+
+<details>
+<summary>All 15 agents</summary>
+
+| Agent | Model | Tools | When it activates |
+|-------|-------|-------|-------------------|
+| `lead` | **inherit** | full | Coordinates workflows, enforces gates |
+| `architect` | **inherit** | full | System design, DB schema, backend APIs — uses Opus when session is Opus |
+| `frontend` | **inherit** | full | React, Vue, Angular, Next.js + design systems — uses Opus when session is Opus |
+| `mobile` | **inherit** | full | React Native, Flutter, Expo, NativeWind — uses Opus when session is Opus |
+| `strategist` | sonnet | **read-only** | ROI, MVP, scope creep (Phase 1 Deep) |
+| `security` | sonnet | **read-only** | OWASP, auth/crypto review (Phase 4) |
+| `tester` | sonnet | full | Jest, Cypress, Playwright, Detox, coverage |
+| `devops` | sonnet | full | Docker, K8s, CI/CD, monitoring |
+| `scanner` | **haiku** | read + Bash | Project detection, session-start context |
+
+Agent + complexity + model selection all done by the `agent-detector` skill (no separate router — consolidated in v3.6.0).
 
 </details>
+
+#### Per-Agent Model Override — How It Works and Why
+
+Each agent and skill declares its own `model:` in YAML frontmatter. Claude Code resolves the model like this:
+
+| Priority | Source | When it applies |
+|:--------:|--------|-----------------|
+| 1 (highest) | `CLAUDE_CODE_SUBAGENT_MODEL` env var | Override everything — useful for CI or cost control |
+| 2 | Per-invocation `model` parameter | Rare — set at spawn time |
+| 3 | Agent/skill frontmatter `model:` field | **This is where Aura Frog declarations live** |
+| 4 (fallback) | Main session model | Used only if nothing above is set |
+
+**Key point:** frontmatter wins over session model. If you started your session on Opus but invoke `agent-detector`, that skill runs on **haiku** — not Opus. The session model is the *fallback*, not the override.
+
+Why we hard-code certain models:
+
+| Agent or skill | Model | Why |
+|----------------|:-----:|-----|
+| `agent-detector`, `scanner` | **haiku** | Classification/detection tasks. Fire every message or session-start. Haiku is ~3× faster and ~10× cheaper. Opus here wastes budget. |
+| `security`, `strategist`, `tester`, `devops` | **sonnet** | Balanced reasoning for review/analysis/tests/deploy. Locked to sonnet — Opus rarely pays back for these roles. |
+| `lead`, `architect`, `frontend`, `mobile` | **inherit** | These do the heavy design/build work. If you chose Opus for a complex task, these agents should reason at Opus too. |
+
+**What this means for you:**
+- Starting a session on **Opus** → `lead`, `architect`, `frontend`, `mobile` all run on Opus (they inherit). Review/test/deploy stay on sonnet. Detection stays on haiku. You get Opus-quality design + sonnet-cost everything else.
+- Starting on **Sonnet** → everything runs ≤ sonnet (haiku calls still haiku). No Opus unless you escalate the session.
+- Want everything on one model? Set `CLAUDE_CODE_SUBAGENT_MODEL=opus` (env var at top of resolution order) — overrides every frontmatter declaration.
+
+**Not what you want?** Edit the `model:` field in `aura-frog/agents/<name>.md` frontmatter. Remove the line to inherit session model. Change to `opus`/`sonnet`/`haiku` to lock. See the Frontmatter Maintenance Rule in `.claude/CLAUDE.md`.
 
 ### 3. Complex Features Get Debated Before Built
 
@@ -220,10 +936,10 @@ Plus Figma design fetching and Slack notifications.
 Detects your patterns, remembers corrections, creates rules that persist across sessions. Optional Supabase sync for teams.
 
 #### Smart Complexity Routing
-Automatically matches effort to task size — typos get direct edits, features get full workflows, architecture gets collaborative planning. No configuration.
+Automatically matches effort to task size — typos get direct edits, features get full workflows, architecture gets collaborative planning. No configuration. See [Routing Strategies](#routing-strategies) below.
 
 #### Built-in Safety Net
-Workflow crashed? `workflow:resume`. Context full? Decisions preserved across `/compact`. Need to pause? `workflow:handoff` saves everything.
+Run crashed? `/run resume`. Context full? Decisions preserved across `/compact`. Need to pause? Type `handoff` to save everything.
 
 #### Memory That Heals Itself
 All cached context is treated as a hint — agents verify against actual files before acting. State only updates after confirmed success (Strict Write Discipline). No stale assumptions propagate.
@@ -234,7 +950,49 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 #### Performance by Design
 3-tier rule loading (~75% less context), conditional hooks (~40% fewer executions), agent detection caching, session start caching (<1s repeat sessions).
 
+#### JIRA Ticket Auto-Fetch
+Mention a ticket key in any prompt (e.g. *"please look at PROJ-123"*) and the `jira-auto-fetch.cjs` hook pulls the ticket on `UserPromptSubmit`, caches it at `.claude/logs/jira/{TICKET_ID}.json` (24h TTL), and surfaces a 1-line TOON summary so Claude reads it as canonical requirements. Silent if no key is found or if `JIRA_BASE_URL` / `JIRA_EMAIL` / `JIRA_API_TOKEN` env vars are unset (one-time hint per session). Cap: 3 tickets per prompt; optional `JIRA_PROJECT_PREFIXES` allowlist filters out false positives like `RFC-123` or `UTF-8`. No CLI command needed — the hook is the single source of truth.
+
 </details>
+
+---
+
+## Routing Strategies
+
+Aura Frog picks one of three execution strategies per task — you never configure it manually.
+
+```mermaid
+flowchart TB
+    Prompt([Prompt]):::m --> AD[agent-detector analyzes]:::s
+    AD --> Cx{Complexity?}:::g
+
+    Cx -->|single file<br/>clear scope<br/>~5K tokens| Q[Quick Strategy]:::q
+    Cx -->|2-5 files<br/>feature<br/>~20K tokens| S[Standard Strategy]:::st
+    Cx -->|6+ files<br/>architecture<br/>~80K tokens| D[Deep Strategy]:::d
+
+    Q --> QR[Direct edit<br/>haiku model<br/>no workflow]:::q
+    S --> SR[Single agent inline<br/>sonnet model<br/>TDD optional]:::st
+    D --> DR[5-phase TDD<br/>2 approval gates<br/>builder ≠ reviewer<br/>collaborative planning]:::d
+
+    classDef m fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#000000
+    classDef s fill:#ec4899,stroke:#9d174d,stroke-width:2px,color:#ffffff
+    classDef g fill:#dc2626,stroke:#7f1d1d,stroke-width:2px,color:#ffffff
+    classDef q fill:#10b981,stroke:#065f46,stroke-width:2px,color:#ffffff
+    classDef st fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#ffffff
+    classDef d fill:#8b5cf6,stroke:#5b21b6,stroke-width:2px,color:#ffffff
+```
+
+| Strategy | Triggers | Model | Gates | Example |
+|---|---|---|---|---|
+| **Quick** | Single file, typo, one-line fix | haiku | 0 | "Fix typo in login.ts" |
+| **Standard** | 2–5 files, one feature | sonnet | 0–1 | "Add email validation to signup form" |
+| **Deep** | 6+ files, architecture, vague scope | sonnet (opus for design) | 2 (P1 + P3) | "Design and implement user subscription system" |
+
+**Why three tiers instead of always-TDD?** Forcing Deep on every task burns tokens (~3× vs subagent mode) and slows iteration. Forcing Quick on complex work skips tests and breaks production. The three-tier model matches effort to risk.
+
+**Team Mode** (subset of Deep): if the task spans 2+ domains AND `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, multiple agents work in parallel and cross-review each other. See [AGENT_TEAMS_GUIDE](docs/guides/AGENT_TEAMS_GUIDE.md).
+
+Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `skills/run-orchestrator/SKILL.md`.
 
 ---
 
@@ -242,25 +1000,295 @@ MicroCompact (free, every 10 turns) → AutoCompact (one /compact call at 80%) �
 
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
-| **Agents** | 10 | Right expert auto-selected per task |
-| **Skills** | 44 | 8 auto-invoke on context, 36 on-demand |
-| **Commands** | 26 | 10 bundled + 16 standalone — 71% consolidated |
-| **Rules** | 45 | 3-tier loading — only what's needed per phase |
-| **Hooks** | 28 | Conditional — skip processing for non-code files |
-| **MCP Servers** | 6 | Zero-config, auto-invoked |
+| **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
+| **Skills** | 55 | 9 auto-invoke on context, 46 on-demand |
+| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite |
+| **Rules** | 70 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
+| **Hooks** | 42 | Conditional — skip processing for non-code files |
+| **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
 
 ---
 
-## Workflow Modes
+## Command Reference
 
-| Mode | Command | Best for |
-|------|---------|----------|
-| **Full Workflow** | `workflow:start "task"` | New features, production code |
-| **Fast-Track** | `fasttrack: <specs>` | Pre-approved specs |
-| **Quick Fix** | `bugfix:quick "fix"` | Small bugs with TDD |
-| **Refactor** | `refactor "file"` | Code cleanup |
+Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. Specialized `/aura-frog:*` commands (plan, freeze, conflicts, heal, mcp, dashboard, preflight) layer on for hierarchical planning and safety operations.
+
+### `/run <task>` — The main entry point
+
+Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow.
+
+| What you say | Intent detected | Flow |
+|---|---|---|
+| `/run implement user profile` | Feature | 5-phase TDD workflow |
+| `/run fix login not working` | Bugfix | `bugfix-quick` skill — investigate → test → fix → verify |
+| `/run refactor auth service` | Refactor | `refactor-expert` skill — analyze → plan → test → refactor |
+| `/run add tests for payment` | Test | `test-writer` skill — detect framework → write tests → coverage |
+| `/run fasttrack: <specs>` | Fast-Track | Skip Phase 1, auto-execute P2–P5 (specs must include Requirements + Design + API + Data Model + Acceptance Criteria) |
+| `/run resume <id>` | Resume | Load state from `.claude/logs/runs/<id>/` |
+| `/run status` | Status | Current phase + progress |
+| `/run handoff` | Handoff | Save state for cross-session continuation |
+
+### `/check` — Health + quality checks
+
+```bash
+/check            # all checks (security + perf + complexity + debt + coverage + deps)
+/check security   # SAST only
+/check perf       # performance bottlenecks
+/check coverage   # test coverage report
+/check deps       # outdated/vulnerable dependencies
+```
+
+### `/design` — Design artifacts
+
+```bash
+/design api       # REST/GraphQL API spec (calls api-designer skill)
+/design db        # Database schema design
+/design doc       # ADR or runbook (calls documentation skill)
+```
+
+### `/project` — Project lifecycle
+
+```bash
+/project init     # First-time setup — generates 7 context files
+/project status   # Current context + active workflow
+/project refresh  # Re-scan codebase, update conventions
+/project regen    # Regenerate context files from scratch
+/project env      # Validate .envrc / MCP tokens
+/project sync     # Sync status line + refresh cache
+```
+
+### `/af` — Plugin management + learning
+
+```bash
+/af status        # Plugin health check
+/af agents        # List loaded agents with their tools + model
+/af metrics       # Workflow velocity + token efficiency
+/af learn status  # Learning system state (Supabase or local)
+/af learn analyze # Extract patterns from past workflows
+/af learn apply   # Apply learned rules to future sessions
+/af setup cli     # Install af CLI system-wide
+/af prompts       # Analyze prompt quality + suggest improvements
+```
+
+### `/help` — Contextual help
+
+```bash
+/help             # Plugin overview
+/help <command>   # Detailed help for a specific command
+/help agents      # Agent selection guide
+/help hooks       # Hook lifecycle reference
+```
+
+Full command docs: [commands/README.md](aura-frog/commands/README.md).
+
+---
+
+## Agent Selection Examples
+
+Real examples of what the `agent-detector` skill picks and why. Score thresholds: **PRIMARY ≥80**, SECONDARY 50–79, OPTIONAL 30–49.
+
+| You type | PRIMARY agent | Why (scoring breakdown) |
+|---|---|---|
+| "Add login form with email+password" | **frontend** | `form` +35, `login` +30, UI intent +50 = **115** |
+| "Add rate-limit to /api routes" | **architect** | `api route` +55, `rate limit` +45, backend intent +50 = **150** |
+| "Fix email template styling in Laravel" | **frontend** (in Laravel repo!) | `email template` +55, `styling` +40, Layer 0 overrides repo = **95** |
+| "Optimize this slow query" | **architect** | `slow query` +50, `optimize` +35, database intent +55 = **140** |
+| "Run OWASP audit on payment flow" | **security** | `OWASP` +55, `audit` +50, security intent +55 = **160** |
+| "Write Cypress tests for checkout" | **tester** | `Cypress` +50, `tests` +55, test infra exists +30 = **135** |
+| "Set up GitHub Actions for CI" | **devops** | `GitHub Actions` +55, `CI` +50, deployment intent +50 = **155** |
+| "Fix FlatList performance in Expo" | **mobile** | `FlatList` +50, `Expo` +55, mobile intent +50 = **155** |
+| "Should we build this feature?" | **strategist** | `should we` +50, business-question intent +55 = **105** |
+| "What does this repo do?" | **scanner** | Project detection intent +60, cached context +40 = **100** |
+
+**Key insight:** Layer 0 (task content) overrides repo type. A Laravel repo asking "fix email template styling" gets `frontend`, not `architect`. See `skills/agent-detector/task-based-agent-selection.md` for the full scoring matrix.
+
+---
+
+## Token Budget
+
+Real measurements from production workflows. Numbers vary ±20% based on project size.
+
+| Strategy | Typical Tokens | Cost (Sonnet) | Cost (Opus) | Gates | Example task |
+|---|---:|---:|---:|:---:|---|
+| **Quick** (direct edit, haiku) | ~3K | $0.003 | — | 0 | Fix typo, rename variable |
+| **Standard** (single agent, sonnet) | ~15–25K | $0.08 | $0.40 | 0–1 | Add validation to form |
+| **Deep** (5-phase, sonnet) | ~60–90K | $0.30 | $1.50 | 2 | JWT auth, payment flow |
+| **Deep + Team Mode** (multi-agent, sonnet) | ~120–180K | $0.60 | $3.00 | 2 | User subscription system |
+
+### Per-Phase Breakdown (Deep workflow, sonnet)
+
+```
+Phase 1: Understand + Design     ~8K   (13%)
+Phase 2: Test RED                ~6K   (10%)
+Phase 3: Build GREEN            ~40K   (65%)  ← biggest phase
+Phase 4: Refactor + Review       ~6K   (10%)
+Phase 5: Finalize                ~2K   ( 2%)
+```
+
+**Target:** ≤30K tokens per workflow. Actual median: **62K** (2x target — Phase 3 is the compressor target for future optimization).
+
+Run `/run predict <task>` before a workflow to get a tailored estimate.
+
+---
+
+## Troubleshooting / FAQ
+
+<details>
+<summary><strong>Q: Workflow state isn't saving. `/run status` shows nothing.</strong></summary>
+
+**Likely cause:** Path drift between hooks and skills (fixed in v3.7+).
+
+**Check:**
+```bash
+ls -la .claude/logs/runs/         # Should exist after first /run
+ls -la .claude/logs/workflows/    # Legacy path — may have old state
+```
+
+**Fix:**
+- Upgrade to v3.7+ (`/plugin update aura-frog`)
+- Or manually move: `mv .claude/logs/workflows/* .claude/logs/runs/`
+
+Verify with `/af status` — should show 0 orphan paths.
+</details>
+
+<details>
+<summary><strong>Q: Wrong agent picked for my task.</strong></summary>
+
+**Likely cause:** Missing project context or ambiguous task description.
+
+**Check:**
+- Did you run `/project init` yet? Scanner uses those files for Layer 3 (project context).
+- Is your task description short/vague? `agent-detector` defaults to repo type when signals are weak.
+
+**Fix:**
+- Run `/project init` if you haven't
+- Rephrase task with domain-specific keywords: `"Add email template styling"` (frontend) vs `"Update email feature"` (ambiguous)
+- Override manually: `/run @frontend implement X` forces the frontend agent
+
+Full scoring logic: `skills/agent-detector/task-based-agent-selection.md`.
+</details>
+
+<details>
+<summary><strong>Q: Token budget blown past 200K. What happened?</strong></summary>
+
+**Likely cause:** Phase 3 (Build GREEN) hit an iteration loop on a complex refactor.
+
+**Check:**
+```bash
+/run budget      # Shows per-phase consumption
+/run metrics     # Shows if rejection count is high
+```
+
+**Fix:**
+- `/run handoff` to save state → resume in fresh session
+- For next time: use `/run predict <task>` first — flags Deep tasks likely to exceed budget
+- Consider splitting: `/run part 1: <narrow scope>` → merge → `/run part 2`
+</details>
+
+<details>
+<summary><strong>Q: Hooks not firing (no SessionStart banner, no lint-autofix).</strong></summary>
+
+**Likely cause:** `.claude/settings.json` missing hook config, or plugin not activated in this project.
+
+**Check:**
+```bash
+cat .claude/settings.json   # Should reference plugin hooks
+/af status                  # Should show "Hooks: 28 registered"
+```
+
+**Fix:**
+```bash
+/af setup integrations      # Re-installs hook config
+```
+
+If still nothing, check plugin.json path:
+```bash
+ls ~/.claude/plugins/marketplaces/aurafrog/aura-frog/hooks/hooks.json
+```
+</details>
+
+<details>
+<summary><strong>Q: Opus session costs surprised me. Can I lock everything to Sonnet?</strong></summary>
+
+**Yes — two ways:**
+
+**Option 1 — Session override (temporary):**
+```bash
+# Start Claude Code with model flag
+claude --model sonnet
+```
+
+**Option 2 — Env var (permanent, overrides ALL frontmatter):**
+```bash
+export CLAUDE_CODE_SUBAGENT_MODEL=sonnet
+```
+
+This overrides every agent/skill `model:` declaration. See [Per-Agent Model Override](#per-agent-model-override--how-it-works-and-why) for resolution order.
+
+**Cost tip:** `scanner` and `agent-detector` stay on haiku regardless — you don't need to touch them.
+</details>
+
+<details>
+<summary><strong>Q: Can I run multiple /run workflows in parallel?</strong></summary>
+
+**Yes — use git worktrees:**
+```bash
+/run worktree: <task>    # Automatically creates isolated worktree + runs there
+```
+
+Each worktree has its own state in `.claude/logs/runs/<id>/`. See [Git Worktree skill](aura-frog/skills/git-worktree/SKILL.md).
+
+For full multi-agent parallel work, enable Agent Teams:
+```bash
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+```
+
+See [Agent Teams Guide](docs/guides/AGENT_TEAMS_GUIDE.md).
+</details>
+
+<details>
+<summary><strong>Q: How do I disable a hook that's slowing me down?</strong></summary>
+
+Each hook has a disable env var:
+
+```bash
+AF_LINT_AUTOFIX=false        # Skip post-edit linter
+AF_PROMPT_LOGGING=false      # Skip prompt metadata logging
+AF_LEARNING_ENABLED=false    # Skip all learning hooks
+```
+
+Or disable at the source by editing `aura-frog/hooks/hooks.json` (comment out the matcher).
+
+Full hook list: [hooks/README.md](aura-frog/hooks/README.md).
+</details>
+
+More issues: [TROUBLESHOOTING.md](docs/operations/TROUBLESHOOTING.md).
+
+---
+
+## Compared to Other Claude Code Plugins
+
+Honest comparison with two popular plugins in the ecosystem (April 2026).
+
+| | **Aura Frog** | **wshobson/agents** | **Superpowers** |
+|---|---|---|---|
+| **Agents** | 9 curated | 184 across 78 plugins | ~20 |
+| **Skills** | 38 | 150 | Small focused set |
+| **Commands** | 6 | 98 | ~10 |
+| **Workflow** | 5-phase TDD with 2 gates | No structured workflow | Phase-gated workflow |
+| **Agent routing** | Task-content Layer 0 override | Manual `/agent-name` | Similar to Aura Frog |
+| **TDD enforcement** | ✅ Mandatory RED→GREEN→REFACTOR | ❌ Per-agent | ✅ Phase-gated |
+| **Context management** | 3-tier (MicroCompact / AutoCompact / ManualCompact) | ❌ Base Claude Code | Partial |
+| **Approval gates** | 2 (P1 + P3) | ❌ | Multiple |
+| **MCP bundled** | 6 (context7, playwright, vitest, firebase, figma, slack) | Varies per plugin | 2–3 |
+| **Best fit** | Teams shipping production features with TDD discipline | Extending with niche specialists | Structured workflows for research/writing |
+| **Weakness** | Steeper learning curve | Agent sprawl (184 is a lot) | Smaller ecosystem |
+
+**Not competing — different optimization targets.** Aura Frog optimizes for *production code quality* (TDD + security review). wshobson optimizes for *breadth of specialists*. Superpowers optimizes for *structured thinking over code*.
+
+Combine freely — plugins coexist in Claude Code.
 
 ---
 
@@ -271,8 +1299,8 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 | **All Documentation** | [docs/README.md](docs/README.md) |
 | **Getting Started** | [GET_STARTED.md](docs/getting-started/GET_STARTED.md) |
 | **First Workflow Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](docs/getting-started/FIRST_WORKFLOW_TUTORIAL.md) |
-| **All Commands (26)** | [commands/README.md](aura-frog/commands/README.md) |
-| **All Skills (44)** | [skills/README.md](aura-frog/skills/README.md) |
+| **All Commands (6)** | [commands/README.md](aura-frog/commands/README.md) |
+| **All Skills (38)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams Guide** | [AGENT_TEAMS_GUIDE.md](docs/guides/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](docs/operations/MCP_GUIDE.md) |
 | **Hooks & Lifecycle** | [hooks/README.md](aura-frog/hooks/README.md) |
@@ -289,14 +1317,14 @@ Agents = Processes       5-Phase TDD = Scheduler        MCP = Device Drivers
 TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
-├── agents/         10 processes (auto-dispatched per task)
-├── skills/         44 skills (8 auto-invoke + 36 on-demand)
-├── commands/       26 commands (10 bundled + 16 standalone)
-├── rules/          45 rules (13 core + 15 agent + 17 workflow)
-├── hooks/          28 lifecycle hooks (conditional execution)
-├── scripts/        43 utility scripts
+├── agents/         15 processes (auto-dispatched per task)
+├── skills/         55 skills (9 auto-invoke + 46 on-demand)
+├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
+├── rules/          71 rules (22 core + 19 agent + 30 workflow)
+├── hooks/          42 lifecycle hooks (conditional execution)
+├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
-└── .mcp.json       6 device drivers (MCP servers)
+└── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)
 ```
 
 ---

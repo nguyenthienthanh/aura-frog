@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
   paths: {
     docs: 'docs',
     plans: 'plans',
-    workflows: '.claude/logs/workflows'
+    workflows: '.claude/logs/runs'
   },
   project: {
     type: 'auto',
@@ -517,7 +517,11 @@ function isAgentTeamsEnabled() {
  */
 function escapeShellValue(str) {
   if (typeof str !== 'string') return str;
-  return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\$/g, '\\$');
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\$/g, '\\$')
+    .replace(/`/g, '\\`');
 }
 
 /**

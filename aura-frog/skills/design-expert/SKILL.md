@@ -11,6 +11,7 @@ triggers:
   - "Tailwind"
   - "shadcn"
   - "responsive layout"
+user-invocable: false
 ---
 
 # Design Expert

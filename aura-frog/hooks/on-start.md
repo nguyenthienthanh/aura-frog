@@ -1,7 +1,7 @@
 # On-Start Hook - Workflow Initialization Check
 
 **Purpose:** Check project setup before workflow starts
-**Trigger:** Automatically run when `/workflow start` or any workflow command is executed
+**Trigger:** Automatically run when `/run` or any run command is executed
 
 ---
 
@@ -24,7 +24,7 @@ Ensure the project is properly initialized with Aura Frog before executing workf
 ## 🔄 Execution Flow
 
 ```
-User: workflow:start "Task"
+User: /run "Task"
       ↓
 [ON-START HOOK] ← YOU ARE HERE
       ↓
@@ -273,9 +273,9 @@ Your choice: _
 ### Hook Activation
 
 This hook is triggered by:
-- `/workflow start`
-- `/workflow phase:*` commands
-- Any command that begins a workflow
+- `/run`
+- Run phase commands
+- Any command that begins a run
 
 ### State Management
 
