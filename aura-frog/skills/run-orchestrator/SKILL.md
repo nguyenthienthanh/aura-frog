@@ -54,7 +54,16 @@ This step is non-negotiable. If you skip it, /run status will show nothing and t
 1. agent-detector → select lead, complexity, model
 2. **Apply context-economy** — locate before Read, use Glob/Grep first, slice large files with `offset`+`limit`, delegate broad exploration to Explore subagent. See `rules/core/context-economy.md`. **If you hit `overloaded_error`, do NOT retry with the same context — distill, then resume.**
 3. **Validate prompt (6-dim benchmark)** — score per `rules/core/prompt-validation.md`. If below threshold, ask focused questions before proceeding (see `rules/core/no-assumption.md`)
-4. **Check for JIRA ticket context** — if user prompt or `RUN_ID` matches a JIRA ticket pattern, the `jira-auto-fetch` hook will have written `.claude/logs/jira/{TICKET_ID}.json`. Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
+4. **Check for JIRA ticket context** — if the user prompt or `RUN_ID` matches `[A-Za-z]{2,10}-[0-9]{1,6}`, the `jira-auto-fetch.cjs` hook fires on `UserPromptSubmit` and writes `.claude/logs/jira/{TICKET_ID}.json` (TICKET_ID is always UPPERCASE — the hook normalises). Read it as the canonical requirements source (description + comments). Reference the ticket key in run-state under `context.jira_ticket`.
+
+   **There is no CLI script and no Atlassian MCP — the hook IS the integration.** Do not search `scripts/`, `.claude/scripts/`, or `.mcp.json` for a Jira fetcher; you will not find one. Source of truth: `aura-frog/hooks/jira-auto-fetch.cjs`. The standalone `scripts/jira-fetch.sh` was removed in v3.7.0 post-release polish.
+
+   If `.claude/logs/jira/{TICKET_ID_UPPER}.json` is missing despite the user mentioning a ticket, the hook silently skipped for one of three reasons — surface this to the user and ask how to proceed:
+   - **Env not set:** missing `JIRA_BASE_URL` / `JIRA_EMAIL` / `JIRA_API_TOKEN` in `.envrc` (plus `af envrc allow` if the trust gate is enabled). Tell the user to set them, then re-prompt.
+   - **JIRA_PROJECT_PREFIXES filtered it out:** the env allowlist excluded this project prefix.
+   - **JIRA API failed:** `aura-frog/hooks/jira-auto-fetch.cjs` writes `[jira-auto-fetch] WARN: fetch failed for <id>` to stderr; check there.
+
+   When env is unavailable in this environment (e.g. no `.envrc` access), continue the run by asking the user to paste the task description inline — do not invent a fallback fetch path.
 5. **Run ↔ Plan bridge** — apply `rules/workflow/run-plan-bridge.md`:
    - If `.aura/plans/active.json#active.task` is set → **auto-anchor** run-state to that T4; Sprint Contract seeds from the task's acceptance criteria; Phase 5 syncs status back to the plan tree.
    - If `active.feature` is set but `active.task` is null → suggest `/aura-frog:plan-next` to claim a task first (user may reply `proceed` to run inline).

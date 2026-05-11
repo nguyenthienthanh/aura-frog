@@ -10,7 +10,9 @@
  *          user typically does not).
  *
  * Behavior:
- *   - Silent if no [A-Z]{2,10}-[0-9]{1,6} tokens in prompt
+ *   - Silent if no [A-Za-z]{2,10}-[0-9]{1,6} tokens in prompt
+ *   - Case-insensitive: 'ignt-2034' and 'IGNT-2034' both match; the cache key
+ *     and API request always use UPPERCASE-<digits>.
  *   - Silent if JIRA env not configured (one-time hint per session via flag file)
  *   - Cap: 3 unique tickets per prompt (anti-fatigue)
  *   - Cache 24h TTL per ticket; subsequent prompts reuse the cache silently
@@ -24,7 +26,7 @@
  * Exit codes:
  *   0 — always (non-blocking; this is informational context, not a guard)
  *
- * @version 1.1.0 (jira-fetch.sh removed; hook is now the sole JIRA path)
+ * @version 1.2.0 (case-insensitive ticket match; normalises to UPPERCASE)
  */
 
 'use strict';
@@ -45,7 +47,10 @@ try {
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_TICKETS_PER_PROMPT = 3;
-const TICKET_PATTERN = /\b([A-Z]{2,10})-(\d{1,6})\b/g;
+// Case-insensitive — users frequently type `ignt-2034` or `Ignt-2034` in chat
+// while JIRA itself canonicalises the project key in uppercase. We accept any
+// case and normalise to UPPERCASE-<digits> for the cache key and API call.
+const TICKET_PATTERN = /\b([A-Za-z]{2,10})-(\d{1,6})\b/g;
 
 function safeExit(code = 0) { process.exit(code); }
 
@@ -70,7 +75,9 @@ function extractTickets(prompt) {
   let m;
   TICKET_PATTERN.lastIndex = 0;
   while ((m = TICKET_PATTERN.exec(prompt)) !== null) {
-    found.add(`${m[1]}-${m[2]}`);
+    // Normalise to UPPERCASE-<digits> so the cache file path and JIRA API
+    // call both use the canonical key regardless of how the user typed it.
+    found.add(`${m[1].toUpperCase()}-${m[2]}`);
   }
   return Array.from(found);
 }
