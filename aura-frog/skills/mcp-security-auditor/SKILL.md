@@ -1,7 +1,7 @@
 ---
 name: mcp-security-auditor
 description: "On-demand audit of MCP usage. Reads .aura/security/mcp-audit.jsonl, surfaces blocked calls, rate-limit hits, suspicious input patterns. Companion to mcp-call-gate hook (which produces the audit log)."
-when_to_use: "/aura:mcp audit, security review, post-incident forensics on MCP calls"
+when_to_use: "/aura-frog:mcp audit, security review, post-incident forensics on MCP calls"
 allowed-tools: Read, Glob, Grep, Bash
 effort: low
 user-invocable: false
@@ -68,5 +68,5 @@ blocked[3]{ts,agent,mcp,reason}:
 - **Script:** `scripts/security/sanitize-mcp-input.sh` — sanitization run by the gate before logging
 - **Rule:** `rules/agent/mcp-security-policy.md` — authoritative policy
 - **Rule:** `rules/agent/db-access-policy.md` — DB-specific subset (architect/tdd-engineer only, read-only default, destructive ops blocked)
-- **Command:** `/aura:mcp audit` — primary user-facing entry to this skill
+- **Command:** `/aura-frog:mcp audit` — primary user-facing entry to this skill
 - **Skill:** Reuses `scripts/json-to-toon.cjs` to project the JSONL into context-friendly TOON

@@ -322,16 +322,16 @@
 
 ### 6.1. Consolidated Command Surface
 
-**What:** A 6-command core (`/run` universal + `/check` quality + `/design` pre-code + `/project` config + `/af` system + `/help`) covers the everyday workflow. v3.7.0 layered an `/aura:*` suite on top (plan, expand, freeze, conflicts, heal, mcp, dashboard, preflight, …) for hierarchical planning and safety operations. Total: 24 slash commands.
+**What:** A 6-command core (`/run` universal + `/check` quality + `/design` pre-code + `/project` config + `/af` system + `/help`) covers the everyday workflow. v3.7.0 layered an `/aura-frog:*` suite on top (plan, expand, freeze, conflicts, heal, mcp, dashboard, preflight, …) for hierarchical planning and safety operations. Total: 24 slash commands.
 
-**How applied:** Core commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow. `/aura:*` commands operate on the plan tree at `.aura/plans/` and never compete with the core surface.
+**How applied:** Core commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow. `/aura-frog:*` commands operate on the plan tree at `.aura/plans/` and never compete with the core surface.
 
-**Why you need it:** Discovery paralysis is real (some plugins ship 25+ verbs). 6 core commands cover 80%+ of daily use; specialized `/aura:*` verbs surface only when you actually use hierarchical planning.
+**Why you need it:** Discovery paralysis is real (some plugins ship 25+ verbs). 6 core commands cover 80%+ of daily use; specialized `/aura-frog:*` verbs surface only when you actually use hierarchical planning.
 
 **Use cases:**
 - New user — memorize the 6 core commands in 30 seconds
 - Experienced user — muscle memory for `/run` on everything
-- Planner — opt-in to `/aura:plan` only when a feature warrants T0-T4 decomposition
+- Planner — opt-in to `/aura-frog:plan` only when a feature warrants T0-T4 decomposition
 
 ---
 

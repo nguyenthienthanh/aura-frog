@@ -62,7 +62,7 @@ if (active.context_anchors && active.context_anchors.current_phase) {
 }
 
 if (Array.isArray(active.frozen) && active.frozen.length > 0) {
-  lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura:plan:conflicts`);
+  lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura-frog:plan-conflicts`);
 }
 
 if (Array.isArray(active.ready_queue) && active.ready_queue.length > 0) {

@@ -28,17 +28,17 @@ All notable changes to Aura Frog will be documented in this file.
 ### What shipped (across the 7 internal pre-releases)
 
 - **alpha.1** — Hierarchical planning foundation: T0-T4 schema, plan-loader (auto-invoke), `master-planner` / `feature-architect` / `story-planner` agents, 8 planning commands, plan-tree validator with 8 invariants, byte-identical round-trip
-- **alpha.2** — Failure handling + reasoning trace: F1-F5 deterministic classifier, `replanner` agent, `reasoning-trace-recorder` (auto-invoke), `/aura:trace` with hallucination surface, grounding-discipline rule, checkpoint discipline + `/aura:plan:undo` with git_sha rollback
-- **alpha.3** — Project-level extension creation: `extension-detector` (auto-invoke), `/aura:extend` command, `extension-policy` rule — auto-detect when a new skill/rule/command would help, confirm with user, create at `.claude/` (NEVER plugin-level)
-- **alpha.4** — Memory tier: `epic-summarizer` agent (T2 done → permanent_memory), `permanent-memory-loader` (auto-invoke, ≤120 tokens), `plan-archivist`, `/aura:reset-session`. **Plus: deterministic JSON→TOON projection hook** (saves tokens vs. AI-side projection rule)
-- **beta.1** — Pre-flight Tier 1: 7 bash linters (frontmatter, tool-input, tool-output, path-safety, command-allowlist, secret-patterns, run-all), `pre-flight-validate.cjs` hook (blocks `rm -rf /`, hostile paths, credential leaks), single-use bypass with `/aura:preflight bypass`
-- **beta.2** — Conflict detection + freeze: L1 (file overlap) + L2 (function overlap) bash detectors, `conflict-arbiter` agent, F6 class, 3 conflict commands (`/aura:plan:freeze`, `:thaw`, `:conflicts`), branch freeze cascade (descendants only per spec §13.1)
-- **rc.1** — Self-healing + MCP security: `self-healing-orchestrator` (F2/F3 only, ≥0.7 confidence, NEVER auto-applies), `mcp-call-gate.cjs` (per-agent allowlist, rate limits, sanitized audit), `db-access-policy` + `mcp-security-policy` rules, Phase 4 ≠ Phase 3 builder HARD RULE, `/aura:dashboard`
+- **alpha.2** — Failure handling + reasoning trace: F1-F5 deterministic classifier, `replanner` agent, `reasoning-trace-recorder` (auto-invoke), `/aura-frog:trace` with hallucination surface, grounding-discipline rule, checkpoint discipline + `/aura-frog:plan-undo` with git_sha rollback
+- **alpha.3** — Project-level extension creation: `extension-detector` (auto-invoke), `/aura-frog:extend` command, `extension-policy` rule — auto-detect when a new skill/rule/command would help, confirm with user, create at `.claude/` (NEVER plugin-level)
+- **alpha.4** — Memory tier: `epic-summarizer` agent (T2 done → permanent_memory), `permanent-memory-loader` (auto-invoke, ≤120 tokens), `plan-archivist`, `/aura-frog:reset-session`. **Plus: deterministic JSON→TOON projection hook** (saves tokens vs. AI-side projection rule)
+- **beta.1** — Pre-flight Tier 1: 7 bash linters (frontmatter, tool-input, tool-output, path-safety, command-allowlist, secret-patterns, run-all), `pre-flight-validate.cjs` hook (blocks `rm -rf /`, hostile paths, credential leaks), single-use bypass with `/aura-frog:preflight bypass`
+- **beta.2** — Conflict detection + freeze: L1 (file overlap) + L2 (function overlap) bash detectors, `conflict-arbiter` agent, F6 class, 3 conflict commands (`/aura-frog:plan-freeze`, `:thaw`, `:conflicts`), branch freeze cascade (descendants only per spec §13.1)
+- **rc.1** — Self-healing + MCP security: `self-healing-orchestrator` (F2/F3 only, ≥0.7 confidence, NEVER auto-applies), `mcp-call-gate.cjs` (per-agent allowlist, rate limits, sanitized audit), `db-access-policy` + `mcp-security-policy` rules, Phase 4 ≠ Phase 3 builder HARD RULE, `/aura-frog:dashboard`
 
 ### Stable polish (this release)
 
 - **MCP allowlists on all 9 baseline agents** (security=[], scanner=[], lead=[], strategist=[context7], devops=[firebase,slack], tester=[vitest,playwright], frontend=[context7,figma,playwright], mobile=[context7,figma,playwright], architect=[context7,postgres,redis]) — gate now actually enforces, not just defaulted to backward-compat
-- **README rewrite** — lead with `/aura:plan` + v3.7.0 systems overview; `/run` documented as lightweight mode for one-off tasks
+- **README rewrite** — lead with `/aura-frog:plan` + v3.7.0 systems overview; `/run` documented as lightweight mode for one-off tasks
 - **`MIGRATION_TO_V3.7.md`** — single comprehensive migration doc: what's new, what's backward-compat, opt-in features, breaking-ish changes, env var inventory, deferred work
 - Version files bumped 3.7.0-rc.1 → **3.7.0**
 
@@ -65,6 +65,7 @@ AF_JSON_TOON_DISABLED=true        — revert to raw JSON in context
 
 ### Fixed (post-release polish — 2026-05-11)
 
+- **Command namespace consistency** — renamed 18 `aura-*.md` command files to drop the redundant `aura-` prefix; the slash form was displaying as `/aura-frog:aura-plan` (plugin prefix + filename redundancy). New slash forms match the core `/aura-frog:run` convention: `/aura-frog:plan`, `/aura-frog:plan-expand`, `/aura-frog:trace`, `/aura-frog:heal`, `/aura-frog:mcp`, `/aura-frog:dashboard`, `/aura-frog:extend`, `/aura-frog:preflight`, `/aura-frog:reset-session`, plus 10 `plan-*` subcommands. Updated ~140 references across docs, agents, hooks, rules, scripts, READMEs to long-form (e.g. `/aura:plan:expand` → `/aura-frog:plan-expand`). `git mv` preserved history. Audit clean.
 - **Doc count drift** — synced stale v3.6.x counts in `README.md` (L101 / L533 / L697-700 / L708 / L1011-1019), `CONTRIBUTING.md` (project-structure block), `docs/README.md` (Plugin Internals list), `docs/reference/BENEFITS.md` (§4.3, §5.1, §6.1, §7.x) to v3.7.0 reality (15 / 55 / 70 / 24 / 42)
 - **`install.sh` removed** — deprecated since v3.6 marketplace publish; only historical reference retained in this changelog. Use `/plugin install aura-frog@aurafrog` instead.
 - **`scripts/jira-fetch.sh` removed** — `hooks/jira-auto-fetch.cjs` already calls the JIRA REST API directly (verified end-to-end against `IGNT-1975` on `fwdnextgen.atlassian.net`), so the standalone CLI script duplicated logic with no callers. Hook is now the single source of truth for JIRA fetching. Updated refs in `scripts/README.md`, `rules/workflow/mcp-response-logging.md`, `docs/operations/MCP_GUIDE.md`, `docs/getting-started/GET_STARTED.md`. Confluence fetch script kept (no equivalent hook). README gains a "JIRA Ticket Auto-Fetch" entry in the *More features* section.
@@ -110,13 +111,13 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 ### Added — Self-healing safety gates + MCP security tier + phase-role hard rule + CLI dashboard
 
 **Skills (2 new — 53 → 55)**
-- `skills/self-healing-orchestrator/` — F2/F3 ONLY (refuses F1/F4-F6). Confidence ≥0.7 required to propose; below threshold escalates raw findings. NEVER auto-applies; user approval mandatory. Counts toward replan_budget. Per-task max 1; session cap 5. Disable via `AF_SELF_HEAL_DISABLED=true` env or `/aura:heal disable` (session flag). Cross-checks ONLY context7 + permanent_memory + traces — no random web sources.
+- `skills/self-healing-orchestrator/` — F2/F3 ONLY (refuses F1/F4-F6). Confidence ≥0.7 required to propose; below threshold escalates raw findings. NEVER auto-applies; user approval mandatory. Counts toward replan_budget. Per-task max 1; session cap 5. Disable via `AF_SELF_HEAL_DISABLED=true` env or `/aura-frog:heal disable` (session flag). Cross-checks ONLY context7 + permanent_memory + traces — no random web sources.
 - `skills/mcp-security-auditor/` — read-side companion to `mcp-call-gate` hook. Reads `.aura/security/mcp-audit.jsonl`, projects to TOON via `json-to-toon.cjs`, surfaces blocked calls / rate-limit hits / suspicious patterns.
 
 **Commands (3 new — 21 → 24)**
-- `/aura:heal diagnose|status|disable|enable|accept|decline` — self-healing orchestration. `accept <HEAL-ID>` applies a proposal as a NEW T4 task (not in-place patch). Bypass-counter + cycle-guard hardening.
-- `/aura:mcp status|audit|reset-limits|test` — MCP security operations. `audit --blocked-only` for forensics. `reset-limits` is logged event. `test <server>` is single-call connectivity check.
-- `/aura:dashboard` — terse one-screen CLI status (plan tree, active task, conflicts, memory, MCP, pre-flight). `--live` (5s refresh), `--json` (machine-readable, sanitized), `--section <name>` for slot integration.
+- `/aura-frog:heal diagnose|status|disable|enable|accept|decline` — self-healing orchestration. `accept <HEAL-ID>` applies a proposal as a NEW T4 task (not in-place patch). Bypass-counter + cycle-guard hardening.
+- `/aura-frog:mcp status|audit|reset-limits|test` — MCP security operations. `audit --blocked-only` for forensics. `reset-limits` is logged event. `test <server>` is single-call connectivity check.
+- `/aura-frog:dashboard` — terse one-screen CLI status (plan tree, active task, conflicts, memory, MCP, pre-flight). `--live` (5s refresh), `--json` (machine-readable, sanitized), `--section <name>` for slot integration.
 
 **Rules (2 new agent-tier — workflow 29 unchanged; agent 17 → 19)**
 - `rules/agent/db-access-policy.md` — DB MCPs locked down: architect + tdd-engineer only (default-deny for everyone else). Read-only by default; writes require explicit `--allow-write`. Destructive ops (DROP/TRUNCATE/DELETE without WHERE) HARD-BLOCKED unconditionally regardless of allowlist.
@@ -130,7 +131,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 
 **Scripts (2 new)**
 - `scripts/security/sanitize-mcp-input.sh` — strips Authorization headers, redacts AWS/GitHub/OpenAI/JWT/Bearer tokens, truncates >1KB strings. jq-based when available; sed-fallback otherwise.
-- `scripts/dashboard.sh` — implementation behind `/aura:dashboard`. Static / `--live` (5s loop) / `--json` / `--section` modes. Read-only — never mutates state.
+- `scripts/dashboard.sh` — implementation behind `/aura-frog:dashboard`. Static / `--live` (5s loop) / `--json` / `--section` modes. Read-only — never mutates state.
 
 **Config**
 - `.mcp.json` — added `postgres` + `redis` servers (both `disabled: true` by default per spec §14.1, decision Q14 — opt-in for security)
@@ -148,7 +149,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - [x] Postgres MCP destructive ops blocked unconditionally (per `db-access-policy.md`)
 - [x] AF_SELF_HEAL_DISABLED=true disables self-healing
 - [x] Phase 4 reviewer ≠ Phase 3 builder formalized as HARD RULE in plan-lifecycle.md
-- [x] /aura:dashboard renders without errors (static + JSON modes verified)
+- [x] /aura-frog:dashboard renders without errors (static + JSON modes verified)
 
 ### Verification
 
@@ -163,7 +164,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - Agents: 15 (unchanged)
 - Skills: 53 → **55** (+2: self-healing-orchestrator, mcp-security-auditor); auto-invoke 9 (unchanged)
 - Rules: 68 → **70** (+2 agent-tier: db-access-policy, mcp-security-policy); workflow 29 unchanged but plan-lifecycle.md hard-rule promotion
-- Commands: 21 → **24** (+3: /aura:heal, /aura:mcp, /aura:dashboard)
+- Commands: 21 → **24** (+3: /aura-frog:heal, /aura-frog:mcp, /aura-frog:dashboard)
 - Hooks: 41 → **42** (+1 mcp-call-gate)
 - Scripts: 52 → **55** (+3: sanitize-mcp-input + dashboard + get-plugin-prefix)
 - MCP servers: 6 → **8** (+2 disabled: postgres, redis)
@@ -171,7 +172,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 ### Pending for v3.7.0 stable (final ship)
 
 - 17 documentation deliverables per spec §30 (architecture/HIERARCHICAL_PLANNING, MASTER_PLANNER, llm-os update, 8 guides, 3 troubleshooting, MIGRATION_TO_V3.7)
-- README.md update — lead with `/aura:plan`, document `/run` as lightweight mode
+- README.md update — lead with `/aura-frog:plan`, document `/run` as lightweight mode
 - Marketplace listing update with v3.7.0 description
 - Public release announcement
 - Add `mcp_servers:` allowlists to existing 9 baseline agents (gate works but most currently default to all-allowed)
@@ -200,15 +201,15 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - `skills/conflict-detector/SKILL.md` — orchestrates L1-L4 dispatch per spec §21.3. L1+L2 functional via the bash scripts; L3+L4 return stub findings pending rc.1 LLM dispatchers. Writes records to `.aura/plans/conflicts.jsonl` (append-only, schema per spec §21.4).
 
 **Commands (3 new — 18 → 21)**
-- `/aura:plan:freeze <NODE_ID> [reason]` — manual freeze with descendant cascade (per spec §13.1, decision Q10 — descendants only, NOT siblings)
-- `/aura:plan:thaw <NODE_ID>` — reverse freeze with compatibility check (`git diff <blocker.git_sha>..HEAD` vs frozen sibling's planned artifacts). `--partial` keeps descendants frozen; `--discard` finalizes as discarded; `--grant-replan-budget N` overrides budget reset
-- `/aura:plan:conflicts list|show|resolve|history|check` — full conflict lifecycle UX. `resolve <CONFLICT-ID> <choice>` supports accept-proposed / accept-blocker / sequential / freeze-both / escalate
+- `/aura-frog:plan-freeze <NODE_ID> [reason]` — manual freeze with descendant cascade (per spec §13.1, decision Q10 — descendants only, NOT siblings)
+- `/aura-frog:plan-thaw <NODE_ID>` — reverse freeze with compatibility check (`git diff <blocker.git_sha>..HEAD` vs frozen sibling's planned artifacts). `--partial` keeps descendants frozen; `--discard` finalizes as discarded; `--grant-replan-budget N` overrides budget reset
+- `/aura-frog:plan-conflicts list|show|resolve|history|check` — full conflict lifecycle UX. `resolve <CONFLICT-ID> <choice>` supports accept-proposed / accept-blocker / sequential / freeze-both / escalate
 
 **Rule (1 new — 67 → 68; workflow 28 → 29)**
 - `rules/workflow/conflict-arbitration-policy.md` — formalizes auto vs manual boundary (L1/L2 auto, L3/L4 manual), freeze cascade rules (Q10: descendants only), replan_budget interaction, cycle guard (3-arbitration limit), compatibility-check pseudocode
 
 **Hooks (3 new — 38 → 41)**
-- `pre-dispatch-conflict-check.cjs` — PreToolUse async on Edit|Write|Bash. Resolves siblings under same Story, runs L1, drills to L2 on low-confidence overlap. Mints CONFLICT-NNNNN, appends conflicts.jsonl + history.jsonl, emits stderr hint with `/aura:plan:conflicts show` next step. Anti-block: informational only; arbiter applies actual mutations
+- `pre-dispatch-conflict-check.cjs` — PreToolUse async on Edit|Write|Bash. Resolves siblings under same Story, runs L1, drills to L2 on low-confidence overlap. Mints CONFLICT-NNNNN, appends conflicts.jsonl + history.jsonl, emits stderr hint with `/aura-frog:plan-conflicts show` next step. Anti-block: informational only; arbiter applies actual mutations
 - `post-execute-conflict-rescan.cjs` — PostToolUse async on Edit|Write. Detects recent execution_completed events, looks up frozen siblings tied to same conflict, runs `git diff <blocker.checkpoint.git_sha>..HEAD` vs frozen sibling planned artifacts, emits auto_thaw / auto_discard recommendation
 - `pending-confirm-timeout.cjs` — SessionStart async. Walks T4 nodes, surfaces those in `planned`/`frozen`/`blocked` status idle >24h (configurable via `AF_PENDING_TIMEOUT_HOURS`). Cap: 5 surfaced + tail count
 
@@ -222,7 +223,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - [x] CONFLICT-NNNNN records minted with proper schema; conflicts.jsonl append-only
 - [x] Frozen node remains frozen until explicit thaw
 - [x] Branch freeze cascades to descendants only (NOT siblings) — per spec §13.1, Q10
-- [x] /aura:plan:thaw runs compatibility check via git_sha
+- [x] /aura-frog:plan-thaw runs compatibility check via git_sha
 - [x] F6 class added to failure-classifier with conflict-arbiter dispatch
 - [x] L1 detection well under 100ms p95 (bash + comm + sort, no LLM)
 - [x] End-to-end tested: artifact map → L1 hit → CONFLICT-00001 minted → conflicts.jsonl + history.jsonl + counters.json all updated
@@ -240,7 +241,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - Agents: 14 → **15** (+1 conflict-arbiter)
 - Skills: 52 → **53** (+1 conflict-detector); auto-invoke 9 (unchanged)
 - Rules: 67 → **68** (+1 conflict-arbitration-policy); workflow 28 → **29**
-- Commands: 18 → **21** (+3: /aura:plan:freeze, /aura:plan:thaw, /aura:plan:conflicts)
+- Commands: 18 → **21** (+3: /aura-frog:plan-freeze, /aura-frog:plan-thaw, /aura-frog:plan-conflicts)
 - Hooks: 38 → **41** (+3)
 - MCP servers: 6 (unchanged)
 
@@ -252,7 +253,7 @@ v3.7.0           2026-05-11   Stable — marketplace publish
 - Self-healing orchestrator — F2/F3 propose patch, never auto-apply
 - MCP security tier — per-agent allowlist, audit log, rate limits
 - Phase-Role binding hard rule (Phase 4 reviewer ≠ Phase 3 builder)
-- /aura:dashboard CLI
+- /aura-frog:dashboard CLI
 
 ### Pending — deferred FEAT-B work (rolling)
 
@@ -286,7 +287,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - `skills/preflight-validator/` — programmatic wrapper for on-demand invocation (CI, contributor workflow, batch validation). On-demand only.
 
 **Command (1 new — 17 → 18)**
-- `commands/aura-preflight.md` — `/aura:preflight check|policies|bypass|status`. `bypass <reason>` requires reason ≥10 chars (refuses vague "test it"). Logs to history.jsonl.
+- `commands/preflight.md` — `/aura-frog:preflight check|policies|bypass|status`. `bypass <reason>` requires reason ≥10 chars (refuses vague "test it"). Logs to history.jsonl.
 
 **Rule (1 new — 65 → 66; workflow 27 → 28)**
 - `rules/workflow/preflight-policies.md` — formalizes triggers, hard-block vs warn pattern classes, exit-code semantics, bypass policy (per-call only), 3-bypasses-warn threshold, escalation order (per-call → per-session env → permanent — strongly discouraged).
@@ -295,7 +296,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 
 - [x] All 7 Tier 1 linters defined; each returns 0/1/2 per spec §20.2
 - [x] `pre-flight-validate.cjs` blocks tool call on exit 2; warns on exit 1
-- [x] `/aura:preflight bypass` is single-use (consumed on next PreToolUse)
+- [x] `/aura-frog:preflight bypass` is single-use (consumed on next PreToolUse)
 - [x] After 3 bypasses in a session: warning banner emitted
 - [x] Hook silent if `AF_PREFLIGHT_DISABLED=true`
 - [x] Hook silent if `run-all.sh` missing
@@ -314,7 +315,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - Agents: 14 (unchanged)
 - Skills: 51 → **52** (+1 preflight-validator); auto-invoke 9 (unchanged)
 - Rules: 65 → **66** (+1 preflight-policies); workflow 27 → **28**
-- Commands: 17 → **18** (+1 /aura:preflight)
+- Commands: 17 → **18** (+1 /aura-frog:preflight)
 - Hooks: 37 → **38** (+1 pre-flight-validate)
 - MCP servers: 6 (unchanged)
 
@@ -324,12 +325,12 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - **Self-healing orchestrator** — F2/F3 propose patch, never auto-apply
 - **MCP security tier** — per-agent allowlist (`mcp_servers:` frontmatter), `mcp-call-gate.cjs` hook, audit log, rate limits
 - **Phase-Role binding** — Phase 4 reviewer ≠ Phase 3 builder hard rule enforcement
-- **CLI dashboard** — `/aura:dashboard`
+- **CLI dashboard** — `/aura-frog:dashboard`
 
 ### Pending for v3.7.0-beta.2 (Milestone D)
 
 - L1-L4 conflict detection + conflict-arbiter agent + F6 class
-- 3 conflict commands (`/aura:plan:freeze`, `:thaw`, `:conflicts`)
+- 3 conflict commands (`/aura-frog:plan-freeze`, `:thaw`, `:conflicts`)
 - Branch freeze cascade + auto-thaw
 
 ### Pending — deferred FEAT-B work (rolling)
@@ -358,13 +359,13 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - `skills/plan-archivist/` — on-demand. Compresses completed plan-tree branches to `.aura/plans/archive/{NODE_ID}.summary.md`. Optional `--prune` removes original Story/Task files (always preserved in checkpoints).
 
 **Commands (1 new — 16 → 17)**
-- `commands/aura-reset-session.md` — distills active Epic via epic-summarizer → permanent_memory.md → optional reset prompt. Preserves history.jsonl, plan tree, conflict cache, manual_overrides.md. Supports `--feature`, `--initiative`, `--dry-run`, `--no-prompt`.
+- `commands/reset-session.md` — distills active Epic via epic-summarizer → permanent_memory.md → optional reset prompt. Preserves history.jsonl, plan tree, conflict cache, manual_overrides.md. Supports `--feature`, `--initiative`, `--dry-run`, `--no-prompt`.
 
 **Rules (1 new — 63 → 64; workflow 26 → 27)**
 - `rules/workflow/session-reset-policy.md` — formalizes triggers (T2 done default, T1 quarterly, manual), distillation include/exclude rules, 500/8000 token caps, confidence-tiered output, what's preserved across reset.
 
 **Hooks (2 new — 34 → 36)**
-- `hooks/feature-done-trigger-archive.cjs` — PostToolUse Edit|Write. Detects T2 status transition `active → done` via history.jsonl tail. Surfaces `/aura:reset-session` suggestion.
+- `hooks/feature-done-trigger-archive.cjs` — PostToolUse Edit|Write. Detects T2 status transition `active → done` via history.jsonl tail. Surfaces `/aura-frog:reset-session` suggestion.
 - `hooks/session-reset-trigger.cjs` — PostToolUse Edit|Write. After epic-summarizer writes a section (within 60s window), prompts user to actually reset the session. Per-feature flag prevents spam.
 
 ### Acceptance criteria — alpha.4 sub-scope
@@ -372,7 +373,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - [x] epic-summarizer agent defined with 500-token cap + confidence tiers + .aura/memory/ write-only
 - [x] permanent-memory-loader auto-invokes, ≤120 tokens, silent without `.aura/memory/`
 - [x] plan-archivist defined with --prune opt-in
-- [x] /aura:reset-session distills and offers reset; preserves what spec §19.5 says it should
+- [x] /aura-frog:reset-session distills and offers reset; preserves what spec §19.5 says it should
 - [x] session-reset-policy formalizes triggers + caps + preservation list
 - [x] feature-done-trigger-archive emits hint on T2 done detection
 - [x] session-reset-trigger prompts user post-distillation (anti-spam flag)
@@ -390,13 +391,13 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - Agents: 13 → **14** (+1 epic-summarizer)
 - Skills: 49 → **51** (+2); auto-invoke 8 → **9** (+permanent-memory-loader)
 - Rules: 63 → **64** (+1 session-reset-policy); workflow 26 → **27**
-- Commands: 16 → **17** (+1 /aura:reset-session)
+- Commands: 16 → **17** (+1 /aura-frog:reset-session)
 - Hooks: 34 → **36** (+2)
 - MCP servers: 6 (unchanged)
 
 ### Pending for beta.1 (rest of FEAT-C)
 
-- preflight-validator skill + /aura:preflight command + preflight-policies workflow rule
+- preflight-validator skill + /aura-frog:preflight command + preflight-policies workflow rule
 - pre-flight-validate.cjs hook
 - 7 Tier 1 bash linters + install-opa.sh (sha256 verified)
 - 5 OPA Rego policies (plan_structure, mutation_safety, grounding, token_budget, conflict_respect)
@@ -417,7 +418,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 - `skills/extension-detector/` — auto-invoke. Detects strong/medium signals that a new skill/rule/command would reduce friction. NEVER writes files itself; surfaces a one-line proposal and waits for explicit `y` / `yes` confirmation. Detection budget: 1 proposal/turn, 3/session.
 
 **Commands (1 new — 15 → 16)**
-- `commands/aura-extend.md` — `/aura:extend propose|create|list|remove`. Always writes to `.claude/{skills,rules,commands}/` in the user's project — **NEVER to plugin's `aura-frog/` folder** (hard path-prefix check). Includes reference-integrity audit step + extensions.log append.
+- `commands/extend.md` — `/aura-frog:extend propose|create|list|remove`. Always writes to `.claude/{skills,rules,commands}/` in the user's project — **NEVER to plugin's `aura-frog/` folder** (hard path-prefix check). Includes reference-integrity audit step + extensions.log append.
 
 **Rules (1 new — 62 → 63; workflow 25 → 26)**
 - `rules/workflow/extension-policy.md` — formalizes signal thresholds (strong/medium/weak with occurrence requirements), confirmation gate as non-negotiable, project-only write constraint, frontmatter requirements for project extensions, anti-fatigue budget caps.
@@ -425,7 +426,7 @@ Each linter follows spec §20.2 exit codes: 0 pass / 1 warn / 2 fail.
 ### Acceptance criteria — all green for alpha.3 sub-scope
 
 - [x] extension-detector auto-invokes only on signal threshold match (3+ for medium, 1 for strong)
-- [x] /aura:extend supports propose/create/list/remove
+- [x] /aura-frog:extend supports propose/create/list/remove
 - [x] extension-policy formalizes thresholds + confirmation gate + project-only writes
 - [x] Hard guardrail: write paths starting with `aura-frog/` rejected immediately
 - [x] Mandatory user confirmation before any file creation
@@ -446,13 +447,13 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 - Agents: 13 (unchanged)
 - Skills: 48 → **49** (+1 extension-detector); auto-invoke 7 → **8**
 - Rules: 62 → **63** (+1 extension-policy); workflow 25 → **26**
-- Commands: 15 → **16** (+1 /aura:extend)
+- Commands: 15 → **16** (+1 /aura-frog:extend)
 - Hooks: 33 (unchanged)
 - MCP servers: 6 (unchanged)
 
 ### Pending for subsequent milestones
 
-- **Milestone C remainder (beta.1)** — epic-summarizer, plan-archivist, permanent-memory-loader, preflight-validator, /aura:reset-session, /aura:preflight, session-reset-policy + preflight-policies rules, 3 hooks (feature-done-trigger-archive, pre-flight-validate, session-reset-trigger), 7 Tier 1 linters, OPA install + 5 Rego policies
+- **Milestone C remainder (beta.1)** — epic-summarizer, plan-archivist, permanent-memory-loader, preflight-validator, /aura-frog:reset-session, /aura-frog:preflight, session-reset-policy + preflight-policies rules, 3 hooks (feature-done-trigger-archive, pre-flight-validate, session-reset-trigger), 7 Tier 1 linters, OPA install + 5 Rego policies
 - **Deferred from FEAT-B** — classifier 80-fixture suite, hallucination/logic-error fixture suites, deviation_score auto-update, trace-event latency benchmark
 - **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class
 - **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement
@@ -475,13 +476,13 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 - `skills/plan-validator/` — wrapper over `validate-plan-tree.sh`; closes a reference gap from alpha.1 (was promised, never built).
 
 **Rules (3 new — 59 → 62; core 18 → 20, workflow 22 → 25)**
-- `rules/core/grounding-discipline.md` — `output_claim` must be preceded by a `file_read` for the named file/symbol; ungrounded claims surface in `/aura:trace --hallucinations`.
+- `rules/core/grounding-discipline.md` — `output_claim` must be preceded by a `file_read` for the named file/symbol; ungrounded claims surface in `/aura-frog:trace --hallucinations`.
 - `rules/workflow/replan-thresholds.md` — `replan_budget` per tier (T2=2, T3=3, T4=0), `deviation_score` formula, freeze-on-exhaustion + cycle guard.
 - `rules/workflow/checkpoint-discipline.md` — pre-mutation snapshots in `.aura/plans/checkpoints/`, retention (5 per node / 30 days / 50 MB cap), idempotent restore semantics.
 
 **Commands (1 new — 14 → 15; +1 upgrade)**
-- `commands/aura-trace.md` — read traces by TASK_ID, filter by event type, surface ungrounded claims (`--hallucinations`).
-- `commands/aura-plan-undo.md` — full implementation (alpha.1 was a stub): LIFO checkpoint restore, idempotent (no-op on second run), refuses on missing checkpoint.
+- `commands/trace.md` — read traces by TASK_ID, filter by event type, surface ungrounded claims (`--hallucinations`).
+- `commands/plan-undo.md` — full implementation (alpha.1 was a stub): LIFO checkpoint restore, idempotent (no-op on second run), refuses on missing checkpoint.
 
 **Hooks (3 new — 30 → 33; all 5 planning hooks now wired into hooks.json)**
 - `hooks/post-execute-update-node.cjs` — PostToolUse. Records execution_completed/execution_failed events to history.jsonl; surfaces failure-classifier hint on non-zero exit.
@@ -494,12 +495,12 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 - [x] failure-classifier returns F1-F5 with confidence ≥ 0.6
 - [x] replanner emits proposals respecting `replan_budget`; refuses on exhaustion
 - [x] reasoning-trace-recorder writes append-only `traces/{TASK_ID}.jsonl`
-- [x] `/aura:trace` reads traces and surfaces ungrounded claims
+- [x] `/aura-frog:trace` reads traces and surfaces ungrounded claims
 - [x] grounding-discipline rule defines `grounded:bool` semantics
 - [x] post-execute-update-node hook records execution events to history.jsonl
 - [x] tdd-red-failure-tracker hook distinguishes RED-as-designed from F2 candidate
 - [x] tool-call-tracer hook emits tool_call/tool_result/file_read events
-- [x] /aura:plan:undo full implementation honors checkpoint LIFO + idempotent
+- [x] /aura-frog:plan-undo full implementation honors checkpoint LIFO + idempotent
 - [x] checkpoint-discipline rule defines retention + restore semantics
 - [x] replan-thresholds rule defines deviation_score + budget enforcement
 
@@ -515,7 +516,7 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 - Agents: 12 → **13** (+1 replanner)
 - Skills: 45 → **48** (+3); auto-invoke 5 → **7** (+plan-loader was alpha.1, +reasoning-trace-recorder)
 - Rules: 59 → **62** (+3); core 18 → 20, workflow 22 → 25
-- Commands: 14 → **15** (+1 /aura:trace; /aura:plan:undo upgraded from stub to full)
+- Commands: 14 → **15** (+1 /aura-frog:trace; /aura-frog:plan-undo upgraded from stub to full)
 - Hooks: 30 → **33** (+3); all 5 planning hooks now wired in hooks.json
 - MCP servers: 6 (unchanged)
 
@@ -552,14 +553,14 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 - `rules/workflow/plan-lifecycle.md` — state machine + Phase 4 reviewer ≠ Phase 3 builder hard rule
 
 **Commands (8 new — 6 → 14)**
-- `commands/aura-plan.md` — interview-bootstrap T0/T1/T2
-- `commands/aura-plan-expand.md` — decompose node one tier down
-- `commands/aura-plan-next.md` — return next ready T4 leaf
-- `commands/aura-plan-status.md` — render plan tree + summary
-- `commands/aura-plan-replan.md` — replan flow with budget enforcement (full impl Milestone B)
-- `commands/aura-plan-promote.md` — promote node tier
-- `commands/aura-plan-archive.md` — archive completed branch with summary
-- `commands/aura-plan-undo.md` — restore from checkpoint (full impl Milestone B)
+- `commands/plan.md` — interview-bootstrap T0/T1/T2
+- `commands/plan-expand.md` — decompose node one tier down
+- `commands/plan-next.md` — return next ready T4 leaf
+- `commands/plan-status.md` — render plan tree + summary
+- `commands/plan-replan.md` — replan flow with budget enforcement (full impl Milestone B)
+- `commands/plan-promote.md` — promote node tier
+- `commands/plan-archive.md` — archive completed branch with summary
+- `commands/plan-undo.md` — restore from checkpoint (full impl Milestone B)
 
 **Hooks (2 new — 28 → 30)**
 - `hooks/pre-execute-load-plan-context.cjs` — PreToolUse: emits `[plan-context | trust:plan]` to stderr (silent if no `.aura/plans/`)
@@ -592,7 +593,7 @@ This keeps each pre-release reviewable and avoids bundling unrelated changes.
 
 ### Pending for subsequent milestones
 
-- **Milestone B (alpha.2)** — failure classifier F1-F6, replanner, reasoning trace, /aura:trace, replan-thresholds, checkpoint-discipline
+- **Milestone B (alpha.2)** — failure classifier F1-F6, replanner, reasoning trace, /aura-frog:trace, replan-thresholds, checkpoint-discipline
 - **Milestone C (beta.1)** — session reset, pre-flight (Tier 1 bash + optional OPA Tier 2), epic-summarizer, permanent-memory-loader
 - **Milestone D (beta.2)** — L1-L4 conflict detection, conflict-arbiter, F6 class, freeze cascade
 - **Milestone E (rc.1)** — self-healing safety gates, MCP per-agent allowlist + audit, phase-role binding hard enforcement

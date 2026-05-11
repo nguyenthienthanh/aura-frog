@@ -1,4 +1,4 @@
-# /aura:plan:replan &lt;id&gt;
+# /aura-frog:plan-replan &lt;id&gt;
 
 **Force replan of a node and all descendants.** Increments revision, decrements replan_budget.
 
@@ -7,10 +7,10 @@
 ## Usage
 
 ```
-/aura:plan:replan TASK-00101                    # Replan single task
-/aura:plan:replan STORY-0042                    # Replan story (descendants discarded)
-/aura:plan:replan FEAT-A --reason "discovered X"  # With justification
-/aura:plan:replan TASK-00101 --avoid src/auth.py  # Constrain replan
+/aura-frog:plan-replan TASK-00101                    # Replan single task
+/aura-frog:plan-replan STORY-0042                    # Replan story (descendants discarded)
+/aura-frog:plan-replan FEAT-A --reason "discovered X"  # With justification
+/aura-frog:plan-replan TASK-00101 --avoid src/auth.py  # Constrain replan
 ```
 
 ## Protocol
@@ -26,7 +26,7 @@
 
 ## Constraints
 
-- Cannot replan `status: done` (use `/aura:plan:undo` first to revert)
+- Cannot replan `status: done` (use `/aura-frog:plan-undo` first to revert)
 - Cannot replan `status: archived`
 - Replan does NOT delete nodes — descendants get `discarded`, preserve in archive after acceptance
 - Each replan counts toward parent's `replan_budget` if escalated upward
@@ -35,4 +35,4 @@
 
 - **Spec:** §10.1, §16 (replan decision engine), §17 (checkpoints)
 - **Agent:** replanner (Milestone B — full implementation)
-- **Companion:** `/aura:plan:undo` — revert the replan
+- **Companion:** `/aura-frog:plan-undo` — revert the replan

@@ -107,7 +107,7 @@ if (stale.length > MAX_SHOWN) {
 process.stderr.write(
   `[pending-confirm-timeout] ${stale.length} T4 task(s) idle > ${TIMEOUT_HOURS}h:\n` +
   lines.join('\n') + '\n' +
-  `  Resolve via /aura:plan:status, /aura:plan:thaw, or /aura:plan:replan.\n`
+  `  Resolve via /aura-frog:plan-status, /aura-frog:plan-thaw, or /aura-frog:plan-replan.\n`
 );
 
 safeExit(0);

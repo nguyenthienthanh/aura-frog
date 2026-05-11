@@ -1,4 +1,4 @@
-# /aura:mcp
+# /aura-frog:mcp
 
 **MCP security operations.** Status, audit, rate-limit reset, connectivity test.
 
@@ -7,11 +7,11 @@
 ## Usage
 
 ```
-/aura:mcp status                  # which servers enabled, agent allowlists, current usage vs limits
-/aura:mcp audit [--window 24h]    # show audit log (sanitized) — calls, blocks, rate-limit hits
-/aura:mcp audit --blocked-only    # only blocked calls (forensics view)
-/aura:mcp reset-limits [--mcp X]  # reset session counters (logged event); without --mcp resets all
-/aura:mcp test <server>           # single-call connectivity test (e.g., context7 ping)
+/aura-frog:mcp status                  # which servers enabled, agent allowlists, current usage vs limits
+/aura-frog:mcp audit [--window 24h]    # show audit log (sanitized) — calls, blocks, rate-limit hits
+/aura-frog:mcp audit --blocked-only    # only blocked calls (forensics view)
+/aura-frog:mcp reset-limits [--mcp X]  # reset session counters (logged event); without --mcp resets all
+/aura-frog:mcp test <server>           # single-call connectivity test (e.g., context7 ping)
 ```
 
 ## Protocol — `status`

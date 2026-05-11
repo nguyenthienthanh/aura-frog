@@ -77,7 +77,7 @@ phases[3]{phase,role}:
 
 In addition to the Phase 1 business-strategy role above, strategist OWNS hierarchical planning Tier 0 (Mission) and Tier 1 (Initiative) per spec §8.2.
 
-**Activated when:** `/aura:plan` runs for first-time setup, on quarterly review, or when discovery contradicts current Initiative's `target_outcome`.
+**Activated when:** `/aura-frog:plan` runs for first-time setup, on quarterly review, or when discovery contradicts current Initiative's `target_outcome`.
 
 **Constraints when in T0/T1 mode:**
 - Writes only to `.aura/plans/mission.md` and `.aura/plans/initiatives/INIT-NNN.md`

@@ -26,36 +26,36 @@ standalone[1]{command,file,description}:
 
 ```toon
 planning[12]{command,file,purpose}:
-  /aura:plan,aura-plan.md,"Bootstrap T0/T1/T2 via interview"
-  /aura:plan:expand,aura-plan-expand.md,"Decompose node one tier down"
-  /aura:plan:next,aura-plan-next.md,"Return next ready T4 leaf"
-  /aura:plan:replan,aura-plan-replan.md,"Replan with budget enforcement"
-  /aura:plan:promote,aura-plan-promote.md,"Promote node to higher tier"
-  /aura:plan:archive,aura-plan-archive.md,"Archive completed branch"
-  /aura:plan:status,aura-plan-status.md,"Render plan tree + summary"
-  /aura:plan:undo,aura-plan-undo.md,"Restore latest checkpoint (LIFO) + git_sha rollback"
-  /aura:plan:freeze,aura-plan-freeze.md,"Manual freeze + descendant cascade (beta.2)"
-  /aura:plan:thaw,aura-plan-thaw.md,"Reverse freeze + compatibility check (beta.2)"
-  /aura:plan:conflicts,aura-plan-conflicts.md,"list/show/resolve/history/check L1-L4 conflicts (beta.2)"
-  /aura:trace,aura-trace.md,"Reasoning trace + hallucination surface (alpha.2)"
+  /aura-frog:plan,plan.md,"Bootstrap T0/T1/T2 via interview"
+  /aura-frog:plan-expand,plan-expand.md,"Decompose node one tier down"
+  /aura-frog:plan-next,plan-next.md,"Return next ready T4 leaf"
+  /aura-frog:plan-replan,plan-replan.md,"Replan with budget enforcement"
+  /aura-frog:plan-promote,plan-promote.md,"Promote node to higher tier"
+  /aura-frog:plan-archive,plan-archive.md,"Archive completed branch"
+  /aura-frog:plan-status,plan-status.md,"Render plan tree + summary"
+  /aura-frog:plan-undo,plan-undo.md,"Restore latest checkpoint (LIFO) + git_sha rollback"
+  /aura-frog:plan-freeze,plan-freeze.md,"Manual freeze + descendant cascade (beta.2)"
+  /aura-frog:plan-thaw,plan-thaw.md,"Reverse freeze + compatibility check (beta.2)"
+  /aura-frog:plan-conflicts,plan-conflicts.md,"list/show/resolve/history/check L1-L4 conflicts (beta.2)"
+  /aura-frog:trace,trace.md,"Reasoning trace + hallucination surface (alpha.2)"
 ```
 
-These commands are **silent on projects without `.aura/plans/`**. Initialize with `/aura:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
+These commands are **silent on projects without `.aura/plans/`**. Initialize with `/aura-frog:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
 
 ## Project Extension (alpha.3 — opt-in)
 
 ```toon
 extension[1]{command,file,purpose}:
-  /aura:extend,aura-extend.md,"Create project-level skills/rules/commands at .claude/ — never plugin-level. Subcommands: propose / create / list / remove."
+  /aura-frog:extend,extend.md,"Create project-level skills/rules/commands at .claude/ — never plugin-level. Subcommands: propose / create / list / remove."
 ```
 
-`extension-detector` skill auto-invokes when patterns suggest a new skill/rule/command would help; surfaces a confirmation question; only `/aura:extend` actually writes files. Hard guardrail: writes are blocked from any path inside `aura-frog/`.
+`extension-detector` skill auto-invokes when patterns suggest a new skill/rule/command would help; surfaces a confirmation question; only `/aura-frog:extend` actually writes files. Hard guardrail: writes are blocked from any path inside `aura-frog/`.
 
 ## Memory Tier (alpha.4 — opt-in)
 
 ```toon
 memory[1]{command,file,purpose}:
-  /aura:reset-session,aura-reset-session.md,"Distill active Epic via epic-summarizer → permanent_memory.md → optional reset. Preserves history.jsonl, plan tree, conflict cache, manual_overrides."
+  /aura-frog:reset-session,reset-session.md,"Distill active Epic via epic-summarizer → permanent_memory.md → optional reset. Preserves history.jsonl, plan tree, conflict cache, manual_overrides."
 ```
 
 `epic-summarizer` agent runs on T2 done (auto via `feature-done-trigger-archive` hook) or manually via this command. `permanent-memory-loader` skill auto-loads distilled summaries (≤120 tokens always-loaded) in subsequent sessions.
@@ -64,18 +64,18 @@ memory[1]{command,file,purpose}:
 
 ```toon
 preflight[1]{command,file,purpose}:
-  /aura:preflight,aura-preflight.md,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter, tool input/output)"
+  /aura-frog:preflight,preflight.md,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter, tool input/output)"
 ```
 
-`hooks/pre-flight-validate.cjs` auto-fires on every PreToolUse for Bash|Edit|Write|Read. Hard-blocks `rm -rf /`, system paths, credential leaks. Warns on `git push --force`, `DROP TABLE`, etc. Bypass per-call only with `/aura:preflight bypass <reason ≥10 chars>`. Tier 2 OPA Rego policies deferred to v3.7.0-rc.1.
+`hooks/pre-flight-validate.cjs` auto-fires on every PreToolUse for Bash|Edit|Write|Read. Hard-blocks `rm -rf /`, system paths, credential leaks. Warns on `git push --force`, `DROP TABLE`, etc. Bypass per-call only with `/aura-frog:preflight bypass <reason ≥10 chars>`. Tier 2 OPA Rego policies deferred to v3.7.0-rc.1.
 
 ## Self-Healing + MCP Security + Dashboard (rc.1)
 
 ```toon
 rc1[3]{command,file,purpose}:
-  /aura:heal,aura-heal.md,"diagnose/status/disable/enable/accept/decline — F2/F3 only, confidence ≥0.7, user approval"
-  /aura:mcp,aura-mcp.md,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit"
-  /aura:dashboard,aura-dashboard.md,"--live / --json / --section — terse one-screen view of plan + conflicts + memory + MCP + preflight"
+  /aura-frog:heal,heal.md,"diagnose/status/disable/enable/accept/decline — F2/F3 only, confidence ≥0.7, user approval"
+  /aura-frog:mcp,mcp.md,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit"
+  /aura-frog:dashboard,dashboard.md,"--live / --json / --section — terse one-screen view of plan + conflicts + memory + MCP + preflight"
 ```
 
 `hooks/mcp-call-gate.cjs` auto-fires on every PreToolUse for `mcp__.*`. Enforces per-agent allowlist (frontmatter `mcp_servers:`), rate limits (soft 80% warn / hard 100% block), and writes sanitized audit to `.aura/security/mcp-audit.jsonl`. `scripts/security/sanitize-mcp-input.sh` strips Authorization headers + redacts tokens before logging.

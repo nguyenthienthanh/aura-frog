@@ -1,4 +1,4 @@
-# /aura:plan:promote &lt;note&gt;
+# /aura-frog:plan-promote &lt;note&gt;
 
 **Bubble a T4 (Task) discovery up to T2 (Feature) or T1 (Initiative)** as an architectural insight.
 
@@ -7,9 +7,9 @@
 ## Usage
 
 ```
-/aura:plan:promote "Existing module X already provides Y — feature scope shrinks"
-/aura:plan:promote --to FEAT-007 "Auth needs Redis, not in original feature scope"
-/aura:plan:promote --to INIT-001 "We need a new initiative for migration"
+/aura-frog:plan-promote "Existing module X already provides Y — feature scope shrinks"
+/aura-frog:plan-promote --to FEAT-007 "Auth needs Redis, not in original feature scope"
+/aura-frog:plan-promote --to INIT-001 "We need a new initiative for migration"
 ```
 
 ## Protocol
@@ -46,4 +46,4 @@ NOT promotable:
 
 - **Spec:** §10.1, §16.2 (branch replan triggers — discovery contradiction)
 - **Hook:** `post-execute-update-node.cjs` (Milestone B) — auto-prompt promote on certain F-classes
-- **Companion:** `/aura:plan:replan` — act on the discovery
+- **Companion:** `/aura-frog:plan-replan` — act on the discovery

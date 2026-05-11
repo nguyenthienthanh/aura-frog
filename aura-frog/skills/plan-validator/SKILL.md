@@ -1,7 +1,7 @@
 ---
 name: plan-validator
 description: "On-demand plan-tree validator. Runs all 8 invariants from spec §6.7 (parent existence, children integrity, no orphans, valid status, monotonic revision, test_ref existence, DAG no-cycles, freeze_reason). Refuses commits on violations."
-when_to_use: "Before /aura:plan:expand, /aura:plan:promote, /aura:plan:archive — and as part of pre-commit when .aura/plans/ has uncommitted changes"
+when_to_use: "Before /aura-frog:plan-expand, /aura-frog:plan-promote, /aura-frog:plan-archive — and as part of pre-commit when .aura/plans/ has uncommitted changes"
 allowed-tools: Bash, Read
 effort: low
 user-invocable: false
@@ -33,14 +33,14 @@ user-invocable: false
 
 ## When to invoke
 
-- **Before** `/aura:plan:expand`, `/aura:plan:promote`, `/aura:plan:archive`
+- **Before** `/aura-frog:plan-expand`, `/aura-frog:plan-promote`, `/aura-frog:plan-archive`
 - **Before** `git commit` when `.aura/plans/` has uncommitted changes
 - **After** any direct file edit on `.aura/plans/*.md` (manual override)
 
 ## When NOT to invoke
 
-- Read-only commands (`/aura:plan:status`, `/aura:trace`) — running validation on a healthy tree is wasted overhead
-- During `/aura:plan:undo` — the post-restore state may transiently violate invariants while restoring
+- Read-only commands (`/aura-frog:plan-status`, `/aura-frog:trace`) — running validation on a healthy tree is wasted overhead
+- During `/aura-frog:plan-undo` — the post-restore state may transiently violate invariants while restoring
 - Inside hooks fired on every PreToolUse — too expensive
 
 ## Output discipline
@@ -54,5 +54,5 @@ user-invocable: false
 - **Script:** `aura-frog/scripts/plans/validate-plan-tree.sh` — actual implementation
 - **Skill:** `plan-loader` — companion (loader is read-only; this is the validator)
 - **Agent:** `master-planner` — invokes before mutations
-- **Command:** `/aura:plan:expand`, `/aura:plan:promote`, `/aura:plan:archive` — invoke before applying
+- **Command:** `/aura-frog:plan-expand`, `/aura-frog:plan-promote`, `/aura-frog:plan-archive` — invoke before applying
 - **Rule:** `rules/workflow/plan-lifecycle.md` — invariant 4 enforces valid status transitions

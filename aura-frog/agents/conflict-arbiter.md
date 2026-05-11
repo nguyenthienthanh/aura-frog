@@ -18,7 +18,7 @@ When `conflict-detector` finds a conflict between a proposed T4 task and a pendi
 resolutions[6]{path,trigger,result}:
   auto_thaw,"Blocker done AND output compatible","Frozen → planned, re-queue"
   auto_discard,"Blocker done AND output incompatible","Frozen → planned with replan_required:true"
-  user_priority,"/aura:plan:conflicts resolve <id>","User picks winner"
+  user_priority,"/aura-frog:plan-conflicts resolve <id>","User picks winner"
   sequential_reorder,"Master-planner restructures DAG","One becomes depends_on the other"
   replan,"High-cost conflict","Replanner creates alternative"
   escalate,"replan_budget exhausted OR cycle detected","Human action required"
@@ -35,7 +35,7 @@ resolutions[6]{path,trigger,result}:
 
 - `pre-dispatch-conflict-check` hook detects L1/L2 overlap and emits a CONFLICT-NNNNN record
 - `post-execute-conflict-rescan` hook fires when a blocker reaches `done` and frozen siblings need re-evaluation
-- User runs `/aura:plan:conflicts resolve <CONFLICT-ID>`
+- User runs `/aura-frog:plan-conflicts resolve <CONFLICT-ID>`
 
 ## Process
 

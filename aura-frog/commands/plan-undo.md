@@ -1,4 +1,4 @@
-# /aura:plan:undo
+# /aura-frog:plan-undo
 
 **Restore the latest checkpoint** for a node. LIFO order — each invocation undoes one mutation.
 
@@ -7,10 +7,10 @@
 ## Usage
 
 ```
-/aura:plan:undo                          # undo active node (active.task → active.story → active.feature)
-/aura:plan:undo <NODE_ID>                # undo a specific node
-/aura:plan:undo --dry-run                # preview without applying
-/aura:plan:undo --list                   # list available checkpoints for the node
+/aura-frog:plan-undo                          # undo active node (active.task → active.story → active.feature)
+/aura-frog:plan-undo <NODE_ID>                # undo a specific node
+/aura-frog:plan-undo --dry-run                # preview without applying
+/aura-frog:plan-undo --list                   # list available checkpoints for the node
 ```
 
 ## Protocol (imperative)
@@ -38,7 +38,7 @@
     ```json
     {"ts":"<ISO>","node":"<NODE_ID>","event":"undo_restored","restored_from":"<checkpoint_id>","git_reset_to":"<sha or null>","actor":"master-planner"}
     ```
-11. **Do NOT delete the checkpoint** — leaves `/aura:plan:undo` itself idempotent (re-running on same state is a no-op per step 6).
+11. **Do NOT delete the checkpoint** — leaves `/aura-frog:plan-undo` itself idempotent (re-running on same state is a no-op per step 6).
 12. **Render** the post-undo node summary: `id, status, revision, children_count` and (if git was reset) `git: HEAD now at <git_sha>`.
 
 ## Multi-step undo
@@ -51,7 +51,7 @@ LIFO — call again to undo further. Retention cap is 5 checkpoints per node (pe
 - `revision` increments from content edits made by feature-architect / story-planner
 - Children list reorder, add, remove
 - Replanner-applied proposals
-- `/aura:plan:promote` tier change
+- `/aura-frog:plan-promote` tier change
 - **File mutations on tracked git branch** — via `git reset --hard <git_sha>` from checkpoint (with explicit user confirmation)
 
 ## What CANNOT be undone
@@ -77,5 +77,5 @@ LIFO — call again to undo further. Retention cap is 5 checkpoints per node (pe
 - **Rule:** `rules/workflow/checkpoint-discipline.md` — defines retention, format, restore semantics
 - **Rule:** `rules/workflow/plan-lifecycle.md` — forbidden transitions still apply (cannot undo into a forbidden state)
 - **Agent:** `master-planner` — only writer of checkpoints (this command is the only consumer)
-- **Companion:** `/aura:plan:replan` — every replan creates a checkpoint that this undoes
-- **Companion:** `/aura:trace` — for code-level rollback (separate concern; this is plan-only)
+- **Companion:** `/aura-frog:plan-replan` — every replan creates a checkpoint that this undoes
+- **Companion:** `/aura-frog:trace` — for code-level rollback (separate concern; this is plan-only)

@@ -228,13 +228,13 @@ commands[13]{cmd,subs}:
   /project,"init/detect/status/list/switch/refresh/regen/env/sync"
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"
   /help,"<topic> — plugin overview, per-command help, agent routing guide, hook reference"
-  /aura:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura:trace (forensic reproducibility) + freeze/thaw/conflicts (L1-L4 + arbiter)"
-  /aura:heal,"diagnose/status/disable/enable/accept/decline — self-healing F2/F3 with confidence ≥0.7 + user approval"
-  /aura:mcp,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit log"
-  /aura:dashboard,"static / --live / --json / --section — CLI status backed by scripts/dashboard.sh"
-  /aura:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
-  /aura:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
-  /aura:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
+  /aura-frog:plan,"plan/expand/next/replan/promote/archive/status/undo + /aura-frog:trace (forensic reproducibility) + freeze/thaw/conflicts (L1-L4 + arbiter)"
+  /aura-frog:heal,"diagnose/status/disable/enable/accept/decline — self-healing F2/F3 with confidence ≥0.7 + user approval"
+  /aura-frog:mcp,"status/audit/reset-limits/test — per-agent allowlist + rate limits + sanitized audit log"
+  /aura-frog:dashboard,"static / --live / --json / --section — CLI status backed by scripts/dashboard.sh"
+  /aura-frog:extend,"propose/create/list/remove — project-level skill/rule/command authoring (NEVER plugin-level)"
+  /aura-frog:reset-session,"distill active Epic via epic-summarizer → permanent_memory.md → optional reset"
+  /aura-frog:preflight,"check/policies/bypass/status — Tier 1 bash linters (path safety, command allowlist, secret patterns, frontmatter)"
 ```
 
 ---

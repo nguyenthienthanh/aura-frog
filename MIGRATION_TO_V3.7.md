@@ -12,14 +12,14 @@
 
 What's new (all opt-in):
 
-- 🎯 `/aura:plan` — hierarchical planning (T0-T4), persistent across sessions, forensic decision trail
-- 🔍 `/aura:trace` — every Claude decision auditable with grounded/ungrounded flags
-- ❄️ `/aura:plan:freeze` + `/aura:plan:conflicts` — detect file/function overlaps between parallel work
-- 🩺 `/aura:heal` — F2/F3 self-heal proposals (never auto-applies)
-- 🛡️ `/aura:mcp` — per-agent MCP allowlist + audit + rate limits
-- 📊 `/aura:dashboard` — terse one-screen CLI status
-- 🔌 `/aura:extend` — create project-level skills/rules/commands at `.claude/`
-- 🔄 `/aura:reset-session` — distill T2 done into permanent_memory
+- 🎯 `/aura-frog:plan` — hierarchical planning (T0-T4), persistent across sessions, forensic decision trail
+- 🔍 `/aura-frog:trace` — every Claude decision auditable with grounded/ungrounded flags
+- ❄️ `/aura-frog:plan-freeze` + `/aura-frog:plan-conflicts` — detect file/function overlaps between parallel work
+- 🩺 `/aura-frog:heal` — F2/F3 self-heal proposals (never auto-applies)
+- 🛡️ `/aura-frog:mcp` — per-agent MCP allowlist + audit + rate limits
+- 📊 `/aura-frog:dashboard` — terse one-screen CLI status
+- 🔌 `/aura-frog:extend` — create project-level skills/rules/commands at `.claude/`
+- 🔄 `/aura-frog:reset-session` — distill T2 done into permanent_memory
 
 ---
 
@@ -39,21 +39,21 @@ T3 Story           "TDD-bounded unit"
 T4 Task            "Atom — single agent invocation"
 ```
 
-Activate with `/aura:plan`. Plans survive session reset and context compaction. `master-planner` agent owns the tree; specialist agents (architect, frontend, etc.) execute T4 atoms.
+Activate with `/aura-frog:plan`. Plans survive session reset and context compaction. `master-planner` agent owns the tree; specialist agents (architect, frontend, etc.) execute T4 atoms.
 
 ### 2. Failure handling + reasoning trace (alpha.2 — FEAT-B)
 
 Every failure is classified F1-F5 deterministically (no LLM): transient / local-logic / local-design / story-level / architectural. Each class has a recommended action (retry / replan / freeze / escalate).
 
-Every Claude tool call emits a trace event to `.aura/plans/traces/{TASK_ID}.jsonl`. `/aura:trace --hallucinations` surfaces output_claims that weren't grounded in prior file_reads — your hallucination canary.
+Every Claude tool call emits a trace event to `.aura/plans/traces/{TASK_ID}.jsonl`. `/aura-frog:trace --hallucinations` surfaces output_claims that weren't grounded in prior file_reads — your hallucination canary.
 
 ### 3. Memory tier + extensions + pre-flight (alpha.3 + alpha.4 + beta.1 — FEAT-C)
 
-**Memory tier**: when a T2 (Feature) reaches `done`, `epic-summarizer` distills the Epic into a permanent_memory section (≤500 tokens). `/aura:reset-session` cleanly resets the conversation while preserving history.jsonl, plan tree, and permanent_memory.
+**Memory tier**: when a T2 (Feature) reaches `done`, `epic-summarizer` distills the Epic into a permanent_memory section (≤500 tokens). `/aura-frog:reset-session` cleanly resets the conversation while preserving history.jsonl, plan tree, and permanent_memory.
 
-**Extensions**: `/aura:extend` creates project-specific skills / rules / commands at `.claude/` — never at the plugin level. The plugin stays generic; per-project knowledge stays with the repo.
+**Extensions**: `/aura-frog:extend` creates project-specific skills / rules / commands at `.claude/` — never at the plugin level. The plugin stays generic; per-project knowledge stays with the repo.
 
-**Pre-flight**: 7 Tier 1 bash linters run on every PreToolUse — block `rm -rf /`, hostile paths, AWS/GitHub/OpenAI credentials, path traversals. Bypass per-call only with `/aura:preflight bypass <reason ≥10 chars>`.
+**Pre-flight**: 7 Tier 1 bash linters run on every PreToolUse — block `rm -rf /`, hostile paths, AWS/GitHub/OpenAI credentials, path traversals. Bypass per-call only with `/aura-frog:preflight bypass <reason ≥10 chars>`.
 
 ### 4. Conflict detection + freeze (beta.2 — FEAT-D)
 
@@ -67,7 +67,7 @@ Before any T4 dispatch, L1 (file overlap) + L2 (function overlap) detection comp
 
 **Phase-Role hard rule**: Phase 4 reviewer ≠ Phase 3 builder (formalized as enforced, was advisory).
 
-**Dashboard**: `/aura:dashboard` — terse one-screen status (plan tree, conflicts, memory, MCP, pre-flight).
+**Dashboard**: `/aura-frog:dashboard` — terse one-screen status (plan tree, conflicts, memory, MCP, pre-flight).
 
 ---
 
@@ -104,7 +104,7 @@ Before any T4 dispatch, L1 (file overlap) + L2 (function overlap) detection comp
 
    **Impact**: if you had custom code dispatching `security` agent to call an MCP, it now blocks. To restore old behavior on a specific agent, edit the agent file's `mcp_servers:` field (e.g., add `[context7]` to security).
 
-2. **Pre-flight hook auto-blocks destructive commands.** Things like `rm -rf /` were always discouraged; now they're hard-blocked at PreToolUse. To bypass intentionally: `/aura:preflight bypass <reason ≥10 chars>` (single-use per call).
+2. **Pre-flight hook auto-blocks destructive commands.** Things like `rm -rf /` were always discouraged; now they're hard-blocked at PreToolUse. To bypass intentionally: `/aura-frog:preflight bypass <reason ≥10 chars>` (single-use per call).
 
    **Impact**: scripts/workflows that intentionally run destructive commands (very rare in user flows) need to bypass per call. The list of hard-blocks is in `aura-frog/scripts/preflight/check-command-allowlist.sh`.
 
@@ -116,7 +116,7 @@ Before any T4 dispatch, L1 (file overlap) + L2 (function overlap) detection comp
 
 ```bash
 # In your project directory:
-/aura:plan  # interview-bootstrap; creates .aura/plans/
+/aura-frog:plan  # interview-bootstrap; creates .aura/plans/
 
 # Or non-interactive:
 bash aura-frog/scripts/plans/new-plan.sh
@@ -168,7 +168,7 @@ DB MCPs are **read-only by default**. Writes require `--allow-write` in the tool
 
 ```bash
 # Hierarchical planning
-# (no env vars — opt-in via /aura:plan command)
+# (no env vars — opt-in via /aura-frog:plan command)
 
 # JIRA auto-fetch (alpha.3)
 JIRA_BASE_URL=
@@ -267,7 +267,7 @@ Stop hook error: Failed to run: Plugin directory does not exist:
 - **Acceptance fixture suites** — 80-case classifier, 20-case hallucination, 15-case logic-error, 30-case L1, 20-case L2 corpora per spec §28.7; full fixtures generate from real usage in v3.7.1+
 - **Trace-event latency benchmark** — spec target <100ms per emission; works in practice but no formal benchmark suite yet
 - **deviation_score auto-update** — formula in `replan-thresholds.md` is defined and used by `replanner` but the post-execute hook does not yet auto-compute; manual setting only
-- **/aura:plan:promote and /aura:plan:replan full impl** — protocols documented, basic execution works, advanced features (LLM-driven alternative generation in replan) deferred
+- **/aura-frog:plan-promote and /aura-frog:plan-replan full impl** — protocols documented, basic execution works, advanced features (LLM-driven alternative generation in replan) deferred
 
 None of these are blockers — the system is fully functional with current behavior.
 

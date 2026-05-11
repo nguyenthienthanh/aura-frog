@@ -1,13 +1,13 @@
 # Rule: Checkpoint Discipline
 
 **Priority:** High
-**Applies To:** master-planner before any plan-tree mutation; `/aura:plan:undo` consumer
+**Applies To:** master-planner before any plan-tree mutation; `/aura-frog:plan-undo` consumer
 
 ---
 
 ## Core Principle
 
-**Every plan-tree mutation is preceded by a checkpoint snapshot. `/aura:plan:undo` restores the latest checkpoint.**
+**Every plan-tree mutation is preceded by a checkpoint snapshot. `/aura-frog:plan-undo` restores the latest checkpoint.**
 
 Reversibility is not optional — it's the safety net that lets master-planner make autonomous decisions in Milestone B+.
 
@@ -21,8 +21,8 @@ Before applying any of these mutations:
 2. `revision` increment caused by content edit
 3. Children list reorder, add, or remove
 4. Replanner-applied proposals
-5. `/aura:plan:archive` runs (Milestone C)
-6. `/aura:plan:promote` tier change
+5. `/aura-frog:plan-archive` runs (Milestone C)
+6. `/aura-frog:plan-promote` tier change
 
 NOT checkpointed (cosmetic):
 
@@ -59,7 +59,7 @@ Path: `.aura/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
 }
 ```
 
-**git_sha tracking** (per spec §17.1): every checkpoint records the current `HEAD` sha and branch at capture time. This lets `/aura:plan:undo` restore not just the plan tree but also any file mutations the master-planner triggered while the node was active.
+**git_sha tracking** (per spec §17.1): every checkpoint records the current `HEAD` sha and branch at capture time. This lets `/aura-frog:plan-undo` restore not just the plan tree but also any file mutations the master-planner triggered while the node was active.
 
 If `git_dirty: true` (uncommitted changes present at capture), undo must warn the user before any `git reset --hard` — uncommitted work could be lost.
 
@@ -74,13 +74,13 @@ retention[3]{rule,limit}:
   size_cap,50 MB,".aura/plans/checkpoints/ total"
 ```
 
-Pruning runs in `/aura:plan:archive` (lazy, not a daemon). Manual: `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C).
+Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon). Manual: `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C).
 
 ---
 
 ## Restore semantics
 
-`/aura:plan:undo {NODE_ID}` (or `--active` for active node):
+`/aura-frog:plan-undo {NODE_ID}` (or `--active` for active node):
 
 1. Find latest `.aura/plans/checkpoints/{NODE_ID}.*.json` (lexicographic max — ISO timestamps sort correctly)
 2. Refuse if file count == 0 → "no checkpoint exists; nothing to undo"
@@ -89,13 +89,13 @@ Pruning runs in `/aura:plan:archive` (lazy, not a daemon). Manual: `aura-frog/sc
 5. Replace node file with `node_state_before.body + frontmatter`
 6. Restore parent's `children` if `parent_children_before` differs
 7. Append history.jsonl: `event: undo_restored`, with `restored_from: <checkpoint_id>`
-8. Do NOT delete the checkpoint (so `/aura:plan:undo` is itself idempotent)
+8. Do NOT delete the checkpoint (so `/aura-frog:plan-undo` is itself idempotent)
 
 ---
 
 ## Multi-step undo
 
-Each `/aura:plan:undo` restores ONE checkpoint. To undo further, the user runs `/aura:plan:undo` again (LIFO order). After 5 undos (the retention cap), older checkpoints are gone.
+Each `/aura-frog:plan-undo` restores ONE checkpoint. To undo further, the user runs `/aura-frog:plan-undo` again (LIFO order). After 5 undos (the retention cap), older checkpoints are gone.
 
 ---
 
@@ -122,7 +122,7 @@ Each `/aura:plan:undo` restores ONE checkpoint. To undo further, the user runs `
 
 - **Spec:** §11.3 (checkpoint), §15 (storage)
 - **Agent:** `master-planner` — only writer of checkpoints
-- **Command:** `/aura:plan:undo` — only consumer
+- **Command:** `/aura-frog:plan-undo` — only consumer
 - **Rule:** `rules/workflow/replan-thresholds.md` — replan-triggered checkpoints
 - **Rule:** `rules/workflow/plan-lifecycle.md` — status-transition triggered checkpoints
 - **Script:** `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C)

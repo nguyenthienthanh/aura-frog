@@ -67,10 +67,10 @@ rate_limits[4]{mcp,per_min,per_session}:
 ```toon
 limit_levels[2]{level,threshold,action}:
   soft,80% of cap,"warn in stderr; tool call proceeds"
-  hard,100% of cap,"BLOCK tool call; user override via /aura:mcp reset-limits"
+  hard,100% of cap,"BLOCK tool call; user override via /aura-frog:mcp reset-limits"
 ```
 
-Per-MCP per-session counters live in `.claude/logs/.mcp-rate-counter.json`. Counters reset on SessionStart (or via `/aura:mcp reset-limits`).
+Per-MCP per-session counters live in `.claude/logs/.mcp-rate-counter.json`. Counters reset on SessionStart (or via `/aura-frog:mcp reset-limits`).
 
 ## Audit log (per spec §23.2)
 
@@ -90,8 +90,8 @@ Retention: `AF_MCP_AUDIT_RETENTION_DAYS=30` default; pruned on SessionStart.
 ## Workflow integration
 
 - **Pre-tool hook** (`mcp-call-gate.cjs`) fires on `mcp__.*` tool name match → checks agent allowlist → checks rate limit → if both pass, runs sanitizer + appends audit entry → tool call proceeds
-- **Auditor** (`skills/mcp-security-auditor`) reads the audit JSONL on demand for `/aura:mcp audit`
-- **Override** for legitimate over-cap calls: `/aura:mcp reset-limits` resets counters (logs the reset event)
+- **Auditor** (`skills/mcp-security-auditor`) reads the audit JSONL on demand for `/aura-frog:mcp audit`
+- **Override** for legitimate over-cap calls: `/aura-frog:mcp reset-limits` resets counters (logs the reset event)
 
 ## Anti-patterns
 
@@ -110,6 +110,6 @@ Retention: `AF_MCP_AUDIT_RETENTION_DAYS=30` default; pruned on SessionStart.
 - **Hook:** `hooks/json-toon-projector.cjs` — projects MCP output before context (per JSON→TOON architecture)
 - **Script:** `scripts/security/sanitize-mcp-input.sh` — sanitization at the audit boundary
 - **Skill:** `mcp-security-auditor` — read-side audit interface
-- **Command:** `/aura:mcp status|audit|reset-limits|test`
+- **Command:** `/aura-frog:mcp status|audit|reset-limits|test`
 - **MCP config:** `.mcp.json` — per-server enable/disable
 - **Plugin config:** `plugin.json#mcp_rate_limits` — per-MCP rate-limit overrides

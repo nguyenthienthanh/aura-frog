@@ -1,4 +1,4 @@
-# /aura:dashboard
+# /aura-frog:dashboard
 
 **CLI status display** — terse one-screen view of plan tree, active task, conflicts, freezes, token budget, recent decisions.
 
@@ -7,10 +7,10 @@
 ## Usage
 
 ```
-/aura:dashboard                    # static one-shot snapshot (default)
-/aura:dashboard --live             # live refresh every 5s (until Ctrl-C)
-/aura:dashboard --json             # machine-readable JSON for automation
-/aura:dashboard --section <name>   # only one section: plan|active|conflicts|memory|mcp|preflight
+/aura-frog:dashboard                    # static one-shot snapshot (default)
+/aura-frog:dashboard --live             # live refresh every 5s (until Ctrl-C)
+/aura-frog:dashboard --json             # machine-readable JSON for automation
+/aura-frog:dashboard --section <name>   # only one section: plan|active|conflicts|memory|mcp|preflight
 ```
 
 ## Sections
@@ -76,7 +76,7 @@ Run only the named section. Useful for status-line integration or scripted check
 
 | Missing input | Behavior |
 |---|---|
-| No `.aura/plans/` | Render banner + "Plans not initialized — run /aura:plan" |
+| No `.aura/plans/` | Render banner + "Plans not initialized — run /aura-frog:plan" |
 | No `.aura/memory/` | Memory section: "Memory not initialized" |
 | No audit log | MCP section: "Audit logging not started" |
 | run-state.json missing | Active section: "No active run" |

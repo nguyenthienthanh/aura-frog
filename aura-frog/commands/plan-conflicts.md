@@ -1,4 +1,4 @@
-# /aura:plan:conflicts
+# /aura-frog:plan-conflicts
 
 **Inspect, resolve, and audit detected plan-tree conflicts.** Backed by `.aura/plans/conflicts.jsonl` (append-only).
 
@@ -7,12 +7,12 @@
 ## Usage
 
 ```
-/aura:plan:conflicts list                        # all conflicts (open + resolved)
-/aura:plan:conflicts list --open                 # open only
-/aura:plan:conflicts show <CONFLICT-ID>          # full record + history
-/aura:plan:conflicts resolve <CONFLICT-ID> <choice>  # user-priority resolution
-/aura:plan:conflicts history                     # arbitration timeline
-/aura:plan:conflicts check                       # run conflict-detector against active.task NOW
+/aura-frog:plan-conflicts list                        # all conflicts (open + resolved)
+/aura-frog:plan-conflicts list --open                 # open only
+/aura-frog:plan-conflicts show <CONFLICT-ID>          # full record + history
+/aura-frog:plan-conflicts resolve <CONFLICT-ID> <choice>  # user-priority resolution
+/aura-frog:plan-conflicts history                     # arbitration timeline
+/aura-frog:plan-conflicts check                       # run conflict-detector against active.task NOW
 ```
 
 `<choice>` for `resolve`: `accept-proposed | accept-blocker | sequential <which-first> | freeze-both | escalate`.
@@ -37,7 +37,7 @@
 
 ## Protocol — `resolve <CONFLICT-ID> <choice>`
 
-1. Refuse if conflict already resolved (no double-resolve; user must reopen via `/aura:plan:freeze ... --conflict <ID>`)
+1. Refuse if conflict already resolved (no double-resolve; user must reopen via `/aura-frog:plan-freeze ... --conflict <ID>`)
 2. Validate `<choice>` is one of: `accept-proposed | accept-blocker | sequential <NODE_ID-first> | freeze-both | escalate`
 3. Save checkpoint on each affected participant before mutation
 4. Apply per-choice:
@@ -83,7 +83,7 @@ Manual invocation of `conflict-detector` skill against the active.task. Useful w
 - **Spec:** §10.2, §21.4 (conflict record schema), §21.5 (resolution paths)
 - **Skill:** `conflict-detector` — primary producer of records
 - **Agent:** `conflict-arbiter` — auto-arbitrates; user resolves manually via this command
-- **Companion commands:** `/aura:plan:freeze`, `/aura:plan:thaw`
+- **Companion commands:** `/aura-frog:plan-freeze`, `/aura-frog:plan-thaw`
 - **Rule:** `rules/workflow/conflict-arbitration-policy.md` — decision table
 - **Rule:** `rules/workflow/plan-lifecycle.md` — state transitions on resolve
 - **File:** `.aura/plans/conflicts.jsonl` — append-only conflict log

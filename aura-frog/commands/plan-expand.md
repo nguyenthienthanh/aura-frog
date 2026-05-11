@@ -1,4 +1,4 @@
-# /aura:plan:expand &lt;id&gt;
+# /aura-frog:plan-expand &lt;id&gt;
 
 **Decompose a plan node one tier down.** T1→T2, T2→T3, T3→T4.
 
@@ -7,9 +7,9 @@
 ## Usage
 
 ```
-/aura:plan:expand FEAT-A             # decompose Feature into Stories
-/aura:plan:expand STORY-0042         # decompose Story into Tasks
-/aura:plan:expand INIT-001           # decompose Initiative into Features
+/aura-frog:plan-expand FEAT-A             # decompose Feature into Stories
+/aura-frog:plan-expand STORY-0042         # decompose Story into Tasks
+/aura-frog:plan-expand INIT-001           # decompose Initiative into Features
 ```
 
 ## Protocol
@@ -44,5 +44,5 @@
 ## Tie-Ins
 
 - **Spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §10.1, §8.3 (feature-architect), §8.4 (story-planner)
-- **Companion:** `/aura:plan:promote <note>` — bubble T4 discoveries up
-- **Companion:** `/aura:plan:replan <id>` — rewrite an existing decomposition
+- **Companion:** `/aura-frog:plan-promote <note>` — bubble T4 discoveries up
+- **Companion:** `/aura-frog:plan-replan <id>` — rewrite an existing decomposition

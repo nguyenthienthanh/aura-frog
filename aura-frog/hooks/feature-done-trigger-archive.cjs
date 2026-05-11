@@ -12,7 +12,7 @@
  *   - Reads the active feature node; checks status field
  *   - On done transition (compared against last-seen status in history.jsonl):
  *     - Append history.jsonl event: feature_done_detected
- *     - Emit stderr suggestion: "T2 done — invoke /aura:reset-session to distill Epic"
+ *     - Emit stderr suggestion: "T2 done — invoke /aura-frog:reset-session to distill Epic"
  *
  * Detection method:
  *   - Tail history.jsonl for the most recent {node: <FEAT-ID>, status_to: ...} event
@@ -92,7 +92,7 @@ try {
 
 process.stderr.write(
   `[feature-done] ${featureId} reached status: done\n` +
-  `  Run /aura:reset-session to distill into permanent_memory and start fresh.\n`
+  `  Run /aura-frog:reset-session to distill into permanent_memory and start fresh.\n`
 );
 
 safeExit(0);

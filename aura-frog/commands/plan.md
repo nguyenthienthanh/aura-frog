@@ -1,4 +1,4 @@
-# /aura:plan
+# /aura-frog:plan
 
 **Hierarchical planning entry point.** Interview-bootstraps T0 (Mission) → T1 (Initiative) → T2 (Feature) for the current project.
 
@@ -9,7 +9,7 @@
 
 ## EXECUTION PROTOCOL — FOLLOW IN ORDER
 
-When the user types `/aura:plan` (no args), Claude MUST:
+When the user types `/aura-frog:plan` (no args), Claude MUST:
 
 1. **Check for existing plan tree.** Run `bash aura-frog/scripts/plans/new-plan.sh` (idempotent — does nothing if `.aura/plans/` already exists).
 2. **Validate.** Run `bash aura-frog/scripts/plans/validate-plan-tree.sh` — abort if any invariant fails.
@@ -20,7 +20,7 @@ When the user types `/aura:plan` (no args), Claude MUST:
 7. **Update active.json** — point at the new active T2.
 8. **Append to history.jsonl** — `event: plan_init` with timestamp + nodes created.
 9. **Render** the plan tree: `bash aura-frog/scripts/plans/render-plan-tree.sh`.
-10. **Announce next:** "Plan initialized. Run `/aura:plan:expand FEAT-NNN` to decompose into Stories, or `/aura:plan:status` for the current tree."
+10. **Announce next:** "Plan initialized. Run `/aura-frog:plan-expand FEAT-NNN` to decompose into Stories, or `/aura-frog:plan-status` for the current tree."
 
 If any step fails, surface the error to the user — do NOT silently fall through.
 
@@ -29,10 +29,10 @@ If any step fails, surface the error to the user — do NOT silently fall throug
 ## Subcommands
 
 ```
-/aura:plan                       # Interview T0/T1/T2 (this file's protocol)
-/aura:plan:expand <id>           # Decompose node one tier down (Story/Task)
-/aura:plan:next                  # Return next ready T4 leaf
-/aura:plan:status                # Render plan tree as ASCII
+/aura-frog:plan                       # Interview T0/T1/T2 (this file's protocol)
+/aura-frog:plan-expand <id>           # Decompose node one tier down (Story/Task)
+/aura-frog:plan-next                  # Return next ready T4 leaf
+/aura-frog:plan-status                # Render plan tree as ASCII
 ```
 
 Additional commands ship in later milestones: `replan`, `promote`, `archive`, `undo`, `freeze`, `thaw`, `conflicts`.

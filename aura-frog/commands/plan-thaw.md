@@ -1,4 +1,4 @@
-# /aura:plan:thaw
+# /aura-frog:plan-thaw
 
 **Reverse a freeze.** Validates the original blocker is resolved + output compatible per spec §21.6.
 
@@ -7,10 +7,10 @@
 ## Usage
 
 ```
-/aura:plan:thaw <NODE_ID>                       # thaw + auto-cascade descendants
-/aura:plan:thaw <NODE_ID> --partial             # thaw NODE_ID only; descendants stay frozen
-/aura:plan:thaw <NODE_ID> --discard             # thaw + status: discarded (abandoning, not resuming)
-/aura:plan:thaw <NODE_ID> --grant-replan-budget 1   # thaw + grant N additional replan budget
+/aura-frog:plan-thaw <NODE_ID>                       # thaw + auto-cascade descendants
+/aura-frog:plan-thaw <NODE_ID> --partial             # thaw NODE_ID only; descendants stay frozen
+/aura-frog:plan-thaw <NODE_ID> --discard             # thaw + status: discarded (abandoning, not resuming)
+/aura-frog:plan-thaw <NODE_ID> --grant-replan-budget 1   # thaw + grant N additional replan budget
 ```
 
 ## Protocol (imperative)
@@ -55,9 +55,9 @@ When you want to inspect a frozen branch without resuming the whole subtree. Use
 
 - **Spec:** §10.2, §13 (state machine: frozen → planned), §21.6 (compatibility check)
 - **Decision Q10:** descendants only on freeze cascade — also applies to thaw cascade
-- **Companion command:** `/aura:plan:freeze` — produces the freeze this command reverses
-- **Companion command:** `/aura:plan:conflicts list` — find conflict_id linking this freeze
-- **Companion command:** `/aura:plan:replan` — invoked when `replan_required: true` after thaw
+- **Companion command:** `/aura-frog:plan-freeze` — produces the freeze this command reverses
+- **Companion command:** `/aura-frog:plan-conflicts list` — find conflict_id linking this freeze
+- **Companion command:** `/aura-frog:plan-replan` — invoked when `replan_required: true` after thaw
 - **Rule:** `rules/workflow/plan-lifecycle.md` — frozen → planned transition validity
 - **Rule:** `rules/workflow/conflict-arbitration-policy.md` — auto-thaw path for blocker `done` + compatible
 - **Rule:** `rules/workflow/replan-thresholds.md` — budget reset on thaw

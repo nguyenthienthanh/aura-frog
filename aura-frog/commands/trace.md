@@ -1,4 +1,4 @@
-# /aura:trace
+# /aura-frog:trace
 
 **Render the reasoning trace for a task** — file_reads, output_claims, tool_calls, decisions. Surfaces hallucinations (claims with `grounded: false`).
 
@@ -7,12 +7,12 @@
 ## Usage
 
 ```
-/aura:trace <TASK_ID>                          # full trace, table format
-/aura:trace <TASK_ID> --filter file_read       # one event type only
-/aura:trace <TASK_ID> --hallucinations         # only output_claim events with grounded:false
-/aura:trace <TASK_ID> --tail 50                # last N events
-/aura:trace <TASK_ID> --since 2026-04-29T12:00:00Z
-/aura:trace --active                            # use the active.task from .aura/plans/active.json
+/aura-frog:trace <TASK_ID>                          # full trace, table format
+/aura-frog:trace <TASK_ID> --filter file_read       # one event type only
+/aura-frog:trace <TASK_ID> --hallucinations         # only output_claim events with grounded:false
+/aura-frog:trace <TASK_ID> --tail 50                # last N events
+/aura-frog:trace <TASK_ID> --since 2026-04-29T12:00:00Z
+/aura-frog:trace --active                            # use the active.task from .aura/plans/active.json
 ```
 
 ## Protocol
@@ -22,7 +22,7 @@
 3. **Parse** each line as JSON. Filter by `--filter` and `--since` flags.
 4. **Render table** (columns: ts, event_id, type, summary). For long payloads (>80 chars), truncate with `…`.
 5. **Halluciation summary**: count of `output_claim` with `grounded:false`. If > 0 in non-`--hallucinations` mode, print: `⚠️  N potential hallucinations — re-run with --hallucinations to see them`.
-6. **Storage warning**: if trace file > 10 MB or > 1000 events → suggest `/aura:plan:archive` (Milestone C).
+6. **Storage warning**: if trace file > 10 MB or > 1000 events → suggest `/aura-frog:plan-archive` (Milestone C).
 
 ## Output format
 
@@ -58,4 +58,4 @@ Prints only `output_claim` events where `grounded == false`. For each, shows:
 - **Skill:** `reasoning-trace-recorder` — produces the .jsonl files
 - **Rule:** `rules/core/grounding-discipline.md` — defines what counts as "grounded"
 - **Hook:** `hooks/tool-call-tracer.cjs` — appends tool_call/tool_result events
-- **Companion command:** `/aura:plan:status` — high-level plan view
+- **Companion command:** `/aura-frog:plan-status` — high-level plan view

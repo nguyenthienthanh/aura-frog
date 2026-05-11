@@ -50,7 +50,7 @@ count_tier() {
 
 section_plan() {
   if [ ! -d "$PLANS_DIR" ]; then
-    echo "Plan tree: not initialized — run /aura:plan"
+    echo "Plan tree: not initialized — run /aura-frog:plan"
     return
   fi
   local total t0 t1 t2 t3 t4

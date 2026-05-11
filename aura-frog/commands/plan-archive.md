@@ -1,4 +1,4 @@
-# /aura:plan:archive &lt;id&gt;
+# /aura-frog:plan-archive &lt;id&gt;
 
 **Compress a completed branch** (T2 Feature or higher with all descendants `done`) into a single summary file.
 
@@ -7,8 +7,8 @@
 ## Usage
 
 ```
-/aura:plan:archive FEAT-005                  # archive completed feature
-/aura:plan:archive INIT-001                  # archive after all features done
+/aura-frog:plan-archive FEAT-005                  # archive completed feature
+/aura-frog:plan-archive INIT-001                  # archive after all features done
 ```
 
 ## Protocol
@@ -44,4 +44,4 @@
 - **Spec:** §10.1, §13 (state machine — archived terminal), §19 (session reset triggers on T2 archive)
 - **Skill:** plan-archivist (Milestone C+)
 - **Agent:** epic-summarizer (Milestone C+)
-- **Companion:** `/aura:reset-session` — what runs after T2 archive
+- **Companion:** `/aura-frog:reset-session` — what runs after T2 archive

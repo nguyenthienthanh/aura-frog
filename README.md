@@ -14,7 +14,7 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Two entry points, one continuum.** `/aura:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
+**Two entry points, one continuum.** `/aura-frog:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
 **[Install in 30 seconds](#-install)** · **[v3.7.0 highlights](#-whats-new-in-v370)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
@@ -24,11 +24,11 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 
 | System | Opt-in via | What it solves |
 |---|---|---|
-| Hierarchical planning | `/aura:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
-| Reasoning trace + grounding | `/aura:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
-| Conflict detection (L1+L2) | `/aura:plan:conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
-| Memory tier + session reset | `/aura:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
-| Self-healing + MCP security | `/aura:heal` + `/aura:mcp` | F2/F3 patch proposals (NEVER auto-apply); per-agent allowlists + audit + rate limits |
+| Hierarchical planning | `/aura-frog:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
+| Reasoning trace + grounding | `/aura-frog:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
+| Conflict detection (L1+L2) | `/aura-frog:plan-conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
+| Memory tier + session reset | `/aura-frog:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
+| Self-healing + MCP security | `/aura-frog:heal` + `/aura-frog:mcp` | F2/F3 patch proposals (NEVER auto-apply); per-agent allowlists + audit + rate limits |
 
 **Backward-compatible MINOR bump** — your existing `/run` workflow continues unchanged. Everything new is opt-in. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for details.
 
@@ -697,7 +697,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 |-----------|:-----:|----------------|
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
 | **Skills** | 55 | 9 auto-invoke on context, 46 on-demand |
-| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura:*` hierarchical-planning suite |
+| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite |
 | **Rules** | 70 | 3-tier loading (22 core + 19 agent + 29 workflow) — only what's needed |
 | **Hooks** | 42 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
@@ -708,7 +708,7 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 
 ## Command Reference
 
-Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. Specialized `/aura:*` commands (plan, freeze, conflicts, heal, mcp, dashboard, preflight) layer on for hierarchical planning and safety operations.
+Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. Specialized `/aura-frog:*` commands (plan, freeze, conflicts, heal, mcp, dashboard, preflight) layer on for hierarchical planning and safety operations.
 
 ### `/run <task>` — The main entry point
 
@@ -1014,7 +1014,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
 ├── skills/         55 skills (9 auto-invoke + 46 on-demand)
-├── commands/       24 commands (core /run /check /design /project /af /help + /aura:* hierarchical-planning suite)
+├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          70 rules (22 core + 19 agent + 29 workflow)
 ├── hooks/          42 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)

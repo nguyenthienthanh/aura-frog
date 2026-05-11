@@ -1,4 +1,4 @@
-# /aura:plan:freeze
+# /aura-frog:plan-freeze
 
 **Manually freeze a plan node.** Cascades to descendants only (not siblings) per spec §13.1.
 
@@ -7,9 +7,9 @@
 ## Usage
 
 ```
-/aura:plan:freeze <NODE_ID> [reason]                # freeze with optional reason
-/aura:plan:freeze <NODE_ID> --conflict <CONFLICT-ID>  # link to detected conflict
-/aura:plan:freeze --active                          # freeze the active.task node
+/aura-frog:plan-freeze <NODE_ID> [reason]                # freeze with optional reason
+/aura-frog:plan-freeze <NODE_ID> --conflict <CONFLICT-ID>  # link to detected conflict
+/aura-frog:plan-freeze --active                          # freeze the active.task node
 ```
 
 ## Protocol (imperative)
@@ -64,8 +64,8 @@
 
 - **Spec:** §13.1 (freeze cascade), §10.2 (manual commands)
 - **Decision Q10:** descendants only, not siblings
-- **Companion command:** `/aura:plan:thaw` — reverses freeze
-- **Companion command:** `/aura:plan:conflicts list` — shows all CONFLICT-NNNNN records and which freezes they triggered
+- **Companion command:** `/aura-frog:plan-thaw` — reverses freeze
+- **Companion command:** `/aura-frog:plan-conflicts list` — shows all CONFLICT-NNNNN records and which freezes they triggered
 - **Rule:** `rules/workflow/plan-lifecycle.md` — frozen state semantics
 - **Rule:** `rules/workflow/conflict-arbitration-policy.md` — auto-freeze paths (vs. manual)
 - **Rule:** `rules/workflow/checkpoint-discipline.md` — pre-mutation checkpoint

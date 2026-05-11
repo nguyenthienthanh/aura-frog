@@ -1,4 +1,4 @@
-# /aura:plan:status
+# /aura-frog:plan-status
 
 **Render the current plan tree** with status, counts, and storage usage.
 
@@ -7,8 +7,8 @@
 ## Usage
 
 ```
-/aura:plan:status                      # ASCII tree + summary
-/aura:plan:status --detailed           # add per-node revision + deviation_score
+/aura-frog:plan-status                      # ASCII tree + summary
+/aura-frog:plan-status --detailed           # add per-node revision + deviation_score
 ```
 
 ## Protocol
@@ -25,7 +25,7 @@
    - `.aura/plans/history.jsonl` size
    - `.aura/plans/conflicts.jsonl` size
    - Hard caps from spec §27 — warn at 80% utilization
-5. **Surface frozen/blocked count:** if > 0, mention `/aura:plan:conflicts list` (Milestone D+) for details.
+5. **Surface frozen/blocked count:** if > 0, mention `/aura-frog:plan-conflicts list` (Milestone D+) for details.
 
 ## Output format
 
@@ -60,4 +60,4 @@ Token budget (loaded plan context): ~720 / 800 target
 
 - **Spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §10.1, §27 (storage budget)
 - **Scripts:** `validate-plan-tree.sh`, `render-plan-tree.sh`
-- **Companion:** `/aura:plan:next` (what to do next), `/aura:plan:undo` (Milestone A part 2)
+- **Companion:** `/aura-frog:plan-next` (what to do next), `/aura-frog:plan-undo` (Milestone A part 2)

@@ -1,4 +1,4 @@
-# /aura:extend
+# /aura-frog:extend
 
 **Create project-level skills / rules / commands.** Always writes to `.claude/` in the user's project — NEVER to the plugin's `aura-frog/` folder.
 
@@ -7,10 +7,10 @@
 ## Usage
 
 ```
-/aura:extend propose <kind> <description>           # interview-driven skeleton; no write yet
-/aura:extend create  <kind> <name>                  # write file from approved skeleton
-/aura:extend list                                   # show project extensions
-/aura:extend remove <kind> <name>                   # delete a project extension (confirm required)
+/aura-frog:extend propose <kind> <description>           # interview-driven skeleton; no write yet
+/aura-frog:extend create  <kind> <name>                  # write file from approved skeleton
+/aura-frog:extend list                                   # show project extensions
+/aura-frog:extend remove <kind> <name>                   # delete a project extension (confirm required)
 ```
 
 `<kind>` ∈ `skill | rule | command`.
@@ -25,7 +25,7 @@
    - `command` → usage block, protocol (imperative), tie-ins
 4. **Show the skeleton** to the user with the target path printed.
 5. **Wait for explicit confirmation.** `y` / `yes` / `looks good` / `create it` advances to step 6. Anything else aborts.
-6. **Run `/aura:extend create <kind> <name>`** with the approved skeleton.
+6. **Run `/aura-frog:extend create <kind> <name>`** with the approved skeleton.
 
 ## Protocol — `create <kind> <name>`
 
@@ -33,7 +33,7 @@
    - skill → `.claude/skills/<name>/SKILL.md`
    - rule → `.claude/rules/<tier>/<name>.md` (tier from frontmatter)
    - command → `.claude/commands/<name>.md`
-2. **Refuse if path collides with `aura-frog/`** — explicit error: "/aura:extend writes only to .claude/, never to plugin folder".
+2. **Refuse if path collides with `aura-frog/`** — explicit error: "/aura-frog:extend writes only to .claude/, never to plugin folder".
 3. **Refuse if file already exists** — suggest `propose` to draft an update instead.
 4. **Create parent directory** if missing (`.claude/skills/<name>/` etc.).
 5. **Write the approved skeleton** verbatim.

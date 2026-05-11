@@ -178,7 +178,7 @@ try {
 process.stderr.write(
   `[conflict-detected] ${conflictId} (${detectedLayer}) — ${taskId} overlaps ${(conflictPayload.with || []).join(', ')}\n` +
   `  files: ${(conflictPayload.files || []).join(', ')}\n` +
-  `  Run /aura:plan:conflicts show ${conflictId} for details, or wait for conflict-arbiter to decide.\n`
+  `  Run /aura-frog:plan-conflicts show ${conflictId} for details, or wait for conflict-arbiter to decide.\n`
 );
 
 safeExit(0);

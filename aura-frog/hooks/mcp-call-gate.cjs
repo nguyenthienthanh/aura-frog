@@ -141,7 +141,7 @@ if (usage >= HARD_BLOCK_LIMIT) {
     `[mcp-call-gate] BLOCKED: rate limit hit for "${parsed.server}"\n` +
     `  per-minute: ${counter.last_minute.length}/${limits.max_calls_per_minute}\n` +
     `  per-session: ${counter.session}/${limits.max_calls_per_session}\n` +
-    `  to override: /aura:mcp reset-limits --mcp ${parsed.server}\n`
+    `  to override: /aura-frog:mcp reset-limits --mcp ${parsed.server}\n`
   );
   safeExit(2);
 }

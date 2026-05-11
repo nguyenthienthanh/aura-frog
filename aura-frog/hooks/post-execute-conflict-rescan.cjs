@@ -113,7 +113,7 @@ for (const [cid, conflict] of latestConflicts) {
     ? 'auto_thaw'
     : compatible === false
       ? 'auto_discard'
-      : 'inconclusive — manual /aura:plan:thaw recommended';
+      : 'inconclusive — manual /aura-frog:plan-thaw recommended';
 
   recommendations.push({
     conflict_id: cid,
