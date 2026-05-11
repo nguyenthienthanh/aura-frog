@@ -125,7 +125,7 @@ jobs:
           check_exists "aura-frog/skills/agent-detector/SKILL.md"
           check_exists "aura-frog/skills/run-orchestrator/SKILL.md"
           check_exists "aura-frog/skills/plan-orchestrator/SKILL.md"
-          check_exists ".mcp.json"
+          check_exists "aura-frog/.mcp.json"
 
           [ "$PASS" = false ] && exit 1
           echo "" >> $GITHUB_STEP_SUMMARY
