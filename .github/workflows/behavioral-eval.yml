@@ -20,10 +20,14 @@ jobs:
           node-version: '20'
 
       - name: Install cc-plugin-eval
+        # Upstream cc-plugin-eval has a peerDep conflict: madge@8 wants
+        # typescript@^5.4.4, but the project pins typescript@^6.0.3.
+        # `--legacy-peer-deps` lets npm resolve anyway; once upstream
+        # fixes the conflict, this flag can come off.
         run: |
           git clone https://github.com/sjnims/cc-plugin-eval /tmp/cc-plugin-eval
           cd /tmp/cc-plugin-eval
-          npm install && npm run build
+          npm install --legacy-peer-deps && npm run build
 
       - name: Run evaluation (auto-invoke skills only)
         env:
