@@ -43,6 +43,7 @@ For bugs only. Features/refactors → run-orchestrator.
 
 ### 2. Write Failing Test (RED)
 - Test that reproduces the bug exactly
+- **Pick the right layer** (`skills/test-writer/SKILL.md#test-type-selection`). If the bug is a UI / user-flow / auth / payment regression → **e2e spec via Playwright MCP**, not a unit test that won't actually reproduce it. If the bug is in pure logic → unit. The test must fail for the *right* reason.
 - User confirms test FAILS
 
 ### 3. Fix (GREEN)
@@ -50,8 +51,8 @@ For bugs only. Features/refactors → run-orchestrator.
 - User confirms test PASSES
 
 ### 4. Verify
-- Run full test suite — no regressions
-- Read output, THEN claim result
+- Run full test suite — **and the e2e suite if S2 wrote an e2e spec** (`npx playwright test` / `npx cypress run`). No regressions in either.
+- Read output, THEN claim result. "Tests passed" with no pass count = `0 tests collected` = bug.
 - **Wrong:** "Should work now" / **Right:** "Tests pass: [output]"
 
 ---

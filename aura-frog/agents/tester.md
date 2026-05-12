@@ -40,6 +40,21 @@ REFACTOR → Improve code quality → ensure tests still pass → APPROVAL GATE
 
 **BLOCK code generation if:** No test file created, coverage will drop below threshold, critical path not covered, TDD mode enabled but skipped.
 
+## Test Pyramid (v3.7.4+) — pick the layer FIRST
+
+Pre-v3.7.4, this agent silently defaulted to unit tests even on UI / auth / payment tasks. Fixed by following `skills/test-writer/SKILL.md#test-type-selection`. Decide BEFORE writing:
+
+```
+unit         → jest|vitest|pytest|phpunit|go test  →  always (fast feedback)
+integration  → same runner + real DB/fake          →  2+ modules cross-talking
+e2e          → playwright (preferred, MCP)         →  UI / auth / payment / 'flow' / 'journey'
+              | cypress | detox (mobile)
+```
+
+**Playwright MCP usage.** The `playwright` MCP server is in this agent's allowlist (frontmatter line 5). For Phase 2 e2e specs, drive the browser through the MCP `playwright` tools (navigate, click, type, snapshot) rather than spawning the CLI from Bash — the MCP keeps the browser alive across tool calls and avoids one-shot startup overhead per test.
+
+**Runner verification — never trust silence.** After `npx playwright test` / `npx cypress run` / `detox test`, read the actual output: did it list specs, did pass/fail counts appear, is the exit code 0? "Tests passed" without a pass count = `0 tests collected` = bug. Same rule for all runners.
+
 ---
 
 ## Coverage Targets
