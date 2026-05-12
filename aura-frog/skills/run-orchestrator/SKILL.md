@@ -69,10 +69,12 @@ Then write `.claude/logs/runs/${RUN_ID}/run-state.json` with this skeleton:
   "run_id": "<RUN_ID>",
   "task": "<verbatim user task>",
   "status": "in_progress",
-  "complexity": "<Quick|Standard|Deep — from agent-detector>",
-  "flow": "<direct|bugfix|refactor|test|feature-standard|feature-deep>",
+  "complexity": "<Quick|Standard|Deep|Project — from agent-detector>",
+  "flow": "<direct|bugfix|refactor|test|feature-standard|feature-deep|security|review|deploy|quality>",
   "started_at": "<ISO 8601 UTC>",
   "current_phase": 1,
+  "current_step": "<bugfix steps: investigate|test-red|fix-green|verify · otherwise omit>",
+  "active_agent": "<lead|architect|frontend|… — read by scripts/statusline.sh>",
   "phases": {},
   "agents": [],
   "deliverables": [],
@@ -82,9 +84,13 @@ Then write `.claude/logs/runs/${RUN_ID}/run-state.json` with this skeleton:
 }
 ```
 
+**Keep `current_phase` / `current_step` / `active_agent` in sync with reality** — `scripts/statusline.sh` reads them on every prompt to render the status bar. Stale values mean the user sees "P1 / lead" while you're actually executing P3 work via `architect`.
+
 **Announce to user transparently:**
 
 > "Detected: `<complexity>` complexity → `<flow>` flow. State file: `.claude/logs/runs/${RUN_ID}/run-state.json`. Say `deep` to escalate, `quick` to downgrade, or proceed."
+
+For Deep runs, follow with the per-phase team announcement (see §5-Phase Workflow below): builder / reviewers / gate / dispatching-now. For Standard/Quick, one line: `🛠 Dispatching <agent> (<mode> / single-agent inline).`
 
 This step is non-negotiable. If you skip it, /run status will show nothing and the user loses observability.
 
@@ -204,6 +210,33 @@ phases[5]{phase,name,builder,reviewer,gate}:
 ```
 
 **Builder != Reviewer.** Details: `rules/workflow/cross-review-workflow.md`
+
+### Mandatory transparency — announce who's doing what (v3.7.4+)
+
+At every phase transition AND every agent dispatch, surface the team to the user in the response message. Format:
+
+```
+─── Phase {N} · {Name} ────────────────────────────────────
+  Builder:   {agent-id}              (writes the deliverable)
+  Reviewers: {agent-id}, {agent-id}  (verify after; never the same as Builder)
+  Gate:      APPROVAL | Auto
+  Dispatching: {agent-id} now…
+```
+
+Also update `run-state.json#active_agent` to the currently-dispatching agent so the statusline (`scripts/statusline.sh`) reflects it. Read the per-phase assignment from the `phases[5]` table above. Per-task agent selection within a phase (e.g. P3 picking `frontend` vs `mobile` vs `architect`) goes through `agent-detector` — surface the selection result with one line:
+
+```
+  agent-detector → frontend (score 115, primary)
+                    reasons: form +35, login +30, UI intent +50
+```
+
+This is non-negotiable for Deep runs. Skipping it means the user can't tell which agent wrote which artifact when reviewing the deliverable at gate time.
+
+For Standard/Quick runs (single agent inline), one-line announcement at start suffices:
+
+```
+🛠 Dispatching frontend (Standard / single-agent inline).
+```
 
 ## Execution Model — Subagent Isolation (Deep tasks)
 

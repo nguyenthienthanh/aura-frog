@@ -25,6 +25,15 @@ For bugs only. Features/refactors → run-orchestrator.
 
 ## Process (4 Steps)
 
+| Step | Name | Agent | Statusline |
+|---|---|---|---|
+| S1 | Investigate | `lead` (inline) — uses Read/Grep/Bash to reproduce | `bugfix S1` |
+| S2 | Test RED | `tester` — writes failing test | `bugfix S2` |
+| S3 | Fix GREEN | `architect` / `frontend` / `mobile` (per artifact, via `agent-detector`) | `bugfix S3` |
+| S4 | Verify | `tester` — runs full suite | `bugfix S4` |
+
+**Announce per step.** When transitioning, surface to the user: `─── Step S{N} · {Name} ─── Dispatching {agent}…`. Also update `run-state.json#current_step` (one of: `investigate`, `test-red`, `fix-green`, `verify`) and `#active_agent` so the statusline reflects reality.
+
 ### 1. Investigate
 - Read error + stack trace
 - Reproduce the bug
