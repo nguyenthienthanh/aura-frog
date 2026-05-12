@@ -11,9 +11,10 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 
 try {
-  const input = fs.readFileSync(0, 'utf-8').trim();
+  const input = readStdinSafely();
   if (!input) process.exit(0);
 
   const data = JSON.parse(input);

@@ -32,6 +32,7 @@
 'use strict';
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
@@ -57,7 +58,7 @@ function safeExit(code = 0) { process.exit(code); }
 function readPrompt() {
   let input = '';
   try {
-    input = fs.readFileSync(0, 'utf-8').trim();
+    input = readStdinSafely();
   } catch {/* no stdin */}
   if (input) {
     try {

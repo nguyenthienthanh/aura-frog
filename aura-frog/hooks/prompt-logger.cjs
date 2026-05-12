@@ -21,6 +21,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
 const PROMPTS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'prompts');
@@ -128,7 +129,7 @@ function main() {
     // Read stdin for hook data
     let input = '';
     try {
-      input = fs.readFileSync(0, 'utf-8').trim();
+      input = readStdinSafely();
     } catch { /* no stdin */ }
 
     // Get user prompt from stdin JSON or env

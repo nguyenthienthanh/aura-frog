@@ -41,6 +41,7 @@
 'use strict';
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
 if (process.env.AF_JSON_TOON_DISABLED === 'true') process.exit(0);
@@ -94,7 +95,7 @@ function detectSchema(data) {
 
 function readPromptInput() {
   let raw = '';
-  try { raw = fs.readFileSync(0, 'utf-8').trim(); } catch {/* no stdin */}
+  try { raw = readStdinSafely(); } catch {/* no stdin */}
   if (!raw) return {};
   try { return JSON.parse(raw); } catch { return { raw }; }
 }

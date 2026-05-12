@@ -15,6 +15,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
 const {
@@ -39,7 +40,7 @@ const PHASE_DELIVERABLES = {
 
 function parseTaskInput() {
   try {
-    const stdin = fs.readFileSync(0, 'utf-8').trim();
+    const stdin = readStdinSafely();
     if (stdin) {
       return JSON.parse(stdin);
     }

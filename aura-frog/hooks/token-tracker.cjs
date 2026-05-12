@@ -25,6 +25,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
 if (process.env.AF_TOKEN_TRACKER_DISABLED === 'true') process.exit(0);
@@ -128,7 +129,7 @@ function estimateFileTokens(filePath) {
 
 function main() {
   try {
-    const input = fs.readFileSync(0, 'utf-8').trim();
+    const input = readStdinSafely();
     if (!input) process.exit(0);
 
     const data = JSON.parse(input);

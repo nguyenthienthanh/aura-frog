@@ -21,6 +21,7 @@
  */
 
 const { execSync, spawnSync } = require('child_process');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -285,7 +286,7 @@ function getAvailableLinters(filePath) {
  */
 function readStdin() {
   try {
-    return fs.readFileSync(0, 'utf-8');
+    return readStdinSafely();
   } catch {
     return '';
   }

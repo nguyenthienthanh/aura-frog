@@ -30,6 +30,7 @@
 'use strict';
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
@@ -86,7 +87,7 @@ if (!parsed) safeExit(0);
 // declare allowlists per agent.
 function readAgentFromStdin() {
   try {
-    const buf = fs.readFileSync(0, 'utf8').trim();
+    const buf = readStdinSafely();
     if (!buf) return null;
     const data = JSON.parse(buf);
     return data.agent || data.agent_name || data.subagent_type || null;
