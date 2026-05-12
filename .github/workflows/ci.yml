@@ -27,25 +27,46 @@ jobs:
         run: bash aura-frog/scripts/ci/validate-counts.sh
 
       - name: Check for broken markdown links
+        # Scan README.md, MIGRATION_TO_V3.7.md, CONTRIBUTING.md, docs/**/*.md
+        # AND aura-frog/**/*.md. For each `](path)` link that isn't
+        # http://, https://, # (anchor), or mailto:, assert the target
+        # exists either relative to the link's containing file OR relative
+        # to the repo root. Strip ?query and #anchor from the path. Path
+        # extensions: .md, .json, .yaml, .yml, .sh, .cjs, .js, dir.
         run: |
           set -euo pipefail
           errors=0
           while IFS= read -r file; do
             while IFS= read -r link; do
               [ -z "$link" ] && continue
+              # Strip ?query and #fragment for filesystem checks.
+              clean="${link%%#*}"
+              clean="${clean%%\?*}"
+              [ -z "$clean" ] && continue
               dir=$(dirname "$file")
-              target="$dir/$link"
-              if [ ! -e "$target" ] && [ ! -e "$link" ]; then
+              target="$dir/$clean"
+              if [ ! -e "$target" ] && [ ! -e "$clean" ]; then
                 echo "Broken link in $file: $link"
                 errors=$((errors + 1))
               fi
             done < <(grep -oP '\]\((?!http|#|mailto)([^)]+)\)' "$file" 2>/dev/null | sed 's/\](//' | sed 's/)//' || true)
-          done < <(find aura-frog -name "*.md" -not -path "*/node_modules/*")
+          done < <(
+            find aura-frog -name "*.md" -not -path "*/node_modules/*"
+            find docs -name "*.md" 2>/dev/null
+            ls README.md MIGRATION_TO_V3.7.md CONTRIBUTING.md 2>/dev/null
+          )
           if [ "$errors" -gt 0 ]; then
             echo "Found $errors broken link(s)"
             exit 1
           fi
           echo "Link check complete: 0 broken"
+
+      - name: Validate README counts vs stats.json
+        # Surgical check that flags stale summary counts in user-facing docs
+        # (table cells, link labels, banner lines). Doesn't flag narrative
+        # prose. Covers what validate-counts.sh misses (it only scans
+        # plugin.json + CLAUDE.md).
+        run: bash aura-frog/scripts/ci/validate-readme-counts.sh
 
   test:
     runs-on: ubuntu-latest
