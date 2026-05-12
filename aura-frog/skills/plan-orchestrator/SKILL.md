@@ -1,6 +1,6 @@
 ---
 name: plan-orchestrator
-description: "Route hierarchical-planning intents to the correct backing script. Use when the user invokes /aura-frog:plan (with or without subcommand), mentions plan verbs (expand/next/replan/promote/archive/freeze/thaw/undo/status/conflicts), or types a plan-vocabulary bare word with .aura/plans/active.json present. Owns verb table, intent classifier, and 3-stage routing pipeline."
+description: "Route hierarchical-planning intents to the correct backing script. Use when the user invokes /aura-frog:plan (with or without subcommand), mentions plan verbs (expand/next/replan/promote/archive/freeze/thaw/undo/status/conflicts), or types a plan-vocabulary bare word with .claude/plans/active.json present. Owns verb table, intent classifier, and 3-stage routing pipeline."
 when_to_use: "/aura-frog:plan, /aura-frog:plan-*, hierarchical planning verbs, bare-word routing while plan active, plan tree mutation, T0-T4 decomposition"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash
 effort: medium
@@ -13,7 +13,7 @@ Single entry point for the 11-verb hierarchical-planning vocabulary. Routes user
 
 **Owner command:** `commands/plan.md` (single user-facing command)
 **Bare-word router:** `hooks/bare-word-router.cjs` (active-plan vocabulary)
-**Data model:** `.aura/plans/` per Tech Spec §6
+**Data model:** `.claude/plans/` per Tech Spec §6
 
 ---
 
@@ -115,8 +115,8 @@ Delegate to `scripts/plans/resolve-node.sh <input>` — exit 0 single match, 1 m
 ## Atomicity contract (applies to every mutating verb)
 
 Every backing script that writes a node file must:
-1. **Read** the current `.aura/plans/active.json` and target node file.
-2. **Save checkpoint** to `.aura/plans/checkpoints/<NODE_ID>.<ISO8601>.json` containing pre-mutation state + git SHA.
+1. **Read** the current `.claude/plans/active.json` and target node file.
+2. **Save checkpoint** to `.claude/plans/checkpoints/<NODE_ID>.<ISO8601>.json` containing pre-mutation state + git SHA.
 3. **Mutate** the target file with `revision += 1`.
 4. **Validate** via `bash scripts/plans/validate-plan-tree.sh` — abort + restore checkpoint if any invariant fails.
 5. **Append** `history.jsonl` decision event: `{ts, verb, target, before_revision, after_revision, agent}`.
@@ -128,7 +128,7 @@ Every backing script that writes a node file must:
 
 | Script | Owner verb | Purpose |
 |---|---|---|
-| `new-plan.sh` | bootstrap | Init `.aura/plans/` skeleton (existing, idempotent) |
+| `new-plan.sh` | bootstrap | Init `.claude/plans/` skeleton (existing, idempotent) |
 | `expand-node.sh` | expand | Decompose T2→T3 or T3→T4. Dispatches feature-architect or story-planner agent. |
 | `next-task.sh` | next | Pop next ready T4 from `ready_queue`; populate from active T3 if empty. |
 | `freeze-branch.sh` | freeze | Cascade-freeze descendants. Save checkpoint, refuse on done/archived. |
@@ -137,7 +137,7 @@ Every backing script that writes a node file must:
 | `conflicts-scan.sh` | conflicts | Wrap L1+L2 detection (conflict-detector hook). List/show/resolve/history/check. |
 | `replan-node.sh` | replan | Mutate target + descendants. Budget-aware (refuse if `replan_count >= replan_budget`). |
 | `promote-node.sh` | promote | Bubble T4 discovery up to T2/T1 — append to `discoveries[]`, increment revision. |
-| `undo-decision.sh` | undo | Restore latest `.aura/plans/checkpoints/<id>.*.json` (LIFO). |
+| `undo-decision.sh` | undo | Restore latest `.claude/plans/checkpoints/<id>.*.json` (LIFO). |
 | `resolve-node.sh` | (helper) | Resolve `<input>` to node ID. Exit 0/1/2. |
 
 Existing: `new-plan.sh`, `validate-plan-tree.sh`, `render-plan-tree.sh`. All others new in v3.7.2.
@@ -146,10 +146,10 @@ Existing: `new-plan.sh`, `validate-plan-tree.sh`, `render-plan-tree.sh`. All oth
 
 ## Bare-word activation
 
-When `.aura/plans/active.json` exists, the user may type a verb as the first token of a short message and have it route here. `hooks/bare-word-router.cjs` handles detection; this skill receives the routing hint and dispatches per Stage 1.
+When `.claude/plans/active.json` exists, the user may type a verb as the first token of a short message and have it route here. `hooks/bare-word-router.cjs` handles detection; this skill receives the routing hint and dispatches per Stage 1.
 
 Activation conditions (all must hold):
-- `.aura/plans/active.json` is present and parseable.
+- `.claude/plans/active.json` is present and parseable.
 - First token of the user prompt is a member of `verb_table[].verb`.
 - Total word count ≤ 5 (so "next" routes but "next steps are unclear" doesn't).
 

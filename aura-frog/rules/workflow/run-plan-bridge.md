@@ -11,18 +11,18 @@ Auto-detect when `/aura-frog:run` should anchor to an active hierarchical plan n
 
 ```toon
 states[3]{state,trigger,bridge_action}:
-  no_plan,".aura/plans/ does not exist OR active.json missing","Heuristic check on task description. If multi-feature/epic → suggest /aura-frog:plan. Else proceed inline."
+  no_plan,".claude/plans/ does not exist OR active.json missing","Heuristic check on task description. If multi-feature/epic → suggest /aura-frog:plan. Else proceed inline."
   plan_idle,"active.json exists, active.feature set, active.task null","Suggest /aura-frog:plan-next to claim the next ready T4 before running freely."
-  plan_anchored,"active.json has active.task set","Auto-anchor run-state to that T4 — deliverables write into the plan tree, status transitions sync to .aura/plans/."
+  plan_anchored,"active.json has active.task set","Auto-anchor run-state to that T4 — deliverables write into the plan tree, status transitions sync to .claude/plans/."
 ```
 
 ---
 
 ## Anchoring (state: plan_anchored)
 
-When `.aura/plans/active.json#active.task` is set:
+When `.claude/plans/active.json#active.task` is set:
 
-1. **Read** the task file at `.aura/plans/features/<feature>/stories/<story>/tasks/<task>.md`.
+1. **Read** the task file at `.claude/plans/features/<feature>/stories/<story>/tasks/<task>.md`.
 2. **Populate run-state with anchor block:**
    ```json
    {
@@ -36,7 +36,7 @@ When `.aura/plans/active.json#active.task` is set:
    }
    ```
 3. **Sprint Contract negotiation** uses the task's acceptance criteria as the seed — user can amend but not weaken below the plan's contract.
-4. **Phase 5 (Finalize)** writes deliverable digests to `.aura/plans/.../tasks/<task>.md` under a `### Run Log` section AND triggers `post-execute-update-node.cjs` to transition the task to `status: done`.
+4. **Phase 5 (Finalize)** writes deliverable digests to `.claude/plans/.../tasks/<task>.md` under a `### Run Log` section AND triggers `post-execute-update-node.cjs` to transition the task to `status: done`.
 
 If the task is `frozen`, abort the run with: *"TASK-N is frozen. Thaw via `/aura-frog:plan-thaw <id>` first, or pick a different ready task with `/aura-frog:plan-next`."*
 
@@ -54,7 +54,7 @@ Wait for user input. `proceed` skips the bridge; anything else routes through `/
 
 ## Escalation heuristic (state: no_plan)
 
-When `.aura/plans/` doesn't exist, scan the task description against these triggers:
+When `.claude/plans/` doesn't exist, scan the task description against these triggers:
 
 ```toon
 escalation_triggers[8]{signal,weight}:

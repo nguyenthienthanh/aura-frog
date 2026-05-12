@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 # Render the plan tree as an ASCII tree.
-# Usage: bash aura-frog/scripts/plans/render-plan-tree.sh [.aura/plans/ path]
+# Usage: bash aura-frog/scripts/plans/render-plan-tree.sh [.claude/plans/ path]
 
 set -euo pipefail
 
-PLANS_DIR="${1:-.aura/plans}"
+SCRIPT_DIR=$(dirname "$0")
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/_lib.sh"
+
+PLANS_DIR=$(plans_dir "${1:-}")
 
 if [ ! -d "${PLANS_DIR}" ]; then
     echo "✗ Plan tree not found at ${PLANS_DIR}"

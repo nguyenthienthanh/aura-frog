@@ -16,15 +16,15 @@ auto_invoke[9]{name,priority,trigger,tokens}:
   test-writer,medium,Test writing / TDD / coverage,~500
   code-reviewer,high,Code review / after implementation,~450
   code-simplifier,medium,Simplify / KISS / complexity,~300
-  plan-loader,high,.aura/plans/ exists in cwd,~400 (≤800 hard cap)
+  plan-loader,high,.claude/plans/ exists in cwd,~400 (≤800 hard cap)
   reasoning-trace-recorder,medium,active.task set during T4 execution,~250
   extension-detector,medium,Repeated patterns or 'add a skill/rule for X' signals,~200
-  permanent-memory-loader,high,.aura/memory/permanent_memory.md exists,~120 (≤200 hard cap)
+  permanent-memory-loader,high,.claude/memory/permanent_memory.md exists,~120 (≤200 hard cap)
 ```
 
 **Note:** `run-orchestrator` is NOT auto-invoke — it fires when `/run` is typed or intent matches its `when_to_use` string (build feature, complex task, `fasttrack:` prefix). Listing it as auto-invoke would cause it to wastefully fire on every message.
 
-**New in v3.7.0-alpha (hierarchical planning):** `plan-loader` and `reasoning-trace-recorder` are silent on projects without `.aura/plans/` — zero overhead until users opt in via `/aura-frog:plan`.
+**New in v3.7.0-alpha (hierarchical planning):** `plan-loader` and `reasoning-trace-recorder` are silent on projects without `.claude/plans/` — zero overhead until users opt in via `/aura-frog:plan`.
 
 ---
 

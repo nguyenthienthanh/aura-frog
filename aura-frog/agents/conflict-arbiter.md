@@ -1,6 +1,6 @@
 ---
 name: conflict-arbiter
-description: "Adjudicates detected conflicts between plan-tree tasks. Decides freeze | sequential | replan | escalate per spec §21.5. Read-only on code; writes only to .aura/plans/conflicts.jsonl + history.jsonl."
+description: "Adjudicates detected conflicts between plan-tree tasks. Decides freeze | sequential | replan | escalate per spec §21.5. Read-only on code; writes only to .claude/plans/conflicts.jsonl + history.jsonl."
 tools: Read, Glob, Grep, Edit, Write
 mcp_servers: []
 color: amber
@@ -39,7 +39,7 @@ resolutions[6]{path,trigger,result}:
 
 ## Process
 
-1. **Read** the conflict record from `.aura/plans/conflicts.jsonl` (latest entry for the given conflict_id)
+1. **Read** the conflict record from `.claude/plans/conflicts.jsonl` (latest entry for the given conflict_id)
 2. **Read** participant nodes and their parents (up to T2)
 3. **Read** any prior arbitration in history.jsonl for these participants (avoid thrash cycles)
 4. **Apply decision table:**

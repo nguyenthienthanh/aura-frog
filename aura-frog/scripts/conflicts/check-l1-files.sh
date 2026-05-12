@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-PLANS_DIR="${PWD}/.aura/plans"
+PLANS_DIR="${PWD}/.claude/plans"
 
 # Helper: extract artifact paths from a node file
 get_artifacts() {

@@ -12,7 +12,7 @@
  *   AF_PENDING_TIMEOUT_HOURS=24  — threshold (default 24h)
  *
  * Behavior:
- *   - Silent if no .aura/plans/
+ *   - Silent if no .claude/plans/
  *   - Walk all T4 task files, check status + ages
  *   - For tasks in status: planned (interpreted as pending-confirm in this
  *     codebase) older than threshold, emit a warning

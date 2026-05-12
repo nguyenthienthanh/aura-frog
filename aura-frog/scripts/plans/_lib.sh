@@ -4,10 +4,57 @@
 
 # ---------------------------------------------------------------------------
 # plans_dir [explicit_path]
-#   Resolve the plans dir. Default ".aura/plans" — caller may pass override.
+#   Resolve the plans dir. Resolution order (v3.7.3+):
+#     1. Explicit positional arg (caller passed it)
+#     2. $AF_PLANS_DIR env var
+#     3. Default ".claude/plans"
+#     4. Legacy fallback ".aura/plans" (if it exists and .claude/plans does not)
+#   The legacy fallback is removed in v4.0.
 # ---------------------------------------------------------------------------
 plans_dir() {
-    echo "${1:-.aura/plans}"
+    if [ -n "${1:-}" ]; then
+        echo "$1"
+        return 0
+    fi
+    if [ -n "${AF_PLANS_DIR:-}" ]; then
+        echo "${AF_PLANS_DIR}"
+        return 0
+    fi
+    if [ -d ".claude/plans" ]; then
+        echo ".claude/plans"
+        return 0
+    fi
+    if [ -d ".aura/plans" ]; then
+        # Legacy fallback — warn to stderr but allow.
+        echo "⚠ Using legacy .aura/plans — migrate to .claude/plans (removal v4.0)" >&2
+        echo ".aura/plans"
+        return 0
+    fi
+    echo ".claude/plans"
+}
+
+# ---------------------------------------------------------------------------
+# slugify <text>
+#   Lower-case, ASCII-only, hyphen-separated. Used in feature/story/task
+#   folder names: ${ID}_${slug}/.
+# ---------------------------------------------------------------------------
+slugify() {
+    echo "$1" \
+        | tr '[:upper:]' '[:lower:]' \
+        | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' \
+        | cut -c1-50
+}
+
+# ---------------------------------------------------------------------------
+# feature_folder <id> <intent>  →  "{ID}_{slug}"
+#   Compose the canonical feature folder name. If id starts with a known
+#   ticket prefix (JIRA-/LIN-/ABC-9999), it's used as-is. Otherwise FEAT-N.
+# ---------------------------------------------------------------------------
+feature_folder() {
+    local id="$1"; local intent="${2:-}"
+    local slug; slug=$(slugify "$intent")
+    [ -z "$slug" ] && slug="unnamed"
+    echo "${id}_${slug}"
 }
 
 # ---------------------------------------------------------------------------

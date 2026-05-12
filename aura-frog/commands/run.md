@@ -19,7 +19,7 @@ When the user types `/run <task>`, Claude MUST execute these steps in order. Do 
    - `AF_ESCALATION_DISABLED=true` — opts out per-session.
 4. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0b. **MANDATORY** — do not proceed without it. If escalation ran and the user picked `deep`, record `escalation_declined: true` in run-state.
 5. **Apply the Run ↔ Plan bridge** (`rules/workflow/run-plan-bridge.md`):
-   - `.aura/plans/active.json#active.task` set → auto-anchor; deliverables sync back to the plan tree on Phase 5.
+   - `.claude/plans/active.json#active.task` set → auto-anchor; deliverables sync back to the plan tree on Phase 5.
    - Active feature without claimed task → suggest `/aura-frog:plan next`.
    - No plan + escalation prompt was emitted in Step 3 (the trigger heuristic owns this case now).
    - `AF_RUN_PLAN_BRIDGE_DISABLED=true` disables the bridge entirely (also disables Step 3 escalation).
@@ -79,6 +79,12 @@ Force mode (skip brainstorming): prefix with `must do:`, `just do:`, `exactly:`.
 - `/run project: <desc>` — force project mode; write `pending-plan-bootstrap.json` and route to `/aura-frog:plan`.
 - `AF_ESCALATION_DISABLED=true` — per-session opt-out of the escalation check.
 
+**Feature anchor prefix** (v3.7.3+, link a run to a T2 feature):
+
+- `/run feature: FEAT-A <desc>` — anchor a new run to the named feature. After Step 0b (run-state creation), call `scripts/plans/link-run.sh link <run-id> FEAT-A --status in_progress` to write both sides: `run-state.json#feature_id` + the feature's `## Runs` table. Deliverables sync back to the plan tree on Phase 5.
+- `/run feature: JIRA-1234 <desc>` — same, with a ticket-ID-prefixed feature folder.
+- The feature must already exist (`/aura-frog:plan` first if not). For a fresh feature + run, use `/run project: <desc>` (escalates to plan bootstrap, then anchors).
+
 ---
 
 ## /run status
@@ -87,9 +93,14 @@ Show active run: phase, progress %, deliverables, agents, time elapsed, token us
 
 ---
 
-## /run resume <id>
+## /run resume <id-or-feature>
 
-Resume a saved run. Loads `run-state.json`, validates git state, restores context, continues from last phase.
+Resume a saved run. Two forms (v3.7.3+):
+
+- **`/run resume <run-id>`** (e.g., `/run resume auth-260512`) — direct resume by run ID. Loads `.claude/logs/runs/<run-id>/run-state.json`, validates git state, restores context, continues from last phase.
+- **`/run resume <FEATURE_ID>`** (e.g., `/run resume FEAT-A`, `/run resume JIRA-1234`) — feature-anchored resume. Looks up the feature's `## Runs` table via `scripts/plans/link-run.sh list <FEATURE_ID>`, surfaces all linked runs with their status (in_progress / done / discarded), and prompts to pick one. If only one in-progress run exists, resumes it directly.
+
+Both forms validate the run still matches the current git branch and warn if the working tree has diverged from the run's last checkpoint.
 
 ---
 

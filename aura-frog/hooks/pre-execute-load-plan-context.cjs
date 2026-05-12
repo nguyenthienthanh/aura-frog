@@ -3,11 +3,11 @@
  * Aura Frog — Pre-Execute: Load Plan Context
  *
  * Fires: PreToolUse (Bash | Edit | Write | Read)
- * Purpose: Load minimum hierarchical plan context (.aura/plans/) so the
+ * Purpose: Load minimum hierarchical plan context (.claude/plans/) so the
  *          executing agent has current focus + ancestors.
  *
  * Behavior:
- *   - If .aura/plans/active.json doesn't exist → exit silently (no plan = no overhead)
+ *   - If .claude/plans/active.json doesn't exist → exit silently (no plan = no overhead)
  *   - Otherwise, read active.json and emit a brief context block to stderr
  *     (Claude sees stderr; user usually doesn't unless verbose)
  *   - Stamp loaded plan content with `trust: plan` semantically (rule reference)

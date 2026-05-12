@@ -115,7 +115,7 @@ function projectReadTool() {
   const baseName = path.basename(filePath);
   if (SKIP_FILES.has(baseName)) return null;
   if (baseName.endsWith('.test.json')) return null;
-  if (filePath.includes('/.aura/plans/active.json')) return null; // already minimal
+  if (filePath.includes('/.claude/plans/active.json')) return null; // already minimal
 
   let stat;
   try { stat = fs.statSync(filePath); } catch { return null; }

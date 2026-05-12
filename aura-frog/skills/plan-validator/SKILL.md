@@ -1,7 +1,7 @@
 ---
 name: plan-validator
 description: "On-demand plan-tree validator. Runs all 8 invariants from spec §6.7 (parent existence, children integrity, no orphans, valid status, monotonic revision, test_ref existence, DAG no-cycles, freeze_reason). Refuses commits on violations."
-when_to_use: "Before /aura-frog:plan-expand, /aura-frog:plan-promote, /aura-frog:plan-archive — and as part of pre-commit when .aura/plans/ has uncommitted changes"
+when_to_use: "Before /aura-frog:plan-expand, /aura-frog:plan-promote, /aura-frog:plan-archive — and as part of pre-commit when .claude/plans/ has uncommitted changes"
 allowed-tools: Bash, Read
 effort: low
 user-invocable: false
@@ -13,7 +13,7 @@ user-invocable: false
 
 ## Behavior
 
-1. Detect: if `.aura/plans/` does NOT exist → exit silently
+1. Detect: if `.claude/plans/` does NOT exist → exit silently
 2. Run `bash aura-frog/scripts/plans/validate-plan-tree.sh`
 3. If exit_code === 0 → silent (or one-line success when `verbose: true`)
 4. If exit_code !== 0 → surface the failing invariant(s) and refuse the calling operation
@@ -34,8 +34,8 @@ user-invocable: false
 ## When to invoke
 
 - **Before** `/aura-frog:plan-expand`, `/aura-frog:plan-promote`, `/aura-frog:plan-archive`
-- **Before** `git commit` when `.aura/plans/` has uncommitted changes
-- **After** any direct file edit on `.aura/plans/*.md` (manual override)
+- **Before** `git commit` when `.claude/plans/` has uncommitted changes
+- **After** any direct file edit on `.claude/plans/*.md` (manual override)
 
 ## When NOT to invoke
 

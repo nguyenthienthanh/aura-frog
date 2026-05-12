@@ -7,7 +7,7 @@
  *          and trigger failure-classifier on non-zero exit.
  *
  * Behavior:
- *   - Silent exit if .aura/plans/active.json missing or active.task null
+ *   - Silent exit if .claude/plans/active.json missing or active.task null
  *   - On exit_code === 0 → optionally promote status if acceptance hook says so
  *     (acceptance check is a downstream concern — this hook only records execution)
  *   - On exit_code !== 0 → increment failed_attempts, append history.jsonl event,

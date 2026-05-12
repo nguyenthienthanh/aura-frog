@@ -19,7 +19,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 NODE_INPUT=""
 REASON=""
 AVOID=""
@@ -40,6 +40,8 @@ while [ $# -gt 0 ]; do
         *) NODE_INPUT="$1"; shift ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 
 [ -n "$NODE_INPUT" ] || { echo "usage: replan-node.sh <NODE_ID>" >&2; exit 5; }
 

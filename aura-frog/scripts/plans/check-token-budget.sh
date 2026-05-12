@@ -2,13 +2,13 @@
 # Token budget check for plan-loader's always-loaded context.
 # Acceptance criterion from spec §28.2 Milestone A — must be ≤ 13,500 tokens.
 #
-# Usage: bash aura-frog/scripts/plans/check-token-budget.sh [.aura/plans/ path]
+# Usage: bash aura-frog/scripts/plans/check-token-budget.sh [.claude/plans/ path]
 #
 # Estimate: 1 line ≈ 4/3 tokens (per spec §1, measure-performance.sh convention)
 
 set -euo pipefail
 
-PLANS_DIR="${1:-.aura/plans}"
+PLANS_DIR="${1:-.claude/plans}"
 HARD_LIMIT=13500
 
 if [ ! -d "$PLANS_DIR" ]; then

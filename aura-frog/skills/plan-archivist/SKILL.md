@@ -1,6 +1,6 @@
 ---
 name: plan-archivist
-description: "Compresses a completed plan-tree branch into .aura/plans/archive/{NODE_ID}.summary.md. Removes the original node files (preserved by checkpoint history). Reduces always-loaded surface area as features ship."
+description: "Compresses a completed plan-tree branch into .claude/plans/archive/{NODE_ID}.summary.md. Removes the original node files (preserved by checkpoint history). Reduces always-loaded surface area as features ship."
 when_to_use: "/aura-frog:plan-archive <NODE_ID> — invoked after a T2 (Feature) reaches status: done AND epic-summarizer has finished distilling"
 allowed-tools: Read, Write, Glob, Bash
 effort: medium
@@ -15,7 +15,7 @@ user-invocable: false
 
 | Concern | epic-summarizer | plan-archivist |
 |---|---|---|
-| Output | `.aura/memory/permanent_memory.md` (durable wisdom) | `.aura/plans/archive/{NODE_ID}.summary.md` (plan-tree compaction) |
+| Output | `.claude/memory/permanent_memory.md` (durable wisdom) | `.claude/plans/archive/{NODE_ID}.summary.md` (plan-tree compaction) |
 | Scope | Cross-cutting decisions + gotchas | Per-branch summary: what shipped, with what AC, what tasks |
 | Lifecycle | Survives reset | Survives reset |
 | Token budget | ≤500/Epic, ≤8000 total | ≤300/branch, no global cap (one file per archived branch) |
@@ -32,7 +32,7 @@ epic-summarizer captures *what was learned*. plan-archivist captures *what was b
    - Acceptance criteria roll-up (passed/total per Story)
    - Total tasks (done/discarded/skipped)
    - Trace size + hallucination count (if traces exist)
-4. **Write** `.aura/plans/archive/{NODE_ID}.summary.md`.
+4. **Write** `.claude/plans/archive/{NODE_ID}.summary.md`.
 5. **Optional pruning** (only with `--prune` flag): remove the original Story/Task files (they're in checkpoints if needed). Refuse to prune if any descendant is not in `done` or `archived`.
 6. **Update** parent's `children` list — replace pruned IDs with archive references.
 7. **Append** `history.jsonl` event: `event: branch_archived`, with archive_path + pruned count.
@@ -82,7 +82,7 @@ trace_summary: { events: 287, hallucinations_flagged: 1, recovered: 1 }
 
 ## What this skill does NOT do
 
-- Does NOT read or write `.aura/memory/` (that's epic-summarizer's lane)
+- Does NOT read or write `.claude/memory/` (that's epic-summarizer's lane)
 - Does NOT delete checkpoints — those follow checkpoint-discipline.md retention
 - Does NOT mutate node frontmatter on un-pruned nodes (only the `archived` status transition; revision++)
 - Does NOT decompress an archive — restoration is via `/aura-frog:plan-undo` against checkpoints

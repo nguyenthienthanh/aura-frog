@@ -4,6 +4,59 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [3.7.3] - 2026-05-12 (Plan storage restructure + run↔feature linking)
+
+> Moves the plan tree from `.aura/plans/` to `.claude/plans/` (next to other Claude Code state), introduces a slug-aware feature folder schema (`{ID}_{kebab-slug}/`), and wires bidirectional run↔feature linking with two new `/run` prefixes.
+
+### Changed (storage layout)
+
+- **Default plans dir: `.aura/plans/` → `.claude/plans/`.** Resolution order in scripts: explicit positional arg → `$AF_PLANS_DIR` env var → `.claude/plans/` (default) → `.aura/plans/` (legacy fallback, removed in v4.0).
+- **Feature folder schema:** flat `features/FEAT-A.md` → folder `features/{ID}_{slug}/feature.md`. Same for stories (`stories/{ID}_{slug}/story.md`) and tasks (`tasks/{ID}_{slug}.md`). If a JIRA / Linear / GitHub ticket ID is attached, it's used as the prefix; otherwise the plan-orchestrator mints `FEAT-N` / `STORY-NNNN` / `TASK-NNNNN`.
+- **`new-plan.sh`** writes a new `INDEX.md` on first init documenting the layout, naming convention, run-feature linking, commands, and migration path from the legacy location.
+
+### Added (run ↔ feature linking)
+
+- **`scripts/plans/link-run.sh`** — two-sided helper: writes `feature_id` + `feature_slug` + optional `anchor.task_id` to `run-state.json` AND appends an idempotent row to the feature's `## Runs` table. Subcommands: `link`, `unlink` (marks discarded, doesn't delete), `list`.
+- **`run-state.json` gains `feature_id`, `feature_slug`, `feature_linked_at`** (and `anchor.task_id` when a specific T4 is anchored). Surfaces in `/run status` and `/run resume`.
+- **`feature.md` gains a `## Runs` section** listing every `/run` invocation against the feature with status (in_progress / done / discarded) + start timestamp + anchor task. Auto-managed by `link-run.sh`.
+- **`/run feature: FEAT-A <task>`** prefix anchors a new run to a feature. `run-orchestrator` Step 0c writes both sides of the link.
+- **`/run resume <FEATURE_ID>`** lists runs under a feature and prompts to pick one (or auto-resumes the single in-progress run).
+- **Phase 5 updates the link.** On finalize, `link-run.sh link <run-id> <feature> --status done` replaces the in-progress row.
+
+### Helper functions in `_lib.sh`
+
+- **`slugify <text>`** — lower-case ASCII kebab-slug, capped at 50 chars.
+- **`feature_folder <id> <intent>`** — composes `{ID}_{slug}` for consistent folder naming.
+- **`plans_dir [explicit]`** — 4-level resolution (arg → env → default → legacy fallback) replacing the old hardcoded `.aura/plans` default.
+
+### Tests
+
+- **+5 new unit tests in `plans.test.cjs`** covering `link-run.sh`: link writes both sides, idempotent re-link, list output, missing run-state refusal. Total plan-script tests now 43 (was 38).
+- Existing 38 plan-script tests + 64 bare-word-router tests still green.
+
+### Path sweep (35 files)
+
+`.aura/plans/` → `.claude/plans/` (and `.aura/memory/` → `.claude/memory/`) across 8 agent files, 9 hooks, 12 skills, 7 rules, 11 command files, the dashboard script, and CLAUDE.md. `.aura/security/mcp-audit.jsonl` stays where it is — MCP audit is a separate concern from plans.
+
+### Migration path
+
+No automatic content migration — the script ships with this notice on first init:
+
+```
+ℹ Legacy .aura/plans/ detected. To migrate:
+ℹ   mv .aura/plans .claude/plans
+ℹ Or set AF_PLANS_DIR=.aura/plans to keep using the legacy location.
+```
+
+The legacy `.aura/plans/` fallback in `plans_dir()` is removed in v4.0.
+
+### Deprecation timeline
+
+- v3.7.3 (this release): `.claude/plans/` is the default. `.aura/plans/` works via fallback (with stderr warning).
+- v4.0: `.aura/plans/` fallback removed. Must set `AF_PLANS_DIR=.aura/plans` to keep using the legacy location.
+
+---
+
 ## [3.7.2] - 2026-05-11 (Plan consolidation)
 
 > Consolidates `/aura-frog:plan-*` (10 verbs) under a single dispatcher backed by the new `plan-orchestrator` skill. Ships the 9 backing scripts the existing command files always promised. Adds bare-word activation when a plan is active, plus `/run` intelligent escalation for project-scope tasks.

@@ -48,7 +48,7 @@ mutations[5]{action,scope,when}:
 3. **Check** replan_budget on the affected node and parent
 4. **Generate 2-3 candidate mutations** — apply self-consistency to vote between them
 5. **Score each candidate** on: scope_blast_radius, evidence_alignment, budget_fit, reversibility
-6. **Emit proposal JSON** to `.aura/plans/proposals/{NODE_ID}.{ISO}.json`:
+6. **Emit proposal JSON** to `.claude/plans/proposals/{NODE_ID}.{ISO}.json`:
    ```json
    {
      "node_id": "STORY-0042",

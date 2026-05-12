@@ -26,7 +26,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 DRY_RUN=0
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -36,6 +36,8 @@ while [ $# -gt 0 ]; do
         *) echo "unknown arg: $1" >&2; exit 5 ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 
 [ -f "${PLANS_DIR}/active.json" ] || { echo "no active.json — run /aura-frog:plan first" >&2; exit 5; }
 

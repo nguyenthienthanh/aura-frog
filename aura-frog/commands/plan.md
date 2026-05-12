@@ -4,7 +4,7 @@
 v3.7.2 consolidates `/aura-frog:plan-*` (10 commands) into a single dispatcher that routes via the `plan-orchestrator` skill. The legacy `plan-<verb>` aliases still work as thin stubs.
 
 **Category:** Planning
-**Scope:** Project-local (writes to `.aura/plans/`)
+**Scope:** Project-local (writes to `.claude/plans/`)
 
 ---
 
@@ -16,7 +16,7 @@ v3.7.2 consolidates `/aura-frog:plan-*` (10 commands) into a single dispatcher t
 /aura-frog:plan
 ```
 
-Initialises `.aura/plans/` and interview-bootstraps T0 (Mission) → T1 (Initiative) → T2 (Feature).
+Initialises `.claude/plans/` and interview-bootstraps T0 (Mission) → T1 (Initiative) → T2 (Feature).
 
 ### 2. Verb dispatch
 
@@ -55,7 +55,7 @@ Each verb takes its own flags — see `aura-frog/commands/plan-<verb>.md` for fu
 /aura-frog:plan conflicts list --open               # subcommand chaining
 ```
 
-**Bare-word forms** (only when `.aura/plans/active.json` exists, via `hooks/bare-word-router.cjs`):
+**Bare-word forms** (only when `.claude/plans/active.json` exists, via `hooks/bare-word-router.cjs`):
 
 ```
 next                # → /aura-frog:plan next
@@ -103,10 +103,10 @@ If no first-arg verb match:
 
 1. Run `bash aura-frog/scripts/plans/new-plan.sh` (idempotent).
 2. Run `bash aura-frog/scripts/plans/validate-plan-tree.sh` — abort on invariant fail.
-3. Read `.aura/plans/mission.md` and `.aura/plans/active.json`.
+3. Read `.claude/plans/mission.md` and `.claude/plans/active.json`.
 4. **If mission.md is the default stub** → interview the user for the actual mission (1–3 sentences). Write to mission.md.
-5. **If no T1 exists** → interview for the active initiative. Mint INIT-NNN via `.counters.json`, write `.aura/plans/initiatives/INIT-NNN.md` per Tech Spec §6.3.
-6. **If no T2 exists under the active T1** → interview for the active feature. Mint FEAT-N, write `.aura/plans/features/FEAT-N/feature.md` per Tech Spec §6.4.
+5. **If no T1 exists** → interview for the active initiative. Mint INIT-NNN via `.counters.json`, write `.claude/plans/initiatives/INIT-NNN.md` per Tech Spec §6.3.
+6. **If no T2 exists under the active T1** → interview for the active feature. Mint FEAT-N, write `.claude/plans/features/FEAT-N/feature.md` per Tech Spec §6.4.
 7. **Update `active.json`** — point at the new active T2.
 8. **Append to `history.jsonl`** — `event: plan_init` with timestamp + nodes created.
 9. **Render** the plan tree: `bash aura-frog/scripts/plans/render-plan-tree.sh`.

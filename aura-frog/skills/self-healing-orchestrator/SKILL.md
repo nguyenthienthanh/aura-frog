@@ -56,7 +56,7 @@ Step 8: On user no → log as `event: self_heal_declined`, increment session cou
 allowed_sources[3]{source,why}:
   context7 MCP,"Library documentation; trusted technical reference"
   permanent_memory.md,"Project's own learned wisdom; trust:file"
-  recent traces (.aura/plans/traces/),"Same-project context for the failure"
+  recent traces (.claude/plans/traces/),"Same-project context for the failure"
 ```
 
 **Forbidden sources:** Stack Overflow, blog posts, web search results — too noisy, too easy to hallucinate from.
@@ -83,7 +83,7 @@ budget_decrement: 1
 session_proposal_count: 2 of 5
 ```
 
-The proposal lives at `.aura/plans/proposals/HEAL-<TASK_ID>-<NNN>.yaml` until accepted/declined.
+The proposal lives at `.claude/plans/proposals/HEAL-<TASK_ID>-<NNN>.yaml` until accepted/declined.
 
 ## Anti-patterns (each is a hard refusal)
 
@@ -103,5 +103,5 @@ The proposal lives at `.aura/plans/proposals/HEAL-<TASK_ID>-<NNN>.yaml` until ac
 - **Rule:** `rules/workflow/checkpoint-discipline.md` — pre-mutation snapshot before applying accepted proposals
 - **Command:** `/aura-frog:heal diagnose|status|disable|accept`
 - **MCP:** `context7` — sole external knowledge source (rate-limited via mcp-call-gate)
-- **File:** `.aura/plans/proposals/HEAL-*.yaml` — proposal artifacts
-- **File:** `.aura/memory/permanent_memory.md` — Gotchas / Anti-patterns sections cross-referenced
+- **File:** `.claude/plans/proposals/HEAL-*.yaml` — proposal artifacts
+- **File:** `.claude/memory/permanent_memory.md` — Gotchas / Anti-patterns sections cross-referenced

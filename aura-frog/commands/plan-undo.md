@@ -21,7 +21,7 @@ bash aura-frog/scripts/plans/undo-decision.sh [<NODE_ID>] [--dry-run] [--list] [
 
 The script:
 1. Resolves target: explicit arg, else walks `active.{task,story,feature,initiative}` for deepest non-null.
-2. Picks the latest `.aura/plans/checkpoints/<id>.<ISO8601>.json` (LIFO).
+2. Picks the latest `.claude/plans/checkpoints/<id>.<ISO8601>.json` (LIFO).
 3. Restores the node body (base64-decoded from `node_state_before_b64`).
 4. Moves the consumed checkpoint to `.consumed` so LIFO advances.
 5. Appends `history.jsonl event=undo`.

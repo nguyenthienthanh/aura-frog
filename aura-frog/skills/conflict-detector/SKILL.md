@@ -57,9 +57,9 @@ Set `AF_CONFLICT_LLM_DISABLED=true` to short-circuit L3+L4 dispatch even after t
 4. If L1 returns overlap with confidence < 0.95 OR file-overlap is ambiguous → run `check-l2-syntactic.sh` on the overlapping files
 5. **L3 (semantic)**: in beta.2, return `{layer:L3, status:stubbed_for_rc1}`. In rc.1, dispatch an LLM call comparing intents; cache result in `conflict_cache.jsonl`.
 6. **L4 (architectural)**: in beta.2, return `{layer:L4, status:stubbed_for_rc1}`. In rc.1, dispatch an LLM call comparing against `permanent_memory.md` decisions.
-7. Append finding to `.aura/plans/conflicts.jsonl` (per spec §21.4) if conflict found
+7. Append finding to `.claude/plans/conflicts.jsonl` (per spec §21.4) if conflict found
 
-## Conflict record schema (.aura/plans/conflicts.jsonl)
+## Conflict record schema (.claude/plans/conflicts.jsonl)
 
 ```json
 {
@@ -101,7 +101,7 @@ If hard cap hit: log warning, **proceed assuming conflict** (fail-safe — bette
 - Does NOT mutate plan tree state (writes to conflicts.jsonl only; conflict-arbiter agent does the freeze/replan/escalate)
 - Does NOT decide resolution (that's conflict-arbiter)
 - Does NOT block tool calls directly (pre-dispatch-conflict-check hook does, based on this skill's findings)
-- Does NOT cross project boundaries — per project, per .aura/plans/
+- Does NOT cross project boundaries — per project, per .claude/plans/
 
 ## Tie-Ins
 

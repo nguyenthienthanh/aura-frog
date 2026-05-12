@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.7.2 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.7.3 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. 15 agents + 56 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
-## 🐸 The 8 Pillars (v3.7.2)
+## 🐸 The 8 Pillars (v3.7.3)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -133,10 +133,10 @@ skills[9]{name,trigger}:
   test-writer,Test request
   code-reviewer,Code review
   code-simplifier,Simplify/KISS
-  plan-loader,.aura/plans/ exists (auto)
+  plan-loader,.claude/plans/ exists (auto)
   reasoning-trace-recorder,active.task set during T4 execution (auto)
   extension-detector,Repeated patterns or 'we should have a skill for X' signals (auto)
-  permanent-memory-loader,.aura/memory/permanent_memory.md exists (auto)
+  permanent-memory-loader,.claude/memory/permanent_memory.md exists (auto)
 ```
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
@@ -284,4 +284,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.7.2
+**Version:** 3.7.3

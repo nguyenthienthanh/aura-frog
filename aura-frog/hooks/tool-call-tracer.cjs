@@ -3,7 +3,7 @@
  * Aura Frog — Tool Call Tracer
  *
  * Fires: PreToolUse + PostToolUse for Bash | Edit | Write | Read | Grep | Glob
- * Purpose: Emit append-only trace events to .aura/plans/traces/{TASK_ID}.jsonl
+ * Purpose: Emit append-only trace events to .claude/plans/traces/{TASK_ID}.jsonl
  *          Used by /aura-frog:trace and grounding-discipline rule.
  *
  * Behavior:
@@ -13,7 +13,7 @@
  *   - For Read: also emits a `file_read` event with path + sha256 (cheap, exact)
  *
  * Disable:
- *   AF_TRACE_DISABLED=true — no trace events emitted; .aura/plans/traces/ stays empty.
+ *   AF_TRACE_DISABLED=true — no trace events emitted; .claude/plans/traces/ stays empty.
  *
  * Exit codes:
  *   0 — success (always; this is a recorder)

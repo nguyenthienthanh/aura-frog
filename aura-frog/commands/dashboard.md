@@ -48,11 +48,11 @@ Pre-flight: 0 bypasses this session · last block: never
 
 ## Protocol — static (default)
 
-1. Read `.aura/plans/active.json` for active path
+1. Read `.claude/plans/active.json` for active path
 2. Run `bash scripts/plans/render-plan-tree.sh` for tier counts (parsed, not rendered tree)
 3. Read latest run-state from `.claude/logs/runs/<latest>/run-state.json`
-4. Read open conflicts from `.aura/plans/conflicts.jsonl` (latest per conflict_id, filter resolution: null)
-5. Read `.aura/memory/permanent_memory.md` for size + Epic count
+4. Read open conflicts from `.claude/plans/conflicts.jsonl` (latest per conflict_id, filter resolution: null)
+5. Read `.claude/memory/permanent_memory.md` for size + Epic count
 6. Read `.aura/security/mcp-audit.jsonl` tail (last 24h) for MCP stats
 7. Read `.claude/logs/.preflight-bypass-count` for session bypass count
 8. Project all into TOON via `scripts/json-to-toon.cjs --schema generic` per section
@@ -76,8 +76,8 @@ Run only the named section. Useful for status-line integration or scripted check
 
 | Missing input | Behavior |
 |---|---|
-| No `.aura/plans/` | Render banner + "Plans not initialized — run /aura-frog:plan" |
-| No `.aura/memory/` | Memory section: "Memory not initialized" |
+| No `.claude/plans/` | Render banner + "Plans not initialized — run /aura-frog:plan" |
+| No `.claude/memory/` | Memory section: "Memory not initialized" |
 | No audit log | MCP section: "Audit logging not started" |
 | run-state.json missing | Active section: "No active run" |
 
@@ -88,4 +88,4 @@ Run only the named section. Useful for status-line integration or scripted check
 - **Skill:** `mcp-security-auditor` — for MCP section
 - **Skill:** `permanent-memory-loader` (via summary lines) — for Memory section
 - **Skill:** `plan-validator` — invariant check for the Plan-tree heading
-- **Files read** (read-only): `.aura/plans/active.json`, `conflicts.jsonl`, `history.jsonl`, `.aura/memory/permanent_memory.md`, `.aura/security/mcp-audit.jsonl`, `.claude/logs/runs/<latest>/run-state.json`, `.claude/logs/.preflight-bypass-count`
+- **Files read** (read-only): `.claude/plans/active.json`, `conflicts.jsonl`, `history.jsonl`, `.claude/memory/permanent_memory.md`, `.aura/security/mcp-audit.jsonl`, `.claude/logs/runs/<latest>/run-state.json`, `.claude/logs/.preflight-bypass-count`
