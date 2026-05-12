@@ -14,7 +14,9 @@
 
 > **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a planning-first LLM OS with 15 agents, 5-phase TDD workflows, hierarchical planning that survives session resets, forensic reasoning traces, conflict detection between parallel work, and per-agent MCP security.
 
-> **What v3.7.0 ships:** Eight composable pillars — Hierarchical Planning, Reasoning Trace Audit, Semantic Session Reset, Pre-flight Validation, Semantic Conflict Detection, Self-Healing Orchestrator, MCP Security Layer, Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
+> **The 8 Pillars (current track):** Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
+>
+> **Latest in v3.7.3** (2026-05-12): plans live at `.claude/plans/` with `{ID}_{slug}/` folders, `/run` anchors to features and writes back to `feature.md`, the statusline shows `mode {step}` from `run-state.json`, Phase 2 picks unit/integration/e2e before writing, 14 hooks no longer hang on TTY stdin. See [CHANGELOG](../reference/CHANGELOG.md#373---2026-05-12).
 
 ---
 
@@ -342,22 +344,26 @@ export AF_LOCAL_LEARNING="false"
 
 ## MCP Servers (Auto-Configured)
 
-Aura Frog includes **6 MCP servers** in `.mcp.json`:
+Aura Frog includes **8 MCP servers** in `.mcp.json` — 6 enabled by default, 2 opt-in (postgres + redis):
 
 | MCP | Purpose | Auto-Triggers On | Setup |
 |-----|---------|------------------|-------|
 | **context7** | Library docs | "Build with MUI", "Tailwind" | None |
-| **playwright** | E2E testing | "Test the login page" | None |
+| **playwright** | E2E testing (v3.7.3+ default) | "Test the login page" | None |
 | **vitest** | Unit tests | "Run tests", "Check coverage" | None |
 | **firebase** | Firebase services | "Set up Firestore", "Firebase Auth" | `firebase login` |
 | **figma** | Design files | Figma URLs | `FIGMA_API_TOKEN` in `.envrc` |
 | **slack** | Notifications | Phase 5 completion | `SLACK_BOT_TOKEN` in `.envrc` |
+| **postgres** *(opt-in)* | Database queries (read-only default) | "Query users table" | Set `POSTGRES_CONNECTION_STRING` + flip `disabled: false` in `.mcp.json` |
+| **redis** *(opt-in)* | Cache + queue introspection | "Check redis cache" | Set `REDIS_URL` + flip `disabled: false` in `.mcp.json` |
 
 **No manual configuration needed** - MCPs requiring tokens will silently skip if not set.
 
 **No explicit commands needed** - Claude auto-detects context and uses appropriate MCP.
 
-**Create your own MCP:** See `docs/MCP_GUIDE.md` for a complete guide.
+**Per-agent allowlist** - The MCP Security Layer (Pillar 7) restricts which servers each agent can call. See `/aura-frog:mcp status` and `/aura-frog:mcp audit`.
+
+**Create your own MCP:** See [MCP Guide](../operations/MCP_GUIDE.md) for a complete guide.
 
 ---
 
@@ -394,15 +400,15 @@ Aura Frog includes utility scripts for common operations:
 
 ### 1. You Give a Command
 ```
-workflow:start Refactor MyComponent
+/run Refactor MyComponent
 ```
 
-### 2. Claude Detects Command
-- Reads `CLAUDE.md` for instructions
-- Loads `commands/workflow/start.md`
-- Activates relevant agents (dev, QA, UI designer)
+### 2. Claude Detects Intent
+- `agent-detector` skill classifies complexity (Quick / Standard / Deep / Project)
+- `run-orchestrator` picks the flow (feature / bugfix / refactor / test / review / deploy)
+- Activates the right agents (architect, frontend, tester, …)
 
-### 3. Executes 5-Phase Workflow
+### 3. Executes 5-Phase Workflow (for Deep / feature runs)
 ```
 Phase 1: Understand + Design → [APPROVAL GATE]
 Phase 2: Test RED → [Auto-continue]
@@ -411,14 +417,15 @@ Phase 4: Refactor + Review → [Auto-continue]
 Phase 5: Finalize → [Auto-complete]
 ```
 
-**Only 2 approval gates** (Phase 1 & 3) -- other phases auto-continue after showing deliverables.
+**Only 2 approval gates** (Phase 1 & 3) -- other phases auto-continue after showing deliverables. Bugfix runs use a lighter 4-step TDD (S1 investigate → S2 test RED → S3 fix GREEN → S4 verify).
 
 ### 4. You Control Every Step
-At approval gates:
-- Review deliverables
-- Type `workflow:approve` or `approve` to continue
-- Type `workflow:reject <reason>` to redo
-- Type `workflow:modify <changes>` to adjust
+At approval gates, type a bare verb (no slash prefix needed when a run is active):
+- `approve` — advance to next phase
+- `reject <reason>` — redo with feedback
+- `modify <changes>` — adjust deliverables without restarting
+- `handoff` — save state for next session
+- `status` / `progress` / `rollback` / `stop`
 
 ---
 
@@ -433,14 +440,15 @@ For common issues and solutions, see the full [Troubleshooting Guide](../operati
 **Start building with AI-powered project management:**
 
 ```
-workflow:start <your-task-description>
+/run <your-task-description>
 ```
 
 **Examples:**
-- `workflow:start Analyze useSocialMediaPost hook and suggest improvements`
-- `workflow:start Refactor SocialMarketingCompositePost - split into smaller components`
-- `workflow:start Add error handling to API calls`
-- `workflow:start Optimize performance of list rendering`
+- `/run Analyze useSocialMediaPost hook and suggest improvements`
+- `/run Refactor SocialMarketingCompositePost — split into smaller components`
+- `/run Add error handling to API calls`
+- `/run fix login button not disabling on submit`
+- `/run Optimize performance of list rendering`
 
 ---
 
@@ -448,7 +456,7 @@ workflow:start <your-task-description>
 
 - **All Documentation:** [docs/README.md](../README.md) (central index)
 - **Usage Guide:** [Usage Guide](../guides/USAGE_GUIDE.md) (best practices + workflow modes)
-- **MCP Guide:** [MCP Guide](../operations/MCP_GUIDE.md) (6 MCP servers)
+- **MCP Guide:** [MCP Guide](../operations/MCP_GUIDE.md) (8 MCP servers — 6 enabled + 2 opt-in)
 - **Learning System:** [Learning System](../operations/LEARNING_SYSTEM.md) (local + Supabase)
 - **Troubleshooting:** [Troubleshooting](../operations/TROUBLESHOOTING.md)
 - **Changelog:** [Changelog](../reference/CHANGELOG.md)

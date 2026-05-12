@@ -2,7 +2,9 @@
 
 Central index for all human-readable documentation. AI-consumed docs live in `aura-frog/`.
 
-> **New in v3.7.0:** [The 8 Pillars](../README.md#-the-8-pillars-of-the-planning-first-llm-os) — Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Full marketing breakdown with examples + diagrams in the project README; engineering depth in [BENEFITS.md Part 9](reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
+> **Latest — v3.7.3** (2026-05-12): Plans now live at `.claude/plans/` (legacy `.aura/plans/` still works via fallback until v4.0), `{ID}_{kebab-slug}/` folder schema across all tiers, bidirectional run↔feature linking, statusline shows `mode {step} agent` (cost segment removed), Phase 2 picks unit/integration/e2e BEFORE writing (no more silent e2e skip on UI/auth/payment tasks), TTY-hang fixed in 14 hooks, Node 20/22 back in CI. See [CHANGELOG](reference/CHANGELOG.md#373---2026-05-12).
+>
+> **Core architecture:** [The 8 Pillars](../README.md#-the-8-pillars-of-the-planning-first-llm-os) — Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full marketing breakdown in the project README; engineering depth in [BENEFITS.md Part 9](reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ---
 

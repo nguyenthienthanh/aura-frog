@@ -89,7 +89,7 @@ user_messages[5]{code,technical,user_facing}:
 - **API handler:** Log all errors with context (code, stack, path, requestId). Send operational errors to client, hide programming error details.
 - **Service layer:** Throw typed errors (NotFoundError, ValidationError). Validate before processing.
 - **Frontend:** Transform API errors, handle specific codes (401 → redirect to login). Use Error Boundaries for React.
-- **Logging:** See `rules/logging-standards.md`. Include code, message, stack, requestId. Never log passwords/tokens.
+- **Logging:** See `rules/agent/logging-standards.md`. Include code, message, stack, requestId. Never log passwords/tokens.
 
 ---
 

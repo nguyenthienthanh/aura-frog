@@ -26,13 +26,15 @@ Aura Frog frames Claude Code as an **Operating System** for software engineering
 │  │  2K    │ │  800   │ │  4K  │ │  8K  │ │  4K  │ │
 │  └────────┘ └────────┘ └──────┘ └──────┘ └──────┘ │
 ├─────────────────────────────────────────────────────┤
-│              PROCESSES (10 Agents)                  │
+│              PROCESSES (15 Agents)                  │
 │  lead │ architect │ frontend │ mobile │ strategist  │
-│  security │ tester │ devops │ scanner │ router      │
+│  security │ tester │ devops │ scanner               │
+│  master-planner │ feature-architect │ story-planner │
+│  replanner │ epic-summarizer │ conflict-arbiter     │
 ├─────────────────────────────────────────────────────┤
-│              DEVICE DRIVERS (6 MCP Servers)         │
+│       DEVICE DRIVERS (8 MCP Servers · 6 + 2)        │
 │  context7 │ playwright │ vitest │ firebase │ figma  │
-│  slack                                              │
+│  slack │ postgres* │ redis*    (* opt-in)           │
 ├─────────────────────────────────────────────────────┤
 │              FILESYSTEM (Project Files)             │
 │  Read on demand via retrieval hierarchy             │
@@ -47,32 +49,39 @@ Aura Frog frames Claude Code as an **Operating System** for software engineering
 |------------|-------------------------|------------------|
 | **CPU/Kernel** | Claude + orchestrator rules | Orchestrates, dispatches, verifies |
 | **RAM** | Context window (token budget) | Managed segments, eviction policies |
-| **Processes** | 10 specialized agents | Each has state, budget, priority |
-| **Process Scheduler** | 5-phase TDD workflow | Priority-based phase progression |
+| **Processes** | 15 specialized agents (9 exec + 6 planning) | Each has state, budget, priority |
+| **Process Scheduler** | 5-phase TDD workflow + plan-tree DAG | Priority-based phase progression + dependency-aware T4 scheduling |
 | **Interrupts** | Approval gates (Phase 1 & 3) | Human-in-the-loop checkpoints |
-| **IPC** | Handoff state / TOON snapshots | Agent-to-agent data passing |
-| **Device Drivers** | 6 MCP servers | Standardized external interfaces |
+| **IPC** | Handoff state / TOON snapshots / `run-state.json` ↔ feature `## Runs` link | Agent-to-agent data passing |
+| **Device Drivers** | 8 MCP servers (6 enabled + 2 opt-in) | Standardized external interfaces, per-agent allowlist |
 | **Filesystem** | Project files on disk | Read on demand, not preloaded |
 | **Compression Codec** | TOON format | Minimize memory footprint |
 | **Context Switch** | Agent swap protocol | Save state → evict → load new → inject |
 
 ---
 
-## Process Table — 10 Agents
+## Process Table — 15 Agents
 
 ```toon
-process_table[10]{pid,agent,type,domain,token_budget,priority}:
+process_table[15]{pid,agent,type,domain,token_budget,priority}:
   01,lead,system,Workflow coordination + team orchestration,3K,critical
   02,architect,system,System design + databases + backend,4K,critical
   03,frontend,worker,React/Vue/Angular/Next.js + design systems,4K,medium
   04,mobile,worker,React Native/Flutter/Expo/NativeWind,4K,medium
-  05,strategist,system,ROI evaluation + MVP scoping + scope creep,3K,high
+  05,strategist,system,ROI evaluation + MVP scoping + scope creep + T0/T1 framing,3K,high
   06,security,system,OWASP audits + vulnerability scanning + SAST,3K,high
-  07,tester,system,Jest/Cypress/Playwright/Detox + coverage,4K,high
+  07,tester,system,Jest/Vitest/Playwright/Cypress/Detox + coverage + test-pyramid layer pick,4K,high
   08,devops,worker,Docker/K8s/CI-CD/monitoring,3K,low
   09,scanner,system,Project detection + config + context,2K,medium
-  10,router,system,Agent + model selection,2K,high
+  10,master-planner,system,Plan tree owner + decisions + persistence,3K,critical
+  11,feature-architect,system,T2 → T3 decomposition (Feature → Stories),3K,high
+  12,story-planner,system,T3 → T4 decomposition (Story → Tasks),3K,high
+  13,replanner,system,F2-F4 mutation proposals (re-decompose / promote / discard),3K,medium
+  14,epic-summarizer,system,T2 done → permanent_memory distillation,3K,medium
+  15,conflict-arbiter,system,L1-L4 conflict adjudication + freeze/thaw decisions,3K,high
 ```
+
+Agent selection is handled by `skills/agent-detector/SKILL.md` (haiku model, highest priority, fires on every message). The router from earlier versions is no longer a separate agent — its job is now done by the skill at zero cost.
 
 ### Process States
 

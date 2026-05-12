@@ -20,17 +20,21 @@ User Message → Claude → MCP Server → External Service
 
 ## MCP Servers
 
-All 6 MCP servers are configured in `.mcp.json`:
+All 8 MCP servers are configured in `.mcp.json` — 6 enabled by default, 2 opt-in (postgres + redis):
 
 ```toon
-servers[6]{name,package,purpose,requires}:
-  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc),None
-  playwright,@playwright/mcp,Browser automation + E2E testing,None
-  vitest,@djankies/vitest-mcp,Test execution + coverage,None
-  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login
-  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN
-  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN + SLACK_TEAM_ID
+servers[8]{name,package,purpose,requires,enabled}:
+  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc),None,enabled
+  playwright,@playwright/mcp,Browser automation + E2E testing (v3.7.3+ default e2e runner),None,enabled
+  vitest,@djankies/vitest-mcp,Test execution + coverage,None,enabled
+  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login,enabled
+  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN,enabled
+  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN + SLACK_TEAM_ID,enabled
+  postgres,@modelcontextprotocol/server-postgres,Database queries (read-only by default),POSTGRES_CONNECTION_STRING,opt-in (disabled in .mcp.json)
+  redis,@modelcontextprotocol/server-redis,Cache + queue introspection,REDIS_URL,opt-in (disabled in .mcp.json)
 ```
+
+**Per-agent allowlist** — MCP Security Layer (Pillar 7) restricts which servers each agent can call. `architect` gets DB; `frontend` gets Figma + Playwright; `security` reads only. See `/aura-frog:mcp status` for the current allowlist, `/aura-frog:mcp audit` for the sanitized call log.
 
 **No manual copying needed** - MCPs requiring tokens will silently skip if tokens aren't set.
 

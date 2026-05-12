@@ -4,9 +4,16 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [3.7.3] - 2026-05-12 (Plan storage restructure + run↔feature linking)
+## [3.7.3] - 2026-05-12 (Plan relocation + run linking + test-pyramid + statusline transparency)
 
-> Moves the plan tree from `.aura/plans/` to `.claude/plans/` (next to other Claude Code state), introduces a slug-aware feature folder schema (`{ID}_{kebab-slug}/`), and wires bidirectional run↔feature linking with two new `/run` prefixes.
+> A consolidated release bundling six tightly-coupled shipments since v3.7.2:
+>
+> 1. **Plan storage restructure** — `.aura/plans/` → `.claude/plans/`, slug-aware folder schema, bidirectional run↔feature linking (PR #16).
+> 2. **TTY-hang fix** — 14 hooks that called `fs.readFileSync(0)` could block forever when stdin is a TTY; now gated by `fstatSync(0)` via the new `hooks/lib/safe-stdin.cjs` helper, with Node 20/22 restored to the CI matrix (PR #17).
+> 3. **README hygiene** — five stale counts corrected, 419 lines moved from `README.md` into `docs/*` (Walkthrough, Token Budget, Agent Selection, "Why Teams Ship Faster"), plus the new `validate-readme-counts.sh` CI guard (PR #18).
+> 4. **Statusline transparency + agent announcements** — cost segment removed, `mode {step}` and `agent` surfaced from `run-state.json`, every phase/step dispatch must announce builder/reviewer/gate to the user (PR #19).
+> 5. **E2E test-gap fix** — Phase 2 now picks the test layer (unit/integration/e2e) before writing, Playwright is the recommended e2e default with MCP integration, and UI/auth/payment tasks must add at least one e2e spec (PR #20).
+> 6. **Skill-vs-Agent disambiguation** — fixes the `Agent type 'aura-frog:bugfix-quick' not found` error class by adding ⚠️ callouts in CLAUDE.md, commands, and SKILL files (also PR #4 skill review optimization upstream).
 
 ### Changed (storage layout)
 
@@ -54,6 +61,70 @@ The legacy `.aura/plans/` fallback in `plans_dir()` is removed in v4.0.
 
 - v3.7.3 (this release): `.claude/plans/` is the default. `.aura/plans/` works via fallback (with stderr warning).
 - v4.0: `.aura/plans/` fallback removed. Must set `AF_PLANS_DIR=.aura/plans` to keep using the legacy location.
+
+### Fixed — TTY hang in 14 hooks (PR #17)
+
+- **Root cause** — `fs.readFileSync(0)` blocks indefinitely when stdin is an interactive terminal (no EOF arrives, no exception thrown). Symptom: Ubuntu Node 20/22 jobs in CI hung for 10+ minutes before the workflow timed out; locally the hook never returned.
+- **`hooks/lib/safe-stdin.cjs`** — new helper that uses `fs.fstatSync(0)` to detect whether stdin is a pipe/FIFO. Returns the parsed JSON when piped; returns `null` immediately when stdin is a TTY. Synchronous, zero deps, ≤20 lines.
+- **14 hooks swept** — every `readFileSync(0, 'utf8')` call in `hooks/*.cjs` replaced with `require('./lib/safe-stdin')()`. Hooks that need stdin (most `UserPromptSubmit` hooks) now no-op when invoked interactively instead of hanging.
+- **CI matrix restored** — `.github/workflows/test.yml` re-adds Node 20.x + 22.x (removed in `027c2e0` while the hang was unexplained). Per-job SIGKILL timeout from `8a3fa1c` retained as belt-and-braces.
+
+### Fixed — Stale counts + README cleanup (PR #18)
+
+- **Five stale count references corrected** across `README.md` and `aura-frog/CLAUDE.md`: 55→56 skills, 70→71 rules, 42→43 hooks, 9→15 agents, 6→24 commands.
+- **`scripts/ci/validate-readme-counts.sh`** — new CI guard with three surgical grep patterns (Markdown bold table cells, `[All Components (N)](...)` link labels, colon-aligned summaries) that scope the check tightly enough to avoid false positives on narrative prose. Wired into `.github/workflows/test.yml`.
+- **README slimmed 1493 → 1074 lines (−419)** — four sections relocated to `docs/`:
+  - "Walkthrough: Standard Path" → `docs/walkthrough/STANDARD_FLOW.md`
+  - "Token Budget Reality" → `docs/guides/TOKEN_BUDGETS.md`
+  - "Agent Selection" → `docs/guides/AGENT_SELECTION.md`
+  - "Why Teams Ship Faster" → `docs/marketing/WHY_TEAMS_SHIP_FASTER.md`
+- **Banner PNG preserved** — `assets/logo/github_banner.png` checksum unchanged; an accidental recompression during PR rebase was reverted before merge.
+
+### Added — Statusline transparency + per-step agent announcements (PR #19)
+
+- **New statusline format:** `🐸 AF v{version} │ {mode} {step} │ {agent} │ {model} │ {ctx}% ctx`
+  - **mode** — read from `run-state.json#flow` (specific: `feature-deep`, `bugfix`, `refactor`, `test`, `security`, `review`, `deploy`, `quality`); falls back to `#complexity` (Quick/Standard/Deep/Project); `idle` when no in-progress run.
+  - **step** — `P{N}` for 5-phase Deep runs (from `current_phase`); `S{N}` for bugfix's 4-step TDD (`current_step` ∈ `investigate`/`test-red`/`fix-green`/`verify`); omitted for quick/idle.
+  - **agent** — `run-state.json#active_agent`, updated by run-orchestrator at every dispatch; falls back to last entry in `agents[]` array, then the session-start cache.
+  - **cost segment removed** — Claude Code's `total_cost_usd` is real but adds visual noise without per-call breakdown. Use `/af status` for a richer cost+token report.
+- **Mandatory builder/reviewer/gate announcements** — run-orchestrator must emit `─── Phase {N} · {Name} ─── Builder: {agent} · Reviewer: {agent}` at every phase boundary and `─── Step S{N} · {Name} ─── Dispatching {agent}…` at every bugfix step transition. Updates `run-state.json#active_agent` so the statusline reflects reality.
+
+### Added — E2E test-gap fix (PR #20)
+
+- **`skills/test-writer/SKILL.md#test-type-selection`** — new section forcing Phase 2 to decide unit vs integration vs e2e BEFORE writing. Trigger words requiring an e2e layer: `login`, `signup`, `checkout`, `payment`, `flow`, `journey`, `end-to-end`, `happy path`, `smoke test`, UI-bearing tasks, T2 features with user-visible acceptance criteria.
+- **`skills/run-orchestrator/SKILL.md`** — Phase 2 now runs the test-type selection step explicitly. Cannot silently default to unit-only on UI/auth/payment tasks; must surface "no e2e runner detected — install playwright, use cypress, or `unit-only` to proceed" prompt when needed.
+- **`agents/tester.md`** — adds "Test Pyramid (v3.7.4+) — pick the layer FIRST" section + `playwright` MCP usage guidance + runner-verification discipline (read pass/fail counts; "Tests passed" without a count = `0 tests collected` bug).
+- **`skills/bugfix-quick/SKILL.md`** — Step 2 (Test RED) now includes "Pick the right layer" — UI / user-flow / auth / payment regressions get an e2e spec via Playwright MCP, not a unit test that won't actually reproduce it.
+
+### Added — Skill-vs-Agent disambiguation
+
+- **CLAUDE.md, `commands/run.md`, `skills/test-writer/SKILL.md`, `skills/bugfix-quick/SKILL.md`** — explicit ⚠️ callouts that `bugfix-quick`, `test-writer`, `run-orchestrator` etc. are **skills** (Skill tool), not **agents** (Agent tool). Calling them via `subagent_type: 'aura-frog:<name>'` errors with "Agent type not found". This fixes the most common new-user error class.
+
+### Path sweep (35 files, expanded scope)
+
+`.aura/plans/` → `.claude/plans/` (and `.aura/memory/` → `.claude/memory/`) across 8 agent files, 9 hooks, 12 skills, 7 rules, 11 command files, the dashboard script, and CLAUDE.md. `.aura/security/mcp-audit.jsonl` stays where it is — MCP audit is a separate concern from plans.
+
+### Stats diff
+
+| | v3.7.2 | v3.7.3 |
+|---|---:|---:|
+| Agents | 15 | 15 |
+| Skills | 56 | 56 |
+| Rules | 70 | 71 (+test-pyramid section, no new rule file) |
+| Commands | 24 | 24 |
+| Hooks | 43 | 43 (14 swept for TTY safety, no count change) |
+| Backing scripts | 12 | 13 (+`link-run.sh`) |
+| Tests | 317 | 322 (+5 link-run unit tests) |
+| CI guards | 2 | 4 (+validate-readme-counts.sh, +Node 20/22 restored) |
+
+### Merged PRs in this release
+
+- #4 — Skill review optimization (upstream contributor)
+- #16 — `.claude/plans/` relocation + slug folder schema + run↔feature linking
+- #17 — TTY-hang fix via `fstatSync`-gated stdin reader
+- #18 — Stale README counts, four sections relocated to `docs/`, two new CI checks
+- #19 — Statusline transparency + mandatory agent announcements
+- #20 — E2E test-gap fix (Phase 2 picks layer, Playwright not silently skipped)
 
 ---
 

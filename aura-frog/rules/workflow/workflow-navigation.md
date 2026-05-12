@@ -79,6 +79,6 @@ Tokens: ████████████░░░░ 75% (~150K used)
 
 ---
 
-**See also:** `rules/next-step-guidance.md` for command reference and context-aware guidance.
+**See also:** `rules/workflow/next-step-guidance.md` for command reference and context-aware guidance.
 
 **Last Updated:** 2025-12-04

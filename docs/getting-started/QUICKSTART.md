@@ -1,5 +1,7 @@
 # Aura Frog — 60-Second Quickstart
 
+> v3.7.3 syntax. If you see `workflow:start` / `bugfix:quick` / `agent:list` in older notes, those were pre-v3.7 commands — the current surface is `/run` + `/aura-frog:*`.
+
 ## Install
 
 ```bash
@@ -11,23 +13,26 @@
 ## Use
 
 ```bash
-# Initialize project context (recommended, run once)
-project:init
+# Universal entry point — auto-detects bugfix / feature / refactor / test / review / deploy
+/run implement user profile with avatar upload
 
-# Start a workflow
-workflow:start "Your task description"
+# Or a one-shot bugfix
+/run fix login button not disabling on submit
 
-# At approval gates:
-# approve     → continue
-# reject      → redo with feedback
-# modify      → adjust deliverables
+# At approval gates (Phase 1 design, Phase 3 build):
+#   approve     → advance to next phase
+#   reject      → redo with feedback
+#   modify      → adjust deliverables without restarting
+#   handoff     → save state for next session
 ```
+
+For a project-scope task that touches 5+ features, `/run` will offer to escalate into the hierarchical planner (`/aura-frog:plan`). Once a plan is active, you can also type bare verbs (`next`, `expand FEAT-A`, `status`) without any prefix.
 
 ## Update
 
 ```bash
 # Check current version
-plugin:update
+/af status
 
 # Update to latest
 /plugin marketplace update aurafrog
@@ -42,18 +47,20 @@ plugin:update
 
 | Command | What it does |
 |---------|-------------|
-| `workflow:start <task>` | Full 5-phase TDD workflow |
-| `bugfix:quick <desc>` | Quick bug fix with tests |
-| `project:init` | Scan repo, generate context |
-| `workflow:approve` | Approve current phase |
-| `agent:list` | Show available agents |
+| `/run <task>` | Universal entry point — auto-detects intent (feature / bugfix / refactor / test / review / deploy) |
+| `/aura-frog:plan` | Hierarchical planning (T0 Mission → T1 Initiative → T2 Feature → T3 Story → T4 Task) |
+| `/check` | Quality scan — security / perf / complexity / debt / coverage / deps |
+| `/design` | Pre-code design — API / DB / docs |
+| `/project init` | Scan repo, detect stack, generate `.claude/project-contexts/` |
+| `/af status` | Plugin status — version, agents, MCP servers, learning system |
+| `/help` | Plugin overview, per-command help, agent routing guide |
 
 ## Learn More
 
-- [GET_STARTED.md](GET_STARTED.md) — Full setup guide
-- [All Commands](../../aura-frog/commands/README.md) — 6 commands
-- [MCP Guide](../operations/MCP_GUIDE.md) — MCP server setup
-- [Agent Teams Guide](../guides/AGENT_TEAMS_GUIDE.md) — Multi-agent orchestration
+- [GET_STARTED.md](GET_STARTED.md) — Full setup walkthrough with first workflow
+- [FIRST_WORKFLOW_TUTORIAL.md](FIRST_WORKFLOW_TUTORIAL.md) — Guided hands-on tutorial
+- [All Commands](../../aura-frog/commands/README.md) — 24 commands (core 6 + `/aura-frog:*` planning suite)
+- [MCP Guide](../operations/MCP_GUIDE.md) — 8 MCP servers (6 enabled + postgres/redis opt-in)
+- [Agent Selection Guide](../guides/AGENT_SELECTION_GUIDE.md) — How agents are auto-picked per task
 
 ---
-
