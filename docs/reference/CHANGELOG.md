@@ -51,6 +51,13 @@ All notable changes to Aura Frog will be documented in this file.
 - Projects with `.aura/plans/active.json` will see the bare-word router suggest routes for verb-first prompts. To opt out: `export AF_BARE_WORD_ROUTER_DISABLED=true`.
 - Multi-feature `/run` invocations will see the escalation prompt. To opt out per-session: `export AF_ESCALATION_DISABLED=true`. To force-bypass for one invocation: prefix with `task:` or `project:`.
 
+### Documentation (catch-up)
+
+- **README rewrite from v3.7.0 baseline** — Version badge bumped 3.7.0 → 3.7.2; "What's new" section restructured around the v3.7.2 plan consolidation + /run escalation + bare-word router (with a collapsed v3.7.0-highlights subsection for context). 8 Pillars status table updated (Tier 2 OPA / L3+L4 / auto-trigger moved from `v3.7.2+` to `v3.8+`). Command Reference section adds the consolidated `/aura-frog:plan <verb>` form. The Numbers table reflects updated counts. New "Honest Maturity Report" section discloses tech debt with references to issues #6/#7/#8/#9.
+- **MIGRATION_TO_V3.7.md** — v3.7.2 changes prepended at the top (consolidation + bare-word + escalation), keeping the v3.7.0 historical section intact below for users still on v3.6.x.
+- **LICENSE** — repo was missing the LICENSE file referenced in README. MIT license added.
+- **Pre-rewrite README backup** — preserved at `docs/marketing/README.pre-v3.7.2-rewrite.md`.
+
 ---
 
 ## [3.7.1] - 2026-05-11 (CI stabilization)

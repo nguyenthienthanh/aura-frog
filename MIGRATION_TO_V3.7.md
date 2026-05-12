@@ -1,4 +1,24 @@
-# Migrating to Aura Frog v3.7.0
+# Migrating to Aura Frog v3.7.x
+
+**Latest:** v3.7.2 (2026-05-11)
+**Path covered:** v3.6.x → v3.7.0 → v3.7.1 → v3.7.2 — every step backward-compatible
+**Migration required:** None mandatory; everything new is opt-in
+
+## v3.7.2 changes (most recent)
+
+| Change | What it means for you |
+|---|---|
+| Consolidated `/aura-frog:plan <verb>` | Use the consolidated form going forward. Legacy `/aura-frog:plan-<verb>` (e.g., `/aura-frog:plan-expand FEAT-7`) still works via alias stubs; soft-deprecated v3.7.2 → warning v4.0 → removed v5.0. |
+| Bare-word activation | With `.aura/plans/active.json` present, short prompts starting with a plan verb (`next`, `expand FEAT-A`, `freeze TASK-1`) route to `/aura-frog:plan` automatically. Disable: `AF_BARE_WORD_ROUTER_DISABLED=true`. |
+| `/run` 3-option escalation | Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt `plan` / `deep` / `details`. Force with `/run task: …` (skip escalation) or `/run project: …` (skip ask). Disable: `AF_ESCALATION_DISABLED=true`. |
+| 9 new backing scripts under `scripts/plans/` | The legacy plan commands now have real implementations. Atomic write + pre-mutation checkpoint + regression-aware validation. |
+| 102 new tests | 38 plan-script unit tests + 64 bare-word router tests; coverage gate maintained. |
+
+**Counts updated:** Skills 55→56 (+plan-orchestrator), Hooks 42→43 (+bare-word-router), Tests 215→317. Commands count unchanged (24) — 10 legacy `/aura-frog:plan-*` files preserved as alias stubs.
+
+---
+
+# Migrating to Aura Frog v3.7.0 (history)
 
 **Released:** 2026-05-11
 **Type:** MINOR version bump (3.6.x → 3.7.0) — backward-compatible

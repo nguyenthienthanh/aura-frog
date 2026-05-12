@@ -8,7 +8,7 @@
 
 A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.7.2-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
@@ -16,36 +16,21 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 
 **Two entry points, one continuum.** `/aura-frog:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[v3.7.2 highlights](#-whats-new-in-v372)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+**[Install in 30 seconds](#-install)** · **[v3.7.0 highlights](#-whats-new-in-v370)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
 ---
 
-## 🆕 What's new in v3.7.2
-
-v3.7.2 consolidates the plan-command surface and adds intelligent escalation to `/run`. Builds on the v3.7.0 baseline (8 Pillars) — every feature still ships, this release polishes the entry points.
-
-| System | What changed | Why it matters |
-|---|---|---|
-| **Plan consolidation** | `/aura-frog:plan <verb> [args]` — one command, 11 verbs (`expand`, `next`, `status`, `replan`, `promote`, `archive`, `undo`, `freeze`, `thaw`, `conflicts`, `bootstrap`). Routes via the new `plan-orchestrator` skill. | Was: 10 separate `/aura-frog:plan-*` commands. Now: one dispatcher; legacy aliases preserved (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0). |
-| **9 new backing scripts** | `scripts/plans/{expand,next,freeze,thaw,archive,conflicts,replan,promote,undo}-node.sh` plus `_lib.sh` and `resolve-node.sh`. Each: atomic write + pre-mutation checkpoint + regression-aware validation. | The legacy plan-command files documented behavior the implementation didn't provide. v3.7.2 delivers it. |
-| **Bare-word activation** | When `.aura/plans/active.json` exists, prompts ≤5 words starting with a plan verb (`next`, `expand FEAT-A`, `freeze TASK-1`) route to `/aura-frog:plan` via the `bare-word-router.cjs` hook. | Lower friction during active plans. Opt-out: `AF_BARE_WORD_ROUTER_DISABLED=true`. |
-| **/run intelligent escalation** | Bridge heuristic extended to 8 triggers (added `word_count >80` and `scope_verbs` rebuild/redesign/rewrite). At weight ≥ 3 without a plan, `/run` emits a 3-option prompt: `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details`. | Multi-feature requests no longer need manual `/aura-frog:plan` invocation first. Override prefixes: `/run task: …`, `/run project: …`. Opt-out: `AF_ESCALATION_DISABLED=true`. |
-| **Tests + audit** | 38 unit tests against the 9 backing scripts + 64 tests for the bare-word router (8 verbs × 3 cases). Coverage gate maintained; full suite 317 passing on Node 18 CI. | Real require()-based tests, not test-theater. |
-
-**Backward-compatible PATCH bump** — every legacy `/aura-frog:plan-<verb>` invocation continues to work via 20-line alias stubs that delegate to the new dispatcher. No breaking changes. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for the full v3.6 → v3.7.2 path.
-
-<details>
-<summary><b>v3.7.0 highlights (still shipped, see 8 Pillars below)</b></summary>
+## 🆕 What's new in v3.7.0
 
 | System | Opt-in via | What it solves |
 |---|---|---|
 | Hierarchical planning | `/aura-frog:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
 | Reasoning trace + grounding | `/aura-frog:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
-| Conflict detection (L1+L2) | `/aura-frog:plan conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
+| Conflict detection (L1+L2) | `/aura-frog:plan-conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
 | Memory tier + session reset | `/aura-frog:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
 | Self-healing + MCP security | `/aura-frog:heal` + `/aura-frog:mcp` | F2/F3 patch proposals (NEVER auto-apply); per-agent allowlists + audit + rate limits |
 
-</details>
+**Backward-compatible MINOR bump** — your existing `/run` workflow continues unchanged. Everything new is opt-in. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for details.
 
 </div>
 
@@ -113,11 +98,11 @@ flowchart TB
 
 ## 🐸 The 8 Pillars of the Planning-First LLM OS
 
-v3.7.0 introduced **eight features** that compose into one cohesive OS; v3.7.2 polishes their entry points (notably Pillar 1). Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped · 🚧 queued for v3.8+.
+v3.7.0 ships **eight features** that compose into one cohesive OS. Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped in v3.7.0 · 🚧 ships behind a flag or queued for v3.7.2+.
 
 | # | Pillar | One-liner | Status |
 |---|---|---|---|
-| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart. v3.7.2: consolidated `/aura-frog:plan <verb>` + bare-word activation | ✅ |
+| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart | ✅ |
 | 2 | **Reasoning Trace Audit** | Every Claude decision is forensically recorded with grounded evidence | ✅ |
 | 3 | **Semantic Session Reset** | Finished an Epic? Distill it into permanent memory, then reset cleanly | ✅ |
 | 4 | **Pre-flight Validation** | Bash linters block bad AI output before it hits disk | ✅ Tier 1 · 🚧 Tier 2 OPA |
@@ -254,7 +239,7 @@ flowchart LR
 
 ### 4 · Pre-flight Validation  ✅ Tier 1 · 🚧 Tier 2
 
-**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.8+).
+**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.7.2+).
 
 ```bash
 /aura-frog:preflight check                              # Manual run
@@ -270,7 +255,7 @@ flowchart LR
     T1 -- pass --> Tool2[Execute]:::ok
     T1 -- warn --> Log[stderr warn, proceed]:::warn
     T1 -- block --> Stop[Refuse]:::block
-    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.8+}:::tier2
+    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.7.2+}:::tier2
     classDef input fill:#6366f1,color:#fff
     classDef gate fill:#475569,color:#fff
     classDef tier fill:#10b981,color:#fff
@@ -286,15 +271,15 @@ flowchart LR
 
 ### 5 · Semantic Conflict Detection  ✅ L1+L2 · 🚧 L3+L4
 
-**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.8+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
+**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.7.2+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
 
 ```bash
-/aura-frog:plan conflicts check          # Manually re-scan
-/aura-frog:plan conflicts list           # Active conflicts
-/aura-frog:plan conflicts resolve <id>   # User-pick resolution
+/aura-frog:plan-conflicts check          # Manually re-scan
+/aura-frog:plan-conflicts list           # Active conflicts
+/aura-frog:plan-conflicts resolve <id>   # User-pick resolution
 /aura-frog:plan-freeze FEAT-007 "reason" # Manual freeze
 /aura-frog:plan-thaw FEAT-007            # Reverse
-AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.8+)
+AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.7.2+)
 ```
 
 ```mermaid
@@ -315,7 +300,7 @@ stateDiagram-v2
 
 ### 6 · Self-Healing Orchestrator  ✅ manual · 🚧 auto-trigger
 
-**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.8+.
+**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.7.2+.
 
 ```bash
 /aura-frog:heal diagnose <task-id>       # Manual diagnosis
@@ -408,9 +393,9 @@ flowchart LR
 
 ### Status snapshot — what ships now vs queued
 
-| Pillar | Ships now (v3.7.0 + v3.7.2 polish) | Queued for v3.8+ |
+| Pillar | v3.7.0 ships | v3.7.2+ queued |
 |---|---|---|
-| 1 — Planning | T0-T4 tree, **consolidated `/aura-frog:plan <verb>`**, 12 backing scripts, 5 agents, **bare-word router hook** | — |
+| 1 — Planning | T0-T4 tree, 8 commands, 5 agents, 2 hooks | — |
 | 2 — Reasoning Trace | tracer hook, grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
 | 3 — Session Reset | epic-summarizer, permanent-memory-loader, `/reset-session` | — |
 | 4 — Pre-flight | 7 Tier-1 bash linters, hook, bypass with 3-warn | Tier 2 OPA + 5 `.rego` policies |
@@ -418,9 +403,8 @@ flowchart LR
 | 6 — Self-Healing | manual `/heal diagnose`, ≥0.7 confidence, never auto-apply | auto-trigger hook on F2/F3 classification |
 | 7 — MCP Security | per-agent allowlist + audit + rate limits + sanitizer | SQLite WAL for audit ([issue #8](https://github.com/nguyenthienthanh/aura-frog/issues/8)) |
 | 8 — Phase-Role | hard rule in `cross-review-workflow.md` + run-orchestrator | — |
-| Routing — `/run` | **3-option escalation** (`plan`/`deep`/`details`) on weight ≥ 3, **`task:` / `project:` override prefixes** | — |
 
-Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`, `AF_BARE_WORD_ROUTER_DISABLED`, `AF_ESCALATION_DISABLED`. All eight pillars + the v3.7.2 routing additions are opt-in friendly.
+Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`. All eight pillars are opt-in friendly.
 
 ---
 
@@ -501,7 +485,7 @@ You: "approve"
 Expected output:
 
 ```
-🐸 Aura Frog v3.7.2 — Ready
+🐸 Aura Frog v3.7.0 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   55 available (9 auto-invoke, 46 on-demand)
@@ -1024,13 +1008,11 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
-| **Skills** | 56 | 9 auto-invoke on context, 47 on-demand (incl. v3.7.2 `plan-orchestrator`) |
-| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
-| **Rules** | 71 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
-| **Hooks** | 43 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
-| **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
+| **Skills** | 55 | 9 auto-invoke on context, 46 on-demand |
+| **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite |
+| **Rules** | 70 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
+| **Hooks** | 42 | Conditional — skip processing for non-code files |
 | **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
-| **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
 
@@ -1038,35 +1020,11 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 
 ## Command Reference
 
-Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. The `/aura-frog:*` namespace (plan, trace, heal, mcp, dashboard, preflight, reset-session) layers on for hierarchical planning and safety operations.
-
-### `/aura-frog:plan <verb> [args]` — Hierarchical planning (v3.7.2 consolidated form)
-
-One command, 11 verbs. The `plan-orchestrator` skill routes via a 3-stage pipeline (explicit verb → intent keywords → LLM fallback). Bare-word activation works when `.aura/plans/active.json` exists.
-
-```bash
-/aura-frog:plan                          # Interview-bootstrap T0→T1→T2 (no args)
-/aura-frog:plan expand FEAT-7            # Decompose one tier down
-/aura-frog:plan next                     # Claim next ready T4; /run auto-anchors
-/aura-frog:plan status                   # ASCII tree
-/aura-frog:plan replan STORY-42          # Budget-aware replan + discard descendants
-/aura-frog:plan promote "note"           # Bubble T4 discovery up to T2/T1
-/aura-frog:plan freeze TASK-101          # Cascade-freeze descendants
-/aura-frog:plan thaw TASK-101            # Reverse freeze + compatibility check
-/aura-frog:plan archive FEAT-5           # Compress completed T2 to summary
-/aura-frog:plan conflicts list --open    # L1+L2 conflict log
-/aura-frog:plan undo                     # LIFO checkpoint restore
-```
-
-**Legacy `/aura-frog:plan-<verb>` forms** (e.g., `/aura-frog:plan-expand FEAT-7`) still work via 20-line alias stubs. Soft-deprecated v3.7.2 → warning v4.0 → removed v5.0.
-
-**Bare-word activation:** with a plan active, prompts ≤5 words starting with a plan verb route automatically: just type `next`, `expand FEAT-A`, `freeze TASK-1`. Opt-out: `AF_BARE_WORD_ROUTER_DISABLED=true`.
-
-
+Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. Specialized `/aura-frog:*` commands (plan, freeze, conflicts, heal, mcp, dashboard, preflight) layer on for hierarchical planning and safety operations.
 
 ### `/run <task>` — The main entry point
 
-Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow. v3.7.2 adds intelligent escalation for project-scope tasks.
+Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow.
 
 | What you say | Intent detected | Flow |
 |---|---|---|
@@ -1078,9 +1036,6 @@ Auto-detects what kind of work you want (feature / bugfix / refactor / test) and
 | `/run resume <id>` | Resume | Load state from `.claude/logs/runs/<id>/` |
 | `/run status` | Status | Current phase + progress |
 | `/run handoff` | Handoff | Save state for cross-session continuation |
-| `/run rebuild auth + OAuth + 2FA` | Project (v3.7.2+) | Escalation prompt — `plan` bootstraps `/aura-frog:plan`, `deep` proceeds inline, `details` shows signals |
-| `/run task: <desc>` | Override (v3.7.2+) | Force task mode; skip escalation entirely |
-| `/run project: <desc>` | Override (v3.7.2+) | Force project mode; write `pending-plan-bootstrap.json` + invoke `/aura-frog:plan` |
 
 ### `/check` — Health + quality checks
 
@@ -1341,49 +1296,6 @@ Honest comparison with two popular plugins in the ecosystem (April 2026).
 **Not competing — different optimization targets.** Aura Frog optimizes for *production code quality* (TDD + security review). wshobson optimizes for *breadth of specialists*. Superpowers optimizes for *structured thinking over code*.
 
 Combine freely — plugins coexist in Claude Code.
-
----
-
-## Honest Maturity Report
-
-What works well, what doesn't, what's tracked. v3.7.2 polishes the surface; the underlying engineering still has real tech debt. We name it so you can plan around it.
-
-### Confidence
-
-- **8 Pillars feature surface** — all shipped and exercised through the integration tests. Hierarchical planning, reasoning trace, conflict detection, self-healing proposals, MCP security, pre-flight, session reset, phase-role binding. Day-to-day production use is fine.
-- **Plan consolidation (v3.7.2)** — 38 unit tests against the 9 new backing scripts using temp `.aura/plans/` fixtures. 64 tests for the bare-word router with require()-based imports (no test theater).
-- **CI green on Node 18** — 317 tests, coverage gate held.
-
-### Known tech debt (tracked openly)
-
-| Item | Severity | Issue | Effort |
-|---|---|---|---|
-| 5 deferred env-var-dependent hooks still rely on undocumented `CLAUDE_TOOL_NAME` / `CLAUDE_FILE_PATHS` instead of the documented stdin-JSON contract. Only `mcp-call-gate` got the stdin fallback in v3.7.1. | medium | [#7](https://github.com/nguyenthienthanh/aura-frog/issues/7) | ~1d |
-| `hooks/lib/hook-runtime.cjs` doesn't exist yet — every hook re-implements stdin parsing + audit appending + atomic writes. Boilerplate × 43 files. | medium | [#6](https://github.com/nguyenthienthanh/aura-frog/issues/6) | ~2d |
-| `.aura/plans/traces/*.jsonl` and `.aura/security/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
-| Hook performance budget not enforced. ~19 hooks fire on every Write/Edit; estimated 100-300ms p95 but unmeasured. | medium | [#9](https://github.com/nguyenthienthanh/aura-frog/issues/9) | ~1d for budget + benchmark |
-| Node 20/22 test matrix hangs on Ubuntu CI runners (Node 18 + macOS pass in ~22s). Temporarily reduced to Node 18 only for v3.7.2 release. | low | (no open issue yet — investigate in v3.7.3) | ~2-4h to bisect |
-| Pillar 4 Tier 2 OPA Rego policies, Pillar 5 L3+L4 LLM conflict detection, Pillar 6 auto-trigger on F2/F3 — all in the v3.7.0 roadmap, queued for v3.8+. | feature | — | varies |
-| `cc-plugin-eval` upstream npm peer-dep conflict (`madge` vs `typescript ^6`) breaks the behavioral-eval CI workflow. Not a regression in this plugin; tracked as upstream. | external | — | wait for cc-plugin-eval fix |
-
-### What v3.7.2 explicitly does NOT do
-
-- It does not enable Tier 2 OPA pre-flight (queued v3.8+).
-- It does not add L3 (semantic LLM) or L4 (architectural LLM) conflict checks. The env var `AF_CONFLICT_LLM_DISABLED` is a no-op until v3.8+.
-- It does not auto-apply self-heal patches — proposals only, confidence ≥ 0.7, max 5/session.
-- It does not change `/run`'s 5-phase TDD flow. The escalation prompt adds an option, not a replacement.
-
-### How to assess fit
-
-Use this checklist:
-
-- ✅ Multi-week features, complex refactors, scope creep risk → high value
-- ✅ AI hallucination concerns (reasoning trace + grounding rejects ungrounded claims) → high value
-- ✅ Parallel-team work with conflict risk → L1+L2 detector catches file/function overlap
-- ✅ MCP-heavy workflows (Figma + Firebase + Slack + DBs) → per-agent allowlists + audit log
-- ⚠️ Single-file edits / quick prototypes → workflow overhead may not pay off; use `/run task: …` to bypass
-- ⚠️ Haiku-only budget — some features (planning, conflict, design phases) prefer Sonnet/Opus
-- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 56 skills, 71 rules, 43 hooks)
 
 ---
 
