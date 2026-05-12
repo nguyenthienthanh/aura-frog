@@ -275,7 +275,7 @@
 
 ### 5.1. 15 Specialized Agents with Proper Frontmatter
 
-**What:** 15 agents with official Anthropic YAML frontmatter (`name`, `description`, `tools` allowlist, `color`, optional `model`). Security + strategist are read-only; planning agents (master-planner, feature-architect, story-planner, replanner, conflict-arbiter, epic-summarizer) are read-only on code and only write under `.aura/plans/`.
+**What:** 15 agents with official Anthropic YAML frontmatter (`name`, `description`, `tools` allowlist, `color`, optional `model`). Security + strategist are read-only; planning agents (master-planner, feature-architect, story-planner, replanner, conflict-arbiter, epic-summarizer) are read-only on code and only write under `.claude/plans/`.
 
 **How applied:** Each agent's `.md` file has frontmatter. Claude Code respects tool restrictions and color coding. Agent-detector picks the right one per task.
 
@@ -324,7 +324,7 @@
 
 **What:** A 6-command core (`/run` universal + `/check` quality + `/design` pre-code + `/project` config + `/af` system + `/help`) covers the everyday workflow. v3.7.0 layered an `/aura-frog:*` suite on top (plan, expand, freeze, conflicts, heal, mcp, dashboard, preflight, …) for hierarchical planning and safety operations. Total: 24 slash commands.
 
-**How applied:** Core commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow. `/aura-frog:*` commands operate on the plan tree at `.aura/plans/` and never compete with the core surface.
+**How applied:** Core commands auto-detect intent. `/run fix login` → bugfix-quick skill. `/run implement X` → 5-phase workflow. `/aura-frog:*` commands operate on the plan tree at `.claude/plans/` (v3.7.3+; legacy `.aura/plans/` still resolved via fallback) and never compete with the core surface.
 
 **Why you need it:** Discovery paralysis is real (some plugins ship 25+ verbs). 6 core commands cover 80%+ of daily use; specialized `/aura-frog:*` verbs surface only when you actually use hierarchical planning.
 
@@ -503,11 +503,11 @@ v3.7.0 ships eight composable features organized into four themes. Each pillar i
 
 ### 9.1. Hierarchical Planning (Structure)
 
-**What:** Plans persist to `.aura/plans/` as a five-tier tree (Mission → Initiative → Feature → Story → Task). `plan-loader` auto-loads minimum context per turn (mission + active branch + ancestors); the rest stays on disk. Five planning agents (`master-planner`, `strategist`, `feature-architect`, `story-planner`, `replanner`) decompose tier by tier.
+**What:** Plans persist to `.claude/plans/` (v3.7.3+; legacy `.aura/plans/` still resolved via fallback) as a five-tier tree (Mission → Initiative → Feature → Story → Task). Every node is a folder named `{ID}_{kebab-slug}/` (v3.7.3) with its spec file + co-located aux (`checkpoints/`, `trace.jsonl` for tasks). `plan-loader` auto-loads minimum context per turn (mission + active branch + ancestors); the rest stays on disk. Five planning agents (`master-planner`, `strategist`, `feature-architect`, `story-planner`, `replanner`) decompose tier by tier.
 
-**How applied:** `/aura-frog:plan` interview-bootstraps T0-T2. `/aura-frog:plan-expand <id>` drills one tier deeper. `/aura-frog:plan-next` returns the next ready Task; `/aura-frog:run` auto-anchors to it via the run-plan bridge (`rules/workflow/run-plan-bridge.md`).
+**How applied:** `/aura-frog:plan` interview-bootstraps T0-T2. `/aura-frog:plan expand <id>` drills one tier deeper. `/aura-frog:plan next` returns the next ready Task; `/aura-frog:run` auto-anchors to it via the run-plan bridge (`rules/workflow/run-plan-bridge.md`). `/run feature: FEAT-A <task>` (v3.7.3) anchors a new run; `/run resume FEAT-A` lists runs in the feature's `## Runs` table and prompts to pick.
 
-**Why you need it:** Long-running projects no longer lose decisions to `/compact`. Multi-week features get explicit decomposition. Team handoffs reduce to *"read `mission.md` and `active.json`"*.
+**Why you need it:** Long-running projects no longer lose decisions to `/compact`. Multi-week features get explicit decomposition. Team handoffs reduce to *"read `mission/mission.md`, the feature folder, and `active.json`"*. The folder-per-node layout keeps everything about a feature (spec, deliverables, traces, checkpoints, runs that touched it) in one place.
 
 **Use cases:** 3+ month projects · multi-feature releases · team handovers · resumable work after machine restarts.
 
@@ -515,7 +515,7 @@ v3.7.0 ships eight composable features organized into four themes. Each pillar i
 
 ### 9.2. Reasoning Trace Audit (Accountability)
 
-**What:** Every Claude tool call writes an append-only event to `.aura/plans/traces/{TASK_ID}.jsonl` with sha256-anchored evidence. Events include `tool_call`, `file_read` (path + sha256 + lines), `tool_result`, `output_claim` (claim + `grounded_in` references + confidence), `decision`, `plan_deviation`, `acceptance_check`. The `grounding-discipline` rule rejects any `output_claim` not backed by a prior `file_read`.
+**What:** Every Claude tool call writes an append-only event to the task's `trace.jsonl` (v3.7.3+: co-located inside `.claude/plans/features/.../tasks/{TASK_ID}_{slug}/trace.jsonl`; legacy fallback to `.claude/plans/traces/{TASK_ID}.jsonl`) with sha256-anchored evidence. Events include `tool_call`, `file_read` (path + sha256 + lines), `tool_result`, `output_claim` (claim + `grounded_in` references + confidence), `decision`, `plan_deviation`, `acceptance_check`. The `grounding-discipline` rule rejects any `output_claim` not backed by a prior `file_read`.
 
 **How applied:** `tool-call-tracer.cjs` fires PreToolUse + PostToolUse. `reasoning-trace-recorder` (auto-invoke) captures claims. `/aura-frog:trace --hallucinations` surfaces ungrounded claims; `--filter file_read --tail 20` shows recent reads.
 
@@ -529,7 +529,7 @@ v3.7.0 ships eight composable features organized into four themes. Each pillar i
 
 ### 9.3. Semantic Session Reset (Memory)
 
-**What:** When a Feature (T2) reaches `done`, `epic-summarizer` agent distills architectural decisions, gotchas, anti-patterns, and successful patterns into a structured Epic section in `.aura/memory/permanent_memory.md`. Hard caps: ≤500 tokens per Epic, ≤8K total. `permanent-memory-loader` (auto-invoke) loads only the summary lines (≤120 always-loaded tokens). Master Planner then offers a clean session restart.
+**What:** When a Feature (T2) reaches `done`, `epic-summarizer` agent distills architectural decisions, gotchas, anti-patterns, and successful patterns into a structured Epic section in `.claude/memory/permanent_memory.md` (v3.7.3+; legacy `.aura/memory/` still resolved). Hard caps: ≤500 tokens per Epic, ≤8K total. `permanent-memory-loader` (auto-invoke) loads only the summary lines (≤120 always-loaded tokens). Master Planner then offers a clean session restart.
 
 **How applied:** `feature-done-trigger-archive.cjs` hook fires on T2 done. `/aura-frog:reset-session` manually invokes. `--dry-run` previews; `--no-prompt` is CI-friendly.
 

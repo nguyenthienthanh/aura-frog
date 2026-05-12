@@ -8,7 +8,7 @@
 
 A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.7.2-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.3-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
@@ -16,30 +16,43 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 
 **Two entry points, one continuum.** `/aura-frog:plan` for hierarchical projects that survive session reset. `/run` for one-off tasks. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[v3.7.2 highlights](#-whats-new-in-v372)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+**[Install in 30 seconds](#-install)** · **[v3.7.3 highlights](#-whats-new-in-v373)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
 ---
 
-## 🆕 What's new in v3.7.2
+## 🆕 What's new in v3.7.3
 
-v3.7.2 consolidates the plan-command surface and adds intelligent escalation to `/run`. Builds on the v3.7.0 baseline (8 Pillars) — every feature still ships, this release polishes the entry points.
+v3.7.3 relocates the plan tree under `.claude/plans/` (next to other Claude Code state), normalises every node to a folder, and wires bidirectional `/run` ↔ feature linking. Backward-compatible patch.
+
+| Change | What it means |
+|---|---|
+| **Storage moves to `.claude/plans/`** | Plan tree now lives next to runs (`.claude/logs/runs/`) instead of in a separate `.aura/` directory. Resolution order: `--plans-dir` arg → `$AF_PLANS_DIR` env → `.claude/plans/` (default) → `.aura/plans/` (legacy fallback, removal v4.0). |
+| **Every node is a folder** | T0 mission, T1 initiative, T2 feature, T3 story, T4 task — each lives in `{ID}_{kebab-slug}/` containing its `<tier>.md` spec. Tickets (JIRA-/LIN-/GH-) used as ID prefix when attached; otherwise auto-minted `FEAT-N` / `STORY-NNNN` / `TASK-NNNNN`. |
+| **Co-located aux files** | `<node>/checkpoints/{ISO}.json` and `<task>/trace.jsonl` live INSIDE the node folder (was: global `plans/checkpoints/` and `plans/traces/`). Archive consolidated to `archive/{ID}_{slug}/{summary.md, original/}`. |
+| **Run ↔ feature linking (bidirectional)** | `run-state.json` gains `feature_id` + `feature_slug` + `anchor.task_id`. Feature.md gains a `## Runs` table listing every `/run` that anchored to it. New `scripts/plans/link-run.sh` is the single writer; idempotent (re-link replaces row). |
+| **New `/run` prefixes** | `/run feature: FEAT-A <task>` — anchor a new run to a feature. `/run resume FEAT-A` — list runs under a feature, prompt to pick (auto-resume if single in-progress). Existing `/run task: …` and `/run project: …` (v3.7.2) unchanged. |
+| **INDEX.md auto-emitted** | `new-plan.sh` writes a `.claude/plans/INDEX.md` on first init documenting the layout, naming convention, run-feature linking, commands, and migration path. |
+
+**Backward-compatible patch.** Scripts have legacy fallbacks for `.aura/plans/`, flat `mission.md`, flat `initiatives/INIT-N.md`, flat `tasks/TASK-N.md`, and global `plans/checkpoints/` — all keep working until v4.0. No data migration required; new structure activates when `.claude/plans/` is present.
+
+<details>
+<summary><b>v3.7.2 highlights (still shipped — plan consolidation + /run escalation)</b></summary>
 
 | System | What changed | Why it matters |
 |---|---|---|
-| **Plan consolidation** | `/aura-frog:plan <verb> [args]` — one command, 11 verbs (`expand`, `next`, `status`, `replan`, `promote`, `archive`, `undo`, `freeze`, `thaw`, `conflicts`, `bootstrap`). Routes via the new `plan-orchestrator` skill. | Was: 10 separate `/aura-frog:plan-*` commands. Now: one dispatcher; legacy aliases preserved (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0). |
-| **9 new backing scripts** | `scripts/plans/{expand,next,freeze,thaw,archive,conflicts,replan,promote,undo}-node.sh` plus `_lib.sh` and `resolve-node.sh`. Each: atomic write + pre-mutation checkpoint + regression-aware validation. | The legacy plan-command files documented behavior the implementation didn't provide. v3.7.2 delivers it. |
-| **Bare-word activation** | When `.aura/plans/active.json` exists, prompts ≤5 words starting with a plan verb (`next`, `expand FEAT-A`, `freeze TASK-1`) route to `/aura-frog:plan` via the `bare-word-router.cjs` hook. | Lower friction during active plans. Opt-out: `AF_BARE_WORD_ROUTER_DISABLED=true`. |
-| **/run intelligent escalation** | Bridge heuristic extended to 8 triggers (added `word_count >80` and `scope_verbs` rebuild/redesign/rewrite). At weight ≥ 3 without a plan, `/run` emits a 3-option prompt: `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details`. | Multi-feature requests no longer need manual `/aura-frog:plan` invocation first. Override prefixes: `/run task: …`, `/run project: …`. Opt-out: `AF_ESCALATION_DISABLED=true`. |
-| **Tests + audit** | 38 unit tests against the 9 backing scripts + 64 tests for the bare-word router (8 verbs × 3 cases). Coverage gate maintained; full suite 317 passing on Node 18 CI. | Real require()-based tests, not test-theater. |
+| Plan consolidation | `/aura-frog:plan <verb> [args]` — one command, 11 verbs. Routes via `plan-orchestrator` skill. | 10 legacy `/aura-frog:plan-*` aliases preserved (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0). |
+| 9 backing scripts | `scripts/plans/{expand,next,freeze,thaw,archive,conflicts,replan,promote,undo}-node.sh`. | Implementation that matched the docs. |
+| Bare-word activation | Prompts ≤5 words starting with a plan verb route to `/aura-frog:plan`. | Opt-out: `AF_BARE_WORD_ROUTER_DISABLED=true`. |
+| /run escalation | At weight ≥ 3 without a plan, 3-option prompt: `plan` / `deep` / `details`. | Opt-out: `AF_ESCALATION_DISABLED=true`. |
 
-**Backward-compatible PATCH bump** — every legacy `/aura-frog:plan-<verb>` invocation continues to work via 20-line alias stubs that delegate to the new dispatcher. No breaking changes. See [MIGRATION_TO_V3.7.md](MIGRATION_TO_V3.7.md) for the full v3.6 → v3.7.2 path.
+</details>
 
 <details>
-<summary><b>v3.7.0 highlights (still shipped, see 8 Pillars below)</b></summary>
+<summary><b>v3.7.0 baseline (still shipped — 8 Pillars below)</b></summary>
 
 | System | Opt-in via | What it solves |
 |---|---|---|
-| Hierarchical planning | `/aura-frog:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.aura/plans/history.jsonl` |
+| Hierarchical planning | `/aura-frog:plan` | Plans persist across sessions; T0-T4 schema; forensic decision audit at `.claude/plans/history.jsonl` |
 | Reasoning trace + grounding | `/aura-frog:trace` | Every `output_claim` is grounded in a prior `file_read`; hallucinations flagged with `grounded: false` |
 | Conflict detection (L1+L2) | `/aura-frog:plan conflicts check` | File + function overlap between parallel work; freeze cascade; auto-thaw on compatible blocker |
 | Memory tier + session reset | `/aura-frog:reset-session` | T2 done distills into `permanent_memory.md`; clean session restart preserves wisdom |
@@ -113,11 +126,11 @@ flowchart TB
 
 ## 🐸 The 8 Pillars of the Planning-First LLM OS
 
-v3.7.0 introduced **eight features** that compose into one cohesive OS; v3.7.2 polishes their entry points (notably Pillar 1). Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped · 🚧 queued for v3.8+.
+v3.7.0 introduced **eight features** that compose into one cohesive OS; v3.7.2 + v3.7.3 polished their entry points + storage layout (notably Pillar 1). Each pillar solves a real failure mode of shipping with an AI agent. Status legend: ✅ shipped · 🚧 queued for v3.8+.
 
 | # | Pillar | One-liner | Status |
 |---|---|---|---|
-| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart. v3.7.2: consolidated `/aura-frog:plan <verb>` + bare-word activation | ✅ |
+| 1 | **Hierarchical Planning** | Plans survive session reset · `/compact` · machine restart. v3.7.3: uniform folder-per-node layout under `.claude/plans/` · run↔feature linking | ✅ |
 | 2 | **Reasoning Trace Audit** | Every Claude decision is forensically recorded with grounded evidence | ✅ |
 | 3 | **Semantic Session Reset** | Finished an Epic? Distill it into permanent memory, then reset cleanly | ✅ |
 | 4 | **Pre-flight Validation** | Bash linters block bad AI output before it hits disk | ✅ Tier 1 · 🚧 Tier 2 OPA |
@@ -154,45 +167,72 @@ flowchart LR
 
 ### 1 · Hierarchical Planning  ✅
 
-**What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.aura/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
+**What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.claude/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
 
-**v3.7.2+ consolidated form** — one command, 11 verbs:
+**v3.7.3+ uniform folder-per-node layout** — every node lives in `{ID}_{kebab-slug}/` with its spec file + co-located aux:
+
+```
+.claude/plans/                           # next to .claude/logs/runs/
+├── INDEX.md                             # auto-emitted readme of the tree
+├── mission/mission.md                   # T0
+├── initiatives/INIT-001_q1-rollout/initiative.md
+├── features/JIRA-1234_oauth-flow/       # T2 (ticket-ID prefix when attached)
+│   ├── feature.md                       # spec + ## Runs table
+│   ├── REQUIREMENTS.md · DESIGN.md      # /run Phase 1 deliverables
+│   ├── checkpoints/{ISO}.json
+│   └── stories/STORY-0001_login-form/
+│       ├── story.md
+│       └── tasks/TASK-00001_password-input/
+│           ├── task.md
+│           ├── trace.jsonl              # per-task forensic log
+│           └── checkpoints/
+└── archive/FEAT-X_kebab-slug/{summary.md, original/}
+```
+
+**One command, 11 verbs** (since v3.7.2):
 
 ```bash
-/aura-frog:plan                          # Interview-bootstraps T0 → T1 → T2
+/aura-frog:plan                          # Interview-bootstrap T0 → T1 → T2
 /aura-frog:plan expand FEAT-7            # Decompose one tier down
-/aura-frog:plan next                     # Claim next ready Task; /run auto-anchors
+/aura-frog:plan next                     # Claim next ready Task
 /aura-frog:plan status                   # ASCII tree
 /aura-frog:plan {replan,promote,archive,undo,freeze,thaw,conflicts} <args>
 ```
 
-Bare-word activation when a plan is active: just type `next`, `expand FEAT-A`, etc. — the bare-word-router hook treats short verb-first prompts as `/aura-frog:plan <prompt>`. Legacy `/aura-frog:plan-<verb>` aliases still work (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0).
+Bare-word activation when a plan is active: just type `next`, `expand FEAT-A`, etc. Legacy `/aura-frog:plan-<verb>` aliases still work (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0).
 
-**`/run` escalation:** Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt 3 options — `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details` (show signals). Force with `/run task: …` or `/run project: …`; opt out via `AF_ESCALATION_DISABLED=true`.
+**Run ↔ feature linking** (v3.7.3): `/run feature: FEAT-A <task>` anchors a run to a feature; `/run resume FEAT-A` lists runs and prompts to pick. Bidirectional: `run-state.json` carries `feature_id`, the feature's `## Runs` table records every run that touched it. Resume / rework / continue across sessions becomes trivial.
+
+**`/run` escalation** (v3.7.2): Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt 3 options — `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details` (show signals). Force with `/run task: …` or `/run project: …`; opt out via `AF_ESCALATION_DISABLED=true`.
 
 ```mermaid
 flowchart TB
-    M([T0: Mission]):::t0 --> I[T1: Initiative INIT-001]:::t1
-    I --> F1[T2: Feature FEAT-007]:::t2
-    I --> F2[T2: Feature FEAT-008]:::t2
-    F1 --> S1[T3: Story STORY-0042]:::t3
-    F1 --> S2[T3: Story STORY-0043]:::t3
-    S1 --> T1[T4: Task 00101]:::t4
-    S1 --> T2[T4: Task 00102]:::t4
+    subgraph Tree["Plan tree — every node is a folder"]
+        M(["T0 mission/<br/>mission.md"]):::t0 --> I[T1 initiatives/INIT-001_q1-rollout/<br/>initiative.md]:::t1
+        I --> F1[T2 features/JIRA-1234_oauth-flow/<br/>feature.md + REQUIREMENTS.md + DESIGN.md]:::t2
+        I --> F2[T2 features/FEAT-B_billing/<br/>feature.md]:::t2
+        F1 --> S1[T3 stories/STORY-0001_login-form/<br/>story.md]:::t3
+        F1 --> S2[T3 stories/STORY-0002_oauth-callback/<br/>story.md]:::t3
+        S1 --> T1[T4 tasks/TASK-00001_password-input/<br/>task.md + trace.jsonl + checkpoints/]:::t4
+        S1 --> T2[T4 tasks/TASK-00002_submit-handler/<br/>task.md + trace.jsonl + checkpoints/]:::t4
+    end
+    Run([🏃 /run feature: JIRA-1234 …]):::run -.anchors.-> F1
+    F1 -.runs[].-> Run
     classDef t0 fill:#1e293b,color:#fff
     classDef t1 fill:#475569,color:#fff
     classDef t2 fill:#6366f1,color:#fff
     classDef t3 fill:#10b981,color:#fff
     classDef t4 fill:#f59e0b,color:#000
+    classDef run fill:#ec4899,stroke:#9d174d,color:#fff
 ```
 
-**Why it matters:** Long-running projects no longer lose decisions to context compaction. Team handoffs become trivial — read `mission.md` + `active.json` and you're caught up. Multi-week features get explicit decomposition.
+**Why it matters:** Long-running projects no longer lose decisions to context compaction. Team handoffs become trivial — read `mission/mission.md` + `active.json` + the feature folder and you're caught up. The folder-per-node layout keeps everything about a feature (spec, deliverables, traces, checkpoints, runs that touched it) in one place. Multi-week features get explicit decomposition with provenance — every `/run` against a feature shows up in its `## Runs` table.
 
 ---
 
 ### 2 · Reasoning Trace Audit  ✅
 
-**What you get:** Every Claude tool call writes an append-only event to `.aura/plans/traces/{TASK_ID}.jsonl` — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
+**What you get:** Every Claude tool call writes an append-only event to the task's `trace.jsonl` (v3.7.3: co-located inside `.claude/plans/features/.../tasks/{TASK_ID}_{slug}/trace.jsonl`; legacy fallback to `.claude/plans/traces/{TASK_ID}.jsonl`) — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
 
 ```bash
 /aura-frog:trace                              # Full trace for active task
@@ -225,7 +265,7 @@ sequenceDiagram
 
 ### 3 · Semantic Session Reset  ✅
 
-**What you get:** When a Feature (T2) reaches `done`, the `epic-summarizer` agent distills the most valuable findings — architectural decisions, gotchas, anti-patterns — into `.aura/memory/permanent_memory.md`. Then Master Planner offers you a clean session restart: working context wipes, permanent memory anchors.
+**What you get:** When a Feature (T2) reaches `done`, the `epic-summarizer` agent distills the most valuable findings — architectural decisions, gotchas, anti-patterns — into `.claude/memory/permanent_memory.md`. Then Master Planner offers you a clean session restart: working context wipes, permanent memory anchors.
 
 ```bash
 /aura-frog:reset-session                      # Distill + prompt to reset
@@ -408,19 +448,19 @@ flowchart LR
 
 ### Status snapshot — what ships now vs queued
 
-| Pillar | Ships now (v3.7.0 + v3.7.2 polish) | Queued for v3.8+ |
+| Pillar | Ships now (v3.7.0 + v3.7.2/v3.7.3 polish) | Queued for v3.8+ |
 |---|---|---|
-| 1 — Planning | T0-T4 tree, **consolidated `/aura-frog:plan <verb>`**, 12 backing scripts, 5 agents, **bare-word router hook** | — |
-| 2 — Reasoning Trace | tracer hook, grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
-| 3 — Session Reset | epic-summarizer, permanent-memory-loader, `/reset-session` | — |
+| 1 — Planning | T0-T4 tree at `.claude/plans/`, **uniform folder-per-node layout** (v3.7.3), **consolidated `/aura-frog:plan <verb>`** (v3.7.2), 12 backing scripts, 5 agents, bare-word router, `link-run.sh` for run↔feature bidirectional linking | — |
+| 2 — Reasoning Trace | tracer hook (writes per-task `trace.jsonl` inside the task folder, v3.7.3), grounding-discipline, `/trace` queries | helper CLI scripts (deferred per [issue #6](https://github.com/nguyenthienthanh/aura-frog/issues/6)) |
+| 3 — Session Reset | epic-summarizer, permanent-memory-loader (`.claude/memory/`), `/reset-session` | — |
 | 4 — Pre-flight | 7 Tier-1 bash linters, hook, bypass with 3-warn | Tier 2 OPA + 5 `.rego` policies |
 | 5 — Conflict Detection | L1 (file) + L2 (function) + freeze cascade + arbitration | L3 (semantic LLM) + L4 (architectural LLM) |
 | 6 — Self-Healing | manual `/heal diagnose`, ≥0.7 confidence, never auto-apply | auto-trigger hook on F2/F3 classification |
 | 7 — MCP Security | per-agent allowlist + audit + rate limits + sanitizer | SQLite WAL for audit ([issue #8](https://github.com/nguyenthienthanh/aura-frog/issues/8)) |
 | 8 — Phase-Role | hard rule in `cross-review-workflow.md` + run-orchestrator | — |
-| Routing — `/run` | **3-option escalation** (`plan`/`deep`/`details`) on weight ≥ 3, **`task:` / `project:` override prefixes** | — |
+| Routing — `/run` | **3-option escalation** (`plan`/`deep`/`details`) on weight ≥ 3, **`task:` / `project:` override prefixes** (v3.7.2), **`feature: <ID>` prefix** + **`resume <FEATURE_ID>`** (v3.7.3) | — |
 
-Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`, `AF_BARE_WORD_ROUTER_DISABLED`, `AF_ESCALATION_DISABLED`. All eight pillars + the v3.7.2 routing additions are opt-in friendly.
+Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AUDIT_DISABLED`, `AF_TRACE_DISABLED`, `AF_PREFLIGHT_DISABLED`, `AF_CONFLICT_LLM_DISABLED`, `AF_RUN_PLAN_BRIDGE_DISABLED`, `AF_TOKEN_TRACKER_DISABLED`, `AF_BARE_WORD_ROUTER_DISABLED`, `AF_ESCALATION_DISABLED`. Override the plans dir entirely with `AF_PLANS_DIR=<path>` (e.g. to keep using legacy `.aura/plans/`). All eight pillars + the v3.7.2/v3.7.3 routing additions are opt-in friendly.
 
 ---
 
@@ -501,7 +541,7 @@ You: "approve"
 Expected output:
 
 ```
-🐸 Aura Frog v3.7.2 — Ready
+🐸 Aura Frog v3.7.3 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   55 available (9 auto-invoke, 46 on-demand)
@@ -1042,7 +1082,7 @@ Six core commands cover every everyday workflow — they auto-detect intent and 
 
 ### `/aura-frog:plan <verb> [args]` — Hierarchical planning (v3.7.2 consolidated form)
 
-One command, 11 verbs. The `plan-orchestrator` skill routes via a 3-stage pipeline (explicit verb → intent keywords → LLM fallback). Bare-word activation works when `.aura/plans/active.json` exists.
+One command, 11 verbs. The `plan-orchestrator` skill routes via a 3-stage pipeline (explicit verb → intent keywords → LLM fallback). Bare-word activation works when `.claude/plans/active.json` exists.
 
 ```bash
 /aura-frog:plan                          # Interview-bootstrap T0→T1→T2 (no args)
@@ -1066,7 +1106,7 @@ One command, 11 verbs. The `plan-orchestrator` skill routes via a 3-stage pipeli
 
 ### `/run <task>` — The main entry point
 
-Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow. v3.7.2 adds intelligent escalation for project-scope tasks.
+Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow. v3.7.2 adds intelligent escalation for project-scope tasks; v3.7.3 adds feature-anchored runs.
 
 | What you say | Intent detected | Flow |
 |---|---|---|
@@ -1075,12 +1115,14 @@ Auto-detects what kind of work you want (feature / bugfix / refactor / test) and
 | `/run refactor auth service` | Refactor | `refactor-expert` skill — analyze → plan → test → refactor |
 | `/run add tests for payment` | Test | `test-writer` skill — detect framework → write tests → coverage |
 | `/run fasttrack: <specs>` | Fast-Track | Skip Phase 1, auto-execute P2–P5 (specs must include Requirements + Design + API + Data Model + Acceptance Criteria) |
-| `/run resume <id>` | Resume | Load state from `.claude/logs/runs/<id>/` |
+| `/run resume <id>` | Resume (run-id) | Load state from `.claude/logs/runs/<id>/` |
+| `/run resume FEAT-A` | Resume (feature) | v3.7.3+ — list runs under FEAT-A's `## Runs` table, prompt to pick (auto-resume if single in-progress) |
 | `/run status` | Status | Current phase + progress |
 | `/run handoff` | Handoff | Save state for cross-session continuation |
 | `/run rebuild auth + OAuth + 2FA` | Project (v3.7.2+) | Escalation prompt — `plan` bootstraps `/aura-frog:plan`, `deep` proceeds inline, `details` shows signals |
 | `/run task: <desc>` | Override (v3.7.2+) | Force task mode; skip escalation entirely |
 | `/run project: <desc>` | Override (v3.7.2+) | Force project mode; write `pending-plan-bootstrap.json` + invoke `/aura-frog:plan` |
+| `/run feature: FEAT-A <desc>` | Anchor (v3.7.3+) | Anchor a new run to a feature; writes `run-state.json#feature_id` + appends to the feature's `## Runs` table |
 
 ### `/check` — Health + quality checks
 
@@ -1351,7 +1393,7 @@ What works well, what doesn't, what's tracked. v3.7.2 polishes the surface; the 
 ### Confidence
 
 - **8 Pillars feature surface** — all shipped and exercised through the integration tests. Hierarchical planning, reasoning trace, conflict detection, self-healing proposals, MCP security, pre-flight, session reset, phase-role binding. Day-to-day production use is fine.
-- **Plan consolidation (v3.7.2)** — 38 unit tests against the 9 new backing scripts using temp `.aura/plans/` fixtures. 64 tests for the bare-word router with require()-based imports (no test theater).
+- **Plan consolidation (v3.7.2) + uniform layout (v3.7.3)** — 43 unit tests against the 9 backing scripts + `link-run.sh` using temp `.claude/plans/` fixtures. 64 tests for the bare-word router with require()-based imports (no test theater).
 - **CI green on Node 18** — 317 tests, coverage gate held.
 
 ### Known tech debt (tracked openly)
@@ -1360,7 +1402,7 @@ What works well, what doesn't, what's tracked. v3.7.2 polishes the surface; the 
 |---|---|---|---|
 | 5 deferred env-var-dependent hooks still rely on undocumented `CLAUDE_TOOL_NAME` / `CLAUDE_FILE_PATHS` instead of the documented stdin-JSON contract. Only `mcp-call-gate` got the stdin fallback in v3.7.1. | medium | [#7](https://github.com/nguyenthienthanh/aura-frog/issues/7) | ~1d |
 | `hooks/lib/hook-runtime.cjs` doesn't exist yet — every hook re-implements stdin parsing + audit appending + atomic writes. Boilerplate × 43 files. | medium | [#6](https://github.com/nguyenthienthanh/aura-frog/issues/6) | ~2d |
-| `.aura/plans/traces/*.jsonl` and `.aura/security/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
+| `.claude/plans/.../trace.jsonl` files and `.aura/security/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
 | Hook performance budget not enforced. ~19 hooks fire on every Write/Edit; estimated 100-300ms p95 but unmeasured. | medium | [#9](https://github.com/nguyenthienthanh/aura-frog/issues/9) | ~1d for budget + benchmark |
 | Node 20/22 test matrix hangs on Ubuntu CI runners (Node 18 + macOS pass in ~22s). Temporarily reduced to Node 18 only for v3.7.2 release. | low | (no open issue yet — investigate in v3.7.3) | ~2-4h to bisect |
 | Pillar 4 Tier 2 OPA Rego policies, Pillar 5 L3+L4 LLM conflict detection, Pillar 6 auto-trigger on F2/F3 — all in the v3.7.0 roadmap, queued for v3.8+. | feature | — | varies |
