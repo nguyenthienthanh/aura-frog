@@ -157,6 +157,5 @@ When a run starts, `run-orchestrator` detects repo traits and loads relevant ski
 
 ## Related
 
-- **Skill:** `run-orchestrator` (feature runs), `bugfix-quick` (bugfix runs), `test-writer` (test runs)
-- **Session:** `session-continuation` (handoff/resume)
+- **Skills** (invoke via the Skill tool, NOT the Agent tool — they're not agents): `run-orchestrator` (feature runs), `bugfix-quick` (bugfix runs), `test-writer` (test runs), `session-continuation` (handoff/resume)
 - **Phase guides:** `docs/phases/PHASE_[N]_*.MD`

@@ -126,6 +126,8 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 
 Only skills with `autoInvoke: true` in frontmatter fire on every message.
 
+⚠️ **Skills vs agents — different tools.** Everything in this section is a **skill** (file: `aura-frog/skills/<name>/SKILL.md`), invoke via the **Skill tool**. Do NOT call these names via the Agent tool's `subagent_type` — that errors with "Agent type 'aura-frog:<name>' not found". The 15 agents live in `aura-frog/agents/*.md` and are listed in the Process Table above.
+
 ```toon
 skills[9]{name,trigger}:
   agent-detector,Every message (priority highest, haiku)
@@ -139,7 +141,7 @@ skills[9]{name,trigger}:
   permanent-memory-loader,.claude/memory/permanent_memory.md exists (auto)
 ```
 
-**`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion.
+**`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion. **Also a skill, not an agent.**
 
 40 reference skills loaded on-demand. Full list: `skills/README.md`
 

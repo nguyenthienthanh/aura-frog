@@ -9,7 +9,7 @@ user-invocable: false
 
 # Run Orchestrator
 
-For complex features / multi-file changes requiring TDD. NOT for: bug fixes (bugfix-quick), quick edits (direct).
+For complex features / multi-file changes requiring TDD. NOT for: bug fixes (use the `bugfix-quick` **skill** via the Skill tool — it is NOT an agent), quick edits (direct).
 
 ## Step 0 — Escalation Check (precondition, v3.7.2+)
 
