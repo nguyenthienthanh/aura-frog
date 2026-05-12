@@ -55,8 +55,13 @@ TASKS_DIR="${STORY_DIR}/tasks"
 [ -d "$TASKS_DIR" ] || { echo "story has no tasks/ — run /aura-frog:plan-expand ${ACTIVE_STORY}" >&2; exit 2; }
 
 # Collect candidates: T4, status=planned, all depends_on in {done, active}.
+# v3.7.3+: tasks live in folders — `tasks/{ID}_{slug}/task.md`. Pre-v3.7.3
+# layout was flat — `tasks/{ID}_{slug}.md`. Support both for transition.
 CANDIDATES=""
-for f in "$TASKS_DIR"/*.md; do
+TASK_CANDIDATES=$(find "$TASKS_DIR" -maxdepth 2 -name 'task.md' 2>/dev/null)
+TASK_CANDIDATES="${TASK_CANDIDATES}
+$(find "$TASKS_DIR" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null)"
+for f in $TASK_CANDIDATES; do
     [ -f "$f" ] || continue
     tier=$(get_field "$f" "tier")
     [ "$tier" = "4" ] || continue

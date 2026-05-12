@@ -27,9 +27,17 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const PLANS_DIR = path.join(process.cwd(), '.aura', 'plans');
+// v3.7.3+: plans live under `.claude/plans/`. Legacy fallback: `.aura/plans/`.
+function resolvePlansDir() {
+  const claudePath = path.join(process.cwd(), '.claude', 'plans');
+  const auraPath = path.join(process.cwd(), '.aura', 'plans');
+  if (process.env.AF_PLANS_DIR) return path.resolve(process.env.AF_PLANS_DIR);
+  if (fs.existsSync(claudePath)) return claudePath;
+  if (fs.existsSync(auraPath)) return auraPath;
+  return claudePath; // default for the absent-tree case (skipped below)
+}
+const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
-const TRACES_DIR = path.join(PLANS_DIR, 'traces');
 
 function safeExit(code = 0) { process.exit(code); }
 
@@ -50,10 +58,51 @@ const phase = process.env.CLAUDE_HOOK_PHASE || 'pre'; // 'pre' or 'post'
 const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
 const ts = new Date().toISOString();
 
-if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
-const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
+// v3.7.3+: trace.jsonl lives INSIDE the task folder
+// (features/.../stories/.../tasks/{ID}_{slug}/trace.jsonl). Find that folder
+// by searching for a file whose `id:` frontmatter matches taskId.
+function resolveTaskFolder(plansDir, id) {
+  const featuresRoot = path.join(plansDir, 'features');
+  if (!fs.existsSync(featuresRoot)) return null;
+  const walk = (dir) => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return null; }
+    for (const ent of entries) {
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        // Look for a task.md inside this dir with matching id.
+        const candidate = path.join(full, 'task.md');
+        if (fs.existsSync(candidate)) {
+          try {
+            const body = fs.readFileSync(candidate, 'utf8');
+            const m = body.match(/^id:\s*(.+?)\s*$/m);
+            if (m && m[1].trim().replace(/^["']|["']$/g, '') === id) return full;
+          } catch { /* skip */ }
+        }
+        const sub = walk(full);
+        if (sub) return sub;
+      }
+    }
+    return null;
+  };
+  return walk(featuresRoot);
+}
 
-// Event counter — persisted in a sibling .count file so each fresh Node
+let traceFile, counterFile;
+const taskFolder = resolveTaskFolder(PLANS_DIR, taskId);
+if (taskFolder) {
+  // v3.7.3+ co-located layout.
+  traceFile = path.join(taskFolder, 'trace.jsonl');
+  counterFile = path.join(taskFolder, '.trace.count');
+} else {
+  // Legacy fallback: top-level traces/ dir (pre-v3.7.3, or task folder lookup failed).
+  const tracesDir = path.join(PLANS_DIR, 'traces');
+  if (!fs.existsSync(tracesDir)) fs.mkdirSync(tracesDir, { recursive: true });
+  traceFile = path.join(tracesDir, `${taskId}.jsonl`);
+  counterFile = path.join(tracesDir, `${taskId}.count`);
+}
+
+// Event counter — persisted in a sibling counter file so each fresh Node
 // process reads at most 4 bytes (not the full trace). True O(1) per event;
 // fixes the prior O(n²) over a task lifetime that the half-measure
 // in-memory cache only solved within a single invocation.
@@ -61,7 +110,6 @@ const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
 // assumption per spec §2.1.6, and the JSONL append below would race anyway).
 // taskSlug keeps the id safe for taskIds like "T2.3" vs "T23".
 const taskSlug = taskId.replace(/[^A-Za-z0-9]+/g, '-');
-const counterFile = path.join(TRACES_DIR, `${taskId}.count`);
 function nextEventId() {
   let n = 0;
   try {

@@ -43,11 +43,15 @@ if [ -f "${PLANS_DIR}/.counters.json" ] && [ -f "${PLANS_DIR}/active.json" ]; th
     exit 0
 fi
 
+# v3.7.3+ uniform layout: every node is a folder. Mission is the singleton T0.
+# Top-level archive/ still exists (for compressed completed branches). Top-level
+# traces/ and checkpoints/ are gone — traces co-locate inside the task folder
+# as `trace.jsonl`; checkpoints co-locate inside each node folder as
+# `checkpoints/{ISO}.json`.
+mkdir -p "${PLANS_DIR}/mission"
 mkdir -p "${PLANS_DIR}/initiatives"
 mkdir -p "${PLANS_DIR}/features"
 mkdir -p "${PLANS_DIR}/archive"
-mkdir -p "${PLANS_DIR}/traces"
-mkdir -p "${PLANS_DIR}/checkpoints"
 mkdir -p "${CLAUDE_DIR}/memory/archive"
 mkdir -p "${PROJECT_ROOT}/.aura/security"  # MCP audit lives under .aura/security/ still
 
@@ -92,9 +96,10 @@ if [ ! -f "${PLANS_DIR}/active.json" ]; then
 EOF
 fi
 
-# mission.md — T0 stub
-if [ ! -f "${PLANS_DIR}/mission.md" ]; then
-    cat > "${PLANS_DIR}/mission.md" <<EOF
+# mission/mission.md — T0 stub (singleton; lives in its own folder for layout
+# uniformity with T1-T4. Room for related docs: VISION.md, VALUES.md, etc.).
+if [ ! -f "${PLANS_DIR}/mission/mission.md" ]; then
+    cat > "${PLANS_DIR}/mission/mission.md" <<EOF
 ---
 id: MISSION
 tier: 0
@@ -109,7 +114,9 @@ updated_at: ${NOW}
 EOF
 fi
 
-# Touch append-only logs so they exist
+# Touch append-only logs so they exist (top-level — these are global infra,
+# not per-node state). Per-task trace.jsonl files are created on demand by
+# tool-call-tracer.cjs inside each task folder.
 touch "${PLANS_DIR}/history.jsonl"
 touch "${PLANS_DIR}/conflicts.jsonl"
 touch "${PLANS_DIR}/conflict_cache.jsonl"
@@ -120,50 +127,68 @@ if [ ! -f "${PLANS_DIR}/INDEX.md" ]; then
     cat > "${PLANS_DIR}/INDEX.md" <<'EOF'
 # `.claude/plans/` — Hierarchical Plan Tree
 
-This directory holds your project's plan tree. Layout:
+This directory holds your project's plan tree. **Every node is a folder.** Per-node aux files (checkpoints, traces, per-feature deliverables) co-locate inside the node's folder.
 
 ```
 .claude/plans/
-├── INDEX.md                          ← you are here
-├── mission.md                        ← T0: project's reason for existing
-├── active.json                       ← focus pointer (mission/initiative/feature/story/task)
-├── .counters.json                    ← ID counters (INIT, FEAT, STORY, TASK, etc.)
-├── history.jsonl                     ← append-only decision log
-├── conflicts.jsonl                   ← append-only conflict log
-├── initiatives/                      ← T1: multi-feature efforts
-│   └── INIT-001.md
-├── features/                         ← T2: user-facing capabilities
-│   └── {ID}_{slug}/                  ← e.g. FEAT-A_oauth-flow/ or JIRA-1234_login-redesign/
-│       ├── feature.md                ← spec + status + runs[] link
-│       ├── REQUIREMENTS.md           ← /run Phase 1 deliverable (optional)
-│       ├── DESIGN.md                 ← /run Phase 1 deliverable (optional)
+├── INDEX.md                                ← you are here
+├── active.json                             ← focus pointer (mission/initiative/feature/story/task)
+├── .counters.json                          ← ID counters (INIT, FEAT, STORY, TASK, etc.)
+├── history.jsonl                           ← append-only decision log
+├── conflicts.jsonl                         ← append-only conflict log
+├── mission/                                ← T0: project's reason for existing
+│   ├── mission.md                          ← spec
+│   └── checkpoints/                        ← (optional) pre-mutation snapshots
+├── initiatives/                            ← T1: multi-feature efforts
+│   └── {ID}_{slug}/                        ← e.g. INIT-001_q1-rollout/
+│       ├── initiative.md                   ← spec + status + children[FEAT-*]
+│       ├── ROADMAP.md                      ← (optional) per-initiative deliverable
+│       └── checkpoints/
+├── features/                               ← T2: user-facing capabilities
+│   └── {ID}_{slug}/                        ← e.g. FEAT-A_oauth-flow/ or JIRA-1234_login-redesign/
+│       ├── feature.md                      ← spec + status + runs[] link
+│       ├── REQUIREMENTS.md                 ← (optional) /run Phase 1 deliverable
+│       ├── DESIGN.md                       ← (optional) /run Phase 1 deliverable
+│       ├── checkpoints/
 │       └── stories/
-│           └── {ID}_{slug}/          ← e.g. STORY-0001_login-form/
+│           └── {ID}_{slug}/                ← e.g. STORY-0001_login-form/
 │               ├── story.md
+│               ├── checkpoints/
 │               └── tasks/
-│                   └── {ID}_{slug}.md  ← e.g. TASK-00042_password-input.md
-├── archive/                          ← compressed completed branches
-├── traces/                           ← per-task append-only event log (forensic audit)
-└── checkpoints/                      ← pre-mutation snapshots (undo target)
+│                   └── {ID}_{slug}/        ← e.g. TASK-00042_password-input/
+│                       ├── task.md         ← spec
+│                       ├── trace.jsonl     ← per-task forensic event log
+│                       └── checkpoints/    ← per-task snapshots
+└── archive/                                ← compressed completed branches
+    └── {ID}_{slug}/
+        ├── summary.md
+        └── original/                       ← preserves the pre-archive subtree
 ```
 
 ## Naming convention
 
-| Tier | ID prefix | Folder name | Example |
+Every node is a folder named `{ID}_{kebab-slug}` containing a `<tier>.md` file (e.g. `feature.md`, `story.md`). The slug is `slugify(intent)`, capped at 50 chars.
+
+| Tier | ID prefix | Folder name | Spec file |
 |---|---|---|---|
-| T1 | `INIT-NNN` | (none — flat file) | `INIT-001.md` |
-| T2 | `FEAT-N` or ticket-ID | `{ID}_{kebab-slug}/feature.md` | `JIRA-1234_oauth-flow/feature.md` |
-| T3 | `STORY-NNNN` | `{ID}_{kebab-slug}/story.md` | `STORY-0042_login-form/story.md` |
-| T4 | `TASK-NNNNN` | `{ID}_{kebab-slug}.md` | `TASK-00101_password-input.md` |
+| T0 | `MISSION` (singleton) | `mission/` (no slug — only one mission) | `mission.md` |
+| T1 | `INIT-NNN` | `{ID}_{slug}/` | `initiative.md` |
+| T2 | `FEAT-N` or ticket-ID | `{ID}_{slug}/` | `feature.md` |
+| T3 | `STORY-NNNN` | `{ID}_{slug}/` | `story.md` |
+| T4 | `TASK-NNNNN` | `{ID}_{slug}/` | `task.md` |
 
-If a JIRA / Linear / GitHub ticket ID is attached to a feature, use it as the prefix. Otherwise plan-orchestrator mints `FEAT-N`.
+If a JIRA / Linear / GitHub ticket ID is attached to a feature, use it as the prefix (e.g. `JIRA-1234_login-redesign/`). Otherwise plan-orchestrator mints `FEAT-N`.
 
-## How to read a feature folder
+## How to read a node folder
 
-1. Start with `feature.md` — frontmatter has `id`, `status`, `intent`, `children: [STORY-*]`, `runs: [...]`.
-2. If `## Runs` section is non-empty, scroll there to see `/run` invocations against this feature (in_progress / done / discarded) and their run-state.json paths.
-3. Walk into `stories/` for T3 decomposition, `tasks/` for T4 atoms.
-4. `REQUIREMENTS.md` / `DESIGN.md` / `TEST_PLAN.md` are per-feature `/run` deliverables (scaffolded when a Standard/Deep run anchors here).
+1. Start with the spec file (`mission.md` / `initiative.md` / `feature.md` / `story.md` / `task.md`).
+2. Check the frontmatter: `id`, `tier`, `parent`, `status`, `intent`, `children: [...]`, `revision`.
+3. For feature folders: if `## Runs` section is non-empty, scroll there to see `/run` invocations and their run-state.json paths.
+4. Per-node aux dirs:
+   - `checkpoints/` — pre-mutation snapshots (each file is `{ISO8601}.json`). Drives `/aura-frog:plan undo`.
+   - `trace.jsonl` (task folders only) — append-only Claude tool-call events. Source of `/aura-frog:trace`.
+5. Per-feature deliverables (`REQUIREMENTS.md`, `DESIGN.md`, `TEST_PLAN.md`) are scaffolded by `/run` Phase 1 when a Standard/Deep run anchors to the feature.
+6. Walk into child folders for decomposition (`stories/`, `tasks/`).
 
 ## Commands
 
@@ -202,9 +227,9 @@ EOF
 fi
 
 echo "✓ Plan skeleton initialized at ${PLANS_DIR}"
-echo "  INDEX.md, mission.md, active.json, .counters.json created"
+echo "  INDEX.md, mission/mission.md, active.json, .counters.json created"
 echo ""
 echo "Next steps:"
 echo "  1. Read ${PLANS_DIR}/INDEX.md to understand the layout"
-echo "  2. Edit ${PLANS_DIR}/mission.md to describe your project"
+echo "  2. Edit ${PLANS_DIR}/mission/mission.md to describe your project"
 echo "  3. Run /aura-frog:plan to interview-bootstrap T1 (Initiative) and T2 (Feature)"

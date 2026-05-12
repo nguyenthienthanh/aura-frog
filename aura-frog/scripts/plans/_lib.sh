@@ -207,16 +207,27 @@ append_history() {
 
 # ---------------------------------------------------------------------------
 # save_checkpoint <plans_dir> <node_id> <node_file>
-#   Snapshot a node's pre-mutation state to checkpoints/<id>.<ISO8601>.json.
+#   Snapshot a node's pre-mutation state. v3.7.3+ co-locates the checkpoint
+#   inside the node's own folder: <node_folder>/checkpoints/<ISO8601>.json
+#   Falls back to global plans/checkpoints/{ID}_legacy/{ISO}.json for nodes
+#   whose file path is unknown (rare — only when called with a path under
+#   archive/ which is read-only anyway).
 #   Returns the checkpoint path on stdout.
 # ---------------------------------------------------------------------------
 save_checkpoint() {
     local plans="$1"; local node_id="$2"; local node_file="$3"
-    local ckpt_dir="${plans}/checkpoints"
-    mkdir -p "$ckpt_dir"
     local ts; ts=$(now_utc)
     local safe_ts; safe_ts=$(echo "$ts" | tr ':' '-')
-    local ckpt="${ckpt_dir}/${node_id}.${safe_ts}.json"
+    local ckpt_dir
+    if [ -n "$node_file" ] && [ -f "$node_file" ]; then
+        # Co-locate inside the node's own folder.
+        ckpt_dir="$(dirname "$node_file")/checkpoints"
+    else
+        # Fallback (legacy / orphan checkpoints).
+        ckpt_dir="${plans}/checkpoints/${node_id}_legacy"
+    fi
+    mkdir -p "$ckpt_dir"
+    local ckpt="${ckpt_dir}/${safe_ts}.json"
     local git_sha=""
     if command -v git >/dev/null 2>&1 && git rev-parse HEAD >/dev/null 2>&1; then
         git_sha=$(git rev-parse HEAD)

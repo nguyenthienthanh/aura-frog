@@ -49,50 +49,64 @@ print_node() {
     printf '%s%s %s — %s\n' "$prefix" "$i" "$id" "${intent:-(no intent)}"
 }
 
-# T0 — Mission
-if [ -f "${PLANS_DIR}/mission.md" ]; then
+# T0 — Mission. v3.7.3+ layout: mission/mission.md (folder). Pre-v3.7.3: mission.md (flat).
+if [ -f "${PLANS_DIR}/mission/mission.md" ]; then
+    print_node "${PLANS_DIR}/mission/mission.md" ""
+elif [ -f "${PLANS_DIR}/mission.md" ]; then
     print_node "${PLANS_DIR}/mission.md" ""
 fi
 
-# T1 — Initiatives
-if [ -d "${PLANS_DIR}/initiatives" ]; then
-    for init in "${PLANS_DIR}/initiatives"/*.md; do
-        [ -f "$init" ] || continue
-        print_node "$init" "├─ "
+# T1 — Initiatives. v3.7.3+ layout: initiatives/{ID}_{slug}/initiative.md (folder).
+# Pre-v3.7.3 layout: initiatives/{ID}.md (flat). Support both.
+init_files() {
+    if [ -d "${PLANS_DIR}/initiatives" ]; then
+        # v3.7.3+ folder layout
+        find "${PLANS_DIR}/initiatives" -maxdepth 2 -name 'initiative.md' 2>/dev/null
+        # legacy flat layout
+        find "${PLANS_DIR}/initiatives" -maxdepth 1 -name '*.md' 2>/dev/null
+    fi
+}
 
-        # T2 — Features under this initiative (parent match)
-        init_id=$(get_field "$init" "id")
-        if [ -d "${PLANS_DIR}/features" ]; then
-            for feat_dir in "${PLANS_DIR}/features"/*; do
-                [ -d "$feat_dir" ] || continue
-                feat_file="${feat_dir}/feature.md"
-                [ -f "$feat_file" ] || continue
-                feat_parent=$(get_field "$feat_file" "parent")
-                [ "$feat_parent" = "$init_id" ] || continue
+for init in $(init_files); do
+    [ -f "$init" ] || continue
+    print_node "$init" "├─ "
 
-                print_node "$feat_file" "│  ├─ "
+    # T2 — Features under this initiative (parent match)
+    init_id=$(get_field "$init" "id")
+    if [ -d "${PLANS_DIR}/features" ]; then
+        for feat_dir in "${PLANS_DIR}/features"/*; do
+            [ -d "$feat_dir" ] || continue
+            feat_file="${feat_dir}/feature.md"
+            [ -f "$feat_file" ] || continue
+            feat_parent=$(get_field "$feat_file" "parent")
+            [ "$feat_parent" = "$init_id" ] || continue
 
-                # T3 — Stories
-                if [ -d "${feat_dir}/stories" ]; then
-                    for story_dir in "${feat_dir}/stories"/*; do
-                        [ -d "$story_dir" ] || continue
-                        story_file="${story_dir}/story.md"
-                        [ -f "$story_file" ] || continue
-                        print_node "$story_file" "│  │  ├─ "
+            print_node "$feat_file" "│  ├─ "
 
-                        # T4 — Tasks
-                        if [ -d "${story_dir}/tasks" ]; then
-                            for task in "${story_dir}/tasks"/*.md; do
-                                [ -f "$task" ] || continue
-                                print_node "$task" "│  │  │  └─ "
-                            done
-                        fi
-                    done
-                fi
-            done
-        fi
-    done
-fi
+            # T3 — Stories
+            if [ -d "${feat_dir}/stories" ]; then
+                for story_dir in "${feat_dir}/stories"/*; do
+                    [ -d "$story_dir" ] || continue
+                    story_file="${story_dir}/story.md"
+                    [ -f "$story_file" ] || continue
+                    print_node "$story_file" "│  │  ├─ "
+
+                    # T4 — Tasks. v3.7.3+: tasks/{ID}_{slug}/task.md. Pre-v3.7.3: tasks/{ID}_{slug}.md.
+                    if [ -d "${story_dir}/tasks" ]; then
+                        # New folder-per-task layout.
+                        for task in $(find "${story_dir}/tasks" -maxdepth 2 -name 'task.md' 2>/dev/null); do
+                            print_node "$task" "│  │  │  └─ "
+                        done
+                        # Legacy flat layout.
+                        for task in $(find "${story_dir}/tasks" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null); do
+                            print_node "$task" "│  │  │  └─ "
+                        done
+                    fi
+                done
+            fi
+        done
+    fi
+done
 
 echo ""
 echo "Legend: ○ planned  ▶ active  ✓ done  ■ blocked  ❄ frozen  ✗ discarded  ⌂ archived"
