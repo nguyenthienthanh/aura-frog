@@ -39,6 +39,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const os = require('os');
 const path = require('path');
 
@@ -140,7 +141,7 @@ async function main() {
     // Read stdin for session data
     let data = {};
     try {
-      const stdin = fs.readFileSync(0, 'utf-8').trim();
+      const stdin = readStdinSafely();
       if (stdin) data = JSON.parse(stdin);
     } catch (e) { /* ignore stdin errors */ }
 

@@ -13,6 +13,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
 // Default blocked patterns.
@@ -82,7 +83,7 @@ function isAllowedBuildCommand(command) {
 function main() {
   try {
     // Read hook input from stdin
-    const input = fs.readFileSync(0, 'utf-8').trim();
+    const input = readStdinSafely();
     if (!input) {
       process.exit(0); // Allow if no input
     }

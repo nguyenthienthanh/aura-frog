@@ -28,6 +28,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { readPromptFromStdin, installWatchdog } = require('./lib/safe-stdin.cjs');
 
 const PLAN_VERBS = [
   'bootstrap', 'expand', 'next', 'status', 'replan',
@@ -40,23 +41,23 @@ const OVERRIDE_PREFIXES = [
   'must do:', 'just do:', 'exactly:',
 ];
 
+// readPrompt is now a thin wrapper. The actual logic — fstatSync gate + JSON
+// parse + env fallback — lives in lib/safe-stdin.cjs to fix the production
+// TTY-hang bug (fs.readFileSync(0) on a TTY blocks forever, with no error).
+// Kept exported under the same name so external callers / tests continue
+// working.
 function readPrompt() {
-  let input = '';
-  try { input = fs.readFileSync(0, 'utf-8').trim(); } catch { /* no stdin */ }
-  if (input) {
-    try {
-      const data = JSON.parse(input);
-      return data.prompt || data.user_prompt || '';
-    } catch {
-      return input;
-    }
-  }
-  return process.env.CLAUDE_USER_PROMPT || '';
+  return readPromptFromStdin();
 }
 
 function planActive(cwd) {
+  // v3.7.3+: plans live under .claude/plans/. Pre-v3.7.3: .aura/plans/.
+  // Either path counts as "plan active" — match the resolution order used by
+  // scripts/plans/_lib.sh#plans_dir().
   try {
-    return fs.existsSync(path.join(cwd, '.aura', 'plans', 'active.json'));
+    if (fs.existsSync(path.join(cwd, '.claude', 'plans', 'active.json'))) return true;
+    if (fs.existsSync(path.join(cwd, '.aura', 'plans', 'active.json'))) return true;
+    return false;
   } catch {
     return false;
   }
@@ -127,6 +128,12 @@ function main(opts = {}) {
 }
 
 if (require.main === module) {
+  // Belt-and-suspenders watchdog — bare-word-router fires on every
+  // UserPromptSubmit. If anything ever blocks despite the safe-stdin guard,
+  // the user's prompt is wedged. 200ms is generous (real work is <20ms).
+  // Armed only when invoked directly, NOT when required from tests, so
+  // jest's longer-lived worker process isn't killed mid-test.
+  installWatchdog(200, 0);
   try {
     process.exit(main());
   } catch {

@@ -17,6 +17,7 @@
  */
 
 const fs = require('fs');
+const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 const { recordFeedback, recordAgentPerformance, isFeedbackEnabled } = require('./lib/af-learning.cjs');
 
@@ -99,7 +100,7 @@ async function main() {
     // Read stdin for tool use data
     let data = {};
     try {
-      const stdin = fs.readFileSync(0, 'utf-8').trim();
+      const stdin = readStdinSafely();
       if (stdin) data = JSON.parse(stdin);
     } catch { /* malformed data - skip silently, no stdin or invalid JSON is expected */ }
 
