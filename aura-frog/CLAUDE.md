@@ -71,9 +71,18 @@ rules[8]{rule,detail}:
 
 ## Status Line (0 tokens)
 
+Format (v3.7.4+): `AF v{version} │ {mode} {step} │ {agent} │ {model} │ {ctx}% ctx`
+
 ```
-🐸 AF v3.7.3 │ lead │ P1 │ Opus │ 12% ctx │ $0.05
+🐸 AF v3.7.3 │ deep P3 │ architect │ Opus │ 12% ctx
+🐸 AF v3.7.3 │ bugfix S2 │ tester │ Sonnet │ 28% ctx
+🐸 AF v3.7.3 │ idle │ ready │ Sonnet │ 4% ctx
 ```
+
+- **mode** — from `run-state.json#flow` (bugfix / deep / standard / quick / refactor / test / project / security / review / deploy / quality). `idle` when no active run.
+- **step** — `P{N}` for 5-phase Deep runs (`current_phase`), `S{N}` for bugfix's 4-step TDD (`current_step`). Omitted for quick/idle.
+- **agent** — `run-state.json#active_agent`, updated by run-orchestrator at every dispatch.
+- **cost segment removed in v3.7.4** — Claude Code's `total_cost_usd` is real but adds noise without per-call breakdown. Use `/af status` for a richer cost+token report.
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
 
