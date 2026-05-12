@@ -238,6 +238,30 @@ For Standard/Quick runs (single agent inline), one-line announcement at start su
 🛠 Dispatching frontend (Standard / single-agent inline).
 ```
 
+### Phase 2 — Test type selection (v3.7.4+, fixes silent unit-only default)
+
+`tester` in Phase 2 MUST pick the right test layer BEFORE writing tests. The pre-v3.7.4 default was implicitly "unit tests only" because the run-orchestrator didn't say otherwise — even for UI/auth/payment tasks where an e2e spec is the meaningful safety net. Fixed by following `skills/test-writer/SKILL.md#test-type-selection`:
+
+```toon
+phase2_layers[3]{layer,framework_default,when_to_write}:
+  unit,jest/vitest,"every Phase 2 — fast feedback on isolated logic"
+  integration,jest/vitest with real DB,"task spans 2+ modules or hits a DB query path"
+  e2e,playwright (preferred) | cypress | detox,"task contains UI / auth / payment / 'flow' / 'journey' / 'end-to-end' OR Phase-1 acceptance references user-visible behavior"
+```
+
+`tester` MUST surface the layer choice to the user before writing the first test:
+
+```
+🧪 Phase 2 plan: unit (vitest) + e2e (playwright)
+   - Unit: 4 specs for password validator + token signer
+   - E2E:  1 happy-path spec (login → dashboard) + 1 failure-path (bad password)
+   - No integration layer (auth doesn't cross a DB module in this PR)
+```
+
+If the project has no e2e runner configured but the task warrants one, the orchestrator asks the user to pick: install Playwright, use an existing runner, or explicitly accept unit-only with a recorded `escalation_declined: e2e` note in run-state.json.
+
+**Verification (also v3.7.4+):** After `npx playwright test` (or equivalent), read the runner output. "Tests passed" with no pass count = `0 tests collected` = bug. Same discipline applies to all runners.
+
 ## Execution Model — Subagent Isolation (Deep tasks)
 
 Context pollution is the #1 failure mode for multi-phase TDD: P1 research artifacts still live in the window when P3 tries to build, so the model gets distracted by outdated design notes.
