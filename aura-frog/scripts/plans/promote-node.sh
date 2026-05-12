@@ -20,7 +20,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 NOTE=""
 TARGET_INPUT=""
 SOURCE_INPUT=""
@@ -39,6 +39,8 @@ while [ $# -gt 0 ]; do
         *) [ -z "$NOTE" ] && NOTE="$1" || NOTE="${NOTE} $1"; shift ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 
 [ -n "$NOTE" ] || { echo "usage: promote-node.sh \"<note>\" [--to TARGET]" >&2; exit 5; }
 

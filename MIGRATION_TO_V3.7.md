@@ -1,20 +1,32 @@
 # Migrating to Aura Frog v3.7.x
 
-**Latest:** v3.7.2 (2026-05-11)
-**Path covered:** v3.6.x → v3.7.0 → v3.7.1 → v3.7.2 — every step backward-compatible
+**Latest:** v3.7.3 (2026-05-12)
+**Path covered:** v3.6.x → v3.7.0 → v3.7.1 → v3.7.2 → v3.7.3 — every step backward-compatible
 **Migration required:** None mandatory; everything new is opt-in
 
-## v3.7.2 changes (most recent)
+## v3.7.3 changes (most recent)
+
+| Change | What it means for you |
+|---|---|
+| Plan tree moves to `.claude/plans/` | Was at `.aura/plans/`. Resolution order: `--plans-dir` arg → `$AF_PLANS_DIR` env → `.claude/plans/` (default) → `.aura/plans/` (legacy fallback, removed v4.0). One-liner migration: `mv .aura/plans .claude/plans`. |
+| Uniform folder-per-node layout | Every tier is a folder: `mission/mission.md`, `initiatives/{ID}_{slug}/initiative.md`, `features/{ID}_{slug}/feature.md`, `stories/{ID}_{slug}/story.md`, `tasks/{ID}_{slug}/task.md`. Ticket-ID prefix (JIRA-/LIN-/GH-) used when attached; auto-minted otherwise. |
+| Co-located aux | `<node>/checkpoints/{ISO}.json` and `<task>/trace.jsonl` live inside the node folder (was global `plans/checkpoints/` + `plans/traces/`). Archive consolidated to `archive/{ID}_{slug}/{summary.md, original/}`. |
+| Run ↔ feature linking | `run-state.json` gains `feature_id`, `feature_slug`, `anchor.task_id`. Feature.md gains a `## Runs` table. New `scripts/plans/link-run.sh` writes both sides idempotently. |
+| New `/run` prefixes | `/run feature: FEAT-A <task>` — anchor a new run to a feature. `/run resume FEAT-A` — list runs under a feature, prompt to pick (auto-resume if single in-progress). |
+| INDEX.md auto-emitted | `new-plan.sh` writes a `.claude/plans/INDEX.md` documenting the layout, naming, run-feature linking, migration. |
+
+**Counts updated:** Plan-script tests 38→43 (+5 link-run cases). Skills / Hooks / Rules / Commands / Agents unchanged from v3.7.2.
+
+## v3.7.2 changes
 
 | Change | What it means for you |
 |---|---|
 | Consolidated `/aura-frog:plan <verb>` | Use the consolidated form going forward. Legacy `/aura-frog:plan-<verb>` (e.g., `/aura-frog:plan-expand FEAT-7`) still works via alias stubs; soft-deprecated v3.7.2 → warning v4.0 → removed v5.0. |
-| Bare-word activation | With `.aura/plans/active.json` present, short prompts starting with a plan verb (`next`, `expand FEAT-A`, `freeze TASK-1`) route to `/aura-frog:plan` automatically. Disable: `AF_BARE_WORD_ROUTER_DISABLED=true`. |
 | `/run` 3-option escalation | Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt `plan` / `deep` / `details`. Force with `/run task: …` (skip escalation) or `/run project: …` (skip ask). Disable: `AF_ESCALATION_DISABLED=true`. |
 | 9 new backing scripts under `scripts/plans/` | The legacy plan commands now have real implementations. Atomic write + pre-mutation checkpoint + regression-aware validation. |
 | 102 new tests | 38 plan-script unit tests + 64 bare-word router tests; coverage gate maintained. |
 
-**Counts updated:** Skills 55→56 (+plan-orchestrator), Hooks 42→43 (+bare-word-router), Tests 215→317. Commands count unchanged (24) — 10 legacy `/aura-frog:plan-*` files preserved as alias stubs.
+**Counts updated in v3.7.2:** Skills 55→56 (+plan-orchestrator), Hooks 42→43 (+bare-word-router), Tests 215→317. Commands count unchanged (24) — 10 legacy `/aura-frog:plan-*` files preserved as alias stubs.
 
 ---
 
@@ -153,13 +165,13 @@ Before any T4 dispatch, L1 (file overlap) + L2 (function overlap) detection comp
 
 ```bash
 # In your project directory:
-/aura-frog:plan  # interview-bootstrap; creates .aura/plans/
+/aura-frog:plan  # interview-bootstrap; creates .claude/plans/ (v3.7.3+; legacy .aura/plans/ still resolved via fallback)
 
 # Or non-interactive:
 bash aura-frog/scripts/plans/new-plan.sh
 ```
 
-`.aura/` is added to `.gitignore` by default (per decision Q2). Commit it if you want plans tracked in git.
+`.claude/` (and the legacy `.aura/`) are typically added to `.gitignore`. Commit them if you want plans tracked in git.
 
 ### Enable JIRA ticket auto-fetch
 

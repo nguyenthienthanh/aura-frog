@@ -40,7 +40,7 @@ planning[12]{command,file,purpose}:
   /aura-frog:trace,trace.md,"Reasoning trace + hallucination surface (alpha.2)"
 ```
 
-These commands are **silent on projects without `.aura/plans/`**. Initialize with `/aura-frog:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
+These commands are **silent on projects without `.claude/plans/`**. Initialize with `/aura-frog:plan` (or `bash aura-frog/scripts/plans/new-plan.sh`).
 
 ## Project Extension (alpha.3 — opt-in)
 

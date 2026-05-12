@@ -3,7 +3,7 @@
  * Aura Frog — Bare-Word Plan Router (UserPromptSubmit)
  *
  * Fires only when:
- *   1. .aura/plans/active.json exists (project has a plan tree)
+ *   1. .claude/plans/active.json exists (project has a plan tree)
  *   2. AF_BARE_WORD_ROUTER_DISABLED env var is NOT set
  *
  * Heuristic: route when ALL of

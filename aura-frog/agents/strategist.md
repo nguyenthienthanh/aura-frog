@@ -80,11 +80,11 @@ In addition to the Phase 1 business-strategy role above, strategist OWNS hierarc
 **Activated when:** `/aura-frog:plan` runs for first-time setup, on quarterly review, or when discovery contradicts current Initiative's `target_outcome`.
 
 **Constraints when in T0/T1 mode:**
-- Writes only to `.aura/plans/mission.md` and `.aura/plans/initiatives/INIT-NNN.md`
+- Writes only to `.claude/plans/mission.md` and `.claude/plans/initiatives/INIT-NNN.md`
 - Does NOT decompose into Features (that's feature-architect's job for T2)
 - Mission output ≤ 50 tokens, Initiative ≤ 300 tokens body
-- Logs every plan-file write to `.aura/plans/history.jsonl` as `event: strategist_decompose`
+- Logs every plan-file write to `.claude/plans/history.jsonl` as `event: strategist_decompose`
 
-**Tools used in T0/T1 mode:** Read + Glob + Grep + Bash (NOT Write/Edit on code; Write only to .aura/plans/). The agent's frontmatter `tools` field stays read-only by default; planning skill grants narrow Write to plan files via context-scoped delegation.
+**Tools used in T0/T1 mode:** Read + Glob + Grep + Bash (NOT Write/Edit on code; Write only to .claude/plans/). The agent's frontmatter `tools` field stays read-only by default; planning skill grants narrow Write to plan files via context-scoped delegation.
 
 **Decisions tied:** Q1 (deterministic decision logic; LLM only when reasoning across alternatives needed).

@@ -1,7 +1,7 @@
 ---
 name: permanent-memory-loader
-description: "Loads permanent_memory.md summary lines (≤120 always-loaded tokens, hard cap 200). Surfaces durable wisdom from past Epics into the current session. Silent if .aura/memory/ does not exist."
-when_to_use: "Every Claude turn when .aura/memory/permanent_memory.md exists; loads section headers + 1-line summaries only, never the full body"
+description: "Loads permanent_memory.md summary lines (≤120 always-loaded tokens, hard cap 200). Surfaces durable wisdom from past Epics into the current session. Silent if .claude/memory/ does not exist."
+when_to_use: "Every Claude turn when .claude/memory/permanent_memory.md exists; loads section headers + 1-line summaries only, never the full body"
 autoInvoke: true
 allowed-tools: Read, Glob
 effort: low
@@ -14,7 +14,7 @@ user-invocable: false
 
 ## Behavior (in order)
 
-1. **Detect:** if `.aura/memory/permanent_memory.md` does NOT exist → exit silently (no overhead)
+1. **Detect:** if `.claude/memory/permanent_memory.md` does NOT exist → exit silently (no overhead)
 2. **Read** the file, extract:
    - Each `## Epic: <ID> — <intent>` header
    - For each Epic, the first non-empty line of each subsection (Architectural decisions, Gotchas discovered, Anti-patterns to avoid, Patterns that worked, Conflicts encountered)
@@ -51,10 +51,10 @@ Epic FEAT-008 (Profile avatars):
 ## What this skill does NOT do
 
 - Does NOT load the full Epic body — only summary lines
-- Does NOT load `.aura/memory/manual_overrides.md` (that's user-curated; treated separately)
+- Does NOT load `.claude/memory/manual_overrides.md` (that's user-curated; treated separately)
 - Does NOT modify memory files (read-only)
 - Does NOT make decisions based on memory content (caller decides)
-- Does NOT trigger across projects (project-isolated; per `.aura/memory/` is per-project)
+- Does NOT trigger across projects (project-isolated; per `.claude/memory/` is per-project)
 
 ## Memory staleness
 
@@ -64,7 +64,7 @@ If an Epic section is older than 90 days (parsed from its `**Completed:**` line)
 
 - **Spec:** §9.6, §19.2 (permanent_memory.md structure)
 - **Producer:** `agents/epic-summarizer.md` — only writer of the content this skill loads
-- **Producer (manual):** `.aura/memory/manual_overrides.md` — user-curated; loaded separately by name (not via this skill)
+- **Producer (manual):** `.claude/memory/manual_overrides.md` — user-curated; loaded separately by name (not via this skill)
 - **Rule:** `rules/core/memory-trust-policy.md` — defines `trust: file` semantics for loaded content
 - **Rule:** `rules/workflow/session-reset-policy.md` — defines what's preserved across reset (this content is)
 - **Companion auto-invoke skill:** `plan-loader` — both fire silently when their files don't exist

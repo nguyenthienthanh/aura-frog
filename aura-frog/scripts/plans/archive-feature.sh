@@ -18,7 +18,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 NODE_INPUT=""
 SUMMARY_TEXT=""
 FORCE=0
@@ -36,6 +36,8 @@ while [ $# -gt 0 ]; do
         *) NODE_INPUT="$1"; shift ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 
 [ -n "$NODE_INPUT" ] || { echo "usage: archive-feature.sh <NODE_ID>" >&2; exit 5; }
 
@@ -98,9 +100,17 @@ while IFS=$'\t' read -r id f; do
     [ "$s" = "discarded" ] && DISC=$((DISC+1))
 done <<< "$ALL"
 
-SUMMARY_FILE="${ARCHIVE_DIR}/${NODE_ID}.summary.md"
+# v3.7.3+: consolidate into `archive/{ID}_{slug}/` containing `summary.md` +
+# `original/`. Replaces pre-v3.7.3 layout of `archive/{ID}.summary.md` +
+# `archive/{ID}.original/` (two siblings).
 INTENT=$(get_field "$NODE_FILE" "intent")
 PARENT=$(get_field "$NODE_FILE" "parent")
+INTENT_SLUG=$(slugify "$INTENT")
+[ -z "$INTENT_SLUG" ] && INTENT_SLUG="unnamed"
+ARCHIVE_NODE_DIR="${ARCHIVE_DIR}/${NODE_ID}_${INTENT_SLUG}"
+mkdir -p "$ARCHIVE_NODE_DIR"
+SUMMARY_FILE="${ARCHIVE_NODE_DIR}/summary.md"
+ORIG_DIR="${ARCHIVE_NODE_DIR}/original"
 VIOLATIONS_BEFORE=$(tree_violation_count "$PLANS_DIR")
 CKPT=$(save_checkpoint "$PLANS_DIR" "$NODE_ID" "$NODE_FILE")
 
@@ -131,8 +141,7 @@ while IFS=$'\t' read -r id f; do
     echo "- **${id}** [${status}] — ${intent}" >> "$SUMMARY_FILE"
 done <<< "$ALL"
 
-# Move originals — preserve in archive/<id>.original/ for audit.
-ORIG_DIR="${ARCHIVE_DIR}/${NODE_ID}.original"
+# Move originals — preserve in archive/<id>_<slug>/original/ for audit.
 mkdir -p "$ORIG_DIR"
 while IFS=$'\t' read -r id f; do
     [ -z "$id" ] && continue

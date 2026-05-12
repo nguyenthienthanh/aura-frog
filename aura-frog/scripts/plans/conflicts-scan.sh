@@ -23,7 +23,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 SUBCMD="${1:-}"
 [ -n "$SUBCMD" ] || { echo "usage: conflicts-scan.sh list|show|resolve|history|check ..." >&2; exit 5; }
 shift || true
@@ -45,6 +45,8 @@ for i in $(seq 1 $#); do
         *) ARGS+=("$a") ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 if [ ${#ARGS[@]} -gt 0 ]; then
     set -- "${ARGS[@]}"
 else

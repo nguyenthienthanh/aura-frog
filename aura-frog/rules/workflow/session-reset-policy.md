@@ -48,13 +48,13 @@ The exclude list is **non-negotiable**. epic-summarizer must reject content matc
 ```toon
 caps[3]{scope,limit,enforcement}:
   per_epic_section,500 tokens,"epic-summarizer trims lowest-confidence first; if still over, escalates to user"
-  total_permanent_memory,8000 tokens,"oldest Epic auto-moves to .aura/memory/archive/"
+  total_permanent_memory,8000 tokens,"oldest Epic auto-moves to .claude/memory/archive/"
   archive_directory,unlimited,"user manually cleans"
 ```
 
 When `permanent_memory.md` exceeds 8,000 tokens after a new section is appended:
 
-1. Move the oldest Epic section (chronologically by `**Completed:**`) to `.aura/memory/archive/{ISO-date}.md`
+1. Move the oldest Epic section (chronologically by `**Completed:**`) to `.claude/memory/archive/{ISO-date}.md`
 2. Append `history.jsonl` event: `event: memory_archived`
 3. Repeat until total ≤ 8,000
 
@@ -78,11 +78,11 @@ Items in the Tentative subsection are loaded by `permanent-memory-loader` ONLY i
 
 ```toon
 preserved[5]{path,reason}:
-  .aura/plans/history.jsonl,"Single durable timeline — append-only audit"
-  .aura/memory/permanent_memory.md,"Accumulates wisdom across Epics"
-  .aura/plans/{mission,initiatives,features}/**,"Plan tree is persistent"
-  .aura/plans/conflicts.jsonl + conflict_cache.jsonl,"Conflict knowledge persists"
-  .aura/memory/manual_overrides.md,"User-curated; never touched by reset"
+  .claude/plans/history.jsonl,"Single durable timeline — append-only audit"
+  .claude/memory/permanent_memory.md,"Accumulates wisdom across Epics"
+  .claude/plans/{mission,initiatives,features}/**,"Plan tree is persistent"
+  .claude/plans/conflicts.jsonl + conflict_cache.jsonl,"Conflict knowledge persists"
+  .claude/memory/manual_overrides.md,"User-curated; never touched by reset"
 ```
 
 ---

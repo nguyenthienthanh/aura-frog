@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Resolve a user-supplied node reference to a single node file path.
 #
-# Usage: bash aura-frog/scripts/plans/resolve-node.sh <input> [.aura/plans/ path]
+# Usage: bash aura-frog/scripts/plans/resolve-node.sh <input> [.claude/plans/ path]
 #
 # Input forms:
 #   - Full ID:        FEAT-A | INIT-001 | TASK-00042 | STORY-0007 | MISSION
@@ -16,8 +16,12 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(dirname "$0")
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/_lib.sh"
+
 INPUT="${1:-}"
-PLANS_DIR="${2:-.aura/plans}"
+PLANS_DIR=$(plans_dir "${2:-}")
 
 if [ -z "${INPUT}" ]; then
     echo "usage: resolve-node.sh <input> [plans_dir]" >&2

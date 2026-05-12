@@ -25,7 +25,7 @@ complexity[4]{level,criteria,approach}:
   Project,"Multi-feature / multi-session / weight ≥ 3 on bridge heuristic AND no active plan","/aura-frog:plan bootstrap then per-task /run anchored"
 ```
 
-**Project (v3.7.2+):** Emitted when `rules/workflow/run-plan-bridge.md` triggers sum to weight ≥ 3 AND `.aura/plans/active.json` is absent. `run-orchestrator` Step 0 owns the user prompt (`plan` / `deep` / `details`) and the scratch-file handoff. Otherwise Quick/Standard/Deep classification is unchanged.
+**Project (v3.7.2+):** Emitted when `rules/workflow/run-plan-bridge.md` triggers sum to weight ≥ 3 AND `.claude/plans/active.json` is absent. `run-orchestrator` Step 0 owns the user prompt (`plan` / `deep` / `details`) and the scratch-file handoff. Otherwise Quick/Standard/Deep classification is unchanged.
 
 ## Model Selection
 

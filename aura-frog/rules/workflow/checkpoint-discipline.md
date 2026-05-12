@@ -34,7 +34,7 @@ NOT checkpointed (cosmetic):
 
 ## Checkpoint format
 
-Path: `.aura/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
+Path: `.claude/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
 
 ```json
 {
@@ -71,7 +71,7 @@ If `git_dirty: true` (uncommitted changes present at capture), undo must warn th
 retention[3]{rule,limit}:
   per_node,5,"keep last 5 checkpoints per node"
   age_cap,30 days,"checkpoints older than 30 days are pruned"
-  size_cap,50 MB,".aura/plans/checkpoints/ total"
+  size_cap,50 MB,".claude/plans/checkpoints/ total"
 ```
 
 Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon). Manual: `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C).
@@ -82,7 +82,7 @@ Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon). Manual: `aura-fr
 
 `/aura-frog:plan-undo {NODE_ID}` (or `--active` for active node):
 
-1. Find latest `.aura/plans/checkpoints/{NODE_ID}.*.json` (lexicographic max — ISO timestamps sort correctly)
+1. Find latest `.claude/plans/checkpoints/{NODE_ID}.*.json` (lexicographic max — ISO timestamps sort correctly)
 2. Refuse if file count == 0 → "no checkpoint exists; nothing to undo"
 3. Compute current `node_state_now` (frontmatter + body_sha256)
 4. If `node_state_now` matches `node_state_before` → no-op, report "already at checkpoint"

@@ -21,7 +21,7 @@ SCRIPT_DIR=$(dirname "$0")
 source "${SCRIPT_DIR}/_lib.sh"
 
 DRY_RUN=0
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 NODE_INPUT=""
 
 while [ $# -gt 0 ]; do
@@ -33,6 +33,8 @@ while [ $# -gt 0 ]; do
         *) NODE_INPUT="$1"; shift ;;
     esac
 done
+
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
 
 [ -n "$NODE_INPUT" ] || { echo "usage: expand-node.sh <NODE_ID> [--dry-run]" >&2; exit 5; }
 
@@ -60,7 +62,13 @@ DRY RUN — would:
   • Save checkpoint of ${NODE_ID}
   • Dispatch ${AGENT} to propose children at tier T${CHILD_TIER}
   • Mint ${CHILD_KIND}-N IDs via .counters.json
-  • Write child files + update ${NODE_ID}.children[]
+  • Write child files at the v3.7.3+ slug-aware layout:
+      T2 (Feature): features/\${ID}_\${slug}/feature.md
+      T3 (Story):   features/.../stories/\${ID}_\${slug}/story.md
+      T4 (Task):    features/.../stories/.../tasks/\${ID}_\${slug}.md
+    where \${slug} is slugify(intent). For ticket-attached features,
+    \${ID} may be a JIRA-/LIN- prefix instead of FEAT-N.
+  • Update ${NODE_ID}.children[]
   • Bump ${NODE_ID}.revision
   • Append history.jsonl event=expand
   • Run validate-plan-tree.sh; on failure, restore from checkpoint
@@ -84,5 +92,10 @@ expand prepared:
   node:       ${NODE_ID}  (T${TIER} → T${CHILD_TIER})
   agent:      ${AGENT}
   checkpoint: ${CKPT}
-  next:       agent dispatches and writes child node files; counter via 'next_counter ${CHILD_KIND}'
+  next:       agent dispatches and writes child node files at the slug-aware layout:
+              T2: features/\${ID}_\${slug}/feature.md
+              T3: features/.../stories/\${ID}_\${slug}/story.md
+              T4: features/.../stories/.../tasks/\${ID}_\${slug}.md
+              Counter via 'next_counter ${CHILD_KIND}'. Slug via 'slugify <intent>'.
+              For T2 with ticket attached (JIRA-/LIN-/...), use ticket ID as prefix instead of FEAT-N.
 EOF

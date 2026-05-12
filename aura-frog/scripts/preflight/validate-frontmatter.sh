@@ -37,7 +37,7 @@ case "$FILE" in
   */skills/*/SKILL.md) TYPE="skill" ;;
   */rules/*/*.md) TYPE="rule" ;;
   */commands/*.md) TYPE="command" ;;
-  */.aura/plans/*) TYPE="plan" ;;
+  */.claude/plans/*) TYPE="plan" ;;
 esac
 
 # Required fields per type

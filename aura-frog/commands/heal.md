@@ -22,14 +22,14 @@
 3. Read failure-classifier output for the task — refuse if class ∉ {F2, F3}
 4. Refuse if task already has an accepted heal (max 1/task)
 5. Check `replan_budget_remaining` on the task; refuse if 0
-6. Invoke `self-healing-orchestrator` skill — it produces a proposal artifact at `.aura/plans/proposals/HEAL-<TASK_ID>-<NNN>.yaml`
+6. Invoke `self-healing-orchestrator` skill — it produces a proposal artifact at `.claude/plans/proposals/HEAL-<TASK_ID>-<NNN>.yaml`
 7. If confidence < 0.7: surface raw findings only ("self-heal couldn't reach a confident proposal — escalating findings"); do NOT create a proposal
 8. If confidence ≥ 0.7: surface diff + reasoning + risks; prompt user to `/aura-frog:heal accept` or `/aura-frog:heal decline`
 9. Append history.jsonl event: `event: self_heal_proposed`
 
 ## Protocol — `accept <HEAL-ID>`
 
-1. Refuse if proposal not found at `.aura/plans/proposals/HEAL-<HEAL-ID>.yaml`
+1. Refuse if proposal not found at `.claude/plans/proposals/HEAL-<HEAL-ID>.yaml`
 2. Refuse if already applied (idempotency check)
 3. Save checkpoint on the affected node (per `rules/workflow/checkpoint-discipline.md`)
 4. Apply the patch as a NEW T4 task (mint TASK-NNNNN), NOT a modification of the failing task
@@ -80,5 +80,5 @@ When disabled, all `/aura-frog:heal diagnose` calls refuse. Existing proposals r
 - **Rule:** `rules/workflow/replan-thresholds.md` — shared budget semantics
 - **Rule:** `rules/workflow/checkpoint-discipline.md` — pre-apply snapshot
 - **Agent:** `master-planner` — applies the new T4 on `accept`
-- **File:** `.aura/plans/proposals/HEAL-*.yaml` — proposal artifacts
+- **File:** `.claude/plans/proposals/HEAL-*.yaml` — proposal artifacts
 - **Env:** `AF_SELF_HEAL_DISABLED=true` — permanent disable

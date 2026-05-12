@@ -17,7 +17,7 @@ user-invocable: false
 
 ## When to Use
 
-Adding tests, improving coverage, TDD (Phase 2/3). NOT for: bug fixes (bugfix-quick), features (run-orchestrator).
+Adding tests, improving coverage, TDD (Phase 2/3). NOT for: bug fixes (use the `bugfix-quick` **skill** via the Skill tool — it is NOT an agent), features (run-orchestrator **skill**).
 
 ---
 

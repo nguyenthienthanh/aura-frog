@@ -49,10 +49,12 @@ function runResolve(input, plansDir) {
 
 function seedFixture(root) {
     execFileSync('bash', [path.join(SCRIPTS_DIR, 'new-plan.sh'), root], { stdio: 'ignore' });
-    const plans = path.join(root, '.aura', 'plans');
+    const plans = path.join(root, '.claude', 'plans');
 
-    // MISSION with children
-    fs.writeFileSync(path.join(plans, 'mission.md'), [
+    // MISSION with children. v3.7.3+ layout: mission/mission.md (folder).
+    // new-plan.sh already created the folder + a stub; this overwrites with
+    // test-specific content (children: [INIT-001]).
+    fs.writeFileSync(path.join(plans, 'mission', 'mission.md'), [
         '---', 'id: MISSION', 'tier: 0', 'intent: "Test mission"',
         'children: [INIT-001]', 'revision: 0', '---', '',
     ].join('\n'));
@@ -362,15 +364,27 @@ describe('undo-decision.sh', () => {
         runScript('next-task.sh', [], plans);
         const r = runScript('undo-decision.sh', ['TASK-00001', '--list'], plans);
         expect(r.code).toBe(0);
-        expect(r.stdout).toMatch(/TASK-00001\..*\.json/);
+        // v3.7.3+ checkpoints co-locate inside the node folder; filename is
+        // ISO timestamp without the {ID} prefix. Legacy layout (still
+        // accepted) used `{ID}.{ISO}.json` flat in plans/checkpoints/.
+        expect(r.stdout).toMatch(/\.json$/m);
     });
 
     test('consumed checkpoint gets .consumed suffix (LIFO)', () => {
         runScript('next-task.sh', [], plans);
         runScript('undo-decision.sh', ['TASK-00001'], plans);
-        const ckptDir = path.join(plans, 'checkpoints');
-        const files = fs.readdirSync(ckptDir);
-        const consumed = files.filter(f => f.endsWith('.consumed'));
+        // v3.7.3+: checkpoints co-locate inside the node folder. Search
+        // recursively for any *.consumed file across the plan tree.
+        function findConsumed(dir) {
+            let out = [];
+            for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+                const full = path.join(dir, ent.name);
+                if (ent.isDirectory()) out = out.concat(findConsumed(full));
+                else if (ent.name.endsWith('.consumed')) out.push(full);
+            }
+            return out;
+        }
+        const consumed = findConsumed(plans);
         expect(consumed.length).toBeGreaterThanOrEqual(1);
     });
 });
@@ -397,11 +411,16 @@ describe('archive-feature.sh', () => {
     });
     afterEach(() => cleanup(root));
 
-    test('writes summary.md + originals dir', () => {
+    test('writes summary.md + original/ dir under archive/{ID}_{slug}/', () => {
         const r = runScript('archive-feature.sh', ['FEAT-A', '--summary-text', 'tests'], plans);
         expect(r.code).toBe(0);
-        expect(fs.existsSync(path.join(plans, 'archive', 'FEAT-A.summary.md'))).toBe(true);
-        expect(fs.existsSync(path.join(plans, 'archive', 'FEAT-A.original'))).toBe(true);
+        // v3.7.3+: archive/{ID}_{slug}/summary.md + archive/{ID}_{slug}/original/
+        const archiveDirs = fs.readdirSync(path.join(plans, 'archive'))
+            .filter(n => n.startsWith('FEAT-A'));
+        expect(archiveDirs.length).toBe(1);
+        const archiveDir = path.join(plans, 'archive', archiveDirs[0]);
+        expect(fs.existsSync(path.join(archiveDir, 'summary.md'))).toBe(true);
+        expect(fs.existsSync(path.join(archiveDir, 'original'))).toBe(true);
     });
 
     test('marks target status=archived', () => {
@@ -479,6 +498,74 @@ describe('conflicts-scan.sh', () => {
             '--plans-dir', plans,
         ], { encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL' });
         expect(r.status).toBe(5);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// link-run.sh — two-sided run ↔ feature linking (v3.7.3+)
+// ---------------------------------------------------------------------------
+
+describe('link-run.sh', () => {
+    let root, plans, runsDir, runId;
+    beforeEach(() => {
+        root = mktmp();
+        plans = seedFixture(root);
+        // Stand up a fake run alongside the plan tree.
+        runsDir = path.join(root, '.claude', 'logs', 'runs');
+        runId = 'auth-260512';
+        fs.mkdirSync(path.join(runsDir, runId), { recursive: true });
+        fs.writeFileSync(
+            path.join(runsDir, runId, 'run-state.json'),
+            JSON.stringify({ run_id: runId, task: 'oauth', status: 'in_progress' }, null, 2)
+        );
+    });
+    afterEach(() => cleanup(root));
+
+    function runLink(args) {
+        const env = { ...process.env, RUNS_DIR: path.join(root, '.claude', 'logs', 'runs') };
+        return spawnSync('bash', [
+            path.join(SCRIPTS_DIR, 'link-run.sh'),
+            ...args,
+        ], { cwd: root, encoding: 'utf8', timeout: SCRIPT_TIMEOUT_MS, killSignal: 'SIGKILL', env });
+    }
+
+    test('link writes feature_id + feature_slug to run-state.json', () => {
+        const r = runLink(['link', runId, 'FEAT-A', '--anchor', 'TASK-00001']);
+        expect(r.status).toBe(0);
+        const state = JSON.parse(fs.readFileSync(path.join(runsDir, runId, 'run-state.json'), 'utf8'));
+        expect(state.feature_id).toBe('FEAT-A');
+        expect(state.feature_slug).toMatch(/FEAT-A/);
+        expect(state.anchor.task_id).toBe('TASK-00001');
+    });
+
+    test('link appends ## Runs row to feature.md', () => {
+        runLink(['link', runId, 'FEAT-A']);
+        const featFile = path.join(plans, 'features', 'FEAT-A', 'feature.md');
+        const content = fs.readFileSync(featFile, 'utf8');
+        expect(content).toMatch(/## Runs/);
+        expect(content).toMatch(new RegExp(`\\| ${runId} \\|`));
+    });
+
+    test('re-linking same run replaces the row (idempotent)', () => {
+        runLink(['link', runId, 'FEAT-A', '--status', 'in_progress']);
+        runLink(['link', runId, 'FEAT-A', '--status', 'done']);
+        const featFile = path.join(plans, 'features', 'FEAT-A', 'feature.md');
+        const content = fs.readFileSync(featFile, 'utf8');
+        const rows = content.split('\n').filter(l => l.includes(`| ${runId} |`));
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatch(/done/);
+    });
+
+    test('list outputs the runs table rows', () => {
+        runLink(['link', runId, 'FEAT-A']);
+        const r = runLink(['list', 'FEAT-A']);
+        expect(r.status).toBe(0);
+        expect(r.stdout).toMatch(new RegExp(`\\| ${runId} \\|`));
+    });
+
+    test('link refuses on missing run-state', () => {
+        const r = runLink(['link', 'nonexistent-run', 'FEAT-A']);
+        expect(r.status).toBe(2);
     });
 });
 

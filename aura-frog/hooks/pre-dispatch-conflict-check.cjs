@@ -6,11 +6,11 @@
  *        mutate files that a pending-confirm sibling task also targets.
  * Purpose: Run conflict-detector L1+L2 before T4 dispatch. If conflict
  *          detected and confidence is high, write a CONFLICT-NNNNN record
- *          to .aura/plans/conflicts.jsonl and emit a hint to invoke
+ *          to .claude/plans/conflicts.jsonl and emit a hint to invoke
  *          conflict-arbiter.
  *
  * Behavior:
- *   - Silent if no .aura/plans/active.json or active.task null
+ *   - Silent if no .claude/plans/active.json or active.task null
  *   - Resolve siblings under same parent T3 with status: planned (pending-confirm)
  *   - Run scripts/conflicts/check-l1-files.sh
  *   - On L1 overlap with confidence < 0.95 → also run check-l2-syntactic.sh

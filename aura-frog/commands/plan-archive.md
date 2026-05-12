@@ -21,8 +21,8 @@ bash aura-frog/scripts/plans/archive-feature.sh <ID> [--summary-text "..."] [--f
 The script:
 1. Refuses on non-`done` target status.
 2. Walks descendants — refuses unless all are in `{done, discarded, archived}` (override with `--force`).
-3. Writes `.aura/plans/archive/<id>.summary.md` (frontmatter + stats + node-list body).
-4. Copies originals to `.aura/plans/archive/<id>.original/` (audit trail).
+3. Writes `.claude/plans/archive/<id>.summary.md` (frontmatter + stats + node-list body).
+4. Copies originals to `.claude/plans/archive/<id>.original/` (audit trail).
 5. Sets target to `status: archived`, bumps revision.
 6. Appends `history.jsonl event=archive`.
 

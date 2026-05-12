@@ -12,13 +12,13 @@
 /aura-frog:trace <TASK_ID> --hallucinations         # only output_claim events with grounded:false
 /aura-frog:trace <TASK_ID> --tail 50                # last N events
 /aura-frog:trace <TASK_ID> --since 2026-04-29T12:00:00Z
-/aura-frog:trace --active                            # use the active.task from .aura/plans/active.json
+/aura-frog:trace --active                            # use the active.task from .claude/plans/active.json
 ```
 
 ## Protocol
 
-1. **Resolve** TASK_ID. If `--active`, read `.aura/plans/active.json` → `active.task`. Refuse if no active task.
-2. **Read** `.aura/plans/traces/{TASK_ID}.jsonl`. If file missing → exit with message "no trace yet for {TASK_ID}".
+1. **Resolve** TASK_ID. If `--active`, read `.claude/plans/active.json` → `active.task`. Refuse if no active task.
+2. **Read** `.claude/plans/traces/{TASK_ID}.jsonl`. If file missing → exit with message "no trace yet for {TASK_ID}".
 3. **Parse** each line as JSON. Filter by `--filter` and `--since` flags.
 4. **Render table** (columns: ts, event_id, type, summary). For long payloads (>80 chars), truncate with `…`.
 5. **Halluciation summary**: count of `output_claim` with `grounded:false`. If > 0 in non-`--hallucinations` mode, print: `⚠️  N potential hallucinations — re-run with --hallucinations to see them`.

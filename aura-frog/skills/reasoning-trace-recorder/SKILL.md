@@ -1,7 +1,7 @@
 ---
 name: reasoning-trace-recorder
-description: "Auto-invokes for every Claude turn during active T4 task execution. Emits append-only trace events (file_read, output_claim, tool_call, decision) to .aura/plans/traces/{TASK_ID}.jsonl. Source of grounding-discipline checks. Disable: AF_TRACE_DISABLED=true."
-when_to_use: "Every Claude turn during active T4 execution; silent if no .aura/plans/active.json or no active.task or AF_TRACE_DISABLED=true"
+description: "Auto-invokes for every Claude turn during active T4 task execution. Emits append-only trace events (file_read, output_claim, tool_call, decision) to .claude/plans/traces/{TASK_ID}.jsonl. Source of grounding-discipline checks. Disable: AF_TRACE_DISABLED=true."
+when_to_use: "Every Claude turn during active T4 execution; silent if no .claude/plans/active.json or no active.task or AF_TRACE_DISABLED=true"
 autoInvoke: true
 allowed-tools: Read, Bash
 effort: low
@@ -14,9 +14,9 @@ user-invocable: false
 
 ## Behavior
 
-1. Detect: if `.aura/plans/active.json` does NOT exist → exit silently
-2. Read `.aura/plans/active.json` — if `active.task` is null → exit silently
-3. For every emitted event from companion hooks/tools, append a line to `.aura/plans/traces/{TASK_ID}.jsonl`
+1. Detect: if `.claude/plans/active.json` does NOT exist → exit silently
+2. Read `.claude/plans/active.json` — if `active.task` is null → exit silently
+3. For every emitted event from companion hooks/tools, append a line to `.claude/plans/traces/{TASK_ID}.jsonl`
 
 ## Event schema (one JSON per line)
 
@@ -61,7 +61,7 @@ If `grounded: false`, it is **flagged as potential hallucination** and surfaced 
 ## File location
 
 ```
-.aura/plans/traces/{TASK_ID}.jsonl
+.claude/plans/traces/{TASK_ID}.jsonl
 ```
 
 One file per T4 task. Append-only; never edited or deleted by this skill.

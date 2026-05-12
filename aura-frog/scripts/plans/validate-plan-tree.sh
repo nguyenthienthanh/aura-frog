@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 # Validate plan tree integrity per spec §6.7 — enforces all 8 invariants.
 #
-# Usage: bash aura-frog/scripts/plans/validate-plan-tree.sh [.aura/plans/ path]
+# Usage: bash aura-frog/scripts/plans/validate-plan-tree.sh [.claude/plans/ path]
 #
 # Exit codes:
 #   0 — all invariants pass
 #   1 — one or more invariants violated (details printed)
-#   2 — plan tree not found / no .aura/plans/
+#   2 — plan tree not found
 
 set -euo pipefail
 
-PLANS_DIR="${1:-.aura/plans}"
+SCRIPT_DIR=$(dirname "$0")
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/_lib.sh"
+
+PLANS_DIR=$(plans_dir "${1:-}")
 
 if [ ! -d "${PLANS_DIR}" ]; then
     echo "✗ Plan tree not found at ${PLANS_DIR}"

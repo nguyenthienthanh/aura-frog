@@ -25,8 +25,8 @@ for arg in "$@"; do
   esac
 done
 
-PLANS_DIR="${PWD}/.aura/plans"
-MEMORY_DIR="${PWD}/.aura/memory"
+PLANS_DIR="${PWD}/.claude/plans"
+MEMORY_DIR="${PWD}/.claude/memory"
 SECURITY_DIR="${PWD}/.aura/security"
 LOGS_DIR="${PWD}/.claude/logs"
 

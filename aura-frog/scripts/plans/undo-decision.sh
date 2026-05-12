@@ -20,7 +20,7 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=".aura/plans"
+PLANS_DIR=""  # resolved below via plans_dir
 NODE_INPUT=""
 DRY_RUN=0
 LIST=0
@@ -38,6 +38,8 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+PLANS_DIR=$(plans_dir "$PLANS_DIR")
+
 # Default target — active path, deepest non-null.
 if [ -z "$NODE_INPUT" ]; then
     for f in task story feature initiative; do
@@ -51,12 +53,26 @@ NODE_ID=$(resolve_id "$PLANS_DIR" "$NODE_INPUT" 2>/dev/null || true)
 # undo may target a node whose file we deleted — fall back to literal ID.
 [ -z "$NODE_ID" ] && NODE_ID="${NODE_INPUT}"
 
-CKPT_DIR="${PLANS_DIR}/checkpoints"
-[ -d "$CKPT_DIR" ] || { echo "no checkpoints dir at ${CKPT_DIR}" >&2; exit 2; }
+# v3.7.3+ co-located checkpoints: each node folder has its own checkpoints/ subdir.
+# Find it via the node's resolved file path. Fall back to legacy global location
+# for nodes whose file we can't resolve (e.g. archived).
+NODE_FILE=$(resolve_file "$PLANS_DIR" "$NODE_ID" 2>/dev/null || true)
+if [ -n "$NODE_FILE" ]; then
+    CKPT_DIR="$(dirname "$NODE_FILE")/checkpoints"
+else
+    CKPT_DIR="${PLANS_DIR}/checkpoints/${NODE_ID}_legacy"
+fi
 
-# List or pick the latest matching checkpoint.
-MATCHES=$(ls -1 "${CKPT_DIR}/${NODE_ID}".*.json 2>/dev/null | sort || true)
-[ -z "$MATCHES" ] && { echo "no checkpoint for ${NODE_ID}" >&2; exit 2; }
+# Legacy fallback: pre-v3.7.3 stored at ${PLANS_DIR}/checkpoints/{ID}.{ISO}.json (flat).
+LEGACY_CKPT_DIR="${PLANS_DIR}/checkpoints"
+
+if [ -d "$CKPT_DIR" ]; then
+    MATCHES=$(ls -1 "${CKPT_DIR}"/*.json 2>/dev/null | sort || true)
+fi
+if [ -z "${MATCHES:-}" ] && [ -d "$LEGACY_CKPT_DIR" ]; then
+    MATCHES=$(ls -1 "${LEGACY_CKPT_DIR}/${NODE_ID}".*.json 2>/dev/null | sort || true)
+fi
+[ -z "${MATCHES:-}" ] && { echo "no checkpoint for ${NODE_ID}" >&2; exit 2; }
 
 if [ "$LIST" = "1" ]; then
     printf '%s\n' "$MATCHES"

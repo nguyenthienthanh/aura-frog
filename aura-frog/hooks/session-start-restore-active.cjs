@@ -8,7 +8,7 @@
  *          reset gracefully.
  *
  * Behavior:
- *   - If .aura/plans/ doesn't exist → silent
+ *   - If .claude/plans/ doesn't exist → silent
  *   - Otherwise, read active.json and emit a single banner line to stderr
  *   - Append a session_start event to history.jsonl (audit trail)
  *

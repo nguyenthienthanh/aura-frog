@@ -2,11 +2,11 @@
 # Plan tree round-trip test — verify save → load → save is byte-identical.
 # Acceptance criterion from spec §28.2 Milestone A.
 #
-# Usage: bash aura-frog/scripts/plans/test-roundtrip.sh [.aura/plans/ source]
+# Usage: bash aura-frog/scripts/plans/test-roundtrip.sh [.claude/plans/ source]
 
 set -euo pipefail
 
-SRC="${1:-.aura/plans}"
+SRC="${1:-.claude/plans}"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 

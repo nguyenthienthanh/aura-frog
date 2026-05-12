@@ -9,11 +9,11 @@ user-invocable: false
 
 # Run Orchestrator
 
-For complex features / multi-file changes requiring TDD. NOT for: bug fixes (bugfix-quick), quick edits (direct).
+For complex features / multi-file changes requiring TDD. NOT for: bug fixes (use the `bugfix-quick` **skill** via the Skill tool — it is NOT an agent), quick edits (direct).
 
 ## Step 0 — Escalation Check (precondition, v3.7.2+)
 
-Before creating run-state.json, screen the task description for project-level scope via the bridge heuristic in `rules/workflow/run-plan-bridge.md`. The 8-trigger rubric (multi_feature, multi_week, shipping_scope, scale_words, cross_session, user_explicit, word_count, scope_verbs) sums to a weight; if weight ≥ 3 AND no plan tree exists (`.aura/plans/active.json` missing), emit this 3-option prompt:
+Before creating run-state.json, screen the task description for project-level scope via the bridge heuristic in `rules/workflow/run-plan-bridge.md`. The 8-trigger rubric (multi_feature, multi_week, shipping_scope, scale_words, cross_session, user_explicit, word_count, scope_verbs) sums to a weight; if weight ≥ 3 AND no plan tree exists (`.claude/plans/active.json` missing), emit this 3-option prompt:
 
 ```
 Your task scores ≥3 on the escalation heuristic — multi-feature / multi-session scope.
@@ -31,7 +31,7 @@ Options:
 
 **Skip the prompt when:**
 
-- `.aura/plans/active.json` exists → fall through to Step 1 (plan_anchored / plan_idle states from `run-plan-bridge.md` apply).
+- `.claude/plans/active.json` exists → fall through to Step 1 (plan_anchored / plan_idle states from `run-plan-bridge.md` apply).
 - `AF_ESCALATION_DISABLED=true` env var is set.
 - Task description has an override prefix: `task:` (force task mode, skip ask) or `project:` (force project mode, skip ask + write scratch file).
 - Force prefixes `must do:` / `just do:` / `exactly:` are present (these bypass the entire bridge per the bridge rule).
@@ -87,6 +87,41 @@ Then write `.claude/logs/runs/${RUN_ID}/run-state.json` with this skeleton:
 > "Detected: `<complexity>` complexity → `<flow>` flow. State file: `.claude/logs/runs/${RUN_ID}/run-state.json`. Say `deep` to escalate, `quick` to downgrade, or proceed."
 
 This step is non-negotiable. If you skip it, /run status will show nothing and the user loses observability.
+
+### Step 0c — Feature linking (v3.7.3+)
+
+After writing run-state.json, register the run against its feature if anchored:
+
+**Path A — `/run feature: FEAT-X <task>` prefix:**
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/plans/link-run.sh" link "${RUN_ID}" "<FEATURE_ID>" --status in_progress
+# If a specific task is anchored, add: --anchor TASK-NNNNN
+```
+
+This writes both sides of the run ↔ feature link:
+1. `run-state.json` gets `feature_id`, `feature_slug`, `feature_linked_at` (and `anchor.task_id` if `--anchor` passed)
+2. The feature's `feature.md` gets a row in its `## Runs` table (creates the section if absent)
+
+**Path B — Existing `active.json#active.task` set:**
+
+The Run ↔ Plan bridge (Step 1) already anchors via `active.task`. After Step 1 confirms an anchor, also call link-run.sh so the feature.md side stays in sync.
+
+**Path C — `/run resume <FEATURE_ID>`:**
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/plans/link-run.sh" list "<FEATURE_ID>"
+```
+
+Surface every row to the user; prompt to pick one (or auto-resume if only one is `in_progress`). Then `/run resume <run-id>` continues normally.
+
+**On Phase 5 (Finalize) — update the link:**
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/plans/link-run.sh" link "${RUN_ID}" "${FEATURE_ID}" --status done
+```
+
+Same idempotent helper — overwrites the existing row with the new status. No duplicate entries.
 
 ---
 
@@ -147,7 +182,7 @@ scaffold_map[5]{phase,files}:
 
    When env is unavailable in this environment (e.g. no `.envrc` access), continue the run by asking the user to paste the task description inline — do not invent a fallback fetch path.
 5. **Run ↔ Plan bridge** — apply `rules/workflow/run-plan-bridge.md`:
-   - If `.aura/plans/active.json#active.task` is set → **auto-anchor** run-state to that T4; Sprint Contract seeds from the task's acceptance criteria; Phase 5 syncs status back to the plan tree.
+   - If `.claude/plans/active.json#active.task` is set → **auto-anchor** run-state to that T4; Sprint Contract seeds from the task's acceptance criteria; Phase 5 syncs status back to the plan tree.
    - If `active.feature` is set but `active.task` is null → suggest `/aura-frog:plan-next` to claim a task first (user may reply `proceed` to run inline).
    - If no plan exists and the task description triggers ≥3 escalation weight (multi-feature, multi-week, shipping/rollout/epic keywords) → suggest `/aura-frog:plan` to bootstrap T0-T2 first. Honor `proceed` to run inline.
    - Disable with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. Force-mode prefixes (`must do:`, `just do:`, `exactly:`) skip the bridge.

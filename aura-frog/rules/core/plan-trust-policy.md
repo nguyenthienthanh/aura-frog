@@ -1,7 +1,7 @@
 # Rule: Plan Trust Policy
 
 **Priority:** Critical
-**Applies To:** All Claude operations when `.aura/plans/` exists in the project
+**Applies To:** All Claude operations when `.claude/plans/` exists in the project
 
 ---
 

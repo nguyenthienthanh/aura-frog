@@ -8,7 +8,7 @@
  *          decides actual invocation; this hook only signals the boundary).
  *
  * Behavior:
- *   - Silent if .aura/plans/active.json missing or active.feature null
+ *   - Silent if .claude/plans/active.json missing or active.feature null
  *   - Reads the active feature node; checks status field
  *   - On done transition (compared against last-seen status in history.jsonl):
  *     - Append history.jsonl event: feature_done_detected

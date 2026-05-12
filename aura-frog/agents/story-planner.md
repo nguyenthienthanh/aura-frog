@@ -26,9 +26,9 @@ A Story is one TDD-bounded unit (RED → GREEN → REFACTOR). Tasks are atoms a 
 
 - **READ-ONLY on production code**
 - **Writes only to:**
-  - `.aura/plans/features/<feat>/stories/<story>/story.md` (revisions)
-  - `.aura/plans/features/<feat>/stories/<story>/acceptance.md` (test plan)
-  - `.aura/plans/features/<feat>/stories/<story>/tasks/TASK-NNNNN.md` (new files)
+  - `.claude/plans/features/<feat>/stories/<story>/story.md` (revisions)
+  - `.claude/plans/features/<feat>/stories/<story>/acceptance.md` (test plan)
+  - `.claude/plans/features/<feat>/stories/<story>/tasks/TASK-NNNNN.md` (new files)
 - **MAY** stub `__tests__/<story-id>/*.test.cjs` files with `it.skip()` placeholders so acceptance.md has real `test_ref` paths
 - **Does NOT execute tests or write production code** — that's the assigned agent's job in Phase 2/3
 

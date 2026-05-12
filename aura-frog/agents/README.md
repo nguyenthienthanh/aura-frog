@@ -13,7 +13,7 @@ agents[15]{name,file,expertise}:
   devops,devops.md,CI/CD pipelines + deployment + infrastructure
   lead,lead.md,Workflow coordination + team lead
   scanner,scanner.md,Project detection + config + context
-  master-planner,master-planner.md,Plan tree owner — .aura/plans/ + decision audit
+  master-planner,master-planner.md,Plan tree owner — .claude/plans/ + decision audit
   feature-architect,feature-architect.md,T2 (Feature) → T3 (Story) decomposition
   story-planner,story-planner.md,T3 (Story) → T4 (Task) decomposition
   replanner,replanner.md,F2-F4 mutation proposals (re-decompose / discard / promote)

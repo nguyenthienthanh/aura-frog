@@ -1,7 +1,7 @@
 # Rule: Plan Lifecycle
 
 **Priority:** Critical
-**Applies To:** All plan-tree state transitions when `.aura/plans/` exists
+**Applies To:** All plan-tree state transitions when `.claude/plans/` exists
 
 ---
 
@@ -107,7 +107,7 @@ When inside an active phase, `agent-detector` skill MUST prefer `phase_role_map`
 
 ## State persistence
 
-Every transition logged to `.aura/plans/history.jsonl` as append-only event:
+Every transition logged to `.claude/plans/history.jsonl` as append-only event:
 
 ```jsonl
 {"ts":"2026-04-28T11:30:00Z","node":"TASK-00101","from":"planned","to":"active","trigger":"plan_next","actor":"master-planner"}

@@ -1,8 +1,8 @@
 ---
 name: plan-loader
-description: "Loads minimum hierarchical plan context (.aura/plans/) for current execution focus. Auto-invokes every session when plans exist. Stays under 800 always-loaded tokens regardless of plan tree size."
+description: "Loads minimum hierarchical plan context (.claude/plans/) for current execution focus. Auto-invokes every session when plans exist. Stays under 800 always-loaded tokens regardless of plan tree size."
 autoInvoke: true
-when_to_use: "Every Claude turn when .aura/plans/ exists in project; loads mission + active node + ancestors only"
+when_to_use: "Every Claude turn when .claude/plans/ exists in project; loads mission + active node + ancestors only"
 allowed-tools: Read, Glob, Bash
 effort: low
 user-invocable: false
@@ -14,8 +14,8 @@ user-invocable: false
 
 ## Behavior (in order)
 
-1. **Detect**: if `.aura/plans/` does NOT exist → exit silently (no plan = no overhead)
-2. **Read** `.aura/plans/active.json` — get current focus pointer
+1. **Detect**: if `.claude/plans/` does NOT exist → exit silently (no plan = no overhead)
+2. **Read** `.claude/plans/active.json` — get current focus pointer
 3. **Load mission.md** — T0 (always loaded if exists)
 4. **Load active T1** (Initiative) if `active.initiative` set
 5. **Load active T2** (Feature) if `active.feature` set
@@ -52,12 +52,12 @@ When always-loaded budget approaches 13,500 tokens:
 ## Detection logic (bash one-liner the model can run)
 
 ```bash
-[ -f .aura/plans/active.json ] && echo "plan-active" || echo "no-plan"
+[ -f .claude/plans/active.json ] && echo "plan-active" || echo "no-plan"
 ```
 
 ## Tie-Ins
 
-- **Owns:** `.aura/plans/active.json` (read), `.aura/plans/mission.md` (read), `.aura/plans/<active path>/*.md` (read)
+- **Owns:** `.claude/plans/active.json` (read), `.claude/plans/mission.md` (read), `.claude/plans/<active path>/*.md` (read)
 - **Skill spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §9.1
 - **Rule:** `rules/core/plan-trust-policy.md` — content loaded by this skill is `trust: plan`
 - **Hook:** `hooks/pre-execute-load-plan-context.cjs` (Milestone A part 2) — invokes this skill on every PreToolUse

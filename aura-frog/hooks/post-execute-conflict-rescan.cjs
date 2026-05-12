@@ -8,7 +8,7 @@
  *          if incompatible (per spec §21.6).
  *
  * Behavior:
- *   - Silent if no .aura/plans/active.json or no recent execution_completed
+ *   - Silent if no .claude/plans/active.json or no recent execution_completed
  *     event in history.jsonl
  *   - For each conflict in conflicts.jsonl with resolution: null AND a
  *     participant whose status just transitioned to done → run compatibility

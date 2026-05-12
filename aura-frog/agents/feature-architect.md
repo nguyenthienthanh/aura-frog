@@ -1,6 +1,6 @@
 ---
 name: feature-architect
-description: "T2 (Feature) decomposition specialist for hierarchical planning. Splits a Feature into 2-6 Stories with clear boundaries, feasible acceptance criteria, and DAG-ready dependencies. Read-only on code; writes only to .aura/plans/features/<id>/ tree."
+description: "T2 (Feature) decomposition specialist for hierarchical planning. Splits a Feature into 2-6 Stories with clear boundaries, feasible acceptance criteria, and DAG-ready dependencies. Read-only on code; writes only to .claude/plans/features/<id>/ tree."
 tools: Read, Glob, Grep, Bash
 mcp_servers: [context7]
 color: blue
@@ -26,9 +26,9 @@ A Feature is a user-facing capability (e.g., "user authentication"). Stories are
 
 - **READ-ONLY on code** — uses Read/Glob/Grep to understand existing architecture
 - **Writes only to:**
-  - `.aura/plans/features/<feature-id>/feature.md` (revisions)
-  - `.aura/plans/features/<feature-id>/stories/STORY-NNNN/story.md` (new files)
-  - `.aura/plans/features/<feature-id>/stories/STORY-NNNN/acceptance.md`
+  - `.claude/plans/features/<feature-id>/feature.md` (revisions)
+  - `.claude/plans/features/<feature-id>/stories/STORY-NNNN/story.md` (new files)
+  - `.claude/plans/features/<feature-id>/stories/STORY-NNNN/acceptance.md`
 - **Does NOT decompose Stories into Tasks** — that's story-planner's job
 - **Does NOT execute task work**
 
@@ -49,7 +49,7 @@ A Feature is a user-facing capability (e.g., "user authentication"). Stories are
 3. **Decompose** into Stories with explicit boundaries (one Story = one TDD-bounded change)
 4. **Define DAG** — Story-level depends_on declares ordering
 5. **Generate acceptance criteria** with test_ref placeholders
-6. **Mint IDs** via `.aura/plans/.counters.json`
+6. **Mint IDs** via `.claude/plans/.counters.json`
 7. **Write** all Story files atomically; on failure, revert via checkpoint
 8. **Update** Feature's `children: [STORY-NNNN, ...]`
 9. **Append** `history.jsonl` — `event: feature_architect_decompose`
