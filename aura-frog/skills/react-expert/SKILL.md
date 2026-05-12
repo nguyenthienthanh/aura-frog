@@ -1,6 +1,6 @@
 ---
 name: react-expert
-description: "React gotchas and decision criteria. Covers conditional rendering traps, state management choices, and hooks pitfalls Claude commonly misses."
+description: "React gotchas and decision criteria covering stale closure bugs in useEffect, conditional rendering traps (falsy 0/empty string), state management selection (useState vs Context vs Zustand vs TanStack Query), and hooks rules. Use when writing React components, debugging re-renders, choosing state management, or encountering useEffect infinite loops."
 autoInvoke: false
 priority: high
 triggers:

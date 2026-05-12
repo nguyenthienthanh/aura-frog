@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: "6-aspect structured code review with calibrated scoring. Prevents LGTM drift by requiring per-aspect breakdown. Without this skill, reviews miss security issues, skip edge cases, and lack consistent scoring."
+description: "6-aspect structured code review (security, architecture, error handling, test gaps, type safety, simplification) with calibrated scoring and per-aspect breakdown. Use when the user asks to review code, check a PR, review a pull request, audit changes before merge, or give code feedback."
 autoInvoke: true
 priority: high
 triggers:
