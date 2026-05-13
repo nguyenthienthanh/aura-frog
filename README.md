@@ -386,7 +386,7 @@ sequenceDiagram
     MP->>ES: T2 done — distill
     ES->>PA: write permanent_memory.md section
     PA->>MP: write archive/FEAT-A/summary.md
-    MP->>U: feature shipped; archived branch removed from always-loaded surface
+    MP->>U: feature shipped — archived branch removed from always-loaded surface
 ```
 
 ##### Decomposition discipline — the agent-by-agent contract
