@@ -32,9 +32,10 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const resolvePlansDir = require('./lib/plans-dir.cjs');
 
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
-const PLANS_DIR = path.join(process.cwd(), '.aura', 'plans');
+const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
 const CONFLICTS_FILE = path.join(PLANS_DIR, 'conflicts.jsonl');

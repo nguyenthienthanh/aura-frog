@@ -29,8 +29,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const resolvePlansDir = require('./lib/plans-dir.cjs');
 
-const PLANS_DIR = path.join(process.cwd(), '.aura', 'plans');
+const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
 

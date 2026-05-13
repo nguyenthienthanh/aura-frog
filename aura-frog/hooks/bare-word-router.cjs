@@ -51,13 +51,12 @@ function readPrompt() {
 }
 
 function planActive(cwd) {
-  // v3.7.3+: plans live under .claude/plans/. Pre-v3.7.3: .aura/plans/.
-  // Either path counts as "plan active" — match the resolution order used by
-  // scripts/plans/_lib.sh#plans_dir().
+  // Delegate to lib/plans-dir.cjs so the resolution stays in lock-step with
+  // every other hook + scripts/plans/_lib.sh#plans_dir().
   try {
-    if (fs.existsSync(path.join(cwd, '.claude', 'plans', 'active.json'))) return true;
-    if (fs.existsSync(path.join(cwd, '.aura', 'plans', 'active.json'))) return true;
-    return false;
+    const resolvePlansDir = require('./lib/plans-dir.cjs');
+    const plansDir = resolvePlansDir(cwd);
+    return fs.existsSync(path.join(plansDir, 'active.json'));
   } catch {
     return false;
   }

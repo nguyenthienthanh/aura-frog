@@ -26,16 +26,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const resolvePlansDir = require('./lib/plans-dir.cjs');
 
-// v3.7.3+: plans live under `.claude/plans/`. Legacy fallback: `.aura/plans/`.
-function resolvePlansDir() {
-  const claudePath = path.join(process.cwd(), '.claude', 'plans');
-  const auraPath = path.join(process.cwd(), '.aura', 'plans');
-  if (process.env.AF_PLANS_DIR) return path.resolve(process.env.AF_PLANS_DIR);
-  if (fs.existsSync(claudePath)) return claudePath;
-  if (fs.existsSync(auraPath)) return auraPath;
-  return claudePath; // default for the absent-tree case (skipped below)
-}
 const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 

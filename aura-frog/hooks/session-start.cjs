@@ -149,6 +149,20 @@ async function main() {
     const source = data.source || 'unknown';
     const sessionId = data.session_id || process.ppid?.toString() || null;
 
+    // One-shot legacy migration: .aura/plans → .claude/plans (v3.7.3+).
+    // Fires when only the legacy dir exists and AF_PLANS_DIR is unset.
+    // Runs BEFORE any other hook reads plan state so downstream consumers
+    // always see the canonical path. Loud notice; safe no-op otherwise.
+    try {
+      const { migrateLegacyPlansDir } = require('./lib/plans-dir.cjs');
+      const migration = migrateLegacyPlansDir();
+      if (migration.migrated) {
+        console.log(`🐸 Migrated legacy .aura/plans → .claude/plans (v3.7.3 schema). Source: ${migration.from}`);
+      } else if (migration.error) {
+        console.log(`⚠️  Legacy .aura/plans migration failed: ${migration.error}. Run manually: mv .aura/plans .claude/plans`);
+      }
+    } catch { /* non-blocking */ }
+
     // Fast path: use cached session if valid (skips all detection)
     const cached = getValidCache();
     if (cached && envFile && source !== 'init') {
@@ -414,9 +428,14 @@ function sweepRetention() {
   if (!retentionDays || retentionDays <= 0) return;
   const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
 
+  const resolvePlansDir = require('./lib/plans-dir.cjs');
+  const plansDir = resolvePlansDir();
   const targets = [
+    // MCP audit lives under .aura/security/ by design (security domain stays
+    // separate from plans). Plan traces follow the v3.7.3 .claude/plans path,
+    // with legacy .aura/plans honored via the resolver.
     path.join(process.cwd(), '.aura', 'security', 'mcp-audit.jsonl'),
-    ...listFiles(path.join(process.cwd(), '.aura', 'plans', 'traces')),
+    ...listFiles(path.join(plansDir, 'traces')),
     ...listFiles(path.join(process.cwd(), '.claude', 'metrics', 'sessions')),
   ];
 

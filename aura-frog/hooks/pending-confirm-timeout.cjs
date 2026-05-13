@@ -29,8 +29,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const resolvePlansDir = require('./lib/plans-dir.cjs');
 
-const PLANS_DIR = path.join(process.cwd(), '.aura', 'plans');
+const PLANS_DIR = resolvePlansDir();
 const FEATURES_DIR = path.join(PLANS_DIR, 'features');
 const TIMEOUT_HOURS = parseInt(process.env.AF_PENDING_TIMEOUT_HOURS || '24', 10);
 const TIMEOUT_MS = TIMEOUT_HOURS * 3600 * 1000;
