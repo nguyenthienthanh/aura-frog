@@ -430,6 +430,10 @@ Two pieces of state link the two systems:
 
 The **escalation heuristic** in `rules/workflow/run-plan-bridge.md` scores every `/run <task>` on 8 signals (word count, scope verbs, file count, multi-domain keywords, …). At weight ≥ 3 without an active plan, it prompts `plan` / `deep` / `details`. Tasks fail this test for a reason — they're project-scoped, not single-feature.
 
+> ⚠️ **Anchoring does NOT skip the 5-phase TDD workflow.** The plan tree feeds **inputs** to Phase 1 (acceptance criteria → Sprint Contract; design notes → architecture inputs) and Phase 2 (test scaffolds). It does **not** replace either phase. Every anchored `/run` still executes Phase 1 → 2 → 3 → 4 → 5 against its task. **Phase 2 (Test RED) is mandatory** even when the plan documents acceptance criteria — acceptance criteria are intent; failing tests are executable contracts. Skipping Phase 2 because "the plan already has it" is the most common misread of this design.
+>
+> **One `/run` covers one task's full 5-phase cycle.** A feature with 5 tasks needs 5 `/run` invocations. Iterate with `/aura-frog:plan next` (or just type `next` with a plan active) to claim the next ready task — each `/run` after that auto-anchors and runs all 5 phases against it. Single-shot `/run feature: FEAT-A` does **not** loop through every task of the feature automatically; it runs the 5 phases against one task and stops at Phase 5.
+
 ##### What survives what (the resilience matrix)
 
 |  | `/compact` | Session restart | `/aura-frog:reset-session` | `git clean` |

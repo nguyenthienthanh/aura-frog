@@ -20,6 +20,10 @@ states[3]{state,trigger,bridge_action}:
 
 ## Anchoring (state: plan_anchored)
 
+> **Critical contract — anchoring does NOT bypass the 5-phase TDD workflow.** The plan tree provides INPUTS to Phase 1 + Phase 2 (acceptance criteria, design notes, dependency hints). It does **not** replace either phase. Every anchored `/run` cycle executes Phase 1 → 2 → 3 → 4 → 5 against the task — no exceptions. Phase 2 (Test RED) is the most commonly-skipped phase under the misreading "the plan has acceptance criteria, why write failing tests?" Answer: acceptance criteria are intent; failing tests are executable contracts. Phase 2 converts one into the other. Skipping it is the bug this rule exists to prevent.
+>
+> One `/run` = one task's full 5-phase cycle. A feature with 5 tasks needs 5 `/run` invocations (each auto-anchoring via `/aura-frog:plan next`). The bridge wires the inputs; the user — or the future "iterate all tasks" autopilot — drives the loop.
+
 When `.claude/plans/active.json#active.task` is set:
 
 1. **Read** the task file at `.claude/plans/features/<feature>/stories/<story>/tasks/<task>.md`.

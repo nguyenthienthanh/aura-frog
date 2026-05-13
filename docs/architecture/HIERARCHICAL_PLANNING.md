@@ -193,6 +193,23 @@ replan_budget: 2            # per-node budget; exceed → escalate up a tier
 
 Strategist exits. The subagent context is wiped. Main session resumes with only `active.json` (~80 tokens) loaded — Claude knows the plan exists and where the focus is, but doesn't carry the full tree.
 
+### 1.8 The single most-misunderstood part: planning **does not replace** the 5-phase TDD
+
+A common failure mode after the plan tree exists: the user runs `/run feature: FEAT-A` and the model jumps straight to Build GREEN because `feature.md` already documents acceptance criteria. **This is wrong.** The plan tree contains *intent*; the 5-phase workflow converts intent into *executable contracts and verified code*. Both are needed.
+
+| What the plan tree provides | What the 5-phase workflow still does |
+|---|---|
+| Acceptance criteria (intent) | **Phase 1** — Sprint Contract negotiation (binds intent to a concrete, testable design) |
+| Design notes + dependency hints | **Phase 1** — architect proposes the implementation approach grounded in the codebase, surfaces tradeoffs |
+| Story / Task decomposition | **Phase 2** — tester writes the failing tests that lock the acceptance criteria into the runner (intent → executable contract) |
+| `acceptance_refs` list | **Phase 3** — builder writes the minimum code that turns each ref green |
+| `## Runs` table for forensic history | **Phase 4** — different reviewer (not the builder) verifies, refactors, runs cross-checks |
+| Plan-state transitions to `done` | **Phase 5** — Finalize writes deliverables back into the plan node and bumps its `status` |
+
+**Anchoring is wiring, not bypass.** When `/run` finds `active.json#active.task`, it auto-anchors so deliverables sync back to the task — but every `/run` cycle still executes Phase 1 → 2 → 3 → 4 → 5. The most commonly-skipped phase under the misread is **Phase 2** ("the plan has acceptance criteria, why write failing tests?") — and that is the exact bug this contract exists to prevent. Acceptance criteria are *intent*; failing tests are *executable contracts*. Phase 2 converts one into the other; nothing else does.
+
+**One `/run` covers one task's full 5-phase cycle.** A feature with 5 tasks needs 5 `/run` invocations — each one claims the next ready task via `/aura-frog:plan next` (or just `next` as a bare word with a plan active), auto-anchors, and runs 5 phases. `/run feature: FEAT-A` does **not** loop through every task of FEAT-A automatically; it runs the 5 phases against one task and stops.
+
 ---
 
 ## Stage 2 — Memory architecture: four physical tiers (no vector DB)

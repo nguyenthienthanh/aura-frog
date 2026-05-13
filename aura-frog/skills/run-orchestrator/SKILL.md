@@ -192,6 +192,10 @@ scaffold_map[5]{phase,files}:
    - If `active.feature` is set but `active.task` is null → suggest `/aura-frog:plan-next` to claim a task first (user may reply `proceed` to run inline).
    - If no plan exists and the task description triggers ≥3 escalation weight (multi-feature, multi-week, shipping/rollout/epic keywords) → suggest `/aura-frog:plan` to bootstrap T0-T2 first. Honor `proceed` to run inline.
    - Disable with `AF_RUN_PLAN_BRIDGE_DISABLED=true`. Force-mode prefixes (`must do:`, `just do:`, `exactly:`) skip the bridge.
+
+   > ⚠️ **Anchoring does NOT skip phases.** The plan tree feeds Phase 1 (acceptance criteria → Sprint Contract; design notes → architecture inputs) — it does **not** replace Phase 1 or Phase 2. **All 5 phases run per task even when anchored.** A common failure mode is interpreting "the feature is already designed in the plan tree" as a license to skip straight to Phase 3 / Build GREEN. That is wrong. Phase 2 (Test RED) is mandatory — it converts the plan's acceptance criteria into executable failing tests before any code is written. Skipping Phase 2 because the plan exists is the bug we're trying to prevent. If you find yourself implementing without a failing test, stop and write the test first.
+   >
+   > Iterating a whole feature: a single `/run` cycles through Phase 1 → 5 for **one task**. To complete a multi-task feature, repeat `/aura-frog:plan next` (or just type `next` while a plan is active) to claim the next ready task, then re-enter `/run` which auto-anchors. Each task gets its own full 5-phase cycle. This is the contract — not "one /run per feature".
 6. Load project context
 7. Verify complexity — suggest lighter approach if simple
 8. Socratic brainstorming (Standard/Deep only)

@@ -85,6 +85,8 @@ Force mode (skip brainstorming): prefix with `must do:`, `just do:`, `exactly:`.
 - `/run feature: JIRA-1234 <desc>` — same, with a ticket-ID-prefixed feature folder.
 - The feature must already exist (`/aura-frog:plan` first if not). For a fresh feature + run, use `/run project: <desc>` (escalates to plan bootstrap, then anchors).
 
+> ⚠️ **Anchoring to a plan never skips the 5-phase TDD.** A `/run` anchored to FEAT-A still runs Phase 1 → 2 → 3 → 4 → 5 against the task. The plan tree feeds Phase 1 (acceptance criteria, design notes) and Phase 2 (test scaffolds) — it does **not** replace them. **Phase 2 (Test RED) is mandatory** even when the plan already documents acceptance criteria, because acceptance criteria are intent and failing tests are executable contracts. One `/run` covers one task's full 5-phase cycle; iterating a feature means looping `/aura-frog:plan next` + `/run` per task.
+
 ---
 
 ## /run status
