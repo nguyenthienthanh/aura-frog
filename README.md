@@ -243,10 +243,10 @@ Five tiers from intent down to executable atom. Each tier has one specialist age
 | **T0** Mission | Why the project exists. One per repo. | `MISSION` | `mission/` | `mission.md` | `strategist` (one-shot during bootstrap) |
 | **T1** Initiative *(optional)* | Multi-feature theme — quarter / OKR / milestone. Skip on solo projects. | `INIT-NNN` | `initiatives/{ID}_{slug}/` | `initiative.md` | `master-planner` + `strategist` |
 | **T2** Feature | User-facing capability. Anchor for `/run`. | `FEAT-N` or `JIRA-1234` | `features/{ID}_{slug}/` (top-level) or `features/<parent>/subfeatures/{ID}_{slug}/` (nested, v3.7.3+) | `feature.md` | `feature-architect` |
-| **T3** Story | TDD-bounded unit. Fits one Phase 1 design. | `STORY-NNNN` | `<feature>/stories/{ID}_{slug}/` | `story.md` | `story-planner` |
-| **T4** Task | Single agent invocation. Atomic. | `TASK-NNNNN` | `<story>/tasks/{ID}_{slug}/` | `task.md` | `story-planner` (alongside T3) |
+| **T3** Story | TDD-bounded unit. Fits one Phase 1 design. | `STORY-NNNN` | `<feature-folder>/stories/{ID}_{slug}/` — lives wherever the parent feature lives, including under `subfeatures/` | `story.md` | `story-planner` |
+| **T4** Task | Single agent invocation. Atomic. | `TASK-NNNNN` | `<story-folder>/tasks/{ID}_{slug}/` — same nesting rule | `task.md` | `story-planner` (alongside T3) |
 
-Subfeatures (T2 recursion) ship in v3.7.3+: a feature can decompose into child features rather than stories when one Phase 1 design isn't enough. The child sits inside the parent's `subfeatures/` folder with `parent: <PARENT_FEAT_ID>` in its frontmatter.
+Subfeatures (T2 recursion) ship in v3.7.3+: a feature can decompose into child features rather than stories when one Phase 1 design isn't enough. The child sits inside the parent's `subfeatures/` folder with `parent: <PARENT_FEAT_ID>` in its frontmatter. **Subfeatures own their own stories** — a `features/FEAT-001/subfeatures/FEAT-B/stories/STORY-0001/` path is canonical, not a special case. The `child_path:` line printed by `/aura-frog:plan expand` resolves the concrete folder for whichever agent is doing the decomposition.
 
 ##### Components inventory
 

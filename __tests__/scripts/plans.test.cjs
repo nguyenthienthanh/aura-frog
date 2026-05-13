@@ -771,3 +771,75 @@ describe('resolve-node.sh: nested feature lookup', () => {
         expect(file).toBe(path.join(plans, 'features', 'FEAT-001_parent', 'feature.md'));
     });
 });
+
+// ---------------------------------------------------------------------------
+// expand-node.sh: subfeature decomposition — stories live under the
+// subfeature's actual folder (NOT at the top-level features/<ID>/stories).
+// Regression: pre-fix, the script emitted a literal `features/.../stories/`
+// template that confused agents when the parent was nested.
+// ---------------------------------------------------------------------------
+
+describe('expand-node.sh: T2 subfeature → T3 stories nest at the right path', () => {
+    let root, plans;
+
+    beforeEach(() => {
+        root = mktmp();
+        plans = path.join(root, '.claude', 'plans');
+        fs.mkdirSync(plans, { recursive: true });
+
+        // Minimal scaffolding
+        fs.writeFileSync(path.join(plans, '.counters.json'), JSON.stringify({
+            schema_version: 1, counters: { FEAT: 1, STORY: 0, TASK: 0, CONFLICT: 0, DEC: 0 },
+        }));
+        fs.writeFileSync(path.join(plans, 'history.jsonl'), '');
+        fs.writeFileSync(path.join(plans, 'active.json'), JSON.stringify({
+            schema_version: 1, active: {}, ready_queue: [], blocked: [], frozen: [], context_anchors: {},
+        }));
+
+        // Parent feature
+        const parentDir = path.join(plans, 'features', 'FEAT-001_parent');
+        fs.mkdirSync(parentDir, { recursive: true });
+        fs.writeFileSync(path.join(parentDir, 'feature.md'), [
+            '---', 'id: FEAT-001', 'tier: 2', 'parent: MISSION',
+            'intent: "Parent feature"', 'status: active', 'revision: 0', '---', '',
+        ].join('\n'));
+
+        // Nested subfeature — the system-under-test
+        const subDir = path.join(parentDir, 'subfeatures', 'FEAT-B_child');
+        fs.mkdirSync(subDir, { recursive: true });
+        fs.writeFileSync(path.join(subDir, 'feature.md'), [
+            '---', 'id: FEAT-B', 'tier: 2', 'parent: FEAT-001',
+            'intent: "Nested child"', 'status: planned', 'revision: 0', '---', '',
+        ].join('\n'));
+    });
+    afterEach(() => cleanup(root));
+
+    test('expand FEAT-B prints the concrete subfeature folder, not a `...` placeholder', () => {
+        const r = runScript('expand-node.sh', ['FEAT-B'], plans);
+        expect(r.code).toBe(0);
+        // The script must surface where the child stories will land.
+        // Previously: "features/.../stories/${ID}_${slug}/" (literal ellipsis)
+        // Now: "features/FEAT-001_parent/subfeatures/FEAT-B_child/stories/..."
+        expect(r.stdout).toMatch(/features\/FEAT-001_parent\/subfeatures\/FEAT-B_child\/stories\//);
+    });
+
+    test('expand FEAT-B still dispatches story-planner (T2 → T3)', () => {
+        const r = runScript('expand-node.sh', ['FEAT-B'], plans);
+        expect(r.code).toBe(0);
+        expect(r.stdout).toMatch(/agent:\s+story-planner/);
+    });
+
+    test('history.jsonl records the expand against the subfeature ID', () => {
+        runScript('expand-node.sh', ['FEAT-B'], plans);
+        const h = fs.readFileSync(path.join(plans, 'history.jsonl'), 'utf8');
+        expect(h).toMatch(/"verb":"expand".*"target":"FEAT-B"/);
+    });
+
+    test('expand on top-level FEAT-001 still emits top-level stories path', () => {
+        // Regression-guard: don't break the non-nested case.
+        const r = runScript('expand-node.sh', ['FEAT-001'], plans);
+        expect(r.code).toBe(0);
+        expect(r.stdout).toMatch(/features\/FEAT-001_parent\/stories\//);
+        expect(r.stdout).not.toMatch(/subfeatures\/.*\/stories\//);
+    });
+});

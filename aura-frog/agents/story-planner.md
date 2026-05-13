@@ -25,10 +25,12 @@ A Story is one TDD-bounded unit (RED → GREEN → REFACTOR). Tasks are atoms a 
 ## Constraints
 
 - **READ-ONLY on production code**
-- **Writes only to:**
-  - `.claude/plans/features/<feat>/stories/<story>/story.md` (revisions)
-  - `.claude/plans/features/<feat>/stories/<story>/acceptance.md` (test plan)
-  - `.claude/plans/features/<feat>/stories/<story>/tasks/TASK-NNNNN.md` (new files)
+- **Writes only to** (use the story's RESOLVED folder — see below):
+  - `<story-folder>/story.md` (revisions)
+  - `<story-folder>/acceptance.md` (test plan)
+  - `<story-folder>/tasks/TASK-NNNNN_<slug>/task.md` (new files, v3.7.3+ folder-per-task)
+
+  The story folder lives wherever its parent feature lives — top-level (`features/<id>/stories/<story-id>/`) OR under a subfeature (`features/<parent>/subfeatures/<id>/stories/<story-id>/`, v3.7.3+). The `child_path:` line printed by `expand-node.sh` resolves this for you — copy it verbatim. Never assume `features/<feat>/stories/...` is the only valid prefix.
 - **MAY** stub `__tests__/<story-id>/*.test.cjs` files with `it.skip()` placeholders so acceptance.md has real `test_ref` paths
 - **Does NOT execute tests or write production code** — that's the assigned agent's job in Phase 2/3
 

@@ -25,10 +25,12 @@ A Feature is a user-facing capability (e.g., "user authentication"). Stories are
 ## Constraints
 
 - **READ-ONLY on code** — uses Read/Glob/Grep to understand existing architecture
-- **Writes only to:**
-  - `.claude/plans/features/<feature-id>/feature.md` (revisions)
-  - `.claude/plans/features/<feature-id>/stories/STORY-NNNN/story.md` (new files)
-  - `.claude/plans/features/<feature-id>/stories/STORY-NNNN/acceptance.md`
+- **Writes only to** (use the feature's RESOLVED folder — see below):
+  - `<feature-folder>/feature.md` (revisions)
+  - `<feature-folder>/stories/STORY-NNNN_<slug>/story.md` (new files)
+  - `<feature-folder>/stories/STORY-NNNN_<slug>/acceptance.md`
+
+  The feature folder may be top-level (`features/<id>_<slug>/`) OR nested under a parent feature (`features/<parent>_<parent-slug>/subfeatures/<id>_<slug>/`, v3.7.3+). Resolve via `scripts/plans/_lib.sh#find_feature_path <plans-dir> <feature-id>`, OR honor the concrete `child_path:` line printed by `expand-node.sh` verbatim. Never hard-code `features/<id>/stories/...` — that path is wrong for subfeatures.
 - **Does NOT decompose Stories into Tasks** — that's story-planner's job
 - **Does NOT execute task work**
 
