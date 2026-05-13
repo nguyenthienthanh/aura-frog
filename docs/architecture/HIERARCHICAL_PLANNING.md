@@ -224,9 +224,9 @@ flowchart TB
         AR["archive/{ID}_{slug}/<br/>compressed branches"]
     end
 
-    T2 -. plan-loader lazy reads .-> T1
-    T2 -- T2 done → epic-summarizer .-> T4
-    T3 -- /aura-frog:trace queries .-> T3
+    T2 -. "plan-loader lazy reads" .-> T1
+    T2 -. "T2 done — epic-summarizer" .-> T4
+    T3 -. "queried by aura-frog:trace" .-> T3
     classDef t1 fill:#fef9c3,stroke:#a16207
     classDef t2 fill:#dbeafe,stroke:#1d4ed8
     classDef t3 fill:#fee2e2,stroke:#dc2626

@@ -378,8 +378,8 @@ sequenceDiagram
     PO->>MP: pop ready T4 from DAG
     MP->>U: active.task = TASK-00001
 
-    U->>RO: /run (auto-anchors to active.task)
-    Note over RO: 5-phase TDD; trace.jsonl appends per turn
+    U->>RO: run command auto-anchors to active.task
+    Note over RO: 5-phase TDD — trace.jsonl appends per turn
     RO->>MP: post-execute-update-node bumps status
 
     Note over MP,ES: last T4 of FEAT-A completes
