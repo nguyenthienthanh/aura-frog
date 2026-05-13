@@ -230,6 +230,220 @@ flowchart TB
 
 ---
 
+#### How hierarchical planning actually works
+
+The TL;DR is "a folder per node, with metadata and references that the model loads on demand." Here is the full breakdown — read this if you want to understand the **components**, **mechanisms**, and **memory layers** behind the pillar.
+
+##### Tier semantics
+
+Five tiers from intent down to executable atom. Each tier has one specialist agent that owns its decomposition.
+
+| Tier | Purpose | ID | Folder | Spec file | Decomposed by |
+|---|---|---|---|---|---|
+| **T0** Mission | Why the project exists. One per repo. | `MISSION` | `mission/` | `mission.md` | `strategist` (one-shot during bootstrap) |
+| **T1** Initiative *(optional)* | Multi-feature theme — quarter / OKR / milestone. Skip on solo projects. | `INIT-NNN` | `initiatives/{ID}_{slug}/` | `initiative.md` | `master-planner` + `strategist` |
+| **T2** Feature | User-facing capability. Anchor for `/run`. | `FEAT-N` or `JIRA-1234` | `features/{ID}_{slug}/` (top-level) or `features/<parent>/subfeatures/{ID}_{slug}/` (nested, v3.7.3+) | `feature.md` | `feature-architect` |
+| **T3** Story | TDD-bounded unit. Fits one Phase 1 design. | `STORY-NNNN` | `<feature>/stories/{ID}_{slug}/` | `story.md` | `story-planner` |
+| **T4** Task | Single agent invocation. Atomic. | `TASK-NNNNN` | `<story>/tasks/{ID}_{slug}/` | `task.md` | `story-planner` (alongside T3) |
+
+Subfeatures (T2 recursion) ship in v3.7.3+: a feature can decompose into child features rather than stories when one Phase 1 design isn't enough. The child sits inside the parent's `subfeatures/` folder with `parent: <PARENT_FEAT_ID>` in its frontmatter.
+
+##### Components inventory
+
+```toon
+components[29]{kind,name,role}:
+  agents,master-planner,"Stateful kernel — owns plan tree, dispatches replan decisions, audits every mutation to history.jsonl. Never executes code."
+  agents,strategist,"T0/T1 framing — challenges intent, sizes initiatives, surfaces ROI tradeoffs. Read-only on code."
+  agents,feature-architect,"T2 → T3 decomposition. Splits one feature into 2-6 stories with acceptance criteria + dependency hints."
+  agents,story-planner,"T3 → T4 decomposition. Splits a story into 1-6 atomic tasks. Stubs the acceptance test skeleton so each task has a real test_ref path."
+  agents,replanner,"F2-F4 mutation proposals — re-decompose / promote / discard. Budget-aware (per-node replan_budget enforced)."
+  agents,epic-summarizer,"On T2 done, distills the feature's stories + tasks + traces into permanent_memory.md. Confidence-scored. Writes ONLY to .claude/memory/."
+  agents,conflict-arbiter,"L1-L4 conflict adjudication — freeze / sequential / replan / escalate per spec §21.5."
+  skills,plan-orchestrator,"Single dispatcher for the 11-verb /aura-frog:plan vocabulary. Routes user intent → backing script via verb_table + intent classifier."
+  skills,plan-loader,"Auto-invokes every turn when .claude/plans/ exists. Loads mission + active branch + ancestors — stays under 800 tokens regardless of tree size."
+  skills,plan-validator,"Schema gate — frontmatter shape, tier coherence, children/parent symmetry. Run before mutations."
+  skills,plan-archivist,"Compresses completed T2 branches into archive/{ID}_{slug}/summary.md. Removes original (preserved in checkpoints)."
+  skills,reasoning-trace-recorder,"Auto-invokes during active T4 execution. Appends tool_call / file_read / output_claim events to the task's trace.jsonl."
+  skills,permanent-memory-loader,"Auto-invokes every turn when .claude/memory/permanent_memory.md exists. Loads section headers + 1-line summaries (≤120 tokens)."
+  skills,conflict-detector,"L1 file overlap + L2 function/region overlap (bash, free). L3 semantic + L4 architectural (LLM, queued for v3.8)."
+  skills,self-healing-orchestrator,"On F2/F3 failure, proposes patches. PROPOSES; user APPLIES — same gate as manual replan. Confidence ≥ 0.7 required to surface."
+  scripts,new-plan.sh,"Bootstraps the tree. Writes INDEX.md + active.json + .counters.json + mission/. Resolves AF_PLANS_DIR / .claude/plans / .aura/plans legacy."
+  scripts,expand-node.sh,"Tier-aware decomposition prep. Picks the right specialist agent based on parent tier."
+  scripts,next-task.sh,"DAG-aware ready-task pop. Marks chosen task active in active.json + ready_queue."
+  scripts,resolve-node.sh,"ID / title-substring / --active-token resolver. Recursive find — works on top-level + nested subfeatures."
+  scripts,freeze-branch.sh + thaw-branch.sh,"Cascade-freeze descendants when a conflict requires it. Thaw with conflict-resolution gate."
+  scripts,link-run.sh,"Two-sided run↔feature linker. Writes run-state.json#feature_id + the feature's ## Runs row. Idempotent."
+  scripts,replan-node.sh + promote-node.sh + undo-decision.sh + archive-feature.sh + conflicts-scan.sh,"The other 5 backing scripts that the 11 verbs dispatch to."
+  hooks,session-start-restore-active.cjs,"On every SessionStart, reads active.json + emits a banner so the model picks up where it left off. Survives /compact."
+  hooks,pre-execute-load-plan-context.cjs,"Before any agent dispatch, ensures the active-branch context is loaded if .claude/plans/ exists."
+  hooks,post-execute-update-node.cjs,"After a tool call mutates a node file, advances status + appends history.jsonl."
+  hooks,tool-call-tracer.cjs,"During T4 execution, emits trace events to the task's trace.jsonl."
+  hooks,pre-dispatch-conflict-check.cjs + post-execute-conflict-rescan.cjs,"L1+L2 gate around every dispatch and a 60s post-execute rescan window."
+  hooks,feature-done-trigger-archive.cjs,"When a T2 transitions to done, triggers epic-summarizer + plan-archivist."
+  hooks,session-reset-trigger.cjs,"Detects when a /aura-frog:reset-session is appropriate (1+ T2 done + ≥80% context used)."
+```
+
+##### Memory model — five layers, each with its own lifetime
+
+The system has more memory than a flat "save to disk" — it's tiered by what survives what, and by how much it costs to keep loaded.
+
+```mermaid
+flowchart LR
+    subgraph Vol["Volatile (this turn only)"]
+        CW[Context window<br/>≤200K tokens]
+    end
+    subgraph Sess["Session-scoped (this Claude Code session)"]
+        RS[run-state.json<br/>current /run]
+        SC[session-start-cache.json<br/>boot fast-path]
+    end
+    subgraph Plan["Plan-scoped (survives /compact, restart, session reset)"]
+        AJ[active.json<br/>focus pointer]
+        TR[plan tree<br/>mission.md → task.md]
+        HJ[history.jsonl<br/>append-only decisions]
+        CK[checkpoints/<br/>pre-mutation snapshots]
+        CJ[conflicts.jsonl<br/>L1-L4 detections]
+    end
+    subgraph Task["Per-task forensic (lives with the task folder)"]
+        TJ[trace.jsonl<br/>file_read / tool_call / output_claim]
+    end
+    subgraph Durable["Durable (survives /aura-frog:reset-session)"]
+        PM[permanent_memory.md<br/>distilled Epic wisdom]
+        AR[archive/<br/>compressed done branches]
+    end
+    CW -. loads on demand .-> AJ
+    AJ --> TR
+    AJ --> TJ
+    TR -. T2 done .-> PM
+    TR -. T2 done .-> AR
+    HJ -. forensic replay .-> CW
+    classDef vol fill:#fef2f2,stroke:#dc2626
+    classDef sess fill:#fef9c3,stroke:#a16207
+    classDef plan fill:#dbeafe,stroke:#1d4ed8
+    classDef task fill:#dcfce7,stroke:#15803d
+    classDef dur fill:#f3e8ff,stroke:#7c3aed
+    class CW vol
+    class RS,SC sess
+    class AJ,TR,HJ,CK,CJ plan
+    class TJ task
+    class PM,AR dur
+```
+
+| Layer | File(s) | Lifetime | Read by | Written by |
+|---|---|---|---|---|
+| **Context window** | (in-process) | Single turn | Every agent | Anthropic API |
+| **Session cache** | `.claude/cache/session-start-cache.json` | Until next session-start | `session-start.cjs` fast-path | `session-start.cjs` (TTL 1h) |
+| **Run state** | `.claude/logs/runs/<run-id>/run-state.json` | Until the `/run` completes / is discarded | `/run status`, `/run resume`, statusline | `run-orchestrator`, `link-run.sh` |
+| **Active pointer** | `.claude/plans/active.json` | Until manually changed | `plan-loader` (every turn) | `master-planner`, `next-task.sh`, `link-run.sh` |
+| **Plan tree** | `.claude/plans/**/*.md` | Until archived or deleted | `plan-loader`, `resolve-node.sh` | The 6 planning agents + their scripts |
+| **Decision audit** | `.claude/plans/history.jsonl` | Append-only forever | `/aura-frog:plan undo`, forensic replay | Every plan-script mutation |
+| **Checkpoints** | `.claude/plans/<node>/checkpoints/{ISO}.json` | Until pruned | `undo-decision.sh` | Pre-mutation snapshot in every script |
+| **Conflict log** | `.claude/plans/conflicts.jsonl` | Append-only | `/aura-frog:plan conflicts`, `conflict-arbiter` | `pre-dispatch-conflict-check`, `post-execute-conflict-rescan` |
+| **Task trace** | `<task-folder>/trace.jsonl` | Until task archived | `/aura-frog:trace`, grounding-discipline rule | `reasoning-trace-recorder` + `tool-call-tracer.cjs` |
+| **Permanent memory** | `.claude/memory/permanent_memory.md` | Survives `/aura-frog:reset-session` | `permanent-memory-loader` (every turn) | `epic-summarizer` (on T2 done) |
+| **Archive** | `.claude/plans/archive/{ID}_{slug}/` | Forever (compressed) | `/aura-frog:plan status --archived` | `plan-archivist` (on T2 done) |
+
+**Token discipline.** The two auto-loaded layers (`plan-loader`, `permanent-memory-loader`) are budget-capped: plan-loader stays ≤ 800 tokens regardless of tree size by reading only the active branch, and permanent-memory-loader stays ≤ 120 tokens by reading only section headers + 1-line summaries. Everything else loads on demand — `expand FEAT-A` reads only that subtree.
+
+##### Lifecycle — from "no plan" to "shipped feature"
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant PO as plan-orchestrator
+    participant MP as master-planner
+    participant FA as feature-architect
+    participant SP as story-planner
+    participant RO as run-orchestrator
+    participant ES as epic-summarizer
+    participant PA as plan-archivist
+
+    U->>PO: /aura-frog:plan (or /run escalates)
+    PO->>MP: bootstrap
+    MP->>U: T0 + T1 + T2 interview
+    Note over MP: writes mission/, initiatives/, features/<br/>+ active.json + .counters.json + INDEX.md
+
+    U->>PO: expand FEAT-A
+    PO->>FA: decompose T2 → T3 (2-6 stories)
+    FA->>MP: writes stories/STORY-NNNN/
+    MP->>U: surface stories + acceptance criteria
+
+    U->>PO: expand STORY-0001
+    PO->>SP: decompose T3 → T4 (1-6 tasks)
+    SP->>MP: writes tasks/TASK-NNNNN/ + acceptance test stubs
+
+    U->>PO: next  (or types `next` as bare word)
+    PO->>MP: pop ready T4 from DAG
+    MP->>U: active.task = TASK-00001
+
+    U->>RO: /run (auto-anchors to active.task)
+    Note over RO: 5-phase TDD; trace.jsonl appends per turn
+    RO->>MP: post-execute-update-node bumps status
+
+    Note over MP,ES: last T4 of FEAT-A completes
+    MP->>ES: T2 done — distill
+    ES->>PA: write permanent_memory.md section
+    PA->>MP: write archive/FEAT-A/summary.md
+    MP->>U: feature shipped; archived branch removed from always-loaded surface
+```
+
+##### Decomposition discipline — the agent-by-agent contract
+
+- **strategist** owns T0/T1 framing. Read-only on code. Asks "is this initiative actually worth the surface area we'd add?" Writes nothing on its own — surfaces tradeoffs for the user to commit.
+- **feature-architect** owns T2 → T3. Reads existing code (with Glob/Grep, no MCP DB calls) to inform decomposition. Hard caps: 2-6 stories per feature, intent ≤ 120 chars per story, 2-5 acceptance criteria each. More than 6 stories means the feature is too big — escalates to promote or split.
+- **story-planner** owns T3 → T4. Reads code + may stub `__tests__/<story-id>/*.test.cjs` with `it.skip()` so each task's `test_ref` points to a real path. 1-6 tasks per story. Each task names exactly one agent for execution.
+- **replanner** owns mutations. Triggered on F2-F4 failures (per `failure-classifier`). Budget-aware: each node carries `replan_count` + a `replan_budget` (default 3 per node, 8 per feature). Exceeded → escalate to user, no autonomous loop.
+- **conflict-arbiter** owns L1-L4 conflict adjudication. When `pre-dispatch-conflict-check.cjs` flags an overlap, the arbiter picks one of four resolutions: `freeze` (block descendants), `sequential` (reorder), `replan` (re-decompose conflicting branch), `escalate` (ask user). Decision logged to `conflicts.jsonl`.
+- **epic-summarizer** owns the distillation pass. Confidence-scored: items below 0.7 confidence land in a `### Tentative (low confidence)` subsection of `permanent_memory.md`. Never copies verbatim file content — uses `sha256:abc…` references instead.
+
+##### The 11 verbs — what each one does
+
+```toon
+verbs[11]{verb,what_happens,mutates_active}:
+  bootstrap,"(no verb) T0+T1+T2 interview — strategist surfaces mission, master-planner mints IDs, writes INDEX.md",true
+  expand,"<NODE> — dispatches to the right tier-specialist (feature-architect for T2, story-planner for T3). Pre-mutation checkpoint.",false
+  next,"Pops the next ready T4 from the DAG (no unresolved depends_on). Marks active.task in active.json.",true
+  status,"Renders the tree as ASCII. Highlights active branch + frozen nodes + ready queue.",false
+  replan,"<NODE> — re-decompose. Discards descendants, re-runs the tier specialist. Counts against replan_budget.",false
+  promote,"<TASK> → T1/T2 — when a T4 discovery (e.g. a missing service) warrants its own feature. Bubbles up.",false
+  archive,"<FEATURE> — triggers epic-summarizer + plan-archivist. Moves the subtree to archive/, drops always-loaded cost.",false
+  undo,"<NODE> — LIFO restore from the latest checkpoint. Useful for 'I did not mean to replan that.'",true
+  freeze,"<NODE> — sets status=frozen on the node + cascades to descendants. Blocks dispatch.",false
+  thaw,"<NODE> — reverses freeze. Runs the conflict-resolution gate (won't thaw if the original cause still triggers).",false
+  conflicts,"list/show/resolve/history — view detected conflicts and their L1-L4 type, drive arbiter decisions.",false
+```
+
+Three input modes, same vocabulary:
+
+1. **Explicit verb form** — `/aura-frog:plan expand FEAT-A`.
+2. **Bare-word activation** — type `expand FEAT-A` (no slash) when `.claude/plans/active.json` exists. Hook `bare-word-router.cjs` catches the first token, asks for confirmation, routes via plan-orchestrator.
+3. **Intent classifier** — descriptive natural-language ("show me the tree", "what's next?") — plan-orchestrator pattern-matches to the right verb.
+
+##### `/run` ↔ plan bridge — how they share state
+
+Two pieces of state link the two systems:
+
+- **`active.json#active.task`** — when set, every `/run` invocation auto-anchors to that task. Phase 5 finalize syncs deliverables back into the task's folder.
+- **`feature.md### Runs` table** — every `/run feature: FEAT-A …` writes a row here via `link-run.sh`. Surfaces in `/run resume FEAT-A` and in the feature's status line.
+
+The **escalation heuristic** in `rules/workflow/run-plan-bridge.md` scores every `/run <task>` on 8 signals (word count, scope verbs, file count, multi-domain keywords, …). At weight ≥ 3 without an active plan, it prompts `plan` / `deep` / `details`. Tasks fail this test for a reason — they're project-scoped, not single-feature.
+
+##### What survives what (the resilience matrix)
+
+|  | `/compact` | Session restart | `/aura-frog:reset-session` | `git clean` |
+|---|:---:|:---:|:---:|:---:|
+| Context window | ❌ | ❌ | ❌ | ❌ |
+| `run-state.json` | ✅ | ✅ | ✅ | ❌ (in `.claude/logs/`) |
+| `active.json` + plan tree | ✅ | ✅ | ✅ | ❌ (committed if you commit it) |
+| `history.jsonl` | ✅ | ✅ | ✅ | ❌ |
+| `trace.jsonl` (per task) | ✅ | ✅ | ✅ | ❌ |
+| `permanent_memory.md` | ✅ | ✅ | ✅ (this is what it's for) | ❌ |
+| `archive/*` | ✅ | ✅ | ✅ | ❌ |
+
+Plan files live under `.claude/plans/` — commit them to keep the project's planning context in version control alongside the code.
+
+---
+
 ### 2 · Reasoning Trace Audit  ✅
 
 **What you get:** Every Claude tool call writes an append-only event to the task's `trace.jsonl` (v3.7.3: co-located inside `.claude/plans/features/.../tasks/{TASK_ID}_{slug}/trace.jsonl`; legacy fallback to `.claude/plans/traces/{TASK_ID}.jsonl`) — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
