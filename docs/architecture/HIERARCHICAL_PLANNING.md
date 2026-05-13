@@ -215,13 +215,13 @@ flowchart TB
         TN[active task.md ~2K]
     end
     subgraph T3["Tier 3 — reference only (never loaded into main turn)"]
-        TJ[traces/TASK-*.jsonl<br/>write-only]
-        HJ[history.jsonl<br/>read only via /aura-frog:trace command]
+        TJ["traces/TASK-*.jsonl<br/>write-only"]
+        HJ["history.jsonl<br/>read only via /aura-frog:trace command"]
         MA[mcp-audit.jsonl<br/>write-only]
     end
     subgraph T4["Tier 4 — distilled durable wisdom (survives /aura-frog:reset-session)"]
         PMF[permanent_memory.md<br/>≤500t per Epic · ≤8K total]
-        AR[archive/{ID}_{slug}/<br/>compressed branches]
+        AR["archive/{ID}_{slug}/<br/>compressed branches"]
     end
 
     T2 -. plan-loader lazy reads .-> T1

@@ -583,7 +583,7 @@ AF_SELF_HEAL_DISABLED=true               # Permanent
 ```mermaid
 flowchart LR
     Fail[Task fails<br/>F2 or F3]:::fail --> Cls[failure-classifier]:::cls
-    Cls --> Heal[/aura-frog:heal diagnose]:::heal
+    Cls --> Heal["/aura-frog:heal diagnose"]:::heal
     Heal --> Q1[context7 query]:::src
     Heal --> Q2[permanent_memory.md]:::src
     Q1 --> Diag[Diagnosis + patch<br/>confidence ≥ 0.7]:::diag
