@@ -601,3 +601,173 @@ describe('expand-node.sh', () => {
         expect(h).toMatch(/"verb":"expand".*"target":"FEAT-A"/);
     });
 });
+
+// ---------------------------------------------------------------------------
+// _lib.sh helpers — feature_folder + find_feature_path (T2 recursion support)
+// ---------------------------------------------------------------------------
+
+function sourceLib(snippet) {
+    // Source _lib.sh + run a one-liner snippet. Used to test pure-bash helpers
+    // without spawning the surrounding script.
+    const result = spawnSync('bash', ['-c', `source "${path.join(SCRIPTS_DIR, '_lib.sh')}"; ${snippet}`], {
+        encoding: 'utf8',
+        timeout: SCRIPT_TIMEOUT_MS,
+        killSignal: 'SIGKILL',
+    });
+    return { code: result.status, stdout: result.stdout || '', stderr: result.stderr || '' };
+}
+
+describe('_lib.sh: feature_folder()', () => {
+    test('flat top-level feature: id + intent', () => {
+        const r = sourceLib('feature_folder FEAT-A "OAuth Flow"');
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe('FEAT-A_oauth-flow');
+    });
+
+    test('JIRA-prefixed ID survives the slugify pass', () => {
+        const r = sourceLib('feature_folder JIRA-1234 "Login Redesign"');
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe('JIRA-1234_login-redesign');
+    });
+
+    test('empty intent → slug = unnamed', () => {
+        const r = sourceLib('feature_folder FEAT-X ""');
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe('FEAT-X_unnamed');
+    });
+
+    test('with parent feature → nested subfeatures path', () => {
+        const r = sourceLib('feature_folder FEAT-A "Core Combat MVP" FEAT-001 "Core Gameplay"');
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe('FEAT-001_core-gameplay/subfeatures/FEAT-A_core-combat-mvp');
+    });
+
+    test('with parent + empty parent intent → unnamed slug', () => {
+        const r = sourceLib('feature_folder FEAT-A "Child" FEAT-PARENT ""');
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe('FEAT-PARENT_unnamed/subfeatures/FEAT-A_child');
+    });
+});
+
+describe('_lib.sh: find_feature_path()', () => {
+    let root, plans;
+
+    beforeEach(() => {
+        root = mktmp();
+        plans = path.join(root, '.claude', 'plans');
+        fs.mkdirSync(plans, { recursive: true });
+        // Top-level feature
+        fs.mkdirSync(path.join(plans, 'features', 'FEAT-A_top-level'), { recursive: true });
+        // Nested subfeature: features/FEAT-001_parent/subfeatures/FEAT-B_child/
+        fs.mkdirSync(path.join(plans, 'features', 'FEAT-001_parent', 'subfeatures', 'FEAT-B_child'), { recursive: true });
+        // Another top-level for collision testing
+        fs.mkdirSync(path.join(plans, 'features', 'FEAT-C_another'), { recursive: true });
+    });
+    afterEach(() => cleanup(root));
+
+    test('finds top-level feature by ID', () => {
+        const r = sourceLib(`find_feature_path "${plans}" FEAT-A`);
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe(path.join(plans, 'features', 'FEAT-A_top-level'));
+    });
+
+    test('finds nested subfeature by ID', () => {
+        const r = sourceLib(`find_feature_path "${plans}" FEAT-B`);
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe(path.join(plans, 'features', 'FEAT-001_parent', 'subfeatures', 'FEAT-B_child'));
+    });
+
+    test('finds the parent feature itself', () => {
+        const r = sourceLib(`find_feature_path "${plans}" FEAT-001`);
+        expect(r.code).toBe(0);
+        expect(r.stdout.trim()).toBe(path.join(plans, 'features', 'FEAT-001_parent'));
+    });
+
+    test('returns empty + exit 1 on missing feature', () => {
+        const r = sourceLib(`find_feature_path "${plans}" FEAT-ZZZ`);
+        expect(r.code).toBe(1);
+        expect(r.stdout.trim()).toBe('');
+    });
+
+    test('returns empty + exit 1 on missing features root', () => {
+        const r = sourceLib(`find_feature_path "${plans}/nope" FEAT-A`);
+        expect(r.code).toBe(1);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// new-plan.sh INDEX.md template — documents subfeatures + optional T1
+// ---------------------------------------------------------------------------
+
+describe('new-plan.sh: INDEX.md template', () => {
+    let root, plans;
+
+    beforeEach(() => {
+        root = mktmp();
+        execFileSync('bash', [path.join(SCRIPTS_DIR, 'new-plan.sh'), root], { stdio: 'ignore' });
+        plans = path.join(root, '.claude', 'plans');
+    });
+    afterEach(() => cleanup(root));
+
+    test('mentions subfeatures/ directory in the ASCII tree', () => {
+        const idx = fs.readFileSync(path.join(plans, 'INDEX.md'), 'utf8');
+        expect(idx).toMatch(/subfeatures\//);
+    });
+
+    test('flags initiative tier as optional', () => {
+        const idx = fs.readFileSync(path.join(plans, 'INDEX.md'), 'utf8');
+        expect(idx).toMatch(/T1[^|]*OPTIONAL|optional/i);
+    });
+
+    test('documents subfeature pattern in Naming convention section', () => {
+        const idx = fs.readFileSync(path.join(plans, 'INDEX.md'), 'utf8');
+        expect(idx).toMatch(/Subfeatures \(T2 recursion\)/);
+        expect(idx).toMatch(/parent:\s*<PARENT_FEAT_ID>/);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// resolve-node.sh — finds features nested under subfeatures/
+// ---------------------------------------------------------------------------
+
+describe('resolve-node.sh: nested feature lookup', () => {
+    let root, plans;
+
+    beforeEach(() => {
+        root = mktmp();
+        plans = path.join(root, '.claude', 'plans');
+        fs.mkdirSync(plans, { recursive: true });
+        // parent feature
+        const parentDir = path.join(plans, 'features', 'FEAT-001_parent');
+        fs.mkdirSync(parentDir, { recursive: true });
+        fs.writeFileSync(path.join(parentDir, 'feature.md'), [
+            '---', 'id: FEAT-001', 'tier: 2', 'parent: MISSION',
+            'intent: "Parent feature"', 'status: active', 'revision: 0', '---', '',
+        ].join('\n'));
+        // nested subfeature
+        const subDir = path.join(parentDir, 'subfeatures', 'FEAT-B_child');
+        fs.mkdirSync(subDir, { recursive: true });
+        fs.writeFileSync(path.join(subDir, 'feature.md'), [
+            '---', 'id: FEAT-B', 'tier: 2', 'parent: FEAT-001',
+            'intent: "Nested child"', 'status: planned', 'revision: 0', '---', '',
+        ].join('\n'));
+    });
+    afterEach(() => cleanup(root));
+
+    test('resolves nested FEAT-B to its actual file path', () => {
+        const r = runResolve('FEAT-B', plans);
+        expect(r.code).toBe(0);
+        // Output is `<id>\t<file>` — split on tab.
+        const [id, file] = r.stdout.trim().split('\t');
+        expect(id).toBe('FEAT-B');
+        expect(file).toBe(path.join(plans, 'features', 'FEAT-001_parent', 'subfeatures', 'FEAT-B_child', 'feature.md'));
+    });
+
+    test('resolves parent FEAT-001 to top-level path (not the subfeature)', () => {
+        const r = runResolve('FEAT-001', plans);
+        expect(r.code).toBe(0);
+        const [id, file] = r.stdout.trim().split('\t');
+        expect(id).toBe('FEAT-001');
+        expect(file).toBe(path.join(plans, 'features', 'FEAT-001_parent', 'feature.md'));
+    });
+});

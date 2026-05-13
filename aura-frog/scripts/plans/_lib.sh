@@ -46,15 +46,51 @@ slugify() {
 }
 
 # ---------------------------------------------------------------------------
-# feature_folder <id> <intent>  →  "{ID}_{slug}"
-#   Compose the canonical feature folder name. If id starts with a known
-#   ticket prefix (JIRA-/LIN-/ABC-9999), it's used as-is. Otherwise FEAT-N.
+# feature_folder <id> <intent> [parent_feature_id] [parent_intent]
+#   Compose the canonical feature folder *segment*. If parent_feature_id is
+#   given, the segment is `{PARENT_FOLDER}/subfeatures/{ID}_{slug}` so the
+#   caller can drop it under `features/` and land on the nested path. Used by
+#   `new-plan.sh` and `expand-node.sh` when a T2 is decomposed into child T2
+#   subfeatures rather than directly into T3 stories.
+#
+#   With no parent → "{ID}_{slug}"   (top-level feature)
+#   With parent    → "{PARENT_ID}_{parent_slug}/subfeatures/{ID}_{slug}"
 # ---------------------------------------------------------------------------
 feature_folder() {
     local id="$1"; local intent="${2:-}"
+    local parent_id="${3:-}"; local parent_intent="${4:-}"
     local slug; slug=$(slugify "$intent")
     [ -z "$slug" ] && slug="unnamed"
-    echo "${id}_${slug}"
+    if [ -n "$parent_id" ]; then
+        local parent_slug; parent_slug=$(slugify "$parent_intent")
+        [ -z "$parent_slug" ] && parent_slug="unnamed"
+        echo "${parent_id}_${parent_slug}/subfeatures/${id}_${slug}"
+    else
+        echo "${id}_${slug}"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# find_feature_path <plans_dir> <feature_id>
+#   Locate a feature folder under `<plans_dir>/features/`. Walks both
+#   `features/{ID}_*` (top-level) AND `features/*/subfeatures/{ID}_*` (nested
+#   under a parent feature). Prints the absolute folder path on success.
+#   Empty + exit 1 if not found. Exit 2 on multiple matches (caller decides).
+# ---------------------------------------------------------------------------
+find_feature_path() {
+    local plans_dir="$1"; local fid="$2"
+    [ -z "$plans_dir" ] || [ -z "$fid" ] && return 1
+    local features_root="${plans_dir}/features"
+    [ -d "$features_root" ] || return 1
+    # maxdepth 4 covers `features/<top>/subfeatures/<child>/`. Restrict to
+    # directories whose name matches `{ID}_*`.
+    local matches
+    matches=$(find "$features_root" -maxdepth 4 -type d -name "${fid}_*" 2>/dev/null)
+    [ -z "$matches" ] && return 1
+    local count; count=$(printf '%s\n' "$matches" | grep -c .)
+    printf '%s\n' "$matches"
+    if [ "$count" -gt 1 ]; then return 2; fi
+    return 0
 }
 
 # ---------------------------------------------------------------------------

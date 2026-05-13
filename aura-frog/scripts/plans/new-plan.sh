@@ -139,7 +139,7 @@ This directory holds your project's plan tree. **Every node is a folder.** Per-n
 ├── mission/                                ← T0: project's reason for existing
 │   ├── mission.md                          ← spec
 │   └── checkpoints/                        ← (optional) pre-mutation snapshots
-├── initiatives/                            ← T1: multi-feature efforts
+├── initiatives/                            ← T1 (OPTIONAL): multi-feature efforts
 │   └── {ID}_{slug}/                        ← e.g. INIT-001_q1-rollout/
 │       ├── initiative.md                   ← spec + status + children[FEAT-*]
 │       ├── ROADMAP.md                      ← (optional) per-initiative deliverable
@@ -150,6 +150,10 @@ This directory holds your project's plan tree. **Every node is a folder.** Per-n
 │       ├── REQUIREMENTS.md                 ← (optional) /run Phase 1 deliverable
 │       ├── DESIGN.md                       ← (optional) /run Phase 1 deliverable
 │       ├── checkpoints/
+│       ├── subfeatures/                    ← (optional) T2 recursion — group siblings under parent feature
+│       │   └── {ID}_{slug}/                ← e.g. FEAT-A_core-combat-mvp/ nested under FEAT-001
+│       │       ├── feature.md              ← parent: <PARENT_FEAT_ID>, tier: 2
+│       │       └── stories/...
 │       └── stories/
 │           └── {ID}_{slug}/                ← e.g. STORY-0001_login-form/
 │               ├── story.md
@@ -172,12 +176,16 @@ Every node is a folder named `{ID}_{kebab-slug}` containing a `<tier>.md` file (
 | Tier | ID prefix | Folder name | Spec file |
 |---|---|---|---|
 | T0 | `MISSION` (singleton) | `mission/` (no slug — only one mission) | `mission.md` |
-| T1 | `INIT-NNN` | `{ID}_{slug}/` | `initiative.md` |
-| T2 | `FEAT-N` or ticket-ID | `{ID}_{slug}/` | `feature.md` |
-| T3 | `STORY-NNNN` | `{ID}_{slug}/` | `story.md` |
-| T4 | `TASK-NNNNN` | `{ID}_{slug}/` | `task.md` |
+| T1 | `INIT-NNN` (optional) | `initiatives/{ID}_{slug}/` | `initiative.md` |
+| T2 | `FEAT-N` or ticket-ID | `features/{ID}_{slug}/` (top-level) OR `features/<PARENT>/subfeatures/{ID}_{slug}/` (nested) | `feature.md` |
+| T3 | `STORY-NNNN` | `features/<feature-path>/stories/{ID}_{slug}/` | `story.md` |
+| T4 | `TASK-NNNNN` | `features/<feature-path>/stories/<story>/tasks/{ID}_{slug}/` | `task.md` |
 
 If a JIRA / Linear / GitHub ticket ID is attached to a feature, use it as the prefix (e.g. `JIRA-1234_login-redesign/`). Otherwise plan-orchestrator mints `FEAT-N`.
+
+**Initiative tier is optional.** Small / solo-dev projects often skip T1 entirely — features can have `parent: MISSION` directly. Larger efforts use T1 to group features by quarter / OKR / theme. Use whichever fits.
+
+**Subfeatures (T2 recursion).** When a feature is too coarse for one decomposition pass, split it into child features instead of stories. The child sits at `features/<parent-folder>/subfeatures/{ID}_{slug}/feature.md` with `parent: <PARENT_FEAT_ID>` in its frontmatter. Use this when 5+ stories would belong to one feature — promoting some of those story-groups into subfeatures keeps the tree readable.
 
 ## How to read a node folder
 
