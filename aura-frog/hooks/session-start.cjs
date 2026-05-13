@@ -352,6 +352,35 @@ async function main() {
       } catch { /* non-blocking */ }
     }
 
+    // Detect stale ~/.claude/statusline-command.sh shim (pre-v3.7.3 layout).
+    // Older installs hard-coded `│ P{phase} │` with AF_PHASE="-", which renders
+    // a literal `P-` when no run is active. The plugin now ships the corrected
+    // shim at aura-frog/scripts/statusline-shim.sh. We don't auto-write to the
+    // user's home dir — print a one-time copyable command instead.
+    try {
+      const home = process.env.HOME || process.env.USERPROFILE;
+      if (home) {
+        const userShim = path.join(home, '.claude', 'statusline-command.sh');
+        const staleHintFile = path.join(process.cwd(), '.claude', 'cache', 'statusline-stale-shim-hint-shown');
+        if (fs.existsSync(userShim) && !fs.existsSync(staleHintFile)) {
+          const shimContent = fs.readFileSync(userShim, 'utf-8');
+          // Stale markers: hard-coded `│ P%s │` printf, or AF_PHASE="-" default.
+          const isStale = /\|\s*P%s\s*\|/.test(shimContent) || /AF_PHASE\s*=\s*"-"/.test(shimContent);
+          if (isStale) {
+            const pluginShim = path.join(home, '.claude', 'plugins', 'marketplaces', 'aurafrog', 'aura-frog', 'scripts', 'statusline-shim.sh');
+            console.log('⚠️  Detected stale ~/.claude/statusline-command.sh (renders `P-` instead of mode/step/agent).');
+            console.log(`   Fix:  cp '${pluginShim}' '${userShim}' && chmod +x '${userShim}'`);
+            console.log('   Or point settings.json directly at the plugin: see aura-frog/settings.example.json');
+            try {
+              const hintDir = path.dirname(staleHintFile);
+              if (!fs.existsSync(hintDir)) fs.mkdirSync(hintDir, { recursive: true });
+              fs.writeFileSync(staleHintFile, Date.now().toString());
+            } catch { /* non-blocking */ }
+          }
+        }
+      }
+    } catch { /* non-blocking */ }
+
     // Show user assertions if configured
     if (config.assertions?.length > 0) {
       console.log('\nUser Assertions:');
