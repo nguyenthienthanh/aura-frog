@@ -19,6 +19,7 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 ## Architecture
 
 - [OS Architecture](architecture/os-architecture.md) — LLM OS mental model (kernel, processes, RAM, drivers)
+- [Hierarchical Planning — Runtime Deep Dive](architecture/HIERARCHICAL_PLANNING.md) — agent invocations, memory tiers, anti-hallucination mechanics, failure handling (v3.7.3+)
 - [System Overview](architecture/overview.md) — Agent types, responsibilities, and orchestration
 - [CLAUDE.md Architecture](architecture/CLAUDE_FILE_ARCHITECTURE.md) — How plugin and project instructions load
 - [Config Loading Order](architecture/CONFIG_LOADING_ORDER.md) — Priority chain for configuration files

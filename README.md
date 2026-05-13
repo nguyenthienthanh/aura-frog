@@ -234,6 +234,8 @@ flowchart TB
 
 The TL;DR is "a folder per node, with metadata and references that the model loads on demand." Here is the full breakdown — read this if you want to understand the **components**, **mechanisms**, and **memory layers** behind the pillar.
 
+> **Full runtime deep-dive** (every agent invocation, every memory tier, every failure path, from `/aura-frog:plan` through T4 task completion): [`docs/architecture/HIERARCHICAL_PLANNING.md`](docs/architecture/HIERARCHICAL_PLANNING.md). Required reading before proposing changes to planning agents, the bare-word router, or the failure classifier.
+
 ##### Tier semantics
 
 Five tiers from intent down to executable atom. Each tier has one specialist agent that owns its decomposition.
