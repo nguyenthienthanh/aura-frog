@@ -68,6 +68,13 @@ jobs:
         # plugin.json + CLAUDE.md).
         run: bash aura-frog/scripts/ci/validate-readme-counts.sh
 
+      - name: Validate docs syntax (no pre-v3.7 commands)
+        # Blocks stale `workflow:start`, `agent:list`, `bugfix:quick`,
+        # `learn:*`, `project:reload-env`, and pre-v3.7 verb forms from
+        # re-entering docs/. Companion to scripts/audit/stale-cmd-check.sh
+        # (broader audit). Spec: FEAT-006 STORY-0005 (v3.7.4).
+        run: bash aura-frog/scripts/ci/validate-docs-syntax.sh
+
   test:
     runs-on: ubuntu-latest
     strategy:
