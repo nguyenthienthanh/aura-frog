@@ -1,472 +1,148 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+estimated_reading_time: 8 minutes
+---
+
 <div align="center">
 
 ![Welcome to Aura Frog](../../assets/logo/mascot_full.png)
 
 # Get Started with Aura Frog
 
-### From install to your first TDD workflow in 2 minutes
+### From install to your first TDD workflow in under 10 minutes
 
 </div>
 
 ---
 
-> **First time?** Follow the [Interactive Tutorial](FIRST_WORKFLOW_TUTORIAL.md) for a guided walkthrough.
+> **Already installed?** Skip to [Your first workflow](#your-first-workflow).
+> **Brand new?** Start with [Prerequisites](#prerequisites).
+> **Want a guided tour?** [FIRST_WORKFLOW_TUTORIAL.md](FIRST_WORKFLOW_TUTORIAL.md) is hands-on (15 min).
 
-> **What is Claude Code?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a planning-first LLM OS with 15 agents, 5-phase TDD workflows, hierarchical planning that survives session resets, forensic reasoning traces, conflict detection between parallel work, and per-agent MCP security.
-
-> **The 8 Pillars (current track):** Hierarchical Planning · Reasoning Trace Audit · Semantic Session Reset · Pre-flight Validation · Semantic Conflict Detection · Self-Healing Orchestrator · MCP Security Layer · Phase-Role Binding. Each pillar is opt-in (a single env var disables it). Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
->
-> **Latest in v3.7.3** (2026-05-12): plans live at `.claude/plans/` with `{ID}_{slug}/` folders, `/run` anchors to features and writes back to `feature.md`, the statusline shows `mode {step}` from `run-state.json`, Phase 2 picks unit/integration/e2e before writing, 14 hooks no longer hang on TTY stdin. See [CHANGELOG](../reference/CHANGELOG.md#373---2026-05-12).
+**What is Aura Frog?** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding tool. Aura Frog turns it into a planning-first LLM OS: 15 agents, 5-phase TDD workflows, hierarchical planning (T0–T4) that survives session resets, forensic reasoning traces, semantic conflict detection, and per-agent MCP security. Full breakdown: [README § The 8 Pillars](../../README.md#-the-8-pillars-of-the-planning-first-llm-os).
 
 ---
 
-## Quick Setup (2 minutes)
+## Prerequisites
 
-### Prerequisites
+1. **Claude Code installed.** Follow [Anthropic's installation guide](https://docs.anthropic.com/en/docs/claude-code) if you haven't.
+2. **A terminal with Claude Code running.** Just type `claude` in any project directory.
+3. **Git working tree** for the project you want to use Aura Frog on (Aura Frog works against any local repo).
 
-1. **Install Claude Code** — Follow [Anthropic's installation guide](https://docs.anthropic.com/en/docs/claude-code)
-2. **Start Claude Code** — Run `claude` in your terminal
+---
 
-### Step 1: Install Aura Frog Plugin
+## Install Aura Frog
 
-In the Claude Code terminal, run these commands:
+In the Claude Code chat, run two commands:
 
-**Add Aura Frog Marketplace (one-time):**
 ```bash
 /plugin marketplace add nguyenthienthanh/aura-frog
-```
-
-**Install Aura Frog Plugin:**
-```bash
 /plugin install aura-frog@aurafrog
 ```
 
-**That's it!** Aura Frog is now installed globally and available in all your Claude Code projects.
+That's it. Aura Frog is now installed globally and available in every Claude Code session.
 
----
+**Verify** the install:
 
-### Step 2: Verify Installation
-
-Check that Aura Frog commands are available:
-```bash
+```
 /help
 ```
 
-You should see Aura Frog commands like:
-- `workflow:start` - Start 5-phase workflow
-- `workflow:status` - Check workflow progress
-- `agent:list` - Show all available agents
-- `bugfix:quick` - Quick bug fix
-- `project:init` - Initialize project context
+You should see a category called *Aura Frog* listing commands like `/run`, `/af`, `/aura-frog:plan`, `/check`, `/project`.
+
+**Initialize for this project (optional, recommended once):**
+
+```
+/project init
+```
+
+Detects your tech stack, configures integrations (JIRA / Confluence / Slack), and seeds a project-specific config. Skip and Aura Frog will use sensible defaults.
+
+> **Need supplementary install paths?** CLI symlink, manual install, or environment-variable setup → see [INSTALLATION.md](../operations/INSTALLATION.md).
 
 ---
 
-### Step 3: Initialize (Optional)
+## Your first workflow
 
-Configure for your project:
+Aura Frog uses **one entry point**: `/run`. Type it with a task description and Aura Frog auto-detects intent (bugfix / feature / refactor / test / review / deploy / security / quality) and picks the right flow.
+
+### Tiny task — direct edit
 
 ```
-In Claude Code chat, type:
-
-project:init
+/run fix typo in README
 ```
 
-This will:
-- Detect your project type
-- Configure integrations (JIRA, Confluence, Slack)
-- Set up team reviewers
-- Create project-specific config
+Aura Frog classifies this as **Quick** complexity, makes the edit inline, and reports back. No phases, no gates.
 
-**Or skip and use defaults** - Aura Frog works out of the box!
+### Feature task — full 5-phase TDD
 
-### Step 4: Install CLI (Optional)
-
-Install the `af` command for health checks and setup guides outside Claude Code:
-
-```bash
-# In your regular terminal (not Claude Code):
-sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
-
-# Or without sudo — add to PATH:
-echo 'export PATH="$HOME/.claude/plugins/marketplaces/aurafrog/scripts:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+```
+/run add a login endpoint with email + password
 ```
 
-Then use anywhere:
-```bash
-af doctor           # Health check
-af setup remote     # Remote control guide
-af setup channels   # Telegram/Discord channels
-af measure          # Performance report
+Aura Frog classifies this as **Deep** complexity and runs the 5-phase workflow:
+
 ```
+Phase 1: Understand + Design   → [APPROVAL GATE]
+Phase 2: Test RED              → Auto-continue
+Phase 3: Build GREEN           → [APPROVAL GATE]
+Phase 4: Refactor + Review     → Auto-continue
+Phase 5: Finalize              → Auto-complete
+```
+
+**Only 2 approval gates** (Phase 1 & 3) — other phases auto-continue after showing deliverables. At a gate, type a bare verb (no slash prefix needed when a run is active):
+
+| Verb | What it does |
+|---|---|
+| `approve` | advance to the next phase |
+| `reject <reason>` | redo this phase with the feedback |
+| `modify <changes>` | adjust deliverables without restarting the phase |
+| `handoff` | save state for the next session |
+| `status` / `progress` / `rollback` / `stop` | introspect or unwind |
+
+Bugfix runs use a lighter 4-step flow (`S1` investigate → `S2` test RED → `S3` fix GREEN → `S4` verify). Quick / Standard runs skip phases entirely.
+
+### Project-scale task — bootstrap a plan tree
+
+```
+/run project: ship the billing redesign across web + mobile + admin
+```
+
+Aura Frog escalates to **hierarchical planning** (`/aura-frog:plan`): bootstraps `MISSION → INIT → FEAT → STORY → TASK` under `.claude/plans/`, then resumes execution against the active task. See [HIERARCHICAL_PLANNING.md](../architecture/HIERARCHICAL_PLANNING.md).
 
 ---
 
-## Test Your Setup
-
-### Test 1: Check Status
-```
-workflow:status
-```
-
-**Expected:** "No active workflow found" or current workflow status
-
----
-
-### Test 2: Start Simple Task
-
-**Using Natural Language:**
-```
-Analyze the current component structure
-```
-
-**Or using command:**
-```
-workflow:start Analyze the current component structure
-```
-
-**Expected:**
-- **agent-detector** skill auto-invokes → Selects appropriate agent
-- **run-orchestrator** skill auto-invokes → Starts 5-phase workflow
-- Claude analyzes your code
-- Shows Phase 1: Understand + Design
-- Displays approval gate
-- Waits for your response
-
----
-
-### Test 3: Approve and Continue
-```
-workflow:approve
-```
-
-**Expected:**
-- Proceeds to Phase 2: Test RED
-- Shows next approval gate
-
----
-
-## What's Next?
-
-### Learn the Workflow
-
-Read the guides:
-- **`README.md`** - Complete user guide
-- **`TESTING_GUIDE.md`** - How to test workflows
-- **`docs/phases/`** - Detailed phase guides
-
-### Start Your First Real Task
-
-```
-workflow:start Refactor [ComponentName] - split into smaller, maintainable components
-```
-
-or
-
-```
-workflow:start Add [feature] to [component]
-```
-
-### Configure Integrations
-
-Set environment variables in `.envrc` for:
-- Figma integration (design extraction)
-- Slack integration (notifications)
-- Custom MCP servers
-
----
-
-## Common Commands
-
-### Workflow Commands
-- `workflow:start <task>` - Start new workflow
-- `workflow:status` - Show current progress
-- `workflow:approve` - Approve current phase
-- `workflow:reject <reason>` - Reject and restart phase
-- `workflow:modify <changes>` - Modify deliverables
-
-### Phase Commands (Advanced)
-- `workflow:phase:1` - Execute Phase 1 (Understand + Design)
-- `workflow:phase:2` - Execute Phase 2 (Test RED)
-- `workflow:phase:3` - Execute Phase 3 (Build GREEN)
-- `workflow:phase:4` - Execute Phase 4 (Refactor + Review)
-- `workflow:phase:5` - Execute Phase 5 (Finalize)
-
-### Other Commands
-- `project:init` - Initialize/reconfigure Aura Frog
-- `project:reload-env` - Reload .envrc variables
-- `help` - Show all available commands
-- `agent:list` - Show all agents and their capabilities
-
----
-
-## Manual Installation (Advanced)
-
-If plugin marketplace commands don't work, install manually:
-
-```bash
-# Clone to plugins directory
-mkdir -p ~/.claude/plugins/marketplaces/aurafrog
-git clone https://github.com/nguyenthienthanh/aura-frog.git \
-  ~/.claude/plugins/marketplaces/aurafrog/aura-frog
-
-# Create settings.local.json (REQUIRED)
-cd ~/.claude/plugins/marketplaces/aurafrog/aura-frog
-cp settings.example.json settings.local.json
-```
-
-**Uninstall:** `/plugin uninstall aura-frog@aurafrog`
-
----
-
-## Advanced Setup
-
-### Add to .gitignore
-
-```bash
-# Aura Frog - Exclude sensitive workflow data
-logs/contexts/
-logs/
-workflow-state.json
-.env
-```
-
-### Environment Variables (Optional)
-
-Create `.envrc` for integrations:
-
-```bash
-# JIRA Integration
-export JIRA_URL="https://your-company.atlassian.net"
-export JIRA_EMAIL="your.email@example.com"
-export JIRA_API_TOKEN="your-jira-api-token"
-
-# Figma Integration
-export FIGMA_API_TOKEN="your-figma-token"
-
-# Confluence Integration
-export CONFLUENCE_URL="https://your-company.atlassian.net/wiki"
-export CONFLUENCE_EMAIL="your.email@example.com"
-export CONFLUENCE_API_TOKEN="your-confluence-api-token"
-
-# Slack Integration
-export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-```
-
-**Reload after editing:** `project:reload-env`
-
-**Security:** Never commit `.envrc` file!
-
----
-
-## Learning System (Works Out of the Box!)
-
-Aura Frog **learns and improves** automatically - no setup required. It uses **local storage by default** and optionally syncs to Supabase for cross-machine memory.
-
-### What It Learns (Automatically)
-
-| Feature | How It Works |
-|---------|--------------|
-| **Smart Learn** | Detects successful code patterns (arrow functions, const usage, async/await) without feedback |
-| **Auto-Learn** | Captures corrections when you say "no", "wrong", "actually", "don't do that" |
-| **Workflow Edit Detection** | Learns from your direct edits to workflow MD files |
-| **Pattern Creation** | After 3+ similar corrections, creates a learned pattern |
-
-### Local Learning (Default - No Setup)
-
-Learning works immediately with **local file storage**:
-
-```
-.claude/learning/
-├── feedback.json      # All feedback entries
-├── patterns.json      # Learned patterns
-├── metrics.json       # Workflow metrics
-└── learned-rules.md   # Human-readable rules (auto-linked to Claude)
-```
-
-**Benefits:**
-- ✅ Works instantly - no configuration
-- ✅ Persists across sessions (within same project)
-- ✅ Human-readable learned-rules.md
-- ✅ Automatically linked to main instructions
-
-### Cloud Learning (Optional - Supabase)
-
-For **cross-machine memory** and **team sync**, add Supabase:
-
-**1. Create Supabase Project:**
-- Go to [supabase.com](https://supabase.com) and sign up (free)
-- Create a new project
-- Go to **Project Settings → Data API** to get your keys
-
-**2. Add Environment Variables:**
-
-```bash
-# Add to .envrc
-export SUPABASE_URL="https://your-project.supabase.co"
-export SUPABASE_SECRET_KEY="eyJ..."       # Secret key (service_role)
-export AF_LEARNING_ENABLED="true"
-```
-
-**3. Set Up Database Schema:**
-
-```bash
-./scripts/supabase/setup.sh
-```
-
-**4. Verify Setup:**
-
-```bash
-learn:status
-```
-
-Should show: `Learning: enabled ✓ | Mode: supabase | Memory: X items loaded`
-
-### Learning Commands
-
-| Command | Description |
-|---------|-------------|
-| `learn:status` | Check learning system status (local or Supabase) |
-| `learn:analyze` | Analyze patterns and generate insights |
-| `learn:apply` | Apply learned improvements |
-| `learn:feedback` | Submit manual feedback (optional) |
-
-### Disable Learning
-
-If you don't want any learning:
-```bash
-export AF_LOCAL_LEARNING="false"
-```
-
-**Full documentation:** `docs/LEARNING_SYSTEM.md`
-
----
-
-## MCP Servers (Auto-Configured)
-
-Aura Frog includes **8 MCP servers** in `.mcp.json` — 6 enabled by default, 2 opt-in (postgres + redis):
-
-| MCP | Purpose | Auto-Triggers On | Setup |
-|-----|---------|------------------|-------|
-| **context7** | Library docs | "Build with MUI", "Tailwind" | None |
-| **playwright** | E2E testing (v3.7.3+ default) | "Test the login page" | None |
-| **vitest** | Unit tests | "Run tests", "Check coverage" | None |
-| **firebase** | Firebase services | "Set up Firestore", "Firebase Auth" | `firebase login` |
-| **figma** | Design files | Figma URLs | `FIGMA_API_TOKEN` in `.envrc` |
-| **slack** | Notifications | Phase 5 completion | `SLACK_BOT_TOKEN` in `.envrc` |
-| **postgres** *(opt-in)* | Database queries (read-only default) | "Query users table" | Set `POSTGRES_CONNECTION_STRING` + flip `disabled: false` in `.mcp.json` |
-| **redis** *(opt-in)* | Cache + queue introspection | "Check redis cache" | Set `REDIS_URL` + flip `disabled: false` in `.mcp.json` |
-
-**No manual configuration needed** - MCPs requiring tokens will silently skip if not set.
-
-**No explicit commands needed** - Claude auto-detects context and uses appropriate MCP.
-
-**Per-agent allowlist** - The MCP Security Layer (Pillar 7) restricts which servers each agent can call. See `/aura-frog:mcp status` and `/aura-frog:mcp audit`.
-
-**Create your own MCP:** See [MCP Guide](../operations/MCP_GUIDE.md) for a complete guide.
-
----
-
-## Scripts (Utility Tools)
-
-Aura Frog includes utility scripts for common operations:
-
-| Category | Scripts | Purpose |
-|----------|---------|---------|
-| **Integration** | `confluence-fetch.sh`, `setup-integrations.sh` (JIRA is auto-fetched via `hooks/jira-auto-fetch.cjs`) | Fetch Atlassian data, configure integrations |
-| **Workflow** | `workflow/workflow-manager.sh`, `workflow/track-tokens.sh` | Manage workflows |
-| **Learning** | `learn/submit-feedback.sh`, `supabase/setup.sh` | Learning system |
-| **Visual** | `visual/visual-test.sh`, `visual/snapshot-compare.sh` | Visual testing |
-
-**Full documentation:** `scripts/README.md`
-
-### Quick Examples
-
-```bash
-# Jira tickets — just mention them in a prompt; the hook fetches automatically.
-#   "review PROJ-123 and tell me what changed"
-# Cached at .claude/logs/jira/PROJ-123.json (24h TTL).
-
-# Set up integrations interactively (Confluence, Slack, Figma)
-./scripts/setup-integrations.sh
-
-# Set up Supabase for learning system
-./scripts/supabase/setup.sh
-```
-
----
-
-## How It Works
-
-### 1. You Give a Command
-```
-/run Refactor MyComponent
-```
-
-### 2. Claude Detects Intent
-- `agent-detector` skill classifies complexity (Quick / Standard / Deep / Project)
-- `run-orchestrator` picks the flow (feature / bugfix / refactor / test / review / deploy)
-- Activates the right agents (architect, frontend, tester, …)
-
-### 3. Executes 5-Phase Workflow (for Deep / feature runs)
-```
-Phase 1: Understand + Design → [APPROVAL GATE]
-Phase 2: Test RED → [Auto-continue]
-Phase 3: Build GREEN → [APPROVAL GATE]
-Phase 4: Refactor + Review → [Auto-continue]
-Phase 5: Finalize → [Auto-complete]
-```
-
-**Only 2 approval gates** (Phase 1 & 3) -- other phases auto-continue after showing deliverables. Bugfix runs use a lighter 4-step TDD (S1 investigate → S2 test RED → S3 fix GREEN → S4 verify).
-
-### 4. You Control Every Step
-At approval gates, type a bare verb (no slash prefix needed when a run is active):
-- `approve` — advance to next phase
-- `reject <reason>` — redo with feedback
-- `modify <changes>` — adjust deliverables without restarting
-- `handoff` — save state for next session
-- `status` / `progress` / `rollback` / `stop`
+## What's next
+
+Pick one based on what you want to learn:
+
+| To learn… | Read… |
+|---|---|
+| The full command surface | [QUICKSTART.md](QUICKSTART.md) — 5 min reference card |
+| How a real run unfolds end-to-end | [WALKTHROUGH.md](WALKTHROUGH.md) — JWT-auth transcript |
+| The hands-on tutorial | [FIRST_WORKFLOW_TUTORIAL.md](FIRST_WORKFLOW_TUTORIAL.md) |
+| Runtime mechanics + plan tree | [HIERARCHICAL_PLANNING.md](../architecture/HIERARCHICAL_PLANNING.md) |
+| The OS mental model (Karpathy) | [os-architecture.md](../architecture/os-architecture.md) |
+| Which agent will pick up your task | [AGENT_SELECTION_GUIDE.md](../guides/AGENT_SELECTION_GUIDE.md) |
+| Bundled MCPs + how to add your own | [MCP_GUIDE.md](../operations/MCP_GUIDE.md) |
+| How learning + feedback works (no setup) | [LEARNING_SYSTEM.md](../operations/LEARNING_SYSTEM.md) |
+| Token cost per workflow flavour | [TOKEN_BUDGET.md](TOKEN_BUDGET.md) |
+| 8 Pillars deep dive | [BENEFITS.md](../reference/BENEFITS.md) |
 
 ---
 
 ## Troubleshooting
 
-For common issues and solutions, see the full [Troubleshooting Guide](../operations/TROUBLESHOOTING.md).
+Top 5 install-time questions — fuller fixes in [TROUBLESHOOTING.md](../operations/TROUBLESHOOTING.md).
+
+1. **`/plugin marketplace add` reports an error.** Make sure your Claude Code is recent enough to support marketplace plugins (Anthropic ships this in current builds). If not, use the [manual install path](../operations/INSTALLATION.md#manual-install).
+2. **`/help` doesn't show Aura Frog commands.** Re-run `/plugin install aura-frog@aurafrog`; check that `~/.claude/plugins/marketplaces/aurafrog/aura-frog/` exists.
+3. **First `/run` doesn't auto-detect a flow.** Type a more concrete verb-noun task description (e.g. `/run add password reset to the login form`). Force flow with prefixes: `/run task: …` / `/run project: …`. Disable escalation per-session with `AF_ESCALATION_DISABLED=true`.
+4. **An approval gate seems stuck.** Type bare `status` to see what's pending, or bare `rollback` to revert to the last checkpoint. Full action list above.
+5. **MCP server didn't fire.** Some MCPs need env vars (`FIGMA_API_TOKEN`, `SLACK_BOT_TOKEN`, `firebase login`). They silently no-op if unset — see [MCP_GUIDE.md](../operations/MCP_GUIDE.md) for per-MCP setup.
 
 ---
 
-## You're Ready!
-
-**Start building with AI-powered project management:**
-
-```
-/run <your-task-description>
-```
-
-**Examples:**
-- `/run Analyze useSocialMediaPost hook and suggest improvements`
-- `/run Refactor SocialMarketingCompositePost — split into smaller components`
-- `/run Add error handling to API calls`
-- `/run fix login button not disabling on submit`
-- `/run Optimize performance of list rendering`
-
----
-
-## Support
-
-- **All Documentation:** [docs/README.md](../README.md) (central index)
-- **Usage Guide:** [Usage Guide](../guides/USAGE_GUIDE.md) (best practices + workflow modes)
-- **MCP Guide:** [MCP Guide](../operations/MCP_GUIDE.md) (8 MCP servers — 6 enabled + 2 opt-in)
-- **Learning System:** [Learning System](../operations/LEARNING_SYSTEM.md) (local + Supabase)
-- **Troubleshooting:** [Troubleshooting](../operations/TROUBLESHOOTING.md)
-- **Changelog:** [Changelog](../reference/CHANGELOG.md)
-
----
-
-**Happy Coding!**
-
-Type `workflow:start <task>` to begin your first workflow.
-
----
-
-
+**You're ready.** Type `/run <your task>` and Aura Frog takes it from there.
