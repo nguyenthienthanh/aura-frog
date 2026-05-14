@@ -11,7 +11,7 @@ Quick fixes for common issues. For each problem: what happened, why, and how to 
 **Recovery:**
 1. Start new Claude Code session
 2. Aura Frog auto-detects saved state via `compact-handoff.cjs`
-3. If auto-resume doesn't trigger: `workflow:resume`
+3. If auto-resume doesn't trigger: `/run resume`
 4. If no saved state: check `.claude/logs/workflows/` for latest workflow directory
 
 ### Workflow stuck at approval gate
@@ -25,19 +25,19 @@ Quick fixes for common issues. For each problem: what happened, why, and how to 
 
 Tests don't actually test new code. Workflow auto-stops by design.
 1. Review test file — ensure tests assert NEW behavior
-2. `workflow:resume` — Re-enter Phase 2
+2. `/run resume` — Re-enter Phase 2
 
 ### Phase 4 refactor broke tests
 
 1. Option A: Fix the refactor to maintain behavior
-2. Option B: `workflow:rollback 4` — Revert to pre-refactor checkpoint
-3. `workflow:resume` — Continue
+2. Option B: `rollback 4` — Revert to pre-refactor checkpoint
+3. `/run resume` — Continue
 
 ### Coverage below 80% in Phase 5
 
 1. Check coverage report — which lines/branches uncovered?
 2. Add tests for uncovered paths
-3. `workflow:resume` — Re-run Phase 5
+3. `/run resume` — Re-run Phase 5
 
 ---
 
@@ -47,22 +47,22 @@ Tests don't actually test new code. Workflow auto-stops by design.
 
 **Automatic handling:**
 - 75% (150K tokens): Warning displayed
-- 85% (170K tokens): Suggests `workflow:handoff`
+- 85% (170K tokens): Suggests `handoff`
 - 90% (180K tokens): Force handoff — saves state
 
-**Manual:** `workflow:handoff` then `workflow:resume` in new session.
+**Manual:** `handoff` then `/run resume` in new session.
 
 ### Session disconnected unexpectedly
 
 **Preserved:** All written files, git commits, workflow state (if Stop hook fired).
 **Lost:** In-progress phase deliverables not yet written.
 
-**Recovery:** New session → auto-resume, or `workflow:resume`.
+**Recovery:** New session → auto-resume, or `/run resume`.
 
 ### "/compact ran and lost my context"
 
 `PreCompact` hook saves workflow state before compaction.
-Recovery: `workflow:resume` or check `.claude/cache/compact-handoff.json`.
+Recovery: `/run resume` or check `.claude/cache/compact-handoff.json`.
 
 ---
 
@@ -131,13 +131,13 @@ claude    # Restart
 
 ### Learning not working
 ```
-learn:status
+/af learn status
 ```
 If disabled: check `.envrc` for `AF_LEARNING_DISABLED=true`.
 
 ### Supabase connection failed
 Check `.envrc` has `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
-Run `project:reload-env` after editing. Falls back to local mode automatically.
+Run `/project env` after editing. Falls back to local mode automatically.
 
 ---
 

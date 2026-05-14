@@ -149,7 +149,7 @@ Actions (local cleanup, no LLM needed):
 
 ### Tier 3: ManualCompact (User-triggered or session restart)
 
-**Trigger:** User request or `workflow:handoff`
+**Trigger:** User request or `handoff`
 
 Creates full session snapshot:
 1. Workflow state (all phases, all agents)

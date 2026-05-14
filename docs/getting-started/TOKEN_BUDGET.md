@@ -21,5 +21,3 @@ Phase 5: Finalize                ~2K   ( 2%)
 
 **Target:** ≤30K tokens per workflow. Actual median: **62K** (2x target — Phase 3 is the compressor target for future optimization).
 
-Run `/run predict <task>` before a workflow to get a tailored estimate.
-

@@ -98,10 +98,10 @@ This file is automatically linked via `.claude/LEARNED_PATTERNS.md`, ensuring Cl
 
 | Command | Description |
 |---------|-------------|
-| `/learn:status` | Show learning system status and stats |
-| `/learn:analyze` | Run pattern analysis |
-| `/learn:apply` | Apply learned improvements |
-| `/learn:feedback` | Submit manual feedback |
+| `/af learn status` | Show learning system status and stats |
+| `/af learn analyze` | Run pattern analysis |
+| `/af learn apply` | Apply learned improvements |
+| `/af learn feedback` | Submit manual feedback |
 
 ---
 
@@ -136,7 +136,7 @@ export AF_LEARNING_ENABLED="false"
 |-------|----------|
 | Learning not working | Check `.claude/learning/` directory exists |
 | Missing patterns | Smart Learn needs 3+ successes; Auto-Learn needs 3+ similar corrections; 24h dedup window |
-| Check status | Run `/learn:status` -- should show `Mode: local`, pattern and feedback counts |
+| Check status | Run `/af learn status` -- should show `Mode: local`, pattern and feedback counts |
 
 ---
 
@@ -164,7 +164,7 @@ Then run: `./scripts/supabase/setup.sh`
 
 **Data Retention (Supabase):** Feedback: 90 days | Metrics: 1 year | Patterns: Indefinite
 
-**Troubleshooting Supabase:** Verify `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are set. Run `/learn:status` to confirm `Mode: supabase`.
+**Troubleshooting Supabase:** Verify `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are set. Run `/af learn status` to confirm `Mode: supabase`.
 
 ---
 

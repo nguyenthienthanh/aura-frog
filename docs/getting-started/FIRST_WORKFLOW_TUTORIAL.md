@@ -15,7 +15,7 @@ A step-by-step walkthrough of a complete Aura Frog workflow. Follow along in you
 ## Step 1: Start the Workflow
 
 ```
-workflow:start Add input validation to the login form
+/run Add input validation to the login form
 ```
 
 **Behind the scenes:**
@@ -93,16 +93,16 @@ In 2 approvals:
 
 | You want to... | Command |
 |----------------|---------|
-| Build a feature | `workflow:start "description"` |
-| Fix a bug | `bugfix:quick "description"` |
+| Build a feature | `/run "description"` |
+| Fix a bug | `/run "fix description"` |
 | Skip Phase 1 | `fasttrack: <specs>` |
-| Check progress | `workflow:status` |
+| Check progress | `/run status` |
 | Approve a phase | `approve` |
 | Reject with feedback | `reject: reason` |
-| Pause for later | `workflow:handoff` |
-| Resume | `workflow:resume` |
-| Undo a phase | `workflow:rollback <phase>` |
-| See agents | `agent:list` |
+| Pause for later | `handoff` |
+| Resume | `/run resume` |
+| Undo a phase | `rollback <phase>` |
+| See agents | `/af agents` |
 | Update plugin | `plugin:update` |
 
 ---

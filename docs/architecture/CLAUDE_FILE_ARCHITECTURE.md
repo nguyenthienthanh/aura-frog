@@ -93,7 +93,7 @@ Aura Frog uses a **dual-file loader + project context** architecture:
    ↓
 4. Claude reads plugin CLAUDE.md (all system instructions)
    ↓
-5. User runs workflow (e.g., workflow:start)
+5. User runs workflow (e.g., /run)
    ↓
 6. Workflow loads project context from .claude/project-contexts/
    ↓

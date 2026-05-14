@@ -163,7 +163,7 @@ sequenceDiagram
     participant SEC as Security Expert
 
     Note over U,SEC: Phase 1: Understand + Design (APPROVAL gate)
-    U->>PM: workflow:start "Add user auth"
+    U->>PM: /run "Add user auth"
     PM->>PM: Analyze requirements
     PM->>DEV: Cross-review requirements
     PM->>DEV: Design architecture
@@ -504,7 +504,7 @@ sequenceDiagram
     S1->>TM: Continue working
     TM->>TM: Current: 170K tokens
     TM-->>S1: 💡 SUGGEST HANDOFF<br/>85% context used
-    S1->>SM: workflow:handoff (optional)
+    S1->>SM: handoff (optional)
 
     Note over S1,S2: 90% Force (180K)
     S1->>TM: Continue working
@@ -533,7 +533,7 @@ flowchart TB
     subgraph "Session 1"
         S1A[Working on Phase 5]
         S1B[Token limit reached]
-        S1C[workflow:handoff]
+        S1C[handoff]
     end
 
     subgraph "State Export"
@@ -575,7 +575,7 @@ flowchart TB
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Created: workflow:start
+    [*] --> Created: /run
 
     Created --> Phase1_InProgress: Initialize
 
@@ -597,11 +597,11 @@ stateDiagram-v2
 
     Phase5_InProgress --> Completed: Auto-complete
 
-    Paused --> Phase1_InProgress: workflow:resume (phase 1)
-    Paused --> Phase2_InProgress: workflow:resume (phase 2)
-    Paused --> Phase3_InProgress: workflow:resume (phase 3)
-    Paused --> Phase4_InProgress: workflow:resume (phase 4)
-    Paused --> Phase5_InProgress: workflow:resume (phase 5)
+    Paused --> Phase1_InProgress: /run resume (phase 1)
+    Paused --> Phase2_InProgress: /run resume (phase 2)
+    Paused --> Phase3_InProgress: /run resume (phase 3)
+    Paused --> Phase4_InProgress: /run resume (phase 4)
+    Paused --> Phase5_InProgress: /run resume (phase 5)
 
     Completed --> Archived: Archive
     Completed --> [*]: Delete

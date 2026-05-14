@@ -339,7 +339,7 @@ agents_priority:
 
 ### Verbose Selection
 ```
-User: "workflow:start --debug Implement user profile"
+User: "/run --debug Implement user profile"
 
 Output:
 🧠 Agent Selection Debug

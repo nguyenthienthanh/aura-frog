@@ -1,4 +1,18 @@
-# Aura Frog Usage Guide - Clarifications & Best Practices
+# Aura Frog Usage Guide (Pre-v3.7 archive)
+
+> **⚠️ This document is an archive.** Last aligned with **Aura Frog v3.6.x** (2026-02-09).
+> Many commands referenced here (e.g. `workflow:start`, `bugfix:quick`) no longer exist in v3.7+.
+>
+> **For current usage**, see:
+> - [QUICKSTART.md](../getting-started/QUICKSTART.md) — 60-second start
+> - [FIRST_WORKFLOW_TUTORIAL.md](../getting-started/FIRST_WORKFLOW_TUTORIAL.md) — hands-on
+> - [HIERARCHICAL_PLANNING.md](../architecture/HIERARCHICAL_PLANNING.md) — runtime deep-dive
+>
+> Preserved here for: contributors auditing the v3.6 → v3.7 transition, anyone still running v3.6.x.
+
+---
+
+# Aura Frog Usage Guide — Clarifications & Best Practices (original content below)
 
 **Last Updated:** 2026-02-09
 

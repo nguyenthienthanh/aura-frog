@@ -1,6 +1,12 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: contributor
+---
+
 # Aura Frog Workflow Testing Guide
 
-**Last Updated:** 2026-02-09
+**Last Updated:** 2026-05-14 (v3.7 syntax refresh)
 **Purpose:** How to test the command-based Aura Frog workflow system
 
 ---
@@ -10,7 +16,7 @@
 **Commands are plain text in Claude Code chat:**
 
 ```
-You: workflow:status
+You: /run status
 ```
 
 Or use bundled slash commands:
@@ -28,7 +34,7 @@ Claude AI reads the command text and executes the workflow.
 ### Test if Claude recognizes commands:
 
 ```
-You: workflow:status
+You: /run status
 ```
 
 **Expected Response:**
@@ -36,7 +42,7 @@ You: workflow:status
 No active workflow found.
 
 Initialize a workflow first:
-workflow:start <task-description>
+/run <task-description>
 ```
 
 ---
@@ -46,7 +52,7 @@ workflow:start <task-description>
 ### Start a Simple Task:
 
 ```
-You: workflow:start Analyze the useSocialMediaPost hook and suggest improvements
+You: /run Analyze the useSocialMediaPost hook and suggest improvements
 ```
 
 **Expected: Claude Should:**
@@ -78,9 +84,9 @@ Analyzed useSocialMediaPost hook (505 lines)
 ───────────────────────────────────────────────────────────
 ⚠️  ACTION REQUIRED
 
-Type "workflow:approve" → Proceed to Phase 2
-Type "workflow:reject" → Restart Phase 1
-Type "workflow:modify <feedback>" → Adjust analysis
+Type "approve" → Proceed to Phase 2
+Type "reject" → Restart Phase 1
+Type "modify <feedback>" → Adjust analysis
 
 Your response:
 ═══════════════════════════════════════════════════════════
@@ -89,7 +95,7 @@ Your response:
 ### Then Test Approval:
 
 ```
-You: workflow:approve
+You: approve
 ```
 
 **Expected:**
@@ -107,7 +113,7 @@ You: workflow:approve
 ### Real Refactoring Task:
 
 ```
-You: workflow:start Refactor SocialMarketingCompositePost.phone.tsx - split into smaller, maintainable components
+You: /run Refactor SocialMarketingCompositePost.phone.tsx - split into smaller, maintainable components
 ```
 
 **This will test:**
@@ -121,12 +127,12 @@ You: workflow:start Refactor SocialMarketingCompositePost.phone.tsx - split into
 
 ```
 Phase 1: Analyzes component, creates tech spec + design
-→ You: workflow:approve  ← [APPROVAL GATE]
+→ You: approve  ← [APPROVAL GATE]
 
 Phase 2: Plans tests, writes failing tests (RED) → [Auto-continues]
 
 Phase 3: Implements components (GREEN)
-→ You: workflow:approve  ← [APPROVAL GATE]
+→ You: approve  ← [APPROVAL GATE]
 
 Phase 4: Refactors code + code review + QA validation → [Auto-continues]
 Phase 5: Generates documentation + sends notifications → [Auto-complete]
@@ -141,15 +147,15 @@ Phase 5: Generates documentation + sends notifications → [Auto-complete]
 ## 🎯 TEST 4: Test Rejection (2 minutes)
 
 ```
-You: workflow:start Add error handling to a function
+You: /run Add error handling to a function
 
 [Phase 1 completes, shows approval gate]
 
-You: workflow:reject Need more specific error scenarios - add timeout and network errors
+You: reject Need more specific error scenarios - add timeout and network errors
 
 [Phase 1 restarts with feedback, updates analysis]
 
-You: workflow:approve
+You: approve
 
 [Continues to Phase 2...]
 ```
@@ -159,15 +165,15 @@ You: workflow:approve
 ## 🎯 TEST 5: Test Modification (2 minutes)
 
 ```
-You: workflow:start Create a utility function
+You: /run Create a utility function
 
 [Phase 1 completes]
 
-You: workflow:modify Add TypeScript type definitions and JSDoc comments
+You: modify Add TypeScript type definitions and JSDoc comments
 
 [Phase 1 updates with modifications]
 
-You: workflow:approve
+You: approve
 
 [Continues to Phase 2...]
 ```
@@ -179,7 +185,7 @@ You: workflow:approve
 ### After starting a workflow:
 
 ```
-You: workflow:status
+You: /run status
 ```
 
 **Expected Response:**
@@ -239,11 +245,11 @@ After each test, verify:
 - [ ] Deliverables tracked
 
 ### Commands Work ✅
-- [ ] `workflow:start` - Initializes and executes Phase 1
-- [ ] `workflow:approve` - Approves and continues
-- [ ] `workflow:reject` - Restarts with feedback
-- [ ] `workflow:modify` - Makes changes
-- [ ] `workflow:status` - Shows progress
+- [ ] `/run` - Initializes and executes Phase 1
+- [ ] `approve` - Approves and continues
+- [ ] `reject` - Restarts with feedback
+- [ ] `modify` - Makes changes
+- [ ] `/run status` - Shows progress
 
 ---
 
@@ -257,7 +263,7 @@ After each test, verify:
 ```
 Try being explicit:
 
-"Please execute the workflow command: workflow:start <task>
+"Please execute the workflow command: /run <task>
 
 Follow these steps:
 1. Read commands/workflow/start.md
@@ -284,7 +290,7 @@ Format should include:
 
 ### If state not saved:
 
-**Problem:** `workflow:status` says no workflow
+**Problem:** `/run status` says no workflow
 
 **Solution:**
 ```
@@ -299,19 +305,19 @@ Continue with the workflow, Claude will track context.
 **Copy and paste this:**
 
 ```
-workflow:start Analyze useSocialMediaPost hook and suggest 3 improvements
+/run Analyze useSocialMediaPost hook and suggest 3 improvements
 
 [Wait for approval gate]
 
-workflow:approve
+approve
 
 [Wait for Phase 2]
 
-workflow:status
+/run status
 
 [Check if status shows correctly]
 
-workflow:approve
+approve
 
 [Continue through phases...]
 ```
@@ -351,7 +357,7 @@ If tests fail:
 **Start Simple:**
 
 ```
-workflow:start Analyze the useSocialMediaPost hook
+/run Analyze the useSocialMediaPost hook
 ```
 
 This will:
@@ -366,5 +372,5 @@ This will:
 
 **Ready to test?** 🚀
 
-Try: `workflow:start Analyze useSocialMediaPost hook and suggest improvements`
+Try: `/run Analyze useSocialMediaPost hook and suggest improvements`
 

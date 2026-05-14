@@ -206,7 +206,7 @@ const tddMode = config.tdd_enforcement || 'recommended';
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  User runs: workflow:start "Add feature"       │
+│  User runs: /run "Add feature"       │
 └─────────────────┬───────────────────────────────┘
                   │
                   ▼

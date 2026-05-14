@@ -188,7 +188,7 @@ Current: ~150,000 tokens | Limit: ~200,000 tokens
 
 📍 Progress: Phase 3 - Build GREEN (62% complete)
 
-🔄 Consider: `workflow:handoff` to start fresh session
+🔄 Consider: `handoff` to start fresh session
 
 State will be saved. You can resume seamlessly.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

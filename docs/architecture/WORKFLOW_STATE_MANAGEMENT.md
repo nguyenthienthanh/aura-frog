@@ -173,7 +173,7 @@ bash scripts/workflow/workflow-manager.sh archive [workflow-id]
 ### 1. Create Workflow
 
 ```bash
-workflow:start "Add user authentication"
+/run "Add user authentication"
 
 # Creates:
 # - .claude/logs/workflows/add-user-auth-20251124-120000/
@@ -185,9 +185,9 @@ workflow:start "Add user authentication"
 
 ```
 # All commands operate on active workflow
-workflow:status
+/run status
 workflow:progress
-workflow:approve
+approve
 # etc.
 ```
 
@@ -195,7 +195,7 @@ workflow:approve
 
 ```bash
 # Start another workflow (pauses current)
-workflow:start "Refactor UserProfile"
+/run "Refactor UserProfile"
 
 # Now "refactor-userprofile" is active
 # Previous workflow is paused
@@ -233,11 +233,11 @@ bash scripts/workflow/workflow-manager.sh delete [workflow-id]
 
 ```bash
 # Feature 1: Authentication
-workflow:start "Add authentication"
+/run "Add authentication"
 # ... work on Phase 1-2 ...
 
 # Feature 2: Dark mode (while waiting for auth review)
-workflow:start "Add dark mode"
+/run "Add dark mode"
 # ... work on Phase 1 ...
 
 # Switch back to auth
@@ -251,12 +251,12 @@ workflow:switch add-authentication-20251124-120000
 
 ```bash
 # Session 1
-workflow:start "Large refactoring"
+/run "Large refactoring"
 # ... Phase 1-4 complete (150K tokens) ...
-workflow:handoff
+handoff
 
 # Session 2 (new chat)
-workflow:resume large-refactoring-20251124-100000
+/run resume large-refactoring-20251124-100000
 # Loads state from .claude/logs/workflows/[id]/
 # Continues seamlessly
 ```
@@ -267,10 +267,10 @@ workflow:resume large-refactoring-20251124-100000
 
 ```bash
 # Dev 1: Feature A
-workflow:start "Feature A"
+/run "Feature A"
 
 # Dev 2: Feature B
-workflow:start "Feature B"
+/run "Feature B"
 
 # Each has independent state
 # No conflicts!
@@ -765,13 +765,13 @@ git diff HEAD > .claude/logs/workflows/[id]/backup/uncommitted.patch
 
 ```bash
 # Good
-workflow:start "Add JWT authentication"
-workflow:start "Refactor UserProfile component"
-workflow:start "Fix login crash on iOS"
+/run "Add JWT authentication"
+/run "Refactor UserProfile component"
+/run "Fix login crash on iOS"
 
 # Bad
-workflow:start "Update stuff"
-workflow:start "Changes"
+/run "Update stuff"
+/run "Changes"
 ```
 
 ### 2. One Active Workflow
@@ -789,7 +789,7 @@ workflow:start "Changes"
 
 ```bash
 # After workflow complete
-workflow:status  # Verify completed
+/run status  # Verify completed
 
 # Archive for reference
 bash workflow-manager.sh archive [id]
@@ -802,10 +802,10 @@ bash workflow-manager.sh delete [id]
 
 ```bash
 # At 150K tokens
-workflow:handoff
+handoff
 
 # New session
-workflow:resume [id]
+/run resume [id]
 # State loads from .claude/logs/workflows/[id]/
 ```
 

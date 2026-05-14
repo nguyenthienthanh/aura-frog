@@ -37,7 +37,6 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 - [Design System Guide](guides/DESIGN_SYSTEM_GUIDE.md) — UI library selection (MUI, Tailwind, shadcn/ui)
 - [Styling Detection Guide](guides/STYLING_DETECTION_GUIDE.md) — CSS framework auto-detection logic
 - [TOON Format Guide](guides/TOON_FORMAT_GUIDE.md) — Token-Optimized Object Notation specification
-- [Usage Guide](guides/USAGE_GUIDE.md) — Best practices, workflow modes, and pro tips
 - [Confluence Operations](guides/CONFLUENCE_OPERATIONS.md) — Confluence integration usage
 - [Image Analysis](guides/IMAGE_ANALYSIS.md) — Visual analysis with Figma and screenshots
 
