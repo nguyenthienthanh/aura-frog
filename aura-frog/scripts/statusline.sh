@@ -144,10 +144,74 @@ if [ "$AF_AGENT" = "ready" ] && [ -f ".claude/cache/session-start-cache.json" ];
     [ -n "$cache_agent" ] && AF_AGENT="$cache_agent"
 fi
 
+# ----- Per-step model stack (v3.7.4 follow-up) ------------------------------
+# When a Task tool dispatches a subagent with a different model, the
+# task-track-model.cjs hook pushes a JSONL entry to the stack file. While the
+# stack is non-empty, render the per-step variant: ▶ {phase} {step_model}
+# ⏱{duration} │ session: {session_model}. When empty, render the unchanged
+# mode/step/agent line.
+#
+# Disable: rename or chmod -x the hooks at aura-frog/hooks/task-{track,clear}-model.cjs.
+
+STACK_FILE=".aura-frog/runtime/model-stack.jsonl"
+
+# Format an elapsed-seconds count as Ns / MmSs / HhMMm per spec.
+fmt_duration() {
+    local secs="$1"
+    [ -z "$secs" ] || [ "$secs" -lt 0 ] 2>/dev/null && secs=0
+    if [ "$secs" -lt 60 ]; then
+        printf '%ds' "$secs"
+    elif [ "$secs" -lt 3600 ]; then
+        printf '%dm%02ds' "$((secs / 60))" "$((secs % 60))"
+    else
+        printf '%dh%02dm' "$((secs / 3600))" "$(((secs % 3600) / 60))"
+    fi
+}
+
+# Try the per-step render. Wrapped in a subshell with stderr swallowed so a
+# corrupted last line, missing jq, or any other surprise falls through to
+# the idle render — per the corruption-resilience invariant.
+render_active() {
+    [ -s "$STACK_FILE" ] || return 1
+    command -v jq >/dev/null 2>&1 || return 1
+
+    local top phase step_model started_iso started_epoch now_epoch elapsed dur
+    top=$(tail -n 1 "$STACK_FILE" 2>/dev/null) || return 1
+    [ -z "$top" ] && return 1
+
+    phase=$(printf '%s' "$top" | jq -r '.phase // empty' 2>/dev/null) || return 1
+    step_model=$(printf '%s' "$top" | jq -r '.model_display // empty' 2>/dev/null) || return 1
+    started_iso=$(printf '%s' "$top" | jq -r '.started_at // empty' 2>/dev/null) || return 1
+    [ -z "$phase" ] || [ -z "$step_model" ] && return 1
+
+    # Compute duration. Hooks emit `new Date().toISOString()` which is always
+    # UTC with trailing Z. Linux date -d "$iso" handles the Z. macOS BSD
+    # date -j -f ignores Z and interprets the value as LOCAL time, so we
+    # force TZ=UTC for the parse. Strip a trailing Z or +HH:MM offset before
+    # passing to BSD date (it doesn't understand them).
+    started_epoch=$(date -d "$started_iso" +%s 2>/dev/null \
+        || TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S" "${started_iso%%[+.Z]*}" +%s 2>/dev/null \
+        || echo "")
+    if [ -n "$started_epoch" ]; then
+        now_epoch=$(date +%s)
+        elapsed=$((now_epoch - started_epoch))
+        dur=" ⏱$(fmt_duration "$elapsed")"
+    else
+        dur=""
+    fi
+
+    echo "🐸 AF v${AF_VERSION} │ ▶ ${phase} │ ${step_model}${dur} │ session: ${MODEL} │ ${CTX_INT}% ctx"
+    return 0
+}
+
 # ----- Build output ----------------------------------------------------------
 # Cost segment removed in v3.7.4 — Claude Code's `total_cost_usd` is real
 # but adds visual noise without per-call breakdown. If you want it back,
 # run `/af status` for a richer cost+token report.
+
+if render_active 2>/dev/null; then
+    exit 0
+fi
 
 MODE_STEP="$AF_MODE"
 [ -n "$AF_STEP" ] && MODE_STEP="$AF_MODE $AF_STEP"

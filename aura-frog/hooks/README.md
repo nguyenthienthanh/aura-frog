@@ -22,9 +22,11 @@ Referenced in plugin.json:
 
 ---
 
-## Active Hooks (42 Total)
+## Active Hooks (45 Total)
 
 > **v3.7.0 additions:** alpha.1: `pre-execute-load-plan-context.cjs`, `session-start-restore-active.cjs`. alpha.2: `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs`. alpha.3: `jira-auto-fetch.cjs`. alpha.4: `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs`, `json-toon-projector.cjs`. beta.1: `pre-flight-validate.cjs`. beta.2: `pre-dispatch-conflict-check.cjs`, `post-execute-conflict-rescan.cjs`, `pending-confirm-timeout.cjs`. **rc.1: `mcp-call-gate.cjs`** — PreToolUse on `mcp__.*` enforces per-agent allowlist + rate limits, writes sanitized audit to `.aura/security/mcp-audit.jsonl`.
+>
+> **v3.7.4 follow-up:** `task-track-model.cjs` (PreToolUse `Task`) + `task-clear-model.cjs` (PostToolUse `Task`) maintain `.aura-frog/runtime/model-stack.jsonl` so the statusline can show the per-step subagent model. Fail-open observability — see [docs/statusline-model-tracking.md](../docs/statusline-model-tracking.md).
 
 ### 0. SessionStart - Environment Injection (NEW in 1.4.0)
 **When:** Once per session (startup, resume, clear, compact)

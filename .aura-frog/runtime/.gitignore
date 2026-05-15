@@ -1,0 +1,3 @@
+# Per-machine, per-session runtime state. Never commit.
+*
+!.gitignore
