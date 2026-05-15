@@ -167,504 +167,36 @@ flowchart LR
 
 ### 1 · Hierarchical Planning  ✅
 
-**What you get:** A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.claude/plans/` and survives session resets, `/compact`, and machine restarts. Pick up exactly where you stopped — three weeks later.
-
-**v3.7.3+ uniform folder-per-node layout** — every node lives in `{ID}_{kebab-slug}/` with its spec file + co-located aux:
-
-```
-.claude/plans/                           # next to .claude/logs/runs/
-├── INDEX.md                             # auto-emitted readme of the tree
-├── mission/mission.md                   # T0
-├── initiatives/INIT-001_q1-rollout/initiative.md
-├── features/JIRA-1234_oauth-flow/       # T2 (ticket-ID prefix when attached)
-│   ├── feature.md                       # spec + ## Runs table
-│   ├── REQUIREMENTS.md · DESIGN.md      # /run Phase 1 deliverables
-│   ├── checkpoints/{ISO}.json
-│   └── stories/STORY-0001_login-form/
-│       ├── story.md
-│       └── tasks/TASK-00001_password-input/
-│           ├── task.md
-│           ├── trace.jsonl              # per-task forensic log
-│           └── checkpoints/
-└── archive/FEAT-X_kebab-slug/{summary.md, original/}
-```
-
-**One command, 11 verbs** (since v3.7.2):
-
-```bash
-/aura-frog:plan                          # Interview-bootstrap T0 → T1 → T2
-/aura-frog:plan expand FEAT-7            # Decompose one tier down
-/aura-frog:plan next                     # Claim next ready Task
-/aura-frog:plan status                   # ASCII tree
-/aura-frog:plan {replan,promote,archive,undo,freeze,thaw,conflicts} <args>
-```
-
-Bare-word activation when a plan is active: just type `next`, `expand FEAT-A`, etc. Legacy `/aura-frog:plan-<verb>` aliases still work (soft-deprecated v3.7.2 → warning v4.0 → removed v5.0).
-
-**Run ↔ feature linking** (v3.7.3): `/run feature: FEAT-A <task>` anchors a run to a feature; `/run resume FEAT-A` lists runs and prompts to pick. Bidirectional: `run-state.json` carries `feature_id`, the feature's `## Runs` table records every run that touched it. Resume / rework / continue across sessions becomes trivial.
-
-**`/run` escalation** (v3.7.2): Multi-feature tasks (weight ≥ 3 on the bridge heuristic) prompt 3 options — `plan` (bootstrap with mission seed) / `deep` (normal 5-phase) / `details` (show signals). Force with `/run task: …` or `/run project: …`; opt out via `AF_ESCALATION_DISABLED=true`.
-
-```mermaid
-flowchart TB
-    subgraph Tree["Plan tree — every node is a folder"]
-        M(["T0 mission/<br/>mission.md"]):::t0 --> I[T1 initiatives/INIT-001_q1-rollout/<br/>initiative.md]:::t1
-        I --> F1[T2 features/JIRA-1234_oauth-flow/<br/>feature.md + REQUIREMENTS.md + DESIGN.md]:::t2
-        I --> F2[T2 features/FEAT-B_billing/<br/>feature.md]:::t2
-        F1 --> S1[T3 stories/STORY-0001_login-form/<br/>story.md]:::t3
-        F1 --> S2[T3 stories/STORY-0002_oauth-callback/<br/>story.md]:::t3
-        S1 --> T1[T4 tasks/TASK-00001_password-input/<br/>task.md + trace.jsonl + checkpoints/]:::t4
-        S1 --> T2[T4 tasks/TASK-00002_submit-handler/<br/>task.md + trace.jsonl + checkpoints/]:::t4
-    end
-    Run([🏃 /run feature: JIRA-1234 …]):::run -.anchors.-> F1
-    F1 -.runs[].-> Run
-    classDef t0 fill:#1e293b,color:#fff
-    classDef t1 fill:#475569,color:#fff
-    classDef t2 fill:#6366f1,color:#fff
-    classDef t3 fill:#10b981,color:#fff
-    classDef t4 fill:#f59e0b,color:#000
-    classDef run fill:#ec4899,stroke:#9d174d,color:#fff
-```
-
-**Why it matters:** Long-running projects no longer lose decisions to context compaction. Team handoffs become trivial — read `mission/mission.md` + `active.json` + the feature folder and you're caught up. The folder-per-node layout keeps everything about a feature (spec, deliverables, traces, checkpoints, runs that touched it) in one place. Multi-week features get explicit decomposition with provenance — every `/run` against a feature shows up in its `## Runs` table.
-
----
-
-#### How hierarchical planning actually works
-
-The TL;DR is "a folder per node, with metadata and references that the model loads on demand." Here is the full breakdown — read this if you want to understand the **components**, **mechanisms**, and **memory layers** behind the pillar.
-
-> **Full runtime deep-dive** (every agent invocation, every memory tier, every failure path, from `/aura-frog:plan` through T4 task completion): [`docs/architecture/HIERARCHICAL_PLANNING.md`](docs/architecture/HIERARCHICAL_PLANNING.md). Required reading before proposing changes to planning agents, the bare-word router, or the failure classifier.
-
-##### Tier semantics
-
-Five tiers from intent down to executable atom. Each tier has one specialist agent that owns its decomposition.
-
-| Tier | Purpose | ID | Folder | Spec file | Decomposed by |
-|---|---|---|---|---|---|
-| **T0** Mission | Why the project exists. One per repo. | `MISSION` | `mission/` | `mission.md` | `strategist` (one-shot during bootstrap) |
-| **T1** Initiative *(optional)* | Multi-feature theme — quarter / OKR / milestone. Skip on solo projects. | `INIT-NNN` | `initiatives/{ID}_{slug}/` | `initiative.md` | `master-planner` + `strategist` |
-| **T2** Feature | User-facing capability. Anchor for `/run`. | `FEAT-N` or `JIRA-1234` | `features/{ID}_{slug}/` (top-level) or `features/<parent>/subfeatures/{ID}_{slug}/` (nested, v3.7.3+) | `feature.md` | `feature-architect` |
-| **T3** Story | TDD-bounded unit. Fits one Phase 1 design. | `STORY-NNNN` | `<feature-folder>/stories/{ID}_{slug}/` — lives wherever the parent feature lives, including under `subfeatures/` | `story.md` | `story-planner` |
-| **T4** Task | Single agent invocation. Atomic. | `TASK-NNNNN` | `<story-folder>/tasks/{ID}_{slug}/` — same nesting rule | `task.md` | `story-planner` (alongside T3) |
-
-Subfeatures (T2 recursion) ship in v3.7.3+: a feature can decompose into child features rather than stories when one Phase 1 design isn't enough. The child sits inside the parent's `subfeatures/` folder with `parent: <PARENT_FEAT_ID>` in its frontmatter. **Subfeatures own their own stories** — a `features/FEAT-001/subfeatures/FEAT-B/stories/STORY-0001/` path is canonical, not a special case. The `child_path:` line printed by `/aura-frog:plan expand` resolves the concrete folder for whichever agent is doing the decomposition.
-
-##### Components inventory
-
-```toon
-components[29]{kind,name,role}:
-  agents,master-planner,"Stateful kernel — owns plan tree, dispatches replan decisions, audits every mutation to history.jsonl. Never executes code."
-  agents,strategist,"T0/T1 framing — challenges intent, sizes initiatives, surfaces ROI tradeoffs. Read-only on code."
-  agents,feature-architect,"T2 → T3 decomposition. Splits one feature into 2-6 stories with acceptance criteria + dependency hints."
-  agents,story-planner,"T3 → T4 decomposition. Splits a story into 1-6 atomic tasks. Stubs the acceptance test skeleton so each task has a real test_ref path."
-  agents,replanner,"F2-F4 mutation proposals — re-decompose / promote / discard. Budget-aware (per-node replan_budget enforced)."
-  agents,epic-summarizer,"On T2 done, distills the feature's stories + tasks + traces into permanent_memory.md. Confidence-scored. Writes ONLY to .claude/memory/."
-  agents,conflict-arbiter,"L1-L4 conflict adjudication — freeze / sequential / replan / escalate per spec §21.5."
-  skills,plan-orchestrator,"Single dispatcher for the 11-verb /aura-frog:plan vocabulary. Routes user intent → backing script via verb_table + intent classifier."
-  skills,plan-loader,"Auto-invokes every turn when .claude/plans/ exists. Loads mission + active branch + ancestors — stays under 800 tokens regardless of tree size."
-  skills,plan-validator,"Schema gate — frontmatter shape, tier coherence, children/parent symmetry. Run before mutations."
-  skills,plan-archivist,"Compresses completed T2 branches into archive/{ID}_{slug}/summary.md. Removes original (preserved in checkpoints)."
-  skills,reasoning-trace-recorder,"Auto-invokes during active T4 execution. Appends tool_call / file_read / output_claim events to the task's trace.jsonl."
-  skills,permanent-memory-loader,"Auto-invokes every turn when .claude/memory/permanent_memory.md exists. Loads section headers + 1-line summaries (≤120 tokens)."
-  skills,conflict-detector,"L1 file overlap + L2 function/region overlap (bash, free). L3 semantic + L4 architectural (LLM, queued for v3.8)."
-  skills,self-healing-orchestrator,"On F2/F3 failure, proposes patches. PROPOSES; user APPLIES — same gate as manual replan. Confidence ≥ 0.7 required to surface."
-  scripts,new-plan.sh,"Bootstraps the tree. Writes INDEX.md + active.json + .counters.json + mission/. Resolves AF_PLANS_DIR / .claude/plans / .aura/plans legacy."
-  scripts,expand-node.sh,"Tier-aware decomposition prep. Picks the right specialist agent based on parent tier."
-  scripts,next-task.sh,"DAG-aware ready-task pop. Marks chosen task active in active.json + ready_queue."
-  scripts,resolve-node.sh,"ID / title-substring / --active-token resolver. Recursive find — works on top-level + nested subfeatures."
-  scripts,freeze-branch.sh + thaw-branch.sh,"Cascade-freeze descendants when a conflict requires it. Thaw with conflict-resolution gate."
-  scripts,link-run.sh,"Two-sided run↔feature linker. Writes run-state.json#feature_id + the feature's ## Runs row. Idempotent."
-  scripts,replan-node.sh + promote-node.sh + undo-decision.sh + archive-feature.sh + conflicts-scan.sh,"The other 5 backing scripts that the 11 verbs dispatch to."
-  hooks,session-start-restore-active.cjs,"On every SessionStart, reads active.json + emits a banner so the model picks up where it left off. Survives /compact."
-  hooks,pre-execute-load-plan-context.cjs,"Before any agent dispatch, ensures the active-branch context is loaded if .claude/plans/ exists."
-  hooks,post-execute-update-node.cjs,"After a tool call mutates a node file, advances status + appends history.jsonl."
-  hooks,tool-call-tracer.cjs,"During T4 execution, emits trace events to the task's trace.jsonl."
-  hooks,pre-dispatch-conflict-check.cjs + post-execute-conflict-rescan.cjs,"L1+L2 gate around every dispatch and a 60s post-execute rescan window."
-  hooks,feature-done-trigger-archive.cjs,"When a T2 transitions to done, triggers epic-summarizer + plan-archivist."
-  hooks,session-reset-trigger.cjs,"Detects when a /aura-frog:reset-session is appropriate (1+ T2 done + ≥80% context used)."
-```
-
-##### Memory model — five layers, each with its own lifetime
-
-The system has more memory than a flat "save to disk" — it's tiered by what survives what, and by how much it costs to keep loaded.
-
-```mermaid
-flowchart LR
-    subgraph Vol["Volatile (this turn only)"]
-        CW[Context window<br/>≤200K tokens]
-    end
-    subgraph Sess["Session-scoped (this Claude Code session)"]
-        RS[run-state.json<br/>current /run]
-        SC[session-start-cache.json<br/>boot fast-path]
-    end
-    subgraph Plan["Plan-scoped (survives /compact, restart, session reset)"]
-        AJ[active.json<br/>focus pointer]
-        TR[plan tree<br/>mission.md → task.md]
-        HJ[history.jsonl<br/>append-only decisions]
-        CK[checkpoints/<br/>pre-mutation snapshots]
-        CJ[conflicts.jsonl<br/>L1-L4 detections]
-    end
-    subgraph Task["Per-task forensic (lives with the task folder)"]
-        TJ[trace.jsonl<br/>file_read / tool_call / output_claim]
-    end
-    subgraph Durable["Durable (survives /aura-frog:reset-session)"]
-        PM[permanent_memory.md<br/>distilled Epic wisdom]
-        AR[archive/<br/>compressed done branches]
-    end
-    CW -. loads on demand .-> AJ
-    AJ --> TR
-    AJ --> TJ
-    TR -. T2 done .-> PM
-    TR -. T2 done .-> AR
-    HJ -. forensic replay .-> CW
-    classDef vol fill:#fef2f2,stroke:#dc2626
-    classDef sess fill:#fef9c3,stroke:#a16207
-    classDef plan fill:#dbeafe,stroke:#1d4ed8
-    classDef task fill:#dcfce7,stroke:#15803d
-    classDef dur fill:#f3e8ff,stroke:#7c3aed
-    class CW vol
-    class RS,SC sess
-    class AJ,TR,HJ,CK,CJ plan
-    class TJ task
-    class PM,AR dur
-```
-
-| Layer | File(s) | Lifetime | Read by | Written by |
-|---|---|---|---|---|
-| **Context window** | (in-process) | Single turn | Every agent | Anthropic API |
-| **Session cache** | `.claude/cache/session-start-cache.json` | Until next session-start | `session-start.cjs` fast-path | `session-start.cjs` (TTL 1h) |
-| **Run state** | `.claude/logs/runs/<run-id>/run-state.json` | Until the `/run` completes / is discarded | `/run status`, `/run resume`, statusline | `run-orchestrator`, `link-run.sh` |
-| **Active pointer** | `.claude/plans/active.json` | Until manually changed | `plan-loader` (every turn) | `master-planner`, `next-task.sh`, `link-run.sh` |
-| **Plan tree** | `.claude/plans/**/*.md` | Until archived or deleted | `plan-loader`, `resolve-node.sh` | The 6 planning agents + their scripts |
-| **Decision audit** | `.claude/plans/history.jsonl` | Append-only forever | `/aura-frog:plan undo`, forensic replay | Every plan-script mutation |
-| **Checkpoints** | `.claude/plans/<node>/checkpoints/{ISO}.json` | Until pruned | `undo-decision.sh` | Pre-mutation snapshot in every script |
-| **Conflict log** | `.claude/plans/conflicts.jsonl` | Append-only | `/aura-frog:plan conflicts`, `conflict-arbiter` | `pre-dispatch-conflict-check`, `post-execute-conflict-rescan` |
-| **Task trace** | `<task-folder>/trace.jsonl` | Until task archived | `/aura-frog:trace`, grounding-discipline rule | `reasoning-trace-recorder` + `tool-call-tracer.cjs` |
-| **Permanent memory** | `.claude/memory/permanent_memory.md` | Survives `/aura-frog:reset-session` | `permanent-memory-loader` (every turn) | `epic-summarizer` (on T2 done) |
-| **Archive** | `.claude/plans/archive/{ID}_{slug}/` | Forever (compressed) | `/aura-frog:plan status --archived` | `plan-archivist` (on T2 done) |
-
-**Token discipline.** The two auto-loaded layers (`plan-loader`, `permanent-memory-loader`) are budget-capped: plan-loader stays ≤ 800 tokens regardless of tree size by reading only the active branch, and permanent-memory-loader stays ≤ 120 tokens by reading only section headers + 1-line summaries. Everything else loads on demand — `expand FEAT-A` reads only that subtree.
-
-##### Lifecycle — from "no plan" to "shipped feature"
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as User
-    participant PO as plan-orchestrator
-    participant MP as master-planner
-    participant FA as feature-architect
-    participant SP as story-planner
-    participant RO as run-orchestrator
-    participant ES as epic-summarizer
-    participant PA as plan-archivist
-
-    U->>PO: /aura-frog:plan (or /run escalates)
-    PO->>MP: bootstrap
-    MP->>U: T0 + T1 + T2 interview
-    Note over MP: writes mission/, initiatives/, features/<br/>+ active.json + .counters.json + INDEX.md
-
-    U->>PO: expand FEAT-A
-    PO->>FA: decompose T2 → T3 (2-6 stories)
-    FA->>MP: writes stories/STORY-NNNN/
-    MP->>U: surface stories + acceptance criteria
-
-    U->>PO: expand STORY-0001
-    PO->>SP: decompose T3 → T4 (1-6 tasks)
-    SP->>MP: writes tasks/TASK-NNNNN/ + acceptance test stubs
-
-    U->>PO: next  (or types `next` as bare word)
-    PO->>MP: pop ready T4 from DAG
-    MP->>U: active.task = TASK-00001
-
-    U->>RO: run command auto-anchors to active.task
-    Note over RO: 5-phase TDD — trace.jsonl appends per turn
-    RO->>MP: post-execute-update-node bumps status
-
-    Note over MP,ES: last T4 of FEAT-A completes
-    MP->>ES: T2 done — distill
-    ES->>PA: write permanent_memory.md section
-    PA->>MP: write archive/FEAT-A/summary.md
-    MP->>U: feature shipped — archived branch removed from always-loaded surface
-```
-
-##### Decomposition discipline — the agent-by-agent contract
-
-- **strategist** owns T0/T1 framing. Read-only on code. Asks "is this initiative actually worth the surface area we'd add?" Writes nothing on its own — surfaces tradeoffs for the user to commit.
-- **feature-architect** owns T2 → T3. Reads existing code (with Glob/Grep, no MCP DB calls) to inform decomposition. Hard caps: 2-6 stories per feature, intent ≤ 120 chars per story, 2-5 acceptance criteria each. More than 6 stories means the feature is too big — escalates to promote or split.
-- **story-planner** owns T3 → T4. Reads code + may stub `__tests__/<story-id>/*.test.cjs` with `it.skip()` so each task's `test_ref` points to a real path. 1-6 tasks per story. Each task names exactly one agent for execution.
-- **replanner** owns mutations. Triggered on F2-F4 failures (per `failure-classifier`). Budget-aware: each node carries `replan_count` + a `replan_budget` (default 3 per node, 8 per feature). Exceeded → escalate to user, no autonomous loop.
-- **conflict-arbiter** owns L1-L4 conflict adjudication. When `pre-dispatch-conflict-check.cjs` flags an overlap, the arbiter picks one of four resolutions: `freeze` (block descendants), `sequential` (reorder), `replan` (re-decompose conflicting branch), `escalate` (ask user). Decision logged to `conflicts.jsonl`.
-- **epic-summarizer** owns the distillation pass. Confidence-scored: items below 0.7 confidence land in a `### Tentative (low confidence)` subsection of `permanent_memory.md`. Never copies verbatim file content — uses `sha256:abc…` references instead.
-
-##### The 11 verbs — what each one does
-
-```toon
-verbs[11]{verb,what_happens,mutates_active}:
-  bootstrap,"(no verb) T0+T1+T2 interview — strategist surfaces mission, master-planner mints IDs, writes INDEX.md",true
-  expand,"<NODE> — dispatches to the right tier-specialist (feature-architect for T2, story-planner for T3). Pre-mutation checkpoint.",false
-  next,"Pops the next ready T4 from the DAG (no unresolved depends_on). Marks active.task in active.json.",true
-  status,"Renders the tree as ASCII. Highlights active branch + frozen nodes + ready queue.",false
-  replan,"<NODE> — re-decompose. Discards descendants, re-runs the tier specialist. Counts against replan_budget.",false
-  promote,"<TASK> → T1/T2 — when a T4 discovery (e.g. a missing service) warrants its own feature. Bubbles up.",false
-  archive,"<FEATURE> — triggers epic-summarizer + plan-archivist. Moves the subtree to archive/, drops always-loaded cost.",false
-  undo,"<NODE> — LIFO restore from the latest checkpoint. Useful for 'I did not mean to replan that.'",true
-  freeze,"<NODE> — sets status=frozen on the node + cascades to descendants. Blocks dispatch.",false
-  thaw,"<NODE> — reverses freeze. Runs the conflict-resolution gate (won't thaw if the original cause still triggers).",false
-  conflicts,"list/show/resolve/history — view detected conflicts and their L1-L4 type, drive arbiter decisions.",false
-```
-
-Three input modes, same vocabulary:
-
-1. **Explicit verb form** — `/aura-frog:plan expand FEAT-A`.
-2. **Bare-word activation** — type `expand FEAT-A` (no slash) when `.claude/plans/active.json` exists. Hook `bare-word-router.cjs` catches the first token, asks for confirmation, routes via plan-orchestrator.
-3. **Intent classifier** — descriptive natural-language ("show me the tree", "what's next?") — plan-orchestrator pattern-matches to the right verb.
-
-##### `/run` ↔ plan bridge — how they share state
-
-Two pieces of state link the two systems:
-
-- **`active.json#active.task`** — when set, every `/run` invocation auto-anchors to that task. Phase 5 finalize syncs deliverables back into the task's folder.
-- **`feature.md### Runs` table** — every `/run feature: FEAT-A …` writes a row here via `link-run.sh`. Surfaces in `/run resume FEAT-A` and in the feature's status line.
-
-The **escalation heuristic** in `rules/workflow/run-plan-bridge.md` scores every `/run <task>` on 8 signals (word count, scope verbs, file count, multi-domain keywords, …). At weight ≥ 3 without an active plan, it prompts `plan` / `deep` / `details`. Tasks fail this test for a reason — they're project-scoped, not single-feature.
-
-> ⚠️ **Anchoring does NOT skip the 5-phase TDD workflow.** The plan tree feeds **inputs** to Phase 1 (acceptance criteria → Sprint Contract; design notes → architecture inputs) and Phase 2 (test scaffolds). It does **not** replace either phase. Every anchored `/run` still executes Phase 1 → 2 → 3 → 4 → 5 against its task. **Phase 2 (Test RED) is mandatory** even when the plan documents acceptance criteria — acceptance criteria are intent; failing tests are executable contracts. Skipping Phase 2 because "the plan already has it" is the most common misread of this design.
->
-> **One `/run` covers one task's full 5-phase cycle.** A feature with 5 tasks needs 5 `/run` invocations. Iterate with `/aura-frog:plan next` (or just type `next` with a plan active) to claim the next ready task — each `/run` after that auto-anchors and runs all 5 phases against it. Single-shot `/run feature: FEAT-A` does **not** loop through every task of the feature automatically; it runs the 5 phases against one task and stops at Phase 5.
-
-##### What survives what (the resilience matrix)
-
-|  | `/compact` | Session restart | `/aura-frog:reset-session` | `git clean` |
-|---|:---:|:---:|:---:|:---:|
-| Context window | ❌ | ❌ | ❌ | ❌ |
-| `run-state.json` | ✅ | ✅ | ✅ | ❌ (in `.claude/logs/`) |
-| `active.json` + plan tree | ✅ | ✅ | ✅ | ❌ (committed if you commit it) |
-| `history.jsonl` | ✅ | ✅ | ✅ | ❌ |
-| `trace.jsonl` (per task) | ✅ | ✅ | ✅ | ❌ |
-| `permanent_memory.md` | ✅ | ✅ | ✅ (this is what it's for) | ❌ |
-| `archive/*` | ✅ | ✅ | ✅ | ❌ |
-
-Plan files live under `.claude/plans/` — commit them to keep the project's planning context in version control alongside the code.
-
----
+A plan tree (Mission → Initiative → Feature → Story → Task) that persists to `.claude/plans/` and survives session resets, `/compact`, and machine restarts. v3.7.3 ships uniform `{ID}_{kebab-slug}/` folder-per-node layout, run↔feature bidirectional linking (`run-state.json` ↔ feature's `## Runs` table), and the consolidated `/aura-frog:plan <verb>` surface (`expand` · `next` · `replan` · `promote` · `archive` · `undo` · `freeze` · `thaw` · `conflicts` · `status`). Bare-word activation when a plan is active: type `next`, `expand FEAT-A`. The `/run` escalation heuristic (v3.7.2) prompts plan-mode for multi-feature tasks (weight ≥ 3) — overrides: `task:` / `project:` prefixes, `AF_ESCALATION_DISABLED=true`. Full depth + DAG examples in [BENEFITS.md Part 9 §1](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [HIERARCHICAL_PLANNING.md](docs/architecture/HIERARCHICAL_PLANNING.md).
 
 ### 2 · Reasoning Trace Audit  ✅
 
-**What you get:** Every Claude tool call writes an append-only event to the task's `trace.jsonl` (v3.7.3: co-located inside `.claude/plans/features/.../tasks/{TASK_ID}_{slug}/trace.jsonl`; legacy fallback to `.claude/plans/traces/{TASK_ID}.jsonl`) — `tool_call`, `file_read` (with sha256), `tool_result`. The `grounding-discipline` rule rejects any factual claim that isn't backed by a prior `file_read` event. Hallucinations get *caught*, not shipped.
-
-```bash
-/aura-frog:trace                              # Full trace for active task
-/aura-frog:trace --hallucinations             # Only ungrounded claims
-/aura-frog:trace --filter file_read           # Filter by event type
-/aura-frog:trace --tail 20                    # Last 20 events
-AF_TRACE_DISABLED=true                        # Opt out per session
-```
-
-```mermaid
-sequenceDiagram
-    participant U as You
-    participant C as Claude
-    participant H as Tracer hook
-    participant J as traces/T4.jsonl
-    U->>C: implement payment redirect
-    C->>H: Read src/checkout.ts
-    H->>J: file_read {path, sha256, lines}
-    C->>H: Write src/redirect.ts
-    H->>J: tool_call {tool, args_hash}
-    Note over C: makes a claim
-    C->>U: "Stripe uses query param session_id"
-    H->>J: output_claim {grounded_in: ev-12, conf: 0.95}
-    Note right of J: /aura-frog:trace --hallucinations<br/>finds ungrounded claims later
-```
-
-**Why it matters:** AI-generated code reviews used to trust the AI. Now every factual statement has a sha256-anchored evidence trail. Debugging "why did Claude do that?" three months later becomes a single `/aura-frog:trace` call.
-
----
+Every Claude decision during T4 execution is forensically recorded to a per-task `trace.jsonl` (co-located with the task spec). Captured events: file reads, output claims, tool calls, decisions — each linked to the grounding evidence. The trace is the source of truth for grounding-discipline checks (anti-hallucination); deliverables that cite a file must show a corresponding read event. Query via `/trace` (planned CLI shipped in helper scripts). Disable per-session with `AF_TRACE_DISABLED=true`. Full schema + worked examples in [BENEFITS.md Part 9 §2](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ### 3 · Semantic Session Reset  ✅
 
-**What you get:** When a Feature (T2) reaches `done`, the `epic-summarizer` agent distills the most valuable findings — architectural decisions, gotchas, anti-patterns — into `.claude/memory/permanent_memory.md`. Then Master Planner offers you a clean session restart: working context wipes, permanent memory anchors.
-
-```bash
-/aura-frog:reset-session                      # Distill + prompt to reset
-/aura-frog:reset-session --feature FEAT-007   # Distill specific feature
-/aura-frog:reset-session --dry-run            # Preview what gets written
-/aura-frog:reset-session --no-prompt          # CI-friendly
-```
-
-```mermaid
-flowchart LR
-    Feat[FEAT-007 done] --> Sum[epic-summarizer]:::agent
-    Sum --> PM[(permanent_memory.md<br/>≤500 tok/Epic<br/>≤8K total)]:::pm
-    Sum -.proposes.-> User{Reset?}:::user
-    User -- yes --> Reset[Wipe working context<br/>Anchor permanent memory]:::reset
-    User -- no --> Cont[Continue current session]:::cont
-    classDef agent fill:#6366f1,color:#fff
-    classDef pm fill:#ec4899,color:#fff
-    classDef user fill:#f59e0b,color:#000
-    classDef reset fill:#10b981,color:#fff
-    classDef cont fill:#475569,color:#fff
-```
-
-**Why it matters:** 3-month projects accumulate decision drift; long sessions exceed any context window. Distillation captures *what mattered* (decisions, gotchas) and discards *what was noise* (tool output verbatim, transcripts). Quarterly retrospectives reduce to reading 8K tokens of permanent memory.
-
----
+Long projects accumulate decisions that don't fit in a context window. When a Feature ships, `epic-summarizer` distils its history into `.claude/memory/permanent_memory.md` — a confidence-scored, append-only memo (low-confidence items land in a Tentative subsection). Future sessions load only the header lines via `permanent-memory-loader` (≤120 always-loaded tokens, hard cap 200). `/reset-session` triggers the distil + optional clean-slate restart. Lets you take a Mission across weeks without context creep. Full depth in [BENEFITS.md Part 9 §3](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ### 4 · Pre-flight Validation  ✅ Tier 1 · 🚧 Tier 2
 
-**What you get:** Bash linters run on every tool call: command allowlist, path safety, secret-pattern detection, frontmatter validation. Bad AI output never hits disk. Tier 1 is zero-dependency bash; Tier 2 adds optional OPA Rego policies (queued for v3.8+).
-
-```bash
-/aura-frog:preflight check                              # Manual run
-/aura-frog:preflight policies                           # List active rules
-/aura-frog:preflight bypass <reason ≥ 10 chars>         # Per-call escape
-AF_PREFLIGHT_DISABLED=true                              # Per-session disable
-```
-
-```mermaid
-flowchart LR
-    Tool[Claude tool call]:::input --> Pre[pre-flight-validate.cjs]:::gate
-    Pre --> T1{Tier 1<br/>bash linters}:::tier
-    T1 -- pass --> Tool2[Execute]:::ok
-    T1 -- warn --> Log[stderr warn, proceed]:::warn
-    T1 -- block --> Stop[Refuse]:::block
-    T1 -- "tier 2 installed?" --> T2{OPA Rego<br/>🚧 v3.8+}:::tier2
-    classDef input fill:#6366f1,color:#fff
-    classDef gate fill:#475569,color:#fff
-    classDef tier fill:#10b981,color:#fff
-    classDef tier2 fill:#9ca3af,color:#000
-    classDef ok fill:#059669,color:#fff
-    classDef warn fill:#f59e0b,color:#000
-    classDef block fill:#dc2626,color:#fff
-```
-
-**Why it matters:** AI-coded `rm -rf $HOME` is real. Path-traversal in generated configs is real. Hardcoded credentials in generated code are real. Pre-flight catches them before the tool fires — no rollback needed because the damage never happened.
-
----
+Bash linters that block bad AI output before it hits disk. Tier 1 ships seven checks (path safety, command allowlist, secret patterns, frontmatter shape, markdown sanity, slash-syntax currency, doc maturity). Tier 2 (queued for v3.8) adds OPA + five `.rego` policies for declarative org-specific gates. Hook-driven — fires on Write/Edit. Bypass with 3-warn confirmation when the linter is wrong. Disable with `AF_PREFLIGHT_DISABLED=true`. Full rules in [BENEFITS.md Part 9 §4](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ### 5 · Semantic Conflict Detection  ✅ L1+L2 · 🚧 L3+L4
 
-**What you get:** Before dispatching any task, `conflict-detector` checks scope overlap against active and pending-confirm sibling tasks. L1 (file-set intersection) + L2 (function/region overlap) ship as deterministic bash — sub-300ms. L3 (LLM intent comparison) + L4 (LLM-vs-permanent-memory architectural check) are queued for v3.8+. Conflicting branches **freeze**, descendants cascade, siblings stay free to work.
-
-```bash
-/aura-frog:plan conflicts check          # Manually re-scan
-/aura-frog:plan conflicts list           # Active conflicts
-/aura-frog:plan conflicts resolve <id>   # User-pick resolution
-/aura-frog:plan-freeze FEAT-007 "reason" # Manual freeze
-/aura-frog:plan-thaw FEAT-007            # Reverse
-AF_CONFLICT_LLM_DISABLED=true            # Skip L3/L4 (no-op until v3.8+)
-```
-
-```mermaid
-stateDiagram-v2
-    [*] --> planned
-    planned --> active: dispatch
-    active --> done: success
-    planned --> frozen: L1+L2 detect overlap
-    active --> frozen: pending-confirm sibling conflicts
-    frozen --> planned: blocker done + compatible
-    frozen --> discarded: replan-required
-    done --> [*]
-```
-
-**Why it matters:** Parallel agents on the same codebase used to clobber each other's work silently. Now overlap is detected *before* dispatch; the blocked task freezes; when the blocker finishes, conflict-detector re-checks against *actual* changes (not just planned scope) before auto-thawing.
-
----
+Parallel `/run` tasks can step on each other. v3.7 ships L1 (file-overlap) and L2 (function/region overlap) deterministic checks, plus a freeze-cascade state machine that pauses descendants when a parent conflicts. L3 (semantic, LLM-judged) and L4 (architectural, LLM-judged) ship in v3.7.0-rc.1+. `conflict-arbiter` adjudicates — outcomes recorded to `conflicts.jsonl` + history. Disable LLM tiers with `AF_CONFLICT_LLM_DISABLED=true`. Full state machine + sample conflicts in [BENEFITS.md Part 9 §5](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ### 6 · Self-Healing Orchestrator  ✅ manual · 🚧 auto-trigger
 
-**What you get:** When a Task fails with class F2 (local logic) or F3 (local design), `/aura-frog:heal diagnose` parses the error, queries `context7` MCP for known patterns, cross-references `permanent_memory.md` for past gotchas, and proposes a patch with confidence ≥ 0.7 — **never auto-applies**. Sources are limited to official docs + your project's own memory; never random blogs. Auto-trigger on F2/F3 classification queued for v3.8+.
-
-```bash
-/aura-frog:heal diagnose <task-id>       # Manual diagnosis
-/aura-frog:heal status                   # Recent attempts + outcomes
-/aura-frog:heal disable                  # Per-session
-AF_SELF_HEAL_DISABLED=true               # Permanent
-```
-
-```mermaid
-flowchart LR
-    Fail[Task fails<br/>F2 or F3]:::fail --> Cls[failure-classifier]:::cls
-    Cls --> Heal["/aura-frog:heal diagnose"]:::heal
-    Heal --> Q1[context7 query]:::src
-    Heal --> Q2[permanent_memory.md]:::src
-    Q1 --> Diag[Diagnosis + patch<br/>confidence ≥ 0.7]:::diag
-    Q2 --> Diag
-    Diag --> User{Approve?}:::user
-    User -- yes --> Apply[New T4 with<br/>own approval flow]:::apply
-    User -- no --> Skip[Surface raw findings]:::skip
-    classDef fail fill:#dc2626,color:#fff
-    classDef cls fill:#475569,color:#fff
-    classDef heal fill:#6366f1,color:#fff
-    classDef src fill:#10b981,color:#fff
-    classDef diag fill:#f59e0b,color:#000
-    classDef user fill:#ec4899,color:#fff
-    classDef apply fill:#059669,color:#fff
-    classDef skip fill:#9ca3af,color:#000
-```
-
-**Why it matters:** "Cannot read property of undefined at line 42" used to send you to Stack Overflow for 20 minutes. Now you get a diagnosis citing the official Stripe docs *and* DEC-007 from your own past Epic — with the exact one-line patch ready to apply on your approval.
-
----
+When `failure-classifier` flags a task as F2 (local-logic) or F3 (local-design), the self-healing skill proposes a patch — but **never auto-applies**. Confidence ≥0.7 is required to surface; below threshold the raw findings are escalated to the user. Auto-trigger on the F2/F3 classification hook is queued for v3.7.2+. Per-task cap: 1 self-heal attempt; per-session cap: 5. Disable with `AF_SELF_HEAL_DISABLED=true`. Full workflow in [BENEFITS.md Part 9 §6](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
 ### 7 · MCP Security Layer  ✅
 
-**What you get:** Per-agent MCP allowlist via frontmatter (`mcp_servers: [context7, postgres]`). Every MCP call audited to `.aura/security/mcp-audit.jsonl` with secrets sanitized. Per-server rate limits in `plugin.json` (soft warn at 80%, hard block at 100%). Two new opt-in MCPs: `postgres` and `redis`, both `disabled: true` by default, destructive operations (`DROP TABLE`, `FLUSHDB`) blocked unconditionally.
-
-```bash
-/aura-frog:mcp status                # Per-agent allowlists + current state
-/aura-frog:mcp audit                 # Recent calls + blocked attempts
-/aura-frog:mcp audit --week          # 7-day window
-/aura-frog:mcp reset-limits          # Manual rate-limit reset
-AF_MCP_AUDIT_DISABLED=true           # Disable audit log (enforcement still on)
-```
-
-```mermaid
-flowchart LR
-    Agent[architect agent]:::ag --> Gate[mcp-call-gate.cjs]:::gate
-    Gate --> A{Allowlist?<br/>context7,postgres,redis}:::check
-    A -- yes --> R{Rate limit?<br/>≤30/min · ≤200/session}:::check
-    A -- no --> Block1[Refuse + audit]:::block
-    R -- under --> Call[MCP call]:::ok
-    R -- soft 80% --> Warn[Stderr warn, proceed]:::warn
-    R -- hard 100% --> Block2[Refuse + audit]:::block
-    Call --> Audit[(mcp-audit.jsonl<br/>sanitized, append-only)]:::audit
-    classDef ag fill:#6366f1,color:#fff
-    classDef gate fill:#475569,color:#fff
-    classDef check fill:#10b981,color:#fff
-    classDef ok fill:#059669,color:#fff
-    classDef warn fill:#f59e0b,color:#000
-    classDef block fill:#dc2626,color:#fff
-    classDef audit fill:#ec4899,color:#fff
-```
-
-**Why it matters:** Before v3.7.0, every agent could hit every MCP. A frontend agent could query your production Postgres. Now the architect gets DB access; the frontend gets Figma + Playwright; the security agent gets nothing because it's read-only on code. Audit log gives compliance + forensics — "why did the agent query the DB 1000 times?" gets a JSONL answer.
-
----
+Per-agent allowlist for MCP calls + audit log + rate limits + input sanitization. The `mcp-call-gate` hook authorises every MCP invocation against the agent's declared scope; blocked + rate-limited calls land in `.aura/security/mcp-audit.jsonl`. Post-incident forensics via `/aura-frog:mcp audit`. Tokens never leave the process. Disable audit-only with `AF_MCP_AUDIT_DISABLED=true`. Full threat model in [BENEFITS.md Part 9 §7](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [SECURITY_AND_TRUST.md](docs/operations/SECURITY_AND_TRUST.md).
 
 ### 8 · Phase-Role Binding  ✅
 
-**What you get:** The 5-phase TDD workflow now hard-enforces **Phase 4 reviewer ≠ Phase 3 builder**. Same agent reviewing its own code drifts toward "LGTM"; different agents provide fresh perspective. Aura Frog's Phase 4 dispatches `security` + `tester` (never the Phase 3 builder), formalizing Anthropic's Generator/Evaluator separation insight.
+The Phase 4 reviewer **MUST** differ from the Phase 3 builder. Generator ≠ Evaluator is enforced by `run-orchestrator` and `cross-review-workflow.md` — self-reviewed code has blind spots that PR reviews catch in human teams; same logic for agents. Non-negotiable. The constraint is what makes the 5-phase workflow produce shippable code, not just code that passes its own tests. Full rationale in [BENEFITS.md Part 9 §8](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370).
 
-```mermaid
-flowchart LR
-    P1[Phase 1<br/>architect]:::p1 --> P2[Phase 2<br/>tester writes RED]:::p2
-    P2 --> P3[Phase 3<br/>architect/frontend builds GREEN]:::p3
-    P3 -. NEVER same agent .-> P4
-    P3 --> P4[Phase 4<br/>security + tester review]:::p4
-    P4 --> P5[Phase 5<br/>lead finalize]:::p5
-    classDef p1 fill:#6366f1,color:#fff
-    classDef p2 fill:#10b981,color:#fff
-    classDef p3 fill:#f59e0b,color:#000
-    classDef p4 fill:#ec4899,color:#fff
-    classDef p5 fill:#475569,color:#fff
-```
-
-**Why it matters:** Self-reviewed code has blind spots — confirmation bias is real, even in agents. PR reviews exist for the same reason in human teams. Generator ≠ Evaluator is non-negotiable in Phase 4; it's what makes the workflow produce shippable code, not just code that *passes its own tests*.
-
----
 
 ### Status snapshot — what ships now vs queued
 
@@ -778,49 +310,11 @@ Expected output:
 
 Scans your codebase and creates 7 context files (framework, conventions, rules, examples, architecture, etc.) in `.claude/project-contexts/<name>/`. Takes 30–60 seconds; saves minutes on every future session.
 
-### Optional Setup
+### Optional setup
 
-<details>
-<summary>Install <code>af</code> CLI for health checks outside Claude Code</summary>
-
-```bash
-# Inside Claude Code:
-/af setup cli
-
-# Or manually:
-sudo ln -sf "$HOME/.claude/plugins/marketplaces/aurafrog/scripts/af" /usr/local/bin/af
-```
-
-Then use anywhere: `af doctor`, `af measure`, `af setup remote`.
-
-</details>
-
-<details>
-<summary>MCP tokens (Figma, Slack, Firebase)</summary>
-
-```bash
-cp .envrc.template .envrc
-# Edit .envrc — add FIGMA_API_TOKEN, SLACK_BOT_TOKEN, FIREBASE_TOKEN, etc.
-direnv allow   # if using direnv
-```
-
-Without tokens, `figma` / `slack` / `firebase` MCP servers stay inactive. `context7`, `playwright`, `vitest` need no config.
-
-</details>
-
-<details>
-<summary>Skills-only mode on other platforms</summary>
-
-| Platform | Install | What works |
-|----------|---------|------------|
-| **Claude Code** | `/plugin marketplace add nguyenthienthanh/aura-frog` | Everything |
-| **OpenAI Codex** | `cp -r aura-frog/skills/* ~/.codex/skills/` | Skills + commands |
-| **Gemini CLI** | `cp -r aura-frog/skills/* ~/.gemini/skills/` | Skills + commands |
-| **OpenCode** | `cp -r aura-frog/skills/* .opencode/skills/` | Skills + commands |
-
-Hooks, agent detection, subagent spawning, and MCP servers are Claude Code exclusive.
-
-</details>
+- **`af` CLI for health checks outside Claude Code** — `/af setup cli` or [manual symlink](docs/operations/INSTALLATION.md#cli-symlink--af-outside-claude-code).
+- **MCP tokens (Figma / Slack / Firebase / Supabase)** — `cp .envrc.template .envrc`, fill in tokens. Full template + per-token notes in [INSTALLATION.md § Environment variables](docs/operations/INSTALLATION.md#environment-variables--envrc).
+- **Skills-only mode on Codex / Gemini CLI / OpenCode** — `cp -r aura-frog/skills/* <platform-skills-dir>/`. Hooks, agent detection, subagent spawning, and MCP servers are Claude Code exclusive; everything else is portable (see [Works Across AI Coding Tools](#works-across-ai-coding-tools)).
 
 ### Start Your First Workflow
 
@@ -914,104 +408,22 @@ Full workflow target: **≤30K tokens** across all 5 phases.
 
 ## Command Reference
 
-Six core commands cover every everyday workflow — they auto-detect intent and dispatch the right skills/agents. The `/aura-frog:*` namespace (plan, trace, heal, mcp, dashboard, preflight, reset-session) layers on for hierarchical planning and safety operations.
+The top 8 commands cover every everyday workflow. Full reference + every subcommand + flag → [aura-frog/commands/README.md](aura-frog/commands/README.md).
 
-### `/aura-frog:plan <verb> [args]` — Hierarchical planning (v3.7.2 consolidated form)
-
-One command, 11 verbs. The `plan-orchestrator` skill routes via a 3-stage pipeline (explicit verb → intent keywords → LLM fallback). Bare-word activation works when `.claude/plans/active.json` exists.
-
-```bash
-/aura-frog:plan                          # Interview-bootstrap T0→T1→T2 (no args)
-/aura-frog:plan expand FEAT-7            # Decompose one tier down
-/aura-frog:plan next                     # Claim next ready T4; /run auto-anchors
-/aura-frog:plan status                   # ASCII tree
-/aura-frog:plan replan STORY-42          # Budget-aware replan + discard descendants
-/aura-frog:plan promote "note"           # Bubble T4 discovery up to T2/T1
-/aura-frog:plan freeze TASK-101          # Cascade-freeze descendants
-/aura-frog:plan thaw TASK-101            # Reverse freeze + compatibility check
-/aura-frog:plan archive FEAT-5           # Compress completed T2 to summary
-/aura-frog:plan conflicts list --open    # L1+L2 conflict log
-/aura-frog:plan undo                     # LIFO checkpoint restore
-```
-
-**Legacy `/aura-frog:plan-<verb>` forms** (e.g., `/aura-frog:plan-expand FEAT-7`) still work via 20-line alias stubs. Soft-deprecated v3.7.2 → warning v4.0 → removed v5.0.
-
-**Bare-word activation:** with a plan active, prompts ≤5 words starting with a plan verb route automatically: just type `next`, `expand FEAT-A`, `freeze TASK-1`. Opt-out: `AF_BARE_WORD_ROUTER_DISABLED=true`.
-
-
-
-### `/run <task>` — The main entry point
-
-Auto-detects what kind of work you want (feature / bugfix / refactor / test) and picks the right workflow. v3.7.2 adds intelligent escalation for project-scope tasks; v3.7.3 adds feature-anchored runs.
-
-| What you say | Intent detected | Flow |
+| Command | What it does | Subcommands / flags |
 |---|---|---|
-| `/run implement user profile` | Feature | 5-phase TDD workflow |
-| `/run fix login not working` | Bugfix | `bugfix-quick` skill — investigate → test → fix → verify |
-| `/run refactor auth service` | Refactor | `refactor-expert` skill — analyze → plan → test → refactor |
-| `/run add tests for payment` | Test | `test-writer` skill — detect framework → write tests → coverage |
-| `/run fasttrack: <specs>` | Fast-Track | Skip Phase 1, auto-execute P2–P5 (specs must include Requirements + Design + API + Data Model + Acceptance Criteria) |
-| `/run resume <id>` | Resume (run-id) | Load state from `.claude/logs/runs/<id>/` |
-| `/run resume FEAT-A` | Resume (feature) | v3.7.3+ — list runs under FEAT-A's `## Runs` table, prompt to pick (auto-resume if single in-progress) |
-| `/run status` | Status | Current phase + progress |
-| `/run handoff` | Handoff | Save state for cross-session continuation |
-| `/run rebuild auth + OAuth + 2FA` | Project (v3.7.2+) | Escalation prompt — `plan` bootstraps `/aura-frog:plan`, `deep` proceeds inline, `details` shows signals |
-| `/run task: <desc>` | Override (v3.7.2+) | Force task mode; skip escalation entirely |
-| `/run project: <desc>` | Override (v3.7.2+) | Force project mode; write `pending-plan-bootstrap.json` + invoke `/aura-frog:plan` |
-| `/run feature: FEAT-A <desc>` | Anchor (v3.7.3+) | Anchor a new run to a feature; writes `run-state.json#feature_id` + appends to the feature's `## Runs` table |
+| **`/run <task>`** | Universal entry. Auto-detects intent (feature / bugfix / refactor / test / review / deploy / quality / security) and picks the flow. | `task:` / `project:` / `feature: FEAT-X` / `fasttrack:` / `resume <id-or-feature>` / `status` / `handoff` / `rollback` / `progress` |
+| **`/aura-frog:plan <verb>`** | Hierarchical planning — 11 verbs in one command. Bare-word activation when a plan is active. | `expand` · `next` · `replan` · `promote` · `archive` · `undo` · `freeze` · `thaw` · `conflicts` · `status` · (no-arg interview) |
+| **`/check`** | Health + quality checks across the working tree. | `security` · `perf` · `complexity` · `debt` · `coverage` · `deps` · (no-arg = all) |
+| **`/design`** | Design artifacts from a description. | `api` · `db` · `doc` (ADR / runbook) |
+| **`/project`** | Project context lifecycle. | `init` · `status` · `refresh` · `regen` · `env` · `sync` |
+| **`/af`** | Plugin management + learning system. | `status` · `agents` · `metrics` · `learn {status,analyze,apply,feedback}` · `setup` · `mcp` · `prompts` · `skill` |
+| **`/aura-frog:heal`** / **`:mcp`** / **`:dashboard`** / **`:trace`** / **`:preflight`** / **`:reset-session`** / **`:extend`** | Safety + ops + observability + project-level extension authoring. | See [commands/README.md](aura-frog/commands/README.md) |
+| **`/help`** | Contextual help. | `/help <command>` · `/help agents` · `/help hooks` |
 
-### `/check` — Health + quality checks
+**Context-aware bare verbs** when a `/run` is active: `approve` · `reject <reason>` · `modify <changes>` · `handoff` · `status` · `progress` · `rollback` · `stop`. No slash prefix needed.
 
-```bash
-/check            # all checks (security + perf + complexity + debt + coverage + deps)
-/check security   # SAST only
-/check perf       # performance bottlenecks
-/check coverage   # test coverage report
-/check deps       # outdated/vulnerable dependencies
-```
-
-### `/design` — Design artifacts
-
-```bash
-/design api       # REST/GraphQL API spec (calls api-designer skill)
-/design db        # Database schema design
-/design doc       # ADR or runbook (calls documentation skill)
-```
-
-### `/project` — Project lifecycle
-
-```bash
-/project init     # First-time setup — generates 7 context files
-/project status   # Current context + active workflow
-/project refresh  # Re-scan codebase, update conventions
-/project regen    # Regenerate context files from scratch
-/project env      # Validate .envrc / MCP tokens
-/project sync     # Sync status line + refresh cache
-```
-
-### `/af` — Plugin management + learning
-
-```bash
-/af status        # Plugin health check
-/af agents        # List loaded agents with their tools + model
-/af metrics       # Workflow velocity + token efficiency
-/af learn status  # Learning system state (Supabase or local)
-/af learn analyze # Extract patterns from past workflows
-/af learn apply   # Apply learned rules to future sessions
-/af setup cli     # Install af CLI system-wide
-/af prompts       # Analyze prompt quality + suggest improvements
-```
-
-### `/help` — Contextual help
-
-```bash
-/help             # Plugin overview
-/help <command>   # Detailed help for a specific command
-/help agents      # Agent selection guide
-/help hooks       # Hook lifecycle reference
-```
-
-Full command docs: [commands/README.md](aura-frog/commands/README.md).
+**Legacy `/aura-frog:plan-<verb>` alias forms** still work but are soft-deprecated (warning v4.0 → removed v5.0).
 
 ---
 
