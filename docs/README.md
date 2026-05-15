@@ -10,17 +10,19 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 
 ## Getting Started
 
-- [Quick Start](getting-started/QUICKSTART.md) — 60-second install and first command
-- [Get Started Guide](getting-started/GET_STARTED.md) — Full setup walkthrough with learning system and MCP
-- [First Workflow Tutorial](getting-started/FIRST_WORKFLOW_TUTORIAL.md) — Guided hands-on walkthrough
+> **Start here:** [getting-started/README.md](getting-started/README.md) is the single entry index — read in order: QUICKSTART → GET_STARTED → FIRST_WORKFLOW_TUTORIAL.
+
+- [Getting Started Index](getting-started/README.md) — Read these in order (3 docs · 28 min total)
+- [Walkthrough](getting-started/WALKTHROUGH.md) — Sample transcript of a real run (JWT auth, ~95K tokens)
+- [Agent Selection Examples](getting-started/AGENT_SELECTION.md) — 10 worked examples with scoring math
+- [Token Budget](getting-started/TOKEN_BUDGET.md) — Cost per workflow flavour (Quick/Standard/Deep)
 
 ---
 
 ## Architecture
 
-- [OS Architecture](architecture/os-architecture.md) — LLM OS mental model (kernel, processes, RAM, drivers)
+- [OS Architecture](architecture/os-architecture.md) — LLM OS mental model (kernel, processes, RAM, drivers). Canonical architecture overview.
 - [Hierarchical Planning — Runtime Deep Dive](architecture/HIERARCHICAL_PLANNING.md) — agent invocations, memory tiers, anti-hallucination mechanics, failure handling (v3.7.3+)
-- [System Overview](architecture/overview.md) — Agent types, responsibilities, and orchestration
 - [CLAUDE.md Architecture](architecture/CLAUDE_FILE_ARCHITECTURE.md) — How plugin and project instructions load
 - [Config Loading Order](architecture/CONFIG_LOADING_ORDER.md) — Priority chain for configuration files
 - [Multi-Session Architecture](architecture/MULTI_SESSION_ARCHITECTURE.md) — Parallel sessions and state management

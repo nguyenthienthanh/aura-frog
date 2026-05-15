@@ -1,6 +1,22 @@
-# Aura Frog Team Agents - Architecture Overview
+# Aura Frog — Architecture Overview (Pre-v3.0 archive)
 
-**Last Updated:** 2025-11-23  
+> **⚠️ Archive.** Last aligned with Aura Frog v2.x (2025-11-23, 6 months before v3.7.4 cleanup).
+> Content references the pre-v3.0 agent grouping, the deprecated
+> `.claude/logs/workflows/` state path (current: `.claude/logs/runs/{run-id}/run-state.json`),
+> and `Linear MCP` (no longer in the v3.7.x stack of 8 servers).
+>
+> **Current architecture references:**
+> - [docs/architecture/os-architecture.md](../architecture/os-architecture.md) — canonical OS mental model
+> - [docs/architecture/HIERARCHICAL_PLANNING.md](../architecture/HIERARCHICAL_PLANNING.md) — plan tree runtime
+> - [aura-frog/CLAUDE.md](../../aura-frog/CLAUDE.md) — agent / MCP / boot inventory
+> - [docs/operations/MCP_GUIDE.md](../operations/MCP_GUIDE.md) — MCP details
+> - [docs/operations/SECURITY_AND_TRUST.md](../operations/SECURITY_AND_TRUST.md) — security model
+>
+> Preserved here for: contributors auditing the v2.x → v3.x architectural transition.
+
+---
+
+**Last Updated (original):** 2025-11-23  
 **Reference:** [duongdev/ccpm Architecture](https://github.com/duongdev/ccpm)
 
 ---
