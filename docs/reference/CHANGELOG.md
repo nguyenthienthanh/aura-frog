@@ -68,6 +68,29 @@ All notable changes to Aura Frog will be documented in this file.
 
 This release shipped as `FEAT-006 — Docs Cleanup & Reference-Integrity Sweep` under `INIT-001`. 8 stories: audit + decisions (STORY-0001), Phase A CI guard (STORY-0005), Phase B sweep + onboarding (STORY-0002), Phase C hierarchy consolidation (STORY-0003), Phase D README extraction (STORY-0006), Phase E maturity infrastructure (STORY-0007), Phase F AI/human boundary (STORY-0008), and close + version bump (this story — STORY-0004). All 19 T4 tasks closed in two sessions (audit / replan / Phase A + sweep / GET_STARTED / Phase C-F + close).
 
+### Post-release follow-up — 2026-05-15 (per-step model tracking)
+
+> Lands after the v3.7.4 doc-cleanup main release. No version bump. Pure observability addition — fail-open hooks, idle statusline output unchanged.
+
+#### Added
+
+- **`aura-frog/hooks/task-track-model.cjs`** — PreToolUse(Task) hook. Resolves the dispatched subagent's `model:` frontmatter, maps it to a short label (e.g. `claude-sonnet-4-6 → Sonnet 4.6`), and pushes a JSONL entry onto `.aura-frog/runtime/model-stack.jsonl`. Handles the `aura-frog:` plugin prefix; treats built-ins (Explore / general-purpose / Plan / statusline-setup) as silent no-ops.
+- **`aura-frog/hooks/task-clear-model.cjs`** — PostToolUse(Task) hook. Pops the most-recent JSONL line; removes the file when the stack reaches zero. Atomic `write tmp → rename`.
+- **`.aura-frog/runtime/.gitignore`** — gitignores `model-stack.jsonl` and similar transient runtime files; the .gitignore itself stays tracked.
+- **`__tests__/hooks/task-track-model.test.cjs`** — jest, 41 tests covering pure helpers (model display mapping, frontmatter parse, prefix normalize, agent resolve, push/pop) + end-to-end `processPreToolUse` / `processPostToolUse`.
+- **`aura-frog/docs/statusline-model-tracking.md`** — 80-line user explainer with ASCII diagram + disable + extend sections.
+
+#### Changed
+
+- **`aura-frog/scripts/statusline.sh`** — adds a `render_active()` block. When `.aura-frog/runtime/model-stack.jsonl` is non-empty, renders `🐸 AF v{ver} │ ▶ {phase} │ {step_model} ⏱{duration} │ session: {session_model} │ {ctx}% ctx`. When empty (or corrupted last line, or jq missing), falls through to the existing idle render byte-identically. Duration formatter handles `Ns` / `MmSSs` / `HhMMm`; UTC parsing fixed for macOS BSD `date`.
+- **`aura-frog/hooks/hooks.json`** — registers both new hooks under `matcher: "Task"` (Pre + Post), async, `2>&1`. No other hook entries touched.
+
+#### Stats diff (post-release)
+
+- Hooks: 43 → **45** (+2)
+- Tests: 368 → **409** (+41); all green; no regressions; lint clean on new files
+- Version: 3.7.4 (unchanged)
+
 ---
 
 ## [3.7.3] - 2026-05-12 (Plan relocation + run linking + test-pyramid + statusline transparency)
