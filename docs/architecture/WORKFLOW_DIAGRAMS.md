@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # Aura Frog Workflow Diagrams
 
 **Format:** Mermaid (render with GitHub, VS Code, or mermaid.live)

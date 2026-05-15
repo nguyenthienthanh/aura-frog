@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+---
+
 # Aura Frog — 60-Second Quickstart
 
 > v3.7.x syntax. The current command surface is `/run` (universal entry point with intent detection) + `/aura-frog:*` (plan / heal / mcp / trace / dashboard) + `/af` (status / agents / learn). Older `workflow:*`-prefixed verbs from v3.6 are documented in `MIGRATION_TO_V3.7.md`.

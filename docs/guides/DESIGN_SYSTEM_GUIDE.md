@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Design System Guide
 
 **Last Updated:** 2025-12-04

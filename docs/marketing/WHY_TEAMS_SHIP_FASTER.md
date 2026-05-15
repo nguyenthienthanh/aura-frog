@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # Why Teams Ship Faster With Aura Frog
 
 ### 1. Smart Flow Selection — Right Effort for Every Task

@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Behavioral Eval Setup
 
 Automated trigger-accuracy testing for Aura Frog skills, agents, and commands using [`cc-plugin-eval`](https://github.com/sjnims/cc-plugin-eval). Catches regression when skill descriptions drift or rules are edited.

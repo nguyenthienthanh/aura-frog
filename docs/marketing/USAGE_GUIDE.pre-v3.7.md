@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: archive
+audience: contributor
+---
+
 # Aura Frog Usage Guide (Pre-v3.7 archive)
 
 > **⚠️ This document is an archive.** Last aligned with **Aura Frog v3.6.x** (2026-02-09).

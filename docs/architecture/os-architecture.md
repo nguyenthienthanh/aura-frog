@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # Aura Frog OS Architecture
 
 **Version:** 3.2.1

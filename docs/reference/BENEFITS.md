@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: contributor
+---
+
 # Aura Frog Benefits — Why Use This Plugin
 
 **Purpose:** Explain every capability Aura Frog adds on top of base Claude Code — what it is, how it's applied, why you need it, and concrete use cases.

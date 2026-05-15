@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Agent Teams Guide
 
 **Purpose:** Enable and use Claude Agent Teams with Aura Frog

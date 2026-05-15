@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # Hierarchical Planning — Runtime Deep Dive
 
 > Companion to [`README.md § Pillar 1`](../../README.md#1--hierarchical-planning--). The README gives you the *what*. This file walks the *how* — every agent invocation, every memory tier, every failure path — from the moment you type `/aura-frog:plan` until a T4 task closes out.

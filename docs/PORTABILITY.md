@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # Portability — Aura Frog Across AI Coding Tools
 
 ## Why Portability Matters

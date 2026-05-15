@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # 🔒 Security and Trust - Aura Frog Plugin
 
 **Protecting yourself when installing Claude Code plugins**

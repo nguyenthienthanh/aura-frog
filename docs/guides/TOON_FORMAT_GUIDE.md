@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # TOON Format Guide
 
 **Purpose:** Token-optimized notation for AI-readable documents

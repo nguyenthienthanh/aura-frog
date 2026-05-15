@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: contributor
+---
+
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.

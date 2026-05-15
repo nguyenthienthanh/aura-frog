@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Confluence Operations Guide
 
 **Complete guide for Confluence integration with Aura Frog Team Agents**

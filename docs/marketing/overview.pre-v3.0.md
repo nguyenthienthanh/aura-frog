@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: archive
+audience: contributor
+---
+
 # Aura Frog — Architecture Overview (Pre-v3.0 archive)
 
 > **⚠️ Archive.** Last aligned with Aura Frog v2.x (2025-11-23, 6 months before v3.7.4 cleanup).

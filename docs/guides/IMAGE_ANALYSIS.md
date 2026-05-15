@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Image Analysis Guide
 
 **Visual analysis of screenshots, Figma exports, and design mockups**

@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # MCP Integration Guide
 
 **Purpose:** How to use bundled MCP servers and create your own

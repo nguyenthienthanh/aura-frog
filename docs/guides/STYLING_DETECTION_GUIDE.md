@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Styling Approach Detection Guide
 
 **Last Updated:** 2024-11-26

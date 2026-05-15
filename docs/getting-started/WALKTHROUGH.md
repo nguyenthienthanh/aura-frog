@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+---
+
 # Walkthrough: A Real Workflow in Action
 
 A complete transcript of implementing user authentication with `/run`. This is what you actually see.

@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # Troubleshooting Guide
 
 Quick fixes for common issues. For each problem: what happened, why, and how to fix.

@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # Multi-Session Architecture
 
 **Purpose:** Enable complex workflows across multiple Claude Code sessions

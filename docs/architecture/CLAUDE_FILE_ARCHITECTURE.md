@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # CLAUDE.md File Architecture
 
 **Last Updated:** 2025-11-27

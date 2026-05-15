@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: reference
+audience: power-user
+---
+
 # 🗂️ Workflow State Management
 
 **Purpose:** Manage multiple concurrent workflows

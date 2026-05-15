@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: active-user
+---
+
 # Aura Frog Documentation
 
 Central index for all human-readable documentation. AI-consumed docs live in `aura-frog/`.

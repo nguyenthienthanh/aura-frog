@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+---
+
 # Agent Selection Examples
 
 Real examples of what the `agent-detector` skill picks and why. Score thresholds: **PRIMARY ≥80**, SECONDARY 50–79, OPTIONAL 30–49.

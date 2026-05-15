@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Agent Selection Guide
 
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)

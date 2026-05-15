@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+---
+
 # Token Budget
 
 Real measurements from production workflows. Numbers vary ±20% based on project size.

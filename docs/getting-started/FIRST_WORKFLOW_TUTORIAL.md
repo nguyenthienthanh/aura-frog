@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: current
+audience: first-time
+---
+
 # Your First Workflow — Interactive Tutorial
 
 A step-by-step walkthrough of a complete Aura Frog workflow. Follow along in your own project.

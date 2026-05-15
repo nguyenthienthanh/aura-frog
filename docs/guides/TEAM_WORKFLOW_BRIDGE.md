@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.7.3
+status: needs_review
+audience: active-user
+---
+
 # Team-Workflow Bridge
 
 **Purpose:** Automatic team lifecycle management across workflow phases
