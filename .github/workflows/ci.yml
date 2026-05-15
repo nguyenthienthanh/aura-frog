@@ -75,6 +75,15 @@ jobs:
         # (broader audit). Spec: FEAT-006 STORY-0005 (v3.7.4).
         run: bash aura-frog/scripts/ci/validate-docs-syntax.sh
 
+      - name: Validate doc maturity frontmatter
+        # Every docs/**/*.md must have last_aligned_with + status + audience
+        # frontmatter (except docs/showcase/ and docs/specs/ which are exempt).
+        # status=current docs must align within 2 minor versions of plugin
+        # version; status=needs_review is a warning; status=archive must
+        # live under docs/marketing/ or contain "pre-v" in filename.
+        # Spec: FEAT-006 STORY-0007 (v3.7.4).
+        run: bash aura-frog/scripts/ci/validate-doc-maturity.sh
+
   test:
     runs-on: ubuntu-latest
     strategy:
