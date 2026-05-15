@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.7.3
+last_aligned_with: v3.7.4
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,66 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.7.4] - 2026-05-15 (Documentation cleanup — zero-feature, zero-runtime-change)
+
+> Polish release before v3.8. Doc-only — no new features, no agents added, no skills added, no hook changes. Eliminates 122 stale command references that accumulated during the v3.6 → v3.7 transition, ships two new CI gates to prevent doc rot from recurring, and slims the README by 45%.
+
+### Added
+
+- **`aura-frog/scripts/ci/validate-docs-syntax.sh`** — CI guard against pre-v3.7 verb syntax. 18 BLOCKED_PATTERNS covering the `workflow:*`-prefixed lifecycle verbs, the old `agent:` / `bugfix:` / `learn:` / `project:` namespaces, and the removed phase-hook MD paths. Wired into the `validate` job in `.github/workflows/ci.yml`. Exits 0 on this branch.
+- **`aura-frog/scripts/ci/validate-doc-maturity.sh`** — CI guard against doc frontmatter drift. Every `docs/**/*.md` (except `docs/showcase/`, `docs/specs/`) must carry `last_aligned_with` + `status` + `audience`. `status=current` docs warn at diff > 2 minor versions. Wired into CI right after `validate-docs-syntax`.
+- **`scripts/audit/stale-cmd-check.sh`** — Broader audit tool for contributors. 3-pass detection (verb syntax · `/aura-frog:*` namespaced · backticked bare `/word`). Knows about Claude Code built-ins (`/clear` / `/compact` / `/plugin` / etc.). Modes: `--json` / `--count` / `--quiet`. Idempotent.
+- **`scripts/migrate-doc-frontmatter.sh`** — One-shot backfill of frontmatter to all `docs/**/*.md`. Idempotent; per-directory defaults. Run once during v3.7.4.
+- **`scripts/add-ai-banner.sh`** — One-shot inserter for the AI-consumed reference banner on `aura-frog/skills/*/SKILL.md` and `aura-frog/rules/**/*.md`. Idempotent.
+- **`docs/getting-started/README.md`** — Single ordered entry index for first-time users (QUICKSTART → GET_STARTED → FIRST_WORKFLOW_TUTORIAL).
+- **`docs/operations/INSTALLATION.md`** — Supplementary install paths (CLI symlink, manual install, `.envrc`, `.gitignore` hygiene) extracted from the old 472-line GET_STARTED.md.
+- **`docs/README.md` "Source of Truth" section** — declares `docs/` canonical when in conflict with `aura-frog/`. 8-entry canonical-source table covering 5-phase TDD / OS model / 8 Pillars / agent selection / MCP / learning / security / installation.
+- **AI-consumed banner** on every skill + rule file — 127 files (56 SKILL.md + 71 rule .md) gained a one-paragraph header pointing readers at `docs/architecture/HIERARCHICAL_PLANNING.md` / `docs/getting-started/`.
+
+### Changed
+
+- **`docs/getting-started/GET_STARTED.md` rewritten 472L → 148L.** Frontmatter + Prerequisites → Install → Your first workflow → What's next → Troubleshooting. v3.7.x syntax throughout; old `workflow:*` examples replaced with current `/run` + bare-verb syntax.
+- **`README.md` slimmed 1294L → 720L (44% reduction).** 8 Pillars per-pillar deep-dives (568L total) collapsed to one-paragraph summaries (92L). Command Reference (103L) → single 8-row table (21L). Installation Optional Setup (43L) → 6-line bullet list pointing at INSTALLATION.md. Walkthrough / Why-Teams / Agent-Selection / Token-Budget already extraction-shape from prior cleanup; their destinations unchanged here.
+- **`docs/reference/TESTING_GUIDE.md` syntax refresh** — 31 pre-v3.7 `workflow:*` references replaced; methodology framework preserved; `Last Updated` bumped to 2026-05-14; frontmatter added.
+- **Bulk syntax sweep across 12 docs** — `docs/getting-started/QUICKSTART.md`, `docs/getting-started/FIRST_WORKFLOW_TUTORIAL.md`, `docs/operations/LEARNING_SYSTEM.md`, `docs/operations/TROUBLESHOOTING.md`, `docs/guides/AGENT_SELECTION_GUIDE.md`, `docs/architecture/{WORKFLOW_STATE_MANAGEMENT,WORKFLOW_DIAGRAMS,CONFIG_LOADING_ORDER,CLAUDE_FILE_ARCHITECTURE,MULTI_SESSION_ARCHITECTURE,os-architecture}.md`, `docs/getting-started/TOKEN_BUDGET.md`. ~80 individual `workflow:*` / `agent:list` / `bugfix:quick` / `learn:*` / `project:reload-env` references replaced with current syntax.
+- **35 docs files gained frontmatter** (last_aligned_with + status + audience) via `migrate-doc-frontmatter.sh`. Per-dir status: getting-started=current, architecture=reference, guides=needs_review (9 docs flagged), operations=current, reference=reference, marketing/pre-v*=archive, marketing/other=current.
+- **`docs/README.md` index restructured** — Getting Started section now points at the new entry index; Architecture section drops `overview.md` and labels `os-architecture.md` canonical.
+
+### Moved (archived, history preserved)
+
+- `docs/guides/USAGE_GUIDE.md` → `docs/marketing/USAGE_GUIDE.pre-v3.7.md` (`git mv`). Archive header points at QUICKSTART / FIRST_WORKFLOW_TUTORIAL / HIERARCHICAL_PLANNING. 21 stale refs went away by archive.
+- `docs/architecture/overview.md` → `docs/marketing/overview.pre-v3.0.md` (`git mv`). Archive header points at os-architecture.md / HIERARCHICAL_PLANNING.md / aura-frog/CLAUDE.md / MCP_GUIDE.md / SECURITY_AND_TRUST.md. Pre-v3.0 content (Linear MCP, `.claude/logs/workflows/` paths) preserved for v2.x → v3.x audit.
+
+### Removed
+
+- Outdated install-time content from GET_STARTED.md (CLI install, manual install, env-var setup, learning-system intro, MCP intro, scripts intro, "how it works" rehash) — relocated to INSTALLATION.md or already covered in `docs/operations/{MCP_GUIDE,LEARNING_SYSTEM,SECURITY_AND_TRUST}.md`.
+- README's per-pillar deep-dive sections (560 lines) — content moved to `docs/reference/BENEFITS.md Part 9`.
+
+### Fixed
+
+- 122 stale command references eliminated (116 caught by `validate-docs-syntax.sh`, 6 additional `/learn` bare-slash hits caught by the broader audit script).
+- `docs/getting-started/TOKEN_BUDGET.md:24` — dropped stale `/run predict <task>` reference (command does not exist).
+- `docs/operations/LEARNING_SYSTEM.md` `//af learn` double-slash artifact (introduced by sed sweep) corrected.
+
+### CI
+
+- Validate job in `.github/workflows/ci.yml` now runs 5 doc validators in sequence: `validate-toon` → `validate-config` → `validate-counts` → `check-broken-links` → `validate-readme-counts` → **`validate-docs-syntax`** (new) → **`validate-doc-maturity`** (new).
+
+### Stats diff vs v3.7.3
+
+- Agents: 15 (unchanged)
+- Skills: 56 (unchanged) — all 56 SKILL.md files gained AI-consumed banner
+- Rules: 71 (unchanged) — all 71 rule files gained AI-consumed banner
+- Commands: 24 (unchanged)
+- Hooks: 43 (unchanged)
+- New scripts: 5 (`validate-docs-syntax.sh`, `validate-doc-maturity.sh`, `stale-cmd-check.sh`, `migrate-doc-frontmatter.sh`, `add-ai-banner.sh`)
+
+### Plan tree (FEAT-006)
+
+This release shipped as `FEAT-006 — Docs Cleanup & Reference-Integrity Sweep` under `INIT-001`. 8 stories: audit + decisions (STORY-0001), Phase A CI guard (STORY-0005), Phase B sweep + onboarding (STORY-0002), Phase C hierarchy consolidation (STORY-0003), Phase D README extraction (STORY-0006), Phase E maturity infrastructure (STORY-0007), Phase F AI/human boundary (STORY-0008), and close + version bump (this story — STORY-0004). All 19 T4 tasks closed in two sessions (audit / replan / Phase A + sweep / GET_STARTED / Phase C-F + close).
 
 ---
 

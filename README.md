@@ -8,7 +8,7 @@
 
 A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.7.3-blue.svg)](docs/reference/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.4-blue.svg)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
@@ -16,24 +16,38 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 
 **Two entry points, same natural-language pattern.** `/run <task>` for task execution (5-phase TDD with agents). `/aura-frog:plan <verb> [args]` for project planning (T0–T4 hierarchical tree). Both accept natural language, route through skills, and share state via the run↔feature bridge. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[v3.7.3 highlights](#-whats-new-in-v373)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+**[Install in 30 seconds](#-install)** · **[v3.7.4 highlights](#-whats-new-in-v374)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
 ---
 
-## 🆕 What's new in v3.7.3
+## 🆕 What's new in v3.7.4
 
-v3.7.3 relocates the plan tree under `.claude/plans/` (next to other Claude Code state), normalises every node to a folder, and wires bidirectional `/run` ↔ feature linking. Backward-compatible patch.
+v3.7.4 is a **documentation cleanup release** — no new features, no runtime behaviour change. Eliminates 122 stale command references that accumulated during the v3.6 → v3.7 transition, slims the README, and ships two new CI gates that prevent doc rot from re-entering main.
+
+| Change | What it means |
+|---|---|
+| **CI guard against stale syntax** | New `aura-frog/scripts/ci/validate-docs-syntax.sh` ships an 18-entry BLOCKED_PATTERNS list covering every pre-v3.7 verb form (the old `workflow:*`-prefixed lifecycle verbs, the old `agent:` / `bugfix:` / `learn:` / `project:` namespaces, and the removed phase-hook MD paths). Any of these re-entering `docs/`, `README.md`, or `MIGRATION_TO_V3.7.md` blocks the commit. Wired into the validate job in `.github/workflows/ci.yml`. The full pattern list lives in the script header — single source of truth. |
+| **Doc maturity infrastructure** | Every `docs/**/*.md` (except `docs/showcase/`, `docs/specs/`) now carries `last_aligned_with` + `status` + `audience` frontmatter. `aura-frog/scripts/ci/validate-doc-maturity.sh` checks staleness (status=current docs warn at diff > 2 minor versions) and shape. 9 pre-v3.6 docs/guides/* flagged `needs_review` for contributor attention (non-blocking). |
+| **Onboarding fix** | `docs/getting-started/GET_STARTED.md` rewritten 472L → 148L. New `docs/getting-started/README.md` is the single ordered entry index (QUICKSTART → GET_STARTED → FIRST_WORKFLOW_TUTORIAL). Supplementary install paths extracted to new `docs/operations/INSTALLATION.md`. |
+| **Stale-syntax sweep** | 122 stale references across 12 files cleaned. Pre-v3.7 `docs/guides/USAGE_GUIDE.md` archived to `docs/marketing/USAGE_GUIDE.pre-v3.7.md`. Pre-v3.0 `docs/architecture/overview.md` archived to `docs/marketing/overview.pre-v3.0.md`. `docs/reference/TESTING_GUIDE.md` syntax refresh (31 hits) + frontmatter. |
+| **README slim** | 1294L → 706L (45% reduction). 8 Pillars deep-dives collapsed to per-pillar paragraphs linking to BENEFITS.md Part 9. Command Reference compressed to a single 8-row table. Optional-install `<details>` blocks moved to INSTALLATION.md. |
+| **AI vs human boundary** | All 56 SKILL.md files + 71 rule files now carry an *AI-consumed reference* banner pointing readers at `docs/architecture/HIERARCHICAL_PLANNING.md` / `docs/getting-started/`. `docs/README.md` declares **docs/ as canonical** with an 8-entry source-of-truth table. |
+| **Broader audit tool** | New `scripts/audit/stale-cmd-check.sh` for contributors — 3-pass detection (verb syntax · `/aura-frog:*` namespaced · backticked bare `/word`). Knows about Claude Code built-ins (`/clear`, `/compact`, `/plugin`, …). Idempotent. |
+
+**Zero runtime change.** No new agents, no new skills, no hook changes. The pre-v3.7 verb syntax has been gone since v3.7.0 — these are exclusively doc fixes. CI now prevents the same drift from recurring.
+
+<details>
+<summary><b>v3.7.3 highlights (still shipped — plan relocation + run linking)</b></summary>
 
 | Change | What it means |
 |---|---|
 | **Storage moves to `.claude/plans/`** | Plan tree now lives next to runs (`.claude/logs/runs/`) instead of in a separate `.aura/` directory. Resolution order: `--plans-dir` arg → `$AF_PLANS_DIR` env → `.claude/plans/` (default) → `.aura/plans/` (legacy fallback, removal v4.0). |
-| **Every node is a folder** | T0 mission, T1 initiative, T2 feature, T3 story, T4 task — each lives in `{ID}_{kebab-slug}/` containing its `<tier>.md` spec. Tickets (JIRA-/LIN-/GH-) used as ID prefix when attached; otherwise auto-minted `FEAT-N` / `STORY-NNNN` / `TASK-NNNNN`. |
-| **Co-located aux files** | `<node>/checkpoints/{ISO}.json` and `<task>/trace.jsonl` live INSIDE the node folder (was: global `plans/checkpoints/` and `plans/traces/`). Archive consolidated to `archive/{ID}_{slug}/{summary.md, original/}`. |
-| **Run ↔ feature linking (bidirectional)** | `run-state.json` gains `feature_id` + `feature_slug` + `anchor.task_id`. Feature.md gains a `## Runs` table listing every `/run` that anchored to it. New `scripts/plans/link-run.sh` is the single writer; idempotent (re-link replaces row). |
-| **New `/run` prefixes** | `/run feature: FEAT-A <task>` — anchor a new run to a feature. `/run resume FEAT-A` — list runs under a feature, prompt to pick (auto-resume if single in-progress). Existing `/run task: …` and `/run project: …` (v3.7.2) unchanged. |
-| **INDEX.md auto-emitted** | `new-plan.sh` writes a `.claude/plans/INDEX.md` on first init documenting the layout, naming convention, run-feature linking, commands, and migration path. |
+| **Every node is a folder** | T0–T4 each lives in `{ID}_{kebab-slug}/` containing its `<tier>.md` spec. Tickets used as ID prefix when attached; otherwise auto-minted `FEAT-N` / `STORY-NNNN` / `TASK-NNNNN`. |
+| **Co-located aux files** | `<node>/checkpoints/{ISO}.json` and `<task>/trace.jsonl` live INSIDE the node folder. Archive consolidated to `archive/{ID}_{slug}/{summary.md, original/}`. |
+| **Run ↔ feature linking (bidirectional)** | `run-state.json` gains `feature_id` + `feature_slug` + `anchor.task_id`. Feature.md gains a `## Runs` table; `scripts/plans/link-run.sh` is the single writer. |
+| **New `/run` prefixes** | `/run feature: FEAT-A <task>` anchors a new run; `/run resume FEAT-A` lists runs and prompts. Existing `/run task: …` and `/run project: …` unchanged. |
 
-**Backward-compatible patch.** Scripts have legacy fallbacks for `.aura/plans/`, flat `mission.md`, flat `initiatives/INIT-N.md`, flat `tasks/TASK-N.md`, and global `plans/checkpoints/` — all keep working until v4.0. No data migration required; new structure activates when `.claude/plans/` is present.
+</details>
 
 <details>
 <summary><b>v3.7.2 highlights (still shipped — plan consolidation + /run escalation)</b></summary>
