@@ -7,6 +7,11 @@ effort: medium
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Plan Orchestrator
 
 Single entry point for the 11-verb hierarchical-planning vocabulary. Routes user intent → backing script in `aura-frog/scripts/plans/`. Replaces 10 separate command files with one consolidated dispatcher.

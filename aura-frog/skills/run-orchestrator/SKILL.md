@@ -7,6 +7,11 @@ effort: high
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Run Orchestrator
 
 For complex features / multi-file changes requiring TDD. NOT for: bug fixes (use the `bugfix-quick` **skill** via the Skill tool — it is NOT an agent), quick edits (direct).

@@ -1,3 +1,7 @@
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
 # Run ↔ Plan Bridge
 
 Auto-detect when `/aura-frog:run` should anchor to an active hierarchical plan node, or when a task description warrants bootstrapping a plan first. The bridge is deterministic, non-destructive, and always user-overridable.

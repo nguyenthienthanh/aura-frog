@@ -11,6 +11,11 @@ allowed-tools: NONE
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Agent Detector
 
 **Runs FIRST for every message.**

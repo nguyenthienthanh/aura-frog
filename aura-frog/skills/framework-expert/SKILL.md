@@ -18,6 +18,11 @@ context: fork
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Framework Expert (Bundle)
 
 Lazy-loads detected framework patterns. Use individual expert skills or Context7 for deep reference.

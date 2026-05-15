@@ -12,6 +12,11 @@ paths:
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Monorepo Handling
 
 Monorepos break many assumptions: which `package.json` is "the" one, where `node_modules` live, which test command runs, what `install` actually does. This skill ensures operations target the correct scope.

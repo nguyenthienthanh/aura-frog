@@ -14,6 +14,27 @@ Central index for all human-readable documentation. AI-consumed docs live in `au
 
 ---
 
+## Source of Truth
+
+When information lives in multiple places, **`docs/` wins**. Plugin internals (`aura-frog/skills/`, `aura-frog/rules/`, `aura-frog/CLAUDE.md`) are AI-consumed references — optimised for Claude's execution-time loading, not for human onboarding. Every skill and rule file now carries an **AI-consumed reference** banner header pointing back at this tree.
+
+If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-drift`. Maintainer resolves by aligning `aura-frog/` to `docs/` — never the other way around.
+
+**Key canonical sources:**
+
+| Topic | Canonical doc |
+|---|---|
+| 5-phase TDD workflow | [architecture/HIERARCHICAL_PLANNING.md § 5 Stage 4](architecture/HIERARCHICAL_PLANNING.md) |
+| OS mental model | [architecture/os-architecture.md](architecture/os-architecture.md) |
+| 8 Pillars | [reference/BENEFITS.md Part 9](reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) |
+| Agent selection | [guides/AGENT_SELECTION_GUIDE.md](guides/AGENT_SELECTION_GUIDE.md) |
+| MCP setup | [operations/MCP_GUIDE.md](operations/MCP_GUIDE.md) |
+| Learning system | [operations/LEARNING_SYSTEM.md](operations/LEARNING_SYSTEM.md) |
+| Security + trust model | [operations/SECURITY_AND_TRUST.md](operations/SECURITY_AND_TRUST.md) |
+| Installation supplements | [operations/INSTALLATION.md](operations/INSTALLATION.md) |
+
+---
+
 ## Getting Started
 
 > **Start here:** [getting-started/README.md](getting-started/README.md) is the single entry index — read in order: QUICKSTART → GET_STARTED → FIRST_WORKFLOW_TUTORIAL.

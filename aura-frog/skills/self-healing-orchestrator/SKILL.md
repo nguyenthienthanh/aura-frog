@@ -7,6 +7,11 @@ effort: medium
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Self-Healing Orchestrator
 
 **STATUS — v3.7.0-rc.1.** Per-spec safety gates strictly enforced.

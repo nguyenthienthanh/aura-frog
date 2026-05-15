@@ -8,6 +8,11 @@ effort: low
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Extension Detector
 
 **STATUS — v3.7.0-alpha.3.** Self-extending capability with hard gates against plugin pollution.

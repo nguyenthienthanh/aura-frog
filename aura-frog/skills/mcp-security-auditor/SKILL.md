@@ -7,6 +7,11 @@ effort: low
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # MCP Security Auditor
 
 **STATUS — v3.7.0-rc.1.** Read-only auditor; does not enforce — that's `mcp-call-gate.cjs`'s job.

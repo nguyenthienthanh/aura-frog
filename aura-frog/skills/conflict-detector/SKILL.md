@@ -7,6 +7,11 @@ effort: low
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Conflict Detector
 
 **STATUS — v3.7.0-beta.2.** L1+L2 functional; L3+L4 stubbed pending LLM-dispatch infrastructure in rc.1.

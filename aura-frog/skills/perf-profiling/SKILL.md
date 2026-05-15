@@ -7,6 +7,11 @@ effort: high
 user-invocable: false
 ---
 
+> **AI-consumed reference.** Optimized for Claude to read during execution.
+> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
+> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
+
+
 # Performance Profiling
 
 **Rule 0:** Don't optimize what you haven't measured. Almost all "obvious" optimizations are wrong.
