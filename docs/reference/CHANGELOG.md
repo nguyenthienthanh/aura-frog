@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.7.4
+last_aligned_with: v3.8.0-alpha
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,58 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha] - 2026-05-27 (v3.8 hook-runtime foundation — FEAT-007 / STORY-0009 / TASK-00023 only)
+
+> First alpha cut of the v3.8 hook refactor. **This is a pre-release: only the foundation library lands here. The other three stories (STORY-0010 env-var drop, STORY-0011 SQLite WAL, STORY-0012 perf budget) remain pending.** Use to validate the lib in isolation before the rest of FEAT-007 ships.
+
+### Added
+
+- **`aura-frog/hooks/lib/hook-runtime.cjs`** (653 LOC) — unified runtime utilities for hook scripts. 6 functional exports + 5 error classes + 4 back-compat re-exports + 2 internal helpers (`validateSafePath` for CWE-22 path traversal defense, `deepFreeze` for CWE-471 immutability).
+  - `readHookInput()` — strict stdin JSON parser; throws typed `HookInputSchemaError` on schema gap; does NOT touch `process.env` (no silent degrade for security gates per GH#7 finding).
+  - `readHookInputCompat()` — lenient counterpart with `CLAUDE_*` env-var fallback + `tool → tool_name` alias for legacy hooks. Documented as lower-integrity trust boundary.
+  - `appendAuditJsonl(path, row)` — locked NDJSON appender; cross-process safe via `fs.openSync(lockPath, 'wx')` (O_EXCL) + busy-wait exp backoff + PID-liveness stale reclaim. Lock timeout configurable via `HOOK_LOCK_TIMEOUT_MS` env (default 2000ms).
+  - `atomicWrite(path, content)` — write-then-rename atomic file write via `.tmp.<pid>.<6hex>` intermediate (48-bit entropy floor). Wraps fs errors in `HookIOError` preserving original message.
+  - `logger(scope)` — NDJSON-on-stderr structured logger gated by `HOOK_LOG_LEVEL` env. Routes to fd 2 via `fs.writeSync` (never `process.stderr.write`; stdout reserved for hook JSON responses).
+  - `safeExit(code, reason?)` — sync stderr record + `process.exit`; uses `fs.writeSync(2, ...)` for guaranteed flush before exit.
+  - `withBudget(ms, fn, {label?})` — race `fn()` against a `setTimeout` budget; rejects `HookBudgetTimeout` on timeout with `.finally(clearTimeout)` cleanup + silent catch on workPromise (no unhandled rejection).
+- **`aura-frog/hooks/lib/__tests__/hook-runtime.test.cjs`** (1238 LOC) — 93 jest tests covering all exports + 5 error classes + back-compat re-exports + module shape. Includes subprocess-based concurrent-write contention test (10 parallel workers).
+- **GH #6 acceptance** — `hooks/lib/hook-runtime.cjs` exists with 6 documented exports + unit tests pass.
+
+### Security hardening (Phase 4 review)
+
+- **CWE-117 (Improper Output Neutralization for Logs):** newline-escape attacker-controlled bytes in `meta.raw` on `invalid_json` errors so downstream raw-stderr loggers cannot forge audit log lines.
+- **CWE-471 (Modification of Assumed-Immutable Data):** `readHookInput` returns deep-frozen objects so nested `tool_input` / `tool_response` cannot be mutated between gate validation and tool dispatch.
+- **CWE-22 (Path Traversal):** `validateSafePath` rejects `..` segments in `auditPath` / `targetPath` arguments.
+- **CWE-20 (Improper Input Validation):** `HOOK_LOCK_TIMEOUT_MS` is clamped to `> 0`; negative / zero / non-finite values fall back to 2000ms default (was: `parseInt(env) || 2000` accepted `-1` as truthy → silent audit drop).
+- **CWE-330 (Insufficient Randomness):** `atomicWrite` tmp suffix uses `crypto.randomBytes(6)` (48-bit entropy) — was 24-bit.
+- **CWE-807 (Reliance on Untrusted Inputs):** `readHookInputCompat` JSDoc explicitly flags env-var fields as lower trust boundary; security-critical hooks MUST use strict `readHookInput`.
+- **CWE-362 (Race Condition):** stale-lock reclaim race window documented (benign; `O_EXCL` ensures only one winner). STORY-0011 SQLite WAL eliminates this surface.
+- **CWE-772 (Missing Release of Resource):** `withBudget` abandon semantics documented — callers must use RAII or AbortController for OS resources.
+- **GH #21** — `installWatchdog` NDJSON migration deferred to STORY-0010.
+
+### Changed
+
+- **`jest.config.cjs`** — `roots` extended with `aura-frog/hooks/lib/__tests__` so co-located test files are discovered without moving them into `__tests__/` at repo root.
+
+### Plan-tree state
+
+- New feature: **FEAT-007 hook-runtime-v3.8** (planned → in_progress).
+- New stories: **STORY-0009 (active), STORY-0010, STORY-0011, STORY-0012** (planned, DAG: 9 → 10/11/12).
+- 5 new T4 tasks under STORY-0009; **TASK-00023 done**; TASK-00024 + TASK-00025 unblocked (parallelizable), TASK-00026 blocked on 24, TASK-00027 blocked on 25+26.
+- All 8 plan-tree invariants pass (52 nodes).
+
+### Stats diff
+
+- Hooks lib: 4 → 5 files (added hook-runtime.cjs)
+- Hook tests: +1 file, +93 tests
+- LOC added: +1891 (impl 653 + tests 1238)
+
+### Migration / breaking changes
+
+- **None.** `hook-runtime.cjs` is purely additive. All 42 existing hooks continue using `safe-stdin.cjs` re-exports byte-for-byte. STORY-0010 begins the migration to `readHookInput` for security-critical hooks; STORY-0010's final task deletes `safe-stdin.cjs`.
 
 ---
 
