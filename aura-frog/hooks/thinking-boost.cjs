@@ -37,7 +37,9 @@ const CRITICAL_PATTERNS = /\b(security audit|migration|payment|auth.*system|data
 
 function readSessionState() {
   try {
-    const cacheDir = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+    const cacheDir = path.join(findProjectRoot(), '.claude', 'cache');
     const cacheFile = path.join(cacheDir, 'session-start-cache.json');
     if (fs.existsSync(cacheFile)) {
       return JSON.parse(fs.readFileSync(cacheFile, 'utf8'));

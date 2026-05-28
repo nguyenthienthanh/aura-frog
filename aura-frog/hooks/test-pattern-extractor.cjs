@@ -21,7 +21,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const CACHE_FILE = path.join(CACHE_DIR, 'test-patterns.json');
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 

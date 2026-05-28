@@ -27,7 +27,9 @@ const crypto = require('crypto');
 const { recordFeedback, recordPattern, isLearningEnabled } = require('./lib/af-learning.cjs');
 
 // Cache paths
-const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const WORKFLOW_HASHES_FILE = path.join(CACHE_DIR, 'workflow-file-hashes.json');
 
 // Workflow-related paths to monitor

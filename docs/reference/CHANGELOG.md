@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha
+last_aligned_with: v3.8.0-alpha.2
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,40 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha.2] - 2026-05-28 (CWD pollution fix — `findProjectRoot()` migration)
+
+> Hotfix on top of v3.8.0-alpha. Closes the long-standing "stray `.claude/` folders in subdirs" bug. Every hook that wrote to `.claude/cache/` or `.claude/metrics/` was using `process.cwd()` blindly — when launched from a subdir (e.g., user did `cd aura-frog && claude-code`, or a PreToolUse hook fired during a Bash command with a transient `cd`-prefix), the hook created `<subdir>/.claude/` instead of `<root>/.claude/`. This commit ships the resolver + migrates 25 hook files + 3 shell scripts onto it.
+
+### Added
+
+- **`findProjectRoot()`** in `aura-frog/hooks/lib/hook-runtime.cjs` — walks up from a starting dir (default `process.cwd()`) looking for `.claude/` or `.git/` marker. Honors `AF_PROJECT_ROOT` env override. Falls back to start dir if no marker found.
+- **6 new tests** in `aura-frog/hooks/lib/__tests__/hook-runtime.test.cjs` covering marker discovery (called from root, called from subdir, called from deeply nested dir), env override, and fallback semantics. Total now **99 tests** (was 93).
+
+### Changed
+
+- **25 hook files** migrated from `path.join(process.cwd(), '.claude', ...)` to `path.join(findProjectRoot(), '.claude', ...)`:
+  - Hooks: `auto-learn`, `changelog-notify`, `compact-handoff`, `feedback-capture`, `jira-auto-fetch`, `json-toon-projector`, `mcp-call-gate`, `phase-checkpoint`, `pre-flight-validate`, `prompt-logger`, `session-metrics`, `session-reset-trigger`, `session-start`, `smart-learn`, `subagent-init`, `test-pattern-extractor`, `thinking-boost`, `token-tracker`, `update-check`, `workflow-edit-learn`
+  - Lib: `af-config-utils`, `af-learning`, `af-memory-loader`, `record-workflow-event`, `team-bridge`
+- **3 shell scripts** picked up an equivalent `find_project_root` bash function: `aura-frog/scripts/statusline.sh`, `aura-frog/scripts/dashboard.sh`, `aura-frog/scripts/project-refresh-incremental.sh`.
+  - `statusline.sh` also now prefers the `cwd` field that Claude Code passes via stdin JSON.
+
+### Fixed
+
+- **Stray `.claude/` folders** in 8 locations: `aura-frog/.claude`, `aura-frog/{agents,commands,docs,docs/phases,rules,skills}/.claude`, `docs/.claude`. All caches were stale (March–May), regenerate on next session in the canonical `<root>/.claude/` location. **Bug class is closed** for any caller routed through the migrated surface — verified via smoke test (token-tracker invoked from `aura-frog/skills/` writes to root `.claude/cache/`, not to `aura-frog/skills/.claude/`).
+
+### Stats diff
+
+- Hook files modified: 25
+- Shell scripts modified: 3
+- Tests: 93 → 99 (+6)
+- LOC change in hook-runtime.cjs: 653 → ~720 (added `findProjectRoot` + JSDoc)
+
+### Migration / breaking changes
+
+- **None.** All hooks gain a new helper import; existing behavior preserved (the resolver falls back to `process.cwd()` if no marker found, matching the legacy behavior).
 
 ---
 

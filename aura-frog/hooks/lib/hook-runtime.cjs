@@ -81,6 +81,49 @@ class HookConfigError extends HookRuntimeError {
 }
 
 // ---------------------------------------------------------------------------
+// Project root resolution — fixes "CWD ≠ project root" cache pollution
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the canonical project root. Walks UP from `start` (default cwd)
+ * looking for a `.claude/` directory or `.git/` directory marker. Returns
+ * the first ancestor that has either marker, or `start` if none found.
+ *
+ * Used by hooks that need to write to `.claude/cache/` or `.claude/metrics/`.
+ * Without this, hooks launched from a subdir (e.g., user did
+ * `cd aura-frog && claude`, or a PreToolUse hook fires while the Bash tool
+ * has a transient cd-prefixed command) create stray `.claude/` directories
+ * inside the subdir.
+ *
+ * Resolution order:
+ *   1. `process.env.AF_PROJECT_ROOT` — explicit override
+ *   2. Walk up from `start` (or cwd) looking for `.claude/` or `.git/`
+ *   3. Fallback to `start` (or cwd) — preserves legacy behavior
+ *
+ * @param {string} [start]  optional starting dir; defaults to process.cwd()
+ * @returns {string}        absolute path to project root
+ */
+function findProjectRoot(start) {
+  if (process.env.AF_PROJECT_ROOT) {
+    return path.resolve(process.env.AF_PROJECT_ROOT);
+  }
+  let dir = path.resolve(start || process.cwd());
+  const parent = (p) => path.dirname(p);
+  while (dir !== parent(dir)) {
+    try {
+      if (fs.existsSync(path.join(dir, '.claude')) ||
+          fs.existsSync(path.join(dir, '.git'))) {
+        return dir;
+      }
+    } catch {
+      // existsSync should never throw, but guard anyway
+    }
+    dir = parent(dir);
+  }
+  return path.resolve(start || process.cwd());
+}
+
+// ---------------------------------------------------------------------------
 // Internal helpers: path safety + deep immutability
 // ---------------------------------------------------------------------------
 
@@ -636,6 +679,9 @@ module.exports = {
   logger,
   safeExit,
   withBudget,
+
+  // Project root resolver (v3.8.0-alpha.2 — fixes CWD pollution)
+  findProjectRoot,
 
   // 5 error classes + base
   HookRuntimeError,

@@ -75,7 +75,9 @@ async function main() {
  */
 function getActiveWorkflowId() {
   const possiblePaths = [
-    path.join(process.cwd(), '.claude', 'active-workflow.txt'),
+
+const { findProjectRoot } = require('./hook-runtime.cjs');
+    path.join(findProjectRoot(), '.claude', 'active-workflow.txt'),
     path.join(process.cwd(), 'active-workflow.txt')
   ];
 

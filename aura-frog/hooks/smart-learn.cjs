@@ -22,7 +22,9 @@ const path = require('path');
 const { recordPattern, isLearningEnabled, isLocalMode } = require('./lib/af-learning.cjs');
 
 // Smart learn cache
-const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const SMART_LEARN_CACHE = path.join(CACHE_DIR, 'smart-learn-cache.json');
 
 // Thresholds

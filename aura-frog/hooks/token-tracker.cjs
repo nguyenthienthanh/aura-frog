@@ -30,7 +30,9 @@ const path = require('path');
 
 if (process.env.AF_TOKEN_TRACKER_DISABLED === 'true') process.exit(0);
 
-const CACHE_FILE = path.join(process.cwd(), '.claude', 'cache', 'token-tracker.json');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const CACHE_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'token-tracker.json');
 const CONTEXT_LIMIT = parseInt(process.env.AF_TOKEN_BUDGET || '200000', 10);
 
 // Token estimation per operation type
@@ -77,7 +79,7 @@ function saveTracker(tracker) {
 // Save session metrics to .claude/metrics/sessions/ for dashboard
 function saveSessionMetrics(tracker, toolName) {
   try {
-    const metricsDir = path.join(process.cwd(), '.claude', 'metrics', 'sessions');
+    const metricsDir = path.join(findProjectRoot(), '.claude', 'metrics', 'sessions');
     if (!fs.existsSync(metricsDir)) fs.mkdirSync(metricsDir, { recursive: true });
 
     const date = new Date().toISOString().slice(0, 10);

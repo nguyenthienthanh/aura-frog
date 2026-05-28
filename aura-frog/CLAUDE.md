@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.8.0-alpha | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.8.0-alpha.2 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. 15 agents + 56 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
-## 🐸 The 8 Pillars (v3.8.0-alpha)
+## 🐸 The 8 Pillars (v3.8.0-alpha.2)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -71,7 +71,7 @@ rules[8]{rule,detail}:
 
 ## Status Line (0 tokens)
 
-Format (v3.8.0-alpha+): `AF v{version} │ {mode} {step} │ {agent} │ {model} │ {ctx}% ctx`
+Format (v3.8.0-alpha.2+): `AF v{version} │ {mode} {step} │ {agent} │ {model} │ {ctx}% ctx`
 
 ```
 🐸 AF v3.7.3 │ deep P3 │ architect │ Opus │ 12% ctx
@@ -82,7 +82,7 @@ Format (v3.8.0-alpha+): `AF v{version} │ {mode} {step} │ {agent} │ {model}
 - **mode** — from `run-state.json#flow` (bugfix / deep / standard / quick / refactor / test / project / security / review / deploy / quality). `idle` when no active run.
 - **step** — `P{N}` for 5-phase Deep runs (`current_phase`), `S{N}` for bugfix's 4-step TDD (`current_step`). Omitted for quick/idle.
 - **agent** — `run-state.json#active_agent`, updated by run-orchestrator at every dispatch.
-- **cost segment removed in v3.8.0-alpha** — Claude Code's `total_cost_usd` is real but adds noise without per-call breakdown. Use `/af status` for a richer cost+token report.
+- **cost segment removed in v3.8.0-alpha.2** — Claude Code's `total_cost_usd` is real but adds noise without per-call breakdown. Use `/af status` for a richer cost+token report.
 
 Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
 
@@ -295,4 +295,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.8.0-alpha
+**Version:** 3.8.0-alpha.2

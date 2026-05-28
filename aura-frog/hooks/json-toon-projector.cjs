@@ -143,7 +143,9 @@ function projectMcpResult() {
   // MCP tool results are typically not directly file-backed. Best-effort:
   // peek at recent cache files (.claude/logs/**/*.json) modified within
   // the last 60 seconds. If any large + recent JSON cache exists, project it.
-  const logsDir = path.join(process.cwd(), '.claude', 'logs');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+  const logsDir = path.join(findProjectRoot(), '.claude', 'logs');
   if (!fs.existsSync(logsDir)) return null;
 
   let candidates = [];

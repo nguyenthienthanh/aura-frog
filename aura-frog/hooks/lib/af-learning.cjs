@@ -22,13 +22,15 @@ const fs = require('fs');
 const path = require('path');
 
 // Local storage paths
-const LEARNING_DIR = path.join(process.cwd(), '.claude', 'learning');
+
+const { findProjectRoot } = require('./hook-runtime.cjs');
+const LEARNING_DIR = path.join(findProjectRoot(), '.claude', 'learning');
 const LOCAL_FEEDBACK_FILE = path.join(LEARNING_DIR, 'feedback.json');
 const LOCAL_PATTERNS_FILE = path.join(LEARNING_DIR, 'patterns.json');
 const LOCAL_METRICS_FILE = path.join(LEARNING_DIR, 'metrics.json');
 const LOCAL_WORKFLOW_EVENTS_FILE = path.join(LEARNING_DIR, 'workflow-events.json');
 const LEARNED_RULES_MD = path.join(LEARNING_DIR, 'learned-rules.md');
-const MAIN_INSTRUCTION_LINK = path.join(process.cwd(), '.claude', 'LEARNED_PATTERNS.md');
+const MAIN_INSTRUCTION_LINK = path.join(findProjectRoot(), '.claude', 'LEARNED_PATTERNS.md');
 
 /**
  * Check if Supabase is configured

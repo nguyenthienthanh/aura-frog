@@ -33,6 +33,8 @@ const { spawnSync, spawn } = require('node:child_process');
 // ---------------------------------------------------------------------------
 const HOOK_RUNTIME = path.join(__dirname, '..', 'hook-runtime.cjs');
 const SAFE_STDIN   = path.join(__dirname, '..', 'safe-stdin.cjs');
+// __tests__ → lib → hooks → aura-frog → repo-root (which contains .claude/)
+const REPO_ROOT    = path.resolve(__dirname, '..', '..', '..', '..');
 
 // ---------------------------------------------------------------------------
 // Lazy require — defers the "Cannot find module" error to test-time so jest
@@ -1115,6 +1117,83 @@ describe('hook-runtime: back-compat re-exports', () => {
 
   it('installWatchdog is strictly equal to safe-stdin#installWatchdog', () => {
     expect(rt().installWatchdog).toBe(safeSrc.installWatchdog);
+  });
+});
+
+// ============================================================================
+// findProjectRoot — fixes CWD ≠ project root cache pollution (v3.8.0-alpha.2)
+// ============================================================================
+
+describe('hook-runtime: findProjectRoot', () => {
+  describe('marker discovery', () => {
+    it('returns dir containing .claude/ when called from that dir', () => {
+      const { findProjectRoot } = rt();
+      // The aura-frog repo root has .claude/. Running from repo root.
+      const root = findProjectRoot(REPO_ROOT);
+      expect(root).toBe(REPO_ROOT);
+    });
+
+    it('walks up from a subdir to the nearest ancestor with .claude/', () => {
+      const { findProjectRoot } = rt();
+      // aura-frog/hooks is a subdir of REPO_ROOT (which has .claude/).
+      // findProjectRoot should walk up and return REPO_ROOT.
+      const subdir = path.join(REPO_ROOT, 'aura-frog', 'hooks');
+      const root = findProjectRoot(subdir);
+      expect(root).toBe(REPO_ROOT);
+    });
+
+    it('walks up from a deeply nested subdir', () => {
+      const { findProjectRoot } = rt();
+      const deep = path.join(REPO_ROOT, 'aura-frog', 'hooks', 'lib', '__tests__');
+      const root = findProjectRoot(deep);
+      expect(root).toBe(REPO_ROOT);
+    });
+  });
+
+  describe('AF_PROJECT_ROOT env override', () => {
+    it('honors AF_PROJECT_ROOT when set, ignoring cwd', () => {
+      const { findProjectRoot } = rt();
+      const oldEnv = process.env.AF_PROJECT_ROOT;
+      try {
+        process.env.AF_PROJECT_ROOT = '/tmp';
+        const root = findProjectRoot('/some/other/path');
+        expect(root).toBe('/tmp');
+      } finally {
+        if (oldEnv === undefined) delete process.env.AF_PROJECT_ROOT;
+        else process.env.AF_PROJECT_ROOT = oldEnv;
+      }
+    });
+
+    it('resolves AF_PROJECT_ROOT to absolute path', () => {
+      const { findProjectRoot } = rt();
+      const oldEnv = process.env.AF_PROJECT_ROOT;
+      try {
+        process.env.AF_PROJECT_ROOT = '/tmp/../tmp';
+        const root = findProjectRoot();
+        expect(root).toBe('/tmp');
+      } finally {
+        if (oldEnv === undefined) delete process.env.AF_PROJECT_ROOT;
+        else process.env.AF_PROJECT_ROOT = oldEnv;
+      }
+    });
+  });
+
+  describe('fallback', () => {
+    it('returns the start dir when no marker found anywhere up to /', () => {
+      const { findProjectRoot } = rt();
+      const oldEnv = process.env.AF_PROJECT_ROOT;
+      try {
+        delete process.env.AF_PROJECT_ROOT;
+        // /private (or /) has no .claude or .git — fall back to itself
+        const root = findProjectRoot('/private');
+        // Either /private (no marker) or /Users (if /Users has .git on dev mac)
+        // The contract: result is some ancestor of /private OR /private itself
+        expect(root.length).toBeGreaterThan(0);
+        expect('/private'.startsWith(root) || root === '/private').toBe(true);
+      } finally {
+        if (oldEnv !== undefined) process.env.AF_PROJECT_ROOT = oldEnv;
+      }
+    });
   });
 });
 

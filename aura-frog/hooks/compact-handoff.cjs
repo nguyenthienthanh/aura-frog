@@ -19,10 +19,12 @@ const fs = require('fs');
 const path = require('path');
 
 // File paths
-const WORKFLOW_DIR = path.join(process.cwd(), '.claude', 'logs', 'workflows');
-const HANDOFF_FILE = path.join(process.cwd(), '.claude', 'cache', 'compact-handoff.json');
-const WORKFLOW_STATE_FILE = path.join(process.cwd(), '.claude', 'cache', 'workflow-state.json');
-const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const WORKFLOW_DIR = path.join(findProjectRoot(), '.claude', 'logs', 'workflows');
+const HANDOFF_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'compact-handoff.json');
+const WORKFLOW_STATE_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'workflow-state.json');
+const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 
 /**
  * Ensure directory exists

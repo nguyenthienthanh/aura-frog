@@ -64,7 +64,9 @@ const {
 const { loadMemory } = require('./lib/af-memory-loader.cjs');
 
 // Session cache config
-const SESSION_CACHE_FILE = path.join(process.cwd(), '.claude', 'cache', 'session-start-cache.json');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const SESSION_CACHE_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'session-start-cache.json');
 const SESSION_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const ENVRC_PATH = path.join(process.cwd(), '.envrc');
 
@@ -346,11 +348,11 @@ async function main() {
     } catch {/* best-effort; silent on failure */}
 
     // Check if statusLine is configured — one-time hint
-    const statusHintFile = path.join(process.cwd(), '.claude', 'cache', 'statusline-hint-shown');
+    const statusHintFile = path.join(findProjectRoot(), '.claude', 'cache', 'statusline-hint-shown');
     if (!fs.existsSync(statusHintFile)) {
       try {
         // Check project settings for statusLine
-        const settingsPath = path.join(process.cwd(), '.claude', 'settings.local.json');
+        const settingsPath = path.join(findProjectRoot(), '.claude', 'settings.local.json');
         let hasStatusLine = false;
         if (fs.existsSync(settingsPath)) {
           const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
@@ -375,7 +377,7 @@ async function main() {
       const home = process.env.HOME || process.env.USERPROFILE;
       if (home) {
         const userShim = path.join(home, '.claude', 'statusline-command.sh');
-        const staleHintFile = path.join(process.cwd(), '.claude', 'cache', 'statusline-stale-shim-hint-shown');
+        const staleHintFile = path.join(findProjectRoot(), '.claude', 'cache', 'statusline-stale-shim-hint-shown');
         if (fs.existsSync(userShim) && !fs.existsSync(staleHintFile)) {
           const shimContent = fs.readFileSync(userShim, 'utf-8');
           // Stale markers: hard-coded `│ P%s │` printf, or AF_PHASE="-" default.
@@ -434,9 +436,9 @@ function sweepRetention() {
     // MCP audit lives under .aura/security/ by design (security domain stays
     // separate from plans). Plan traces follow the v3.7.3 .claude/plans path,
     // with legacy .aura/plans honored via the resolver.
-    path.join(process.cwd(), '.aura', 'security', 'mcp-audit.jsonl'),
+    path.join(findProjectRoot(), '.aura', 'security', 'mcp-audit.jsonl'),
     ...listFiles(path.join(plansDir, 'traces')),
-    ...listFiles(path.join(process.cwd(), '.claude', 'metrics', 'sessions')),
+    ...listFiles(path.join(findProjectRoot(), '.claude', 'metrics', 'sessions')),
   ];
 
   for (const file of targets) {

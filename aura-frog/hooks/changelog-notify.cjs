@@ -13,7 +13,9 @@ const path = require('path');
 
 // Per-project: release-notes acknowledgement is project-local.
 // Aura Frog plugin NEVER writes to ~/.claude/ — only to the user's currently-active project.
-const SEEN_FILE = path.join(process.cwd(), '.claude', 'cache', 'aura-frog', 'last-seen-version.json');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const SEEN_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'aura-frog', 'last-seen-version.json');
 
 const RELEASE_HIGHLIGHTS = {
   '2.0.0': [

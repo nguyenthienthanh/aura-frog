@@ -34,8 +34,10 @@ const RUN_ALL = path.join(PLUGIN_ROOT, 'scripts', 'preflight', 'run-all.sh');
 
 if (!fs.existsSync(RUN_ALL)) process.exit(0);
 
-const BYPASS_FLAG = path.join(process.cwd(), '.claude', 'logs', '.preflight-bypass');
-const BYPASS_COUNT_FILE = path.join(process.cwd(), '.claude', 'logs', '.preflight-bypass-count');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const BYPASS_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass');
+const BYPASS_COUNT_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass-count');
 
 // Single-use bypass flag — consume on read
 function consumeBypassFlag() {

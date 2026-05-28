@@ -26,8 +26,10 @@ const {
  * Find active workflow state file
  */
 function findActiveWorkflow() {
-  const primaryDir = path.join(process.cwd(), '.claude/logs/runs');
-  const legacyDir = path.join(process.cwd(), '.claude/logs/workflows');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+  const primaryDir = path.join(findProjectRoot(), '.claude/logs/runs');
+  const legacyDir = path.join(findProjectRoot(), '.claude/logs/workflows');
   const workflowsDir = fs.existsSync(primaryDir) ? primaryDir : legacyDir;
 
   if (!fs.existsSync(workflowsDir)) {

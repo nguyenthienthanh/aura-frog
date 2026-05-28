@@ -494,7 +494,9 @@ function isAgentTeamsEnabled() {
   // Check settings.json
   const settingsPaths = [
     path.join(os.homedir(), '.claude', 'settings.json'),
-    path.join(process.cwd(), '.claude', 'settings.json')
+
+const { findProjectRoot } = require('./hook-runtime.cjs');
+    path.join(findProjectRoot(), '.claude', 'settings.json')
   ];
 
   for (const sp of settingsPaths) {

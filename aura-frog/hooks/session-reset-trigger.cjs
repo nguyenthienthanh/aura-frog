@@ -28,7 +28,9 @@ const resolvePlansDir = require('./lib/plans-dir.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
-const SESSION_FLAG_DIR = path.join(process.cwd(), '.claude', 'logs');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const SESSION_FLAG_DIR = path.join(findProjectRoot(), '.claude', 'logs');
 const SESSION_FLAG_PREFIX = '.session-reset-prompt-shown-';
 
 const PROMPT_WINDOW_MS = 60 * 1000;

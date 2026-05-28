@@ -24,7 +24,9 @@ const crypto = require('crypto');
 const { recordFeedback, recordPattern, isLearningEnabled } = require('./lib/af-learning.cjs');
 
 // Cache file paths
-const CACHE_DIR = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const FEEDBACK_CACHE_FILE = path.join(CACHE_DIR, 'auto-learn-cache.json');
 const PATTERNS_FILE = path.join(CACHE_DIR, 'learned-patterns.md');
 

@@ -46,6 +46,22 @@ file_num() {
         | head -1 | sed 's/.*: *//'
 }
 
+# ----- Project root resolution (matches hooks/lib/hook-runtime.cjs#findProjectRoot)
+# Claude Code passes the project cwd via the JSON `cwd` field. Prefer that.
+# Fallback: walk up from $PWD looking for .claude/ or .git/ marker.
+find_project_root() {
+    if [ -n "$AF_PROJECT_ROOT" ]; then echo "$AF_PROJECT_ROOT"; return; fi
+    local start="${1:-$PWD}"
+    local d="$start"
+    while [ "$d" != "/" ] && [ -n "$d" ]; do
+        if [ -d "$d/.claude" ] || [ -d "$d/.git" ]; then echo "$d"; return; fi
+        d=$(dirname "$d")
+    done
+    echo "$start"
+}
+JSON_CWD=$(parse_str "cwd")
+PROJECT_ROOT=$(find_project_root "${JSON_CWD:-$PWD}")
+
 # ----- Claude Code inputs ----------------------------------------------------
 
 MODEL=$(parse_str "display_name")
@@ -75,7 +91,7 @@ AF_AGENT="ready"
 
 # Prefer the most recently-modified run-state.json with status=in_progress.
 # Fall back to session-start cache.
-RUNS_DIR=".claude/logs/runs"
+RUNS_DIR="$PROJECT_ROOT/.claude/logs/runs"
 if [ -d "$RUNS_DIR" ]; then
     LATEST_RUN=""
     while IFS= read -r f; do
@@ -139,8 +155,8 @@ if [ -d "$RUNS_DIR" ]; then
 fi
 
 # Legacy fallback: session-start cache (pre-v3.7.4 surface).
-if [ "$AF_AGENT" = "ready" ] && [ -f ".claude/cache/session-start-cache.json" ]; then
-    cache_agent=$(file_str ".claude/cache/session-start-cache.json" "agent")
+if [ "$AF_AGENT" = "ready" ] && [ -f "$PROJECT_ROOT/.claude/cache/session-start-cache.json" ]; then
+    cache_agent=$(file_str "$PROJECT_ROOT/.claude/cache/session-start-cache.json" "agent")
     [ -n "$cache_agent" ] && AF_AGENT="$cache_agent"
 fi
 

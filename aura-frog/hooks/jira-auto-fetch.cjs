@@ -38,8 +38,10 @@ const { execFileSync } = require('child_process');
 
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
 const TOON_CONVERTER = path.join(PLUGIN_ROOT, 'scripts', 'json-to-toon.cjs');
-const PROJECT_CACHE_DIR = path.join(process.cwd(), '.claude', 'logs', 'jira');
-const SESSION_HINT_FLAG = path.join(process.cwd(), '.claude', 'logs', '.jira-env-hint-shown');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const PROJECT_CACHE_DIR = path.join(findProjectRoot(), '.claude', 'logs', 'jira');
+const SESSION_HINT_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.jira-env-hint-shown');
 
 let toonConverter = null;
 try {

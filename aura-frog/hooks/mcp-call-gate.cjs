@@ -39,8 +39,10 @@ const SANITIZER = path.join(PLUGIN_ROOT, 'scripts', 'security', 'sanitize-mcp-in
 const PLUGIN_JSON = path.join(PLUGIN_ROOT, '.claude-plugin', 'plugin.json');
 const AGENTS_DIR = path.join(PLUGIN_ROOT, 'agents');
 
-const AUDIT_FILE = path.join(process.cwd(), '.aura', 'security', 'mcp-audit.jsonl');
-const COUNTER_FILE = path.join(process.cwd(), '.claude', 'logs', '.mcp-rate-counter.json');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const AUDIT_FILE = path.join(findProjectRoot(), '.aura', 'security', 'mcp-audit.jsonl');
+const COUNTER_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.mcp-rate-counter.json');
 
 const DEFAULT_LIMITS = { max_calls_per_minute: 30, max_calls_per_session: 200 };
 const HARD_BLOCK_LIMIT = 1.0;
@@ -103,7 +105,7 @@ const agentName = stdinAgent || envAgent || 'main';
 // notice that the per-agent gate is in backward-compat mode (allow-all)
 // instead of failing-closed silently.
 if (!stdinAgent && !envAgent) {
-  const flagFile = path.join(process.cwd(), '.claude', 'logs', '.mcp-agent-hint-shown');
+  const flagFile = path.join(findProjectRoot(), '.claude', 'logs', '.mcp-agent-hint-shown');
   try {
     if (!fs.existsSync(flagFile)) {
       fs.mkdirSync(path.dirname(flagFile), { recursive: true });

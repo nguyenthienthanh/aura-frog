@@ -58,7 +58,9 @@ function createCheckpoint(phase) {
 
 function getCacheFile() {
   // Project-scoped: phase checkpoints belong to a workflow which belongs to a project.
-  const cacheDir = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+  const cacheDir = path.join(findProjectRoot(), '.claude', 'cache');
   return path.join(cacheDir, 'af-phase-checkpoint-cache.json');
 }
 

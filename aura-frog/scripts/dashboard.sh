@@ -25,10 +25,22 @@ for arg in "$@"; do
   esac
 done
 
-PLANS_DIR="${PWD}/.claude/plans"
-MEMORY_DIR="${PWD}/.claude/memory"
-SECURITY_DIR="${PWD}/.aura/security"
-LOGS_DIR="${PWD}/.claude/logs"
+# Resolve project root (walk up from PWD looking for .claude/ or .git/ marker).
+# Matches hooks/lib/hook-runtime.cjs#findProjectRoot.
+find_project_root() {
+    if [ -n "$AF_PROJECT_ROOT" ]; then echo "$AF_PROJECT_ROOT"; return; fi
+    local d="${1:-$PWD}"
+    while [ "$d" != "/" ] && [ -n "$d" ]; do
+        if [ -d "$d/.claude" ] || [ -d "$d/.git" ]; then echo "$d"; return; fi
+        d=$(dirname "$d")
+    done
+    echo "${1:-$PWD}"
+}
+PROJECT_ROOT=$(find_project_root)
+PLANS_DIR="${PROJECT_ROOT}/.claude/plans"
+MEMORY_DIR="${PROJECT_ROOT}/.claude/memory"
+SECURITY_DIR="${PROJECT_ROOT}/.aura/security"
+LOGS_DIR="${PROJECT_ROOT}/.claude/logs"
 
 # ---------- helpers ----------
 

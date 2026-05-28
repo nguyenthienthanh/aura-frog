@@ -164,7 +164,9 @@ function main() {
     try {
       const teamBridge = require('./lib/team-bridge.cjs');
       const workflowStatePaths = [
-        path.join(process.cwd(), '.claude', 'active-workflow.txt'),
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+        path.join(findProjectRoot(), '.claude', 'active-workflow.txt'),
         path.join(process.cwd(), 'active-workflow.txt')
       ];
       let workflowId = null;

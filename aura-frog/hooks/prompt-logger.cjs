@@ -24,7 +24,9 @@ const fs = require('fs');
 const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 
-const PROMPTS_DIR = path.join(process.cwd(), '.claude', 'metrics', 'prompts');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const PROMPTS_DIR = path.join(findProjectRoot(), '.claude', 'metrics', 'prompts');
 const MAX_PROMPT_LENGTH = 2000;
 const RETENTION_DAYS = 30;
 

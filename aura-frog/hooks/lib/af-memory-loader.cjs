@@ -170,7 +170,9 @@ function formatMemoryContext(patterns, insights, agentStats, corrections) {
  * Get memory cache path
  */
 function getMemoryCachePath() {
-  const cacheDir = path.join(process.cwd(), '.claude', 'cache');
+
+const { findProjectRoot } = require('./hook-runtime.cjs');
+  const cacheDir = path.join(findProjectRoot(), '.claude', 'cache');
   if (!fs.existsSync(cacheDir)) {
     fs.mkdirSync(cacheDir, { recursive: true });
   }

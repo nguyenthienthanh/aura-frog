@@ -58,8 +58,10 @@ const PHASE_TEAMS = {
 
 function resolveWorkflowDir(workflowId) {
   const possibleRoots = [
-    path.join(process.cwd(), '.claude', 'logs', 'runs'),
-    path.join(process.cwd(), '.claude', 'logs', 'workflows'),
+
+const { findProjectRoot } = require('./hook-runtime.cjs');
+    path.join(findProjectRoot(), '.claude', 'logs', 'runs'),
+    path.join(findProjectRoot(), '.claude', 'logs', 'workflows'),
     path.join(process.cwd(), 'logs', 'runs'),
     path.join(process.cwd(), 'logs', 'workflows')
   ];
@@ -68,7 +70,7 @@ function resolveWorkflowDir(workflowId) {
     if (fs.existsSync(dir)) return dir;
   }
   // Default to .claude/logs/runs even if it doesn't exist yet
-  return path.join(process.cwd(), '.claude', 'logs', 'runs', workflowId);
+  return path.join(findProjectRoot(), '.claude', 'logs', 'runs', workflowId);
 }
 
 function resolveStateFile(workflowId) {

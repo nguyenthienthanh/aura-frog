@@ -23,7 +23,9 @@ const { recordFeedback, recordAgentPerformance, isFeedbackEnabled } = require('.
 
 // Track recent AI operations for correction detection.
 // Project-scoped (conversation happens within a project; corrections are per-project).
-const STATE_FILE = path.join(process.cwd(), '.claude', 'cache', 'aura-frog-recent-ops.json');
+
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const STATE_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'aura-frog-recent-ops.json');
 
 /**
  * Load recent operations state

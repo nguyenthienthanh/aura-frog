@@ -13,7 +13,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
+# Walk up from PWD looking for .claude/ or .git/ marker (matches
+# hooks/lib/hook-runtime.cjs#findProjectRoot semantics).
+find_project_root() {
+    if [ -n "${AF_PROJECT_ROOT:-}" ]; then echo "$AF_PROJECT_ROOT"; return; fi
+    local d="${1:-$PWD}"
+    while [ "$d" != "/" ] && [ -n "$d" ]; do
+        if [ -d "$d/.claude" ] || [ -d "$d/.git" ]; then echo "$d"; return; fi
+        d=$(dirname "$d")
+    done
+    echo "${1:-$PWD}"
+}
+PROJECT_ROOT="${PROJECT_ROOT:-$(find_project_root)}"
 CONTEXT_DIR="${PROJECT_ROOT}/.claude/project-contexts"
 CACHE_DIR="${PROJECT_ROOT}/.claude/cache"
 STAMP_FILE="${CACHE_DIR}/last-refresh-stamp"
