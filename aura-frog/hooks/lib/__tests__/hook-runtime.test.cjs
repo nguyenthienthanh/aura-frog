@@ -1242,6 +1242,201 @@ describe('hook-runtime: module shape', () => {
 });
 
 // ============================================================================
+// IN-PROCESS COVERAGE — TASK-00024 §AC-9 (≥90% line coverage)
+// ============================================================================
+// Subprocess-driven tests above achieve full BEHAVIORAL coverage but jest's
+// instrumentation does not see code executed inside child node processes.
+// These supplementary tests exercise the same exports IN-PROCESS so jest's
+// coverage report reflects the true reach of the test suite. They are
+// idempotent and side-effect-isolated to a tmp dir.
+
+describe('hook-runtime: in-process coverage smokes (TASK-00024)', () => {
+  describe('error class hierarchy', () => {
+    it('HookRuntimeError carries code + meta + stack', () => {
+      const { HookRuntimeError } = rt();
+      const e = new HookRuntimeError('test_code', { k: 'v' });
+      expect(e.code).toBe('test_code');
+      expect(e.meta).toEqual({ k: 'v' });
+      expect(e.name).toBe('HookRuntimeError');
+      expect(e.stack).toBeTruthy();
+    });
+    it('all 5 subclasses extend HookRuntimeError', () => {
+      const { HookRuntimeError, HookInputSchemaError, HookLockError, HookBudgetTimeout, HookIOError, HookConfigError } = rt();
+      for (const Cls of [HookInputSchemaError, HookLockError, HookBudgetTimeout, HookIOError, HookConfigError]) {
+        const e = new Cls('c', { x: 1 });
+        expect(e).toBeInstanceOf(HookRuntimeError);
+        expect(e.code).toBe('c');
+        expect(e.meta).toEqual({ x: 1 });
+      }
+    });
+    it('error constructor handles missing meta', () => {
+      const { HookIOError } = rt();
+      const e = new HookIOError('c');
+      expect(e.meta).toEqual({});
+    });
+  });
+
+  describe('logger (in-process)', () => {
+    let stderrSpy;
+    const captured = [];
+    beforeEach(() => {
+      captured.length = 0;
+      stderrSpy = jest.spyOn(fs, 'writeSync').mockImplementation((fd, str) => {
+        if (fd === 2) captured.push(str);
+        return Buffer.byteLength(str);
+      });
+    });
+    afterEach(() => stderrSpy.mockRestore());
+
+    it('logger.info emits NDJSON to fd 2', () => {
+      const { logger } = rt();
+      logger('test').info('hello', { k: 1 });
+      expect(captured.length).toBe(1);
+      const obj = JSON.parse(captured[0]);
+      expect(obj.scope).toBe('test');
+      expect(obj.level).toBe('info');
+      expect(obj.msg).toBe('hello');
+      expect(obj.meta).toEqual({ k: 1 });
+      expect(obj.ts).toBeTruthy();
+    });
+    it('all 4 levels (debug/info/warn/error) emit at appropriate threshold', () => {
+      const { logger } = rt();
+      const old = process.env.HOOK_LOG_LEVEL;
+      try {
+        process.env.HOOK_LOG_LEVEL = 'debug';
+        const log = logger('lvl');
+        log.debug('d'); log.info('i'); log.warn('w'); log.error('e');
+        expect(captured.length).toBe(4);
+        expect(captured.map(c => JSON.parse(c).level)).toEqual(['debug', 'info', 'warn', 'error']);
+      } finally {
+        if (old === undefined) delete process.env.HOOK_LOG_LEVEL;
+        else process.env.HOOK_LOG_LEVEL = old;
+      }
+    });
+    it('HOOK_LOG_LEVEL=warn suppresses info + debug', () => {
+      const { logger } = rt();
+      const old = process.env.HOOK_LOG_LEVEL;
+      try {
+        process.env.HOOK_LOG_LEVEL = 'warn';
+        const log = logger('lvl');
+        log.debug('d'); log.info('i'); log.warn('w'); log.error('e');
+        expect(captured.length).toBe(2);
+        expect(captured.map(c => JSON.parse(c).level)).toEqual(['warn', 'error']);
+      } finally {
+        if (old === undefined) delete process.env.HOOK_LOG_LEVEL;
+        else process.env.HOOK_LOG_LEVEL = old;
+      }
+    });
+    it('unknown HOOK_LOG_LEVEL falls back to info', () => {
+      const { logger } = rt();
+      const old = process.env.HOOK_LOG_LEVEL;
+      try {
+        process.env.HOOK_LOG_LEVEL = 'bogus';
+        logger('lvl').info('hello');
+        expect(captured.length).toBe(1);
+      } finally {
+        if (old === undefined) delete process.env.HOOK_LOG_LEVEL;
+        else process.env.HOOK_LOG_LEVEL = old;
+      }
+    });
+  });
+
+  describe('atomicWrite (in-process)', () => {
+    const tmpDir = path.join(os.tmpdir(), `hook-runtime-cov-${process.pid}`);
+    beforeAll(() => {
+      try { fs.mkdirSync(tmpDir, { recursive: true }); } catch {}
+    });
+    afterAll(() => {
+      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+    });
+
+    it('writes content via tmp+rename', () => {
+      const { atomicWrite } = rt();
+      const target = path.join(tmpDir, `aw-${Date.now()}.txt`);
+      atomicWrite(target, 'hello world');
+      expect(fs.readFileSync(target, 'utf-8')).toBe('hello world');
+      // No tmp leftover
+      const leftovers = fs.readdirSync(tmpDir).filter(f => f.startsWith(`aw-`) && f.includes('.tmp.'));
+      expect(leftovers).toEqual([]);
+    });
+    it('rejects parent-traversal paths', () => {
+      const { atomicWrite, HookIOError } = rt();
+      // Use raw string (not path.join, which normalizes '..' away)
+      expect(() => atomicWrite('/tmp/foo/../evil', 'x')).toThrow(HookIOError);
+    });
+    it('wraps fs.writeFileSync errors in HookIOError with preserved message', () => {
+      const { atomicWrite, HookIOError } = rt();
+      const badParent = path.join(tmpDir, 'does-not-exist', 'file.txt');
+      let caught;
+      try { atomicWrite(badParent, 'x'); } catch (e) { caught = e; }
+      expect(caught).toBeInstanceOf(HookIOError);
+      expect(caught.message).toMatch(/ENOENT|no such file/i);
+    });
+  });
+
+  describe('appendAuditJsonl (in-process)', () => {
+    const tmpDir = path.join(os.tmpdir(), `hook-runtime-audit-${process.pid}`);
+    beforeAll(() => { try { fs.mkdirSync(tmpDir, { recursive: true }); } catch {} });
+    afterAll(() => { try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {} });
+
+    it('appends a single row and releases lock', () => {
+      const { appendAuditJsonl } = rt();
+      const target = path.join(tmpDir, `aj-${Date.now()}.jsonl`);
+      appendAuditJsonl(target, { ts: 'x', event: 'test' });
+      const lines = fs.readFileSync(target, 'utf-8').trim().split('\n');
+      expect(lines.length).toBe(1);
+      expect(JSON.parse(lines[0])).toEqual({ ts: 'x', event: 'test' });
+      expect(fs.existsSync(target + '.lock')).toBe(false);
+    });
+    it('rejects parent-traversal paths', () => {
+      const { appendAuditJsonl, HookIOError } = rt();
+      expect(() => appendAuditJsonl('/tmp/foo/../evil.jsonl', { x: 1 })).toThrow(HookIOError);
+    });
+  });
+
+  describe('withBudget (in-process additional)', () => {
+    it('opts is optional', async () => {
+      const { withBudget } = rt();
+      const v = await withBudget(1000, async () => 42);
+      expect(v).toBe(42);
+    });
+    it('opts.label is used in the timeout warn meta when timeout fires', async () => {
+      const { withBudget, HookBudgetTimeout } = rt();
+      let caught;
+      try {
+        await withBudget(20, () => new Promise(r => setTimeout(r, 500)), { label: 'work' });
+      } catch (e) { caught = e; }
+      expect(caught).toBeInstanceOf(HookBudgetTimeout);
+      expect(caught.meta.label).toBe('work');
+      expect(caught.meta.ms).toBe(20);
+    });
+  });
+
+  describe('zero stdout pollution (TASK-00024 §AC-10)', () => {
+    it('stdout is never written by any export', () => {
+      const { logger, withBudget, atomicWrite, appendAuditJsonl, HookIOError } = rt();
+      const spy = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+      try {
+        logger('zs').info('msg');
+        logger('zs').warn('w');
+        const tmpFile = path.join(os.tmpdir(), `zsp-${Date.now()}.txt`);
+        atomicWrite(tmpFile, 'data');
+        appendAuditJsonl(tmpFile + '.jsonl', { k: 1 });
+        try { atomicWrite('..', 'x'); } catch (e) { expect(e).toBeInstanceOf(HookIOError); }
+        // withBudget fast-path
+        return withBudget(500, async () => 1).then(() => {
+          expect(spy).not.toHaveBeenCalled();
+          // Cleanup
+          try { fs.unlinkSync(tmpFile); fs.unlinkSync(tmpFile + '.jsonl'); } catch {}
+        });
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  });
+});
+
+// ============================================================================
 // AC MAPPING
 // ============================================================================
 //
