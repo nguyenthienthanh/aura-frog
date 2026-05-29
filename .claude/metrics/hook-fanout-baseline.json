@@ -1,0 +1,272 @@
+{
+  "timestamp": "2026-05-29T02:43:12Z",
+  "platform": "darwin",
+  "git_sha": "2921597342d94dc4a9d94ae543843f9aa3f47aa2",
+  "hook_count": 10,
+  "p50_ms": 1110.66,
+  "p95_ms": 1110.66,
+  "max_ms": 1320.38,
+  "runs": [
+    {
+      "wall_ms": 1110.66,
+      "hook_count": 10,
+      "per_hook_ms": [
+        {
+          "hook": "pre-execute-load-plan-context.cjs",
+          "event": "PreToolUse",
+          "ms": 103.47,
+          "notes": null
+        },
+        {
+          "hook": "pre-dispatch-conflict-check.cjs",
+          "event": "PreToolUse",
+          "ms": 121.68,
+          "notes": null
+        },
+        {
+          "hook": "pre-flight-validate.cjs",
+          "event": "PreToolUse",
+          "ms": 104.83,
+          "notes": null
+        },
+        {
+          "hook": "mcp-call-gate.cjs",
+          "event": "PreToolUse",
+          "ms": 146.92,
+          "notes": null
+        },
+        {
+          "hook": "security-critical-warn.cjs",
+          "event": "PreToolUse",
+          "ms": 113.79,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-update-node.cjs",
+          "event": "PostToolUse",
+          "ms": 87.58,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-conflict-rescan.cjs",
+          "event": "PostToolUse",
+          "ms": 93.1,
+          "notes": null
+        },
+        {
+          "hook": "token-tracker.cjs",
+          "event": "PostToolUse",
+          "ms": 105.8,
+          "notes": null
+        },
+        {
+          "hook": "tool-call-tracer.cjs",
+          "event": "PostToolUse",
+          "ms": 153.22,
+          "notes": null
+        },
+        {
+          "hook": "prompt-reminder.cjs",
+          "event": "UserPromptSubmit",
+          "ms": 79.8,
+          "notes": "substituted-for-session-metrics(Stop-event)"
+        }
+      ]
+    },
+    {
+      "wall_ms": 1083.7,
+      "hook_count": 10,
+      "per_hook_ms": [
+        {
+          "hook": "pre-execute-load-plan-context.cjs",
+          "event": "PreToolUse",
+          "ms": 89.05,
+          "notes": null
+        },
+        {
+          "hook": "pre-dispatch-conflict-check.cjs",
+          "event": "PreToolUse",
+          "ms": 86.51,
+          "notes": null
+        },
+        {
+          "hook": "pre-flight-validate.cjs",
+          "event": "PreToolUse",
+          "ms": 81.13,
+          "notes": null
+        },
+        {
+          "hook": "mcp-call-gate.cjs",
+          "event": "PreToolUse",
+          "ms": 102.34,
+          "notes": null
+        },
+        {
+          "hook": "security-critical-warn.cjs",
+          "event": "PreToolUse",
+          "ms": 122.45,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-update-node.cjs",
+          "event": "PostToolUse",
+          "ms": 101.41,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-conflict-rescan.cjs",
+          "event": "PostToolUse",
+          "ms": 124.53,
+          "notes": null
+        },
+        {
+          "hook": "token-tracker.cjs",
+          "event": "PostToolUse",
+          "ms": 108.54,
+          "notes": null
+        },
+        {
+          "hook": "tool-call-tracer.cjs",
+          "event": "PostToolUse",
+          "ms": 135.09,
+          "notes": null
+        },
+        {
+          "hook": "prompt-reminder.cjs",
+          "event": "UserPromptSubmit",
+          "ms": 132.24,
+          "notes": "substituted-for-session-metrics(Stop-event)"
+        }
+      ]
+    },
+    {
+      "wall_ms": 1320.38,
+      "hook_count": 10,
+      "per_hook_ms": [
+        {
+          "hook": "pre-execute-load-plan-context.cjs",
+          "event": "PreToolUse",
+          "ms": 139.09,
+          "notes": null
+        },
+        {
+          "hook": "pre-dispatch-conflict-check.cjs",
+          "event": "PreToolUse",
+          "ms": 159.36,
+          "notes": null
+        },
+        {
+          "hook": "pre-flight-validate.cjs",
+          "event": "PreToolUse",
+          "ms": 126.69,
+          "notes": null
+        },
+        {
+          "hook": "mcp-call-gate.cjs",
+          "event": "PreToolUse",
+          "ms": 156.08,
+          "notes": null
+        },
+        {
+          "hook": "security-critical-warn.cjs",
+          "event": "PreToolUse",
+          "ms": 108.74,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-update-node.cjs",
+          "event": "PostToolUse",
+          "ms": 139.78,
+          "notes": null
+        },
+        {
+          "hook": "post-execute-conflict-rescan.cjs",
+          "event": "PostToolUse",
+          "ms": 143.83,
+          "notes": null
+        },
+        {
+          "hook": "token-tracker.cjs",
+          "event": "PostToolUse",
+          "ms": 124.49,
+          "notes": null
+        },
+        {
+          "hook": "tool-call-tracer.cjs",
+          "event": "PostToolUse",
+          "ms": 126.69,
+          "notes": null
+        },
+        {
+          "hook": "prompt-reminder.cjs",
+          "event": "UserPromptSubmit",
+          "ms": 94.74,
+          "notes": "substituted-for-session-metrics(Stop-event)"
+        }
+      ]
+    }
+  ],
+  "hooks_fired": [
+    {
+      "hook": "pre-execute-load-plan-context.cjs",
+      "event": "PreToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "pre-dispatch-conflict-check.cjs",
+      "event": "PreToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "pre-flight-validate.cjs",
+      "event": "PreToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "mcp-call-gate.cjs",
+      "event": "PreToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "security-critical-warn.cjs",
+      "event": "PreToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "post-execute-update-node.cjs",
+      "event": "PostToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "post-execute-conflict-rescan.cjs",
+      "event": "PostToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "token-tracker.cjs",
+      "event": "PostToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "tool-call-tracer.cjs",
+      "event": "PostToolUse",
+      "substituted": false,
+      "notes": null
+    },
+    {
+      "hook": "prompt-reminder.cjs",
+      "event": "UserPromptSubmit",
+      "substituted": true,
+      "notes": "session-metrics.cjs fires on Stop not PostToolUse; prompt-reminder.cjs is same fast-path profile"
+    }
+  ],
+  "baseline_context": "TASK-00025 / STORY-0009. Measured BEFORE TASK-00026 env-var->readHookInput migration. TASK-00023 + v3.8.0-alpha.2 hook-runtime + findProjectRoot migrations ARE already landed."
+}
