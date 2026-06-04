@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.7.3
+last_aligned_with: v3.8.0-alpha.3
 status: current
 audience: active-user
 ---
@@ -83,19 +83,38 @@ Exact equivalents above are best-effort — see each tool's extension docs for a
 | Tool | Status | Estimated coverage | What works / what doesn't |
 |------|--------|-------------------:|---------------------------|
 | **Claude Code** | ✅ First-class, fully tested | **100%** | Everything |
-| **Codex** | 🔄 Adapter in planning | **~85%** | Skills + commands + MCP. No hooks (Codex has no lifecycle events). |
-| **Cursor** | 🔄 Adapter planned Q2 2026 | **~80%** | Rules + skills + agent conventions. Different extension model. |
+| **Codex** | 🟡 Porter ships `AGENTS.md` (`port-plugin.cjs codex`) | **~85%** | Skills + commands + MCP. No hooks (Codex has no lifecycle events). |
+| **Cursor** | 🟡 Porter ships `.cursor/rules/*.mdc` (`port-plugin.cjs cursor`) | **~80%** | Rules + skills + agent conventions. Different extension model. |
+| **GitHub Copilot** | 🟡 Porter ships `.github/copilot-instructions.md` (`port-plugin.cjs copilot`) | **~80%** | Repo-wide + path-scoped instructions. No hooks. |
 | **Windsurf** | 📋 Community request | **~75%** | Rules + skills + MCP. Unknown hook parity. |
 
 Coverage numbers are **estimates based on documented feature overlap** — not measured. They'll be updated once adapters ship and real-world compatibility testing runs.
 
 ---
 
+## Automated Porter (v3.8.0-alpha.3+)
+
+A one-command porter generates the universal layer in each target tool's native format:
+
+```bash
+node aura-frog/scripts/port-plugin.cjs <target> [--out <dir>] [--dry-run]
+#   target: copilot | codex | cursor | all
+```
+
+| Target | Output | Notes |
+|--------|--------|-------|
+| `copilot` | `.github/copilot-instructions.md` + path-scoped `.github/instructions/*.instructions.md` (`applyTo:` frontmatter) | Repo-wide + per-area instructions |
+| `codex` | `AGENTS.md` | Codex/OpenAI convention; hooks excluded (no lifecycle events) |
+| `cursor` | `.cursor/rules/*.mdc` (`description`/`globs`/`alwaysApply`) | One rule doc per category + an overview |
+| `all` | all three | Each run also writes `PORT_MANIFEST.json` |
+
+The porter automates steps 1–5 of the manual guide below. See `aura-frog/scripts/PORT_USAGE.md` for details. It does **not** port the hook layer (step 2) — that remains a per-tool engineering task.
+
 ## Porting Guide for Contributors
 
-If you want to adapt Aura Frog for your tool:
+If you want to adapt Aura Frog for your tool (or extend the porter to a new target):
 
-1. **Copy the universal layer as-is:** `aura-frog/rules/`, `aura-frog/skills/`, `aura-frog/agents/`, `aura-frog/commands/`
+1. **Copy the universal layer as-is:** `aura-frog/rules/`, `aura-frog/skills/`, `aura-frog/agents/`, `aura-frog/commands/` — or run the porter above
 2. **Rewrite `aura-frog/hooks/`** in your tool's extension language (CommonJS, Python, Lua, etc.)
 3. **Map event names** per the table above — each Aura Frog hook script maps to one or more of your tool's events
 4. **Adjust paths:** Claude Code convention `.claude/logs/runs/` becomes `.cursor/runs/` or whatever your tool uses

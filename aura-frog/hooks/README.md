@@ -803,7 +803,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[29]{event,name,purpose}:
+hooks[30]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
@@ -832,6 +832,7 @@ hooks[29]{event,name,purpose}:
   SessionStart,Test Pattern Extractor,Extract test conventions from recent test files
   Stop,Compact Handoff + Metrics,Auto-save workflow state + session metrics
   Stop,Rate Limit Reminder,Remind to check /usage for API rate limits
+  Stop,Context Auto-Refresh,Regenerate stale project-context snapshot (debounced; FEAT-008)
   PreCompact,Pre-Compact State Save,Save workflow state before auto-compact
 ```
 

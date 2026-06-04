@@ -107,6 +107,42 @@ function saveSessionCache(data) {
 }
 
 /**
+ * Emit a one-line banner when the persisted project-context cache is stale
+ * (FEAT-008 / STORY-0013). Best-effort + non-blocking: any failure is swallowed
+ * so it can never break session start. Disable with
+ * AF_CONTEXT_STALE_BANNER_DISABLED=true.
+ */
+function emitContextStalenessBanner() {
+  if (process.env.AF_CONTEXT_STALE_BANNER_DISABLED === 'true') return;
+  try {
+    // Prefer the durable snapshot (FEAT-008 / STORY-0014): if a fresh snapshot
+    // exists, the session can reuse it instead of re-scanning the codebase.
+    try {
+      const snap = require('../scripts/context-snapshot.cjs');
+      const meta = snap.readSnapshotMeta('.');
+      if (meta) {
+        if (snap.isSnapshotFresh('.')) {
+          const at = (meta.gitHead || 'no-git').substring(0, 12);
+          console.log(`📸 Project context snapshot is FRESH (git ${at}) — reuse it, no re-scan needed: ${snap.getSnapshotPath('.')}`);
+        } else {
+          console.log('📸 Project context snapshot is STALE — refresh with: node aura-frog/scripts/context-snapshot.cjs');
+        }
+        return; // snapshot verdict supersedes the raw-detection check
+      }
+    } catch { /* snapshot module optional — fall through to detection-cache check */ }
+
+    const cache = require('./lib/af-project-cache.cjs');
+    const detectionPath = cache.getDetectionPath();
+    if (!fs.existsSync(detectionPath)) return; // nothing persisted yet — nothing to flag
+    const raw = JSON.parse(fs.readFileSync(detectionPath, 'utf-8'));
+    const s = cache.getCacheStaleness(raw, '.');
+    if (s.stale && s.reason) {
+      console.log(`🐸 Project context cache is stale (${s.reason}) — will rebuild on next scan. Run /project refresh to force now.`);
+    }
+  } catch { /* non-blocking */ }
+}
+
+/**
  * Build context summary for output (compact, single line)
  */
 function buildContextOutput(config, detections, resolved, memoryResult) {
@@ -182,6 +218,7 @@ async function main() {
           console.log(`🔌 plugin-prefix: ${pluginPrefix} (use as subagent_type prefix: \`${pluginPrefix}:<agent-id>\` — see rules/core/agent-namespacing.md)`);
         }
       } catch {/* best-effort */}
+      emitContextStalenessBanner();
       process.exit(0);
     }
 
@@ -346,6 +383,8 @@ async function main() {
         console.log(`🔌 plugin-prefix: ${pluginPrefix} (use as subagent_type prefix: \`${pluginPrefix}:<agent-id>\` — see rules/core/agent-namespacing.md)`);
       }
     } catch {/* best-effort; silent on failure */}
+
+    emitContextStalenessBanner();
 
     // Check if statusLine is configured — one-time hint
     const statusHintFile = path.join(findProjectRoot(), '.claude', 'cache', 'statusline-hint-shown');

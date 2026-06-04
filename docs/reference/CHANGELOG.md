@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha.2
+last_aligned_with: v3.8.0-alpha.3
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,38 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha.3] - 2026-06-03 (Durable project-context persistence + cross-tool porter)
+
+> Two features. **FEAT-008** makes persisted project context actually reusable across sessions so Claude stops re-scanning the codebase every time. **FEAT-009** ships a one-command porter that exports the universal layer to GitHub Copilot, Codex, and Cursor. All work is TDD'd; +44 new tests across 4 suites, full suite green.
+
+### Added
+
+- **FEAT-008 — Durable project-context persistence**
+  - **`aura-frog/scripts/context-snapshot.cjs`** (NEW) — generates a single SHA-stamped `snapshot.md` under `.claude/project-contexts/<name>/` by running the long-dormant `repo-map-gen.sh` + `file-registry-gen.sh` + `architecture-gen.sh` generators (which existed but were never persisted here). Freshness API: `generateSnapshot`, `readSnapshotMeta`, `isSnapshotFresh`, `getSnapshotPath`. A snapshot is "fresh" (reusable, skip re-scan) only while git HEAD + content-hash are unchanged. CLI: `node aura-frog/scripts/context-snapshot.cjs`.
+  - **`aura-frog/hooks/context-auto-refresh.cjs`** (NEW) — self-healing `Stop` hook (async, debounced 60s) that regenerates the snapshot when watched dirs change, so the next session always loads fresh context without a manual re-scan. Disable: `AF_CONTEXT_AUTO_REFRESH_DISABLED=true`.
+  - **Session-start staleness banner** — `session-start.cjs` now reports whether the durable snapshot is FRESH (reuse, no re-scan) or STALE (refresh hint), on both fast-path and full-path. Disable: `AF_CONTEXT_STALE_BANNER_DISABLED=true`.
+- **FEAT-009 — Cross-tool porter**
+  - **`aura-frog/scripts/port-plugin.cjs`** (NEW) — exports the universal layer (CLAUDE.md + 71 rules + 56 skills + 15 agents + 24 commands + MCP) to other tools' native formats: `copilot` (`.github/copilot-instructions.md` + path-scoped `.github/instructions/*.instructions.md`), `codex` (`AGENTS.md`), `cursor` (`.cursor/rules/*.mdc`), or `all`. Writes a `PORT_MANIFEST.json` per run. CLI: `node aura-frog/scripts/port-plugin.cjs <target> [--out <dir>] [--dry-run]`.
+  - **`aura-frog/scripts/PORT_USAGE.md`** (NEW) — porter usage guide; pairs with `docs/PORTABILITY.md`.
+
+### Fixed
+
+- **Cache invalidation never fired for non-JS projects** — `af-project-cache.cjs` keyed invalidation off a 24h TTL + a `KEY_FILES` list of JS/TS/Go/Python configs. For this markdown/bash/yaml plugin none of those exist, so the cache froze (observed: `project-detection.json` stuck at 2026-02-11 reporting 11 agents / 53 skills while reality was 15 / 56). Invalidation is now **project-type-aware** (content-hash of structural dirs — `agents/`, `skills/`, `rules/`, … — discovered at depth ≤2) **+ git-HEAD-sha**, the TTL is removed, and a `CACHE_SCHEMA_VERSION` bump rebuilds old-format caches. New exports: `getGitHead`, `calculateContentHash`, `resolveWatchMode`, `findStructuralDirs`, `getCacheStaleness`.
+- **Ghost-dir cache miss** — `getProjectName()` preferred `package.json` `name` (`aura-frog-dev`) over the dir basename (`aura-frog`) where context actually lives, so the cache read/wrote a path that never matched the real data → permanent cache miss. Now an existing `.claude/project-contexts/<basename>/` wins.
+
+### Changed
+
+- **Hooks: 45 → 46** (added `context-auto-refresh.cjs`; wired into `hooks.json` `Stop`, async).
+- **`jest.config.cjs`** — added `aura-frog/scripts/__tests__` to `roots`.
+- Tests: **+44** — `af-project-cache.test.cjs` (17, NEW), `context-snapshot.test.cjs` (5, NEW), `context-auto-refresh.test.cjs` (8, NEW), `port-plugin.test.cjs` (74, NEW).
+
+### Stats
+
+- Hooks: **46** (was 45) · Scripts: +3 new files
+- Agents 15 · Skills 56 · Rules 71 · Commands 24 · MCP 8 (unchanged)
 
 ---
 

@@ -10,17 +10,24 @@
  * - Individual project caches stored in each repo's .claude/cache/
  * - Workspace-level index in parent .claude/cache/
  *
- * Cache invalidation:
+ * Cache invalidation (STORY-0013 — FEAT-008):
  * - Manual refresh via /project:refresh
- * - Key file changes (package.json, composer.json, etc.)
- * - Cache older than 24 hours
+ * - git HEAD sha changes (committed-state drift)
+ * - content-hash of watch targets changes (working-tree drift)
+ * - cache schema-version bump (forces rebuild of old-format caches)
  *
- * @version 2.0.0
+ * The legacy 24h TTL + JS-only KEY_FILES invalidation was REMOVED: it never
+ * fired for markdown/bash/yaml projects (none of the KEY_FILES exist), so the
+ * detection cache froze for months. Invalidation is now project-type-aware and
+ * codebase-change-driven, not clock-driven.
+ *
+ * @version 3.0.0
  */
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 
 // Project contexts directory (persistent project data)
 const PROJECT_CONTEXTS_DIR = '.claude/project-contexts';
@@ -29,7 +36,25 @@ const WORKSPACE_DETECTION_FILE = 'workspace-detection.json';
 const MONOREPO_DETECTION_FILE = 'monorepo-detection.json';
 
 
-const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours — retained for back-compat export only; no longer gates validity
+
+// Cache format version. Bump to force a rebuild of all existing caches whose
+// shape predates the current invalidation logic. A loaded cache whose
+// `cacheSchema` !== this value is treated as invalid (and re-scanned).
+const CACHE_SCHEMA_VERSION = 3;
+
+// Structural source directories used for project-type-aware content hashing.
+// For projects with no JS/TS-style KEY_FILES (markdown/bash/yaml plugins, doc
+// repos, etc.) these directories ARE the codebase — their file count + mtimes
+// drive invalidation. Discovered at depth <= 2 so `aura-frog/agents`,
+// `packages/*/src`, etc. are found, not just top-level dirs.
+const STRUCTURAL_DIRS = [
+  'agents', 'skills', 'rules', 'commands', 'hooks',
+  'src', 'lib', 'app', 'packages', 'docs'
+];
+
+// Bound the recursive walk used when stat-ing a structural directory.
+const STRUCTURAL_WALK_MAX_DEPTH = 4;
 
 // Monorepo config files
 const MONOREPO_CONFIGS = {
@@ -73,6 +98,17 @@ const KEY_FILES = [
  */
 function getProjectName(dir = '.') {
   const absDir = path.resolve(dir);
+
+  // Canonical identity wins (STORY-0014): if a context dir already exists under
+  // the directory basename, use it. This matches where real context lives and
+  // prevents the ghost-dir cache-miss bug where package.json `name`
+  // ("aura-frog-dev") diverged from the context dir basename ("aura-frog").
+  const basename = path.basename(absDir);
+  try {
+    if (fs.existsSync(path.join(absDir, PROJECT_CONTEXTS_DIR, basename))) {
+      return basename;
+    }
+  } catch (e) {}
 
   // Try package.json first
   const pkgPath = path.join(absDir, 'package.json');
@@ -144,20 +180,177 @@ function calculateKeyFilesHash() {
 }
 
 /**
- * Check if cache is valid
+ * Get the current git HEAD sha for a directory. Fail-safe: returns null when
+ * git is unavailable or the dir is not a work tree (never throws).
  */
-function isCacheValid(cache) {
-  if (!cache || !cache.timestamp) return false;
+function getGitHead(dir = '.') {
+  try {
+    const out = execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: dir,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf8'
+    });
+    const sha = out.trim();
+    return /^[0-9a-f]{40}$/.test(sha) ? sha : null;
+  } catch (_) {
+    return null;
+  }
+}
 
-  // Check age
-  const age = Date.now() - cache.timestamp;
-  if (age > CACHE_MAX_AGE_MS) return false;
+/**
+ * Discover structural source directories under `dir` (depth <= 2), skipping
+ * SKIP_DIRS. Returns absolute paths. Catches both top-level (`agents/`) and
+ * single-nested (`aura-frog/agents/`) layouts.
+ */
+function findStructuralDirs(dir = '.') {
+  const found = [];
+  const seen = new Set();
+  const consider = (p) => {
+    try {
+      if (fs.statSync(p).isDirectory() && !seen.has(p)) { seen.add(p); found.push(p); }
+    } catch (_) {}
+  };
+  // depth 1
+  for (const name of STRUCTURAL_DIRS) consider(path.join(dir, name));
+  // depth 2 (one level of source-root nesting, e.g. aura-frog/)
+  let entries = [];
+  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) {}
+  for (const ent of entries) {
+    if (!ent.isDirectory() || SKIP_DIRS.includes(ent.name)) continue;
+    for (const name of STRUCTURAL_DIRS) consider(path.join(dir, ent.name, name));
+  }
+  return found;
+}
 
-  // Check key files hash
-  const currentHash = calculateKeyFilesHash();
-  if (cache.keyFilesHash !== currentHash) return false;
+/**
+ * Stat a structural directory cheaply: recursive file count + max mtime,
+ * bounded depth, skipping SKIP_DIRS. File count catches add/remove; max mtime
+ * catches edits.
+ */
+function statStructuralDir(root, depth = 0) {
+  let count = 0;
+  let maxMtimeMs = 0;
+  let entries = [];
+  try { entries = fs.readdirSync(root, { withFileTypes: true }); } catch (_) { return { count, maxMtimeMs }; }
+  for (const ent of entries) {
+    if (SKIP_DIRS.includes(ent.name)) continue;
+    const full = path.join(root, ent.name);
+    if (ent.isDirectory()) {
+      if (depth < STRUCTURAL_WALK_MAX_DEPTH) {
+        const sub = statStructuralDir(full, depth + 1);
+        count += sub.count;
+        if (sub.maxMtimeMs > maxMtimeMs) maxMtimeMs = sub.maxMtimeMs;
+      }
+    } else {
+      count++;
+      try {
+        const m = fs.statSync(full).mtimeMs;
+        if (m > maxMtimeMs) maxMtimeMs = m;
+      } catch (_) {}
+    }
+  }
+  return { count, maxMtimeMs };
+}
+
+/**
+ * Which watch strategy applies to `dir`:
+ *   'key-files'  — JS/TS-style config files present, no structural dirs
+ *   'structural' — structural source dirs present, no KEY_FILES
+ *   'hybrid'     — both present (e.g. this plugin: root package.json + aura-frog/agents)
+ *   'none'       — neither (fall back to bare git/dir signal)
+ */
+function resolveWatchMode(dir = '.') {
+  const hasKeyFiles = KEY_FILES.some((f) => fs.existsSync(path.join(dir, f)));
+  const hasStructural = findStructuralDirs(dir).length > 0;
+  if (hasKeyFiles && hasStructural) return 'hybrid';
+  if (hasKeyFiles) return 'key-files';
+  if (hasStructural) return 'structural';
+  return 'none';
+}
+
+/**
+ * Project-type-aware content hash. Superset of calculateKeyFilesHash: hashes
+ * every KEY_FILE that exists (mtime+size) AND every discovered structural dir
+ * (recursive count + max mtime). Changing agents/, skills/, etc. now changes
+ * the hash even when no JS config file exists.
+ */
+function calculateContentHash(dir = '.') {
+  const parts = [];
+
+  for (const file of KEY_FILES) {
+    const full = path.join(dir, file);
+    try {
+      if (fs.existsSync(full)) {
+        const stat = fs.statSync(full);
+        parts.push(`${file}:${stat.mtimeMs}:${stat.size}`);
+      }
+    } catch (_) {}
+  }
+
+  for (const sdir of findStructuralDirs(dir)) {
+    const rel = path.relative(dir, sdir) || sdir;
+    const { count, maxMtimeMs } = statStructuralDir(sdir);
+    parts.push(`${rel}:${count}:${maxMtimeMs}`);
+  }
+
+  if (parts.length === 0) return 'empty';
+
+  return crypto.createHash('md5').update(parts.join('|')).digest('hex').substring(0, 16);
+}
+
+/**
+ * Check if cache is valid (STORY-0013): codebase-change-driven, NOT clock-driven.
+ *
+ * Invalid when: missing/old schema, content-hash drift, or a committed git-HEAD
+ * change. There is intentionally NO age/TTL check — a cache stays valid for as
+ * long as the codebase is unchanged, so repeat sessions never re-scan needlessly.
+ */
+function isCacheValid(cache, dir = '.') {
+  if (!cache || typeof cache !== 'object') return false;
+
+  // Old-format caches (pre-STORY-0013) lack cacheSchema → force a rebuild.
+  if (cache.cacheSchema !== CACHE_SCHEMA_VERSION) return false;
+
+  // Working-tree drift.
+  if (cache.contentHash !== calculateContentHash(dir)) return false;
+
+  // Committed-state drift (only when git is available on both sides).
+  const currentGit = getGitHead(dir);
+  if (currentGit && cache.gitHead && cache.gitHead !== currentGit) return false;
 
   return true;
+}
+
+/**
+ * Inspect cache staleness for surfacing (e.g. the session-start banner).
+ * Returns the validity verdict plus a human-readable reason and the sha pair.
+ */
+function getCacheStaleness(cache, dir = '.') {
+  const currentSha = getGitHead(dir);
+  const currentContentHash = calculateContentHash(dir);
+  const valid = isCacheValid(cache, dir);
+
+  let reason = null;
+  if (!cache || typeof cache !== 'object') {
+    reason = 'no cache on disk';
+  } else if (cache.cacheSchema !== CACHE_SCHEMA_VERSION) {
+    reason = 'cache schema changed — rebuilt';
+  } else if (currentSha && cache.gitHead && cache.gitHead !== currentSha) {
+    const short = (s) => (s ? String(s).substring(0, 7) : '—');
+    reason = `git HEAD sha changed (${short(cache.gitHead)} → ${short(currentSha)})`;
+  } else if (cache.contentHash !== currentContentHash) {
+    reason = 'watched files/dirs changed since last scan';
+  }
+
+  return {
+    valid,
+    stale: !valid,
+    reason,
+    cachedSha: cache && typeof cache === 'object' ? cache.gitHead ?? null : null,
+    currentSha,
+    cachedContentHash: cache && typeof cache === 'object' ? cache.contentHash ?? null : null,
+    currentContentHash
+  };
 }
 
 /**
@@ -188,9 +381,12 @@ function saveCache(detection) {
   const cache = {
     ...detection,
     projectName: projectName,
-    timestamp: Date.now(),
-    keyFilesHash: calculateKeyFilesHash(),
-    version: '2.0.0'
+    timestamp: Date.now(),            // informational only — no longer gates validity
+    cacheSchema: CACHE_SCHEMA_VERSION,
+    gitHead: getGitHead(),
+    contentHash: calculateContentHash(),
+    keyFilesHash: calculateKeyFilesHash(), // back-compat for external readers
+    version: '3.0.0'
   };
 
   try {
@@ -1393,6 +1589,12 @@ module.exports = {
   saveCache,
   clearCache,
   isCacheValid,
+  getGitHead,
+  calculateContentHash,
+  calculateKeyFilesHash,
+  resolveWatchMode,
+  findStructuralDirs,
+  getCacheStaleness,
   detectTestInfra,
   detectFilePatterns,
   detectAgentMapping,
@@ -1431,6 +1633,8 @@ module.exports = {
 
   // Constants
   CACHE_MAX_AGE_MS,
+  CACHE_SCHEMA_VERSION,
+  STRUCTURAL_DIRS,
   KEY_FILES,
   SKIP_DIRS,
   PROJECT_CONTEXTS_DIR,
