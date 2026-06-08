@@ -1,21 +1,38 @@
 #!/bin/bash
-# Aura Frog Status Line (v3.7.4+)
-# Replaces the conversation banner — always visible, 0 tokens
+# Aura Frog Status Line (v3.8.0-alpha.4+)
+# Replaces the conversation banner — always visible, 0 tokens.
+# Owns the FULL multi-line status line (dir/git prefix + AF context + cost) so
+# plugin upgrades carry the layout. The ~/.claude/statusline-command.sh shim is
+# now a thin pass-through (no duplicate dir/git prefix).
 #
-# Receives JSON on stdin from Claude Code:
-#   { display_name, used_percentage, cwd, ... }
+# Receives JSON on stdin from Claude Code (parse defensively — fields optional):
+#   { workspace.current_dir, cwd, model.display_name, version, used_percentage,
+#     cost.total_cost_usd, cost.total_lines_added, cost.total_lines_removed,
+#     cost.total_duration_ms }
 #
 # Reads additional state from:
-#   .claude/cache/session-start-cache.json   — fallback for agent/phase
+#   .claude/cache/session-start-cache.json    — fallback for agent/phase
 #   .claude/logs/runs/<latest>/run-state.json — primary source for mode + step
 #
-# Format:
-#   🐸 AF v{version} │ {mode} {step} │ {agent} │ {model} │ {ctx}% ctx
+# Format (multi-line):
+#   ➜  {dir}  git:({branch}) {✓|✗N} {↑a} {↓b}              🕐 HH:MM
+#   🐸 AF v{version} │ {mode} {step} │ {agent}
+#   {model} │ {ctx}% ctx
+#   💰 ${cost} │ +{added}/-{removed} │ ⏱ {duration} │ cc {version}     (opt-in)
+#
+# The AF content is the v3.7.3+ single line `🐸 AF v… │ {mode} {step} │ {agent}
+# │ {model} │ {ctx}% ctx`, split on ` │ ` across two lines (avoids single-line
+# truncation on narrow terminals). The exact substring is preserved internally
+# in $AF_LINE before the split.
 #
 # Examples:
-#   🐸 AF v3.7.3 │ deep P3 │ architect │ Sonnet │ 12% ctx
-#   🐸 AF v3.7.3 │ bugfix S2 │ tester   │ Sonnet │ 28% ctx
-#   🐸 AF v3.7.3 │ idle     │ ready    │ Sonnet │  4% ctx
+#   ➜  aura-frog  git:(main) ✗3 ↑1              🕐 14:32
+#   🐸 AF v3.8.0-alpha.4 │ deep P3 │ architect
+#   Opus 4.8 │ 12% ctx
+#
+# Line 4 (session metrics) is OPT-IN: set AF_STATUSLINE_COST=1 AND the cost data
+# must be present. Cost was removed from the always-on line in v3.7.4 ("visual
+# noise without per-call breakdown"); this re-adds it behind a flag.
 #
 # Mode tokens: quick / standard / deep / project / bugfix / refactor / test / idle
 # Step tokens: P1-P5 for 5-phase flows, S1-S4 for bugfix's 4-step TDD,
@@ -59,8 +76,13 @@ find_project_root() {
     done
     echo "$start"
 }
-JSON_CWD=$(parse_str "cwd")
-PROJECT_ROOT=$(find_project_root "${JSON_CWD:-$PWD}")
+# Claude Code sends the project cwd as workspace.current_dir; older payloads use
+# a top-level cwd. Prefer current_dir, then cwd, then $PWD. Leaf keys are unique
+# so the flat grep parser reaches the nested current_dir without jq.
+JSON_CWD=$(parse_str "current_dir")
+[ -z "$JSON_CWD" ] && JSON_CWD=$(parse_str "cwd")
+[ -z "$JSON_CWD" ] && JSON_CWD="$PWD"
+PROJECT_ROOT=$(find_project_root "$JSON_CWD")
 
 # ----- Claude Code inputs ----------------------------------------------------
 
@@ -220,16 +242,87 @@ render_active() {
     return 0
 }
 
-# ----- Build output ----------------------------------------------------------
-# Cost segment removed in v3.7.4 — Claude Code's `total_cost_usd` is real
-# but adds visual noise without per-call breakdown. If you want it back,
-# run `/af status` for a richer cost+token report.
+# ----- Compose multi-line output ---------------------------------------------
 
-if render_active 2>/dev/null; then
-    exit 0
+# --- Line 1: dir + git:(branch) + tree state + ahead/behind + clock ----------
+# Git calls are guarded by an is-inside-work-tree probe so a non-git cwd skips
+# them entirely (keeps the common case fast). All git failures degrade silently
+# (detached HEAD → empty branch; no upstream → no ahead/behind).
+DIR_NAME=$(basename "$JSON_CWD" 2>/dev/null)
+[ -z "$DIR_NAME" ] && DIR_NAME="$JSON_CWD"
+GIT_PART=""
+GIT_STATUS=""
+if git -C "$JSON_CWD" --no-optional-locks rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    branch=$(git -C "$JSON_CWD" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null)
+    [ -n "$branch" ] && GIT_PART=" git:(${branch})"
+
+    # Working-tree state: ✓ clean / ✗N with N = changed-file count.
+    dirty=$(git -C "$JSON_CWD" --no-optional-locks status --porcelain 2>/dev/null)
+    if [ -n "$dirty" ]; then
+        n=$(printf '%s\n' "$dirty" | grep -c .)
+        GIT_STATUS=" ✗${n}"
+    else
+        GIT_STATUS=" ✓"
+    fi
+
+    # Ahead/behind upstream — rev-list --left-right --count emits "<behind>\t<ahead>".
+    ab=$(git -C "$JSON_CWD" --no-optional-locks rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null)
+    if [ -n "$ab" ]; then
+        behind=$(printf '%s' "$ab" | awk '{print $1}')
+        ahead=$(printf '%s' "$ab" | awk '{print $2}')
+        [ -n "$ahead" ]  && [ "$ahead" != "0" ]  && GIT_STATUS="${GIT_STATUS} ↑${ahead}"
+        [ -n "$behind" ] && [ "$behind" != "0" ] && GIT_STATUS="${GIT_STATUS} ↓${behind}"
+    fi
+fi
+NOW=$(date +%H:%M 2>/dev/null)
+printf "\033[1;32m➜\033[0m  \033[0;36m%s\033[0m\033[1;34m%s\033[0m\033[0;33m%s\033[0m  \033[2;37m🕐 %s\033[0m\n" \
+    "$DIR_NAME" "$GIT_PART" "$GIT_STATUS" "$NOW"
+
+# --- Lines 2-3: AF context, built as the single v3.7.3+ line then split on ` │ `
+# (first 3 fields → line 2 = version/mode-step/agent; rest → line 3 = model/ctx).
+# Keeping the full line in $AF_LINE preserves the exact substring contract.
+AF_LINE=$(render_active 2>/dev/null)
+if [ -z "$AF_LINE" ]; then
+    MODE_STEP="$AF_MODE"
+    [ -n "$AF_STEP" ] && MODE_STEP="$AF_MODE $AF_STEP"
+    AF_LINE="🐸 AF v${AF_VERSION} │ ${MODE_STEP} │ ${AF_AGENT} │ ${MODEL} │ ${CTX_INT}% ctx"
+fi
+printf '%s\n' "$AF_LINE" | awk -F ' │ ' '{
+  l1=""; l2="";
+  for (i = 1; i <= NF; i++) {
+    if (i <= 3) { l1 = l1 (i > 1 ? " │ " : "") $i }
+    else        { l2 = l2 (i > 4 ? " │ " : "") $i }
+  }
+  print l1;
+  if (l2 != "") print l2;
+}'
+
+# --- Line 4: session metrics — OPT-IN. Cost was pulled from the always-on line
+# in v3.7.4 ("visual noise without per-call breakdown"); re-add behind a flag.
+# Only renders when AF_STATUSLINE_COST=1 AND at least one field is present.
+if [ "$AF_STATUSLINE_COST" = "1" ]; then
+    cc_ver=$(parse_str "version")
+    cost=$(parse_num "total_cost_usd")
+    added=$(parse_num "total_lines_added")
+    removed=$(parse_num "total_lines_removed")
+    dur_ms=$(parse_num "total_duration_ms")
+
+    parts=""
+    [ -n "$cost" ] && parts="💰 $(printf '$%.2f' "$cost" 2>/dev/null || printf '$%s' "$cost")"
+    if [ -n "$added" ] || [ -n "$removed" ]; then
+        parts="${parts:+$parts │ }\033[0;32m+${added:-0}\033[0m/\033[0;31m-${removed:-0}\033[0m"
+    fi
+    if [ -n "$dur_ms" ]; then
+        ms=${dur_ms%.*}
+        secs=$((ms / 1000))
+        if   [ "$secs" -ge 3600 ]; then human="$((secs / 3600))h $(((secs % 3600) / 60))m"
+        elif [ "$secs" -ge 60 ];   then human="$((secs / 60))m $((secs % 60))s"
+        else human="${secs}s"; fi
+        parts="${parts:+$parts │ }⏱ ${human}"
+    fi
+    [ -n "$cc_ver" ] && parts="${parts:+$parts │ }cc ${cc_ver}"
+
+    [ -n "$parts" ] && printf "\033[2;37m%b\033[0m\n" "$parts"
 fi
 
-MODE_STEP="$AF_MODE"
-[ -n "$AF_STEP" ] && MODE_STEP="$AF_MODE $AF_STEP"
-
-echo "🐸 AF v${AF_VERSION} │ ${MODE_STEP} │ ${AF_AGENT} │ ${MODEL} │ ${CTX_INT}% ctx"
+exit 0

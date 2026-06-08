@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha.3
+last_aligned_with: v3.8.0-alpha.4
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,26 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha.4] - 2026-06-08 (Multi-line status line)
+
+> The status line (`scripts/statusline.sh`) now renders **multi-line** and owns the full output (dir/git prefix + AF context + opt-in cost), instead of emitting only the AF segment and relying on a user shim. Fixes single-line truncation on narrow terminals and lets the layout survive plugin upgrades.
+
+### Added
+
+- **`scripts/statusline.sh` now owns the full multi-line status line** (was: single AF segment only):
+  - **Line 1** — `➜ {dir}  git:({branch}) {✓|✗N} {↑ahead} {↓behind}   🕐 HH:MM`. Working-tree state via `git status --porcelain` (✓ clean / ✗N changed-file count); ahead/behind via `git rev-list --left-right --count @{upstream}...HEAD` (shown only when non-zero). All git calls use `--no-optional-locks`, are guarded by an `is-inside-work-tree` probe (non-git cwd skips them entirely), and degrade silently (detached HEAD / no upstream).
+  - **Lines 2–3** — the AF context line is split on ` │ ` (`🐸 AF v… │ {mode} {step} │ {agent}` then `{model} │ {ctx}% ctx`) so long lines no longer clip. The exact AF substring is preserved internally before the split.
+  - **Line 4 (opt-in)** — `💰 ${cost} │ +{added}/-{removed} │ ⏱ {duration} │ cc {version}`, rendered **only** when `AF_STATUSLINE_COST=1` AND the cost data is present. Cost was pulled from the always-on line in v3.7.4 ("visual noise without per-call breakdown"); this re-adds it behind a flag. Added green / removed red, line dimmed; duration `Xh Ym` / `Xm Ys` / `Zs`.
+  - Parses `workspace.current_dir` → `cwd` → `$PWD` for the dir; all fields via the existing grep/sed fallback so it runs **with or without jq**; always `exit 0`.
+
+### Changed
+
+- **`AF_STATUSLINE_COST=1`** — new env flag to opt into the session-metrics line (line 4).
+- **Shims are now thin pass-throughs** — `aura-frog/scripts/statusline-shim.sh` (and the user-installed `~/.claude/statusline-command.sh`) no longer build the dir/git prefix themselves (that moved into the plugin); they just forward stdin to the plugin script. Prevents a doubled prefix.
+- Status line header comment "Format:" + examples updated to the new layout.
 
 ---
 
