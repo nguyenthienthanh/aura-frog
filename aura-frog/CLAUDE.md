@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.8.0-alpha.4 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.8.0-alpha.6 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. 15 agents + 56 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
 
 ---
 
-## 🐸 The 8 Pillars (v3.8.0-alpha.4)
+## 🐸 The 8 Pillars (v3.8.0-alpha.6)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -75,8 +75,9 @@ Format (v3.8.0-alpha.4+): **multi-line**, owned end-to-end by `scripts/statuslin
 
 ```
 ➜  aura-frog  git:(main) ✗3 ↑1              🕐 14:32
-🐸 AF v3.8.0-alpha.4 │ deep P3 │ architect
+🐸 AF v3.8.0-alpha.6 │ deep P3 │ architect
 Opus 4.8 │ 12% ctx
+⏳ 5h 37% ↻14:40 │ 7d 4% ↻Wed 22:00
 💰 $1.23 │ +342/-87 │ ⏱ 32m 5s │ cc 2.1.16      ← opt-in (AF_STATUSLINE_COST=1)
 ```
 
@@ -86,7 +87,8 @@ Opus 4.8 │ 12% ctx
   - **step** — `P{N}` for 5-phase Deep runs (`current_phase`), `S{N}` for bugfix's 4-step TDD (`current_step`). Omitted for quick/idle.
   - **agent** — `run-state.json#active_agent`, updated by run-orchestrator at every dispatch.
 - **Line 3** — `{model} │ {ctx}% ctx`. Splitting AF across lines 2–3 avoids single-line truncation on narrow terminals.
-- **Line 4 (opt-in)** — session metrics. Cost was removed from the always-on line in v3.7.4 ("noise without per-call breakdown"); re-add it by setting **`AF_STATUSLINE_COST=1`** (only renders when the data is present). Or use `/af status` for a richer report.
+- **Usage line** — `⏳ 5h {pct}% ↻{reset} │ 7d {pct}% ↻{reset}` from `rate_limits.{five_hour,seven_day}`. % color-coded (red ≥90 · yellow ≥70 · green); reset = local time. Subscribers only, after the first API response — hidden otherwise. Disable: **`AF_STATUSLINE_USAGE=0`**.
+- **Cost line (opt-in)** — session metrics. Cost was removed from the always-on line in v3.7.4 ("noise without per-call breakdown"); re-add it by setting **`AF_STATUSLINE_COST=1`** (only renders when the data is present). Or use `/af status` for a richer report.
 
 The `~/.claude/statusline-command.sh` shim is now a thin pass-through (the prefix logic lives in the plugin).
 
@@ -301,4 +303,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.8.0-alpha.4
+**Version:** 3.8.0-alpha.6

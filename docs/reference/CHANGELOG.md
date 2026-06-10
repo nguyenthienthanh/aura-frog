@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha.4
+last_aligned_with: v3.8.0-alpha.6
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,35 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha.6] - 2026-06-10 (Status line: rate-limit usage)
+
+> The status line gains a usage line showing how much of the rate-limit budget is spent and when it resets — from the `rate_limits` object Claude Code provides on stdin.
+
+### Added
+
+- **`scripts/statusline.sh` usage line** — renders `⏳ 5h {pct}% ↻{reset} │ 7d {pct}% ↻{reset}` from `rate_limits.{five_hour,seven_day}.{used_percentage,resets_at}`. Percentage is color-coded by severity (**red ≥90 · yellow ≥70 · green** otherwise); reset times are formatted from epoch to local `HH:MM` (5h) / `Day HH:MM` (7d). Present only for Claude.ai subscribers after the session's first API response — **degrades silently** when `rate_limits` is absent (no line). Parses jq-first with a grep fallback (one-lines the JSON to read the nested object). Disable: `AF_STATUSLINE_USAGE=0`.
+
+### Changed
+
+- Status-line header comment "Format:" block + `aura-frog/CLAUDE.md` Status Line section document the new usage line and `AF_STATUSLINE_USAGE` flag.
+
+---
+
+## [3.8.0-alpha.5] - 2026-06-09 (Hotfix: botched findProjectRoot() migration)
+
+> The v3.8.0-alpha.2 `findProjectRoot()` migration inserted `const { findProjectRoot } = require('./hook-runtime.cjs');` **inside an array literal** in 4 hook files, producing a `SyntaxError: Unexpected token 'const'`. The bug stayed latent while the installed plugin was 3.7.4; updating to the 3.8.0-alpha line surfaced it ("Failed with non-blocking status code: …/af-config-utils.cjs:498"). Any hook that `require()`d an affected lib failed to load.
+
+### Fixed
+
+- **`SyntaxError` in 4 hook files** — hoisted the lazy `require('./hook-runtime.cjs')` out of the array literal to a valid statement position (immediately before the array, preserving the lazy-require to avoid a circular dependency with `hook-runtime.cjs`):
+  - `aura-frog/hooks/lib/af-config-utils.cjs` (`isAgentTeamsEnabled`, line 498) — `af-config-utils` is required by **12 hooks**, so this was the highest-impact instance.
+  - `aura-frog/hooks/lib/record-workflow-event.cjs` (`getActiveWorkflowId`)
+  - `aura-frog/hooks/lib/team-bridge.cjs` (`resolveWorkflowDir`)
+  - `aura-frog/hooks/subagent-init.cjs` (workflow-state path resolution)
+- Verified: `node -c` clean across **all** hooks + libs (0 syntax errors); each fixed module loads and `findProjectRoot()` resolves; full suite **627/627** green.
 
 ---
 

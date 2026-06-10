@@ -18,6 +18,7 @@
 #   ➜  {dir}  git:({branch}) {✓|✗N} {↑a} {↓b}              🕐 HH:MM
 #   🐸 AF v{version} │ {mode} {step} │ {agent}
 #   {model} │ {ctx}% ctx
+#   ⏳ 5h {pct}% ↻{reset} │ 7d {pct}% ↻{reset}             (rate-limit budget)
 #   💰 ${cost} │ +{added}/-{removed} │ ⏱ {duration} │ cc {version}     (opt-in)
 #
 # The AF content is the v3.7.3+ single line `🐸 AF v… │ {mode} {step} │ {agent}
@@ -30,7 +31,11 @@
 #   🐸 AF v3.8.0-alpha.4 │ deep P3 │ architect
 #   Opus 4.8 │ 12% ctx
 #
-# Line 4 (session metrics) is OPT-IN: set AF_STATUSLINE_COST=1 AND the cost data
+# Usage line (rate-limit budget) shows rate_limits.{five_hour,seven_day}: % spent
+# (red ≥90 / yellow ≥70 / green) + reset time (↻). Subscribers only, after the
+# session's first API response — degrades silently otherwise. Disable: AF_STATUSLINE_USAGE=0.
+#
+# Session-metrics line is OPT-IN: set AF_STATUSLINE_COST=1 AND the cost data
 # must be present. Cost was removed from the always-on line in v3.7.4 ("visual
 # noise without per-call breakdown"); this re-adds it behind a flag.
 #
@@ -296,6 +301,48 @@ printf '%s\n' "$AF_LINE" | awk -F ' │ ' '{
   print l1;
   if (l2 != "") print l2;
 }'
+
+# --- Usage line: rate-limit budget spent + reset times -----------------------
+# rate_limits.{five_hour,seven_day}.{used_percentage(0-100),resets_at(epoch s)}.
+# Present only for Claude.ai subscribers after the first API response of the
+# session → degrades silently when absent. Disable with AF_STATUSLINE_USAGE=0.
+if [ "${AF_STATUSLINE_USAGE:-1}" = "1" ]; then
+    # Read a nested rate_limits field — jq if present, else grep the one-lined JSON.
+    rl_field() {  # $1=five_hour|seven_day  $2=used_percentage|resets_at
+        if command -v jq >/dev/null 2>&1; then
+            printf '%s' "$input" | jq -r ".rate_limits.$1.$2 // empty" 2>/dev/null
+        else
+            printf '%s' "$input" | tr '\n' ' ' \
+                | grep -o "\"$1\"[[:space:]]*:[[:space:]]*{[^}]*}" \
+                | grep -o "\"$2\"[[:space:]]*:[[:space:]]*[0-9.]*" | head -1 | sed 's/.*: *//'
+        fi
+    }
+    # epoch → local time (GNU `date -d @epoch` | BSD `date -r epoch`).
+    fmt_epoch() { [ -n "$1" ] || return; date -r "$1" +"$2" 2>/dev/null || date -d "@$1" +"$2" 2>/dev/null; }
+    # color a percentage by severity: ≥90 red · ≥70 yellow · else green.
+    pct_col() {
+        local p="${1%.*}"
+        if   [ "${p:-0}" -ge 90 ] 2>/dev/null; then printf '\033[1;31m%s%%\033[0m' "$1"
+        elif [ "${p:-0}" -ge 70 ] 2>/dev/null; then printf '\033[0;33m%s%%\033[0m' "$1"
+        else printf '\033[0;32m%s%%\033[0m' "$1"; fi
+    }
+
+    five_pct=$(rl_field five_hour used_percentage)
+    five_rst=$(rl_field five_hour resets_at)
+    week_pct=$(rl_field seven_day used_percentage)
+    week_rst=$(rl_field seven_day resets_at)
+
+    usage=""
+    if [ -n "$five_pct" ]; then
+        r=$(fmt_epoch "$five_rst" '%H:%M')
+        usage="5h $(pct_col "$five_pct")${r:+ ↻$r}"
+    fi
+    if [ -n "$week_pct" ]; then
+        r=$(fmt_epoch "$week_rst" '%a %H:%M')
+        usage="${usage:+$usage │ }7d $(pct_col "$week_pct")${r:+ ↻$r}"
+    fi
+    [ -n "$usage" ] && printf "⏳ %b\n" "$usage"
+fi
 
 # --- Line 4: session metrics — OPT-IN. Cost was pulled from the always-on line
 # in v3.7.4 ("visual noise without per-call breakdown"); re-add behind a flag.
