@@ -57,9 +57,8 @@ const PHASE_TEAMS = {
 // -------------------------------------------------------------------
 
 function resolveWorkflowDir(workflowId) {
+  const { findProjectRoot } = require('./hook-runtime.cjs');
   const possibleRoots = [
-
-const { findProjectRoot } = require('./hook-runtime.cjs');
     path.join(findProjectRoot(), '.claude', 'logs', 'runs'),
     path.join(findProjectRoot(), '.claude', 'logs', 'workflows'),
     path.join(process.cwd(), 'logs', 'runs'),

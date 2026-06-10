@@ -163,9 +163,8 @@ function main() {
     // Inject team log directory from workflow state
     try {
       const teamBridge = require('./lib/team-bridge.cjs');
+      const { findProjectRoot } = require('./lib/hook-runtime.cjs');
       const workflowStatePaths = [
-
-const { findProjectRoot } = require('./lib/hook-runtime.cjs');
         path.join(findProjectRoot(), '.claude', 'active-workflow.txt'),
         path.join(process.cwd(), 'active-workflow.txt')
       ];

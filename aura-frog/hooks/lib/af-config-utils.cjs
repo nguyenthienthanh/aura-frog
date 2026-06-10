@@ -492,10 +492,9 @@ function isAgentTeamsEnabled() {
   if (process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS === '1') return true;
 
   // Check settings.json
+  const { findProjectRoot } = require('./hook-runtime.cjs');
   const settingsPaths = [
     path.join(os.homedir(), '.claude', 'settings.json'),
-
-const { findProjectRoot } = require('./hook-runtime.cjs');
     path.join(findProjectRoot(), '.claude', 'settings.json')
   ];
 
