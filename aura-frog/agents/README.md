@@ -32,12 +32,12 @@ Every agent file must start with YAML frontmatter:
 name: agent-id
 description: "One sentence — what it does + when to use it."
 tools: Read, Grep, Glob[, Edit, Write, Bash]  # allowlist
-model: sonnet|haiku  # optional — omit to inherit
+model: haiku  # optional — set ONLY as a cheap floor for trivial work; OMIT to inherit the session model (the default for substantive agents)
 color: red|blue|green|yellow|purple|orange|pink|cyan
 ---
 ```
 
-Rules: read-only agents (security, strategist) omit Edit/Write/Bash. Fast-path agents (scanner) use haiku. Orchestrator (lead) inherits model.
+Rules: read-only agents (security, strategist) omit Edit/Write/Bash. **Omit `model:` so the agent inherits the session model** — that is the default for substantive work (architect, security, tester, devops, strategist, frontend, mobile, lead). Set `model: haiku` *only* on trivial fast-path agents (scanner). Never hardcode a stronger model (Opus) — the session model is the ceiling. See `rules/core/small-to-large-routing.md`.
 
 ## Categories
 

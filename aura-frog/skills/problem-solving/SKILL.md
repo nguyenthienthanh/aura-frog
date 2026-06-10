@@ -3,7 +3,6 @@ name: problem-solving
 description: "5 techniques for different problem types. Use when stuck or facing complex challenges."
 autoInvoke: false
 priority: high
-model: sonnet
 triggers:
   - "stuck"
   - "can't figure out"

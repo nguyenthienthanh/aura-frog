@@ -3,7 +3,6 @@ name: sequential-thinking
 description: "Structured thinking process for complex analysis. Supports revision, branching, and dynamic adjustment."
 autoInvoke: false
 priority: high
-model: sonnet
 triggers:
   - "complex problem"
   - "need to think through"

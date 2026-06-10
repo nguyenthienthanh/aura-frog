@@ -35,16 +35,17 @@ thresholds[4]{percent,action}:
   >85%,Finish task then /clear
 ```
 
-### Model-Aware Compact Strategy
+### Context-Window-Aware Compact Strategy
+
+Key off the session model's **context window**, not its name (so new models route correctly without a plugin update):
 
 ```toon
-model_strategy[3]{model,strategy,reason}:
-  Haiku,"Prefer /clear + restart","Small context window — compaction loses too much"
-  Sonnet,"Prefer /clear + handoff over /compact","Sonnet reasoning degrades with compacted context — cleaner restart"
-  Opus,"Compaction OK — use /compact freely","Large context window — handles compacted context well"
+window_strategy[2]{context_window,strategy,reason}:
+  small/mid,"Prefer /clear + handoff over /compact","Smaller window + reasoning degrades on compacted context — cleaner restart"
+  large,"Compaction OK — use /compact freely","Large window handles compacted context well"
 ```
 
-**Rule:** Before compacting, check active model. If Sonnet: prefer `handoff` + `/clear` + `/run resume` over `/compact`. If Opus: `/compact` is fine.
+**Rule:** Before compacting, gauge the session model's context window (`used_percentage` + total). On a small/mid-window model: prefer `handoff` + `/clear` + `/run resume` over `/compact`. On a large-window model: `/compact` is fine.
 
 ## Session Boundaries
 

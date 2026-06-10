@@ -79,11 +79,10 @@ Primary agent surfaces the reviewer's findings to the user:
 
 | Scenario | Reviewer |
 |----------|----------|
-| Primary is Opus | Reviewer = Sonnet (cheaper, different weights) |
-| Primary is Sonnet | Reviewer = Sonnet fork OR Haiku |
-| Security-critical (auth, crypto) | Always Sonnet minimum for reviewer |
+| Default | A **fresh instance of the session model** (new context, fresh eyes) — or a cheaper tier if the diff is simple |
+| Security-critical (auth, crypto) | Reviewer at the **session model tier — never down-shift** below it |
 
-The reviewer should NOT be the same model instance as the primary — new context, fresh eyes.
+The reviewer should NOT be the same model instance as the primary — new context, fresh eyes. Match the reviewer to the session model rather than naming a fixed model, so a newer/stronger session model carries through to review too.
 
 ---
 

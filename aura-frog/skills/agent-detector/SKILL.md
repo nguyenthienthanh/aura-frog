@@ -34,7 +34,9 @@ complexity[4]{level,criteria,approach}:
 
 ## Model Selection
 
-Quick→haiku, Standard→sonnet (opus for architecture/design), Deep→sonnet (opus for planning).
+**Prefer the session model — inherit it.** The model the user launched with is the signal of their intent and budget; use it for all substantive work (Standard / Deep / architecture / planning / build / review). Do NOT force-upgrade to a named model (e.g. Opus) for "complex" — if the user wanted more capability they'd run it, and naming a model means a newer/stronger one is ignored.
+
+The only deliberate override is **down-shifting to `haiku`** for trivial mechanical work (classification, detection, state bookkeeping) where a wrong answer costs little. So: Quick/classification → `haiku`; everything else → **inherit (session model)**. See `rules/core/small-to-large-routing.md`.
 
 ## Detection (Priority Order)
 

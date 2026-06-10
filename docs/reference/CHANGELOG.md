@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha.6
+last_aligned_with: v3.8.0-alpha.7
 status: reference
 audience: contributor
 ---
@@ -7,6 +7,24 @@ audience: contributor
 # Aura Frog - Changelog
 
 All notable changes to Aura Frog will be documented in this file.
+
+---
+
+## [3.8.0-alpha.7] - 2026-06-10 (Model routing: prefer the session model)
+
+> The plugin no longer hardcodes a stronger model (Opus) for "complex" work, nor pins substantive agents to Sonnet. It now **inherits the session model** by default — so a newer/stronger model the user launches flows through automatically, with no plugin update needed to "keep up." The only deliberate override is down-shifting to `haiku` for trivial mechanical work.
+
+### Changed
+
+- **`rules/core/small-to-large-routing.md` rewritten** — from a `Haiku→Sonnet→Opus` ladder with "start Opus for hard problems" to **"prefer the session model; down-shift to `haiku` only for trivial work; never force-upgrade to a named model."** The session model is the ceiling; there is no escalation to a hardcoded model. Defaults table: substantive agents → **inherit**; only the trivial detectors keep `haiku`.
+- **`skills/agent-detector/SKILL.md` Model Selection** — was `Quick→haiku, Standard→sonnet (opus for architecture/design), Deep→sonnet (opus for planning)`; now Quick/classification → `haiku`, **everything else inherits the session model**.
+- **Stripped per-agent `model:` overrides** so they inherit the session model: `strategist`, `tester`, `security`, `devops` (were `model: sonnet`), plus reasoning skills `problem-solving`, `sequential-thinking`. Deliberate `haiku` floors kept on `scanner`, `agent-detector`, `git-workflow`, `session-continuation`.
+- **Reframed model-named guidance to be capability-based** (future-proof, no stale model names): `rules/core/context-management.md` compaction strategy now keys off **context-window size** (small/mid vs large) instead of Haiku/Sonnet/Opus; `rules/workflow/dual-llm-review.md` reviewer selection now matches the **session model tier** instead of naming Opus/Sonnet/Haiku.
+- Doc sync: `agents/README.md` frontmatter schema + rules (omit `model:` to inherit; `haiku` only as a cheap floor), `rules/README.md` one-line description.
+
+### Why
+
+New model releases no longer require a plugin update to be used for complex work — the user's session model choice is the single source of truth. Removes the anti-pattern the routing rule itself warned against ("set a fixed model per agent regardless — breaks Opus-session users' intent").
 
 ---
 

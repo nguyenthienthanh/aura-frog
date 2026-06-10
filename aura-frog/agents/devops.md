@@ -3,7 +3,6 @@ name: devops
 description: "Docker, Kubernetes, CI/CD, infrastructure-as-code, cloud deployment. Use for containerization, pipelines, and deployment strategy."
 tools: Read, Grep, Glob, Edit, Write, Bash
 mcp_servers: [firebase, slack]
-model: sonnet
 color: pink
 ---
 

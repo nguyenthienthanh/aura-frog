@@ -2,120 +2,89 @@
 > Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
 > or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
 
-# Rule: Small-to-Large Model Routing — Escalate Only When Needed
+# Rule: Model Routing — Prefer the Session Model, Down-shift Only for Trivial Work
 
 **Priority:** HIGH
-**Applies To:** All agent invocations where model selection is configurable
+**Applies To:** All agent / skill invocations where model selection is configurable
 
 ---
 
 ## Core Principle
 
-**Start with the smallest model that could plausibly succeed. Escalate only on concrete signals that a smaller model is inadequate.**
+**The session model is the default for all substantive work. Inherit it.** The model the user launched with encodes their intent and budget — match it for design, build, review, test, and planning. The *only* deliberate override is **down-shifting to the cheapest tier** for trivial mechanical work where a wrong answer costs little.
 
-Always using Opus is wasteful. Always using Haiku is risky. The right answer is conditional.
+**Never force-upgrade to a named model (e.g. Opus) for "complex" tasks.** If the user wanted more capability they'd already be running it, and hardcoding a model name means a newer/stronger model is silently ignored. There is no fixed top of the ladder — **the session model is the ceiling.**
 
 ---
 
-## The Ladder
+## The Two Tiers
 
 ```
-Haiku → Sonnet → Opus
- (fast)    (balanced)   (deep reasoning)
+cheapest tier (haiku)   →   session model (everything else)
+   (trivial work)            (inherit — design, build, review, reason)
 ```
 
-### When to start Haiku (default for cheap tasks)
+### Down-shift to the cheapest tier (`haiku`) — only when trivial
 
 - Classification (`agent-detector`, `scanner`)
-- File format detection
-- Simple extraction (pull field from JSON)
-- Initial skim of known content
-- Any task where wrong answer costs little
+- File-format / framework detection
+- Simple field extraction
+- State bookkeeping, git plumbing, formatting / lint fixes
+- Any task where a wrong answer costs little and a retry is cheap
 
-### When to start Sonnet (default for most work)
+### Inherit the session model (default) — for real work
 
-- Code generation for single file
-- Standard test writing
-- Code review (most aspects)
-- Feature implementation in known patterns
-- Phase 3 Build GREEN for Standard complexity
-
-### When to start Opus (reserve for hard problems)
-
-- Architecture design with multiple conflicting constraints
+- Code generation, refactors, feature implementation
+- Test writing, code review, security review
+- Architecture / design / planning (esp. multi-constraint, cross-system)
 - Debugging with ambiguous root cause
-- Cross-system reasoning (frontend + backend + infra)
-- Deep refactors where the whole shape must change
-- Hard security reviews
+- Anything where quality matters — the user's session model is the right ceiling
 
 ---
 
-## Escalation Signals
-
-Move up the ladder when you see:
+## Signals
 
 | Signal | Action |
 |--------|--------|
-| Haiku gave contradictory or vague output | → Sonnet |
-| Sonnet's draft failed verification (CoVe caught errors) | → Sonnet retry with better prompt OR → Opus |
-| Sonnet couldn't keep 3+ constraints consistent | → Opus |
-| Output quality oscillates on retry | → Opus (lower-variance model) |
-| Task requires reasoning across 3+ files' worth of context | → Opus |
-| Test failure persists across 2 Sonnet attempts | → Opus |
+| Task is pure extraction / classification / plumbing | down-shift → `haiku` |
+| A down-shifted (`haiku`) step gave vague or contradictory output | restore → session model |
+| Reasoning across 3+ files · multi-constraint · ambiguous root cause | keep the session model (never down-shift) |
+| Tempted to "use Opus to be safe" | the session model already IS the user's chosen ceiling — don't override |
 
----
-
-## De-Escalation Signals
-
-Move DOWN the ladder when you see:
-
-| Signal | Action |
-|--------|--------|
-| Task is pure extraction/classification | → Haiku |
-| Boilerplate generation (scaffolds, fixtures) | → Haiku |
-| Iteration N of same refactor (pattern established) | → Sonnet |
-| Final formatting / linting fixes | → Haiku |
+> There is intentionally **no escalation to a named model.** If the work needs more than the session model offers, that is the user's call (they relaunch with a stronger model) — not a per-agent override the plugin bakes in.
 
 ---
 
 ## Enforced Defaults in Aura Frog
 
-| Agent / Skill | Starts at | Escalation trigger |
-|---------------|:---------:|-------------------|
-| `agent-detector` | Haiku | never (classification task) |
-| `scanner` | Haiku | never (detection task) |
-| `security` | Sonnet | never (no Opus reviewer value) |
-| `strategist` | Sonnet | Complex product strategy → Opus |
-| `tester` | Sonnet | never (tests don't benefit) |
-| `devops` | Sonnet | never (deployment is procedural) |
-| `lead` | inherit | orchestrator matches session |
-| `architect` | inherit | matches session — Opus session → Opus |
-| `frontend` | inherit | matches session |
-| `mobile` | inherit | matches session |
+| Agent / Skill | Model | Why |
+|---------------|:-----:|-----|
+| `agent-detector` | `haiku` | trivial classification |
+| `scanner` | `haiku` | trivial detection |
+| `session-continuation`, `git-workflow` | `haiku` | mechanical state / git plumbing |
+| `security`, `tester`, `devops`, `strategist` | **inherit** | substantive work — match the session |
+| `architect`, `frontend`, `mobile`, `lead` | **inherit** | match the session |
+| `problem-solving`, `sequential-thinking` | **inherit** | reasoning — match the session |
 
-Resolution: Per-agent frontmatter `model:` field > session model. See `README.md#per-agent-model-override`.
+Resolution: per-agent / per-skill frontmatter `model:` field > session model. **Omit `model:` to inherit** — that is the default for any substantive work. Set `model: haiku` *only* as a deliberate cheap floor for trivial work.
 
 ---
 
-## Why Small-to-Large (Not Semantic Embeddings)
+## Why Prefer the Session Model
 
-Embedding-based routing requires infrastructure (embedding API, vector comparison, thresholds). Small-to-Large uses:
-
-- Model behavior signals (agent self-reports confidence/retry)
-- Tool-call outcomes (did verification succeed?)
-- Task meta-signals (classification vs generation vs reasoning)
-
-These are free, observable in-context, and don't require new infra. Good enough for 90% of routing wins.
+- **Future-proof:** new / stronger models flow through automatically — no plugin update needed to "keep up."
+- **Respects intent:** the user picked their session model deliberately; overriding it (up *or* down, for non-trivial work) breaks that intent.
+- **Cost is the user's lever:** they control cost by choosing the session model; the plugin only saves money on genuinely trivial work.
+- **No stale model names:** the plugin stops naming specific models for routing, so it never lags a model release.
 
 ---
 
 ## Anti-Patterns
 
-- **"Always Opus for safety"** — 5–10× cost with marginal quality gain for most tasks
-- **"Always Haiku for speed"** — lose on complex tasks; compensating with retries costs more
-- **"Start Haiku, never escalate"** — missing the point of the ladder
-- **"Escalate after every minor hiccup"** — ladder becomes a stairway to bankruptcy
-- **"Set a fixed model per agent regardless"** — breaks Opus-session users' intent
+- **"Force Opus for complex tasks"** — names a model that goes stale; ignores the user's session choice and any newer model. *This rule exists to remove exactly this.*
+- **"Set a fixed model per agent regardless"** — breaks the session model's intent (an Opus-session user's reviewer shouldn't be pinned to Sonnet).
+- **"Always `haiku` for speed"** — loses on real work; retries cost more than the saving.
+- **"Down-shift after every minor step"** — thrash; only down-shift genuinely trivial work.
 
 ---
 
@@ -124,5 +93,5 @@ These are free, observable in-context, and don't require new infra. Good enough 
 - `README.md` Per-Agent Model Override section — user-facing explanation
 - `rules/core/context-management.md` — model selection is part of context strategy
 - `rules/workflow/token-time-awareness.md` — model choice is the biggest cost lever
-- `skills/agent-detector/SKILL.md` — implements Haiku-first classification
+- `skills/agent-detector/SKILL.md` — implements `haiku`-floor + inherit-default routing
 - `rules/core/prompt-caching.md` — smaller models cache same prefix cheaper

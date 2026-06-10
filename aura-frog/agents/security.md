@@ -3,7 +3,6 @@ name: security
 description: "OWASP + vulnerability + SAST review. Use for security audits, auth/crypto code review, and threat assessment. READ-ONLY — never writes code."
 tools: Read, Grep, Glob
 mcp_servers: []
-model: sonnet
 color: red
 ---
 
