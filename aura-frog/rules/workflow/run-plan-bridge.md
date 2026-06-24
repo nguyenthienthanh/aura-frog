@@ -135,5 +135,6 @@ export AF_ESCALATION_DISABLED=true          # disable just the escalation heuris
 - **Skill:** `run-orchestrator` (consumes this rule in Phase 1 setup)
 - **Command:** `commands/run.md` (documents bridge in protocol)
 - **Command:** `commands/plan-next.md` (reverse-direction suggestion)
+- **Hook:** `plan-escalation-check.cjs` (UserPromptSubmit — enforces the weight-≥-3 escalation heuristic deterministically, even when `/run` isn't typed; respects `AF_ESCALATION_DISABLED` / `AF_RUN_PLAN_BRIDGE_DISABLED`)
 - **Hook:** `post-execute-update-node.cjs` (writes task status back to plan tree on Phase 5)
 - **Spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §10.1, §13

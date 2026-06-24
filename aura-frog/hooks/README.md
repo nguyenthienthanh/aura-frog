@@ -520,6 +520,42 @@ Hook: 🔀 Scope drift detected: This looks like a new feature outside the curre
 
 **Script:** `hooks/scope-drift.cjs`
 
+> **Note (prompt source):** `prompt-reminder.cjs` and `scope-drift.cjs` read the
+> user prompt via `lib/safe-stdin.cjs#readPromptFromStdin()` (stdin JSON first,
+> `CLAUDE_USER_PROMPT` as TTY fallback). Earlier revisions read the env var
+> alone, which Claude Code does not set in production — so the prompt was always
+> empty and neither hook fired. Keep new UserPromptSubmit hooks on the shared
+> `safe-stdin` helper.
+
+---
+
+### 8c. UserPromptSubmit - Plan Escalation Check (NEW in 3.8.0)
+**When:** Every user prompt submission (async)
+
+**Actions:**
+- ✅ Score the prompt against the 8-signal escalation rubric in
+  `rules/workflow/run-plan-bridge.md` (multi_feature, multi_week,
+  shipping_scope, scale_words, cross_session, user_explicit, word_count,
+  scope_verbs)
+- ✅ When the summed weight ≥ 3 AND no plan tree exists, nudge Claude to offer
+  the user the `plan` / `deep` / `details` choice before implementing
+- ✅ Skip when a plan tree is already active, on slash commands, on override
+  prefixes (`task:` / `project:` / `must do:` / `just do:` / `exactly:`), or
+  when `AF_RUN_PLAN_BRIDGE_DISABLED` / `AF_ESCALATION_DISABLED` is set
+
+**Why:** The escalation heuristic used to live only in run-orchestrator Step 0
+(model-read markdown). This hook enforces it deterministically so project-scope
+work surfaces the planning choice even when `/run` isn't typed.
+
+**Example:**
+```
+User: "rewrite the whole auth system and migrate from Auth0 to Cognito, rollout v2.0"
+Hook: 🐸 plan-escalation: task scores 4 (≥3) on the escalation rubric —
+      signals: shipping_scope, scope_verbs. No active plan tree.
+```
+
+**Script:** `hooks/plan-escalation-check.cjs`
+
 ---
 
 ### 9. UserPromptSubmit - Auto-Learn (NEW in 1.11.0)
@@ -824,6 +860,7 @@ hooks[30]{event,name,purpose}:
   PostToolUse,Smart Learn,Auto-learn from successful operations
   UserPromptSubmit,Prompt Reminder,TDD/security/approval reminders
   UserPromptSubmit,Scope Drift Detection,Warn when conversation scope diverges
+  UserPromptSubmit,Plan Escalation Check,Nudge to /aura-frog:plan when scope weight ≥ 3 and no plan tree
   UserPromptSubmit,Auto-Learn,Auto-detect corrections in messages
   UserPromptSubmit,Prompt Logger,Log prompts with metadata for usage analysis
   SubagentStart,Context Injection,Auto-inject workflow context to subagents

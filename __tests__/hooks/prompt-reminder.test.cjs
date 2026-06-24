@@ -7,10 +7,15 @@ jest.mock('../../aura-frog/hooks/lib/af-config-utils.cjs', () => ({
   readSessionState: jest.fn(() => ({})),
 }));
 
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
 const {
   needsTddReminder,
   needsApprovalReminder,
 } = require('../../aura-frog/hooks/prompt-reminder.cjs');
+
+const HOOK = path.join(__dirname, '..', '..', 'aura-frog', 'hooks', 'prompt-reminder.cjs');
 
 describe('prompt-reminder', () => {
   describe('needsTddReminder', () => {
@@ -43,5 +48,33 @@ describe('prompt-reminder', () => {
     it('does NOT trigger on phase 4', () => expect(needsApprovalReminder({ phase: '4' })).toBe(false));
     it('does NOT trigger on phase 5', () => expect(needsApprovalReminder({ phase: '5' })).toBe(false));
     it('does NOT trigger when phase missing', () => expect(needsApprovalReminder({})).toBeFalsy());
+  });
+
+  // Regression: Claude Code delivers the prompt as JSON on stdin, NOT via
+  // CLAUDE_USER_PROMPT. Reading the env var alone left the prompt empty in
+  // production, so the TDD reminder never fired. Spawn the hook the way the
+  // runtime does and assert the reminder reaches stderr.
+  describe('end-to-end (stdin JSON — production path)', () => {
+    function runHook(prompt) {
+      return spawnSync('node', [HOOK], {
+        input: JSON.stringify({ prompt }),
+        encoding: 'utf8',
+        env: { ...process.env, CLAUDE_USER_PROMPT: '' },
+        timeout: 10000,
+        killSignal: 'SIGKILL',
+      });
+    }
+
+    it('emits the TDD reminder for a code prompt read from stdin', () => {
+      const r = runHook('implement user login feature');
+      expect(r.status).toBe(0);
+      expect(r.stderr).toContain('TDD');
+    });
+
+    it('stays silent for a non-code prompt read from stdin', () => {
+      const r = runHook('what time is it');
+      expect(r.status).toBe(0);
+      expect(r.stderr).not.toContain('TDD');
+    });
   });
 });

@@ -280,6 +280,11 @@
             "type": "command",
             "async": true,
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bare-word-router.cjs\""
+          },
+          {
+            "type": "command",
+            "async": true,
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/plan-escalation-check.cjs\""
           }
         ]
       }

@@ -9,6 +9,7 @@
  */
 
 const { readSessionState } = require('./lib/af-config-utils.cjs');
+const { readPromptFromStdin } = require('./lib/safe-stdin.cjs');
 
 // Load session state
 function loadSessionState() {
@@ -31,7 +32,10 @@ function needsApprovalReminder(state) {
 // Main execution
 function main() {
   const state = loadSessionState();
-  const userPrompt = process.env.CLAUDE_USER_PROMPT || '';
+  // Claude Code delivers the prompt as JSON on stdin; CLAUDE_USER_PROMPT is only
+  // the TTY fallback (see lib/safe-stdin.cjs). Reading env alone meant userPrompt
+  // was always '' in production, so the TDD reminder never fired.
+  const userPrompt = readPromptFromStdin();
   const reminders = [];
 
   // TDD reminder for code tasks
