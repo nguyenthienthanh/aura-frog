@@ -14,6 +14,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readSessionState } = require('./lib/af-config-utils.cjs');
+const { readPromptFromStdin } = require('./lib/safe-stdin.cjs');
 
 // Feature-indicating keywords that suggest new scope
 const FEATURE_TRIGGERS = [
@@ -61,7 +62,10 @@ function calculateOverlap(taskKeywords, promptKeywords) {
 
 function main() {
   try {
-    const userPrompt = process.env.CLAUDE_USER_PROMPT || '';
+    // Prompt arrives as JSON on stdin; CLAUDE_USER_PROMPT is only the TTY
+    // fallback (see lib/safe-stdin.cjs). Reading env alone left userPrompt
+    // empty in production, so scope-drift detection never fired.
+    const userPrompt = readPromptFromStdin();
     if (!userPrompt || userPrompt.length < 20) process.exit(0);
 
     if (userPrompt.startsWith('/') || userPrompt.startsWith('workflow:')) {
