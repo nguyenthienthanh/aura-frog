@@ -1,7 +1,7 @@
 # Aura Frog OS — Plugin for Claude Code
 
 **System:** Aura Frog v3.8.0-alpha.7 | **Format:** [TOON](https://github.com/toon-format/toon)
-**Purpose:** Planning-first LLM OS. 15 agents + 56 skills + 24 commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + 8 MCP servers
+**Purpose:** Planning-first LLM OS. Agents + skills + commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + MCP servers. Component counts: see **Resources** below (single source).
 
 ---
 
@@ -71,28 +71,7 @@ rules[8]{rule,detail}:
 
 ## Status Line (0 tokens)
 
-Format (v3.8.0-alpha.4+): **multi-line**, owned end-to-end by `scripts/statusline.sh`:
-
-```
-➜  aura-frog  git:(main) ✗3 ↑1              🕐 14:32
-🐸 AF v3.8.0-alpha.6 │ deep P3 │ architect
-Opus 4.8 │ 12% ctx
-⏳ 5h 37% ↻14:40 │ 7d 4% ↻Wed 22:00
-💰 $1.23 │ +342/-87 │ ⏱ 32m 5s │ cc 2.1.16      ← opt-in (AF_STATUSLINE_COST=1)
-```
-
-- **Line 1** — `{dir}  git:({branch}) {✓ clean | ✗N changed} {↑ahead} {↓behind}` + `🕐 HH:MM`. Git calls guarded (non-git cwd skips them) and degrade silently.
-- **Line 2** — `🐸 AF v{version} │ {mode} {step} │ {agent}`.
-  - **mode** — from `run-state.json#flow` (bugfix / deep / standard / quick / refactor / test / project / security / review / deploy / quality). `idle` when no active run.
-  - **step** — `P{N}` for 5-phase Deep runs (`current_phase`), `S{N}` for bugfix's 4-step TDD (`current_step`). Omitted for quick/idle.
-  - **agent** — `run-state.json#active_agent`, updated by run-orchestrator at every dispatch.
-- **Line 3** — `{model} │ {ctx}% ctx`. Splitting AF across lines 2–3 avoids single-line truncation on narrow terminals.
-- **Usage line** — `⏳ 5h {pct}% ↻{reset} │ 7d {pct}% ↻{reset}` from `rate_limits.{five_hour,seven_day}`. % color-coded (red ≥90 · yellow ≥70 · green); reset = local time. Subscribers only, after the first API response — hidden otherwise. Disable: **`AF_STATUSLINE_USAGE=0`**.
-- **Cost line (opt-in)** — session metrics. Cost was removed from the always-on line in v3.7.4 ("noise without per-call breakdown"); re-add it by setting **`AF_STATUSLINE_COST=1`** (only renders when the data is present). Or use `/af status` for a richer report.
-
-The `~/.claude/statusline-command.sh` shim is now a thin pass-through (the prefix logic lives in the plugin).
-
-Do NOT render banners in conversation. Auto-refresh: 30s (set `refreshInterval` in settings). Setup: `/project sync`
+Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation tokens. **Do NOT render banners in conversation.** Full rendering spec (lines, env toggles `AF_STATUSLINE_USAGE`/`AF_STATUSLINE_COST`, shim): `docs/reference/STATUSLINE.md`. Setup: `/project sync`
 
 ---
 

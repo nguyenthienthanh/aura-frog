@@ -10,6 +10,28 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
+## [Unreleased] (Context economy: slim the always-on CLAUDE.md trio)
+
+> Applied the plugin's own lazy-load principle to its own CLAUDE.md files. Maintainer-only procedure and reference catalogs were costing always-on context every session; they now lazy-load from `docs/`. Net: **~1,685 tokens cut from every session** (~48% of the project CLAUDE.md).
+
+### Changed
+
+- **`.claude/CLAUDE.md` slimmed 257 → 97 lines** — the Documentation Update Rule, Frontmatter Maintenance Rule, Commands-vs-Skills architecture, and Reference Integrity contract moved to **`docs/reference/MAINTENANCE.md`** (they only apply when editing plugin source, not every session). The runtime `User Confirmation Required` directive stays; a one-line pointer + audit-script invocation replaces the moved blocks.
+- **`aura-frog/CLAUDE.md` Status Line section** compressed (24 lines of render spec → 1 directive line); full spec moved to **`docs/reference/STATUSLINE.md`**.
+- **De-duplicated component counts** — plugin purpose line no longer restates `15 agents + 56 skills + 24 commands`; **Resources** table is now the single source. Synced version drift: global `~/.claude/CLAUDE.md` and `.claude/CLAUDE.md` header/footer → `3.8.0-alpha.7` (matching `plugin.json`).
+
+### Added
+
+- **`scripts/audit/audit-refs.sh`** — extracts the 3 inline bash audit blocks (zero-orphan, zero-dead-link, `user-invocable: false`) into one runnable gate. Fixes a latent bug in the inline version (it stripped `.md`, false-flagging `agents/architect`) and filters prose enumerations like `(agents/skills/rules)`. Exits 0 clean / 1 on violation.
+- **`docs/reference/MAINTENANCE.md`** — the maintainer contract (doc-update, count/version sync, frontmatter schema, commands-vs-skills, reference integrity).
+- **`docs/reference/STATUSLINE.md`** — full status-line rendering reference.
+
+### Why
+
+The repo preaches lazy-loading (Golden Rule #2) but its always-on CLAUDE.md trio carried ~3.5K tokens of maintenance procedure, reference catalogs, and drift-prone counts. Per Karpathy's context-engineering principle (CLAUDE.md is always-on prompt budget, not documentation), this is the highest-leverage cut. Zero runtime change.
+
+---
+
 ## [3.8.0-alpha.7] - 2026-06-10 (Model routing: prefer the session model)
 
 > The plugin no longer hardcodes a stronger model (Opus) for "complex" work, nor pins substantive agents to Sonnet. It now **inherits the session model** by default — so a newer/stronger model the user launches flows through automatically, with no plugin update needed to "keep up." The only deliberate override is down-shifting to `haiku` for trivial mechanical work.
