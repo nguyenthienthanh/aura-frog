@@ -279,7 +279,7 @@ Follow these steps:
 **Solution:**
 ```
 "Please show the approval gate as defined in:
-hooks/pre-approval.md
+aura-frog/rules/core/approval-gates.md
 
 Format should include:
 - Phase summary

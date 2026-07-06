@@ -46,15 +46,33 @@ case "$TARGET" in
     ;;
 esac
 
-# Resolve to absolute and check it stays within repo OR a safe sandbox
+# Resolve to absolute and check it stays within repo OR a safe sandbox.
+# Canonicalize FIRST (resolve `..` and symlinks) so traversal segments cannot
+# dodge the containment check, and compare against "$ROOT/"* (trailing slash)
+# so a sibling like "${REPO_ROOT}-evil" is NOT whitelisted by prefix match.
+canonicalize() {
+  # Prefer python3 (resolves `..` + symlinks; works on non-existent paths);
+  # fall back to GNU/BSD realpath, then to a lexical best-effort.
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1" 2>/dev/null && return 0
+  fi
+  realpath -m -- "$1" 2>/dev/null && return 0   # GNU
+  realpath -- "$1" 2>/dev/null && return 0       # BSD (existing paths)
+  echo "$1"                                       # last resort: unresolved
+}
+
 case "$TARGET" in
   /*) ABS="$TARGET" ;;
   *)  ABS="$(pwd)/$TARGET" ;;
 esac
+ABS="$(canonicalize "$ABS")"
 
-REPO_ROOT="$(pwd)"
+REPO_ROOT="$(canonicalize "$(pwd)")"
+# Canonicalize the hardcoded sandboxes too so macOS symlinks (/tmp → /private/tmp)
+# still match after the target has been resolved.
+TMP1="$(canonicalize /tmp)"; TMP2="$(canonicalize /var/tmp)"; HOME_C="$(canonicalize "${HOME:-/dev/null}")"
 case "$ABS" in
-  "$REPO_ROOT"*|/tmp/*|/var/tmp/*|"$HOME"/*) : ;;
+  "$REPO_ROOT"|"$REPO_ROOT"/*|"$TMP1"/*|"$TMP2"/*|/tmp/*|/var/tmp/*|"$HOME_C"/*) : ;;
   *)
     echo "preflight:path-safety WARN: $TARGET resolves outside repo + sandbox dirs" >&2
     exit 1

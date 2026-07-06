@@ -355,6 +355,25 @@ async function scanWorkflowFiles() {
 }
 
 /**
+ * Return the HEAD-committed contents of a repo-relative path, or '' if the
+ * path is untracked / git fails. Uses execFileSync with an argv array (no
+ * shell) so a filename containing shell metacharacters cannot inject a
+ * command — the path is a single, literal argument to `git show`.
+ */
+function gitShowHead(relPath, cwd = process.cwd()) {
+  try {
+    const { execFileSync } = require('child_process');
+    return execFileSync('git', ['show', `HEAD:${relPath}`], {
+      cwd,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    });
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Check a single file for user edits
  */
 async function checkFile(filePath, hashes) {
@@ -365,19 +384,8 @@ async function checkFile(filePath, hashes) {
       // Get content for analysis
       const newContent = fs.readFileSync(filePath, 'utf-8');
 
-      // Try to get old content from git or cache
-      let oldContent = '';
-      try {
-        // Try git show for previous version
-        const { execSync } = require('child_process');
-        oldContent = execSync(`git show HEAD:${filePath.replace(process.cwd() + '/', '')}`, {
-          encoding: 'utf-8',
-          stdio: ['pipe', 'pipe', 'ignore']
-        });
-      } catch {
-        // No previous version available
-        oldContent = '';
-      }
+      // Try to get old content from git (previous committed version).
+      const oldContent = gitShowHead(filePath.replace(process.cwd() + '/', ''), process.cwd());
 
       if (oldContent && oldContent !== newContent) {
         const changes = extractChanges(oldContent, newContent);
@@ -417,7 +425,7 @@ async function main() {
   }
 }
 
-module.exports = { isWorkflowFile, extractChanges, analyzeChanges };
+module.exports = { isWorkflowFile, extractChanges, analyzeChanges, gitShowHead };
 
 if (require.main === module) {
   main();

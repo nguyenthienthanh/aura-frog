@@ -323,24 +323,90 @@ require_no_regression() {
 }
 
 # ---------------------------------------------------------------------------
+# _stat_mtime <path>
+#   Portable mtime-in-epoch-seconds (BSD/macOS `stat -f`, GNU `stat -c`).
+#   Echoes 0 if the path is gone. Internal helper for with_lock stale detection.
+# ---------------------------------------------------------------------------
+_stat_mtime() {
+    stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null || echo 0
+}
+
+# ---------------------------------------------------------------------------
+# with_lock <lock_dir> <cmd> [args...]
+#   Portable mutual exclusion around a critical section. Uses `mkdir` (atomic
+#   on POSIX; flock is NOT stock on macOS) as the lock primitive with a bounded
+#   spin + stale-lock breaker. Runs <cmd args...> while holding the lock,
+#   releases it, and propagates the command's stdout + exit code.
+#
+#   Tunables: AF_LOCK_TIMEOUT_SEC (default 10) — both the stale-lock age and
+#   the max spin budget derive from it.
+#
+#   Shared single implementation: reused by counter minting (next_counter) and
+#   transactional plan-tree writes (STORY-0023 link-run) — do not fork it.
+# ---------------------------------------------------------------------------
+with_lock() {
+    local lock="$1"; shift
+    local timeout="${AF_LOCK_TIMEOUT_SEC:-10}"
+    local waited=0
+    local max_spins=$(( timeout * 20 ))   # 20 spins/sec at 0.05s each
+    while ! mkdir "$lock" 2>/dev/null; do
+        # Break a stale lock left by a crashed holder.
+        if [ -d "$lock" ]; then
+            local age=$(( $(date +%s) - $(_stat_mtime "$lock") ))
+            if [ "$age" -ge "$timeout" ]; then
+                rm -rf "$lock" 2>/dev/null
+                continue
+            fi
+        fi
+        sleep 0.05
+        waited=$(( waited + 1 ))
+        if [ "$waited" -ge "$max_spins" ]; then
+            echo "with_lock: timed out acquiring $lock" >&2
+            return 1
+        fi
+    done
+    "$@"
+    local rc=$?
+    rmdir "$lock" 2>/dev/null || rm -rf "$lock" 2>/dev/null
+    return "$rc"
+}
+
+# ---------------------------------------------------------------------------
 # next_counter <plans_dir> <kind>
 #   Atomically increment .counters.json counter for INIT|FEAT|STORY|TASK|CONFLICT|DEC.
-#   Returns the NEW counter value on stdout.
+#   Returns the NEW counter value on stdout. Concurrency-safe: the whole
+#   read-modify-write runs under with_lock() with a mktemp write (no in-place
+#   clobber). Returns non-zero if the counter key is absent (rather than
+#   silently minting "1" forever).
 # ---------------------------------------------------------------------------
+_next_counter_locked() {
+    local plans="$1"; local kind="$2"
+    local file="${plans}/.counters.json"
+    local current
+    current=$(grep -oE "\"${kind}\"[[:space:]]*:[[:space:]]*[0-9]+" "$file" | head -1 | grep -oE '[0-9]+$')
+    if [ -z "$current" ]; then
+        echo "next_counter: counter key '${kind}' not found in ${file}" >&2
+        return 1
+    fi
+    local next=$((current + 1))
+    local now; now=$(now_utc)
+    local tmp; tmp=$(mktemp "${file}.XXXXXX") || return 1
+    if sed -E "s|\"${kind}\"[[:space:]]*:[[:space:]]*[0-9]+|\"${kind}\": ${next}|" "$file" | \
+        sed -E "s|\"updated_at\"[[:space:]]*:[[:space:]]*\"[^\"]+\"|\"updated_at\": \"${now}\"|" \
+        > "$tmp"; then
+        mv "$tmp" "$file"
+        echo "$next"
+    else
+        rm -f "$tmp" 2>/dev/null
+        return 1
+    fi
+}
+
 next_counter() {
     local plans="$1"; local kind="$2"
     local file="${plans}/.counters.json"
     [ -f "$file" ] || { echo "no .counters.json" >&2; return 1; }
-    local current
-    current=$(grep -oE "\"${kind}\"[[:space:]]*:[[:space:]]*[0-9]+" "$file" | head -1 | grep -oE '[0-9]+$')
-    local next=$((current + 1))
-    local now; now=$(now_utc)
-    local tmp="${file}.tmp.$$"
-    sed -E "s|\"${kind}\"[[:space:]]*:[[:space:]]*[0-9]+|\"${kind}\": ${next}|" "$file" | \
-        sed -E "s|\"updated_at\"[[:space:]]*:[[:space:]]*\"[^\"]+\"|\"updated_at\": \"${now}\"|" \
-        > "$tmp"
-    mv "$tmp" "$file"
-    echo "$next"
+    with_lock "${file}.lock" _next_counter_locked "$plans" "$kind"
 }
 
 # ---------------------------------------------------------------------------
