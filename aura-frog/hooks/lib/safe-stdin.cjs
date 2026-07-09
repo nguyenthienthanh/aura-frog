@@ -127,9 +127,24 @@ function readPromptFromStdin() {
  * @param {number} ms
  * @param {number} [code=0]
  */
+// NDJSON record for the watchdog trip (keeps the v3.8 "stderr is always NDJSON"
+// invariant; the old plain-text line broke it).
+function watchdogRecord(ms) {
+  return JSON.stringify({
+    ts: new Date().toISOString(),
+    scope: 'safe-stdin.watchdog',
+    level: 'warn',
+    msg: 'watchdog_tripped',
+    meta: { ms },
+  }) + '\n';
+}
+
 function installWatchdog(ms, code = 0) {
   const t = setTimeout(() => {
-    try { process.stderr.write(`🐸 hook watchdog tripped at ${ms}ms — exiting safely\n`); } catch { /* swallow */ }
+    // fs.writeSync(2, …) is unbuffered: a buffered process.stderr.write could
+    // interleave bytes with another emitter mid-record and corrupt an NDJSON
+    // line before the force-exit.
+    try { fs.writeSync(2, watchdogRecord(ms)); } catch { /* swallow */ }
     process.exit(code);
   }, ms);
   if (typeof t.unref === 'function') t.unref();
@@ -141,4 +156,5 @@ module.exports = {
   parseStdinJson,
   readPromptFromStdin,
   installWatchdog,
+  watchdogRecord,
 };
