@@ -178,9 +178,9 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 | 8 | Hook performance budget (≤200ms) + watchdog NDJSON | FEAT-007/STORY-0012 | **#9, #21** | 3-4d |
 | 9 | Hook bug-cleanup batch | FEAT-007/STORY-0029 | — | 2-3d |
 | 10 | c8 subprocess coverage instrumentation | FEAT-007/STORY-0009 | **#22** | 1d |
-| 11 | codebase-memory-mcp opt-in + context rule | FEAT-011/STORY-0026 | — | 2-3d |
-| 12 | model/effort statusline | FEAT-011/STORY-0027 | — | 1-2d |
-| 13 | L3/L4 graph-conflict spike (stretch) | FEAT-011/STORY-0028 | — | spike |
+| ✅ | codebase-memory-mcp opt-in + context-economy rule (DONE, pushed) | FEAT-011/STORY-0026 | — | done |
+| ✅ | model/effort statusline (core DONE, pushed; run-orch line + agent effort frontmatters optional) | FEAT-011/STORY-0027 | — | done |
+| ✅ | L3/L4 graph-conflict spike → ADR-001 (DONE, pushed) | FEAT-011/STORY-0028 | — | done |
 | 🚧 | Frontend design quality — **~85% DONE + pushed**: STORY-0016 (frontend-aesthetics + motion-design skills) ✓, STORY-0017 (design-tokens skill) ✓, STORY-0019 (Chrome DevTools MCP opt-in) ✓, STORY-0018 C1 Figma Code Connect discipline ✓, STORY-0020 count-sync (skills 56→59, MCP 8→9) ✓. **Remaining:** STORY-0018 C2 Google Stitch MCP — BLOCKED on the real Stitch MCP endpoint/transport (won't fabricate a URL); STORY-0020 version bump → 3.8.0-alpha.8 + CHANGELOG (deferred until Stitch lands so the bump honestly signals FEAT-009 shipped). | FEAT-009/STORY-0016–0020 | — | ~0.5d (needs Stitch endpoint) |
 
 **GH issue → plan-node map (nothing lost on close):** #6→STORY-0009 · #7→STORY-0010 · #8→STORY-0011 ·
