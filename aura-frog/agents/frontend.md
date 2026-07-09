@@ -57,6 +57,7 @@ Use for all frontend implementation, UI components, design system work, and user
 
 **Skills:**
 - `skills/design-expert/SKILL.md` — UI/UX, component design
+- `skills/frontend-aesthetics/SKILL.md` — distinctive typography + dominant/accent color (house-style tuned)
 - `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
 
 ---
