@@ -90,6 +90,16 @@ function getValidCache() {
       if (envrcMtime > (cache.cachedAt || 0)) return null;
     }
 
+    // Git branch switched since cache → stale (the fast path would replay the
+    // old AF_GIT_BRANCH for up to the TTL). Safe-by-construction: this can only
+    // invalidate (→ full re-detection), never produce a wrong value; a failed
+    // branch detection falls through and keeps the TTL-only behaviour.
+    const cachedBranch = cache.envVars && cache.envVars.AF_GIT_BRANCH;
+    if (cachedBranch !== undefined) {
+      const currentBranch = getGitBranch() || '';
+      if (currentBranch && currentBranch !== cachedBranch) return null;
+    }
+
     return cache;
   } catch { return null; }
 }
