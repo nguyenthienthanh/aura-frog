@@ -413,7 +413,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | **Rules** | 71 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
 | **Hooks** | 47 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
 | **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
-| **MCP Servers** | 9 | 6 enabled by default; postgres + redis + chrome-devtools opt-in |
+| **MCP Servers** | 10 | 6 enabled by default; postgres/redis/chrome-devtools/codebase-memory opt-in |
 | **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |
 
 Full workflow target: **≤30K tokens** across all 5 phases.

@@ -51,6 +51,10 @@
       "command": "npx",
       "args": ["-y", "chrome-devtools-mcp@latest"],
       "disabled": true
+    },
+    "codebase-memory": {
+      "command": "codebase-memory-mcp",
+      "disabled": true
     }
   }
 }

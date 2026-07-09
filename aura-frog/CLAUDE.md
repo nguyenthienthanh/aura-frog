@@ -33,7 +33,7 @@ os_map[5]{concept,implementation}:
   Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,9 MCP servers (auto-invoked; 6 enabled + 3 opt-in)
+  Drivers,10 MCP servers (auto-invoked; 6 enabled + 4 opt-in)
 ```
 
 ---
@@ -78,7 +78,7 @@ Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation token
 ## MCP Servers
 
 ```toon
-mcp[9]{name,purpose,requires,enabled}:
+mcp[10]{name,purpose,requires,enabled}:
   context7,Library docs,None,enabled
   playwright,Browser automation + E2E (drives the browser),None,enabled
   vitest,Test execution + coverage,None,enabled
@@ -88,6 +88,7 @@ mcp[9]{name,purpose,requires,enabled}:
   postgres,Database queries (read-only default),POSTGRES_CONNECTION_STRING,disabled (opt-in)
   redis,Cache + queue,REDIS_URL,disabled (opt-in)
   chrome-devtools,Live inspection/diagnostics (~5-6k tok/session; NOT automation — that's playwright),None,disabled (opt-in)
+  codebase-memory,Code knowledge-graph (search_graph/trace_path; user installs binary),None,disabled (opt-in)
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
@@ -276,7 +277,7 @@ resources[8]{name,location}:
   Rules (70),rules/{core|agent|workflow}/
   Skills (56),skills/
   Hooks (47),hooks/
-  MCP (9),.mcp.json (postgres + redis + chrome-devtools disabled by default)
+  MCP (10),.mcp.json (postgres/redis/chrome-devtools/codebase-memory disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```
