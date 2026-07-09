@@ -59,13 +59,9 @@ BLOCKED_PATTERNS=(
 
 # Files allowed to contain legacy syntax (archive / reference / history).
 EXEMPT=(
-  "docs/marketing/README.pre-v3.7.2-rewrite.md"
-  "docs/marketing/USAGE_GUIDE.pre-v3.7.md"
-  "docs/marketing/overview.pre-v3.0.md"
   "docs/reference/CHANGELOG.md"
   "docs/specs/"
   "docs/showcase/"
-  "MIGRATION_TO_V3.7.md"
 )
 
 is_exempt() {
@@ -80,9 +76,8 @@ is_exempt() {
 
 cd "$REPO_ROOT"
 
-# Build the search-target list. README.md and MIGRATION_TO_V3.7.md are scanned
-# but MIGRATION is exempt by policy (it documents the old→new transition).
-SEARCH_TARGETS=(docs README.md MIGRATION_TO_V3.7.md)
+# Build the search-target list.
+SEARCH_TARGETS=(docs README.md)
 
 ERRORS=0
 

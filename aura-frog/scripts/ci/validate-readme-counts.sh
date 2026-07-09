@@ -48,7 +48,6 @@ expected_hooks=$(read_count "components.hooks")
 # Targeted scan: only flag summary-shaped occurrences.
 FILES=(
     "${REPO_ROOT}/README.md"
-    "${REPO_ROOT}/MIGRATION_TO_V3.7.md"
     "${REPO_ROOT}/docs/README.md"
     "${REPO_ROOT}/docs/reference/BENEFITS.md"
     "${REPO_ROOT}/CONTRIBUTING.md"
@@ -134,6 +133,6 @@ if [ "$VIOLATIONS" -gt 0 ]; then
     exit 1
 fi
 
-echo "✓ README + MIGRATION + docs summary counts match stats.json"
+echo "✓ README + docs summary counts match stats.json"
 echo "  ${expected_agents} agents · ${expected_skills} skills · ${expected_rules} rules · ${expected_commands} commands · ${expected_hooks} hooks"
 exit 0

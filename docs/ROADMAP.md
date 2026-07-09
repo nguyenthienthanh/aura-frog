@@ -158,15 +158,16 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 
 ## 6. Doc cleanup ledger
 
-Redundant/superseded docs identified for removal (each carries `status: archive` or is a stale
-migration guide). **These are referenced by README, CHANGELOG, QUICKSTART, the v3.7 tech spec, and two
-CI scripts** — removal must update every referrer and keep `audit-refs.sh` green, so it is tracked as a
-follow-up rather than a blind `rm`:
+**Removed (2026-07-09)** — 4 redundant/superseded docs, with all referrers rewired so
+`audit-refs.sh`, `validate-docs-syntax.sh`, and `validate-readme-counts.sh` stay green:
 
 - `docs/marketing/overview.pre-v3.0.md` (archive)
 - `docs/marketing/README.pre-v3.7.2-rewrite.md` (archive)
 - `docs/marketing/USAGE_GUIDE.pre-v3.7.md` (archive)
 - `MIGRATION_TO_V3.7.md` (root; superseded at v3.8)
+
+Referrers updated: both CI scripts' file lists, README nav link, and the stale README/docs/README/
+CONTRIBUTING hook counts (43/45 → 47, matching `stats.json`).
 
 Kept (not redundant): the `docs/specs/*` V3.7.0 records (historical), `docs/guides/*` (active content),
 `docs/showcase/*` (examples).

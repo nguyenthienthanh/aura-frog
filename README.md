@@ -16,7 +16,7 @@ A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** t
 
 **Two entry points, same natural-language pattern.** `/run <task>` for task execution (5-phase TDD with agents). `/aura-frog:plan <verb> [args]` for project planning (T0–T4 hierarchical tree). Both accept natural language, route through skills, and share state via the run↔feature bridge. You never lose decisions; every Claude tool call leaves a trace; conflicts are caught before silent overwrites.
 
-**[Install in 30 seconds](#-install)** · **[v3.7.4 highlights](#-whats-new-in-v374)** · **[Migration guide](MIGRATION_TO_V3.7.md)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
+**[Install in 30 seconds](#-install)** · **[v3.7.4 highlights](#-whats-new-in-v374)** · **[Full benefits guide →](docs/reference/BENEFITS.md)**
 
 ---
 
@@ -312,7 +312,7 @@ Expected output:
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   56 available (9 auto-invoke, 47 on-demand)
   Rules:    71 loaded (22 core + 19 agent + 30 workflow)
-  Hooks:    43 registered
+  Hooks:    47 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
 ```
 
@@ -411,7 +411,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | **Skills** | 56 | 9 auto-invoke on context, 47 on-demand (incl. v3.7.2 `plan-orchestrator`) |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
 | **Rules** | 71 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
-| **Hooks** | 43 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
+| **Hooks** | 47 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
 | **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
 | **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
 | **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |
@@ -652,7 +652,7 @@ Use this checklist:
 - ✅ MCP-heavy workflows (Figma + Firebase + Slack + DBs) → per-agent allowlists + audit log
 - ⚠️ Single-file edits / quick prototypes → workflow overhead may not pay off; use `/run task: …` to bypass
 - ⚠️ Haiku-only budget — some features (planning, conflict, design phases) prefer Sonnet/Opus
-- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 56 skills, 71 rules, 45 hooks)
+- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 56 skills, 71 rules, 47 hooks)
 
 ---
 
@@ -685,7 +685,7 @@ aura-frog/
 ├── skills/         56 skills (9 auto-invoke + 47 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          71 rules (22 core + 19 agent + 30 workflow)
-├── hooks/          43 lifecycle hooks (conditional execution)
+├── hooks/          47 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
 └── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)
