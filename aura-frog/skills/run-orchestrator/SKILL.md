@@ -228,11 +228,12 @@ At every phase transition AND every agent dispatch, surface the team to the user
 ─── Phase {N} · {Name} ────────────────────────────────────
   Builder:   {agent-id}              (writes the deliverable)
   Reviewers: {agent-id}, {agent-id}  (verify after; never the same as Builder)
+  Model/Effort: {model} · {effort}   (from the agent frontmatter / call override)
   Gate:      APPROVAL | Auto
   Dispatching: {agent-id} now…
 ```
 
-Also update `run-state.json#active_agent` to the currently-dispatching agent so the statusline (`scripts/statusline.sh`) reflects it. Read the per-phase assignment from the `phases[5]` table above. Per-task agent selection within a phase (e.g. P3 picking `frontend` vs `mobile` vs `architect`) goes through `agent-detector` — surface the selection result with one line:
+Also update `run-state.json#active_agent`, `#active_agent_model`, and `#active_agent_effort` to the currently-dispatching agent so the statusline (`scripts/statusline.sh`, which renders `▶ agent │ Model · effort ⏱dur`) reflects it. Read the per-phase assignment from the `phases[5]` table above. Per-task agent selection within a phase (e.g. P3 picking `frontend` vs `mobile` vs `architect`) goes through `agent-detector` — surface the selection result with one line:
 
 ```
   agent-detector → frontend (score 115, primary)
