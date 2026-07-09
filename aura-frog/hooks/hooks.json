@@ -127,11 +127,6 @@
             "type": "command",
             "async": true,
             "command": "LOG_DIR=$(if [ -d .claude/logs/runs ]; then echo .claude/logs/runs; elif [ -d .claude/logs/workflows ]; then echo .claude/logs/workflows; else echo ''; fi); if [ -n \"$LOG_DIR\" ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> \"$LOG_DIR/commands.log\"; fi"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },
@@ -145,13 +140,18 @@
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Write|Edit|Bash",
         "hooks": [
           {
             "type": "command",
             "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/feedback-capture.cjs\" 2>&1"
-          },
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/learning-dispatch.cjs\" 2>&1"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
           {
             "type": "command",
             "async": true,
@@ -166,11 +166,6 @@
             "type": "command",
             "async": true,
             "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/smart-learn.cjs\" 2>&1"
           }
         ]
       },

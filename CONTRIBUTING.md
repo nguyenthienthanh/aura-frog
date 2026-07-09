@@ -96,7 +96,7 @@ aura-frog/                           # Repository root
 │   ├── commands/                    # 24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 │   ├── skills/                      # 59 skills (9 auto-invoke + 50 reference)
 │   ├── rules/                       # 70 quality rules (22 core + 19 agent + 30 workflow)
-│   ├── hooks/                       # 47 lifecycle hooks (.cjs scripts)
+│   ├── hooks/                       # 48 lifecycle hooks (.cjs scripts)
 │   ├── docs/                        # AI reference docs + phase guides
 │   ├── templates/                   # Document templates
 │   ├── scripts/                     # Bash + Node integration scripts (CI, plans, preflight, workflow, security)

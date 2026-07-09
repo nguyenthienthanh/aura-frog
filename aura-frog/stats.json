@@ -1,25 +1,25 @@
 {
   "version": "3.8.0",
-  "generated": "2026-07-09T10:51:50Z",
+  "generated": "2026-07-09T11:10:36Z",
   "components": {
     "agents": 15,
     "skills": { "total": 59, "autoInvoke": 9 },
     "rules": { "total": 71, "core": 22, "agent": 19, "workflow": 30 },
     "commands": 24,
-    "hooks": 47,
+    "hooks": 48,
     "mcpServers": { "total": 10, "enabled": 6 },
     "scripts": 93
   },
   "performance": {
     "alwaysLoadedLines": 4581,
-    "alwaysLoadedTokens": 30896,
+    "alwaysLoadedTokens": 30897,
     "savingsPercent": 67,
     "overheadPercent": 15
   },
   "codebase": {
-    "cjsLines": 19261,
+    "cjsLines": 19365,
     "mdLines": 24054,
     "shLines": 13349,
-    "totalFiles": 414
+    "totalFiles": 427
   }
 }

@@ -2,7 +2,9 @@
 /**
  * Aura Frog - Feedback Capture Hook
  *
- * Fires: PostToolUse (after Edit, Write operations)
+ * Fires: PostToolUse (after Edit, Write operations) — dispatched in-process by
+ *        learning-dispatch.cjs (no longer registered directly in hooks.json;
+ *        exported run() is the entrypoint). Standalone CLI still works.
  * Purpose: Detect when user corrects AI output and record as feedback
  *
  * Detection Patterns:
@@ -93,43 +95,39 @@ function detectCorrection(userOp, recentOps) {
 /**
  * Main hook execution
  */
-async function main() {
-  if (!isFeedbackEnabled()) {
-    process.exit(0);
-  }
+/**
+ * Core correction-capture logic, factored out of main() so the consolidated
+ * learning-dispatch.cjs can invoke it in-process (one node spawn instead of
+ * one-per-hook). Takes the RAW parsed stdin object (NOT the frozen
+ * hook-runtime whitelist — it reads data.source / data.is_assistant which the
+ * whitelist drops). Never reads stdin and never calls process.exit — returns
+ * on every early-out so a dispatcher can continue to the next module.
+ * Self-filters to Edit/Write, so it is safe to call on any PostToolUse matcher.
+ *
+ * @param {object} data - raw parsed PostToolUse stdin
+ */
+async function run(data) {
+  if (!isFeedbackEnabled()) return;
 
   try {
-    // Read stdin for tool use data
-    let data = {};
-    try {
-      const stdin = readStdinSafely();
-      if (stdin) data = JSON.parse(stdin);
-    } catch { /* malformed data - skip silently, no stdin or invalid JSON is expected */ }
-
-    const { tool, input, output, sessionId } = extractToolFields(data);
+    const { tool, input, output, sessionId } = extractToolFields(data || {});
 
     // Skip if not a file operation
-    if (!['Edit', 'Write'].includes(tool)) {
-      process.exit(0);
-    }
+    if (!['Edit', 'Write'].includes(tool)) return;
 
     const filePath = input?.file_path || input?.path;
-    if (!filePath) {
-      process.exit(0);
-    }
+    if (!filePath) return;
 
     // Fast path: skip brand-new files (ctime ≈ mtime means just created, no correction possible)
     try {
       const stat = fs.statSync(filePath);
-      if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000) {
-        process.exit(0);
-      }
+      if (Math.abs(stat.ctimeMs - stat.mtimeMs) < 1000) return;
     } catch { /* file may not exist yet — skip silently */ }
 
     const recentOps = loadRecentOps();
 
     // Check if this is AI operation or user correction
-    const isAiOperation = data.source === 'assistant' || data.is_assistant;
+    const isAiOperation = (data || {}).source === 'assistant' || (data || {}).is_assistant;
 
     if (isAiOperation) {
       // Record AI operation for future correction detection
@@ -162,13 +160,22 @@ async function main() {
         console.log('🐸 Learning: Recorded correction feedback');
       }
     }
-
-    process.exit(0);
   } catch (error) {
     // Non-blocking - don't fail the tool use
     console.error(`🐸 Feedback hook error: ${error.message}`);
-    process.exit(0);
   }
+}
+
+async function main() {
+  // Read stdin for tool use data
+  let data = {};
+  try {
+    const stdin = readStdinSafely();
+    if (stdin) data = JSON.parse(stdin);
+  } catch { /* malformed data - skip silently, no stdin or invalid JSON is expected */ }
+
+  await run(data);
+  process.exit(0);
 }
 
 // Export for testing
@@ -189,7 +196,7 @@ function extractToolFields(data) {
   };
 }
 
-module.exports = { recordAiOperation, detectCorrection, extractToolFields };
+module.exports = { recordAiOperation, detectCorrection, extractToolFields, run };
 
 // Run if called directly
 if (require.main === module) {

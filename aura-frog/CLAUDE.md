@@ -276,7 +276,7 @@ resources[8]{name,location}:
   Commands (24),commands/
   Rules (70),rules/{core|agent|workflow}/
   Skills (56),skills/
-  Hooks (47),hooks/
+  Hooks (48),hooks/
   MCP (10),.mcp.json (postgres/redis/chrome-devtools/codebase-memory disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)

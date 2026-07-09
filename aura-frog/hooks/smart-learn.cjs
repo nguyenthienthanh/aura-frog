@@ -2,7 +2,9 @@
 /**
  * Aura Frog - Smart Learn Hook
  *
- * Fires: PostToolUse (Write, Edit, Bash)
+ * Fires: PostToolUse (Write, Edit, Bash) — dispatched in-process by
+ *        learning-dispatch.cjs (no longer registered directly in hooks.json;
+ *        exported run() is the entrypoint). Standalone CLI still works.
  * Purpose: Automatically learn from successful operations without explicit user feedback
  *
  * Features:
@@ -273,20 +275,26 @@ async function checkAndCreatePatterns(cache) {
 /**
  * Main hook execution
  */
-async function main() {
-  if (!isLearningEnabled()) {
-    process.exit(0);
-  }
+/**
+ * Core learning logic, factored out of main() so the consolidated
+ * learning-dispatch.cjs can invoke it in-process (one node spawn instead of
+ * one-per-hook). Takes an already-parsed hook input object; never reads stdin
+ * and never calls process.exit — returns on every early-out so a dispatcher
+ * can continue to the next module. Self-filters by tool_name, so it is safe to
+ * call on any PostToolUse matcher (Bash|Write|Edit).
+ *
+ * @param {object} input - parsed PostToolUse stdin (tool_name/tool_input/tool_response)
+ */
+async function run(input) {
+  if (!isLearningEnabled()) return;
 
   try {
-    let input = {};
-    try { input = readHookInputCompat(); } catch { /* env fallback in resolver */ }
-    const { toolName, ti, toolResult } = resolveToolContext(input);
+    const { toolName, ti, toolResult } = resolveToolContext(input || {});
 
     // Skip if there was an error
     if (toolResult.includes('Error:') || toolResult.includes('error:') ||
         toolResult.includes('FAILED') || toolResult.includes('failed')) {
-      process.exit(0);
+      return;
     }
 
     // Handle Write/Edit success
@@ -297,7 +305,7 @@ async function main() {
       const SKIP_EXTS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.css', '.scss', '.svg', '.png', '.jpg', '.gif', '.ico', '.lock', '.log', '.env', '.toml', '.ini', '.cfg']);
       const ext = path.extname(filePath).toLowerCase();
       if (SKIP_EXTS.has(ext)) {
-        process.exit(0);
+        return;
       }
 
       // The written code: Write carries tool_input.content; Edit tool_input.new_string.
@@ -327,15 +335,19 @@ async function main() {
         });
       }
     }
-
-    process.exit(0);
   } catch (error) {
-    // Non-blocking
-    process.exit(0);
+    // Non-blocking — swallow so a dispatcher continues to the next module.
   }
 }
 
-module.exports = { detectCodePatterns, extractBashPattern, recordSuccess, resolveToolContext };
+async function main() {
+  let input = {};
+  try { input = readHookInputCompat(); } catch { /* env fallback in resolver */ }
+  await run(input);
+  process.exit(0);
+}
+
+module.exports = { detectCodePatterns, extractBashPattern, recordSuccess, resolveToolContext, run };
 
 if (require.main === module) {
   main();

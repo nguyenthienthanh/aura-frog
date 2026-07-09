@@ -27,7 +27,7 @@ generated: 2026-07-09
 | FEAT-008 | Context-persistence | ✅ done (committed `bf11d0e`) |
 | **FEAT-010 · STORY-0021** | Security hotfixes (P0-1..4) | ✅ **done + committed `4296bd8f`** |
 | FEAT-007 | Hook-runtime v3.8 refactor | 🚧 STORY-0009 3/5 tasks done; rest planned |
-| FEAT-010 | Plans/scripts hardening | 🚧 STORY-0021 done; 0022–0025 planned |
+| FEAT-010 | Plans/scripts hardening | 🚧 STORY-0021/0022/0023/0025 done; 0024 shellcheck-gate deferred (scope decision) |
 | FEAT-011 | Research integrations | ⏳ planned |
 | FEAT-009 | Frontend design quality | ⏳ planned |
 
@@ -170,7 +170,7 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 | 🚧 | Hook bug-cleanup — **7 done** (session-state fs, task-track PLUGIN_ROOT, post-compact path, CONFLICT-id lock via js-counter, log-filename sanitize, team-bridge attempt persistence, workflow-edit-learn header). Remaining: session-start cache invalidation (branch switch); post-execute-conflict-rescan event-gating (blocked on history event-schema) | FEAT-007/STORY-0029 | — | ~0.5d left |
 | ✅ | audit-refs rewrite — DONE (`7cad04a`): full-path dead-file check + allowlist/template skip-rules + fixture self-test; surfaced & fixed a real dead link (USAGE_GUIDE.md) the old regex missed. | FEAT-010/STORY-0022 | — | done |
 | 🚧 | CI gates — hook-parity validator DONE (`fcc77a8`, wired into CI `ed0bef0`): Fires:-header vs hooks.json drift now fails CI. **Remaining:** shellcheck gate — DEFERRED (blind-add breaks CI on dozens of pre-existing warnings; needs a fix-all-vs-baseline scope decision, same shape as audit-refs was). | FEAT-010/STORY-0024 | — | ~0.5d |
-| 3 | Consolidate learning hooks | FEAT-010/STORY-0025 | — | 2-3d |
+| ✅ | Consolidate learning hooks — DONE: `learning-dispatch.cjs` reads stdin once and fans out to `feedback-capture.run` + `smart-learn.run` in-process (2 node spawns → 1 on the hot PostToolUse Write/Edit path; Bash unified too). Each module refactored to an exported `run(input)` (no stdin/exit), standalone CLI preserved. Registration collapsed 3 entries → 1 (`Write\|Edit\|Bash`). Isolation: one module throwing never blocks the next. 6 dispatcher tests + 440/440 hook suite green; parity/audit/counts clean (hooks 47→48). | FEAT-010/STORY-0025 | — | done |
 | 4 | CI gates (shellcheck + hooks parity) | FEAT-010/STORY-0024 | — | 1-2d |
 | 5 | hook-runtime lib finish (migrate dead hooks) | FEAT-007/STORY-0009 | **#6** | 3-5d |
 | 6 | Drop env-var dependence + session identity | FEAT-007/STORY-0010 | **#7** | 2-3d |
