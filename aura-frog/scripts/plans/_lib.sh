@@ -332,6 +332,16 @@ _stat_mtime() {
 }
 
 # ---------------------------------------------------------------------------
+# _re_escape <string>
+#   Backslash-escape ERE metacharacters so a value (e.g. a RUN_ID that may
+#   contain `.`, `+`, …) can be matched literally inside grep -E / awk regexes.
+#   Prevents a run id from matching or replacing the wrong `## Runs` row.
+# ---------------------------------------------------------------------------
+_re_escape() {
+    printf '%s' "$1" | sed 's/[][\.^$*+?(){}|]/\\&/g'
+}
+
+# ---------------------------------------------------------------------------
 # with_lock <lock_dir> <cmd> [args...]
 #   Portable mutual exclusion around a critical section. Uses `mkdir` (atomic
 #   on POSIX; flock is NOT stock on macOS) as the lock primitive with a bounded

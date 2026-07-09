@@ -93,12 +93,13 @@ PYEOF
         fi
 
         ANCHOR_DISPLAY="${ANCHOR_TASK:-—}"
+        RUN_ID_RE=$(_re_escape "$RUN_ID")
         # Idempotency: replace existing row for this RUN_ID if present, else append.
-        if grep -qE "^\|[[:space:]]*${RUN_ID}[[:space:]]*\|" "$FEATURE_FILE"; then
-            local_tmp="${FEATURE_FILE}.tmp.$$"
-            awk -v rid="$RUN_ID" -v st="$STATUS" -v at="$NOW" -v ad="$ANCHOR_DISPLAY" '
+        if grep -qE "^\|[[:space:]]*${RUN_ID_RE}[[:space:]]*\|" "$FEATURE_FILE"; then
+            local_tmp=$(mktemp "${FEATURE_FILE}.XXXXXX")
+            awk -v rid="$RUN_ID" -v rid_re="$RUN_ID_RE" -v st="$STATUS" -v at="$NOW" -v ad="$ANCHOR_DISPLAY" '
                 BEGIN { rep = "| " rid " | " st " | " at " | " ad " |" }
-                $0 ~ "^\\|[[:space:]]*" rid "[[:space:]]*\\|" { print rep; next }
+                $0 ~ "^\\|[[:space:]]*" rid_re "[[:space:]]*\\|" { print rep; next }
                 { print }
             ' "$FEATURE_FILE" > "$local_tmp"
             mv "$local_tmp" "$FEATURE_FILE"
@@ -117,9 +118,10 @@ PYEOF
 
         FEATURE_FILE=$(resolve_file "$PLANS_DIR" "$FEATURE_INPUT") || { echo "feature not found" >&2; exit 2; }
         NOW=$(now_utc)
-        local_tmp="${FEATURE_FILE}.tmp.$$"
-        awk -v rid="$RUN_ID" -v at="$NOW" '
-            $0 ~ "^\\|[[:space:]]*" rid "[[:space:]]*\\|" {
+        RUN_ID_RE=$(_re_escape "$RUN_ID")
+        local_tmp=$(mktemp "${FEATURE_FILE}.XXXXXX")
+        awk -v rid="$RUN_ID" -v rid_re="$RUN_ID_RE" -v at="$NOW" '
+            $0 ~ "^\\|[[:space:]]*" rid_re "[[:space:]]*\\|" {
                 # Replace status with "discarded" and update timestamp column.
                 n = split($0, parts, "|")
                 # Cells indexed 2..(n-1) — preserve cell 2 (RUN_ID), set cell 3 = "discarded", cell 4 = timestamp
