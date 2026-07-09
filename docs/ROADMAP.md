@@ -153,7 +153,8 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 | ✅ | Security hotfixes P0-1..4 | FEAT-010/STORY-0021 | — | done |
 | ✅ | Plans-scripts correctness batch (7/7 items) | FEAT-010/STORY-0023 | — | done |
 | 🚧 | Hook bug-cleanup — **7 done** (session-state fs, task-track PLUGIN_ROOT, post-compact path, CONFLICT-id lock via js-counter, log-filename sanitize, team-bridge attempt persistence, workflow-edit-learn header). Remaining: session-start cache invalidation (branch switch); post-execute-conflict-rescan event-gating (blocked on history event-schema) | FEAT-007/STORY-0029 | — | ~0.5d left |
-| 🚧 | audit-refs rewrite — **de-risked**: full-path probe found only 2 real dead links (fixed `35f9af8`); the other 18 are documented false positives (prose enumerations, `ADR-NNN`/`service-name` templates, `docs/*/` dir refs, `future`/`no such file` negative refs). Rewrite now just needs full-path capture + skip-rules for those patterns + a fixture self-test — no pile of pre-existing dead links to fix. | FEAT-010/STORY-0022 | — | ~0.5d |
+| ✅ | audit-refs rewrite — DONE (`7cad04a`): full-path dead-file check + allowlist/template skip-rules + fixture self-test; surfaced & fixed a real dead link (USAGE_GUIDE.md) the old regex missed. | FEAT-010/STORY-0022 | — | done |
+| 🚧 | CI gates — hook-parity validator DONE (`fcc77a8`, wired into CI `ed0bef0`): Fires:-header vs hooks.json drift now fails CI. **Remaining:** shellcheck gate — DEFERRED (blind-add breaks CI on dozens of pre-existing warnings; needs a fix-all-vs-baseline scope decision, same shape as audit-refs was). | FEAT-010/STORY-0024 | — | ~0.5d |
 | 3 | Consolidate learning hooks | FEAT-010/STORY-0025 | — | 2-3d |
 | 4 | CI gates (shellcheck + hooks parity) | FEAT-010/STORY-0024 | — | 1-2d |
 | 5 | hook-runtime lib finish (migrate dead hooks) | FEAT-007/STORY-0009 | **#6** | 3-5d |
