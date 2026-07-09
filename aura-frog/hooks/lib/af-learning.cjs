@@ -118,8 +118,15 @@ function loadLocalFile(filePath) {
  */
 function saveLocalFile(filePath, data) {
   try {
-    ensureLearningDir();
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    // Atomic write: a plain writeFileSync could leave a half-written (invalid)
+    // JSON file if a concurrent hook or a crash interrupts it — loadLocalFile
+    // then catches the parse error and returns [], silently wiping the learning
+    // history. mktemp + rename makes the swap atomic (readers see old or new,
+    // never partial).
+    const tmp = `${filePath}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, filePath);
   } catch { /* ignore */ }
 }
 
@@ -755,5 +762,7 @@ module.exports = {
   LEARNING_DIR,
   LEARNED_RULES_MD,
   MAIN_INSTRUCTION_LINK,
-  LOCAL_WORKFLOW_EVENTS_FILE
+  LOCAL_WORKFLOW_EVENTS_FILE,
+  saveLocalFile,
+  loadLocalFile
 };
