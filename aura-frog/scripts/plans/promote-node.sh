@@ -103,7 +103,7 @@ if ! require_no_regression "$PLANS_DIR" "$VIOLATIONS_BEFORE"; then
     exit 4
 fi
 
-EVENT="{\"ts\":\"${NOW}\",\"verb\":\"promote\",\"source\":\"${SOURCE_ID}\",\"target\":\"${TARGET_ID}\",\"note\":\"${NOTE//\"/\\\"}\",\"revision\":${NEW_REV},\"checkpoint\":\"${CKPT}\"}"
+EVENT="{\"ts\":\"${NOW}\",\"verb\":\"promote\",\"source\":\"${SOURCE_ID}\",\"target\":\"${TARGET_ID}\",\"note\":\"$(_json_escape "$NOTE")\",\"revision\":${NEW_REV},\"checkpoint\":\"${CKPT}\"}"
 append_history "$PLANS_DIR" "$EVENT"
 
 echo "promoted: ${SOURCE_ID} → ${TARGET_ID} (rev ${NEW_REV})"

@@ -217,11 +217,14 @@ PYEOF
     fi
 
     # Pure-sed fallback. Two passes: replace string value, then null value.
-    local replacement
+    # Escape sed-replacement metacharacters (\, &, and the # delimiter) in the
+    # value so a value containing them can't corrupt active.json structurally.
+    local replacement sed_val
+    sed_val=$(printf '%s' "$value" | sed 's/[\\&#]/\\&/g')
     if [ -z "$value" ] || [ "$value" = "null" ] || [ "$value" = "-" ]; then
         replacement="\"${field}\": null"
     else
-        replacement="\"${field}\": \"${value}\""
+        replacement="\"${field}\": \"${sed_val}\""
     fi
     sed -E "s#\"${field}\"[[:space:]]*:[[:space:]]*\"[^\"]*\"#${replacement}#" "$file" | \
         sed -E "s#\"${field}\"[[:space:]]*:[[:space:]]*null#${replacement}#" | \
@@ -339,6 +342,19 @@ _stat_mtime() {
 # ---------------------------------------------------------------------------
 _re_escape() {
     printf '%s' "$1" | sed 's/[][\.^$*+?(){}|]/\\&/g'
+}
+
+# ---------------------------------------------------------------------------
+# _json_escape <string>
+#   Escape a string for embedding inside a JSON double-quoted value (produces
+#   the inner content, WITHOUT the surrounding quotes). Handles backslash,
+#   double-quote, and control characters via python3; falls back to sed
+#   (backslash FIRST, then quote) when python3 is unavailable. Prevents a
+#   note/value containing '\' or '"' from corrupting history.jsonl.
+# ---------------------------------------------------------------------------
+_json_escape() {
+    printf '%s' "$1" | python3 -c 'import json,sys; sys.stdout.write(json.dumps(sys.stdin.read())[1:-1])' 2>/dev/null \
+        || printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
 # ---------------------------------------------------------------------------
