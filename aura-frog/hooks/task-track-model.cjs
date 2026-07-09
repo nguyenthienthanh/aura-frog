@@ -89,6 +89,22 @@ function parseModelFromFrontmatter(content) {
 }
 
 /**
+ * Parse the reasoning `effort:` field out of a YAML frontmatter block. Returns
+ * null when absent/malformed (so the statusline shows just the model). Only
+ * accepts the known effort tiers.
+ */
+const EFFORT_TIERS = new Set(['low', 'medium', 'high', 'xhigh', 'max']);
+function parseEffortFromFrontmatter(content) {
+  if (!content || typeof content !== 'string') return null;
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!fmMatch) return null;
+  const m = fmMatch[1].match(/^(?:effort|reasoning_effort):\s*(.+?)\s*$/m);
+  if (!m) return null;
+  const val = m[1].trim().replace(/^["']|["']$/g, '').split(/#/)[0].trim().toLowerCase();
+  return EFFORT_TIERS.has(val) ? val : null;
+}
+
+/**
  * Strip a plugin namespace prefix (e.g. `aura-frog:foo` → `foo`). Returns
  * null for empty / falsy input. The Agent tool accepts both prefixed and
  * bare ids; the bare form is what maps to the on-disk filename.
@@ -137,12 +153,13 @@ function resolveAgentFile(subagentType, projectRoot) {
 /**
  * Build a stack-entry object from resolved fields. No I/O.
  */
-function buildStackEntry({ subagentType, agentFile, model, sessionId }) {
+function buildStackEntry({ subagentType, agentFile, model, effort, sessionId }) {
   return {
     phase: normalizeSubagentType(subagentType) || subagentType || null,
     agent_file: agentFile || null,
     model: model || 'inherit',
     model_display: mapModelDisplay(model),
+    effort: effort || null,
     started_at: new Date().toISOString(),
     session_id: sessionId || null,
   };
@@ -183,23 +200,32 @@ function processPreToolUse(input, opts) {
   const subagentType = normalizeSubagentType(rawSubagent);
   if (!subagentType) return { action: 'skip' };
 
+  // Per-call overrides from the Task tool_input win over agent frontmatter.
+  const ti = input.tool_input || {};
+  const tiModel = typeof ti.model === 'string' && ti.model.trim() ? ti.model.trim() : null;
+  const tiEffort = typeof ti.effort === 'string' && ti.effort.trim() ? ti.effort.trim().toLowerCase() : null;
+
   const agentFile = resolveAgentFile(subagentType, projectRoot);
-  if (!agentFile) {
-    // Per spec: missing agent → log to stderr, exit 0, no state file.
-    try { process.stderr.write(`[task-track-model] no agent file for "${rawSubagent}" — skipping push\n`); } catch { /* swallow */ }
+  let frontmatter = '';
+  if (agentFile) {
+    try { frontmatter = fs.readFileSync(agentFile, 'utf8'); } catch { /* fall through to inherit */ }
+  }
+
+  // Built-in agents (Explore, general-purpose, …) have no frontmatter file —
+  // still track them WHEN the call carries an explicit model/effort override;
+  // otherwise there's nothing to display, so skip.
+  if (!agentFile && !tiModel && !tiEffort) {
+    try { process.stderr.write(`[task-track-model] no agent file / no override for "${rawSubagent}" — skipping push\n`); } catch { /* swallow */ }
     return { action: 'skip' };
   }
 
-  let frontmatter = '';
-  try {
-    frontmatter = fs.readFileSync(agentFile, 'utf8');
-  } catch { /* fall through to inherit */ }
-
-  const model = parseModelFromFrontmatter(frontmatter);
+  const model = tiModel || parseModelFromFrontmatter(frontmatter);
+  const effort = tiEffort || parseEffortFromFrontmatter(frontmatter);
   const entry = buildStackEntry({
     subagentType: rawSubagent,
     agentFile,
     model,
+    effort,
     sessionId: input.session_id || null,
   });
   pushStackEntry(stackFile, entry);
@@ -224,6 +250,7 @@ if (require.main === module) {
 module.exports = {
   mapModelDisplay,
   parseModelFromFrontmatter,
+  parseEffortFromFrontmatter,
   normalizeSubagentType,
   resolveAgentFile,
   buildStackEntry,

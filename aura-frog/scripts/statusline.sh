@@ -218,14 +218,17 @@ render_active() {
     [ -s "$STACK_FILE" ] || return 1
     command -v jq >/dev/null 2>&1 || return 1
 
-    local top phase step_model started_iso started_epoch now_epoch elapsed dur
+    local top phase step_model step_effort started_iso started_epoch now_epoch elapsed dur
     top=$(tail -n 1 "$STACK_FILE" 2>/dev/null) || return 1
     [ -z "$top" ] && return 1
 
     phase=$(printf '%s' "$top" | jq -r '.phase // empty' 2>/dev/null) || return 1
     step_model=$(printf '%s' "$top" | jq -r '.model_display // empty' 2>/dev/null) || return 1
+    step_effort=$(printf '%s' "$top" | jq -r '.effort // empty' 2>/dev/null) || return 1
     started_iso=$(printf '%s' "$top" | jq -r '.started_at // empty' 2>/dev/null) || return 1
     [ -z "$phase" ] || [ -z "$step_model" ] && return 1
+    # Append the reasoning effort when the step declared one: "Sonnet 4.5 · high".
+    [ -n "$step_effort" ] && step_model="${step_model} · ${step_effort}"
 
     # Compute duration. Hooks emit `new Date().toISOString()` which is always
     # UTC with trailing Z. Linux date -d "$iso" handles the Z. macOS BSD
