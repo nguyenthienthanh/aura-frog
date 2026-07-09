@@ -115,10 +115,17 @@ function resolveAgentFile(subagentType, projectRoot) {
   if (!subagentType) return null;
   if (BUILTIN_AGENTS.has(subagentType)) return null;
 
-  const candidates = [
+  // CLAUDE_PLUGIN_ROOT first: in an installed plugin the agent files live in the
+  // plugin cache dir, NOT under <projectRoot>/aura-frog — without this the model
+  // stack never populated for real users (only inside this dev repo).
+  const candidates = [];
+  if (process.env.CLAUDE_PLUGIN_ROOT) {
+    candidates.push(path.join(process.env.CLAUDE_PLUGIN_ROOT, 'agents', `${subagentType}.md`));
+  }
+  candidates.push(
     path.join(projectRoot, 'aura-frog', 'agents', `${subagentType}.md`),
     path.join(projectRoot, '.claude', 'agents', `${subagentType}.md`),
-  ];
+  );
   for (const c of candidates) {
     try {
       if (fs.existsSync(c)) return c;

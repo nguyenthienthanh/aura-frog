@@ -19,9 +19,12 @@
 const fs = require('fs');
 const path = require('path');
 
+// These must match where compact-handoff.cjs actually writes them
+// (.claude/cache/…) — the old paths omitted /cache/, so verification never
+// found the files and corrupted handoffs passed silently.
 const STATE_PATHS = [
-  '.claude/workflow-state.json',
-  '.claude/compact-handoff.json'
+  '.claude/cache/workflow-state.json',
+  '.claude/cache/compact-handoff.json'
 ];
 
 let input = '';

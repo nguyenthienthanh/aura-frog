@@ -9,6 +9,7 @@
  * @version 1.1.0
  */
 
+const fs = require('fs');
 const {
   getSessionTempPath,
   readSessionState,
