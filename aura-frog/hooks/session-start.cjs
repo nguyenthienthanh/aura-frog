@@ -57,6 +57,7 @@ const {
   getGitRemoteUrl,
   resolvePlanPath,
   getReportsPath,
+  resolveSessionId,
   writeSessionState,
   writeEnv
 } = require('./lib/af-config-utils.cjs');
@@ -185,7 +186,9 @@ async function main() {
 
     const envFile = process.env.CLAUDE_ENV_FILE;
     const source = data.source || 'unknown';
-    const sessionId = data.session_id || process.ppid?.toString() || null;
+    // Canonical key shared with every reader hook (ppid / AF_SESSION_ID) — NOT
+    // data.session_id, which readers never see and which desynced this writer.
+    const sessionId = resolveSessionId();
 
     // One-shot legacy migration: .aura/plans → .claude/plans (v3.7.3+).
     // Fires when only the legacy dir exists and AF_PLANS_DIR is unset.

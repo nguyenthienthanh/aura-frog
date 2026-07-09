@@ -388,6 +388,18 @@ function getSessionTempPath(sessionId) {
 }
 
 /**
+ * Canonical per-session key shared by ALL hooks — writers AND readers. Every
+ * hook process reliably shares process.ppid within a session (same parent
+ * Claude Code process), which is what every reader keys by; AF_SESSION_ID lets
+ * a wrapper/test pin it. A stdin session_id (UUID) must NOT be preferred here —
+ * most reader hooks never receive it, so keying the writer by it desyncs it
+ * from every reader and the state file is effectively never found.
+ */
+function resolveSessionId() {
+  return process.env.AF_SESSION_ID || process.ppid?.toString() || null;
+}
+
+/**
  * Read session state from temp file
  */
 function readSessionState(sessionId) {
@@ -567,6 +579,7 @@ module.exports = {
 
   // Session state
   getSessionTempPath,
+  resolveSessionId,
   readSessionState,
   writeSessionState,
 
