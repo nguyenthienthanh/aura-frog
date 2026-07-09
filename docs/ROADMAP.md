@@ -122,12 +122,12 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 
 Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verified-bug elimination.
 
-> **Session progress 2026-07-09** (commits `4296bd8`→`7b28849`): STORY-0021 done;
-> STORY-0023 partially done — fixed `resolve-node` null-field exit code, `validate-plan-tree`
-> full-DFS cycle detection + `ALL_NODES` word-splitting, and `run-all.sh --files` parsing (each
-> with tests). **STORY-0023 remaining:** `next-task.sh` rollback leaves `active.json` stale;
-> `link-run.sh` regex-unsafe RUN_ID + non-transactional write; `promote-node.sh`/`_lib.sh`
-> escaping; `phase-transition.sh` literal `temp.json` (7 call-sites — needs per-site mktemp).
+> **Session progress 2026-07-09** (commits `4296bd8`→`5e579bd`, 9 commits, full suite 25 suites / 0 fail):
+> STORY-0021 done. **STORY-0023 — 6 of 7 items done** (each with tests): `resolve-node` null-field
+> exit code; `validate-plan-tree` full-DFS cycle detection + `ALL_NODES` word-splitting; `run-all.sh
+> --files` parsing; `phase-transition.sh` atomic write (7 sites → `_atomic_state_write`); `link-run.sh`
+> RUN_ID regex safety + mktemp (`_re_escape` added to `_lib.sh`). **STORY-0023 remaining:** `next-task.sh`
+> rollback leaves `active.json` stale; `promote-node.sh`/`_lib.sh` backslash escaping in history/notes.
 
 | # | Work | Maps to | GH issue | Effort |
 |---|---|---|---|---|
