@@ -225,12 +225,20 @@ function handlePhaseRejection(stateFile, logsDir, teamName, phaseSlug) {
   const archiveDir = path.join(logsDir, 'teams', `phase-${phaseSlug}-attempt-${currentAttempt}`);
 
   if (fs.existsSync(currentDir)) {
+    // Persisting attempt (below) keeps archiveDir unique; guard anyway so a
+    // stale archive from a lost/reset state can't crash rename with ENOTEMPTY.
+    if (fs.existsSync(archiveDir)) {
+      try { fs.rmSync(archiveDir, { recursive: true, force: true }); } catch { /* best-effort */ }
+    }
     fs.renameSync(currentDir, archiveDir);
   }
 
-  // Update team entry in state
+  // Update team entry in state. Persist attempt = nextAttempt so a SECOND
+  // rejection reads the incremented value (it previously stayed 1 forever,
+  // re-archiving onto phase-…-attempt-1 and crashing on ENOTEMPTY).
   if (team) {
     team.status = 'rejected';
+    team.attempt = nextAttempt;
     team.teardown_at = new Date().toISOString();
     writeState(stateFile, state);
   }
