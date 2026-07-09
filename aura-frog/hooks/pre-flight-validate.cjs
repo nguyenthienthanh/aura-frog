@@ -35,7 +35,25 @@ const RUN_ALL = path.join(PLUGIN_ROOT, 'scripts', 'preflight', 'run-all.sh');
 if (!fs.existsSync(RUN_ALL)) process.exit(0);
 
 
-const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { findProjectRoot, readHookInputCompat } = require('./lib/hook-runtime.cjs');
+
+// Bridge the stdin tool context onto the env vars run-all.sh reads (it still
+// auto-dispatches from CLAUDE_TOOL_* env). The old code read the tool name from
+// a never-set env var, so the pre-flight gate exited before running and
+// validated NOTHING. The parent now reads stdin and passes it to the child.
+function buildChildEnv(input, baseEnv) {
+  const env = { ...baseEnv };
+  const ti = (input && input.tool_input) || null;
+  if (input && input.tool_name) env.CLAUDE_TOOL_NAME = input.tool_name;
+  if (ti && typeof ti === 'object') {
+    env.CLAUDE_TOOL_INPUT = JSON.stringify(ti);
+    env.CLAUDE_TOOL_ARGS = JSON.stringify(ti);
+    const fp = ti.file_path || ti.path;
+    if (fp) env.CLAUDE_FILE_PATHS = fp;
+    if (ti.command) env.CLAUDE_TOOL_COMMAND = ti.command;
+  }
+  return env;
+}
 const BYPASS_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass');
 const BYPASS_COUNT_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass-count');
 
@@ -66,16 +84,19 @@ function bumpBypassCount() {
   }
 }
 
-if (consumeBypassFlag()) process.exit(0);
+function main() {
+ if (consumeBypassFlag()) process.exit(0);
 
-const toolName = process.env.CLAUDE_TOOL_NAME || '';
-if (!toolName) process.exit(0);
+ let input = {};
+ try { input = readHookInputCompat(); } catch { /* env fallback below */ }
+ const toolName = (input && input.tool_name) || process.env.CLAUDE_TOOL_NAME || '';
+ if (!toolName) process.exit(0);
 
-const result = spawnSync('bash', [RUN_ALL], {
+ const result = spawnSync('bash', [RUN_ALL], {
   encoding: 'utf-8',
-  env: process.env,
+  env: buildChildEnv(input, process.env),
   timeout: 5000,
-});
+ });
 
 const exitCode = result.status === null ? 0 : result.status;
 const stderr = result.stderr || '';
@@ -95,3 +116,8 @@ if (exitCode === 1) {
 }
 
 process.exit(0);
+}
+
+if (require.main === module) main();
+
+module.exports = { buildChildEnv };
