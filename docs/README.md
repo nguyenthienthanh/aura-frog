@@ -86,6 +86,7 @@ If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-dr
 
 - [Changelog](reference/CHANGELOG.md) — Full release history
 - [Testing Guide](reference/TESTING_GUIDE.md) — Plugin QA and validation procedures
+- [ADR-001: Graph backend for L3/L4 conflict detection](adr/ADR-001-graph-backend-for-l3-l4-conflict-detection.md) — spike/decision
 
 ---
 
