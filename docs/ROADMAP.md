@@ -130,9 +130,24 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 > + security-scan + auto-test-runner stdin).
 >
 > **Env-var-dead hooks split into two classes (important finding):**
-> - **Cleanly fixable** (data IS in stdin — tool_name / tool_input / file_path / command) — **ALL DONE**:
->   mcp-call-gate, security-scan, auto-test-runner, json-toon-projector, smart-learn. Pattern:
+> - **Cleanly fixable** (data IS in stdin — tool_name / tool_input / file_path / command) — **ALL 7 DONE**:
+>   mcp-call-gate, security-scan, auto-test-runner, json-toon-projector, smart-learn, feedback-capture,
+>   **pre-flight-validate** (was a DEAD blocking safety gate — read unset env, exited before validating
+>   anything; now reads stdin + bridges tool context to run-all.sh via `buildChildEnv`). Pattern:
 >   require-safe wrap + `readHookInputCompat` + a resolve-helper extracting the per-tool field.
+>
+>   **Turnkey unblock for the exit-code class** — save as `aura-frog/hooks/_probe.cjs`, temporarily add
+>   `{"matcher":"Bash","hooks":[{"type":"command","command":"node \"${CLAUDE_PLUGIN_ROOT}/hooks/_probe.cjs\""}]}`
+>   to hooks.json PostToolUse, run ONE Bash command, inspect `.aura-frog/stdin-probe.jsonl`, then remove:
+>   ```js
+>   const fs=require('fs'); let raw='';
+>   try{const{readStdinSafely}=require('./lib/safe-stdin.cjs');raw=readStdinSafely()||'';}catch{}
+>   try{fs.mkdirSync('.aura-frog',{recursive:true});fs.appendFileSync('.aura-frog/stdin-probe.jsonl',raw.trim()+'\n');}catch{}
+>   process.exit(0);
+>   ```
+>   If the dumped JSON's `tool_response` carries an exit code / duration → the 3 blocked hooks
+>   (tdd-red-failure-tracker, tool-call-tracer post-phase, post-execute-update-node) become clean
+>   migrations. If NOT → they need a Claude-Code hook-contract change, not a code fix.
 > - **BLOCKED on hook-API schema** — tdd-red-failure-tracker, tool-call-tracer (post-phase),
 >   post-execute-update-node, json-toon-projector need `CLAUDE_TOOL_EXIT_CODE` / `CLAUDE_TOOL_DURATION_MS`,
 >   which are NOT known to exist in PostToolUse stdin. **FIRST verify** whether `tool_response` carries an
