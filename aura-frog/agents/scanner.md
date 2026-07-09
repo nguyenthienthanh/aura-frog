@@ -1,5 +1,6 @@
 ---
 name: scanner
+effort: low
 description: "Project detection, config loading, context tracking. Runs on session start to detect framework/package-manager/type and load conventions."
 tools: Read, Grep, Glob, Bash
 mcp_servers: []

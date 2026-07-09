@@ -1,5 +1,6 @@
 ---
 name: replanner
+effort: medium
 description: "Triggered by failure-classifier on F2-F4 escalations. Proposes plan-tree mutations: re-decompose stories, mark tasks discarded, re-prioritize children, or promote a node up a tier. Read-only on code; mutations applied via master-planner."
 tools: Read, Glob, Grep, Edit, Write
 mcp_servers: [context7]
