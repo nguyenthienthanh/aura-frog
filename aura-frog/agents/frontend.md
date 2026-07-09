@@ -59,6 +59,7 @@ Use for all frontend implementation, UI components, design system work, and user
 - `skills/design-expert/SKILL.md` — UI/UX, component design
 - `skills/frontend-aesthetics/SKILL.md` — distinctive typography + dominant/accent color (house-style tuned)
 - `skills/motion-design/SKILL.md` — restrained, reduced-motion-safe, bundle-aware web motion
+- `skills/design-tokens/SKILL.md` — OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
 - `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
 
 ---

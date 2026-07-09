@@ -13,6 +13,8 @@
 
 **Use theme/design system values. Never hardcode colors, spacing, or sizes.**
 
+> **Generator vs enforcer:** this rule *enforces* token usage. To *generate* the token system in the first place (a cohesive OKLCH palette + semantic light/dark from one `--brand-hue`, as a Tailwind v4 `@theme` block or CSS-variables fallback), use the `design-tokens` skill — don't hand-pick scattered colors.
+
 ---
 
 ## Quick Reference
