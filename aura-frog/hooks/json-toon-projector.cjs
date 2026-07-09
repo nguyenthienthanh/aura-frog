@@ -100,7 +100,22 @@ function readPromptInput() {
   try { return JSON.parse(raw); } catch { return { raw }; }
 }
 
-function getToolArgs() {
+// Read + memoize the hook stdin payload once (stdin can only be consumed once).
+let _cachedInput;
+function getHookInput() {
+  if (_cachedInput === undefined) {
+    let raw = '';
+    try { raw = readStdinSafely(); } catch { /* no stdin */ }
+    try { _cachedInput = raw ? JSON.parse(raw) : {}; } catch { _cachedInput = {}; }
+  }
+  return _cachedInput;
+}
+
+// Tool args come from the stdin tool_input (the hook contract) — NOT the
+// CLAUDE_TOOL_ARGS env var, which the API never sets (kept only as a fallback).
+function getToolArgs(input = getHookInput()) {
+  const ti = input && input.tool_input;
+  if (ti && typeof ti === 'object') return ti;
   const argsRaw = process.env.CLAUDE_TOOL_ARGS || '';
   if (!argsRaw) return {};
   try { return JSON.parse(argsRaw); } catch { return {}; }
@@ -188,7 +203,7 @@ const { findProjectRoot } = require('./lib/hook-runtime.cjs');
 }
 
 function main() {
-  const toolName = process.env.CLAUDE_TOOL_NAME || '';
+  const toolName = getHookInput().tool_name || process.env.CLAUDE_TOOL_NAME || '';
 
   let result = null;
   if (toolName === 'Read') {
@@ -212,4 +227,8 @@ function main() {
   safeExit(0);
 }
 
-main();
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { getHookInput, getToolArgs };
+}
