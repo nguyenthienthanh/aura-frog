@@ -125,8 +125,18 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 
 Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verified-bug elimination.
 
-> **Session progress 2026-07-09** (commits `4296bd8`→`599d94f`, all green — 10 script suites / 161 tests):
-> **STORY-0021 done. STORY-0023 done (7/7 items, each with tests):** `resolve-node` null-field exit
+> **Session progress 2026-07-09 (extended)** — 23 commits, all green. **STORY-0021 done; STORY-0023
+> done (7/7); STORY-0029 7 hook bugs done; STORY-0010 core done** (session-identity unification +
+> feedback-capture fields + security-scan stdin). Key insight: the audit over-scoped several "big
+> refactors" — session-identity was ONE writer diverging (not 9 files); the env-var-dead hooks migrate
+> cleanly one at a time (mcp-call-gate, security-scan done via `readHookInputCompat`). **Remaining
+> env-var-dead hooks** (auto-test-runner, tdd-red-failure-tracker, smart-learn, json-toon-projector,
+> tool-call-tracer, post-execute-update-node): each needs a small require-safe wrap before a clean
+> test — mechanical but do in fresh context. **Blocked:** post-execute-conflict-rescan (event-schema);
+> post-execute-update-node exit-code (data may not exist in PostToolUse stdin — verify first).
+>
+> **Earlier this session** (commits `4296bd8`→`599d94f`, 10 script suites / 161 tests):
+> STORY-0023 (7/7 items, each with tests): `resolve-node` null-field exit
 > code; `validate-plan-tree` full-DFS cycle detection + `ALL_NODES` word-splitting; `run-all.sh --files`
 > parsing; `phase-transition.sh` atomic write (7 sites → `_atomic_state_write`); `link-run.sh` RUN_ID
 > regex safety + mktemp (`_re_escape`); `next-task.sh` active.task set only after regression guard;
