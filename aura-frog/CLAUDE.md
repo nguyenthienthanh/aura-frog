@@ -33,7 +33,7 @@ os_map[5]{concept,implementation}:
   Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,8 MCP servers (auto-invoked; 6 enabled + postgres/redis opt-in)
+  Drivers,9 MCP servers (auto-invoked; 6 enabled + 3 opt-in)
 ```
 
 ---
@@ -78,15 +78,16 @@ Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation token
 ## MCP Servers
 
 ```toon
-mcp[8]{name,purpose,requires,enabled}:
+mcp[9]{name,purpose,requires,enabled}:
   context7,Library docs,None,enabled
-  playwright,Browser automation + E2E,None,enabled
+  playwright,Browser automation + E2E (drives the browser),None,enabled
   vitest,Test execution + coverage,None,enabled
   firebase,Firebase management,firebase login,enabled
   figma,Design files,FIGMA_API_TOKEN,enabled
   slack,Notifications,SLACK_BOT_TOKEN,enabled
   postgres,Database queries (read-only default),POSTGRES_CONNECTION_STRING,disabled (opt-in)
   redis,Cache + queue,REDIS_URL,disabled (opt-in)
+  chrome-devtools,Live inspection/diagnostics (~5-6k tok/session; NOT automation — that's playwright),None,disabled (opt-in)
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
@@ -275,7 +276,7 @@ resources[8]{name,location}:
   Rules (70),rules/{core|agent|workflow}/
   Skills (56),skills/
   Hooks (47),hooks/
-  MCP (8),.mcp.json (postgres + redis disabled by default)
+  MCP (9),.mcp.json (postgres + redis + chrome-devtools disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```

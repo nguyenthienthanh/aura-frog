@@ -46,6 +46,11 @@
         "REDIS_URL": "${REDIS_URL}"
       },
       "disabled": true
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "disabled": true
     }
   }
 }
