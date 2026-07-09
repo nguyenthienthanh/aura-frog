@@ -160,9 +160,11 @@ function recordTeamEvent(teamLogDir, agent, action, description, meta) {
   // Append to combined team log
   fs.appendFileSync(path.join(teamLogDir, 'team-log.jsonl'), line, 'utf-8');
 
-  // Append to per-agent log (if agent specified)
+  // Append to per-agent log (if agent specified). Sanitize the name so a value
+  // containing '/' or '..' can't escape the log dir.
   if (agent && agent !== 'system') {
-    fs.appendFileSync(path.join(teamLogDir, `${agent}.jsonl`), line, 'utf-8');
+    const safe = String(agent).replace(/[^A-Za-z0-9._-]/g, '_').replace(/^\.+/, '') || 'agent';
+    fs.appendFileSync(path.join(teamLogDir, `${safe}.jsonl`), line, 'utf-8');
   }
 }
 

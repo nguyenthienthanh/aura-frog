@@ -44,7 +44,7 @@ function appendEntry(entry) {
     // Per-agent log
     const agent = entry.agent;
     if (agent && agent !== 'system') {
-      fs.appendFileSync(path.join(logDir, `${agent}.jsonl`), line, 'utf-8');
+      fs.appendFileSync(path.join(logDir, `${sanitizeAgentName(agent)}.jsonl`), line, 'utf-8');
     }
   } catch { /* non-fatal */ }
 }
@@ -94,10 +94,18 @@ function logMessageSent(recipient, summary) {
 // Exports
 // -------------------------------------------------------------------
 
+// Collapse anything outside [A-Za-z0-9._-] to '_' and strip leading dots so an
+// agent name like '../../etc/x' cannot escape the log dir when used as a
+// per-agent log filename.
+function sanitizeAgentName(agent) {
+  return String(agent || 'agent').replace(/[^A-Za-z0-9._-]/g, '_').replace(/^\.+/, '') || 'agent';
+}
+
 module.exports = {
   logAction,
   logTaskClaimed,
   logTaskCompleted,
   logFileEdited,
-  logMessageSent
+  logMessageSent,
+  sanitizeAgentName
 };
