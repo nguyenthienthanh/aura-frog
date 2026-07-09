@@ -125,15 +125,19 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 
 Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verified-bug elimination.
 
-> **Session progress 2026-07-09 (extended)** — 23 commits, all green. **STORY-0021 done; STORY-0023
-> done (7/7); STORY-0029 7 hook bugs done; STORY-0010 core done** (session-identity unification +
-> feedback-capture fields + security-scan stdin). Key insight: the audit over-scoped several "big
-> refactors" — session-identity was ONE writer diverging (not 9 files); the env-var-dead hooks migrate
-> cleanly one at a time (mcp-call-gate, security-scan done via `readHookInputCompat`). **Remaining
-> env-var-dead hooks** (auto-test-runner, tdd-red-failure-tracker, smart-learn, json-toon-projector,
-> tool-call-tracer, post-execute-update-node): each needs a small require-safe wrap before a clean
-> test — mechanical but do in fresh context. **Blocked:** post-execute-conflict-rescan (event-schema);
-> post-execute-update-node exit-code (data may not exist in PostToolUse stdin — verify first).
+> **Session progress 2026-07-09 (extended)** — 24 commits, all green. **STORY-0021 done; STORY-0023
+> done (7/7); STORY-0029 7 hook bugs done; STORY-0010 core done** (session-identity + feedback-capture
+> + security-scan + auto-test-runner stdin).
+>
+> **Env-var-dead hooks split into two classes (important finding):**
+> - **Cleanly fixable** (data IS in stdin — tool_name / tool_input / file_path / command) — DONE:
+>   mcp-call-gate, security-scan, auto-test-runner. Pattern: require-safe wrap + `readHookInputCompat`.
+> - **BLOCKED on hook-API schema** — tdd-red-failure-tracker, tool-call-tracer (post-phase),
+>   post-execute-update-node, json-toon-projector need `CLAUDE_TOOL_EXIT_CODE` / `CLAUDE_TOOL_DURATION_MS`,
+>   which are NOT known to exist in PostToolUse stdin. **FIRST verify** whether `tool_response` carries an
+>   exit code / duration (probe hook that dumps stdin on a real Bash call). If absent, these need a
+>   hook-contract change, not a code fix. Do NOT guess a field name — that ships a silently-wrong hook.
+> - post-execute-conflict-rescan: BLOCKED on history event-schema cleanup (audit improvement #5).
 >
 > **Earlier this session** (commits `4296bd8`→`599d94f`, 10 script suites / 161 tests):
 > STORY-0023 (7/7 items, each with tests): `resolve-node` null-field exit
