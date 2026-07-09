@@ -137,7 +137,7 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 |---|---|---|---|---|
 | ✅ | Security hotfixes P0-1..4 | FEAT-010/STORY-0021 | — | done |
 | ✅ | Plans-scripts correctness batch (7/7 items) | FEAT-010/STORY-0023 | — | done |
-| 🚧 | Hook bug-cleanup — 3 done (session-state fs, task-track PLUGIN_ROOT, post-compact path); conflict-rescan event-gating + conflict-counter lock + team-bridge/log-sanitize remain | FEAT-007/STORY-0029 | — | ~1d left |
+| 🚧 | Hook bug-cleanup — **7 done** (session-state fs, task-track PLUGIN_ROOT, post-compact path, CONFLICT-id lock via js-counter, log-filename sanitize, team-bridge attempt persistence, workflow-edit-learn header). Remaining: session-start cache invalidation (branch switch); post-execute-conflict-rescan event-gating (blocked on history event-schema) | FEAT-007/STORY-0029 | — | ~0.5d left |
 | 1 | audit-refs rewrite + fixture self-test | FEAT-010/STORY-0022 | — | 1-2d |
 | 3 | Consolidate learning hooks | FEAT-010/STORY-0025 | — | 2-3d |
 | 4 | CI gates (shellcheck + hooks parity) | FEAT-010/STORY-0024 | — | 1-2d |

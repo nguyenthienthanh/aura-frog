@@ -2,7 +2,7 @@
 /**
  * Aura Frog - Workflow Edit Learn Hook
  *
- * Fires: PreToolUse (Read)
+ * Fires: SessionStart (see hooks.json — scans for user edits since last session)
  * Purpose: Detect when users have directly edited workflow MD files and extract learnings
  *
  * Monitors:
