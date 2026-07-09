@@ -14,6 +14,16 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const { readSessionState } = require('./lib/af-config-utils.cjs');
+const { readHookInputCompat } = require('./lib/hook-runtime.cjs');
+
+// Resolve the edited file from the PostToolUse stdin payload (tool_input),
+// falling back to the legacy CLAUDE_FILE_PATHS env var. The old code read only
+// the env var — which the hook API never sets — so auto-test-running never
+// fired on any edit.
+function resolveFilePath(input) {
+  const ti = (input && input.tool_input) || {};
+  return ti.file_path || ti.path || process.env.CLAUDE_FILE_PATHS || '';
+}
 
 // TDD phases where auto-testing is relevant
 const TDD_PHASES = ['2', '3', '4'];
@@ -73,8 +83,11 @@ function isTestRelevant(filePath) {
   return codeExts.has(ext);
 }
 
-try {
-  const filePath = process.env.CLAUDE_FILE_PATHS || '';
+function main() {
+ try {
+  let input = {};
+  try { input = readHookInputCompat(); } catch { /* fall back to env below */ }
+  const filePath = resolveFilePath(input);
   if (!filePath || !isTestRelevant(filePath)) process.exit(0);
 
   // Check if we're in a TDD phase
@@ -115,6 +128,13 @@ try {
 
   process.exit(0);
 
-} catch (error) {
+ } catch (error) {
   process.exit(0); // Fail open
+ }
+}
+
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { isTestRelevant, detectTestRunner, resolveFilePath };
 }
