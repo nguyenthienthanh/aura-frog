@@ -22,7 +22,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 
-const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { findProjectRoot, atomicWrite } = require('./lib/hook-runtime.cjs');
 const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const CACHE_FILE = path.join(CACHE_DIR, 'test-patterns.json');
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
@@ -177,7 +177,9 @@ function main() {
     if (!fs.existsSync(CACHE_DIR)) {
       fs.mkdirSync(CACHE_DIR, { recursive: true });
     }
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(result, null, 2));
+    // Atomic (tmp + rename) so a crash/concurrent write can't leave a partial,
+    // invalid-JSON test-patterns.json that the next read discards.
+    atomicWrite(CACHE_FILE, JSON.stringify(result, null, 2));
   } catch { /* non-blocking */ }
 
   process.exit(0);
