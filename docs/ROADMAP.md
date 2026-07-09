@@ -130,8 +130,9 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 > + security-scan + auto-test-runner stdin).
 >
 > **Env-var-dead hooks split into two classes (important finding):**
-> - **Cleanly fixable** (data IS in stdin — tool_name / tool_input / file_path / command) — DONE:
->   mcp-call-gate, security-scan, auto-test-runner. Pattern: require-safe wrap + `readHookInputCompat`.
+> - **Cleanly fixable** (data IS in stdin — tool_name / tool_input / file_path / command) — **ALL DONE**:
+>   mcp-call-gate, security-scan, auto-test-runner, json-toon-projector, smart-learn. Pattern:
+>   require-safe wrap + `readHookInputCompat` + a resolve-helper extracting the per-tool field.
 > - **BLOCKED on hook-API schema** — tdd-red-failure-tracker, tool-call-tracer (post-phase),
 >   post-execute-update-node, json-toon-projector need `CLAUDE_TOOL_EXIT_CODE` / `CLAUDE_TOOL_DURATION_MS`,
 >   which are NOT known to exist in PostToolUse stdin. **FIRST verify** whether `tool_response` carries an
