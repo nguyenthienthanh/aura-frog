@@ -102,8 +102,11 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 - Field-name mismatches: `feedback-capture` (`data.tool`), `post-compact` (`.claude/` vs `.claude/cache/`),
   `thinking-boost` (dead cache keys). → STORY-0010/TASK-00040.
 - Unlocked read-modify-write on learning JSON stores; `pruneJsonlByTimestamp` ignores the append lock. → STORY-0011/TASK-00041.
-- `session-state.cjs:143` missing `require('fs')`; `post-execute-conflict-rescan` treats any Read as
-  "blocker done"; `task-track-model` never searches `CLAUDE_PLUGIN_ROOT/agents` (dead for installed users). → STORY-0029/TASK-00042.
+- ✅ `session-state.cjs:143` missing `require('fs')` — **fixed** (`696cde9`).
+- ✅ `task-track-model` never searched `CLAUDE_PLUGIN_ROOT/agents` (dead for installed users) — **fixed** (`696cde9`; unblocks STORY-0027).
+- ✅ `post-compact` verified `.claude/…` but handoff writes `.claude/cache/…` — **fixed** (`696cde9`).
+- ⏳ `post-execute-conflict-rescan` treats any Read as "blocker done" — needs the history event schema
+  cleaned first (audit improvement #5); do with STORY-0011 event-schema work. → STORY-0029.
 
 **Bash scripts (→ FEAT-010):**
 - `audit-refs.sh` regex can't see full paths → real dead links pass the gate (e.g. `prune-checkpoints.sh`). → STORY-0022.
@@ -134,6 +137,7 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 |---|---|---|---|---|
 | ✅ | Security hotfixes P0-1..4 | FEAT-010/STORY-0021 | — | done |
 | ✅ | Plans-scripts correctness batch (7/7 items) | FEAT-010/STORY-0023 | — | done |
+| 🚧 | Hook bug-cleanup — 3 done (session-state fs, task-track PLUGIN_ROOT, post-compact path); conflict-rescan event-gating + conflict-counter lock + team-bridge/log-sanitize remain | FEAT-007/STORY-0029 | — | ~1d left |
 | 1 | audit-refs rewrite + fixture self-test | FEAT-010/STORY-0022 | — | 1-2d |
 | 3 | Consolidate learning hooks | FEAT-010/STORY-0025 | — | 2-3d |
 | 4 | CI gates (shellcheck + hooks parity) | FEAT-010/STORY-0024 | — | 1-2d |
