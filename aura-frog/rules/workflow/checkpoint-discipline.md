@@ -78,7 +78,7 @@ retention[3]{rule,limit}:
   size_cap,50 MB,".claude/plans/checkpoints/ total"
 ```
 
-Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon). Manual: `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C).
+Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon) via the `plan-archivist` skill — checkpoint compression is part of branch archival; there is no standalone prune script.
 
 ---
 
@@ -129,4 +129,4 @@ Each `/aura-frog:plan-undo` restores ONE checkpoint. To undo further, the user r
 - **Command:** `/aura-frog:plan-undo` — only consumer
 - **Rule:** `rules/workflow/replan-thresholds.md` — replan-triggered checkpoints
 - **Rule:** `rules/workflow/plan-lifecycle.md` — status-transition triggered checkpoints
-- **Script:** `aura-frog/scripts/plans/prune-checkpoints.sh` (Milestone C)
+- **Command:** `/aura-frog:plan-archive` — checkpoint pruning + branch compression (via the `plan-archivist` skill)

@@ -28,7 +28,7 @@ The script:
 - **show** — prints every record matching `conflict_id`.
 - **resolve** — appends a new record with the user's choice + writes `history.jsonl event=conflicts.resolve`. Validates choice against the allowed set.
 - **history** — dumps `conflicts.jsonl` raw.
-- **check** — invokes `hooks/conflict-detector.cjs --scan-now --plans-dir ...` if present (Tier-1 L1+L2 detection per Tech Spec §21).
+- **check** — runs the `conflict-detector` skill for on-demand L1+L2 detection (Tier-1 per Tech Spec §21); the `pre-dispatch-conflict-check.cjs` hook performs the same automatically before each dispatch.
 
 Full per-choice mutation semantics (accept-proposed discards blocker, sequential sets `depends_on`, freeze-both cascades, etc.) are documented in `commands/plan.md` and the Tech Spec §21.5.
 
