@@ -120,17 +120,15 @@ if (l1Output.confidence < 0.95 && fs.existsSync(L2_SCRIPT) && l1Output.files) {
   }
 }
 
-// Mint CONFLICT-NNNNN
+// Mint CONFLICT-NNNNN under the shared counter lock so concurrent dispatches
+// (and bash mutators) never mint a duplicate id.
+const { nextCounter } = require('./lib/js-counter.cjs');
 function nextConflictId() {
-  let counters = {};
-  try { counters = JSON.parse(fs.readFileSync(COUNTERS_FILE, 'utf8')); }
-  catch { counters = { counters: { CONFLICT: 0 } }; }
-  if (!counters.counters) counters.counters = {};
-  counters.counters.CONFLICT = (counters.counters.CONFLICT || 0) + 1;
-  counters.updated_at = new Date().toISOString();
-  try { fs.writeFileSync(COUNTERS_FILE, JSON.stringify(counters, null, 2)); }
-  catch {/* best-effort */}
-  return `CONFLICT-${String(counters.counters.CONFLICT).padStart(5, '0')}`;
+  const n = nextCounter(COUNTERS_FILE, 'CONFLICT');
+  // Lock-timeout fallback (extremely rare): a time-derived value keeps the id
+  // unique-enough for a best-effort, fail-open hook rather than colliding.
+  const val = n === null ? (Date.now() % 100000) : n;
+  return `CONFLICT-${String(val).padStart(5, '0')}`;
 }
 
 const conflictId = nextConflictId();
