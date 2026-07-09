@@ -106,7 +106,7 @@ async function main() {
       if (stdin) data = JSON.parse(stdin);
     } catch { /* malformed data - skip silently, no stdin or invalid JSON is expected */ }
 
-    const { tool, input, output, session_id: sessionId } = data;
+    const { tool, input, output, sessionId } = extractToolFields(data);
 
     // Skip if not a file operation
     if (!['Edit', 'Write'].includes(tool)) {
@@ -172,7 +172,24 @@ async function main() {
 }
 
 // Export for testing
-module.exports = { recordAiOperation, detectCorrection };
+/**
+ * Extract tool fields from a PostToolUse stdin payload. The hook contract uses
+ * tool_name / tool_input / tool_response; the old code read tool / input /
+ * output (which are never present), so `tool` was always undefined and the hook
+ * exited before doing anything. Accept the correct names, falling back to the
+ * legacy ones for safety.
+ */
+function extractToolFields(data) {
+  const d = data || {};
+  return {
+    tool: d.tool_name !== undefined ? d.tool_name : d.tool,
+    input: d.tool_input !== undefined ? d.tool_input : d.input,
+    output: d.tool_response !== undefined ? d.tool_response : d.output,
+    sessionId: d.session_id,
+  };
+}
+
+module.exports = { recordAiOperation, detectCorrection, extractToolFields };
 
 // Run if called directly
 if (require.main === module) {
