@@ -13,6 +13,23 @@ LOGS_DIR="${CLAUDE_DIR}/logs/runs"
 [ ! -d "${LOGS_DIR}" ] && [ -d "${CLAUDE_DIR}/logs/workflows" ] && LOGS_DIR="${CLAUDE_DIR}/logs/workflows"
 ACTIVE_WORKFLOW_FILE="${CLAUDE_DIR}/cache/active-workflow.txt"
 
+# Atomically replace a state file from stdin (jq output). Uses a per-invocation
+# mktemp in the target's own dir instead of a fixed `temp.json` in the CWD, so
+# concurrent sessions can't clobber each other and nothing is littered into the
+# user's repo root. Refuses to write an empty result (preserves prior state if
+# the producing jq fails).
+_atomic_state_write() {
+    local target="$1" tmp
+    tmp=$(mktemp "${target}.XXXXXX") || return 1
+    cat > "$tmp"
+    if [ -s "$tmp" ]; then
+        mv "$tmp" "$target"
+    else
+        rm -f "$tmp"
+        return 1
+    fi
+}
+
 # Get active workflow ID
 get_active_workflow_id() {
     if [[ -f "${ACTIVE_WORKFLOW_FILE}" ]]; then
@@ -78,7 +95,7 @@ increment_phase_counter() {
        --arg timestamp "$timestamp" \
        ".phases[\$phase][\$counter] = \$count |
         .phases[\$phase].last_updated = \$timestamp" \
-       "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+       "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
 
     echo "$new_count"
 }
@@ -151,7 +168,7 @@ update_phase_status() {
        --arg timestamp "$timestamp" \
        ".phases[\$phase].status = \$status | 
         .phases[\$phase].updated_at = \$timestamp" \
-       "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+       "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
 }
 
 # Start phase timer
@@ -163,7 +180,7 @@ start_phase_timer() {
        --arg timestamp "$timestamp" \
        ".phases[\$phase].started_at = \$timestamp | 
         .phases[\$phase].status = \"in_progress\"" \
-       "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+       "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
 }
 
 # Stop phase timer
@@ -183,7 +200,7 @@ stop_phase_timer() {
            ".phases[\$phase].completed_at = \$timestamp | 
             .phases[\$phase].duration_seconds = \$duration | 
             .phases[\$phase].status = \"completed\"" \
-           "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+           "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
         
         echo "$duration"
     else
@@ -379,7 +396,7 @@ process_approval() {
                 local next_phase=$((phase + 1))
                 jq --argjson next_phase "$next_phase" \
                    '.current_phase = $next_phase' \
-                   "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+                   "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
 
                 log_workflow_event "PHASE_START" "$next_phase" "status=in_progress"
                 echo -e "${BLUE}⏭️  Proceeding to Phase $next_phase...${NC}"
@@ -388,7 +405,7 @@ process_approval() {
             else
                 echo -e "${GREEN}🎉 Workflow complete!${NC}"
                 jq '.status = "completed"' \
-                   "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+                   "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
                 log_workflow_event "WORKFLOW_COMPLETE" "9" "status=completed"
                 return 0
             fi
@@ -422,7 +439,7 @@ process_approval() {
             echo ""
             echo -e "${RED}❌ Workflow cancelled${NC}"
             jq '.status = "cancelled"' \
-               "${WORKFLOW_STATE_FILE}" > temp.json && mv temp.json "${WORKFLOW_STATE_FILE}"
+               "${WORKFLOW_STATE_FILE}" | _atomic_state_write "${WORKFLOW_STATE_FILE}"
             log_workflow_event "CANCELLED" "$phase" "status=cancelled"
             return 3
             ;;
