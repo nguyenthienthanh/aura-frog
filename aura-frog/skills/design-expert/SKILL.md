@@ -60,3 +60,13 @@ Detect from package.json: `@mui/material` → MUI, `antd` → Ant Design, `tailw
 ## Responsive Breakpoints
 
 Mobile: <768px | Tablet: 768-1024px | Desktop: >1024px
+
+---
+
+## Figma Code Connect discipline
+
+When working from Figma (Dev Mode MCP), treat Figma as a *source*, not a regenerator:
+
+- **Sync tokens, don't re-pick.** Pull design variables with `get_variable_defs` and feed them INTO the `design-tokens` skill's system (one OKLCH source of truth) — never hand-copy hexes into components. Figma variables → `--brand-hue`/semantic tokens, so design + code share one palette.
+- **Reuse mapped components, don't duplicate.** Call `get_code_connect_map` first; if a node already maps to a real code component, import and compose THAT instead of generating a new near-duplicate. Regenerating mapped components is the #1 source of design-system drift.
+- Only generate net-new code for nodes with no Code Connect mapping.

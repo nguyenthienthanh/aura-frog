@@ -62,6 +62,8 @@ Use for all frontend implementation, UI components, design system work, and user
 - `skills/design-tokens/SKILL.md` — OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
 - `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
 
+**Figma Code Connect discipline:** when building from Figma (Dev Mode MCP), use `get_variable_defs` to sync design variables INTO the `design-tokens` system (one source of truth — never hand-copy hexes), and `get_code_connect_map` to REUSE already-mapped code components instead of regenerating duplicates. Generate net-new code only for nodes with no Code Connect mapping. See `skills/design-expert/SKILL.md`.
+
 ---
 
 ## Team Mode Behavior (Agent Teams)
