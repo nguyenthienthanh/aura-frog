@@ -107,9 +107,10 @@ NOW=$(now_utc)
 set_field "$PICK_FILE" "status" "active"
 set_field "$PICK_FILE" "started_at" "$NOW"
 NEW_REV=$(bump_revision "$PICK_FILE")
-set_active_field "$PLANS_DIR" "task" "$PICK_ID"
 
-# Detect regression. Roll back the task file if violations increased.
+# Detect regression. Roll back the task file if violations increased. active.task
+# is set ONLY after the check passes (below), so a rollback never leaves
+# active.json pointing at a task that was just reverted to `planned`.
 if ! require_no_regression "$PLANS_DIR" "$VIOLATIONS_BEFORE"; then
     if [ -s "$CKPT" ]; then
         body=$(grep -oE '"node_state_before_b64":[[:space:]]*"[^"]*"' "$CKPT" | sed 's/.*"\([^"]*\)"$/\1/')
@@ -118,6 +119,8 @@ if ! require_no_regression "$PLANS_DIR" "$VIOLATIONS_BEFORE"; then
     echo "restored ${PICK_ID}" >&2
     exit 4
 fi
+
+set_active_field "$PLANS_DIR" "task" "$PICK_ID"
 
 EVENT="{\"ts\":\"${NOW}\",\"verb\":\"next\",\"target\":\"${PICK_ID}\",\"story\":\"${ACTIVE_STORY}\",\"checkpoint\":\"${CKPT}\",\"revision\":${NEW_REV}}"
 append_history "$PLANS_DIR" "$EVENT"
