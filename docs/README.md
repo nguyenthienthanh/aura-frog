@@ -100,7 +100,7 @@ If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-dr
 These live in `aura-frog/` and are optimized for Claude to read:
 
 - [Agents](../aura-frog/agents/README.md) — 15 agents with capabilities
-- [Skills](../aura-frog/skills/README.md) — 56 skills (9 auto-invoke + 47 on-demand)
+- [Skills](../aura-frog/skills/README.md) — 59 skills (9 auto-invoke + 50 on-demand)
 - [Commands](../aura-frog/commands/README.md) — 24 commands (core `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite)
 - [Rules](../aura-frog/rules/README.md) — 71 rules (3-tier loading: 22 core / 19 agent / 30 workflow)
 - [Hooks](../aura-frog/hooks/README.md) — 47 lifecycle hooks

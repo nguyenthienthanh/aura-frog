@@ -232,7 +232,7 @@ Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AU
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 71 rules, 56 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 71 rules, 59 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -310,7 +310,7 @@ Expected output:
 🐸 Aura Frog v3.7.3 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
-  Skills:   56 available (9 auto-invoke, 47 on-demand)
+  Skills:   59 available (9 auto-invoke, 50 on-demand)
   Rules:    71 loaded (22 core + 19 agent + 30 workflow)
   Hooks:    47 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
@@ -408,12 +408,12 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
-| **Skills** | 56 | 9 auto-invoke on context, 47 on-demand (incl. v3.7.2 `plan-orchestrator`) |
+| **Skills** | 59 | 9 auto-invoke on context, 47 on-demand (incl. v3.7.2 `plan-orchestrator`) |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
 | **Rules** | 71 | 3-tier loading (22 core + 19 agent + 30 workflow) — only what's needed |
 | **Hooks** | 47 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
 | **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
-| **MCP Servers** | 8 | 6 enabled by default; postgres + redis opt-in |
+| **MCP Servers** | 9 | 6 enabled by default; postgres + redis + chrome-devtools opt-in |
 | **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
@@ -596,7 +596,7 @@ Honest comparison with two popular plugins in the ecosystem (April 2026).
 | | **Aura Frog** | **wshobson/agents** | **Superpowers** |
 |---|---|---|---|
 | **Agents** | 15 curated | 184 across 78 plugins | ~20 |
-| **Skills** | 56 | 150 | Small focused set |
+| **Skills** | 59 | 150 | Small focused set |
 | **Commands** | 24 (14 user-facing + 10 legacy aliases) | 98 | ~10 |
 | **Workflow** | 5-phase TDD with 2 gates | No structured workflow | Phase-gated workflow |
 | **Agent routing** | Task-content Layer 0 override | Manual `/agent-name` | Similar to Aura Frog |
@@ -652,7 +652,7 @@ Use this checklist:
 - ✅ MCP-heavy workflows (Figma + Firebase + Slack + DBs) → per-agent allowlists + audit log
 - ⚠️ Single-file edits / quick prototypes → workflow overhead may not pay off; use `/run task: …` to bypass
 - ⚠️ Haiku-only budget — some features (planning, conflict, design phases) prefer Sonnet/Opus
-- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 56 skills, 71 rules, 47 hooks)
+- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 59 skills, 71 rules, 47 hooks)
 
 ---
 
@@ -664,7 +664,7 @@ Use this checklist:
 | **Getting Started** | [GET_STARTED.md](docs/getting-started/GET_STARTED.md) |
 | **First Workflow Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](docs/getting-started/FIRST_WORKFLOW_TUTORIAL.md) |
 | **All Commands (24)** | [commands/README.md](aura-frog/commands/README.md) |
-| **All Skills (56)** | [skills/README.md](aura-frog/skills/README.md) |
+| **All Skills (59)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams Guide** | [AGENT_TEAMS_GUIDE.md](docs/guides/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](docs/operations/MCP_GUIDE.md) |
 | **Hooks & Lifecycle** | [hooks/README.md](aura-frog/hooks/README.md) |
@@ -682,7 +682,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
-├── skills/         56 skills (9 auto-invoke + 47 on-demand)
+├── skills/         59 skills (9 auto-invoke + 50 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          71 rules (22 core + 19 agent + 30 workflow)
 ├── hooks/          47 lifecycle hooks (conditional execution)

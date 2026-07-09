@@ -71,9 +71,12 @@ bundle[1]{name,purpose}:
 ### Design & UI (2)
 
 ```toon
-design[2]{name,purpose}:
-  design-expert,Component design + design system selection + responsive layout
+design[5]{name,purpose}:
+  design-expert,Component design + design system selection + responsive layout + Figma Code Connect
   stitch-design,Google Stitch AI prompt generation
+  frontend-aesthetics,Distinctive typography + dominant/accent color (house-style tuned)
+  motion-design,Restrained reduced-motion-safe bundle-aware web motion
+  design-tokens,OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
 ```
 
 ### Workflow & Infrastructure (9)
