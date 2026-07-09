@@ -12,6 +12,16 @@
 
 const fs = require('fs');
 const path = require('path');
+const { readHookInputCompat } = require('./lib/hook-runtime.cjs');
+
+// Resolve the file to scan from the PostToolUse stdin payload (tool_input),
+// falling back to the legacy CLAUDE_FILE_PATHS env var. The old code read only
+// the env var — which the hook API never sets — so the scanner silently
+// skipped every file and did nothing.
+function resolveScanPath(input) {
+  const ti = (input && input.tool_input) || {};
+  return ti.file_path || ti.path || process.env.CLAUDE_FILE_PATHS || '';
+}
 
 // Security patterns by category
 const PATTERNS = {
@@ -74,7 +84,9 @@ function isScannable(filePath) {
 
 function main() {
   try {
-    const filePath = process.env.CLAUDE_FILE_PATHS || '';
+    let input = {};
+    try { input = readHookInputCompat(); } catch { /* fall back to env below */ }
+    const filePath = resolveScanPath(input);
     if (!filePath) process.exit(0);
     if (!isScannable(filePath)) process.exit(0);
     if (!fs.existsSync(filePath)) process.exit(0);
@@ -102,5 +114,5 @@ function main() {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { PATTERNS, SCANNABLE, scanContent, isScannable };
+  module.exports = { PATTERNS, SCANNABLE, scanContent, isScannable, resolveScanPath };
 }
