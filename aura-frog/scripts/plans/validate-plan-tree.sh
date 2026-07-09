@@ -59,8 +59,9 @@ get_list() {
 }
 
 # Collect all node files
-ALL_NODES=$(find "${PLANS_DIR}" -name '*.md' -not -path '*/archive/*' 2>/dev/null)
-NODE_COUNT=$(echo "${ALL_NODES}" | grep -c . || echo 0)
+# Array (not a whitespace-split string) so node paths containing spaces survive.
+mapfile -t ALL_NODES < <(find "${PLANS_DIR}" -name '*.md' -not -path '*/archive/*' 2>/dev/null)
+NODE_COUNT=${#ALL_NODES[@]}
 
 if [ "${NODE_COUNT}" -eq 0 ]; then
     echo "ℹ Empty plan tree — nothing to validate"
@@ -74,7 +75,7 @@ TMP_MAP=$(mktemp)
 TMP_CLAIMED=$(mktemp)
 trap 'rm -f "$TMP_MAP" "$TMP_CLAIMED"' EXIT
 
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     id=$(get_field "$f" "id")
     if [ -n "$id" ]; then
         echo "$id $f" >> "$TMP_MAP"
@@ -92,7 +93,7 @@ id_exists() {
 # ------------------------------------------------------------------
 # INVARIANT 1: Every non-T0 node has existing parent
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     id=$(get_field "$f" "id")
     tier=$(get_field "$f" "tier")
     parent=$(get_field "$f" "parent")
@@ -110,7 +111,7 @@ done
 # ------------------------------------------------------------------
 # INVARIANT 2: Parent's children[] references only existing children
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     id=$(get_field "$f" "id")
     children=$(get_list "$f" "children")
     [ -z "$children" ] && continue
@@ -127,7 +128,7 @@ done
 # ------------------------------------------------------------------
 # INVARIANT 3: No orphan nodes
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     children=$(get_list "$f" "children")
     while IFS= read -r child_id; do
         [ -z "$child_id" ] && continue
@@ -137,7 +138,7 @@ for f in ${ALL_NODES}; do
     done <<< "$children"
 done
 
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     id=$(get_field "$f" "id")
     tier=$(get_field "$f" "tier")
     [ -z "$id" ] && continue
@@ -162,7 +163,7 @@ done
 # INVARIANT 4: Status in allowed set
 # ------------------------------------------------------------------
 ALLOWED_STATUS="planned active done blocked discarded frozen archived"
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     status=$(get_field "$f" "status")
     [ -z "$status" ] && continue
     if ! echo "${ALLOWED_STATUS}" | grep -wq "$status"; then
@@ -174,7 +175,7 @@ done
 # ------------------------------------------------------------------
 # INVARIANT 5: revision is non-negative integer
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     rev=$(get_field "$f" "revision")
     [ -z "$rev" ] && continue
     if ! echo "$rev" | grep -qE '^[0-9]+$'; then
@@ -186,7 +187,7 @@ done
 # ------------------------------------------------------------------
 # INVARIANT 6: T3 acceptance test_ref exists when status >= active
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     tier=$(get_field "$f" "tier")
     [ "$tier" = "3" ] || continue
     status=$(get_field "$f" "status")
@@ -208,36 +209,60 @@ for f in ${ALL_NODES}; do
 done
 
 # ------------------------------------------------------------------
-# INVARIANT 7: T4 depends_on forms DAG (no cycles)
+# INVARIANT 7: T4 depends_on forms a DAG (no cycles) — full DFS.
+# Collect every id→dep edge, then detect a cycle of ANY length (the old
+# check only caught self-loops and 2-cycles; A→B→C→A validated clean).
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+EDGES=""
+for f in "${ALL_NODES[@]}"; do
     tier=$(get_field "$f" "tier")
     [ "$tier" = "4" ] || continue
     id=$(get_field "$f" "id")
     deps=$(get_list "$f" "depends_on")
     [ -z "$deps" ] && continue
     while IFS= read -r dep; do
-        [ -z "$dep" ] && continue
         dep=$(echo "$dep" | tr -d ' "'"'"'')
         [ -z "$dep" ] && continue
-        if [ "$dep" = "$id" ]; then
-            report 7 "T4 ${id} self-references in depends_on (cycle)"
-            continue
-        fi
-        dep_file=$(file_for_id "$dep")
-        if [ -n "$dep_file" ]; then
-            dep_deps=$(get_list "$dep_file" "depends_on" | tr -d ' "'"'"'')
-            if echo "$dep_deps" | grep -qx "$id"; then
-                report 7 "T4 ${id} ↔ ${dep} mutual dependency (cycle)"
-            fi
-        fi
+        EDGES="${EDGES}${id} ${dep}"$'\n'
     done <<< "$deps"
 done
+if [ -n "$EDGES" ]; then
+    CYCLE=$(printf '%s' "$EDGES" | python3 -c '
+import sys
+adj = {}
+for line in sys.stdin:
+    parts = line.split()
+    if len(parts) < 2:
+        continue
+    adj.setdefault(parts[0], []).append(parts[1])
+WHITE, GRAY, BLACK = 0, 1, 2
+color = {}
+def dfs(u, stack):
+    color[u] = GRAY
+    stack.append(u)
+    for v in adj.get(u, []):
+        if color.get(v, WHITE) == GRAY:
+            i = stack.index(v)
+            print(" -> ".join(stack[i:] + [v]))
+            return True
+        if color.get(v, WHITE) == WHITE and dfs(v, stack):
+            return True
+    stack.pop()
+    color[u] = BLACK
+    return False
+for n in list(adj):
+    if color.get(n, WHITE) == WHITE and dfs(n, []):
+        break
+' 2>/dev/null || true)
+    if [ -n "$CYCLE" ]; then
+        report 7 "T4 depends_on cycle detected: ${CYCLE}"
+    fi
+fi
 
 # ------------------------------------------------------------------
 # INVARIANT 8: frozen status must have freeze_reason
 # ------------------------------------------------------------------
-for f in ${ALL_NODES}; do
+for f in "${ALL_NODES[@]}"; do
     status=$(get_field "$f" "status")
     if [ "$status" = "frozen" ]; then
         if ! grep -q "^freeze_reason:" "$f" 2>/dev/null; then

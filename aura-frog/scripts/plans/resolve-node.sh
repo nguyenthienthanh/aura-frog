@@ -50,28 +50,28 @@ case "${INPUT}" in
     --active|--task)
         ACTIVE_JSON="${PLANS_DIR}/active.json"
         [ -f "${ACTIVE_JSON}" ] || exit 2
-        ID=$(grep -oE '"task"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+        ID=$(grep -oE '"task"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/' || true)
         [ -z "${ID}" ] || [ "${ID}" = "null" ] && exit 2
         INPUT="${ID}"
         ;;
     --feature)
         ACTIVE_JSON="${PLANS_DIR}/active.json"
         [ -f "${ACTIVE_JSON}" ] || exit 2
-        ID=$(grep -oE '"feature"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+        ID=$(grep -oE '"feature"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/' || true)
         [ -z "${ID}" ] || [ "${ID}" = "null" ] && exit 2
         INPUT="${ID}"
         ;;
     --story)
         ACTIVE_JSON="${PLANS_DIR}/active.json"
         [ -f "${ACTIVE_JSON}" ] || exit 2
-        ID=$(grep -oE '"story"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+        ID=$(grep -oE '"story"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/' || true)
         [ -z "${ID}" ] || [ "${ID}" = "null" ] && exit 2
         INPUT="${ID}"
         ;;
     --initiative)
         ACTIVE_JSON="${PLANS_DIR}/active.json"
         [ -f "${ACTIVE_JSON}" ] || exit 2
-        ID=$(grep -oE '"initiative"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+        ID=$(grep -oE '"initiative"[[:space:]]*:[[:space:]]*"[^"]+"' "${ACTIVE_JSON}" | head -1 | sed 's/.*"\([^"]*\)"$/\1/' || true)
         [ -z "${ID}" ] || [ "${ID}" = "null" ] && exit 2
         INPUT="${ID}"
         ;;
