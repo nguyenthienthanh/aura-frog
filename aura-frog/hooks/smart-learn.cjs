@@ -23,7 +23,22 @@ const { recordPattern, isLearningEnabled, isLocalMode } = require('./lib/af-lear
 
 // Smart learn cache
 
-const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { findProjectRoot, readHookInputCompat } = require('./lib/hook-runtime.cjs');
+
+// Resolve tool context from the PostToolUse stdin payload. The old code read
+// CLAUDE_TOOL_NAME / _INPUT / _RESULT env vars (never set by the hook API), so
+// toolName was undefined and the hook exited before learning anything. The
+// per-tool code/command field is extracted at each call site (Write/Edit use
+// tool_input.content / new_string; Bash uses tool_input.command).
+function resolveToolContext(input) {
+  const d = input || {};
+  const tr = d.tool_response;
+  return {
+    toolName: d.tool_name || process.env.CLAUDE_TOOL_NAME || '',
+    ti: (d.tool_input && typeof d.tool_input === 'object') ? d.tool_input : {},
+    toolResult: (typeof tr === 'string' ? tr : (tr ? JSON.stringify(tr) : '')) || process.env.CLAUDE_TOOL_RESULT || '',
+  };
+}
 const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 const SMART_LEARN_CACHE = path.join(CACHE_DIR, 'smart-learn-cache.json');
 
@@ -264,9 +279,9 @@ async function main() {
   }
 
   try {
-    const toolName = process.env.CLAUDE_TOOL_NAME;
-    const toolInput = process.env.CLAUDE_TOOL_INPUT || '';
-    const toolResult = process.env.CLAUDE_TOOL_RESULT || '';
+    let input = {};
+    try { input = readHookInputCompat(); } catch { /* env fallback in resolver */ }
+    const { toolName, ti, toolResult } = resolveToolContext(input);
 
     // Skip if there was an error
     if (toolResult.includes('Error:') || toolResult.includes('error:') ||
@@ -276,7 +291,7 @@ async function main() {
 
     // Handle Write/Edit success
     if (toolName === 'Write' || toolName === 'Edit') {
-      const filePath = process.env.CLAUDE_FILE_PATHS || '';
+      const filePath = ti.file_path || ti.path || process.env.CLAUDE_FILE_PATHS || '';
 
       // Early exit: skip non-learnable file types
       const SKIP_EXTS = new Set(['.md', '.txt', '.json', '.yaml', '.yml', '.css', '.scss', '.svg', '.png', '.jpg', '.gif', '.ico', '.lock', '.log', '.env', '.toml', '.ini', '.cfg']);
@@ -285,7 +300,8 @@ async function main() {
         process.exit(0);
       }
 
-      const content = toolInput;
+      // The written code: Write carries tool_input.content; Edit tool_input.new_string.
+      const content = ti.content || ti.new_string || '';
 
       if (filePath && content) {
         const patterns = detectCodePatterns(content, filePath);
@@ -300,7 +316,7 @@ async function main() {
     // Handle Bash success
     if (toolName === 'Bash') {
       // Only track certain types of commands
-      const command = toolInput;
+      const command = ti.command || '';
       if (command && !command.startsWith('cd ') && !command.startsWith('ls') &&
           !command.startsWith('echo') && !command.startsWith('cat')) {
         const cmdPattern = extractBashPattern(command);
@@ -319,7 +335,7 @@ async function main() {
   }
 }
 
-module.exports = { detectCodePatterns, extractBashPattern, recordSuccess };
+module.exports = { detectCodePatterns, extractBashPattern, recordSuccess, resolveToolContext };
 
 if (require.main === module) {
   main();
