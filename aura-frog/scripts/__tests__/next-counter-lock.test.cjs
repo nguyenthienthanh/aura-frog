@@ -31,7 +31,11 @@ describe('next_counter — concurrency + missing-key (P0-4)', () => {
     // Launch N background subshells from a SINGLE bash so they race in parallel,
     // then `wait`. spawnSync alone would serialize the processes.
     const prog = `for i in $(seq 1 ${N}); do ( source "${LIB}"; next_counter "${plans}" TASK ) & done; wait`;
-    const p = spawnSync('bash', ['-c', prog], { encoding: 'utf8' });
+    // Generous lock timeout so CPU starvation under a parallel jest run (many
+    // heavy suites at once) can't spuriously trip the spinlock budget — the
+    // property under test is atomicity (no dupes / no drops), not latency.
+    const p = spawnSync('bash', ['-c', prog],
+      { encoding: 'utf8', env: { ...process.env, AF_LOCK_TIMEOUT_SEC: '120' } });
     const nums = (p.stdout || '')
       .split('\n').map(s => s.trim()).filter(Boolean)
       .map(Number).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
