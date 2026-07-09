@@ -17,13 +17,21 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 QUIET=""
-FILES=""
+FILES=()
 MAX_EXIT=0
 
-for arg in "$@"; do
-  case "$arg" in
-    --quiet) QUIET="true" ;;
-    --files) shift; FILES="$@" ;;
+# Proper flag parsing: `shift` inside a `for arg in "$@"` loop does not advance
+# the iteration, so the old `--files) shift; FILES="$@"` captured the flag token
+# itself (and any preceding flags). Use an explicit while/shift loop; --files
+# consumes every following non-flag token.
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --quiet) QUIET="true"; shift ;;
+    --files)
+      shift
+      while [ $# -gt 0 ] && [ "${1#--}" = "$1" ]; do FILES+=("$1"); shift; done
+      ;;
+    *) shift ;;
   esac
 done
 
@@ -35,8 +43,8 @@ aggregate() {
 }
 
 # Mode 1: explicit file list (manual / CI usage)
-if [ -n "$FILES" ]; then
-  for f in $FILES; do
+if [ "${#FILES[@]}" -gt 0 ]; then
+  for f in "${FILES[@]}"; do
     set +e
     bash "$SCRIPT_DIR/validate-frontmatter.sh" "$f"
     aggregate $?
