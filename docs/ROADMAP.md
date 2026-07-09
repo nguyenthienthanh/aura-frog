@@ -122,11 +122,18 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 
 Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verified-bug elimination.
 
+> **Session progress 2026-07-09** (commits `4296bd8`→`7b28849`): STORY-0021 done;
+> STORY-0023 partially done — fixed `resolve-node` null-field exit code, `validate-plan-tree`
+> full-DFS cycle detection + `ALL_NODES` word-splitting, and `run-all.sh --files` parsing (each
+> with tests). **STORY-0023 remaining:** `next-task.sh` rollback leaves `active.json` stale;
+> `link-run.sh` regex-unsafe RUN_ID + non-transactional write; `promote-node.sh`/`_lib.sh`
+> escaping; `phase-transition.sh` literal `temp.json` (7 call-sites — needs per-site mktemp).
+
 | # | Work | Maps to | GH issue | Effort |
 |---|---|---|---|---|
 | ✅ | Security hotfixes P0-1..4 | FEAT-010/STORY-0021 | — | done |
 | 1 | audit-refs rewrite + fixture self-test | FEAT-010/STORY-0022 | — | 1-2d |
-| 2 | Plans-scripts correctness batch | FEAT-010/STORY-0023 | — | 2-3d |
+| 🚧 | Plans-scripts correctness batch (resolve-node + DAG + run-all done) | FEAT-010/STORY-0023 | — | ~1d left |
 | 3 | Consolidate learning hooks | FEAT-010/STORY-0025 | — | 2-3d |
 | 4 | CI gates (shellcheck + hooks parity) | FEAT-010/STORY-0024 | — | 1-2d |
 | 5 | hook-runtime lib finish (migrate dead hooks) | FEAT-007/STORY-0009 | **#6** | 3-5d |
