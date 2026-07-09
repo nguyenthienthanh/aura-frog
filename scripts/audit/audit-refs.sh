@@ -46,6 +46,28 @@ while IFS= read -r path; do
   fi
 done < <(grep -rhoE '(rules/[a-z]+|skills/[a-z-]+|agents/[a-z-]+)' --include="*.md" . | sort -u)
 
+echo "▶ Dead file references (path with an extension that does not exist)…"
+# The check above only sees narrow component/dir refs. This one catches refs
+# written WITH an explicit file extension (rules/core/x.md, scripts/plans/y.sh)
+# — the class the old regex truncated to a dir and reported "alive". Skips:
+# glob/variable tokens, doc templates (NNN / service-name / -description), and an
+# allowlist of intentional refs to not-yet-created / removed / example files
+# (each documented as 'future' / 'removed' / example in its source line).
+ALLOW_MISSING='^(scripts/jira-fetch\.sh|scripts/preflight/install-opa\.sh|scripts/reproduce-bug\.sh|hooks/recursion-guard\.cjs|agents/observer\.md)$'
+while IFS= read -r ref; do
+  case "$ref" in
+    *'*'*|*'$'*|*'{'*) continue ;;                     # glob / variable
+    *NNN*|*service-name*|*-description*) continue ;;   # doc templates
+  esac
+  echo "$ref" | grep -qE "$ALLOW_MISSING" && continue  # intentional missing
+  # scripts/ and docs/ live at the repo root, one level above aura-frog/.
+  if [ ! -e "$ref" ] && [ ! -e "../$ref" ]; then
+    echo "  DEAD FILE: $ref"
+    fail=1
+  fi
+done < <(grep -rhoE '(rules|skills|agents|commands|hooks|scripts|docs)/[A-Za-z0-9_./-]+\.(md|sh|cjs|js|json|ya?ml)' \
+           --include="*.md" . | sed -E 's/[.,:;)]+$//' | sort -u)
+
 echo "▶ Skills missing 'user-invocable: false'…"
 for f in skills/*/SKILL.md; do
   [ -e "$f" ] || continue
