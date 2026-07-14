@@ -14,6 +14,10 @@ All notable changes to Aura Frog will be documented in this file.
 
 > Applied the plugin's own lazy-load principle to its own CLAUDE.md files. Maintainer-only procedure and reference catalogs were costing always-on context every session; they now lazy-load from `docs/`. Net: **~1,685 tokens cut from every session** (~48% of the project CLAUDE.md).
 
+### Fixed
+
+- **Pre-flight no longer bricks a session when `jq` is missing.** The Tier-1 shell linters parse the tool payload JSON with `jq`. On a machine without jq installed, `scripts/preflight/validate-tool-input.sh` read empty fields for a perfectly valid payload and FALSELY reported `preflight:tool-input FAIL: <Tool> tool missing <field>` (exit 2) — blocking **every** Bash/Read/Write/Edit call and making the whole session unusable. Now fails open, matching the repo's existing "runs with or without jq" convention: `validate-tool-input.sh` skips shape validation when jq is absent, and `hooks/pre-flight-validate.cjs` short-circuits before running any linter (new `jqAvailable()` guard), printing a one-time `install jq to re-enable checks` notice instead of blocking. Regression-tested in `__tests__/hooks/preflight-validate-stdin.test.cjs`.
+
 ### Changed
 
 - **`.claude/CLAUDE.md` slimmed 257 → 97 lines** — the Documentation Update Rule, Frontmatter Maintenance Rule, Commands-vs-Skills architecture, and Reference Integrity contract moved to **`docs/reference/MAINTENANCE.md`** (they only apply when editing plugin source, not every session). The runtime `User Confirmation Required` directive stays; a one-line pointer + audit-script invocation replaces the moved blocks.

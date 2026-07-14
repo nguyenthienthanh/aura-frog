@@ -56,6 +56,33 @@ function buildChildEnv(input, baseEnv) {
 }
 const BYPASS_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass');
 const BYPASS_COUNT_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass-count');
+const JQ_WARN_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-jq-missing');
+
+// Every Tier-1 shell linter parses the tool payload JSON with `jq`. Without jq on
+// PATH, validate-tool-input.sh reads empty fields and FALSELY reports "missing
+// command/file_path" — which exits 2 and blocks EVERY tool call, bricking the
+// session. Detect the missing dependency up front and skip pre-flight entirely
+// (same fail-open philosophy as the missing-run-all.sh guard above), warning once
+// so the user can install jq to re-enable the checks.
+function jqAvailable() {
+  try {
+    return spawnSync('jq', ['--version'], { timeout: 2000 }).status === 0;
+  } catch {
+    return false;
+  }
+}
+
+function warnJqMissingOnce() {
+  try {
+    if (fs.existsSync(JQ_WARN_FLAG)) return; // already warned this project — stay quiet
+    fs.mkdirSync(path.dirname(JQ_WARN_FLAG), { recursive: true });
+    fs.writeFileSync(JQ_WARN_FLAG, 'jq not found on PATH; pre-flight checks skipped\n');
+  } catch { /* best-effort — fall through and print anyway */ }
+  process.stderr.write(
+    '[preflight] jq not found on PATH — Tier-1 pre-flight checks are SKIPPED (not blocking). ' +
+    'Install jq (e.g. `brew install jq`) to re-enable input/secret/path validation.\n'
+  );
+}
 
 // Single-use bypass flag — consume on read
 function consumeBypassFlag() {
@@ -86,6 +113,8 @@ function bumpBypassCount() {
 
 function main() {
  if (consumeBypassFlag()) process.exit(0);
+
+ if (!jqAvailable()) { warnJqMissingOnce(); process.exit(0); }
 
  let input = {};
  try { input = readHookInputCompat(); } catch { /* env fallback below */ }
@@ -120,4 +149,4 @@ process.exit(0);
 
 if (require.main === module) main();
 
-module.exports = { buildChildEnv };
+module.exports = { buildChildEnv, jqAvailable };
