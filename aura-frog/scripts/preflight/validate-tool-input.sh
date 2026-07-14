@@ -9,6 +9,12 @@
 
 set -e
 
+# jq parses CLAUDE_TOOL_ARGS below. Without it on PATH, every field read returns
+# empty and the "missing <field>" FAILs would fire on perfectly valid input —
+# blocking EVERY tool call. Degrade gracefully (like the rest of the repo's
+# jq-optional scripts): skip shape validation when jq is unavailable.
+command -v jq >/dev/null 2>&1 || exit 0
+
 TOOL="${CLAUDE_TOOL_NAME:-}"
 ARGS="${CLAUDE_TOOL_ARGS:-}"
 

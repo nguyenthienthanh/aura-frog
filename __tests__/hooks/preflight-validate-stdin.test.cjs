@@ -5,7 +5,7 @@
  * bridges the tool context to the env vars run-all.sh consumes.
  */
 
-const { buildChildEnv } = require('../../aura-frog/hooks/pre-flight-validate.cjs');
+const { buildChildEnv, jqAvailable } = require('../../aura-frog/hooks/pre-flight-validate.cjs');
 
 describe('pre-flight-validate.buildChildEnv', () => {
   it('bridges a Write tool_input to the env run-all.sh reads', () => {
@@ -31,5 +31,18 @@ describe('pre-flight-validate.buildChildEnv', () => {
 
   it('is null-safe', () => {
     expect(buildChildEnv(null, { X: '1' })).toEqual({ X: '1' });
+  });
+});
+
+/**
+ * BUGFIX — the Tier-1 shell linters parse the tool payload with `jq`. On a
+ * machine WITHOUT jq, validate-tool-input.sh read empty fields and FALSELY
+ * reported "missing command/file_path" (exit 2), blocking every tool call and
+ * bricking the session. The hook now fails open when jq is absent.
+ */
+describe('pre-flight-validate.jqAvailable (fail-open on missing jq)', () => {
+  it('is exported and returns a boolean (never throws)', () => {
+    expect(typeof jqAvailable).toBe('function');
+    expect(typeof jqAvailable()).toBe('boolean');
   });
 });
