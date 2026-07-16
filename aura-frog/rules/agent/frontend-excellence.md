@@ -172,5 +172,6 @@ visual_priority[4]{priority,treatment}:
 - [ ] Touch targets 48x48dp on mobile
 - [ ] Loading states for all async ops
 - [ ] Error states with recovery actions
+- [ ] **Looked at it** — ran the `design-vision-loop` (screenshot across viewports + dark mode, critiqued vs design system) and it PASSED; verdict attached
 
 ---
