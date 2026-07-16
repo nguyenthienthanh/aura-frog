@@ -1,5 +1,5 @@
 ---
-last_aligned_with: v3.8.0-alpha.7
+last_aligned_with: v3.8.0-alpha.8
 status: reference
 audience: contributor
 ---
@@ -33,6 +33,54 @@ All notable changes to Aura Frog will be documented in this file.
 ### Why
 
 The repo preaches lazy-loading (Golden Rule #2) but its always-on CLAUDE.md trio carried ~3.5K tokens of maintenance procedure, reference catalogs, and drift-prone counts. Per Karpathy's context-engineering principle (CLAUDE.md is always-on prompt budget, not documentation), this is the highest-leverage cut. Zero runtime change.
+
+---
+
+## [3.8.0-alpha.8] - 2026-07-16 (Design Intelligence v2 — FEAT-009 ships)
+
+> Closes the long-blocked FEAT-009 tail and adds the missing vision + design-system-persistence layers.
+> Driven by the 2026-07-16 deep-research pass (Anthropic frontend-design skill, Agent SDK vision loop,
+> Google Stitch MCP, superdesign). Full design: `docs/architecture/LLD-DESIGN-INTELLIGENCE.md`.
+
+### Added
+
+- **`skills/design-vision-loop`** — the missing "look at it" step. Renders the running UI via the Playwright
+  MCP, screenshots it across 3 viewports + dark mode, runs a deterministic tier-1 gate (the new
+  design-conformance hook + console errors) **before** spending a vision call, then critiques the shots
+  against the design system and iterates (max 3). Two-tier by design — Anthropic ranks rules-based feedback
+  above LLM-as-judge. Ships with `references/critique-rubric.md` + `references/viewport-matrix.md`.
+- **`hooks/design-conformance.cjs`** (PostToolUse `Write|Edit`) — deterministic design gate that finally
+  enforces what `theme-consistency` / `design-system-usage` / `motion-design` only described in prose:
+  hardcoded hex/rgb, raw px/numeric spacing, one file importing 2+ component libraries, and
+  animation/transition with no `prefers-reduced-motion` guard. Warnings only, fail-open, skips token/theme
+  files. 27 unit tests; RED caught two real regex bugs before merge.
+- **`rules/agent/design-system-persistence.md`** — `.claude/design/design-system.md` as the durable design
+  source of truth (schema + producers/consumers), so tokens/type/library survive across sessions instead of
+  being re-picked each time (pattern from Stitch `design.md` / superdesign `.superdesign/design-system.md`).
+- **Google Stitch MCP** — opt-in remote server in `.mcp.json` (`stitch`, http transport, `STITCH_API_KEY`),
+  disabled by default like the other opt-ins.
+
+### Changed
+
+- **`skills/stitch-design`** rewritten — dropped the stale "Stitch has no API" claim; now prefers the MCP
+  (generate/edit screens + design-system tools, Flash-for-drafts quota discipline) and keeps the manual
+  copy-paste flow as a graceful fallback. Seeds `.claude/design/design-system.md` + saves screen PNGs as
+  vision-loop targets.
+- **`skills/frontend-aesthetics` → v2** — added Anthropic's two-pass process (compact design plan →
+  self-critique against the brief before coding), named the specific AI-default clusters to avoid
+  (cream+serif+terracotta, dark+acid-green, hairline-broadsheet), and a screenshot self-critique directive.
+- **`skills/design-tokens`, `skills/design-expert`, `agents/frontend`** — now write/read the design SoT file.
+- **Figma tool-mismatch fixed** — prompts referenced Dev-Mode-MCP tools (`get_variable_defs`/
+  `get_code_connect_map`) that the installed `figma-developer-mcp` doesn't expose; corrected to
+  `get_figma_data` / `download_figma_images`.
+- **Counts synced** — skills 59→60, rules 71→72, hooks 48→49, MCP 10→11 across CLAUDE.md / plugin.json /
+  README / stats.json.
+
+### Note
+
+Stitch endpoint + tool names came from research that couldn't be fully adversarially verified (session
+limit); the skill instructs verifying via `list tools` on first connect and degrades to the manual path if
+the server is unreachable. Tracked as STORY-0033 open risk in `docs/ROADMAP.md`.
 
 ---
 
