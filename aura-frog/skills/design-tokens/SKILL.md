@@ -53,4 +53,12 @@ Keep chroma restrained (house style: one dominant hue + sharp accent, no rainbow
 ```
 Change `--brand-hue` alone to re-skin the entire product.
 
-**See also:** `rules/agent/theme-consistency.md` (enforces token usage), and the `frontend-aesthetics` skill (color hierarchy).
+## Persist to the design SoT
+
+After generating the token system, **write it to `.claude/design/design-system.md`** in the host project
+(create `.claude/design/` if absent) so it survives across sessions and later components conform to it —
+don't re-derive fresh tokens every session. Fill the `Brand` (the `--brand-hue` + named hex values),
+`Type`, and `Spacing` sections; set `Source: generated`. Merge, don't clobber, if the file already exists.
+See `rules/agent/design-system-persistence.md` for the file contract.
+
+**See also:** `rules/agent/theme-consistency.md` (enforces token usage), `rules/agent/design-system-persistence.md` (the SoT file), and the `frontend-aesthetics` skill (color hierarchy).
