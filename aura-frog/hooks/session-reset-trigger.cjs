@@ -37,51 +37,55 @@ const PROMPT_WINDOW_MS = 60 * 1000;
 
 function safeExit(code = 0) { process.exit(code); }
 
-if (!fs.existsSync(HISTORY_FILE)) safeExit(0);
+// Pure: walking history newest-first, was there a fresh epic_summarized (within
+// `windowMs`) that has NOT since been followed by a session_reset? Returns the
+// summarize event to prompt on, or null. Encodes the "prompt once, right after
+// distillation" rule so a session_reset seen first suppresses the prompt.
+function findPromptableSummarize(historyLines, now, windowMs) {
+  let recentSummarize = null;
+  for (let i = historyLines.length - 1; i >= 0; i--) {
+    let evt;
+    try { evt = JSON.parse(historyLines[i]); } catch { continue; }
 
-let lines = [];
-try {
-  lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean);
-} catch {
-  safeExit(0);
-}
+    if (evt.event === 'session_reset' && !recentSummarize) return null; // already reset
 
-let recentSummarize = null;
-let resetSeen = false;
-
-for (let i = lines.length - 1; i >= 0; i--) {
-  let evt;
-  try { evt = JSON.parse(lines[i]); } catch { continue; }
-
-  if (evt.event === 'session_reset' && !recentSummarize) {
-    resetSeen = true;
-    break;
-  }
-
-  if (evt.event === 'epic_summarized') {
-    const ts = Date.parse(evt.ts || '');
-    if (Number.isFinite(ts) && (Date.now() - ts) <= PROMPT_WINDOW_MS) {
-      recentSummarize = evt;
+    if (evt.event === 'epic_summarized') {
+      const ts = Date.parse(evt.ts || '');
+      if (Number.isFinite(ts) && (now - ts) <= windowMs) recentSummarize = evt;
+      break;
     }
-    break;
   }
+  return recentSummarize;
 }
 
-if (!recentSummarize || resetSeen) safeExit(0);
+function main() {
+  if (!fs.existsSync(HISTORY_FILE)) return;
 
-const featureId = recentSummarize.feature || recentSummarize.node || 'unknown';
-const flagPath = path.join(SESSION_FLAG_DIR, SESSION_FLAG_PREFIX + featureId);
+  let lines = [];
+  try { lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
+  catch { return; }
 
-if (fs.existsSync(flagPath)) safeExit(0);
+  const recentSummarize = findPromptableSummarize(lines, Date.now(), PROMPT_WINDOW_MS);
+  if (!recentSummarize) return;
 
-try {
-  if (!fs.existsSync(SESSION_FLAG_DIR)) fs.mkdirSync(SESSION_FLAG_DIR, { recursive: true });
-  fs.writeFileSync(flagPath, new Date().toISOString());
-} catch {/* best-effort */}
+  const featureId = recentSummarize.feature || recentSummarize.node || 'unknown';
+  const flagPath = path.join(SESSION_FLAG_DIR, SESSION_FLAG_PREFIX + featureId);
+  if (fs.existsSync(flagPath)) return; // prompted already this feature
 
-process.stderr.write(
-  `[session-reset] Epic ${featureId} distilled to permanent_memory.md\n` +
-  `  Run /aura-frog:reset-session to clear conversation context (history + memory + plan tree preserved).\n`
-);
+  try {
+    if (!fs.existsSync(SESSION_FLAG_DIR)) fs.mkdirSync(SESSION_FLAG_DIR, { recursive: true });
+    fs.writeFileSync(flagPath, new Date().toISOString());
+  } catch {/* best-effort */}
 
-safeExit(0);
+  process.stderr.write(
+    `[session-reset] Epic ${featureId} distilled to permanent_memory.md\n` +
+    '  Run /aura-frog:reset-session to clear conversation context (history + memory + plan tree preserved).\n',
+  );
+}
+
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { findPromptableSummarize };
+}

@@ -37,63 +37,66 @@ const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
 
 function safeExit(code = 0) { process.exit(code); }
 
-if (!fs.existsSync(ACTIVE_FILE) || !fs.existsSync(HISTORY_FILE)) safeExit(0);
+// Pure: walking history newest-first, has this feature's most recent status
+// transition landed on `done`, and has it NOT already been epic-summarized?
+// Returns true only when the feature is freshly done and un-summarized.
+function shouldTriggerArchive(historyLines, featureId) {
+  let mostRecentTransitionDone = false;
+  let alreadySummarized = false;
 
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch {
-  safeExit(0);
-}
+  for (let i = historyLines.length - 1; i >= 0; i--) {
+    let evt;
+    try { evt = JSON.parse(historyLines[i]); } catch { continue; }
+    if (evt.node !== featureId) continue;
 
-const featureId = active.active && active.active.feature;
-if (!featureId) safeExit(0);
-
-let lines = [];
-try {
-  lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean);
-} catch {
-  safeExit(0);
-}
-
-let mostRecentTransitionDone = false;
-let alreadySummarized = false;
-
-for (let i = lines.length - 1; i >= 0; i--) {
-  let evt;
-  try { evt = JSON.parse(lines[i]); } catch { continue; }
-
-  if (evt.node !== featureId) continue;
-
-  if (evt.event === 'epic_summarized' && !mostRecentTransitionDone) {
-    alreadySummarized = true;
-    break;
-  }
-
-  if (evt.event === 'status_transition' || evt.from || evt.to) {
-    if (evt.to === 'done') {
-      mostRecentTransitionDone = true;
-      break;
-    } else if (evt.to) {
+    if (evt.event === 'epic_summarized' && !mostRecentTransitionDone) {
+      alreadySummarized = true;
       break;
     }
+
+    if (evt.event === 'status_transition' || evt.from || evt.to) {
+      if (evt.to === 'done') { mostRecentTransitionDone = true; break; }
+      if (evt.to) break; // a more recent non-done transition supersedes
+    }
   }
+
+  return mostRecentTransitionDone && !alreadySummarized;
 }
 
-if (!mostRecentTransitionDone || alreadySummarized) safeExit(0);
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE) || !fs.existsSync(HISTORY_FILE)) return;
 
-try {
-  fs.appendFileSync(HISTORY_FILE, JSON.stringify({
-    ts: new Date().toISOString(),
-    node: featureId,
-    event: 'feature_done_detected',
-    actor: 'feature-done-trigger-archive',
-  }) + '\n');
-} catch {/* best-effort */}
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch { return; }
 
-process.stderr.write(
-  `[feature-done] ${featureId} reached status: done\n` +
-  `  Run /aura-frog:reset-session to distill into permanent_memory and start fresh.\n`
-);
+  const featureId = active.active && active.active.feature;
+  if (!featureId) return;
 
-safeExit(0);
+  let lines = [];
+  try { lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
+  catch { return; }
+
+  if (!shouldTriggerArchive(lines, featureId)) return;
+
+  try {
+    fs.appendFileSync(HISTORY_FILE, JSON.stringify({
+      ts: new Date().toISOString(),
+      node: featureId,
+      event: 'feature_done_detected',
+      actor: 'feature-done-trigger-archive',
+    }) + '\n');
+  } catch {/* best-effort */}
+
+  process.stderr.write(
+    `[feature-done] ${featureId} reached status: done\n` +
+    '  Run /aura-frog:reset-session to distill into permanent_memory and start fresh.\n',
+  );
+}
+
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { shouldTriggerArchive };
+}

@@ -30,32 +30,14 @@ const TRACES_DIR = path.join(PLANS_DIR, 'traces');
 
 function safeExit(code = 0) { process.exit(code); }
 
-if (!fs.existsSync(ACTIVE_FILE)) safeExit(0);
+const TEST_RUNNER = /\b(test|jest|vitest|pytest|cargo\s+test|go\s+test|rspec|phpunit|mocha)\b/i;
 
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch {
-  safeExit(0);
+// Pure: does this command look like a test-runner invocation?
+function isTestRunner(cmd) {
+  return TEST_RUNNER.test(cmd || '');
 }
 
-const phase = active.context_anchors && active.context_anchors.current_phase;
-if (phase !== 'P2_RED') safeExit(0);
-
-const taskId = active.active && active.active.task;
-if (!taskId) safeExit(0);
-
-const cmd = process.env.CLAUDE_TOOL_COMMAND || '';
-const TEST_RUNNER = /\b(test|jest|vitest|pytest|cargo\s+test|go\s+test|rspec|phpunit|mocha)\b/i;
-if (!TEST_RUNNER.test(cmd)) safeExit(0);
-
-const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
-const ts = new Date().toISOString();
-
-if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
-const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
-
-function nextEventId() {
+function nextEventId(traceFile, taskId) {
   let n = 0;
   if (fs.existsSync(traceFile)) {
     n = fs.readFileSync(traceFile, 'utf8').split('\n').filter(Boolean).length;
@@ -63,32 +45,72 @@ function nextEventId() {
   return `TR-${taskId.replace(/[^0-9]/g, '')}-${String(n + 1).padStart(3, '0')}`;
 }
 
-const expected = exitCode !== 0;
-const event = {
-  ts,
-  event_id: nextEventId(),
-  task_id: taskId,
-  type: 'decision',
-  payload: {
-    decision: expected ? 'red_as_designed' : 'red_unexpectedly_green',
-    phase: 'P2_RED',
-    exit_code: exitCode,
-    cmd_match: cmd.slice(0, 80),
-    classifier_hint: expected ? null : 'F2_local_logic'
+// Pure: build the RED-phase decision event. In Phase 2 a failing test (exit != 0)
+// is RED as designed; a passing one is a F2 (local-logic) candidate because the
+// test likely doesn't exercise the new behaviour yet.
+function buildDecisionEvent({ taskId, eventId, exitCode, cmd, ts }) {
+  const expected = exitCode !== 0;
+  return {
+    ts,
+    event_id: eventId,
+    task_id: taskId,
+    type: 'decision',
+    payload: {
+      decision: expected ? 'red_as_designed' : 'red_unexpectedly_green',
+      phase: 'P2_RED',
+      exit_code: exitCode,
+      cmd_match: (cmd || '').slice(0, 80),
+      classifier_hint: expected ? null : 'F2_local_logic',
+    },
+  };
+}
+
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE)) return;
+
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch { return; }
+
+  const phase = active.context_anchors && active.context_anchors.current_phase;
+  if (phase !== 'P2_RED') return;
+
+  const taskId = active.active && active.active.task;
+  if (!taskId) return;
+
+  // NOTE (STORY-0010): CLAUDE_TOOL_COMMAND / CLAUDE_TOOL_EXIT_CODE are not set by
+  // the current hook API. Migrating to the stdin payload needs the exit-code
+  // probe first; left as-is so this change is pure importable+test work.
+  const cmd = process.env.CLAUDE_TOOL_COMMAND || '';
+  if (!isTestRunner(cmd)) return;
+
+  const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
+  const ts = new Date().toISOString();
+
+  if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
+  const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
+
+  const event = buildDecisionEvent({
+    taskId, eventId: nextEventId(traceFile, taskId), exitCode, cmd, ts,
+  });
+
+  try {
+    fs.appendFileSync(traceFile, JSON.stringify(event) + '\n');
+  } catch (err) {
+    process.stderr.write(`[tdd-red-tracker] WARN: trace append failed: ${err.message}\n`);
   }
-};
 
-try {
-  fs.appendFileSync(traceFile, JSON.stringify(event) + '\n');
-} catch (err) {
-  process.stderr.write(`[tdd-red-tracker] WARN: trace append failed: ${err.message}\n`);
+  if (event.payload.decision === 'red_unexpectedly_green') {
+    process.stderr.write(
+      `[tdd-red-tracker] RED test passed unexpectedly — task=${taskId}\n` +
+      '  this is a F2 candidate; the test may not exercise the new behavior\n',
+    );
+  }
 }
 
-if (!expected) {
-  process.stderr.write(
-    `[tdd-red-tracker] RED test passed unexpectedly — task=${taskId}\n` +
-    `  this is a F2 candidate; the test may not exercise the new behavior\n`
-  );
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { isTestRunner, nextEventId, buildDecisionEvent };
 }
-
-safeExit(0);

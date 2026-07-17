@@ -67,28 +67,42 @@ const TIERS = {
   },
 };
 
-try {
-  const input = readStdinSafely();
-  if (!input) process.exit(0);
-
-  const data = JSON.parse(input);
-  const filePath = (data.tool_input || {}).file_path || '';
-  if (!filePath) process.exit(0);
-
-  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
-
+// Pure: classify a file path into the first matching sensitivity tier, or null.
+// Tiers are checked in declaration order (CRITICAL → HIGH → MEDIUM), and the
+// path is normalised (backslashes → slashes, lower-cased) so Windows-style and
+// mixed-case paths match the same patterns.
+function classifyTier(filePath) {
+  if (!filePath) return null;
+  const normalized = String(filePath).replace(/\\/g, '/').toLowerCase();
   for (const [tier, config] of Object.entries(TIERS)) {
-    for (const pattern of config.patterns) {
-      if (pattern.test(normalized)) {
-        console.error(`${config.icon} [${config.label}] ${config.message}`);
-        console.error(`   File: ${path.basename(filePath)}`);
-        process.exit(0); // Warn but don't block
-      }
-    }
+    if (config.patterns.some((p) => p.test(normalized))) return tier;
   }
+  return null;
+}
 
-  process.exit(0);
+function main() {
+  try {
+    const input = readStdinSafely();
+    if (!input) return;
 
-} catch (error) {
-  process.exit(0); // Fail open
+    const data = JSON.parse(input);
+    const filePath = (data.tool_input || {}).file_path || '';
+    if (!filePath) return;
+
+    const tier = classifyTier(filePath);
+    if (tier) {
+      const config = TIERS[tier];
+      console.error(`${config.icon} [${config.label}] ${config.message}`);
+      console.error(`   File: ${path.basename(filePath)}`);
+    }
+  } catch {
+    /* fail open */
+  }
+}
+
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { TIERS, classifyTier };
 }

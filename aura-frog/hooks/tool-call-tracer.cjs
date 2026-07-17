@@ -33,26 +33,9 @@ const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 
 function safeExit(code = 0) { process.exit(code); }
 
-if (process.env.AF_TRACE_DISABLED === 'true') safeExit(0);
-if (!fs.existsSync(ACTIVE_FILE)) safeExit(0);
-
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch {
-  safeExit(0);
-}
-
-const taskId = active.active && active.active.task;
-if (!taskId) safeExit(0);
-
-const phase = process.env.CLAUDE_HOOK_PHASE || 'pre'; // 'pre' or 'post'
-const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
-const ts = new Date().toISOString();
-
 // v3.7.3+: trace.jsonl lives INSIDE the task folder
 // (features/.../stories/.../tasks/{ID}_{slug}/trace.jsonl). Find that folder
-// by searching for a file whose `id:` frontmatter matches taskId.
+// by searching for a file whose `id:` frontmatter matches taskId. Pure fs walk.
 function resolveTaskFolder(plansDir, id) {
   const featuresRoot = path.join(plansDir, 'features');
   if (!fs.existsSync(featuresRoot)) return null;
@@ -80,29 +63,35 @@ function resolveTaskFolder(plansDir, id) {
   return walk(featuresRoot);
 }
 
-let traceFile, counterFile;
-const taskFolder = resolveTaskFolder(PLANS_DIR, taskId);
-if (taskFolder) {
-  // v3.7.3+ co-located layout.
-  traceFile = path.join(taskFolder, 'trace.jsonl');
-  counterFile = path.join(taskFolder, '.trace.count');
-} else {
-  // Legacy fallback: top-level traces/ dir (pre-v3.7.3, or task folder lookup failed).
-  const tracesDir = path.join(PLANS_DIR, 'traces');
+// Resolve where a task's trace + counter live: the v3.7.3+ co-located layout
+// (inside the task folder) if found, else the legacy top-level traces/ dir.
+// Pure except for the mkdir on the legacy path.
+function resolveTracePaths(plansDir, taskId) {
+  const taskFolder = resolveTaskFolder(plansDir, taskId);
+  if (taskFolder) {
+    return {
+      traceFile: path.join(taskFolder, 'trace.jsonl'),
+      counterFile: path.join(taskFolder, '.trace.count'),
+    };
+  }
+  const tracesDir = path.join(plansDir, 'traces');
   if (!fs.existsSync(tracesDir)) fs.mkdirSync(tracesDir, { recursive: true });
-  traceFile = path.join(tracesDir, `${taskId}.jsonl`);
-  counterFile = path.join(tracesDir, `${taskId}.count`);
+  return {
+    traceFile: path.join(tracesDir, `${taskId}.jsonl`),
+    counterFile: path.join(tracesDir, `${taskId}.count`),
+  };
+}
+
+// taskSlug keeps the id safe for taskIds like "T2.3" vs "T23". Pure.
+function taskSlugOf(taskId) {
+  return taskId.replace(/[^A-Za-z0-9]+/g, '-');
 }
 
 // Event counter — persisted in a sibling counter file so each fresh Node
-// process reads at most 4 bytes (not the full trace). True O(1) per event;
-// fixes the prior O(n²) over a task lifetime that the half-measure
-// in-memory cache only solved within a single invocation.
+// process reads at most 4 bytes (not the full trace). True O(1) per event.
 // Atomic-ish: read counter → +1 → write counter (no flock; single-driver
 // assumption per spec §2.1.6, and the JSONL append below would race anyway).
-// taskSlug keeps the id safe for taskIds like "T2.3" vs "T23".
-const taskSlug = taskId.replace(/[^A-Za-z0-9]+/g, '-');
-function nextEventId() {
+function nextEventId(counterFile, taskSlug) {
   let n = 0;
   try {
     n = parseInt(fs.readFileSync(counterFile, 'utf8'), 10) || 0;
@@ -133,7 +122,20 @@ function hash(s) {
   return crypto.createHash('sha256').update(s || '').digest('hex').slice(0, 16);
 }
 
-function append(evt) {
+// Pure: pull the file path a Read tool call targets out of its raw args. Tries
+// JSON first (the normal shape), then a regex fallback for a non-JSON string.
+function extractReadPath(argsRaw) {
+  if (!argsRaw) return null;
+  try {
+    const parsed = JSON.parse(argsRaw);
+    return parsed.file_path || parsed.path || null;
+  } catch {
+    const m = argsRaw.match(/file_path["\s:]+([^"\s,}]+)/);
+    return m ? m[1] : null;
+  }
+}
+
+function append(traceFile, evt) {
   try {
     fs.appendFileSync(traceFile, JSON.stringify(evt) + '\n');
   } catch (err) {
@@ -141,51 +143,60 @@ function append(evt) {
   }
 }
 
-const argsRaw = process.env.CLAUDE_TOOL_ARGS || '';
-const argsHash = hash(argsRaw);
+function main() {
+  if (process.env.AF_TRACE_DISABLED === 'true') return;
+  if (!fs.existsSync(ACTIVE_FILE)) return;
 
-if (phase === 'pre') {
-  append({
-    ts,
-    event_id: nextEventId(),
-    task_id: taskId,
-    type: 'tool_call',
-    payload: { tool_name: toolName, args_hash: argsHash }
-  });
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch { return; }
 
-  // Special-case: Read tool emits a file_read event with the file path
-  if (toolName === 'Read') {
-    let filePath = null;
-    try {
-      const parsed = argsRaw ? JSON.parse(argsRaw) : {};
-      filePath = parsed.file_path || parsed.path || null;
-    } catch {
-      // not JSON — try to extract from raw string
-      const m = argsRaw.match(/file_path["\s:]+([^"\s,}]+)/);
-      if (m) filePath = m[1];
+  const taskId = active.active && active.active.task;
+  if (!taskId) return;
+
+  // NOTE (STORY-0010): these CLAUDE_TOOL_* / CLAUDE_HOOK_PHASE env vars are not
+  // set by the current hook API — migrating them to the stdin payload needs the
+  // exit-code/duration probe first. Left as-is here; this change only makes the
+  // hook importable + tests the pure helpers, so that migration lands safely.
+  const phase = process.env.CLAUDE_HOOK_PHASE || 'pre';
+  const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
+  const ts = new Date().toISOString();
+
+  const { traceFile, counterFile } = resolveTracePaths(PLANS_DIR, taskId);
+  const taskSlug = taskSlugOf(taskId);
+  const argsRaw = process.env.CLAUDE_TOOL_ARGS || '';
+
+  if (phase === 'pre') {
+    append(traceFile, {
+      ts, event_id: nextEventId(counterFile, taskSlug), task_id: taskId,
+      type: 'tool_call', payload: { tool_name: toolName, args_hash: hash(argsRaw) },
+    });
+
+    if (toolName === 'Read') {
+      const filePath = extractReadPath(argsRaw);
+      if (filePath && fs.existsSync(filePath)) {
+        append(traceFile, {
+          ts, event_id: nextEventId(counterFile, taskSlug), task_id: taskId,
+          type: 'file_read', payload: { path: filePath, sha256: hashFileBounded(filePath) },
+        });
+      }
     }
-    if (filePath && fs.existsSync(filePath)) {
-      const sha = hashFileBounded(filePath);
-      append({
-        ts,
-        event_id: nextEventId(),
-        task_id: taskId,
-        type: 'file_read',
-        payload: { path: filePath, sha256: sha }
-      });
-    }
+  } else {
+    const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
+    const durationMs = parseInt(process.env.CLAUDE_TOOL_DURATION_MS || '0', 10);
+    append(traceFile, {
+      ts, event_id: nextEventId(counterFile, taskSlug), task_id: taskId,
+      type: 'tool_result', payload: { tool_name: toolName, exit_code: exitCode, duration_ms: durationMs },
+    });
   }
-} else {
-  // post
-  const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
-  const durationMs = parseInt(process.env.CLAUDE_TOOL_DURATION_MS || '0', 10);
-  append({
-    ts,
-    event_id: nextEventId(),
-    task_id: taskId,
-    type: 'tool_result',
-    payload: { tool_name: toolName, exit_code: exitCode, duration_ms: durationMs }
-  });
 }
 
-safeExit(0);
+// Run as a hook; stay importable for tests. Previously the whole tracer ran at
+// module scope with a process.exit() on require. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = {
+    resolveTaskFolder, resolveTracePaths, taskSlugOf, nextEventId, hashFileBounded, hash, extractReadPath,
+  };
+}

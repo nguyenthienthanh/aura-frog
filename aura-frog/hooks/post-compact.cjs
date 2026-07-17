@@ -27,40 +27,56 @@ const STATE_PATHS = [
   '.claude/cache/compact-handoff.json'
 ];
 
-let input = '';
-process.stdin.on('data', d => input += d);
-process.stdin.on('end', () => {
+// Pure: which required fields is a parsed state file missing? The check depends
+// on WHICH state file it is (matched by the `rel` path), so both are passed in.
+function validateStateFile(rel, data) {
   const warnings = [];
+  if (rel.includes('workflow-state')) {
+    if (!data.phase) warnings.push(`${rel}: missing phase`);
+    if (!data.agent) warnings.push(`${rel}: missing agent`);
+  }
+  if (rel.includes('compact-handoff')) {
+    if (!data.summary && !data.decisions) {
+      warnings.push(`${rel}: missing summary and decisions — handoff may be empty`);
+    }
+  }
+  return warnings;
+}
 
-  for (const rel of STATE_PATHS) {
+// Collect warnings across every configured state path. I/O wrapper.
+function collectWarnings(statePaths) {
+  const warnings = [];
+  for (const rel of statePaths) {
     const abs = path.resolve(process.cwd(), rel);
     if (!fs.existsSync(abs)) continue;
-
     try {
-      const data = JSON.parse(fs.readFileSync(abs, 'utf8'));
-
-      // Check required fields
-      if (rel.includes('workflow-state')) {
-        if (!data.phase) warnings.push(`${rel}: missing phase`);
-        if (!data.agent) warnings.push(`${rel}: missing agent`);
-      }
-      if (rel.includes('compact-handoff')) {
-        if (!data.summary && !data.decisions) {
-          warnings.push(`${rel}: missing summary and decisions — handoff may be empty`);
-        }
-      }
+      warnings.push(...validateStateFile(rel, JSON.parse(fs.readFileSync(abs, 'utf8'))));
     } catch (e) {
       warnings.push(`${rel}: corrupted JSON — ${e.message}`);
     }
   }
+  return warnings;
+}
 
-  if (warnings.length > 0) {
-    process.stderr.write(
-      `⚠️ Post-compact state check:\n${warnings.map(w => `  - ${w}`).join('\n')}\n` +
-      `Action: Re-read workflow state files and verify before continuing.`
-    );
-    process.exit(2);
-  }
+function main() {
+  let input = '';
+  process.stdin.on('data', (d) => { input += d; });
+  process.stdin.on('end', () => {
+    const warnings = collectWarnings(STATE_PATHS);
+    if (warnings.length > 0) {
+      process.stderr.write(
+        `⚠️ Post-compact state check:\n${warnings.map((w) => `  - ${w}`).join('\n')}\n` +
+        'Action: Re-read workflow state files and verify before continuing.',
+      );
+      process.exit(2);
+    }
+    process.exit(0);
+  });
+}
 
-  process.exit(0);
-});
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { STATE_PATHS, validateStateFile, collectWarnings };
+}
