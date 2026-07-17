@@ -28,47 +28,55 @@ const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
 
-if (!fs.existsSync(ACTIVE_FILE)) {
-  process.exit(0);
+// Pure: the "active plan" banner parts for a parsed active.json. Feature wins
+// over initiative wins over mission; story/task hang off a feature. Empty array
+// when there is no active anchor to show.
+function composeBanner(active) {
+  const a = (active && active.active) || {};
+  const banner = [];
+  if (a.feature) {
+    banner.push(`🐸 Active plan: ${a.feature}`);
+    if (a.story) banner.push(`Story: ${a.story}`);
+    if (a.task) banner.push(`Task: ${a.task}`);
+  } else if (a.initiative) {
+    banner.push(`🐸 Active plan: ${a.initiative}`);
+  } else if (a.mission) {
+    banner.push(`🐸 Active mission: ${a.mission}`);
+  }
+  return banner;
 }
 
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch (err) {
-  process.stderr.write(`[plan-restore] WARN: active.json malformed: ${err.message}\n`);
-  process.exit(0);
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE)) return;
+
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch (err) {
+    process.stderr.write(`[plan-restore] WARN: active.json malformed: ${err.message}\n`);
+    return;
+  }
+
+  const banner = composeBanner(active);
+  if (banner.length > 0) {
+    process.stderr.write(`${banner.join(' · ')}\n`);
+    process.stderr.write('Run /aura-frog:plan-status for tree, /aura-frog:plan-next for next ready task.\n');
+  }
+
+  // Append session_start event to history.jsonl (audit trail).
+  try {
+    fs.appendFileSync(HISTORY_FILE, JSON.stringify({
+      ts: new Date().toISOString(),
+      event: 'session_start',
+      active: (active && active.active) || {},
+    }) + '\n');
+  } catch (_err) {
+    // Don't block session start on log write failure.
+  }
 }
 
-const a = active.active || {};
-
-// Compose the banner
-const banner = [];
-if (a.feature) {
-  banner.push(`🐸 Active plan: ${a.feature}`);
-  if (a.story) banner.push(`Story: ${a.story}`);
-  if (a.task) banner.push(`Task: ${a.task}`);
-} else if (a.initiative) {
-  banner.push(`🐸 Active plan: ${a.initiative}`);
-} else if (a.mission) {
-  banner.push(`🐸 Active mission: ${a.mission}`);
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { composeBanner };
 }
-
-if (banner.length > 0) {
-  process.stderr.write(`${banner.join(' · ')}\n`);
-  process.stderr.write(`Run /aura-frog:plan-status for tree, /aura-frog:plan-next for next ready task.\n`);
-}
-
-// Append session_start event to history.jsonl (audit trail)
-try {
-  const event = {
-    ts: new Date().toISOString(),
-    event: 'session_start',
-    active: a,
-  };
-  fs.appendFileSync(HISTORY_FILE, JSON.stringify(event) + '\n');
-} catch (_err) {
-  // Don't block session start on log write failure
-}
-
-process.exit(0);

@@ -34,45 +34,51 @@ function safeExit(code = 0) {
   process.exit(code);
 }
 
-// Silent exit when no plan tree
-if (!fs.existsSync(ACTIVE_FILE)) {
-  safeExit(0);
+// Pure: compose the minimal plan-context lines from a parsed active.json. The
+// order (mission → initiative → feature → story → task → phase → frozen → ready)
+// is the display order Claude reads.
+function composeContextLines(active) {
+  const lines = [];
+  const a = (active && active.active) || {};
+
+  if (a.mission) lines.push(`Mission: ${a.mission}`);
+  if (a.initiative) lines.push(`Initiative: ${a.initiative}`);
+  if (a.feature) lines.push(`Feature: ${a.feature}`);
+  if (a.story) lines.push(`Story: ${a.story}`);
+  if (a.task) lines.push(`Task: ${a.task}`);
+
+  if (active && active.context_anchors && active.context_anchors.current_phase) {
+    lines.push(`Phase: ${active.context_anchors.current_phase}`);
+  }
+  if (active && Array.isArray(active.frozen) && active.frozen.length > 0) {
+    lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura-frog:plan-conflicts`);
+  }
+  if (active && Array.isArray(active.ready_queue) && active.ready_queue.length > 0) {
+    lines.push(`Ready: ${active.ready_queue.length} task(s) queued`);
+  }
+  return lines;
 }
 
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch (err) {
-  // Malformed active.json — log to stderr but don't block
-  process.stderr.write(`[plan-context] WARN: active.json malformed: ${err.message}\n`);
-  safeExit(0);
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE)) return;
+
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch (err) {
+    process.stderr.write(`[plan-context] WARN: active.json malformed: ${err.message}\n`);
+    return;
+  }
+
+  const lines = composeContextLines(active);
+  // Claude reads stderr; the user doesn't see it by default.
+  if (lines.length > 0) {
+    process.stderr.write(`[plan-context | trust:plan]\n  ${lines.join('\n  ')}\n`);
+  }
 }
 
-// Compose minimal context block
-const lines = [];
-const a = active.active || {};
-
-if (a.mission) lines.push(`Mission: ${a.mission}`);
-if (a.initiative) lines.push(`Initiative: ${a.initiative}`);
-if (a.feature) lines.push(`Feature: ${a.feature}`);
-if (a.story) lines.push(`Story: ${a.story}`);
-if (a.task) lines.push(`Task: ${a.task}`);
-
-if (active.context_anchors && active.context_anchors.current_phase) {
-  lines.push(`Phase: ${active.context_anchors.current_phase}`);
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { composeContextLines };
 }
-
-if (Array.isArray(active.frozen) && active.frozen.length > 0) {
-  lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura-frog:plan-conflicts`);
-}
-
-if (Array.isArray(active.ready_queue) && active.ready_queue.length > 0) {
-  lines.push(`Ready: ${active.ready_queue.length} task(s) queued`);
-}
-
-// Output as a single compact block to stderr (Claude reads stderr; user doesn't see by default)
-if (lines.length > 0) {
-  process.stderr.write(`[plan-context | trust:plan]\n  ${lines.join('\n  ')}\n`);
-}
-
-safeExit(0);
