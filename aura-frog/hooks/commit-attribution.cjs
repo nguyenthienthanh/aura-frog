@@ -13,37 +13,42 @@
 const fs = require('fs');
 const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 
-try {
-  const input = readStdinSafely();
-  if (!input) process.exit(0);
+// Pure: should this Bash command be warned about for missing AI attribution?
+// True only for a git commit that introduces a NEW message without a
+// Co-Authored-By trailer. Skips: non-commits, `--amend --no-edit` (no new
+// message), commits that already carry the trailer, and `-F file` commits
+// (the trailer may live in the message file we can't see).
+function needsAttributionWarning(command) {
+  const cmd = command || '';
+  if (!/git\s+commit/.test(cmd)) return false;
+  if (/--amend\s+--no-edit/.test(cmd)) return false;
+  if (/co-authored-by/i.test(cmd)) return false;
+  if (/\s-F\s/.test(cmd)) return false;
+  return true;
+}
 
-  const data = JSON.parse(input);
-  const command = (data.tool_input || {}).command || '';
+function main() {
+  try {
+    const input = readStdinSafely();
+    if (!input) return 0;
 
-  // Only check git commit commands
-  if (!command.match(/git\s+commit/)) {
-    process.exit(0);
+    const data = JSON.parse(input);
+    const command = (data.tool_input || {}).command || '';
+
+    if (needsAttributionWarning(command)) {
+      console.error('💡 Missing AI attribution. Add to commit message:');
+      console.error('   Co-Authored-By: Claude <noreply@anthropic.com>');
+      return 1; // Warning, don't block
+    }
+    return 0;
+  } catch {
+    return 0; // Fail open
   }
+}
 
-  // Skip amend-only commands (no new message)
-  if (command.match(/--amend\s+--no-edit/)) {
-    process.exit(0);
-  }
-
-  // Check for Co-Authored-By in the commit message
-  if (/co-authored-by/i.test(command)) {
-    process.exit(0);
-  }
-
-  // Check if using a message file (-F) that might contain attribution
-  if (command.match(/\s-F\s/)) {
-    process.exit(0);
-  }
-
-  console.error('💡 Missing AI attribution. Add to commit message:');
-  console.error('   Co-Authored-By: Claude <noreply@anthropic.com>');
-  process.exit(1); // Warning, don't block
-
-} catch (error) {
-  process.exit(0); // Fail open
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  process.exit(main());
+} else {
+  module.exports = { needsAttributionWarning };
 }
