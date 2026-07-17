@@ -220,19 +220,26 @@ Four red gates fixed; one remains. Verify CI claims against `gh run list --branc
 | **`with_lock` minted duplicate IDs** — the "flaky" `next-counter-lock` test was a real P0-4 race: age-based stale-break stole locks from live-but-off-CPU holders. Now prefers `flock(1)`; mkdir spinlock is a liveness-gated macOS fallback. CI 756-passed-1-failed → **867/867**. | ✅ PR #27 |
 | **Plural blind spot** — `\btest\b` never matched "tests"; `\bcomment\b` never matched "comments", so auto-learn never learned the most common style correction. | ✅ PR #28 |
 | toon count · audit-refs dead specs · validate broken-link · doc-maturity frontmatter | ✅ PR #26 |
-| **Coverage floor: `functions` 32.63% vs a 40% threshold** (32.32% on 2026-07-14 — never met). | ⏳ **open — needs FEAT-007** |
+| **Coverage floor: `functions` 40 → 32**, reset to the measured level (40 had never been met, so the gate was permanently red and signalled nothing). | ✅ PR #31 |
+| **Prerelease users never told about their stable release** — `compareVersions` parsed `3.8.0-alpha.8` into `[3,8,NaN,8]`, and `NaN\|\|0` → 0, so it compared EQUAL to `3.8.0`. Rewritten per semver §11. | ✅ PR #33 |
 
-**Why the coverage floor needs FEAT-007, not more tests:** **24 of 49 hooks have no `module.exports`** — they run
-`main()` on require, so they cannot be unit-tested without refactoring them to export their logic (~77 top-level
-functions, ~18% of scope, locked away). PR #28 added 6 hook suites (83 tests, 18 functions) and barely moved the
-number. Options: (a) do the hook-runtime refactor (FEAT-007 / issues #5+#22) and let the floor ratchet up, or
-(b) reset the threshold to the measured level so the gate regains its no-regression signal — `jest.config.cjs`'s
-own comment says the value should track "the current measured level". **Decide before touching it.**
+### 4.3 FEAT-007 / issue #5 — making hooks importable (in progress)
 
-> ⚠️ Never call `firebase-cleanup.cleanupDebugLog`, `compact-handoff.saveHandoff`, or
-> `compact-handoff.generateCompactContext` from a test — each resolves paths from the real project root at module
-> load and writes to / unlinks from the working repo. (`generateCompactContext` is not the pure builder its name
-> suggests: it writes `compact-context.md` and shells out to git.)
+**Non-exporting hooks: 24 → 15** (PRs #32–#35). The pattern that works:
+
+1. `if (require.main === module) { main(); } else { module.exports = {...} }` — hook behaviour unchanged; verify **both** directions (import touches nothing; running still behaves).
+2. Split pure decision logic out of the I/O wrapper — see `session-start.cjs` `cacheStaleReason(cache, {now, ttl, envrcMtime, currentBranch})`.
+3. **Never export anything that mutates the repo**, and assert its absence in a test.
+
+> ⚠️ **Making a hook importable *lowers* measured coverage before it raises it.** Tests that `require()` a hook ending in a bare `main();` execute the whole hook, and every function it touches counts as "covered" with zero assertions. `session-start` alone dropped the metric 32.63% → 30.4% once that inflation was removed. **Do not read the dip as a regression** — replace the fake coverage with real tests.
+
+**The remaining 15 need a different, riskier refactor.** Most end in `safeExit(0)`: their logic runs at *module scope*, so the guard alone is not enough — they must first be restructured into a `main()`, turning early `safeExit(0)` calls into returns. Several (`tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node`) also read `CLAUDE_TOOL_*` env vars the hook API never sets, so they belong with **STORY-0010**, not #5.
+
+> ⚠️ **Never call these from a test** — each resolves paths from the real project root at module load:
+> `phase-checkpoint.createCheckpoint` (runs `git add -A` + `git commit` on the working tree!) ·
+> `firebase-cleanup.cleanupDebugLog` (unlinks) · `compact-handoff.saveHandoff` ·
+> `compact-handoff.generateCompactContext` (not the pure builder its name suggests — writes `compact-context.md`
+> and shells out to git) · `subagent-init.trackAgentUsage` (reads fd 0 — blocks a test runner).
 
 ---
 
