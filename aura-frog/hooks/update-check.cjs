@@ -55,13 +55,63 @@ function shouldCheck() {
   return (Date.now() - cache.lastCheck) > CHECK_INTERVAL_MS;
 }
 
-function compareVersions(current, latest) {
-  const c = current.replace(/^v/, '').split('.').map(Number);
-  const l = latest.replace(/^v/, '').split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    if ((l[i] || 0) > (c[i] || 0)) return true;
-    if ((l[i] || 0) < (c[i] || 0)) return false;
+/**
+ * Split "v3.8.0-alpha.8" into { nums: [3,8,0], pre: "alpha.8" }.
+ * Splitting the whole string on "." used to turn "0-alpha" into NaN, which then
+ * collapsed to 0 via `|| 0` — see compareVersions.
+ */
+function parseVersion(v) {
+  const [core, ...rest] = String(v).replace(/^v/, '').split('-');
+  const nums = core.split('.').map((n) => Number(n) || 0);
+  return { nums, pre: rest.length ? rest.join('-') : null };
+}
+
+/**
+ * Compare two dot-separated prerelease strings per semver §11.
+ * Returns >0 when `a` has higher precedence than `b`.
+ */
+function comparePrerelease(a, b) {
+  const A = a.split('.');
+  const B = b.split('.');
+  for (let i = 0; i < Math.max(A.length, B.length); i++) {
+    // A larger set of identifiers wins when all preceding ones are equal.
+    if (A[i] === undefined) return -1;
+    if (B[i] === undefined) return 1;
+    const na = Number(A[i]);
+    const nb = Number(B[i]);
+    const bothNumeric = A[i] !== '' && B[i] !== '' && !Number.isNaN(na) && !Number.isNaN(nb);
+    if (bothNumeric) {
+      if (na !== nb) return na - nb;           // numeric identifiers compare numerically
+    } else if (A[i] !== B[i]) {
+      return A[i] < B[i] ? -1 : 1;             // otherwise ASCII order
+    }
   }
+  return 0;
+}
+
+/**
+ * True when `latest` is newer than `current`.
+ *
+ * Prereleases are the subtle part, and the previous implementation got them
+ * wrong: it did `'3.8.0-alpha.8'.split('.').map(Number)` → [3, 8, NaN, 8], and
+ * `NaN || 0` → 0, so 3.8.0-alpha.8 compared EQUAL to 3.8.0. Every user on a
+ * prerelease was therefore never told when the matching stable release shipped
+ * (only a minor/major bump got through). Semver §11: a prerelease has lower
+ * precedence than its release.
+ */
+function compareVersions(current, latest) {
+  const c = parseVersion(current);
+  const l = parseVersion(latest);
+
+  for (let i = 0; i < 3; i++) {
+    if ((l.nums[i] || 0) > (c.nums[i] || 0)) return true;
+    if ((l.nums[i] || 0) < (c.nums[i] || 0)) return false;
+  }
+
+  // Same numeric core below this point.
+  if (c.pre && !l.pre) return true;   // 3.8.0-alpha.8 -> 3.8.0 IS an update
+  if (!c.pre && l.pre) return false;  // never push a stable user back to a prerelease
+  if (c.pre && l.pre) return comparePrerelease(l.pre, c.pre) > 0;
   return false;
 }
 
@@ -123,4 +173,10 @@ async function main() {
   process.exit(0);
 }
 
-main().catch(() => process.exit(0));
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+// writeCache (writes the real cache) and checkForUpdate (network) stay unexported.
+if (require.main === module) {
+  main().catch(() => process.exit(0));
+} else {
+  module.exports = { getCurrentVersion, readCache, shouldCheck, compareVersions };
+}

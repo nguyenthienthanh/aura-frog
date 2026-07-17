@@ -216,4 +216,13 @@ function main() {
   safeExit(0);
 }
 
-main();
+// Run as a hook; stay importable for tests. Requiring this file used to execute
+// main() as a side effect (read stdin, hit the JIRA API, write the cache), so
+// none of its logic was reachable from a test. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = {
+    extractTickets, applyProjectAllowlist, envConfigured, cachePath, cacheFresh, readCachedJson,
+  };
+}
