@@ -116,4 +116,14 @@ function main() {
   process.exit(0);
 }
 
-main();
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+//
+// createCheckpoint and writeCache are deliberately NOT exported: createCheckpoint
+// runs `git add -A` + `git commit` against the real working tree, and writeCache
+// writes the real .claude/cache. Nothing that mutates the repo should be one
+// require() away from a test runner.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { getWorkflowState, hasUncommittedChanges, getCacheFile, readCache };
+}
