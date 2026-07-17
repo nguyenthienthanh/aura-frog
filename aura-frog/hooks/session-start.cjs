@@ -582,5 +582,7 @@ function pruneJsonlByTimestamp(file, cutoffMs) {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { cacheStaleReason, buildContextOutput, listFiles };
+  module.exports = {
+    cacheStaleReason, getValidCache, buildContextOutput, listFiles, pruneJsonlByTimestamp,
+  };
 }

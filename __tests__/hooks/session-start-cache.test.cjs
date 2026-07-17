@@ -10,7 +10,17 @@
  * was reachable from a test.
  */
 
-const { cacheStaleReason } = require('../../aura-frog/hooks/session-start.cjs');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+const {
+  cacheStaleReason,
+  getValidCache,
+  buildContextOutput,
+  listFiles,
+  pruneJsonlByTimestamp,
+} = require('../../aura-frog/hooks/session-start.cjs');
 
 const TTL = 60 * 60 * 1000; // 1 hour, mirrors SESSION_CACHE_TTL
 const NOW = 1_700_000_000_000;
@@ -101,5 +111,126 @@ describe('session-start — cacheStaleReason', () => {
       expect(cacheStaleReason(cacheOn('main'), env({ envrcMtime: NOW, currentBranch: 'other' })))
         .toBe('envrc_changed');
     });
+  });
+});
+
+describe('session-start — getValidCache', () => {
+  // Read-only against the real .claude/cache. Never asserts a specific value —
+  // only that the I/O wrapper degrades safely whatever the machine's state.
+  it('returns null or an object without throwing', () => {
+    let out;
+    expect(() => { out = getValidCache(); }).not.toThrow();
+    expect(out === null || typeof out === 'object').toBe(true);
+  });
+});
+
+describe('session-start — buildContextOutput', () => {
+  const detections = { type: 'single-repo', pm: 'pnpm', framework: 'nextjs' };
+
+  it('renders type, package manager and framework', () => {
+    const out = buildContextOutput({}, detections, {}, null);
+    expect(out).toContain('Type: single-repo');
+    expect(out).toContain('PM: pnpm');
+    expect(out).toContain('Framework: nextjs');
+  });
+
+  it('labels a session-resolved plan as Plan', () => {
+    const out = buildContextOutput({}, {}, { path: '/p/plans/auth.md', resolvedBy: 'session' }, null);
+    expect(out).toContain('Plan: auth.md');
+  });
+
+  it('labels a branch-matched plan as Suggested (a hint, not a directive)', () => {
+    const out = buildContextOutput({}, {}, { path: '/p/plans/auth.md', resolvedBy: 'branch' }, null);
+    expect(out).toContain('Suggested: auth.md');
+  });
+
+  it('omits the plan when it resolved by neither', () => {
+    const out = buildContextOutput({}, detections, { path: '/p/x.md', resolvedBy: 'other' }, null);
+    expect(out).not.toContain('x.md');
+  });
+
+  it('reports loaded memory and marks a cached load', () => {
+    expect(buildContextOutput({}, {}, {}, { loaded: true, count: 3 })).toContain('Memory: 3 items');
+    expect(buildContextOutput({}, {}, {}, { loaded: true, count: 3, cached: true }))
+      .toContain('Memory: 3 items (cached)');
+  });
+
+  it('omits memory when it did not load', () => {
+    expect(buildContextOutput({}, detections, {}, { loaded: false })).not.toContain('Memory');
+  });
+
+  it('returns an empty string when there is nothing to report', () => {
+    expect(buildContextOutput({}, {}, {}, null)).toBe('');
+  });
+});
+
+describe('session-start — listFiles', () => {
+  let dir;
+  beforeAll(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ss-lf-'));
+    fs.writeFileSync(path.join(dir, 'a.jsonl'), '');
+    fs.writeFileSync(path.join(dir, 'b.json'), '');
+    fs.writeFileSync(path.join(dir, 'c.md'), '');
+  });
+  afterAll(() => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ } });
+
+  it('returns only .json and .jsonl files, as full paths', () => {
+    const out = listFiles(dir).map(f => path.basename(f)).sort();
+    expect(out).toEqual(['a.jsonl', 'b.json']);
+    expect(listFiles(dir).every(f => path.isAbsolute(f))).toBe(true);
+  });
+
+  it('is empty for a missing directory', () => {
+    expect(listFiles(path.join(dir, 'nope'))).toEqual([]);
+  });
+});
+
+describe('session-start — pruneJsonlByTimestamp', () => {
+  let dir;
+  beforeEach(() => { dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ss-pr-')); });
+  afterEach(() => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ } });
+
+  const write = (name, lines) => {
+    const p = path.join(dir, name);
+    fs.writeFileSync(p, lines.join('\n') + '\n');
+    // Backdate mtime so the "recently written" fast path doesn't skip the prune.
+    const old = new Date(Date.now() - 10 * 24 * 3600 * 1000);
+    fs.utimesSync(p, old, old);
+    return p;
+  };
+  const read = (p) => (fs.existsSync(p) ? fs.readFileSync(p, 'utf8').trim().split('\n').filter(Boolean) : null);
+
+  const OLD_TS = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+  const NEW_TS = new Date().toISOString();
+  const cutoff = Date.now() - 7 * 24 * 3600 * 1000;
+
+  it('drops entries older than the cutoff and keeps newer ones', () => {
+    const p = write('a.jsonl', [
+      JSON.stringify({ ts: OLD_TS, v: 'old' }),
+      JSON.stringify({ ts: NEW_TS, v: 'new' }),
+    ]);
+    pruneJsonlByTimestamp(p, cutoff);
+    const kept = read(p);
+    expect(kept).toHaveLength(1);
+    expect(kept[0]).toContain('new');
+  });
+
+  // Never silently destroy data the parser cannot read.
+  it('keeps malformed lines', () => {
+    const p = write('b.jsonl', ['{not json', JSON.stringify({ ts: OLD_TS, v: 'old' })]);
+    pruneJsonlByTimestamp(p, cutoff);
+    expect(read(p)).toEqual(['{not json']);
+  });
+
+  it('accepts timestamp, ts or lastUpdated as the time field', () => {
+    for (const field of ['ts', 'timestamp', 'lastUpdated']) {
+      const p = write(`${field}.jsonl`, [JSON.stringify({ [field]: OLD_TS, v: 'old' })]);
+      pruneJsonlByTimestamp(p, cutoff);
+      expect(read(p)).toBeNull(); // every line aged out → file removed
+    }
+  });
+
+  it('does not throw on a missing file', () => {
+    expect(() => pruneJsonlByTimestamp(path.join(dir, 'nope.jsonl'), cutoff)).not.toThrow();
   });
 });
