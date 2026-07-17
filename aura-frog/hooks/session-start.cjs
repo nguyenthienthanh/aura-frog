@@ -72,35 +72,60 @@ const SESSION_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const ENVRC_PATH = path.join(process.cwd(), '.envrc');
 
 /**
- * Check if session cache is valid
+ * Decide whether a loaded cache object is stale. Pure — all environment facts
+ * arrive as arguments, so the rule set is unit-testable without touching the
+ * real .claude/cache or the working tree's git state.
+ *
+ * @param {object} cache        parsed cache object
+ * @param {object} env
+ * @param {number} env.now            current epoch ms
+ * @param {number} env.ttl            max age in ms
+ * @param {number|null} env.envrcMtime .envrc mtime in ms, or null when absent
+ * @param {string} env.currentBranch   current git branch, '' when undetectable
+ * @returns {string|null} the staleness reason, or null when the cache is usable
+ */
+function cacheStaleReason(cache, { now, ttl, envrcMtime, currentBranch }) {
+  if (!cache) return 'missing';
+
+  const cachedAt = cache.cachedAt || 0;
+
+  if (now - cachedAt > ttl) return 'ttl_expired';
+
+  // .envrc rewritten after we cached → env vars may have changed.
+  if (envrcMtime !== null && envrcMtime !== undefined && envrcMtime > cachedAt) {
+    return 'envrc_changed';
+  }
+
+  // Git branch switched since cache → stale (the fast path would otherwise
+  // replay the old AF_GIT_BRANCH for up to the TTL). Safe-by-construction: it
+  // can only invalidate (→ full re-detection), never produce a wrong value; an
+  // undetectable branch ('') falls through to the TTL-only behaviour.
+  const cachedBranch = cache.envVars && cache.envVars.AF_GIT_BRANCH;
+  if (cachedBranch !== undefined && currentBranch && currentBranch !== cachedBranch) {
+    return 'branch_switched';
+  }
+
+  return null;
+}
+
+/**
+ * Check if session cache is valid. I/O wrapper around cacheStaleReason().
  */
 function getValidCache() {
   try {
     if (!fs.existsSync(SESSION_CACHE_FILE)) return null;
 
     const cache = JSON.parse(fs.readFileSync(SESSION_CACHE_FILE, 'utf-8'));
-    const age = Date.now() - (cache.cachedAt || 0);
+    const envrcMtime = fs.existsSync(ENVRC_PATH) ? fs.statSync(ENVRC_PATH).mtimeMs : null;
 
-    // TTL expired
-    if (age > SESSION_CACHE_TTL) return null;
+    const reason = cacheStaleReason(cache, {
+      now: Date.now(),
+      ttl: SESSION_CACHE_TTL,
+      envrcMtime,
+      currentBranch: getGitBranch() || '',
+    });
 
-    // .envrc changed since cache
-    if (fs.existsSync(ENVRC_PATH)) {
-      const envrcMtime = fs.statSync(ENVRC_PATH).mtimeMs;
-      if (envrcMtime > (cache.cachedAt || 0)) return null;
-    }
-
-    // Git branch switched since cache → stale (the fast path would replay the
-    // old AF_GIT_BRANCH for up to the TTL). Safe-by-construction: this can only
-    // invalidate (→ full re-detection), never produce a wrong value; a failed
-    // branch detection falls through and keeps the TTL-only behaviour.
-    const cachedBranch = cache.envVars && cache.envVars.AF_GIT_BRANCH;
-    if (cachedBranch !== undefined) {
-      const currentBranch = getGitBranch() || '';
-      if (currentBranch && currentBranch !== cachedBranch) return null;
-    }
-
-    return cache;
+    return reason === null ? cache : null;
   } catch { return null; }
 }
 
@@ -550,4 +575,12 @@ function pruneJsonlByTimestamp(file, cutoffMs) {
   } catch { /* best-effort; never block startup */ }
 }
 
-main();
+// Run as a hook; stay importable for tests. Requiring this file previously
+// executed main() as a side effect (writing the cache, emitting the banner,
+// sweeping retention), which is why none of its logic could be unit-tested.
+// FEAT-007 / issue #5: make hooks importable without changing hook behaviour.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { cacheStaleReason, buildContextOutput, listFiles };
+}
