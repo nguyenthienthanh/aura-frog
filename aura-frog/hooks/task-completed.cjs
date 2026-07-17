@@ -48,6 +48,25 @@ function parseTaskInput() {
   return {};
 }
 
+// Pure: in a TDD phase (5a/5b/5c) a task must reference test results — its
+// description/subject has to mention test/spec/assert/expect/coverage. Returns
+// true when that requirement is VIOLATED.
+const TDD_PHASES = ['5a', '5b', '5c'];
+function checkTddViolation(currentPhase, taskData) {
+  if (!currentPhase || !TDD_PHASES.includes(currentPhase)) return false;
+  const desc = ((taskData && (taskData.description || taskData.subject)) || '').toLowerCase();
+  return !/test|spec|assert|expect|coverage/.test(desc);
+}
+
+// Pure: phases 2 and 5b are approval gates — completion is blocked while the
+// matching approval status is still 'pending'. Returns true when BLOCKED.
+const APPROVAL_PHASES = ['2', '5b'];
+function checkApprovalPending(currentPhase, state) {
+  if (!currentPhase || !APPROVAL_PHASES.includes(currentPhase)) return false;
+  const status = state && state.approvalStatus && state.approvalStatus[`phase${currentPhase}`];
+  return status === 'pending';
+}
+
 function main() {
   // Only active when Agent Teams is enabled
   if (!isAgentTeamsEnabled()) {
@@ -66,30 +85,20 @@ function main() {
   const state = readSessionState(sessionId);
   const currentPhase = state?.phase || process.env.AF_CURRENT_PHASE;
 
-  // Validation 1: Check if task mentions test results when in TDD phases
-  const tddPhases = ['5a', '5b', '5c'];
-  if (currentPhase && tddPhases.includes(currentPhase)) {
-    const taskDescription = taskData.description || taskData.subject || '';
-    const hasTestReference = /test|spec|assert|expect|coverage/.test(taskDescription.toLowerCase());
-
-    if (!hasTestReference) {
-      console.error('🔴 TDD Violation: Task in TDD phase must reference test results');
-      console.error('Action: Run tests and include results before marking complete');
-      process.exit(2); // Reject
-      return;
-    }
+  // Validation 1: TDD phases must reference test results.
+  if (checkTddViolation(currentPhase, taskData)) {
+    console.error('🔴 TDD Violation: Task in TDD phase must reference test results');
+    console.error('Action: Run tests and include results before marking complete');
+    process.exit(2); // Reject
+    return;
   }
 
-  // Validation 2: Check for approval gate phases
-  const approvalPhases = ['2', '5b'];
-  if (currentPhase && approvalPhases.includes(currentPhase)) {
-    const approvalStatus = state?.approvalStatus?.[`phase${currentPhase}`];
-    if (approvalStatus === 'pending') {
-      console.error(`⏳ Phase ${currentPhase} requires user approval before completion`);
-      console.error('Action: Wait for approval gate before marking phase complete');
-      process.exit(2); // Reject
-      return;
-    }
+  // Validation 2: approval-gate phases can't complete while approval is pending.
+  if (checkApprovalPending(currentPhase, state)) {
+    console.error(`⏳ Phase ${currentPhase} requires user approval before completion`);
+    console.error('Action: Wait for approval gate before marking phase complete');
+    process.exit(2); // Reject
+    return;
   }
 
   // Record completion in team log if available
@@ -109,4 +118,10 @@ function main() {
   process.exit(0);
 }
 
-main();
+// Run as a hook; stay importable for tests. parseTaskInput reads stdin (blocks a
+// test runner), so it stays unexported. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { checkTddViolation, checkApprovalPending };
+}
