@@ -584,5 +584,6 @@ if (require.main === module) {
 } else {
   module.exports = {
     cacheStaleReason, getValidCache, buildContextOutput, listFiles, pruneJsonlByTimestamp,
+    emitContextStalenessBanner,
   };
 }

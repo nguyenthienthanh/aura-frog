@@ -20,6 +20,7 @@ const {
   buildContextOutput,
   listFiles,
   pruneJsonlByTimestamp,
+  emitContextStalenessBanner,
 } = require('../../aura-frog/hooks/session-start.cjs');
 
 const TTL = 60 * 60 * 1000; // 1 hour, mirrors SESSION_CACHE_TTL
@@ -121,6 +122,30 @@ describe('session-start — getValidCache', () => {
     let out;
     expect(() => { out = getValidCache(); }).not.toThrow();
     expect(out === null || typeof out === 'object').toBe(true);
+  });
+});
+
+describe('session-start — emitContextStalenessBanner', () => {
+  // Read-only (reads the snapshot / detection cache and logs a line). Its whole
+  // contract is "best-effort, never block startup", so both paths are asserted
+  // to stay silent-and-safe rather than to produce a particular message.
+  const KEY = 'AF_CONTEXT_STALE_BANNER_DISABLED';
+  let saved, log;
+  beforeEach(() => { saved = process.env[KEY]; log = jest.spyOn(console, 'log').mockImplementation(() => {}); });
+  afterEach(() => {
+    if (saved === undefined) delete process.env[KEY]; else process.env[KEY] = saved;
+    log.mockRestore();
+  });
+
+  it('emits nothing when disabled by env', () => {
+    process.env[KEY] = 'true';
+    emitContextStalenessBanner();
+    expect(log).not.toHaveBeenCalled();
+  });
+
+  it('never throws when enabled', () => {
+    delete process.env[KEY];
+    expect(() => emitContextStalenessBanner()).not.toThrow();
   });
 });
 
