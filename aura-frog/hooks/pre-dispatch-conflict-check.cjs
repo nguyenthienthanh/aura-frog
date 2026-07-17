@@ -45,21 +45,40 @@ const L2_SCRIPT = path.join(PLUGIN_ROOT, 'scripts', 'conflicts', 'check-l2-synta
 
 function safeExit(code = 0) { process.exit(code); }
 
-if (!fs.existsSync(ACTIVE_FILE)) safeExit(0);
+// A sibling task counts as pending-confirm (and therefore a conflict candidate)
+// when it is planned, blocked, or blocked-on-confirm. Pure.
+function isPendingStatus(status) {
+  return status === 'planned' || status === 'blocked' || status === 'blocked-on-confirm';
+}
 
-let active;
-try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
-catch { safeExit(0); }
+// Pure: assemble the conflicts.jsonl record from the detector output. Kept
+// separate from the file append so its exact shape can be pinned by a test.
+function buildConflictRecord({ taskId, detectedLayer, conflictPayload, conflictId, ts }) {
+  return {
+    conflict_id: conflictId,
+    detected_at: ts,
+    detected_by: 'pre-dispatch-conflict-check.cjs',
+    layer: detectedLayer,
+    type: detectedLayer === 'L1' ? 'file_overlap' : 'function_overlap',
+    participants: [
+      { task: taskId, role: 'proposed' },
+      ...(conflictPayload.with || []).map((s) => ({ task: s, role: 'pending-confirm' })),
+    ],
+    overlap: {
+      files: conflictPayload.files || null,
+      functions: conflictPayload.functions || null,
+      schema_elements: null,
+    },
+    confidence: conflictPayload.confidence || 1.0,
+    arbitration: null,
+    actions_taken: [],
+    resolution: null,
+    resolved_at: null,
+  };
+}
 
-const taskId = active.active && active.active.task;
-const storyId = active.active && active.active.story;
-if (!taskId || !storyId) safeExit(0);
-
-if (!fs.existsSync(L1_SCRIPT)) safeExit(0);
-
-// Find sibling tasks under the same Story
-function findSiblings() {
-  const storyDir = path.join(PLANS_DIR, 'features', '*', 'stories', storyId, 'tasks');
+// Find sibling tasks under the same Story, in a pending-confirm status.
+function findSiblings(taskId, storyId) {
   const siblings = [];
   try {
     const featuresDir = path.join(PLANS_DIR, 'features');
@@ -71,59 +90,19 @@ function findSiblings() {
         if (!f.endsWith('.md')) continue;
         const sid = f.replace(/\.md$/, '');
         if (sid === taskId) continue;
-        // Check status
         const content = fs.readFileSync(path.join(tasksDir, f), 'utf8');
         const m = content.match(/^status:[\s]*(\w+)/m);
-        const status = m ? m[1] : 'unknown';
-        if (status === 'planned' || status === 'blocked' || status === 'blocked-on-confirm') {
-          siblings.push(sid);
-        }
+        if (isPendingStatus(m ? m[1] : 'unknown')) siblings.push(sid);
       }
     }
   } catch {/* best-effort */}
   return siblings;
 }
 
-const siblings = findSiblings();
-if (siblings.length === 0) safeExit(0);
-
-// Run L1 detector
-const l1Result = spawnSync('bash', [
-  L1_SCRIPT,
-  '--task', taskId,
-  '--siblings', siblings.join(','),
-], { encoding: 'utf-8', timeout: 1000, cwd: process.cwd() });
-
-let l1Output;
-try { l1Output = JSON.parse(l1Result.stdout || '{}'); }
-catch { safeExit(0); }
-
-if (!l1Output.overlap) safeExit(0);
-
-let detectedLayer = 'L1';
-let conflictPayload = l1Output;
-
-// If L1 confidence not high enough, drill into L2
-if (l1Output.confidence < 0.95 && fs.existsSync(L2_SCRIPT) && l1Output.files) {
-  const l2Result = spawnSync('bash', [
-    L2_SCRIPT,
-    '--files', l1Output.files.join(','),
-  ], { encoding: 'utf-8', timeout: 2000, cwd: process.cwd() });
-
-  let l2Output;
-  try { l2Output = JSON.parse(l2Result.stdout || '{}'); }
-  catch { l2Output = {}; }
-
-  if (l2Output.overlap) {
-    detectedLayer = 'L2';
-    conflictPayload = { ...l1Output, ...l2Output };
-  }
-}
-
 // Mint CONFLICT-NNNNN under the shared counter lock so concurrent dispatches
 // (and bash mutators) never mint a duplicate id.
-const { nextCounter } = require('./lib/js-counter.cjs');
 function nextConflictId() {
+  const { nextCounter } = require('./lib/js-counter.cjs');
   const n = nextCounter(COUNTERS_FILE, 'CONFLICT');
   // Lock-timeout fallback (extremely rare): a time-derived value keeps the id
   // unique-enough for a best-effort, fail-open hook rather than colliding.
@@ -131,53 +110,79 @@ function nextConflictId() {
   return `CONFLICT-${String(val).padStart(5, '0')}`;
 }
 
-const conflictId = nextConflictId();
-const ts = new Date().toISOString();
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE)) return;
 
-const record = {
-  conflict_id: conflictId,
-  detected_at: ts,
-  detected_by: 'pre-dispatch-conflict-check.cjs',
-  layer: detectedLayer,
-  type: detectedLayer === 'L1' ? 'file_overlap' : 'function_overlap',
-  participants: [
-    { task: taskId, role: 'proposed' },
-    ...(conflictPayload.with || []).map(s => ({ task: s, role: 'pending-confirm' })),
-  ],
-  overlap: {
-    files: conflictPayload.files || null,
-    functions: conflictPayload.functions || null,
-    schema_elements: null,
-  },
-  confidence: conflictPayload.confidence || 1.0,
-  arbitration: null,
-  actions_taken: [],
-  resolution: null,
-  resolved_at: null,
-};
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch { return; }
 
-try {
-  fs.appendFileSync(CONFLICTS_FILE, JSON.stringify(record) + '\n');
-} catch (err) {
-  process.stderr.write(`[pre-dispatch-conflict] WARN: conflicts.jsonl append failed: ${err.message}\n`);
-  safeExit(0);
+  const taskId = active.active && active.active.task;
+  const storyId = active.active && active.active.story;
+  if (!taskId || !storyId) return;
+  if (!fs.existsSync(L1_SCRIPT)) return;
+
+  const siblings = findSiblings(taskId, storyId);
+  if (siblings.length === 0) return;
+
+  const l1Result = spawnSync('bash', [
+    L1_SCRIPT, '--task', taskId, '--siblings', siblings.join(','),
+  ], { encoding: 'utf-8', timeout: 1000, cwd: process.cwd() });
+
+  let l1Output;
+  try { l1Output = JSON.parse(l1Result.stdout || '{}'); }
+  catch { return; }
+
+  if (!l1Output.overlap) return;
+
+  let detectedLayer = 'L1';
+  let conflictPayload = l1Output;
+
+  // If L1 confidence not high enough, drill into L2.
+  if (l1Output.confidence < 0.95 && fs.existsSync(L2_SCRIPT) && l1Output.files) {
+    const l2Result = spawnSync('bash', [
+      L2_SCRIPT, '--files', l1Output.files.join(','),
+    ], { encoding: 'utf-8', timeout: 2000, cwd: process.cwd() });
+
+    let l2Output;
+    try { l2Output = JSON.parse(l2Result.stdout || '{}'); }
+    catch { l2Output = {}; }
+
+    if (l2Output.overlap) {
+      detectedLayer = 'L2';
+      conflictPayload = { ...l1Output, ...l2Output };
+    }
+  }
+
+  const conflictId = nextConflictId();
+  const ts = new Date().toISOString();
+  const record = buildConflictRecord({ taskId, detectedLayer, conflictPayload, conflictId, ts });
+
+  try {
+    fs.appendFileSync(CONFLICTS_FILE, JSON.stringify(record) + '\n');
+  } catch (err) {
+    process.stderr.write(`[pre-dispatch-conflict] WARN: conflicts.jsonl append failed: ${err.message}\n`);
+    return;
+  }
+
+  try {
+    fs.appendFileSync(HISTORY_FILE, JSON.stringify({
+      ts, node: taskId, event: 'conflict_detected',
+      conflict_id: conflictId, layer: detectedLayer, actor: 'pre-dispatch-conflict-check',
+    }) + '\n');
+  } catch {/* best-effort */}
+
+  process.stderr.write(
+    `[conflict-detected] ${conflictId} (${detectedLayer}) — ${taskId} overlaps ${(conflictPayload.with || []).join(', ')}\n` +
+    `  files: ${(conflictPayload.files || []).join(', ')}\n` +
+    `  Run /aura-frog:plan-conflicts show ${conflictId} for details, or wait for conflict-arbiter to decide.\n`,
+  );
 }
 
-try {
-  fs.appendFileSync(HISTORY_FILE, JSON.stringify({
-    ts,
-    node: taskId,
-    event: 'conflict_detected',
-    conflict_id: conflictId,
-    layer: detectedLayer,
-    actor: 'pre-dispatch-conflict-check',
-  }) + '\n');
-} catch {/* best-effort */}
-
-process.stderr.write(
-  `[conflict-detected] ${conflictId} (${detectedLayer}) — ${taskId} overlaps ${(conflictPayload.with || []).join(', ')}\n` +
-  `  files: ${(conflictPayload.files || []).join(', ')}\n` +
-  `  Run /aura-frog:plan-conflicts show ${conflictId} for details, or wait for conflict-arbiter to decide.\n`
-);
-
-safeExit(0);
+// Run as a hook; stay importable for tests. Previously the entire detection
+// pipeline ran at module scope with a process.exit() on require. FEAT-007 / #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { isPendingStatus, buildConflictRecord, findSiblings };
+}

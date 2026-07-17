@@ -37,78 +37,90 @@ const TIMEOUT_HOURS = parseInt(process.env.AF_PENDING_TIMEOUT_HOURS || '24', 10)
 const TIMEOUT_MS = TIMEOUT_HOURS * 3600 * 1000;
 const MAX_SHOWN = 5;
 
-function safeExit(code = 0) { process.exit(code); }
-
-if (!fs.existsSync(FEATURES_DIR)) safeExit(0);
-
-const now = Date.now();
-const stale = []; // { id, status, age_hours, file }
-
-function walk(dir) {
-  let entries;
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }); }
-  catch { return; }
-  for (const e of entries) {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) walk(p);
-    else if (e.isFile() && e.name.endsWith('.md')) checkFile(p);
-  }
-}
-
 function parseFrontmatterField(content, field) {
   const re = new RegExp(`^${field}:\\s*(.+)$`, 'm');
   const m = content.match(re);
   return m ? m[1].trim() : null;
 }
 
-function checkFile(filePath) {
-  let content;
-  try { content = fs.readFileSync(filePath, 'utf8'); }
-  catch { return; }
-  if (!content.startsWith('---')) return;
+// Pure: decide whether one task file is a stale T4 task worth surfacing.
+// Returns the record, or null when it should be skipped. `displayPath` is the
+// (already project-relative) path echoed back in the record.
+function evaluateTaskFile(content, displayPath, { now, timeoutMs }) {
+  if (!content || !content.startsWith('---')) return null;
 
   const status = parseFrontmatterField(content, 'status');
   const tier = parseFrontmatterField(content, 'tier');
   const updatedAt = parseFrontmatterField(content, 'updated_at');
   const id = parseFrontmatterField(content, 'id');
 
-  if (!id) return;
-  if (tier !== '4') return; // only check T4 tasks
-  if (status !== 'planned' && status !== 'frozen' && status !== 'blocked') return;
+  if (!id) return null;
+  if (tier !== '4') return null;                                   // only T4 tasks
+  if (status !== 'planned' && status !== 'frozen' && status !== 'blocked') return null;
+  if (!updatedAt) return null;
 
-  if (!updatedAt) return;
   const ts = Date.parse(updatedAt);
-  if (!Number.isFinite(ts)) return;
+  if (!Number.isFinite(ts)) return null;
 
   const ageMs = now - ts;
-  if (ageMs < TIMEOUT_MS) return;
+  if (ageMs < timeoutMs) return null;
 
-  stale.push({
-    id,
-    status,
-    age_hours: Math.round(ageMs / 3600000),
-    file: path.relative(process.cwd(), filePath),
-  });
+  return { id, status, age_hours: Math.round(ageMs / 3600000), file: displayPath };
 }
 
-walk(FEATURES_DIR);
+// Pure: sort + cap the stale records and render the warning block. Returns null
+// when there is nothing to warn about.
+function formatWarning(stale, { timeoutHours, maxShown }) {
+  if (!stale || stale.length === 0) return null;
 
-if (stale.length === 0) safeExit(0);
+  const sorted = [...stale].sort((a, b) => b.age_hours - a.age_hours);
+  const lines = sorted.slice(0, maxShown).map(
+    (s) => `  ${s.id} [${s.status}] ${s.age_hours}h old (${s.file})`,
+  );
+  if (sorted.length > maxShown) {
+    lines.push(`  ... +${sorted.length - maxShown} more stale T4 task(s)`);
+  }
 
-stale.sort((a, b) => b.age_hours - a.age_hours);
-
-const shown = stale.slice(0, MAX_SHOWN);
-const lines = shown.map(s =>
-  `  ${s.id} [${s.status}] ${s.age_hours}h old (${s.file})`
-);
-if (stale.length > MAX_SHOWN) {
-  lines.push(`  ... +${stale.length - MAX_SHOWN} more stale T4 task(s)`);
+  return (
+    `[pending-confirm-timeout] ${sorted.length} T4 task(s) idle > ${timeoutHours}h:\n` +
+    lines.join('\n') + '\n' +
+    '  Resolve via /aura-frog:plan-status, /aura-frog:plan-thaw, or /aura-frog:plan-replan.\n'
+  );
 }
 
-process.stderr.write(
-  `[pending-confirm-timeout] ${stale.length} T4 task(s) idle > ${TIMEOUT_HOURS}h:\n` +
-  lines.join('\n') + '\n' +
-  `  Resolve via /aura-frog:plan-status, /aura-frog:plan-thaw, or /aura-frog:plan-replan.\n`
-);
+function collectStale(dir, opts) {
+  const out = [];
+  const walk = (d) => {
+    let entries;
+    try { entries = fs.readdirSync(d, { withFileTypes: true }); }
+    catch { return; }
+    for (const e of entries) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) { walk(p); continue; }
+      if (!e.isFile() || !e.name.endsWith('.md')) continue;
+      let content;
+      try { content = fs.readFileSync(p, 'utf8'); } catch { continue; }
+      const rec = evaluateTaskFile(content, path.relative(process.cwd(), p), opts);
+      if (rec) out.push(rec);
+    }
+  };
+  walk(dir);
+  return out;
+}
 
-safeExit(0);
+function main() {
+  if (!fs.existsSync(FEATURES_DIR)) return;
+  const opts = { now: Date.now(), timeoutMs: TIMEOUT_MS };
+  const stale = collectStale(FEATURES_DIR, opts);
+  const msg = formatWarning(stale, { timeoutHours: TIMEOUT_HOURS, maxShown: MAX_SHOWN });
+  if (msg) process.stderr.write(msg);
+}
+
+// Run as a hook; stay importable for tests. Previously the walk + warning ran at
+// module scope with a process.exit() on require, so none of it was testable.
+// FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { parseFrontmatterField, evaluateTaskFile, formatWarning };
+}
