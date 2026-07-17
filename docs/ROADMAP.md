@@ -29,7 +29,7 @@ generated: 2026-07-09
 | FEAT-007 | Hook-runtime v3.8 refactor | 🚧 STORY-0009 3/5 tasks done; rest planned |
 | FEAT-010 | Plans/scripts hardening | 🚧 STORY-0021/0022/0023/0025 done; 0024 shellcheck-gate deferred (scope decision) |
 | FEAT-011 | Research integrations | ⏳ planned |
-| FEAT-009 | Frontend design quality | 🚧 core done; **Design Intelligence v2** in progress (Stitch unblocked + vision loop) |
+| FEAT-009 | Frontend design quality | ✅ **done** — Design Intelligence v2 shipped (vision loop · design SoT · Stitch MCP opt-in), PR #26 |
 
 Actual on-disk counts (v3.8.0-alpha.8): **15 agents · 60 skills · 72 rules · 24 commands · 49 hooks · 11 MCPs**.
 
@@ -193,19 +193,46 @@ the 2026-07-16 deep-research pass (Anthropic frontend-design skill, Agent SDK vi
 superdesign). The research **unblocked the long-stuck Stitch item** (endpoint + API-key auth now known).
 Priority order — foundation first, each buildable without Stitch auth except STORY-0033:
 
-| # | Story | Work | WS | Depends | Effort |
-|---|-------|------|----|---------|--------|
-| 1 | STORY-0030 | `.claude/design/design-system.md` as design SoT — design-tokens writes it, design-expert/frontend read it first; persistence rule | WS-3 | — | S |
-| 2 | STORY-0031 | Figma tool-mismatch fix — prompts call actually-installed `figma-developer-mcp` tools (`get_figma_data`/`download_figma_images`), not Dev-Mode-MCP names | WS-6 | — | XS |
-| 3 | STORY-0033 | Google Stitch MCP — opt-in remote server in `.mcp.json` (http, API-key); rewrite `stitch-design` skill (drop "no API"), MCP workflow + manual fallback, seed design-system.md + screen PNGs | WS-4 | 0030 | M |
-| 4 | STORY-0032 | `frontend-aesthetics` v2 — two-pass (plan → self-critique vs brief), expanded AI-default bans, screenshot self-critique directive | WS-2 | 0030 | S |
-| 5 | STORY-0034 | `design-vision-loop` skill — Playwright screenshot (3 viewports + dark) → deterministic gates → vision critique rubric → iterate (max 3); wired into frontend agent | WS-1 | 0030 | M |
-| 6 | STORY-0035 | `design-conformance` hook — PostToolUse Write\|Edit on UI files; grep hardcoded hex/px vs tokens, mixed component libs, missing `prefers-reduced-motion`; TDD, fail-open, parity-clean | WS-5 | 0030 | M |
-| 7 | STORY-0036 | Count-sync (skills/hooks/MCP) + version bump → 3.8.0-alpha.8 + CHANGELOG signalling FEAT-009 shipped | WS-0 | all above | XS |
+**✅ ALL SHIPPED 2026-07-17** — merged via PR #26 (`97480fc`).
 
-**Open risk (STORY-0033):** Stitch endpoint/tool names not yet through adversarial verify (research hit session
-limit twice on that node). First implementation step = connect real MCP + list tools to confirm before trusting
-`stitch.googleapis.com/mcp` / tool names. Skill ships with the manual-paste fallback intact so it degrades safely.
+| # | Story | Work | WS | Status |
+|---|-------|------|----|--------|
+| 1 | STORY-0030 | `.claude/design/design-system.md` as design SoT — design-tokens writes it, design-expert/frontend read it first; persistence rule | WS-3 | ✅ |
+| 2 | STORY-0031 | Figma tool-mismatch fix — prompts call actually-installed `figma-developer-mcp` tools (`get_figma_data`/`download_figma_images`), not Dev-Mode-MCP names | WS-6 | ✅ |
+| 3 | STORY-0033 | Google Stitch MCP — opt-in remote server in `.mcp.json` (http, API-key); rewrote `stitch-design` skill (dropped "no API"), MCP workflow + manual fallback | WS-4 | ✅ |
+| 4 | STORY-0032 | `frontend-aesthetics` v2 — two-pass (plan → self-critique vs brief), expanded AI-default bans, screenshot self-critique directive | WS-2 | ✅ |
+| 5 | STORY-0034 | `design-vision-loop` skill — Playwright screenshot (3 viewports + dark) → deterministic gates → vision critique rubric → iterate (max 3); wired into frontend agent | WS-1 | ✅ |
+| 6 | STORY-0035 | `design-conformance` hook — PostToolUse Write\|Edit; hardcoded hex/px, mixed component libs, unguarded motion; 27 tests, fail-open, parity-clean | WS-5 | ✅ |
+| 7 | STORY-0036 | Count-sync + version bump → 3.8.0-alpha.8 + CHANGELOG | WS-0 | ✅ |
+
+**Open risk (STORY-0033):** Stitch endpoint/tool names never cleared adversarial verify (research hit the session
+limit twice on that node). The MCP therefore ships **disabled by default** and the skill instructs verifying via
+`list tools` on first connect, degrading to the manual-paste path if the server is unreachable. **Confirm the real
+endpoint before enabling.**
+
+### 4.2 CI health (2026-07-17) — main had been red since ≥2026-07-09
+
+Four red gates fixed; one remains. Verify CI claims against `gh run list --branch main` before trusting them.
+
+| Finding | Status |
+|---|---|
+| **`validate.yml` had never run — 146 runs, all `failure` in 0s, 0 jobs.** Step name `Check hook parity (Fires: header vs hooks.json registration)` was an unquoted YAML scalar containing `: `. GitHub listed the workflow by *path* instead of `name:` — the tell. So validate-counts / validate-hooks (**incl. the parity gate this roadmap recorded as "wired into CI `ed0bef0` … now fails CI"**) / validate-structure / performance-report never executed once. | ✅ PR #29 — all 4 jobs green |
+| **`with_lock` minted duplicate IDs** — the "flaky" `next-counter-lock` test was a real P0-4 race: age-based stale-break stole locks from live-but-off-CPU holders. Now prefers `flock(1)`; mkdir spinlock is a liveness-gated macOS fallback. CI 756-passed-1-failed → **867/867**. | ✅ PR #27 |
+| **Plural blind spot** — `\btest\b` never matched "tests"; `\bcomment\b` never matched "comments", so auto-learn never learned the most common style correction. | ✅ PR #28 |
+| toon count · audit-refs dead specs · validate broken-link · doc-maturity frontmatter | ✅ PR #26 |
+| **Coverage floor: `functions` 32.63% vs a 40% threshold** (32.32% on 2026-07-14 — never met). | ⏳ **open — needs FEAT-007** |
+
+**Why the coverage floor needs FEAT-007, not more tests:** **24 of 49 hooks have no `module.exports`** — they run
+`main()` on require, so they cannot be unit-tested without refactoring them to export their logic (~77 top-level
+functions, ~18% of scope, locked away). PR #28 added 6 hook suites (83 tests, 18 functions) and barely moved the
+number. Options: (a) do the hook-runtime refactor (FEAT-007 / issues #5+#22) and let the floor ratchet up, or
+(b) reset the threshold to the measured level so the gate regains its no-regression signal — `jest.config.cjs`'s
+own comment says the value should track "the current measured level". **Decide before touching it.**
+
+> ⚠️ Never call `firebase-cleanup.cleanupDebugLog`, `compact-handoff.saveHandoff`, or
+> `compact-handoff.generateCompactContext` from a test — each resolves paths from the real project root at module
+> load and writes to / unlinks from the working repo. (`generateCompactContext` is not the pure builder its name
+> suggests: it writes `compact-context.md` and shells out to git.)
 
 ---
 
