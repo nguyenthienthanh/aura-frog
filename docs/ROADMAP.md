@@ -225,15 +225,22 @@ Four red gates fixed; one remains. Verify CI claims against `gh run list --branc
 
 ### 4.3 FEAT-007 / issue #5 — making hooks importable (in progress)
 
-**Non-exporting hooks: 24 → 15** (PRs #32–#35). The pattern that works:
+**Non-exporting hooks: 24 → 13** (PRs #32–#35, #37). The pattern that works:
 
-1. `if (require.main === module) { main(); } else { module.exports = {...} }` — hook behaviour unchanged; verify **both** directions (import touches nothing; running still behaves).
-2. Split pure decision logic out of the I/O wrapper — see `session-start.cjs` `cacheStaleReason(cache, {now, ttl, envrcMtime, currentBranch})`.
+1. `if (require.main === module) { main(); } else { module.exports = {...} }` — hook behaviour unchanged; verify **both** directions (import touches nothing; running still behaves — run the hook as a subprocess against synthetic inputs, since the extracted-function tests don't prove `main()` still fires).
+2. Split pure decision logic out of the I/O wrapper — see `session-start.cjs` `cacheStaleReason(...)`, `pending-confirm-timeout.evaluateTaskFile(...)`, `pre-dispatch-conflict-check.buildConflictRecord(...)`.
 3. **Never export anything that mutates the repo**, and assert its absence in a test.
 
 > ⚠️ **Making a hook importable *lowers* measured coverage before it raises it.** Tests that `require()` a hook ending in a bare `main();` execute the whole hook, and every function it touches counts as "covered" with zero assertions. `session-start` alone dropped the metric 32.63% → 30.4% once that inflation was removed. **Do not read the dip as a regression** — replace the fake coverage with real tests.
 
-**The remaining 15 need a different, riskier refactor.** Most end in `safeExit(0)`: their logic runs at *module scope*, so the guard alone is not enough — they must first be restructured into a `main()`, turning early `safeExit(0)` calls into returns. Several (`tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node`) also read `CLAUDE_TOOL_*` env vars the hook API never sets, so they belong with **STORY-0010**, not #5.
+**The tractable, valuable work is now essentially done — the remaining 13 are blocked or marginal.** Breakdown so nobody re-litigates it:
+
+| Group | Hooks | Why not now |
+|---|---|---|
+| **STORY-0010, not #5** | `tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node` | Read `CLAUDE_TOOL_*` env vars the hook API never sets. Making them importable without fixing the data source just ships dead test code. First unblock: the probe-hook that determines whether `tool_response` carries exit-code/duration (needs a **live session**, can't be done headlessly). |
+| **No pure logic to extract** | `session-start-restore-active`, `security-critical-warn`, `rate-limit-check`, `post-compact`, `commit-attribution` (0 functions); `session-reset-trigger`, `pre-execute-load-plan-context`, `feature-done-trigger-archive` (only `safeExit`) | Thin inline module-scope scripts — read a file, check a condition, maybe write, exit. Restructuring adds structure with no testable payoff. |
+| **Blocked on schema** | `post-execute-conflict-rescan` | Event-gating blocked on the history event-schema cleanup (audit improvement #5), same as its STORY-0029 sibling. |
+| **Low value** | `task-completed` | Only a stdin-reader + `main()`; nothing safe to export. |
 
 > ⚠️ **Never call these from a test** — each resolves paths from the real project root at module load:
 > `phase-checkpoint.createCheckpoint` (runs `git add -A` + `git commit` on the working tree!) ·
