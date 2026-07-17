@@ -33,23 +33,18 @@ function safeExit(code = 0) {
   process.exit(code);
 }
 
-if (!fs.existsSync(ACTIVE_FILE)) safeExit(0);
-
-let active;
-try {
-  active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8'));
-} catch (err) {
-  process.stderr.write(`[post-execute] WARN: active.json malformed: ${err.message}\n`);
-  safeExit(0);
+// Pure: a non-zero exit is an execution_failed event (which downstream triggers
+// the failure-classifier); a zero exit is execution_completed.
+function buildHistoryEvent({ taskId, toolName, exitCode, ts }) {
+  return {
+    ts,
+    node: taskId,
+    event: exitCode !== 0 ? 'execution_failed' : 'execution_completed',
+    tool: toolName,
+    exit_code: exitCode,
+    actor: 'post-execute-update-node',
+  };
 }
-
-const taskId = active.active && active.active.task;
-if (!taskId) safeExit(0);
-
-const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
-const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
-
-const ts = new Date().toISOString();
 
 function appendHistory(event) {
   try {
@@ -59,28 +54,40 @@ function appendHistory(event) {
   }
 }
 
-if (exitCode !== 0) {
-  appendHistory({
-    ts,
-    node: taskId,
-    event: 'execution_failed',
-    tool: toolName,
-    exit_code: exitCode,
-    actor: 'post-execute-update-node'
-  });
-  process.stderr.write(
-    `[post-execute] task=${taskId} tool=${toolName} exit=${exitCode}\n` +
-    `  invoke failure-classifier skill to classify (F1-F5) before retry/replan\n`
-  );
-} else {
-  appendHistory({
-    ts,
-    node: taskId,
-    event: 'execution_completed',
-    tool: toolName,
-    exit_code: 0,
-    actor: 'post-execute-update-node'
-  });
+function main() {
+  if (!fs.existsSync(ACTIVE_FILE)) return;
+
+  let active;
+  try { active = JSON.parse(fs.readFileSync(ACTIVE_FILE, 'utf8')); }
+  catch (err) {
+    process.stderr.write(`[post-execute] WARN: active.json malformed: ${err.message}\n`);
+    return;
+  }
+
+  const taskId = active.active && active.active.task;
+  if (!taskId) return;
+
+  // NOTE (STORY-0010): CLAUDE_TOOL_EXIT_CODE / CLAUDE_TOOL_NAME are not set by the
+  // current hook API — migrating to the stdin payload needs the exit-code probe
+  // first. Left as-is; this change only makes the hook importable + testable.
+  const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
+  const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
+  const ts = new Date().toISOString();
+
+  const event = buildHistoryEvent({ taskId, toolName, exitCode, ts });
+  appendHistory(event);
+
+  if (event.event === 'execution_failed') {
+    process.stderr.write(
+      `[post-execute] task=${taskId} tool=${toolName} exit=${exitCode}\n` +
+      '  invoke failure-classifier skill to classify (F1-F5) before retry/replan\n',
+    );
+  }
 }
 
-safeExit(0);
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { buildHistoryEvent };
+}
