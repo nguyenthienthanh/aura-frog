@@ -1,6 +1,6 @@
 {
   "version": "3.8.0",
-  "generated": "2026-07-17T05:04:48Z",
+  "generated": "2026-07-17T05:20:30Z",
   "components": {
     "agents": 15,
     "skills": { "total": 60, "autoInvoke": 9 },
@@ -12,13 +12,13 @@
   },
   "performance": {
     "alwaysLoadedLines": 4585,
-    "alwaysLoadedTokens": 31022,
+    "alwaysLoadedTokens": 31021,
     "savingsPercent": 67,
     "overheadPercent": 15
   },
   "codebase": {
     "cjsLines": 19574,
-    "mdLines": 24374,
+    "mdLines": 24375,
     "shLines": 13355,
     "totalFiles": 420
   }
