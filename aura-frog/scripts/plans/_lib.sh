@@ -364,8 +364,17 @@ _json_escape() {
 #   spin + stale-lock breaker. Runs <cmd args...> while holding the lock,
 #   releases it, and propagates the command's stdout + exit code.
 #
-#   Tunables: AF_LOCK_TIMEOUT_SEC (default 10) — both the stale-lock age and
-#   the max spin budget derive from it.
+#   Tunables: AF_LOCK_TIMEOUT_SEC (default 10) — the max spin budget.
+#             AF_LOCK_STALE_SEC   (default max(timeout,60)) — age after which a
+#             lock with NO live holder recorded is force-broken.
+#
+#   Stale-break is liveness-gated, NOT age-only. A holder writes its PID into
+#   the lock dir; a waiter breaks the lock only when that PID is dead (crash) or,
+#   for the tiny mkdir→pid-write window with no PID yet, after AF_LOCK_STALE_SEC.
+#   Age-only breaking (the previous behaviour) let a waiter steal the lock from a
+#   live-but-CPU-starved holder under heavy parallel load, admitting two writers
+#   into the critical section and minting DUPLICATE counter IDs — the P0-4 bug
+#   this guards against, which resurfaced as a flaky test under oversubscribed CI.
 #
 #   Shared single implementation: reused by counter minting (next_counter) and
 #   transactional plan-tree writes (STORY-0023 link-run) — do not fork it.
@@ -373,15 +382,28 @@ _json_escape() {
 with_lock() {
     local lock="$1"; shift
     local timeout="${AF_LOCK_TIMEOUT_SEC:-10}"
+    local stale="${AF_LOCK_STALE_SEC:-$(( timeout > 60 ? timeout : 60 ))}"
     local waited=0
     local max_spins=$(( timeout * 20 ))   # 20 spins/sec at 0.05s each
     while ! mkdir "$lock" 2>/dev/null; do
-        # Break a stale lock left by a crashed holder.
         if [ -d "$lock" ]; then
-            local age=$(( $(date +%s) - $(_stat_mtime "$lock") ))
-            if [ "$age" -ge "$timeout" ]; then
-                rm -rf "$lock" 2>/dev/null
-                continue
+            local holder; holder=$(cat "$lock/pid" 2>/dev/null)
+            if [ -n "$holder" ]; then
+                # A live holder — even one starved off-CPU for a long time — must
+                # NEVER have its lock stolen. Only break it once the PID is dead.
+                if ! kill -0 "$holder" 2>/dev/null; then
+                    rm -rf "$lock" 2>/dev/null
+                    continue
+                fi
+            else
+                # No PID recorded: either the sub-millisecond window between
+                # mkdir and the pid write, or a holder that died before writing.
+                # Break only after a generous staleness age (never at ~0s).
+                local age=$(( $(date +%s) - $(_stat_mtime "$lock") ))
+                if [ "$age" -ge "$stale" ]; then
+                    rm -rf "$lock" 2>/dev/null
+                    continue
+                fi
             fi
         fi
         sleep 0.05
@@ -391,9 +413,13 @@ with_lock() {
             return 1
         fi
     done
+    # Record the real holder PID for liveness checks. BASHPID is the true PID of
+    # this (sub)shell on bash 4+ (CI); $$ is the fallback on bash 3.2 (macOS),
+    # where it is the parent — still safe (kill -0 stays true → never steals).
+    printf '%s\n' "${BASHPID:-$$}" > "$lock/pid" 2>/dev/null || true
     "$@"
     local rc=$?
-    rmdir "$lock" 2>/dev/null || rm -rf "$lock" 2>/dev/null
+    rm -rf "$lock" 2>/dev/null
     return "$rc"
 }
 
