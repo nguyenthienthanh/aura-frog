@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.8.0-alpha.8
+status: reference
+audience: contributor
+---
+
 # Plugin Maintenance Contract
 
 **Audience:** contributors editing the Aura Frog plugin source (`aura-frog/agents/`, `skills/`, `rules/`, `commands/`, `hooks/`).

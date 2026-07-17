@@ -839,7 +839,7 @@ Response to User
 ## Hook Summary Table
 
 ```toon
-hooks[30]{event,name,purpose}:
+hooks[32]{event,name,purpose}:
   SessionStart,Environment Injection,Auto-detect project and inject env vars
   SessionStart,Firebase Cleanup,Clean up firebase-debug.log if not configured
   SessionStart,Workflow Edit Detection,Detect user edits to workflow files
@@ -854,6 +854,7 @@ hooks[30]{event,name,purpose}:
   PostToolUse,Large File Warning,Warn about context consumption
   PostToolUse,Lint Auto-Fix,Auto-run linters after file changes
   PostToolUse,Security Scan,Detect vulnerability patterns in written code
+  PostToolUse,Design Conformance,Flag hardcoded colors/spacing + mixed UI libs + unguarded motion
   PostToolUse,Auto Test Runner,Auto-run tests during TDD phases
   PostToolUse,Token Tracker,Estimate and warn on token usage thresholds
   PostToolUse,Feedback Capture,Capture file edit corrections

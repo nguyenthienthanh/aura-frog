@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.8.0-alpha.7 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.8.0-alpha.8 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. Agents + skills + commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + MCP servers. Component counts: see **Resources** below (single source).
 
 ---
 
-## 🐸 The 8 Pillars (v3.8.0-alpha.7)
+## 🐸 The 8 Pillars (v3.8.0-alpha.8)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -33,7 +33,7 @@ os_map[5]{concept,implementation}:
   Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,10 MCP servers (auto-invoked; 6 enabled + 4 opt-in)
+  Drivers,11 MCP servers (auto-invoked; 6 enabled + 5 opt-in)
 ```
 
 ---
@@ -78,7 +78,7 @@ Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation token
 ## MCP Servers
 
 ```toon
-mcp[10]{name,purpose,requires,enabled}:
+mcp[11]{name,purpose,requires,enabled}:
   context7,Library docs,None,enabled
   playwright,Browser automation + E2E (drives the browser),None,enabled
   vitest,Test execution + coverage,None,enabled
@@ -89,6 +89,7 @@ mcp[10]{name,purpose,requires,enabled}:
   redis,Cache + queue,REDIS_URL,disabled (opt-in)
   chrome-devtools,Live inspection/diagnostics (~5-6k tok/session; NOT automation — that's playwright),None,disabled (opt-in)
   codebase-memory,Code knowledge-graph (search_graph/trace_path; user installs binary),None,disabled (opt-in)
+  stitch,Google Stitch AI UI generation (generate/edit screens + design-system tools),STITCH_API_KEY,disabled (opt-in)
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
@@ -274,14 +275,14 @@ Guide: `docs/guides/AGENT_TEAMS_GUIDE.md` (repo root, not shipped with plugin)
 resources[8]{name,location}:
   Agents (15),agents/
   Commands (24),commands/
-  Rules (70),rules/{core|agent|workflow}/
-  Skills (56),skills/
-  Hooks (48),hooks/
-  MCP (10),.mcp.json (postgres/redis/chrome-devtools/codebase-memory disabled by default)
+  Rules (72),rules/{core|agent|workflow}/
+  Skills (60),skills/
+  Hooks (49),hooks/
+  MCP (11),.mcp.json (postgres/redis/chrome-devtools/codebase-memory/stitch disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```
 
 ---
 
-**Version:** 3.8.0-alpha.7
+**Version:** 3.8.0-alpha.8

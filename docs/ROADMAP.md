@@ -1,7 +1,7 @@
 ---
 title: Aura Frog — Consolidated Roadmap & Research
-last_aligned_with: v3.8.0-alpha.7
-status: canonical
+last_aligned_with: v3.8.0-alpha.8
+status: current
 audience: contributor
 generated: 2026-07-09
 ---
@@ -29,9 +29,9 @@ generated: 2026-07-09
 | FEAT-007 | Hook-runtime v3.8 refactor | 🚧 STORY-0009 3/5 tasks done; rest planned |
 | FEAT-010 | Plans/scripts hardening | 🚧 STORY-0021/0022/0023/0025 done; 0024 shellcheck-gate deferred (scope decision) |
 | FEAT-011 | Research integrations | ⏳ planned |
-| FEAT-009 | Frontend design quality | ⏳ planned |
+| FEAT-009 | Frontend design quality | 🚧 core done; **Design Intelligence v2** in progress (Stitch unblocked + vision loop) |
 
-Actual on-disk counts (v3.8.0-alpha.7): **15 agents · 56 skills · 71 rules · 24 commands · 47 hooks · 8 MCPs**.
+Actual on-disk counts (v3.8.0-alpha.8): **15 agents · 60 skills · 72 rules · 24 commands · 49 hooks · 11 MCPs**.
 
 ---
 
@@ -181,10 +181,31 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 | ✅ | codebase-memory-mcp opt-in + context-economy rule (DONE, pushed) | FEAT-011/STORY-0026 | — | done |
 | ✅ | model/effort statusline (core DONE, pushed; run-orch line + agent effort frontmatters optional) | FEAT-011/STORY-0027 | — | done |
 | ✅ | L3/L4 graph-conflict spike → ADR-001 (DONE, pushed) | FEAT-011/STORY-0028 | — | done |
-| 🚧 | Frontend design quality — **~85% DONE + pushed**: STORY-0016 (frontend-aesthetics + motion-design skills) ✓, STORY-0017 (design-tokens skill) ✓, STORY-0019 (Chrome DevTools MCP opt-in) ✓, STORY-0018 C1 Figma Code Connect discipline ✓, STORY-0020 count-sync (skills 56→59, MCP 8→9) ✓. **Remaining:** STORY-0018 C2 Google Stitch MCP — BLOCKED on the real Stitch MCP endpoint/transport (won't fabricate a URL); STORY-0020 version bump → 3.8.0-alpha.8 + CHANGELOG (deferred until Stitch lands so the bump honestly signals FEAT-009 shipped). | FEAT-009/STORY-0016–0020 | — | ~0.5d (needs Stitch endpoint) |
+| 🚧 | Frontend design quality — **core DONE + pushed**: STORY-0016 (frontend-aesthetics + motion-design skills) ✓, STORY-0017 (design-tokens skill) ✓, STORY-0019 (Chrome DevTools MCP opt-in) ✓, STORY-0018 C1 Figma Code Connect discipline ✓, STORY-0020 count-sync ✓. **Now unblocked → Design Intelligence v2 (LLD, see below).** | FEAT-009/STORY-0016–0020 | — | rolling into v2 |
 
 **GH issue → plan-node map (nothing lost on close):** #6→STORY-0009 · #7→STORY-0010 · #8→STORY-0011 ·
 #9→STORY-0012 · #21→STORY-0012 (watchdog NDJSON) · #22→STORY-0009 (c8 coverage).
+
+### 4.1 Design Intelligence v2 (FEAT-009 continuation — from LLD)
+
+Full LLD: [`docs/architecture/LLD-DESIGN-INTELLIGENCE.md`](architecture/LLD-DESIGN-INTELLIGENCE.md). Driven by
+the 2026-07-16 deep-research pass (Anthropic frontend-design skill, Agent SDK vision loop, Google Stitch MCP,
+superdesign). The research **unblocked the long-stuck Stitch item** (endpoint + API-key auth now known).
+Priority order — foundation first, each buildable without Stitch auth except STORY-0033:
+
+| # | Story | Work | WS | Depends | Effort |
+|---|-------|------|----|---------|--------|
+| 1 | STORY-0030 | `.claude/design/design-system.md` as design SoT — design-tokens writes it, design-expert/frontend read it first; persistence rule | WS-3 | — | S |
+| 2 | STORY-0031 | Figma tool-mismatch fix — prompts call actually-installed `figma-developer-mcp` tools (`get_figma_data`/`download_figma_images`), not Dev-Mode-MCP names | WS-6 | — | XS |
+| 3 | STORY-0033 | Google Stitch MCP — opt-in remote server in `.mcp.json` (http, API-key); rewrite `stitch-design` skill (drop "no API"), MCP workflow + manual fallback, seed design-system.md + screen PNGs | WS-4 | 0030 | M |
+| 4 | STORY-0032 | `frontend-aesthetics` v2 — two-pass (plan → self-critique vs brief), expanded AI-default bans, screenshot self-critique directive | WS-2 | 0030 | S |
+| 5 | STORY-0034 | `design-vision-loop` skill — Playwright screenshot (3 viewports + dark) → deterministic gates → vision critique rubric → iterate (max 3); wired into frontend agent | WS-1 | 0030 | M |
+| 6 | STORY-0035 | `design-conformance` hook — PostToolUse Write\|Edit on UI files; grep hardcoded hex/px vs tokens, mixed component libs, missing `prefers-reduced-motion`; TDD, fail-open, parity-clean | WS-5 | 0030 | M |
+| 7 | STORY-0036 | Count-sync (skills/hooks/MCP) + version bump → 3.8.0-alpha.8 + CHANGELOG signalling FEAT-009 shipped | WS-0 | all above | XS |
+
+**Open risk (STORY-0033):** Stitch endpoint/tool names not yet through adversarial verify (research hit session
+limit twice on that node). First implementation step = connect real MCP + list tools to confirm before trusting
+`stitch.googleapis.com/mcp` / tool names. Skill ships with the manual-paste fallback intact so it degrades safely.
 
 ---
 

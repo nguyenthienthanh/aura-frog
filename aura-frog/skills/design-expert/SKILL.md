@@ -25,6 +25,10 @@ user-invocable: false
 
 Component design, design system selection/setup, responsive layouts, Figma analysis.
 
+**Read the design SoT first.** If `.claude/design/design-system.md` exists, it is the project's committed
+design system — honor its library / palette / type choices instead of re-recommending. Only run the selection
+logic below when no SoT file exists yet (then persist the choice — see `rules/agent/design-system-persistence.md`).
+
 ---
 
 ## Principles
@@ -63,10 +67,18 @@ Mobile: <768px | Tablet: 768-1024px | Desktop: >1024px
 
 ---
 
-## Figma Code Connect discipline
+## Figma sync discipline
 
-When working from Figma (Dev Mode MCP), treat Figma as a *source*, not a regenerator:
+The installed `figma` MCP is **`figma-developer-mcp` (Framelink)** — it exposes `get_figma_data`
+(layout + styles + text + component tree) and `download_figma_images`. It does **not** expose the
+Dev-Mode-MCP tools `get_variable_defs` / `get_code_connect_map` — don't call those; they error on this server.
 
-- **Sync tokens, don't re-pick.** Pull design variables with `get_variable_defs` and feed them INTO the `design-tokens` skill's system (one OKLCH source of truth) — never hand-copy hexes into components. Figma variables → `--brand-hue`/semantic tokens, so design + code share one palette.
-- **Reuse mapped components, don't duplicate.** Call `get_code_connect_map` first; if a node already maps to a real code component, import and compose THAT instead of generating a new near-duplicate. Regenerating mapped components is the #1 source of design-system drift.
-- Only generate net-new code for nodes with no Code Connect mapping.
+Treat Figma as a *source*, not a regenerator:
+
+- **Sync tokens, don't re-pick.** Call `get_figma_data`, read the colors/typography/spacing out of its
+  style + node data, and feed them INTO the `design-tokens` skill's OKLCH system + `.claude/design/design-system.md`
+  (one source of truth) — never hand-copy hexes into components. Figma styles → `--brand-hue`/semantic tokens.
+- **Reuse existing components, don't duplicate.** There is no Code Connect map on this server, so before
+  generating a node, name-match its Figma layer name against `src/components/` and compose the existing
+  component if one matches. Regenerating existing components is the #1 source of design-system drift.
+- **Assets:** pull images/icons with `download_figma_images` rather than re-tracing them.

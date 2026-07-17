@@ -48,6 +48,7 @@ Use for all frontend implementation, UI components, design system work, and user
 - `rules/agent/frontend-excellence.md` — UX laws, performance targets
 - `rules/agent/accessibility-rules.md` — WCAG, keyboard, screen reader
 - `rules/agent/design-system-usage.md` — Design system enforcement
+- `rules/agent/design-system-persistence.md` — **Read `.claude/design/design-system.md` first**; it is the project's committed design SoT
 - `rules/agent/theme-consistency.md` — No hardcoded values
 - `rules/agent/direct-hook-access.md` — Hook access patterns
 - `rules/agent/correct-file-extensions.md` — .tsx vs .ts
@@ -61,9 +62,11 @@ Use for all frontend implementation, UI components, design system work, and user
 - `skills/frontend-aesthetics/SKILL.md` — distinctive typography + dominant/accent color (house-style tuned)
 - `skills/motion-design/SKILL.md` — restrained, reduced-motion-safe, bundle-aware web motion
 - `skills/design-tokens/SKILL.md` — OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
+- `skills/design-vision-loop/SKILL.md` — **after building UI**, render → screenshot (viewports + dark) → critique vs design system → iterate
+- `skills/stitch-design/SKILL.md` — generate UI via Google Stitch (MCP or manual) → seed design system + screen targets
 - `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
 
-**Figma Code Connect discipline:** when building from Figma (Dev Mode MCP), use `get_variable_defs` to sync design variables INTO the `design-tokens` system (one source of truth — never hand-copy hexes), and `get_code_connect_map` to REUSE already-mapped code components instead of regenerating duplicates. Generate net-new code only for nodes with no Code Connect mapping. See `skills/design-expert/SKILL.md`.
+**Figma sync discipline:** the installed `figma` MCP is `figma-developer-mcp` (Framelink), which exposes `get_figma_data` (layout + styles + text + component tree) and `download_figma_images` — **not** the Dev-Mode-MCP `get_variable_defs`/`get_code_connect_map`. So: pull structure with `get_figma_data`, extract its colors/typography/spacing, and feed those INTO the `design-tokens` system + `.claude/design/design-system.md` (one source of truth — never hand-copy hexes into components); use `download_figma_images` for assets. There is no Code Connect map on this server, so reuse existing project components by name-matching the Figma layer names against `src/components/` before generating net-new. See `skills/design-expert/SKILL.md`.
 
 ---
 

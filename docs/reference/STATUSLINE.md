@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.8.0-alpha.8
+status: reference
+audience: contributor
+---
+
 # Status Line Spec
 
 The status line is owned end-to-end by `scripts/statusline.sh` and costs **0 conversation tokens** — Claude never renders it. This doc is the full rendering reference (moved out of `aura-frog/CLAUDE.md` so it stops costing always-on context). `aura-frog/CLAUDE.md` keeps only the one-line directive: *do not render banners in conversation.*
