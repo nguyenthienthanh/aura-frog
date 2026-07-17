@@ -33,11 +33,11 @@ const RETENTION_DAYS = 30;
 // Intent detection patterns
 const INTENT_PATTERNS = [
   { intent: 'command', pattern: /^\// },
-  { intent: 'debug', pattern: /\b(debug|error|bug|fix|broken|crash|fail|not working|issue|problem|wrong|incorrect)\b/i },
+  { intent: 'debug', pattern: /\b(debug|errors?|bugs?|fix(es|ed)?|broken|crash(es|ed)?|fail(s|ed|ing)?|not working|issues?|problems?|wrong|incorrect)\b/i },
   { intent: 'question', pattern: /^(what|how|why|where|when|who|which|can|could|would|is|are|do|does|did|should|will)\b/i },
   { intent: 'question', pattern: /\?\s*$/ },
   { intent: 'review', pattern: /\b(review|check|audit|look at|examine|inspect)\b/i },
-  { intent: 'test', pattern: /\b(test|spec|coverage|unit test|e2e|integration test)\b/i },
+  { intent: 'test', pattern: /\b(tests?|specs?|coverage|unit tests?|e2e|integration tests?)\b/i },
   { intent: 'refactor', pattern: /\b(refactor|simplify|clean up|reorganize|optimize)\b/i },
   { intent: 'implement', pattern: /\b(implement|build|create|add|develop|make|write|generate)\b/i },
   { intent: 'feedback', pattern: /^(no[,.\s!]|nope|wrong|actually|don't|stop|never|prefer|good|great|perfect|thanks)/i },

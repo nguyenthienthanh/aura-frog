@@ -341,7 +341,7 @@ function categorizeCorrection(userInput) {
   const inputLower = userInput.toLowerCase();
 
   // Comments/documentation related
-  if (/\b(comment|jsdoc|docstring|annotation|documentation)\b/i.test(inputLower)) {
+  if (/\b(comments?|jsdocs?|docstrings?|annotations?|documentation)\b/i.test(inputLower)) {
     if (/\b(don't|dont|no|remove|stop|avoid|unnecessary|too many)\b/i.test(inputLower)) {
       return { category: 'code_style', rule: 'no_excessive_comments' };
     }
@@ -368,7 +368,7 @@ function categorizeCorrection(userInput) {
   }
 
   // TypeScript/types
-  if (/\b(type|typescript|any\b|interface|generics?)\b/i.test(inputLower)) {
+  if (/\b(types?|typescript|any\b|interfaces?|generics?)\b/i.test(inputLower)) {
     if (/\b(strict|explicit|proper|specific)\b/i.test(inputLower)) {
       return { category: 'code_style', rule: 'strict_types' };
     }
@@ -388,12 +388,12 @@ function categorizeCorrection(userInput) {
     }
     return { category: 'code_style', rule: 'variable_declaration' };
   }
-  if (/\b(async|await|promise)\b/i.test(inputLower)) {
+  if (/\b(async|await|promises?)\b/i.test(inputLower)) {
     return { category: 'code_style', rule: 'async_await' };
   }
 
   // Testing
-  if (/\b(test|spec|coverage|jest|vitest|mocha)\b/i.test(inputLower)) {
+  if (/\b(tests?|specs?|coverage|jest|vitest|mocha)\b/i.test(inputLower)) {
     if (/\b(describe|it|expect|assert)\b/i.test(inputLower)) {
       return { category: 'testing', rule: 'test_structure' };
     }
@@ -401,7 +401,7 @@ function categorizeCorrection(userInput) {
   }
 
   // Imports/modules
-  if (/\b(import|export|module|require)\b/i.test(inputLower)) {
+  if (/\b(imports?|exports?|modules?|require)\b/i.test(inputLower)) {
     if (/\borganiz/i.test(inputLower)) {
       return { category: 'code_style', rule: 'organize_imports' };
     }
@@ -409,7 +409,7 @@ function categorizeCorrection(userInput) {
   }
 
   // Naming
-  if (/\b(naming|name|variable|rename)\b/i.test(inputLower)) {
+  if (/\b(naming|names?|variables?|rename)\b/i.test(inputLower)) {
     if (/\b(camel|pascal|snake|kebab)\b/i.test(inputLower)) {
       return { category: 'code_style', rule: 'naming_convention' };
     }
