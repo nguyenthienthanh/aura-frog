@@ -115,4 +115,9 @@ function main() {
   process.exit(0);
 }
 
-main();
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { getTeammateName, getTeammateRole };
+}

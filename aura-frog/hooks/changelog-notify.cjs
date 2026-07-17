@@ -89,4 +89,10 @@ function main() {
   process.exit(0);
 }
 
-main();
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+// setLastSeen stays unexported -- it writes the real seen-marker file.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { getCurrentVersion, getLastSeen };
+}
