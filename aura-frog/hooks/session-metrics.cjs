@@ -258,4 +258,10 @@ async function main() {
   }
 }
 
-main();
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+// sendWorkflowMetrics / sendAgentMetrics stay unexported — they post metrics.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { findActiveWorkflow, extractPatterns };
+}

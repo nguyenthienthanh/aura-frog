@@ -255,4 +255,11 @@ function main() {
   saveSessionState(state);
 }
 
-main();
+// Run as a hook; stay importable for tests. FEAT-007 / issue #5.
+// saveSessionState (writes real state) and trackAgentUsage (reads fd 0, which
+// would block or throw under a test runner) stay unexported.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = { loadSessionState, detectPhase, getProjectName };
+}
