@@ -225,28 +225,30 @@ Four red gates fixed; one remains. Verify CI claims against `gh run list --branc
 
 ### 4.3 FEAT-007 / issue #5 — making hooks importable (in progress)
 
-**Non-exporting hooks: 24 → 13** (PRs #32–#35, #37). The pattern that works:
+**Non-exporting hooks: 24 → 2 — every hook with real extractable logic is now importable + unit-tested** (PRs #32–#35, #37, #39; ~340 hook tests across the session). The pattern that works:
 
 1. `if (require.main === module) { main(); } else { module.exports = {...} }` — hook behaviour unchanged; verify **both** directions (import touches nothing; running still behaves — run the hook as a subprocess against synthetic inputs, since the extracted-function tests don't prove `main()` still fires).
-2. Split pure decision logic out of the I/O wrapper — see `session-start.cjs` `cacheStaleReason(...)`, `pending-confirm-timeout.evaluateTaskFile(...)`, `pre-dispatch-conflict-check.buildConflictRecord(...)`.
+2. Split pure decision logic out of the I/O wrapper — e.g. `session-start.cacheStaleReason`, `pending-confirm-timeout.evaluateTaskFile`, `pre-dispatch-conflict-check.buildConflictRecord`, `tool-call-tracer.extractReadPath`, `security-critical-warn.classifyTier`, `update-check.compareVersions`.
 3. **Never export anything that mutates the repo**, and assert its absence in a test.
 
 > ⚠️ **Making a hook importable *lowers* measured coverage before it raises it.** Tests that `require()` a hook ending in a bare `main();` execute the whole hook, and every function it touches counts as "covered" with zero assertions. `session-start` alone dropped the metric 32.63% → 30.4% once that inflation was removed. **Do not read the dip as a regression** — replace the fake coverage with real tests.
 
-**The tractable, valuable work is now essentially done — the remaining 13 are blocked or marginal.** Breakdown so nobody re-litigates it:
+> **An over-hasty call, corrected:** an earlier revision of this section parked ~13 hooks as "no pure logic to extract" or "STORY-0010, nothing to do." That was wrong. The `CLAUDE_TOOL_*` env-var problem only blocks the *stdin migration* of `main()`'s inputs — the hooks still held real pure logic (path classification, version compare, history scans, decision builders) that made fine tests. Every one of them got extracted and tested in PR #39. Lesson: "it reads a dead env var" ≠ "there's nothing here."
 
-| Group | Hooks | Why not now |
-|---|---|---|
-| **STORY-0010, not #5** | `tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node` | Read `CLAUDE_TOOL_*` env vars the hook API never sets. Making them importable without fixing the data source just ships dead test code. First unblock: the probe-hook that determines whether `tool_response` carries exit-code/duration (needs a **live session**, can't be done headlessly). |
-| **No pure logic to extract** | `session-start-restore-active`, `security-critical-warn`, `rate-limit-check`, `post-compact`, `commit-attribution` (0 functions); `session-reset-trigger`, `pre-execute-load-plan-context`, `feature-done-trigger-archive` (only `safeExit`) | Thin inline module-scope scripts — read a file, check a condition, maybe write, exit. Restructuring adds structure with no testable payoff. |
-| **Blocked on schema** | `post-execute-conflict-rescan` | Event-gating blocked on the history event-schema cleanup (audit improvement #5), same as its STORY-0029 sibling. |
-| **Low value** | `task-completed` | Only a stdin-reader + `main()`; nothing safe to export. |
+**The only 2 hooks still non-exporting are genuinely not worth it:**
+
+| Hook | Why |
+|---|---|
+| `rate-limit-check` | 11 lines: a single `console.log('Run /usage')` reminder. No logic, nothing to test. |
+| `post-execute-conflict-rescan` | Event-gating blocked on the history event-schema cleanup (audit improvement #5 / STORY-0029). Restructure it when that schema work lands. |
+
+**Still separate (STORY-0010):** `tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node` are now importable + tested, but they still *read* `CLAUDE_TOOL_*` env vars the hook API never sets. The env→stdin migration needs the probe-hook that checks whether `tool_response` carries exit-code/duration (a **live-session** step). Now that the hooks are tested, that migration can land with a safety net.
 
 > ⚠️ **Never call these from a test** — each resolves paths from the real project root at module load:
 > `phase-checkpoint.createCheckpoint` (runs `git add -A` + `git commit` on the working tree!) ·
 > `firebase-cleanup.cleanupDebugLog` (unlinks) · `compact-handoff.saveHandoff` ·
 > `compact-handoff.generateCompactContext` (not the pure builder its name suggests — writes `compact-context.md`
-> and shells out to git) · `subagent-init.trackAgentUsage` (reads fd 0 — blocks a test runner).
+> and shells out to git) · `subagent-init.trackAgentUsage` / `task-completed.parseTaskInput` (read fd 0 — block a test runner).
 
 ---
 
