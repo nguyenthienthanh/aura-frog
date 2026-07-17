@@ -358,11 +358,21 @@ _json_escape() {
 }
 
 # ---------------------------------------------------------------------------
-# with_lock <lock_dir> <cmd> [args...]
-#   Portable mutual exclusion around a critical section. Uses `mkdir` (atomic
-#   on POSIX; flock is NOT stock on macOS) as the lock primitive with a bounded
-#   spin + stale-lock breaker. Runs <cmd args...> while holding the lock,
-#   releases it, and propagates the command's stdout + exit code.
+# with_lock <lock_path> <cmd> [args...]
+#   Portable mutual exclusion around a critical section. Runs <cmd args...>
+#   while holding the lock, releases it, and propagates stdout + exit code.
+#
+#   Two backends, in preference order:
+#     1. flock(1) — kernel-managed. The lock lives on an fd and the kernel
+#        releases it when the fd closes, INCLUDING on crash. No staleness
+#        heuristic exists, so there is no window in which a live holder's lock
+#        can be stolen. Present on Linux (and CI); NOT stock on macOS.
+#     2. _with_lock_mkdir — the portable mkdir spinlock fallback (see below).
+#
+#   Why this matters: any age-based stale-break can mistake a live-but-off-CPU
+#   holder for a crashed one, admit a second writer into the critical section,
+#   and mint DUPLICATE counter IDs (the P0-4 bug). flock removes that class of
+#   race outright; the mkdir fallback merely narrows it (liveness gating).
 #
 #   Tunables: AF_LOCK_TIMEOUT_SEC (default 10) — the max spin budget.
 #             AF_LOCK_STALE_SEC   (default max(timeout,60)) — age after which a
@@ -380,6 +390,45 @@ _json_escape() {
 #   transactional plan-tree writes (STORY-0023 link-run) — do not fork it.
 # ---------------------------------------------------------------------------
 with_lock() {
+    local lock="$1"; shift
+    local timeout="${AF_LOCK_TIMEOUT_SEC:-10}"
+
+    # Backend 1: flock(1). Guard the fd open with a subshell probe first — a
+    # failed `exec` redirection is fatal to a non-interactive shell.
+    # The lock token is a separate `.flock` FILE, deliberately not the `$lock`
+    # path itself: the mkdir backend needs `$lock` to be a directory, so a stray
+    # lock FILE left by a flock host (Linux) would otherwise wedge mkdir forever
+    # on a shared checkout (macOS). The 0-byte file is never deleted — unlinking
+    # a flock token is itself racy.
+    if command -v flock >/dev/null 2>&1; then
+        local lf="${lock}.flock"
+        if ( : >> "$lf" ) 2>/dev/null; then
+            exec 9>>"$lf"
+            if flock -x -w "$timeout" 9 2>/dev/null; then
+                "$@"
+                local rc=$?
+                exec 9>&-          # close fd → kernel releases the lock
+                return "$rc"
+            fi
+            exec 9>&-
+            echo "with_lock: timed out acquiring $lf" >&2
+            return 1
+        fi
+    fi
+
+    # Backend 2: portable mkdir spinlock.
+    _with_lock_mkdir "$lock" "$@"
+}
+
+# ---------------------------------------------------------------------------
+# _with_lock_mkdir <lock_dir> <cmd> [args...]
+#   mkdir-based spinlock fallback for hosts without flock(1) (e.g. stock macOS).
+#   Stale-break is liveness-gated: the holder records its PID in the lock dir and
+#   a waiter breaks the lock only once that PID is dead, or — for the sub-ms
+#   mkdir→pid-write window where no PID exists yet — after AF_LOCK_STALE_SEC
+#   (default max(timeout,60)). Never age-breaks a lock whose holder is alive.
+# ---------------------------------------------------------------------------
+_with_lock_mkdir() {
     local lock="$1"; shift
     local timeout="${AF_LOCK_TIMEOUT_SEC:-10}"
     local stale="${AF_LOCK_STALE_SEC:-$(( timeout > 60 ? timeout : 60 ))}"
