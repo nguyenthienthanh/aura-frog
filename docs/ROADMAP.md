@@ -1,7 +1,7 @@
 ---
 title: Aura Frog — Consolidated Roadmap & Research
 last_aligned_with: v3.8.0-alpha.8
-status: canonical
+status: current
 audience: contributor
 generated: 2026-07-09
 ---

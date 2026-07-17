@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.8.0-alpha.8
+status: reference
+audience: contributor
+---
+
 # LLD — Design Intelligence Upgrade (Vision Loop + Design System + Stitch MCP)
 
 **Status:** Draft for review — no code written

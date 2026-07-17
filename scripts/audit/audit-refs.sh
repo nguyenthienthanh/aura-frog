@@ -53,7 +53,10 @@ echo "▶ Dead file references (path with an extension that does not exist)…"
 # glob/variable tokens, doc templates (NNN / service-name / -description), and an
 # allowlist of intentional refs to not-yet-created / removed / example files
 # (each documented as 'future' / 'removed' / example in its source line).
-ALLOW_MISSING='^(scripts/jira-fetch\.sh|scripts/preflight/install-opa\.sh|scripts/reproduce-bug\.sh|hooks/recursion-guard\.cjs|agents/observer\.md)$'
+# docs/specs/*V3.7.0* = the authoritative V3.7.0 design spec, cited by section
+# across core files; it lives outside the shipped repo (never committed), so the
+# citations stay as provenance and resolve if the spec is added later.
+ALLOW_MISSING='^(scripts/jira-fetch\.sh|scripts/preflight/install-opa\.sh|scripts/reproduce-bug\.sh|hooks/recursion-guard\.cjs|agents/observer\.md|docs/specs/AURA_FROG_V3\.7\.0_TECH_SPEC\.md|docs/specs/V3\.7\.0_DECISIONS\.md)$'
 while IFS= read -r ref; do
   case "$ref" in
     *'*'*|*'$'*|*'{'*) continue ;;                     # glob / variable

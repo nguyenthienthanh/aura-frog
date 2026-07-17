@@ -420,7 +420,7 @@ The legacy `.aura/plans/` fallback in `plans_dir()` is removed in v4.0.
 ### Fixed — Stale counts + README cleanup (PR #18)
 
 - **Five stale count references corrected** across `README.md` and `aura-frog/CLAUDE.md`: 55→56 skills, 70→71 rules, 42→43 hooks, 9→15 agents, 6→24 commands.
-- **`scripts/ci/validate-readme-counts.sh`** — new CI guard with three surgical grep patterns (Markdown bold table cells, `[All Components (N)](...)` link labels, colon-aligned summaries) that scope the check tightly enough to avoid false positives on narrative prose. Wired into `.github/workflows/test.yml`.
+- **`scripts/ci/validate-readme-counts.sh`** — new CI guard with three surgical grep patterns (Markdown bold table cells, `[All Components (N)]` link labels, colon-aligned summaries) that scope the check tightly enough to avoid false positives on narrative prose. Wired into `.github/workflows/test.yml`.
 - **README slimmed 1493 → 1074 lines (−419)** — four sections relocated to `docs/`:
   - "Walkthrough: Standard Path" → `docs/walkthrough/STANDARD_FLOW.md`
   - "Token Budget Reality" → `docs/guides/TOKEN_BUDGETS.md`
