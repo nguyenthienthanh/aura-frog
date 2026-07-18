@@ -148,7 +148,10 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 >   `duration`/`exit_code`, so these hooks parse the raw stdin JSON directly rather than via
 >   `readHookInputCompat`. The seconds→ms unit follows the docs and is the only detail not yet
 >   confirmed by a live-session probe — telemetry-only, so it cannot alter a control-flow decision.
->   Still open in STORY-0010: `json-toon-projector` (separate concern, not an exit-code reader).
+>   With this, **STORY-0010's env→stdin hook migration is COMPLETE**: the 7 cleanly-fixable hooks
+>   (above), this exit-code class of 3, and `json-toon-projector` (already reading `tool_input` from
+>   stdin, env only as fallback) all migrated. No hook still depends on a never-set `CLAUDE_TOOL_*` env
+>   var for its primary path. (`CLAUDE_HOOK_PHASE` stays — it is set explicitly by the hooks.json wrappers.)
 > - post-execute-conflict-rescan: BLOCKED on history event-schema cleanup (audit improvement #5).
 >
 > **Earlier this session** (commits `4296bd8`→`599d94f`, 10 script suites / 161 tests):
