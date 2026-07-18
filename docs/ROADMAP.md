@@ -136,23 +136,19 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 >   anything; now reads stdin + bridges tool context to run-all.sh via `buildChildEnv`). Pattern:
 >   require-safe wrap + `readHookInputCompat` + a resolve-helper extracting the per-tool field.
 >
->   **Turnkey unblock for the exit-code class** — save as `aura-frog/hooks/_probe.cjs`, temporarily add
->   `{"matcher":"Bash","hooks":[{"type":"command","command":"node \"${CLAUDE_PLUGIN_ROOT}/hooks/_probe.cjs\""}]}`
->   to hooks.json PostToolUse, run ONE Bash command, inspect `.aura-frog/stdin-probe.jsonl`, then remove:
->   ```js
->   const fs=require('fs'); let raw='';
->   try{const{readStdinSafely}=require('./lib/safe-stdin.cjs');raw=readStdinSafely()||'';}catch{}
->   try{fs.mkdirSync('.aura-frog',{recursive:true});fs.appendFileSync('.aura-frog/stdin-probe.jsonl',raw.trim()+'\n');}catch{}
->   process.exit(0);
->   ```
->   If the dumped JSON's `tool_response` carries an exit code / duration → the 3 blocked hooks
->   (tdd-red-failure-tracker, tool-call-tracer post-phase, post-execute-update-node) become clean
->   migrations. If NOT → they need a Claude-Code hook-contract change, not a code fix.
-> - **BLOCKED on hook-API schema** — tdd-red-failure-tracker, tool-call-tracer (post-phase),
->   post-execute-update-node, json-toon-projector need `CLAUDE_TOOL_EXIT_CODE` / `CLAUDE_TOOL_DURATION_MS`,
->   which are NOT known to exist in PostToolUse stdin. **FIRST verify** whether `tool_response` carries an
->   exit code / duration (probe hook that dumps stdin on a real Bash call). If absent, these need a
->   hook-contract change, not a code fix. Do NOT guess a field name — that ships a silently-wrong hook.
+> - **✅ RESOLVED (exit-code class migrated)** — tdd-red-failure-tracker, tool-call-tracer (post-phase),
+>   post-execute-update-node now read the tool context from the **stdin payload**, not the never-set
+>   `CLAUDE_TOOL_*` env vars. The documented PostToolUse schema carries what they need: `tool_name`
+>   top-level, `tool_input.command` (Bash), `tool_response.exit_code` (+ a top-level `exit_code`
+>   duplicate), and top-level `duration` (seconds → ms). Extraction lives in the pure
+>   `hooks/lib/tool-context.cjs`; env vars retained as fallback so the change cannot regress. Verified
+>   end-to-end by piping synthetic payloads through each hook as a subprocess (exit 1 → `execution_failed`;
+>   RED + exit 0 → `red_unexpectedly_green`; `duration:1.5` → `duration_ms:1500`; top-level-only
+>   `exit_code:3` → recorded 3). **Impl note:** `buildInputObject`'s whitelist drops top-level
+>   `duration`/`exit_code`, so these hooks parse the raw stdin JSON directly rather than via
+>   `readHookInputCompat`. The seconds→ms unit follows the docs and is the only detail not yet
+>   confirmed by a live-session probe — telemetry-only, so it cannot alter a control-flow decision.
+>   Still open in STORY-0010: `json-toon-projector` (separate concern, not an exit-code reader).
 > - post-execute-conflict-rescan: BLOCKED on history event-schema cleanup (audit improvement #5).
 >
 > **Earlier this session** (commits `4296bd8`→`599d94f`, 10 script suites / 161 tests):
