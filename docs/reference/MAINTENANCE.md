@@ -56,14 +56,21 @@ version_files[4]{file,location}:
 | Minor (x.X.0) | New features, agents, skills, rules | Add godot-expert skill |
 | Major (X.0.0) | Breaking changes, major refactors | Restructure plugin |
 
+**A bump is NOT complete until it is tagged AND released.** Use `scripts/release.sh` — it runs the whole flow so no step (git tag, GitHub release) is skipped:
+
 ```bash
-./scripts/sync-version.sh patch   # 1.6.0 -> 1.6.1
-./scripts/sync-version.sh minor   # 1.6.0 -> 1.7.0
-./scripts/sync-version.sh major   # 1.6.0 -> 2.0.0
-./scripts/sync-version.sh 1.7.0   # Set specific version
+# 1. Prepare: bump every version file, stamp CHANGELOG [Unreleased] as the new
+#    version + open a fresh [Unreleased], run the CI gates, print the diff.
+#    Does NOT commit — review, commit on a branch, open a PR, merge.
+bash scripts/release.sh prepare 3.8.0-alpha.9 "Hook runtime hardening"
+
+# 2. Publish: run on `main` AFTER the prepare PR merges. Creates the annotated
+#    tag v<version>, pushes it, and cuts a GitHub release (auto Pre-release for
+#    -alpha/-beta/-rc), with notes pulled from the CHANGELOG section.
+bash scripts/release.sh publish 3.8.0-alpha.9
 ```
 
-Only updates the 4 version files above + README badge.
+`prepare` edits only the canonical version locations (the version-reference files above + each doc's `last_aligned_with:` frontmatter) — historical version strings in CHANGELOG/ROADMAP prose are left untouched. `publish` refuses to run unless it is on `main`, the tree is clean, and `plugin.json` already carries the target version (i.e. the prepare PR has merged).
 
 ### Pre-commit checklist
 
@@ -73,6 +80,7 @@ Only updates the 4 version files above + README badge.
 - [ ] README files updated if public API changed
 - [ ] `git diff` reviewed for consistency
 - [ ] `./scripts/audit/audit-refs.sh` exits 0
+- [ ] On a version bump: `scripts/release.sh prepare` ran; after merge, `scripts/release.sh publish` created the tag + GitHub release
 
 ---
 
