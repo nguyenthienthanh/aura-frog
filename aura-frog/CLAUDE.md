@@ -1,11 +1,11 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.8.0-alpha.8 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.8.0-alpha.9 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. Agents + skills + commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + MCP servers. Component counts: see **Resources** below (single source).
 
 ---
 
-## 🐸 The 8 Pillars (v3.8.0-alpha.8)
+## 🐸 The 8 Pillars (v3.8.0-alpha.9)
 
 Eight composable features compose into one planning-first LLM OS. Each pillar is independently disable-able via env var. Full marketing: `README.md § The 8 Pillars`. Engineering depth: `docs/reference/BENEFITS.md` Part 9.
 
@@ -285,4 +285,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.8.0-alpha.8
+**Version:** 3.8.0-alpha.9
