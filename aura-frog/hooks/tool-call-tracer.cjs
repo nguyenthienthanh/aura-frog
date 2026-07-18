@@ -27,6 +27,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readStdinSafely, parseStdinJson } = require('./lib/hook-runtime.cjs');
+const { readToolName, readExitCode, readArgs, readDurationMs } = require('./lib/tool-context.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
@@ -154,17 +156,19 @@ function main() {
   const taskId = active.active && active.active.task;
   if (!taskId) return;
 
-  // NOTE (STORY-0010): these CLAUDE_TOOL_* / CLAUDE_HOOK_PHASE env vars are not
-  // set by the current hook API — migrating them to the stdin payload needs the
-  // exit-code/duration probe first. Left as-is here; this change only makes the
-  // hook importable + tests the pure helpers, so that migration lands safely.
+  // STORY-0010: the tool context comes from the hook's stdin payload (the
+  // CLAUDE_TOOL_* env vars this used to read were never set by the hook API). Env
+  // is kept as a fallback throughout so an unpopulated payload is a no-op change.
+  // CLAUDE_HOOK_PHASE is the exception — it IS set explicitly in hooks.json (the
+  // pre/post wrappers), so it stays the source of truth for phase.
+  const input = parseStdinJson(readStdinSafely()) || {};
   const phase = process.env.CLAUDE_HOOK_PHASE || 'pre';
-  const toolName = process.env.CLAUDE_TOOL_NAME || 'unknown';
+  const toolName = readToolName(input) || process.env.CLAUDE_TOOL_NAME || 'unknown';
   const ts = new Date().toISOString();
 
   const { traceFile, counterFile } = resolveTracePaths(PLANS_DIR, taskId);
   const taskSlug = taskSlugOf(taskId);
-  const argsRaw = process.env.CLAUDE_TOOL_ARGS || '';
+  const argsRaw = readArgs(input) || process.env.CLAUDE_TOOL_ARGS || '';
 
   if (phase === 'pre') {
     append(traceFile, {
@@ -182,8 +186,8 @@ function main() {
       }
     }
   } else {
-    const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
-    const durationMs = parseInt(process.env.CLAUDE_TOOL_DURATION_MS || '0', 10);
+    const exitCode = readExitCode(input) ?? (parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10) || 0);
+    const durationMs = readDurationMs(input) ?? (parseInt(process.env.CLAUDE_TOOL_DURATION_MS || '0', 10) || 0);
     append(traceFile, {
       ts, event_id: nextEventId(counterFile, taskSlug), task_id: taskId,
       type: 'tool_result', payload: { tool_name: toolName, exit_code: exitCode, duration_ms: durationMs },

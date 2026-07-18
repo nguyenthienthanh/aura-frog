@@ -23,6 +23,8 @@
 const fs = require('fs');
 const path = require('path');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readStdinSafely, parseStdinJson } = require('./lib/hook-runtime.cjs');
+const { readCommand, readExitCode } = require('./lib/tool-context.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
@@ -78,13 +80,14 @@ function main() {
   const taskId = active.active && active.active.task;
   if (!taskId) return;
 
-  // NOTE (STORY-0010): CLAUDE_TOOL_COMMAND / CLAUDE_TOOL_EXIT_CODE are not set by
-  // the current hook API. Migrating to the stdin payload needs the exit-code
-  // probe first; left as-is so this change is pure importable+test work.
-  const cmd = process.env.CLAUDE_TOOL_COMMAND || '';
+  // STORY-0010: read the command + exit code from the hook's stdin payload (the
+  // CLAUDE_TOOL_* env vars this used to read were never set by the hook API). Env
+  // kept as a fallback so a host that doesn't populate the payload is unaffected.
+  const input = parseStdinJson(readStdinSafely()) || {};
+  const cmd = readCommand(input) || process.env.CLAUDE_TOOL_COMMAND || '';
   if (!isTestRunner(cmd)) return;
 
-  const exitCode = parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10);
+  const exitCode = readExitCode(input) ?? (parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10) || 0);
   const ts = new Date().toISOString();
 
   if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
