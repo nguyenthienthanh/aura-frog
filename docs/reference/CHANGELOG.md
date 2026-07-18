@@ -12,6 +12,10 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **`scripts/release.sh` — one command for a complete, no-step-missed version bump.** A bump is not just editing `plugin.json`; it must also stamp the CHANGELOG, tag the commit, and cut a GitHub release. Doing it by hand skipped the tag+release for alpha.3–alpha.8. The script runs the whole flow in two phases: `prepare <version> "<title>"` bumps every canonical version location (plugin.json, marketplace.json, `aura-frog/CLAUDE.md`, each doc's `last_aligned_with:` frontmatter), stamps CHANGELOG `[Unreleased]` → `[version]` with a fresh empty `[Unreleased]`, runs the CI gates, and prints a diff without committing; `publish <version>` (run on `main` after the prepare PR merges) creates the annotated `v<version>` tag, pushes it, and cuts a GitHub release (auto Pre-release for `-alpha`/`-beta`/`-rc`) with notes extracted from the CHANGELOG section. Historical version strings in CHANGELOG/ROADMAP prose are left untouched (only canonical locations are edited); `publish` refuses unless on `main`, tree clean, and `plugin.json` already at the target version. Also fixes `MAINTENANCE.md`, which pointed at a `sync-version.sh` that never existed.
+
 ## [3.8.0-alpha.9] - 2026-07-18 (Hook runtime hardening — importable hooks, stdin migration, CI restored)
 
 > Applied the plugin's own lazy-load principle to its own CLAUDE.md files. Maintainer-only procedure and reference catalogs were costing always-on context every session; they now lazy-load from `docs/`. Net: **~1,685 tokens cut from every session** (~48% of the project CLAUDE.md).
