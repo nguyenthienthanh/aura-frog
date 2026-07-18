@@ -10,7 +10,9 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [Unreleased] (Context economy: slim the always-on CLAUDE.md trio)
+## [Unreleased]
+
+## [3.8.0-alpha.9] - 2026-07-18 (Hook runtime hardening — importable hooks, stdin migration, CI restored)
 
 > Applied the plugin's own lazy-load principle to its own CLAUDE.md files. Maintainer-only procedure and reference catalogs were costing always-on context every session; they now lazy-load from `docs/`. Net: **~1,685 tokens cut from every session** (~48% of the project CLAUDE.md).
 

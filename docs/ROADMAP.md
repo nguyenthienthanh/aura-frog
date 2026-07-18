@@ -1,6 +1,6 @@
 ---
 title: Aura Frog — Consolidated Roadmap & Research
-last_aligned_with: v3.8.0-alpha.8
+last_aligned_with: v3.8.0-alpha.9
 status: current
 audience: contributor
 generated: 2026-07-09
@@ -31,7 +31,7 @@ generated: 2026-07-09
 | FEAT-011 | Research integrations | ⏳ planned |
 | FEAT-009 | Frontend design quality | ✅ **done** — Design Intelligence v2 shipped (vision loop · design SoT · Stitch MCP opt-in), PR #26 |
 
-Actual on-disk counts (v3.8.0-alpha.8): **15 agents · 60 skills · 72 rules · 24 commands · 49 hooks · 11 MCPs**.
+Actual on-disk counts (v3.8.0-alpha.9): **15 agents · 60 skills · 72 rules · 24 commands · 49 hooks · 11 MCPs**.
 
 ---
 
