@@ -8,8 +8,8 @@
  *          if incompatible (per spec §21.6).
  *
  * Behavior:
- *   - Silent if no .claude/plans/active.json or no recent execution_completed
- *     event in history.jsonl
+ *   - Silent if no .claude/plans/conflicts.jsonl / history.jsonl or no recent
+ *     execution_completed event in history.jsonl
  *   - For each conflict in conflicts.jsonl with resolution: null AND a
  *     participant whose status just transitioned to done → run compatibility
  *     check via git diff
@@ -19,7 +19,7 @@
  * Exit codes:
  *   0 — always (advisory; doesn't block)
  *
- * @version 1.0.0 (v3.7.0-beta.2)
+ * @version 1.1.0 (FEAT-007 / issue #5 — importable + pure logic extracted)
  */
 
 'use strict';
@@ -30,121 +30,153 @@ const { execSync } = require('child_process');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
 
 const PLANS_DIR = resolvePlansDir();
-const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
 const CONFLICTS_FILE = path.join(PLANS_DIR, 'conflicts.jsonl');
 const RESCAN_WINDOW_MS = 60 * 1000;
 
-function safeExit(code = 0) { process.exit(code); }
+// Pure: newest-first scan of history lines for execution_completed(exit 0) events
+// within the window. Returns a Set of node ids. History is chronological (newest
+// last), so the scan stops at the first out-of-window event. The exit_code gate
+// only became meaningful once post-execute-update-node read the real exit code
+// from stdin (STORY-0010) — before that every event carried a bogus 0.
+function collectRecentDoneTasks(historyLines, { now, windowMs }) {
+  const done = new Set();
+  for (let i = historyLines.length - 1; i >= 0; i--) {
+    let evt;
+    try { evt = JSON.parse(historyLines[i]); } catch { continue; }
+    const ts = Date.parse(evt.ts || '');
+    if (!Number.isFinite(ts) || (now - ts) > windowMs) break;
+    if (evt.event === 'execution_completed' && evt.exit_code === 0 && evt.node) {
+      done.add(evt.node);
+    }
+  }
+  return done;
+}
 
-if (!fs.existsSync(CONFLICTS_FILE) || !fs.existsSync(HISTORY_FILE)) safeExit(0);
+// Pure: fold conflicts.jsonl (append-only, may have many lines per conflict) to
+// the latest record per conflict_id. Malformed / id-less lines are skipped.
+function foldLatestConflicts(conflictLines) {
+  const latest = new Map();
+  for (const line of conflictLines) {
+    try {
+      const c = JSON.parse(line);
+      if (c.conflict_id) latest.set(c.conflict_id, c);
+    } catch {/* skip */}
+  }
+  return latest;
+}
 
-// Find recent execution_completed events for tasks that match a conflict participant
-let historyLines = [];
-try { historyLines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
-catch { safeExit(0); }
+// Pure: given a conflict and the set of just-done tasks, identify the blocker
+// (a participant that just finished) and its frozen pending-confirm sibling.
+// Returns {blocker, frozen} or null when this conflict isn't actionable (already
+// resolved, no just-done participant, or no frozen sibling).
+function findRescanPair(conflict, recentDoneTasks) {
+  if (!conflict || conflict.resolution) return null;
+  const participants = conflict.participants || [];
+  const blocker = participants.find(p => p && recentDoneTasks.has(p.task));
+  if (!blocker) return null;
+  const frozen = participants.find(p =>
+    p && p.task !== blocker.task && p.role === 'pending-confirm'
+  );
+  if (!frozen) return null;
+  return { blocker, frozen };
+}
 
-const now = Date.now();
-const recentDoneTasks = new Set();
-for (let i = historyLines.length - 1; i >= 0; i--) {
-  let evt;
-  try { evt = JSON.parse(historyLines[i]); } catch { continue; }
-  const ts = Date.parse(evt.ts || '');
-  if (!Number.isFinite(ts) || (now - ts) > RESCAN_WINDOW_MS) break;
-  if (evt.event === 'execution_completed' && evt.exit_code === 0 && evt.node) {
-    recentDoneTasks.add(evt.node);
+// Pure: map a compatibility verdict (true / false / null-unknown) to the
+// recommendation string.
+function recommendationFor(compatible) {
+  if (compatible === true) return 'auto_thaw';
+  if (compatible === false) return 'auto_discard';
+  return 'inconclusive — manual /aura-frog:plan-thaw recommended';
+}
+
+// Pure: build the advisory history event for a recommendation.
+function buildRescanEvent({ conflictId, blocker, frozen, recommendation, ts }) {
+  return {
+    ts,
+    conflict_id: conflictId,
+    event: 'conflict_rescan_recommendation',
+    blocker,
+    frozen,
+    recommendation,
+    actor: 'post-execute-conflict-rescan',
+  };
+}
+
+// I/O: compatibility check — did the blocker's actual output (git diff since its
+// latest checkpoint) still touch the frozen sibling's planned files? Returns
+// true (compatible), false (still overlaps), or null (couldn't determine).
+function checkCompatibility(plansDir, blockerTask, plannedFiles) {
+  try {
+    const checkpointsDir = path.join(plansDir, 'checkpoints');
+    if (!fs.existsSync(checkpointsDir)) return null;
+    const checkpoints = fs.readdirSync(checkpointsDir)
+      .filter(f => f.startsWith(`${blockerTask}.`))
+      .sort()
+      .reverse();
+    if (checkpoints.length === 0) return null;
+    const cp = JSON.parse(fs.readFileSync(path.join(checkpointsDir, checkpoints[0]), 'utf8'));
+    if (!cp.git_sha) return null;
+    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, { encoding: 'utf8' }).trim();
+    const changed = diff.split('\n').filter(Boolean);
+    return !changed.some(f => plannedFiles.includes(f));
+  } catch {
+    return null;
   }
 }
 
-if (recentDoneTasks.size === 0) safeExit(0);
+function main() {
+  if (!fs.existsSync(CONFLICTS_FILE) || !fs.existsSync(HISTORY_FILE)) return;
 
-// Parse conflicts.jsonl, fold to latest per conflict_id
-let conflictLines = [];
-try { conflictLines = fs.readFileSync(CONFLICTS_FILE, 'utf8').split('\n').filter(Boolean); }
-catch { safeExit(0); }
+  let historyLines = [];
+  try { historyLines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
+  catch { return; }
 
-const latestConflicts = new Map();
-for (const line of conflictLines) {
-  try {
-    const c = JSON.parse(line);
-    if (c.conflict_id) latestConflicts.set(c.conflict_id, c);
-  } catch {/* skip */}
-}
+  const recentDoneTasks = collectRecentDoneTasks(historyLines, { now: Date.now(), windowMs: RESCAN_WINDOW_MS });
+  if (recentDoneTasks.size === 0) return;
 
-const recommendations = [];
+  let conflictLines = [];
+  try { conflictLines = fs.readFileSync(CONFLICTS_FILE, 'utf8').split('\n').filter(Boolean); }
+  catch { return; }
 
-for (const [cid, conflict] of latestConflicts) {
-  if (conflict.resolution) continue; // already resolved
+  const recommendations = [];
+  for (const [cid, conflict] of foldLatestConflicts(conflictLines)) {
+    const pair = findRescanPair(conflict, recentDoneTasks);
+    if (!pair) continue;
+    const plannedFiles = (conflict.overlap && conflict.overlap.files) || [];
+    const compatible = checkCompatibility(PLANS_DIR, pair.blocker.task, plannedFiles);
+    recommendations.push({
+      conflict_id: cid,
+      blocker: pair.blocker.task,
+      frozen: pair.frozen.task,
+      recommendation: recommendationFor(compatible),
+    });
+  }
 
-  // Find which participant just transitioned to done — that's the blocker
-  const doneParticipant = (conflict.participants || []).find(p => recentDoneTasks.has(p.task));
-  if (!doneParticipant) continue;
+  if (recommendations.length === 0) return;
 
-  // Find frozen sibling
-  const frozenSibling = (conflict.participants || []).find(p =>
-    p.task !== doneParticipant.task && p.role === 'pending-confirm'
+  const lines = recommendations.map(r =>
+    `  ${r.conflict_id}: blocker=${r.blocker} done; frozen=${r.frozen} → ${r.recommendation}`
   );
-  if (!frozenSibling) continue;
+  process.stderr.write(`[conflict-rescan] ${recommendations.length} pending decision(s):\n${lines.join('\n')}\n`);
 
-  // Compatibility check: did the actual blocker output overlap the frozen
-  // sibling's planned artifacts? Use git diff against checkpoint git_sha.
-  let compatible = null;
-  try {
-    // Find the most recent checkpoint for the blocker
-    const checkpointsDir = path.join(PLANS_DIR, 'checkpoints');
-    if (fs.existsSync(checkpointsDir)) {
-      const checkpoints = fs.readdirSync(checkpointsDir)
-        .filter(f => f.startsWith(`${doneParticipant.task}.`))
-        .sort()
-        .reverse();
-      if (checkpoints.length > 0) {
-        const cp = JSON.parse(fs.readFileSync(path.join(checkpointsDir, checkpoints[0]), 'utf8'));
-        if (cp.git_sha) {
-          const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, { encoding: 'utf8' }).trim();
-          const changed = diff.split('\n').filter(Boolean);
-          const plannedFiles = (conflict.overlap && conflict.overlap.files) || [];
-          const stillOverlaps = changed.some(f => plannedFiles.includes(f));
-          compatible = !stillOverlaps;
-        }
-      }
-    }
-  } catch {/* git unavailable or other failure */}
-
-  const recommendation = compatible === true
-    ? 'auto_thaw'
-    : compatible === false
-      ? 'auto_discard'
-      : 'inconclusive — manual /aura-frog:plan-thaw recommended';
-
-  recommendations.push({
-    conflict_id: cid,
-    blocker: doneParticipant.task,
-    frozen: frozenSibling.task,
-    recommendation,
-  });
+  // Append advisory history events (arbiter agent applies the actual mutation).
+  const ts = new Date().toISOString();
+  for (const r of recommendations) {
+    try {
+      fs.appendFileSync(HISTORY_FILE, JSON.stringify(buildRescanEvent({
+        conflictId: r.conflict_id, blocker: r.blocker, frozen: r.frozen, recommendation: r.recommendation, ts,
+      })) + '\n');
+    } catch {/* best-effort */}
+  }
 }
 
-if (recommendations.length === 0) safeExit(0);
-
-const lines = recommendations.map(r =>
-  `  ${r.conflict_id}: blocker=${r.blocker} done; frozen=${r.frozen} → ${r.recommendation}`
-);
-process.stderr.write(`[conflict-rescan] ${recommendations.length} pending decision(s):\n${lines.join('\n')}\n`);
-
-// Append history events (advisory only — arbiter agent applies the mutation)
-const ts = new Date().toISOString();
-for (const r of recommendations) {
-  try {
-    fs.appendFileSync(HISTORY_FILE, JSON.stringify({
-      ts,
-      conflict_id: r.conflict_id,
-      event: 'conflict_rescan_recommendation',
-      blocker: r.blocker,
-      frozen: r.frozen,
-      recommendation: r.recommendation,
-      actor: 'post-execute-conflict-rescan',
-    }) + '\n');
-  } catch {/* best-effort */}
+// Run as a hook; stay importable for tests. Previously the entire rescan ran at
+// module scope with process.exit() on require. FEAT-007 / issue #5.
+if (require.main === module) {
+  main();
+} else {
+  module.exports = {
+    collectRecentDoneTasks, foldLatestConflicts, findRescanPair, recommendationFor, buildRescanEvent,
+  };
 }
-
-safeExit(0);

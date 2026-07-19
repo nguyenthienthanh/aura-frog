@@ -105,8 +105,9 @@ Three parallel Fable-5 audits (47 CJS hooks · bash scripts · refs/doc integrit
 - ✅ `session-state.cjs:143` missing `require('fs')` — **fixed** (`696cde9`).
 - ✅ `task-track-model` never searched `CLAUDE_PLUGIN_ROOT/agents` (dead for installed users) — **fixed** (`696cde9`; unblocks STORY-0027).
 - ✅ `post-compact` verified `.claude/…` but handoff writes `.claude/cache/…` — **fixed** (`696cde9`).
-- ⏳ `post-execute-conflict-rescan` treats any Read as "blocker done" — needs the history event schema
-  cleaned first (audit improvement #5); do with STORY-0011 event-schema work. → STORY-0029.
+- ✅ `post-execute-conflict-rescan` — made importable + pure decision logic extracted/tested (STORY-0029).
+  The feared "treats any Read as blocker done" never applied: it gates on `execution_completed`(exit 0)
+  history events, which STORY-0010 made reliable. Now `require`-safe with 14 tests.
 
 **Bash scripts (→ FEAT-010):**
 - `audit-refs.sh` regex can't see full paths → real dead links pass the gate (e.g. `prune-checkpoints.sh`). → STORY-0022.
@@ -152,7 +153,8 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 >   (above), this exit-code class of 3, and `json-toon-projector` (already reading `tool_input` from
 >   stdin, env only as fallback) all migrated. No hook still depends on a never-set `CLAUDE_TOOL_*` env
 >   var for its primary path. (`CLAUDE_HOOK_PHASE` stays — it is set explicitly by the hooks.json wrappers.)
-> - post-execute-conflict-rescan: BLOCKED on history event-schema cleanup (audit improvement #5).
+> - post-execute-conflict-rescan: ✅ DONE — importable + pure logic tested (STORY-0029). The event-schema
+>   concern was upstream data quality, fixed by STORY-0010; the importable refactor was independent.
 >
 > **Earlier this session** (commits `4296bd8`→`599d94f`, 10 script suites / 161 tests):
 > STORY-0023 (7/7 items, each with tests): `resolve-node` null-field exit
@@ -166,7 +168,7 @@ Phases mirror `.claude/plans/MASTER_PLAN.md`. Suggested order prioritises verifi
 |---|---|---|---|---|
 | ✅ | Security hotfixes P0-1..4 | FEAT-010/STORY-0021 | — | done |
 | ✅ | Plans-scripts correctness batch (7/7 items) | FEAT-010/STORY-0023 | — | done |
-| 🚧 | Hook bug-cleanup — **8 done** (session-state fs, task-track PLUGIN_ROOT, post-compact path, CONFLICT-id lock via js-counter, log-filename sanitize, team-bridge attempt persistence, workflow-edit-learn header, **session-start branch-switch cache invalidation — shipped in `fcd1934`; this row wrongly listed it as remaining. It now also has the regression test it never had, via the `session-start.cjs` importable refactor**). Remaining: post-execute-conflict-rescan event-gating (blocked on history event-schema) | FEAT-007/STORY-0029 | — | 1 item left, blocked |
+| ✅ | Hook bug-cleanup — **all done**. 8 bug fixes (session-state fs, task-track PLUGIN_ROOT, post-compact path, CONFLICT-id lock via js-counter, log-filename sanitize, team-bridge attempt persistence, workflow-edit-learn header, session-start branch-switch cache invalidation `fcd1934`), plus the last item — **post-execute-conflict-rescan made importable + tested**. The "blocked on history event-schema" was a data-quality dependency (garbage `exit_code`s), which STORY-0010 fixed; the importable refactor was independent. Pure logic extracted (`collectRecentDoneTasks`/`foldLatestConflicts`/`findRescanPair`/`recommendationFor`/`buildRescanEvent`), 14 tests, both directions verified. | FEAT-007/STORY-0029 | — | done |
 | ✅ | audit-refs rewrite — DONE (`7cad04a`): full-path dead-file check + allowlist/template skip-rules + fixture self-test; surfaced & fixed a real dead link (USAGE_GUIDE.md) the old regex missed. | FEAT-010/STORY-0022 | — | done |
 | 🚧 | CI gates — hook-parity validator DONE (`fcc77a8`, wired into CI `ed0bef0`): Fires:-header vs hooks.json drift now fails CI. **Remaining:** shellcheck gate — DEFERRED (blind-add breaks CI on dozens of pre-existing warnings; needs a fix-all-vs-baseline scope decision, same shape as audit-refs was). | FEAT-010/STORY-0024 | — | ~0.5d |
 | ✅ | Consolidate learning hooks — DONE: `learning-dispatch.cjs` reads stdin once and fans out to `feedback-capture.run` + `smart-learn.run` in-process (2 node spawns → 1 on the hot PostToolUse Write/Edit path; Bash unified too). Each module refactored to an exported `run(input)` (no stdin/exit), standalone CLI preserved. Registration collapsed 3 entries → 1 (`Write\|Edit\|Bash`). Isolation: one module throwing never blocks the next. 6 dispatcher tests + 440/440 hook suite green; parity/audit/counts clean (hooks 47→48). | FEAT-010/STORY-0025 | — | done |
@@ -224,7 +226,7 @@ Four red gates fixed; one remains. Verify CI claims against `gh run list --branc
 
 ### 4.3 FEAT-007 / issue #5 — making hooks importable (in progress)
 
-**Non-exporting hooks: 24 → 2 — every hook with real extractable logic is now importable + unit-tested** (PRs #32–#35, #37, #39; ~340 hook tests across the session). The pattern that works:
+**Non-exporting hooks: 24 → 1 — every hook with real extractable logic is now importable + unit-tested** (PRs #32–#35, #37, #39, and the `post-execute-conflict-rescan` refactor; ~350 hook tests across the session). The pattern that works:
 
 1. `if (require.main === module) { main(); } else { module.exports = {...} }` — hook behaviour unchanged; verify **both** directions (import touches nothing; running still behaves — run the hook as a subprocess against synthetic inputs, since the extracted-function tests don't prove `main()` still fires).
 2. Split pure decision logic out of the I/O wrapper — e.g. `session-start.cacheStaleReason`, `pending-confirm-timeout.evaluateTaskFile`, `pre-dispatch-conflict-check.buildConflictRecord`, `tool-call-tracer.extractReadPath`, `security-critical-warn.classifyTier`, `update-check.compareVersions`.
@@ -234,14 +236,13 @@ Four red gates fixed; one remains. Verify CI claims against `gh run list --branc
 
 > **An over-hasty call, corrected:** an earlier revision of this section parked ~13 hooks as "no pure logic to extract" or "STORY-0010, nothing to do." That was wrong. The `CLAUDE_TOOL_*` env-var problem only blocks the *stdin migration* of `main()`'s inputs — the hooks still held real pure logic (path classification, version compare, history scans, decision builders) that made fine tests. Every one of them got extracted and tested in PR #39. Lesson: "it reads a dead env var" ≠ "there's nothing here."
 
-**The only 2 hooks still non-exporting are genuinely not worth it:**
+**The only hook still non-exporting is genuinely not worth it:**
 
 | Hook | Why |
 |---|---|
 | `rate-limit-check` | 11 lines: a single `console.log('Run /usage')` reminder. No logic, nothing to test. |
-| `post-execute-conflict-rescan` | Event-gating blocked on the history event-schema cleanup (audit improvement #5 / STORY-0029). Restructure it when that schema work lands. |
 
-**Still separate (STORY-0010):** `tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node` are now importable + tested, but they still *read* `CLAUDE_TOOL_*` env vars the hook API never sets. The env→stdin migration needs the probe-hook that checks whether `tool_response` carries exit-code/duration (a **live-session** step). Now that the hooks are tested, that migration can land with a safety net.
+**STORY-0010 — DONE:** `tool-call-tracer`, `tdd-red-failure-tracker`, `post-execute-update-node` now read the tool context (name / command / exit code / duration) from the **stdin payload** via `hooks/lib/tool-context.cjs`, not the `CLAUDE_TOOL_*` env vars the hook API never sets — env kept as a regression-safe fallback (PRs #41, #42). No live-session probe was needed: the plugin loads hooks at session start, so a mid-session probe wouldn't fire; the defensive multi-source read + env fallback made the migration safe without one.
 
 > ⚠️ **Never call these from a test** — each resolves paths from the real project root at module load:
 > `phase-checkpoint.createCheckpoint` (runs `git add -A` + `git commit` on the working tree!) ·
