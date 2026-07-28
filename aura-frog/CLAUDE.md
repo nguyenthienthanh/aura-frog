@@ -80,7 +80,7 @@ Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation token
 ```toon
 mcp[11]{name,purpose,requires,enabled}:
   context7,Library docs,None,enabled
-  playwright,Browser automation + E2E (drives the browser),None,enabled
+  playwright,Browser automation + E2E (headless+isolated; browser is lazy — close it when done),None,enabled
   vitest,Test execution + coverage,None,enabled
   firebase,Firebase management,firebase login,enabled
   figma,Design files,FIGMA_API_TOKEN,enabled
@@ -93,6 +93,8 @@ mcp[11]{name,purpose,requires,enabled}:
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
+
+**Browser hygiene:** the playwright Chrome launches lazily (first `browser_*` call) and does **not** close itself — always `browser_close` when a browser task finishes. The `playwright-reaper` SessionStart hook is the backstop: it kills only *orphaned* playwright processes (a headless Chrome whose MCP server died → `ppid 1`, running for days), never a live session's browser or your normal Chrome. Disable with `AF_PLAYWRIGHT_REAPER_DISABLED=true`.
 
 ---
 
@@ -277,7 +279,7 @@ resources[8]{name,location}:
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
   Skills (60),skills/
-  Hooks (49),hooks/
+  Hooks (50),hooks/
   MCP (11),.mcp.json (postgres/redis/chrome-devtools/codebase-memory/stitch disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
