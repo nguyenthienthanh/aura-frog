@@ -71,6 +71,13 @@ verdict[2]{field,form}:
 Fix each defect, re-render, re-capture. Stop at PASS or after the iteration budget (default 3 — raise only
 if the user asks). If still failing at budget, report the remaining defects honestly rather than looping.
 
+### Step 5 — teardown (mandatory)
+
+Call `browser_close` as soon as you reach PASS or the iteration cap. **Do not leave the browser open.**
+The @playwright/mcp Chrome does not close itself — an unclosed browser survives the task and, if the
+session later exits ungracefully, is orphaned and runs for days (the `playwright-reaper` SessionStart hook
+is only the backstop for that leak; closing here is what prevents it). Use the browser, then dispose it.
+
 ## Output
 
 Write the verdict + screenshot paths + defect log to `.claude/workflow/vision-report-<route>.md` so a

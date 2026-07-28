@@ -13,6 +13,10 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/playwright-reaper.cjs\" 2>&1"
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/workflow-edit-learn.cjs\" 2>&1"
           },
           {
