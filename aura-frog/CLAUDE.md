@@ -279,7 +279,7 @@ resources[8]{name,location}:
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
   Skills (60),skills/
-  Hooks (50),hooks/
+  Hooks (51),hooks/
   MCP (11),.mcp.json (postgres/redis/chrome-devtools/codebase-memory/stitch disabled by default)
   AI References,docs/
   Human Docs,docs/README.md (repo root)

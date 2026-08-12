@@ -902,4 +902,4 @@ hooks[32]{event,name,purpose}:
 ---
 
 **Last Updated:** 2026-04-06
-**Status:** Active hooks system (50 hooks)
+**Status:** Active hooks system (51 hooks)
