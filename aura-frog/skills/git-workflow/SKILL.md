@@ -38,9 +38,15 @@ Stage files, check diff stats, scan for secrets (`api_key|token|password|secret|
 Format: `type(scope): description` (<72 chars, present tense, imperative)
 Types: feat, fix, docs, chore, refactor, test, perf
 
-### 4. Commit + Push
+### 4. Confirm → Commit → Push
 
-Push only if user requests.
+**NEVER auto-commit or auto-push** (per `rules/workflow/git-workflow.md`):
+
+1. Show `git diff --stat` + the proposed commit message
+2. Wait for explicit user confirmation before `git commit`
+3. After commit, ask before `git push` separately — push only if user requests
+
+No exceptions.
 
 ## PR Workflow
 

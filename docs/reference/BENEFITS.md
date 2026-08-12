@@ -251,9 +251,9 @@ audience: contributor
 
 **What:** Rules split into Core (always) / Agent (per-agent) / Workflow (per-phase). Lazy load only what's needed.
 
-**How applied:** 22 core rules load every session (~3.5K tokens). Agent rules load when that agent activates. Workflow rules load when that phase runs.
+**How applied:** the 22 core rules are indexed every session (a ~300-token path table in CLAUDE.md); individual rule bodies load on demand when their topic comes up. Agent rules load when that agent activates. Workflow rules load when that phase runs.
 
-**Why you need it:** Loading all 71 rules every session would be ~18K tokens. 3-tier reduces to ~3.5K always + ~5K conditional = ~50% reduction.
+**Why you need it:** Loading all 72 rule bodies every session would be ~41K tokens (measured: core ~13.5K, agent ~9.5K, workflow ~18K). Index-plus-on-demand loading keeps the always-on cost to the path index plus only the rules the task actually touches.
 
 **Use cases:**
 - Sessions where you only edit frontend code (architect rules never load)
@@ -497,7 +497,7 @@ Details: [`docs/PORTABILITY.md`](../PORTABILITY.md).
 - Only do throwaway scripts / single-file edits
 - Don't want any workflow overhead
 - Have strict Haiku-only budgets (some features use Sonnet)
-- Prefer minimalist plugins (Aura Frog is substantial — 15 agents, 59 skills, 71 rules)
+- Prefer minimalist plugins (Aura Frog is substantial — 15 agents, 60 skills, 72 rules)
 
 🎯 **Best fit:** Teams shipping production features where quality + security + cost control all matter.
 

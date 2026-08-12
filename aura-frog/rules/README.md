@@ -1,6 +1,6 @@
 # Aura Frog Quality Rules
 
-**Total Rules:** 71 (22 core + 19 agent + 30 workflow)
+**Total Rules:** 72 (22 core + 20 agent + 30 workflow)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -10,17 +10,17 @@
 Rules are organized into tiers to reduce context overhead. Only load what's needed.
 
 ```toon
-tiers[3]{tier,dir,count,when_loaded}:
-  Core,rules/core/,22,ALWAYS — every session
-  Agent,rules/agent/,19,Per-agent — only when agent activates
-  Workflow,rules/workflow/,30,Per-phase — only during active workflow
+tiers[3]{tier,dir,count,full_tier_size,when_loaded}:
+  Core,rules/core/,22,"~10,200 words (~13.5K tokens)",Path index every session — rule bodies read on-demand by topic (see CLAUDE.md core_paths)
+  Agent,rules/agent/,20,"~7,100 words (~9.5K tokens)",Per-agent — only the activating agent's Related Rules
+  Workflow,rules/workflow/,30,"~13,500 words (~18K tokens)",Per-phase — only during active workflow
 ```
 
-**Token savings:** ~30-50% reduction vs loading all 71 rules every message.
+**Loading model:** no tier is bulk-loaded. Every session gets the core *path index* (the `core_paths` table in `CLAUDE.md`, ~300 tokens); individual rule bodies are read on demand when their topic comes up. Full-tier sizes above are measured (`wc -w`, ~1.33 tokens/word) — loading all 72 rule bodies would cost ~41K tokens, which is why on-demand loading exists.
 
 ---
 
-## Core Rules (22) — Always Loaded
+## Core Rules (22) — Indexed Every Session, Bodies On Demand
 
 ```toon
 core[22]{rule,priority,purpose}:
@@ -50,12 +50,13 @@ core[22]{rule,priority,purpose}:
 
 ---
 
-## Agent Rules (19) — Loaded Per Agent
+## Agent Rules (20) — Loaded Per Agent
 
 ```toon
-agent[19]{rule,priority,agents}:
+agent[20]{rule,priority,agents}:
   frontend-excellence,critical,frontend/mobile
   design-system-usage,high,frontend
+  design-system-persistence,high,"frontend + design skills (design-expert/design-tokens/stitch-design/design-vision-loop)"
   theme-consistency,medium,frontend
   direct-hook-access,medium,frontend/mobile
   correct-file-extensions,medium,frontend/mobile
@@ -119,11 +120,13 @@ workflow[30]{rule,priority,phases}:
 
 ```toon
 loading[4]{scenario,rules_loaded,est_tokens}:
-  Quick fix (no workflow),Core only (11),~1800
-  Standard (Phase 1),Core + relevant Agent + Phase 1 Workflow,~3800
-  Standard (Phase 3),Core + relevant Agent + Phase 3 Workflow,~3300
-  Deep (full workflow),Core + all Agent + current Phase Workflow,~5000
+  Quick fix (no workflow),Core path index + 2-4 topical core rule bodies,~1500-2500
+  Standard (Phase 1),+ activating agent's rules + Phase 1 workflow rules,~4000-6000
+  Standard (Phase 3),+ activating agent's rules + Phase 3 workflow rules,~3500-5500
+  Deep (full workflow),+ all relevant agent rules + current-phase workflow rules,~6000-9000
 ```
+
+Estimates derive from measured file sizes (core rules average ~460 words ≈ ~620 tokens each); actual cost depends on how many rule bodies the topic pulls in.
 
 **Agent detection determines which agent rules to load:**
 - `frontend` agent → loads: frontend-excellence, design-system-usage, theme-consistency, direct-hook-access, correct-file-extensions, accessibility-rules, state-management
