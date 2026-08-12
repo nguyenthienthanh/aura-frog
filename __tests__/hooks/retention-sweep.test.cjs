@@ -63,6 +63,35 @@ afterEach(() => {
   try { fs.rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ }
 });
 
+describe('sweepRetention — legacy workflows root', () => {
+  // team-bridge's resolveWorkflowDir() falls back to .claude/logs/workflows, and
+  // a workflow that landed there was never swept — carrying its unrotated
+  // teams/phase-*/team-log.jsonl and per-agent logs with it, forever.
+  it('prunes stale dirs under .claude/logs/workflows, not just runs', () => {
+    const workflows = path.join(root, '.claude', 'logs', 'workflows');
+    const stale = path.join(workflows, 'wf-old', 'teams', 'phase-3-build');
+    fs.mkdirSync(stale, { recursive: true });
+    fs.writeFileSync(path.join(stale, 'team-log.jsonl'), `{"ts":"${OLD_TS}"}\n`);
+    backdate(path.join(workflows, 'wf-old'), 60);
+
+    sweepRetention();
+
+    expect(fs.existsSync(path.join(workflows, 'wf-old'))).toBe(false);
+  });
+
+  it('keeps a recent workflow dir and its team logs', () => {
+    const workflows = path.join(root, '.claude', 'logs', 'workflows');
+    const fresh = path.join(workflows, 'wf-new', 'teams', 'phase-3-build');
+    fs.mkdirSync(fresh, { recursive: true });
+    const log = path.join(fresh, 'team-log.jsonl');
+    fs.writeFileSync(log, `{"ts":"${NEW_TS}"}\n`);
+
+    sweepRetention();
+
+    expect(fs.existsSync(log)).toBe(true);
+  });
+});
+
 describe('sweepRetention — plan history + conflicts', () => {
   it('prunes expired entries from history.jsonl and conflicts.jsonl', () => {
     const history = writeJsonl(path.join(root, '.claude', 'plans', 'history.jsonl'), [
