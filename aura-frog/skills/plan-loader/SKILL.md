@@ -8,62 +8,26 @@ effort: low
 user-invocable: false
 ---
 
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
-
 # Plan Loader
 
-**STATUS — v3.7.0-alpha.1.** Provides plan context for hierarchical planning system.
+Provides minimum plan context for the hierarchical planning system. Read-only.
 
 ## Behavior (in order)
 
-1. **Detect**: if `.claude/plans/` does NOT exist → exit silently (no plan = no overhead)
-2. **Read** `.claude/plans/active.json` — get current focus pointer
-3. **Load mission.md** — T0 (always loaded if exists)
-4. **Load active T1** (Initiative) if `active.initiative` set
-5. **Load active T2** (Feature) if `active.feature` set
-6. **Load active T3** (Story) if `active.story` set, plus sibling T4 summaries (id + intent + status only — not full body)
-7. **Load active T4** (Task) if `active.task` set
-8. Stamp loaded plan nodes with `trust: plan` for `memory-trust-policy.md` discipline
+1. **Detect:** if `.claude/plans/` does NOT exist → exit silently
+2. **Read** `.claude/plans/active.json` — current focus pointer
+3. **Load mission.md** (T0) if it exists
+4. **Load active T1 → T2 → T3 → T4** per `active.*` pointers; for the active T3 also load sibling T4 summaries (id + intent + status only)
+5. **Stamp** loaded nodes `trust: plan` per `rules/core/plan-trust-policy.md`
 
-## Token budget
+## Budget
 
-```toon
-budget[5]{layer,target,hard_cap}:
-  always_loaded,800,1000
-  active_T1+T2,1500,2500
-  active_T3+T4,5000,7000
-  sibling_T4_summaries,500,800
-  total_with_plan,~7800,~11300
-```
+Always-loaded target 800 tokens (hard cap 1000). Never loads siblings outside the active path, archive/, traces/, history.jsonl, or conflicts.jsonl; never mutates plan files.
 
-## Auto-degradation rules (per spec §9.1)
-
-When always-loaded budget approaches 13,500 tokens:
-
-1. **First trim:** skip permanent-memory summary lines → saves ~150 tokens
-2. **Second trim:** skip mission.md content (keep only ID) → saves ~50 tokens
-3. **Third trim:** load only `active.json` (no node bodies) → log warning
-
-## What this skill does NOT do
-
-- Does NOT modify plan files (read-only)
-- Does NOT trigger replan or status changes
-- Does NOT load sibling T3s, T2s, T1s outside active path
-- Does NOT load archive/, traces/, history.jsonl, conflicts.jsonl
-
-## Detection logic (bash one-liner the model can run)
+## Detection one-liner
 
 ```bash
 [ -f .claude/plans/active.json ] && echo "plan-active" || echo "no-plan"
 ```
 
-## Tie-Ins
-
-- **Owns:** `.claude/plans/active.json` (read), `.claude/plans/mission.md` (read), `.claude/plans/<active path>/*.md` (read)
-- **Skill spec:** `docs/specs/AURA_FROG_V3.7.0_TECH_SPEC.md` §9.1
-- **Rule:** `rules/core/plan-trust-policy.md` — content loaded by this skill is `trust: plan`
-- **Hook:** `hooks/pre-execute-load-plan-context.cjs` (Milestone A part 2) — invokes this skill on every PreToolUse
-- **Companion:** `skills/plan-validator/SKILL.md` — runs `validate-plan-tree.sh` on demand
+**Detail (full budget table, degradation rules, tie-ins):** `skills/plan-loader/reference.md` — load on demand only.

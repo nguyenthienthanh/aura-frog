@@ -43,7 +43,7 @@ os_map[5]{concept,implementation}:
 ```toon
 boot[5]{step,action,cost}:
   1,Check & load .envrc,~0
-  2,Load KERNEL rules (core/),~2000
+  2,Load KERNEL rule index (core_paths — bodies on demand),~300
   3,Detect agent + model,~200
   4,Load project context (on demand),~500-2000
   5,Verify MCP servers,~100
@@ -144,7 +144,7 @@ skills[9]{name,trigger}:
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion. **Also a skill, not an agent.**
 
-40 reference skills loaded on-demand. Full list: `skills/README.md`
+51 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -202,8 +202,8 @@ Details: `rules/core/context-management.md`
 
 ```toon
 tiers[3]{tier,count,when}:
-  Core (rules/core/),22,Every session
-  Agent (rules/agent/),19,Per-agent type
+  Core (rules/core/),22,Path index every session — bodies on demand
+  Agent (rules/agent/),20,Per-agent type
   Workflow (rules/workflow/),30,Per-phase
 ```
 
