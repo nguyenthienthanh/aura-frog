@@ -22,8 +22,29 @@
 
 const { execSync, spawnSync } = require('child_process');
 const { readStdinSafely } = require('./lib/safe-stdin.cjs');
+const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { acquireRunLock } = require('./lib/af-run-lock.cjs');
+const { TIMEOUT_QUICK_MS, warnExecLimit } = require('./lib/af-exec.cjs');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+// This hook fires on EVERY Write|Edit. A .ts file maps to two linters, each of
+// which used to get 30s — up to a minute of work per keystroke-sized edit, with
+// nothing stopping N concurrent Writes from stacking N eslint processes.
+// Three bounds now apply, in order of how much work they save:
+//   1. debounce  — content unchanged since the last lint → do nothing at all
+//   2. run lock  — another hook is already linting → back off
+//   3. availability cache — don't re-probe `which`/package.json per linter
+const LINTER_TIMEOUT_MS = 10000;
+
+const CACHE_DIR = () => path.join(findProjectRoot(), '.claude', 'cache');
+const AVAILABILITY_CACHE = () => path.join(CACHE_DIR(), 'lint-availability.json');
+const DEBOUNCE_CACHE = () => path.join(CACHE_DIR(), 'lint-debounce.json');
+const RUN_LOCK = () => path.join(CACHE_DIR(), 'lint-autofix.lock');
+
+// Bound the debounce map so it cannot grow one entry per file touched, forever.
+const DEBOUNCE_MAX_ENTRIES = 200;
 
 // File extension to linter mapping
 const LINTER_MAP = {
@@ -145,10 +166,93 @@ const LINTER_COMMANDS = {
   },
 };
 
+// ============================================
+// AVAILABILITY CACHE
+// ============================================
+
+// Per-process memo — a single Write probes 2+ linters and previously re-read and
+// re-parsed package.json for each one.
+const availabilityMemo = new Map();
+
+function readJsonFile(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf-8'));
+  } catch { return null; }
+}
+
 /**
- * Check if a linter is available in the project
+ * Fingerprint of everything `isLinterAvailable` looks at: the manifests it
+ * parses plus every config file it probes for. Same idiom as
+ * af-project-cache.calculateKeyFilesHash — mtime+size, not content.
+ */
+function computeProbeHash(cwd = process.cwd()) {
+  const watched = new Set(['package.json', 'composer.json']);
+  for (const cfg of Object.values(LINTER_COMMANDS)) {
+    for (const f of cfg.configFiles) watched.add(f);
+  }
+  const parts = [];
+  for (const file of [...watched].sort()) {
+    try {
+      const st = fs.statSync(path.join(cwd, file));
+      parts.push(`${file}:${st.mtimeMs}:${st.size}`);
+    } catch { /* absent — absence itself is part of the fingerprint */ }
+  }
+  return crypto.createHash('md5').update(parts.join('|')).digest('hex').substring(0, 16);
+}
+
+function loadAvailabilityCache(cwd = process.cwd()) {
+  const cache = readJsonFile(AVAILABILITY_CACHE());
+  if (!cache || cache.cwd !== cwd) return null;
+  if (cache.probeHash !== computeProbeHash(cwd)) return null;
+  return cache.linters && typeof cache.linters === 'object' ? cache.linters : null;
+}
+
+function saveAvailabilityCache(linters, cwd = process.cwd()) {
+  try {
+    fs.mkdirSync(CACHE_DIR(), { recursive: true });
+    fs.writeFileSync(AVAILABILITY_CACHE(), JSON.stringify({
+      cwd,
+      probeHash: computeProbeHash(cwd),
+      linters
+    }, null, 2));
+  } catch { /* fs/cache write - non-blocking, probe just re-runs next time */ }
+}
+
+/** Drop both memo layers. Test seam. */
+function resetAvailabilityCache() {
+  availabilityMemo.clear();
+  try { fs.unlinkSync(AVAILABILITY_CACHE()); } catch { /* not there */ }
+}
+
+/**
+ * Check if a linter is available in the project.
+ *
+ * Cached at two levels (process memo → on-disk, keyed by cwd + a mtime/size
+ * fingerprint of every manifest and config file the probe consults). The
+ * uncached path below is the expensive one: JSON parse per call, and for system
+ * tools a `which` subprocess run up to 7x per Write.
  */
 function isLinterAvailable(linter) {
+  const cwd = process.cwd();
+  const memoKey = `${cwd}::${linter}`;
+  if (availabilityMemo.has(memoKey)) return availabilityMemo.get(memoKey);
+
+  const disk = loadAvailabilityCache(cwd);
+  if (disk && Object.prototype.hasOwnProperty.call(disk, linter)) {
+    availabilityMemo.set(memoKey, disk[linter]);
+    return disk[linter];
+  }
+
+  const result = probeLinterAvailable(linter);
+  availabilityMemo.set(memoKey, result);
+  saveAvailabilityCache({ ...(disk || {}), [linter]: result }, cwd);
+  return result;
+}
+
+/**
+ * Uncached availability probe (the original implementation).
+ */
+function probeLinterAvailable(linter) {
   const config = LINTER_COMMANDS[linter];
   if (!config) return false;
 
@@ -188,9 +292,14 @@ function isLinterAvailable(linter) {
   // For system tools, check if command exists
   if (['gofmt', 'goimports', 'rubocop', 'rustfmt', 'dart-format', 'ruff', 'black'].includes(linter)) {
     try {
-      execSync(`which ${linter.replace('-format', ' format').split(' ')[0]}`, { stdio: 'ignore' });
+      execSync(`which ${linter.replace('-format', ' format').split(' ')[0]}`, {
+        stdio: 'ignore',
+        timeout: TIMEOUT_QUICK_MS,
+        killSignal: 'SIGKILL'
+      });
       return true;
-    } catch {
+    } catch (e) {
+      warnExecLimit(`which ${linter}`, e);
       return false;
     }
   }
@@ -248,7 +357,10 @@ function runLinter(linter, filePath) {
 
     const result = spawnSync(cmd, args, {
       cwd: process.cwd(),
-      timeout: 30000,
+      // 30s was the old value: two linters on one .ts file meant a Write could
+      // block for a minute. A single-file fix that needs >10s is pathological.
+      timeout: LINTER_TIMEOUT_MS,
+      killSignal: 'SIGKILL',
       encoding: 'utf-8',
       env,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -279,6 +391,64 @@ function getAvailableLinters(filePath) {
   const potentialLinters = LINTER_MAP[ext] || [];
 
   return potentialLinters.filter(linter => isLinterAvailable(linter));
+}
+
+// ============================================
+// DEBOUNCE
+// ============================================
+
+function hashFileContent(filePath) {
+  try {
+    return crypto.createHash('md5').update(fs.readFileSync(filePath)).digest('hex');
+  } catch { return null; }
+}
+
+function loadDebounceCache() {
+  const data = readJsonFile(DEBOUNCE_CACHE());
+  return data && typeof data.files === 'object' && data.files ? data.files : {};
+}
+
+/**
+ * Cap the debounce map. Most-RECENT entries win: an old file's hash is worth
+ * nothing (it will be re-linted once, harmlessly) while the files being edited
+ * right now are exactly the ones a burst of Writes hammers.
+ */
+function trimDebounceEntries(files, max = DEBOUNCE_MAX_ENTRIES) {
+  const keys = Object.keys(files);
+  if (keys.length <= max) return files;
+  const kept = keys
+    .sort((a, b) => (files[b]?.ts || 0) - (files[a]?.ts || 0))
+    .slice(0, max);
+  const out = {};
+  for (const k of kept) out[k] = files[k];
+  return out;
+}
+
+function saveDebounceCache(files) {
+  try {
+    fs.mkdirSync(CACHE_DIR(), { recursive: true });
+    fs.writeFileSync(DEBOUNCE_CACHE(), JSON.stringify({ files: trimDebounceEntries(files) }, null, 2));
+  } catch { /* fs/cache write - non-blocking, worst case is one redundant lint */ }
+}
+
+/**
+ * True when the file's content is byte-identical to what was linted last time.
+ * Re-running a formatter over its own output is pure waste — and a Write that
+ * rewrites a file with unchanged content is common (agents re-emit whole files).
+ */
+function isDebounced(filePath, files = loadDebounceCache()) {
+  const hash = hashFileContent(filePath);
+  if (!hash) return false;
+  return files[filePath]?.hash === hash;
+}
+
+/** Record the POST-lint content, since the fixer may have rewritten the file. */
+function recordLinted(filePath, files = loadDebounceCache()) {
+  const hash = hashFileContent(filePath);
+  if (!hash) return files;
+  files[filePath] = { hash, ts: Date.now() };
+  saveDebounceCache(files);
+  return files;
 }
 
 /**
@@ -335,6 +505,11 @@ async function main() {
       process.exit(0);
     }
 
+    // Debounce: unchanged content since the last lint → nothing to do.
+    if (isDebounced(filePath)) {
+      process.exit(0);
+    }
+
     // Get available linters
     const linters = getAvailableLinters(filePath);
 
@@ -342,13 +517,25 @@ async function main() {
       process.exit(0);
     }
 
+    // Single-flight: a burst of concurrent Writes must not stack linter
+    // processes. Losers back off — the winner is doing the same work.
+    const release = acquireRunLock(RUN_LOCK());
+    if (!release) {
+      process.exit(0);
+    }
+
     // Run linters
     const results = [];
-    for (const linter of linters) {
-      const result = runLinter(linter, filePath);
-      if (!result.skipped) {
-        results.push(result);
+    try {
+      for (const linter of linters) {
+        const result = runLinter(linter, filePath);
+        if (!result.skipped) {
+          results.push(result);
+        }
       }
+      recordLinted(filePath);
+    } finally {
+      release();
     }
 
     // Report results
@@ -373,7 +560,20 @@ async function main() {
   }
 }
 
-module.exports = { getAvailableLinters, isLinterAvailable, runLinter, extractFilePath };
+module.exports = {
+  getAvailableLinters,
+  isLinterAvailable,
+  probeLinterAvailable,
+  resetAvailabilityCache,
+  computeProbeHash,
+  runLinter,
+  extractFilePath,
+  isDebounced,
+  recordLinted,
+  trimDebounceEntries,
+  LINTER_TIMEOUT_MS,
+  DEBOUNCE_MAX_ENTRIES,
+};
 
 if (require.main === module) {
   main();

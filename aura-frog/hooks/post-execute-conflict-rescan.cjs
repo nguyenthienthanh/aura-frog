@@ -27,6 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { TIMEOUT_SLOW_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
 
 const PLANS_DIR = resolvePlansDir();
@@ -117,10 +118,18 @@ function checkCompatibility(plansDir, blockerTask, plannedFiles) {
     if (checkpoints.length === 0) return null;
     const cp = JSON.parse(fs.readFileSync(path.join(checkpointsDir, checkpoints[0]), 'utf8'));
     if (!cp.git_sha) return null;
-    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, { encoding: 'utf8' }).trim();
+    // A stale checkpoint sha can span thousands of commits, so this diff is the
+    // largest git output any hook asks for — slow tier + large buffer.
+    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, {
+      encoding: 'utf8',
+      timeout: TIMEOUT_SLOW_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_LARGE
+    }).trim();
     const changed = diff.split('\n').filter(Boolean);
     return !changed.some(f => plannedFiles.includes(f));
-  } catch {
+  } catch (e) {
+    warnExecLimit('conflict-rescan git diff', e);
     return null;
   }
 }

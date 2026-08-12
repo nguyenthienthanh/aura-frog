@@ -361,14 +361,21 @@ async function scanWorkflowFiles() {
  * command — the path is a single, literal argument to `git show`.
  */
 function gitShowHead(relPath, cwd = process.cwd()) {
+  const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
   try {
     const { execFileSync } = require('child_process');
+    // Buffers a whole committed file — a checked-in bundle or lockfile can be
+    // tens of MB, well past Node's 1MB default.
     return execFileSync('git', ['show', `HEAD:${relPath}`], {
       cwd,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'ignore'],
+      timeout: TIMEOUT_DEFAULT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_LARGE,
     });
-  } catch {
+  } catch (e) {
+    warnExecLimit(`git show HEAD:${relPath}`, e);
     return '';
   }
 }

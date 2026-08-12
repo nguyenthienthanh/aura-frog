@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
+const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_DEFAULT, warnExecLimit } = require('./af-exec.cjs');
 
 // Config paths
 const LOCAL_CONFIG_PATH = '.claude/.af.json';
@@ -99,12 +100,27 @@ function loadConfig() {
 }
 
 /**
- * Safely execute shell command
+ * Safely execute shell command.
+ *
+ * This is the generic escape hatch — callers pass arbitrary commands (version
+ * probes, git queries), so the bounds live HERE rather than at each call site.
+ * Every caller inherits a timeout and a maxBuffer; `opts` can raise them for a
+ * command known to be slower or chattier. A hit limit is warned about on stderr
+ * before falling open to null, so "no data" is never silently indistinguishable
+ * from "command hung".
  */
-function execSafe(cmd) {
+function execSafe(cmd, opts = {}) {
   try {
-    return execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+    return execSync(cmd, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: TIMEOUT_DEFAULT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_DEFAULT,
+      ...opts
+    }).trim();
   } catch (e) {
+    warnExecLimit(`execSafe(${String(cmd).split(' ')[0]})`, e);
     return null;
   }
 }
