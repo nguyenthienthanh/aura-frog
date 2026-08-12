@@ -48,6 +48,17 @@ const SMART_LEARN_CACHE = path.join(CACHE_DIR, 'smart-learn-cache.json');
 const SUCCESS_THRESHOLD = 3; // Number of successes before creating pattern
 const CACHE_MAX_SIZE = 200;
 
+// Caps for the keyed maps. Only `successfulActions` was bounded; the three maps
+// beside it grew a key per distinct extension / pattern / command base — and
+// `bashPatterns` grows with command diversity, which is unbounded in practice.
+//
+// Eviction keeps the highest counts: count is what drives SUCCESS_THRESHOLD, so
+// a high-count key is one prompt away from becoming a learned pattern while a
+// count-1 key is a one-off. Entries whose count was just reset to 0 after being
+// promoted lose first, which is correct — their pattern is already recorded.
+const MAP_MAX_KEYS = 100;
+const SUB_PATTERN_MAX_KEYS = 50;
+
 /**
  * Ensure cache directory exists
  */
@@ -77,13 +88,47 @@ function loadCache() {
 }
 
 /**
+ * Cap a `{key → entry}` map, keeping the highest-scoring entries.
+ * `scoreOf` reads the entry's count; ties break on `lastSuccess` (newer wins).
+ */
+function trimKeyedMap(map, max, scoreOf = (v) => (v && v.count) || 0) {
+  const src = map && typeof map === 'object' ? map : {};
+  const keys = Object.keys(src);
+  if (keys.length <= max) return src;
+  const kept = keys
+    .sort((a, b) =>
+      (scoreOf(src[b]) - scoreOf(src[a])) ||
+      ((src[b]?.lastSuccess || 0) - (src[a]?.lastSuccess || 0))
+    )
+    .slice(0, max);
+  const out = {};
+  for (const k of kept) out[k] = src[k];
+  return out;
+}
+
+/**
+ * Apply every cap. Called on save so no write path can bypass it.
+ */
+function trimCache(cache) {
+  cache.successfulActions = (cache.successfulActions || []).slice(-CACHE_MAX_SIZE);
+  cache.filePatterns = trimKeyedMap(cache.filePatterns, MAP_MAX_KEYS, (v) => (v && v.successCount) || 0);
+  for (const ext of Object.keys(cache.filePatterns)) {
+    if (cache.filePatterns[ext] && cache.filePatterns[ext].patterns) {
+      cache.filePatterns[ext].patterns = trimKeyedMap(cache.filePatterns[ext].patterns, SUB_PATTERN_MAX_KEYS);
+    }
+  }
+  cache.codePatterns = trimKeyedMap(cache.codePatterns, MAP_MAX_KEYS);
+  cache.bashPatterns = trimKeyedMap(cache.bashPatterns, MAP_MAX_KEYS);
+  return cache;
+}
+
+/**
  * Save smart learn cache
  */
 function saveCache(cache) {
   try {
     ensureCacheDir();
-    // Trim successful actions
-    cache.successfulActions = (cache.successfulActions || []).slice(-CACHE_MAX_SIZE);
+    trimCache(cache);
     fs.writeFileSync(SMART_LEARN_CACHE, JSON.stringify(cache, null, 2));
   } catch { /* fs/cache write - non-blocking, will retry next time */ }
 }
@@ -347,7 +392,17 @@ async function main() {
   process.exit(0);
 }
 
-module.exports = { detectCodePatterns, extractBashPattern, recordSuccess, resolveToolContext, run };
+module.exports = {
+  detectCodePatterns,
+  extractBashPattern,
+  recordSuccess,
+  resolveToolContext,
+  run,
+  trimKeyedMap,
+  trimCache,
+  MAP_MAX_KEYS,
+  SUB_PATTERN_MAX_KEYS,
+};
 
 if (require.main === module) {
   main();

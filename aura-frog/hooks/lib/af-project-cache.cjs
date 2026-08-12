@@ -28,6 +28,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
+const { TIMEOUT_QUICK_MS, MAX_BUFFER_DEFAULT, warnExecLimit } = require('./af-exec.cjs');
 
 // Project contexts directory (persistent project data)
 const PROJECT_CONTEXTS_DIR = '.claude/project-contexts';
@@ -185,14 +186,21 @@ function calculateKeyFilesHash() {
  */
 function getGitHead(dir = '.') {
   try {
+    // Output is 41 bytes, so maxBuffer is not the concern — a git that hangs
+    // (network-backed filesystem, lock contention) is, and this runs on every
+    // cache-validity check.
     const out = execFileSync('git', ['rev-parse', 'HEAD'], {
       cwd: dir,
       stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf8'
+      encoding: 'utf8',
+      timeout: TIMEOUT_QUICK_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_DEFAULT
     });
     const sha = out.trim();
     return /^[0-9a-f]{40}$/.test(sha) ? sha : null;
-  } catch (_) {
+  } catch (e) {
+    warnExecLimit('git rev-parse HEAD', e);
     return null;
   }
 }

@@ -36,6 +36,16 @@ const DEDUP_WINDOW_MS = 24 * 60 * 60 * 1000;
 // Pattern threshold (corrections needed to auto-create pattern)
 const PATTERN_THRESHOLD = 3;
 
+// Caps. Both of these were unbounded: one new entry per distinct
+// `category:rule` pair, forever, in a file that is fully read + fully rewritten
+// on every learnable prompt.
+//
+// Eviction keeps the HIGHEST occurrence counts because occurrence count IS the
+// signal this feature exists to surface — a rule seen 40 times is a real user
+// preference, a rule seen once is noise. Ties break toward the newer entry.
+const MAX_PATTERN_BLOCKS = 50;   // rules kept in learned-patterns.md
+const MAX_PATTERN_COUNTS = 200;  // keys kept in cache.patterns
+
 // Correction detection patterns
 const CORRECTION_PATTERNS = [
   /^no[,.\s!]/i,
@@ -171,8 +181,25 @@ function saveCache(cache) {
     ensureCacheDir();
     // Keep only last 100 entries
     cache.entries = (cache.entries || []).slice(-100);
+    // `patterns` was uncapped even though `entries` next to it was capped.
+    cache.patterns = trimPatternCounts(cache.patterns);
     fs.writeFileSync(FEEDBACK_CACHE_FILE, JSON.stringify(cache, null, 2));
   } catch { /* fs/cache write - non-blocking, will retry next time */ }
+}
+
+/**
+ * Cap the `{category:rule → count}` map, keeping the highest counts.
+ * Dropping a low-count key at worst restarts its climb toward
+ * PATTERN_THRESHOLD; dropping a high-count key would erase a confirmed rule.
+ */
+function trimPatternCounts(patterns, max = MAX_PATTERN_COUNTS) {
+  const src = patterns && typeof patterns === 'object' ? patterns : {};
+  const keys = Object.keys(src);
+  if (keys.length <= max) return src;
+  const kept = keys.sort((a, b) => (src[b] || 0) - (src[a] || 0)).slice(0, max);
+  const out = {};
+  for (const k of kept) out[k] = src[k];
+  return out;
 }
 
 /**
@@ -209,6 +236,39 @@ function incrementPatternCount(cache, category, rule) {
 }
 
 /**
+ * Cap the number of `<!-- PATTERN:... -->` blocks in learned-patterns.md.
+ *
+ * Survivors are the highest-**Occurrences** blocks (ties → the later/newer one),
+ * rendered back in their original file order so the file stays diff-stable. The
+ * header above the first marker is always preserved.
+ */
+function capPatternBlocks(content, max = MAX_PATTERN_BLOCKS) {
+  const text = String(content || '');
+  const markerRe = /<!-- PATTERN:[\s\S]*?-->/g;
+  const starts = [];
+  let m;
+  while ((m = markerRe.exec(text)) !== null) starts.push(m.index);
+  if (starts.length <= max) return text;
+
+  const header = text.slice(0, starts[0]);
+  const blocks = starts.map((start, i) => {
+    const body = text.slice(start, i + 1 < starts.length ? starts[i + 1] : text.length);
+    const occ = body.match(/\*\*Occurrences:\*\*\s*(\d+)/);
+    return { index: i, body, occurrences: occ ? parseInt(occ[1], 10) : 0 };
+  });
+
+  const keep = new Set(
+    blocks
+      .slice()
+      .sort((a, b) => (b.occurrences - a.occurrences) || (b.index - a.index))
+      .slice(0, max)
+      .map(b => b.index)
+  );
+
+  return header + blocks.filter(b => keep.has(b.index)).map(b => b.body).join('');
+}
+
+/**
  * Update local patterns file
  */
 function updateLocalPatternsFile(category, rule, reason, count) {
@@ -235,6 +295,11 @@ function updateLocalPatternsFile(category, rule, reason, count) {
 
     // Update timestamp
     content = content.replace(/Updated: .+/, `Updated: ${new Date().toISOString()}`);
+
+    // Bound the file. Without this it grows one ~200-char block per distinct
+    // category:rule pair forever — and the whole file is read, regexed and
+    // rewritten on every learnable prompt.
+    content = capPatternBlocks(content, MAX_PATTERN_BLOCKS);
 
     fs.writeFileSync(PATTERNS_FILE, content);
   } catch { /* fs/cache write - non-blocking, patterns regenerate from corrections */ }
@@ -567,7 +632,17 @@ async function main() {
   }
 }
 
-module.exports = { analyzeInput, categorizeCorrection, isLearnableFeedback, generateHash, loadCache };
+module.exports = {
+  analyzeInput,
+  categorizeCorrection,
+  isLearnableFeedback,
+  generateHash,
+  loadCache,
+  trimPatternCounts,
+  capPatternBlocks,
+  MAX_PATTERN_BLOCKS,
+  MAX_PATTERN_COUNTS,
+};
 
 if (require.main === module) {
   main();

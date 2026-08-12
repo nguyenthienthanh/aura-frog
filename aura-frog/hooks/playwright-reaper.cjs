@@ -29,6 +29,7 @@
 'use strict';
 
 const { execSync } = require('child_process');
+const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
 
 // Matches ONLY playwright-launched processes: the temp profile a playwright
 // Chrome runs under, the bundled ms-playwright browser path, or the MCP server.
@@ -55,8 +56,21 @@ function selectOrphans(procs, { selfPid } = {}) {
 }
 
 function listProcs() {
-  try { return parsePsLines(execSync('ps -Ao pid,ppid,command', { encoding: 'utf8' })); }
-  catch { return []; }
+  // The full process table with argv is big — a couple of Chrome instances
+  // alone carry kilobytes of flags each, so Node's 1MB default maxBuffer is a
+  // real risk. Overflow used to look identical to "no orphans found", silently
+  // disabling the reaper on exactly the busy machines that need it.
+  try {
+    return parsePsLines(execSync('ps -Ao pid,ppid,command', {
+      encoding: 'utf8',
+      timeout: TIMEOUT_DEFAULT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_LARGE
+    }));
+  } catch (e) {
+    warnExecLimit('playwright-reaper ps', e);
+    return [];
+  }
 }
 
 function reap(pids) {
