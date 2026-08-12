@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 # Pop the next ready T4 task and mark it active.
 #
-# Algorithm (per Tech Spec §6.2):
-#   1. Read active.json.
-#   2. If ready_queue non-empty → pop first.
-#   3. Else: walk active.story → collect T4 children with status=planned AND all
-#      depends_on satisfied (each dep status ∈ done|active). Refill ready_queue.
-#      Pop first.
-#   4. Mutate task: status=active, started_at=now, revision+=1.
-#   5. Update active.json: active.task=ID, ready_queue=tail.
-#   6. Append history.jsonl event=task_dispatch.
+# Algorithm:
+#   1. Read active.json → active.story.
+#   2. Walk the story's tasks/ — collect T4 children with status=planned AND
+#      all depends_on satisfied (each dep status ∈ done|active). Pick first.
+#      (No ready_queue: candidates are rescanned from task files each call.)
+#   3. Under the dispatch lock: re-check status=planned, save checkpoint, then
+#      mutate task: status=active, started_at=now, revision+=1.
+#   4. Update active.json: active.task=ID.
+#   5. Append history.jsonl {"verb":"next",...}.
+#
+# Concurrency: the claim-and-write section runs under
+# with_lock "${PLANS_DIR}/.dispatch.lock" so two concurrent sessions cannot
+# both activate the same task — the loser re-checks the status inside the
+# critical section and exits 2.
 #
 # Usage:
 #   next-task.sh [--plans-dir <path>] [--dry-run]
 #
 # Exit codes:
 #   0 success — prints "TASK-NNNNN\t<file_path>"
-#   2 no story active OR no ready task
+#   1 could not acquire dispatch lock
+#   2 no story active OR no ready task OR lost dispatch race
 #   4 validation failed
 #   5 bad input
 
@@ -100,29 +106,46 @@ if [ "$DRY_RUN" = "1" ]; then
     exit 0
 fi
 
-# Save checkpoint, mutate, validate.
-VIOLATIONS_BEFORE=$(tree_violation_count "$PLANS_DIR")
-CKPT=$(save_checkpoint "$PLANS_DIR" "$PICK_ID" "$PICK_FILE")
-NOW=$(now_utc)
-set_field "$PICK_FILE" "status" "active"
-set_field "$PICK_FILE" "started_at" "$NOW"
-NEW_REV=$(bump_revision "$PICK_FILE")
-
-# Detect regression. Roll back the task file if violations increased. active.task
-# is set ONLY after the check passes (below), so a rollback never leaves
-# active.json pointing at a task that was just reverted to `planned`.
-if ! require_no_regression "$PLANS_DIR" "$VIOLATIONS_BEFORE"; then
-    if [ -s "$CKPT" ]; then
-        body=$(grep -oE '"node_state_before_b64":[[:space:]]*"[^"]*"' "$CKPT" | sed 's/.*"\([^"]*\)"$/\1/')
-        echo "$body" | base64 -d > "$PICK_FILE"
+# Claim-and-write critical section. Runs under with_lock (below) so two
+# concurrent sessions cannot both dispatch the same task: the candidate scan
+# above is unlocked, so the status is re-checked here before mutating.
+claim_and_dispatch() {
+    local status
+    status=$(get_field "$PICK_FILE" "status")
+    if [ "$status" != "planned" ]; then
+        echo "lost dispatch race — ${PICK_ID} is no longer planned (status=${status})" >&2
+        return 2
     fi
-    echo "restored ${PICK_ID}" >&2
-    exit 4
-fi
 
-set_active_field "$PLANS_DIR" "task" "$PICK_ID"
+    # Save checkpoint, mutate, validate.
+    local violations_before ckpt now new_rev
+    violations_before=$(tree_violation_count "$PLANS_DIR")
+    ckpt=$(save_checkpoint "$PLANS_DIR" "$PICK_ID" "$PICK_FILE")
+    now=$(now_utc)
+    set_field "$PICK_FILE" "status" "active"
+    set_field "$PICK_FILE" "started_at" "$now"
+    new_rev=$(bump_revision "$PICK_FILE")
 
-EVENT="{\"ts\":\"${NOW}\",\"verb\":\"next\",\"target\":\"${PICK_ID}\",\"story\":\"${ACTIVE_STORY}\",\"checkpoint\":\"${CKPT}\",\"revision\":${NEW_REV}}"
-append_history "$PLANS_DIR" "$EVENT"
+    # Detect regression. Roll back the task file if violations increased. active.task
+    # is set ONLY after the check passes (below), so a rollback never leaves
+    # active.json pointing at a task that was just reverted to `planned`.
+    if ! require_no_regression "$PLANS_DIR" "$violations_before"; then
+        if [ -s "$ckpt" ]; then
+            local body
+            body=$(grep -oE '"node_state_before_b64":[[:space:]]*"[^"]*"' "$ckpt" | sed 's/.*"\([^"]*\)"$/\1/')
+            echo "$body" | base64 -d > "$PICK_FILE"
+        fi
+        echo "restored ${PICK_ID}" >&2
+        return 4
+    fi
 
-printf '%s\t%s\n' "$PICK_ID" "$PICK_FILE"
+    set_active_field "$PLANS_DIR" "task" "$PICK_ID"
+
+    local event="{\"ts\":\"${now}\",\"verb\":\"next\",\"target\":\"${PICK_ID}\",\"story\":\"${ACTIVE_STORY}\",\"checkpoint\":\"${ckpt}\",\"revision\":${new_rev}}"
+    append_history "$PLANS_DIR" "$event"
+
+    printf '%s\t%s\n' "$PICK_ID" "$PICK_FILE"
+    return 0
+}
+
+with_lock "${PLANS_DIR}/.dispatch.lock" claim_and_dispatch || exit $?

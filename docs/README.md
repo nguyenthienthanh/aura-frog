@@ -73,7 +73,7 @@ If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-dr
 
 ## Operations
 
-- [MCP Guide](operations/MCP_GUIDE.md) — 6 bundled MCP servers, setup, and creating your own
+- [MCP Guide](operations/MCP_GUIDE.md) — 6 bundled MCP servers, opt-in snippets, and creating your own
 - [Troubleshooting](operations/TROUBLESHOOTING.md) — Common issues and fixes
 - [Security & Trust](operations/SECURITY_AND_TRUST.md) — Security model and trust policies
 - [Learning System](operations/LEARNING_SYSTEM.md) — Self-improving patterns (local + Supabase)
@@ -101,9 +101,9 @@ If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-dr
 These live in `aura-frog/` and are optimized for Claude to read:
 
 - [Agents](../aura-frog/agents/README.md) — 15 agents with capabilities
-- [Skills](../aura-frog/skills/README.md) — 59 skills (9 auto-invoke + 50 on-demand)
+- [Skills](../aura-frog/skills/README.md) — 60 skills (9 auto-invoke + 51 on-demand)
 - [Commands](../aura-frog/commands/README.md) — 24 commands (core `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite)
-- [Rules](../aura-frog/rules/README.md) — 71 rules (3-tier loading: 22 core / 19 agent / 30 workflow)
-- [Hooks](../aura-frog/hooks/README.md) — 48 lifecycle hooks
+- [Rules](../aura-frog/rules/README.md) — 72 rules (3-tier loading: 22 core / 20 agent / 30 workflow)
+- [Hooks](../aura-frog/hooks/README.md) — 51 lifecycle hooks
 - [Templates](../aura-frog/templates/README.md) — 20 document templates (incl. phase deliverable skeletons)
 - [Scripts](../aura-frog/scripts/README.md) — Utility scripts

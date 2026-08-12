@@ -38,9 +38,9 @@ Aura Frog frames Claude Code as an **Operating System** for software engineering
 │  master-planner │ feature-architect │ story-planner │
 │  replanner │ epic-summarizer │ conflict-arbiter     │
 ├─────────────────────────────────────────────────────┤
-│       DEVICE DRIVERS (8 MCP Servers · 6 + 2)        │
+│      DEVICE DRIVERS (6 MCP Servers · all on)        │
 │  context7 │ playwright │ vitest │ firebase │ figma  │
-│  slack │ postgres* │ redis*    (* opt-in)           │
+│  slack                                              │
 ├─────────────────────────────────────────────────────┤
 │              FILESYSTEM (Project Files)             │
 │  Read on demand via retrieval hierarchy             │
@@ -59,7 +59,7 @@ Aura Frog frames Claude Code as an **Operating System** for software engineering
 | **Process Scheduler** | 5-phase TDD workflow + plan-tree DAG | Priority-based phase progression + dependency-aware T4 scheduling |
 | **Interrupts** | Approval gates (Phase 1 & 3) | Human-in-the-loop checkpoints |
 | **IPC** | Handoff state / TOON snapshots / `run-state.json` ↔ feature `## Runs` link | Agent-to-agent data passing |
-| **Device Drivers** | 8 MCP servers (6 enabled + 2 opt-in) | Standardized external interfaces, per-agent allowlist |
+| **Device Drivers** | 6 MCP servers (all enabled) | Standardized external interfaces, per-agent allowlist |
 | **Filesystem** | Project files on disk | Read on demand, not preloaded |
 | **Compression Codec** | TOON format | Minimize memory footprint |
 | **Context Switch** | Agent swap protocol | Save state → evict → load new → inject |

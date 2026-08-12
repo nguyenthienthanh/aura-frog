@@ -1,0 +1,276 @@
+/**
+ * session-start — retention sweep coverage for the unbounded-growth targets.
+ *
+ * Before this, sweepRetention() pruned only mcp-audit.jsonl, the LEGACY
+ * plans/traces/ dir, and metrics/sessions. Three stores grew forever:
+ *   - .claude/plans/history.jsonl + conflicts.jsonl (six hooks append, none prune)
+ *   - co-located {taskFolder}/trace.jsonl (v3.7.3+ tracer default)
+ *   - .claude/logs/runs/<id>/ (one dir per workflow)
+ */
+
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+const {
+  sweepRetention,
+  findCoLocatedTraces,
+  pruneStaleRunDirs,
+  pruneJsonlByTimestamp,
+} = require('../../aura-frog/hooks/session-start.cjs');
+
+const DAY = 24 * 3600 * 1000;
+const OLD_TS = new Date(Date.now() - 60 * DAY).toISOString();
+const NEW_TS = new Date().toISOString();
+
+let root;
+const savedEnv = {};
+
+const mk = (...parts) => {
+  const p = path.join(root, ...parts);
+  fs.mkdirSync(p, { recursive: true });
+  return p;
+};
+
+// Backdate mtime so the "recently written" fast path doesn't skip the prune.
+const backdate = (p, days = 60) => {
+  const t = new Date(Date.now() - days * DAY);
+  fs.utimesSync(p, t, t);
+};
+
+const writeJsonl = (file, lines, { age = 60 } = {}) => {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, lines.join('\n') + '\n');
+  backdate(file, age);
+  return file;
+};
+
+const readLines = (p) =>
+  fs.existsSync(p) ? fs.readFileSync(p, 'utf8').trim().split('\n').filter(Boolean) : null;
+
+beforeEach(() => {
+  root = fs.mkdtempSync(path.join(os.tmpdir(), 'af-sweep-'));
+  for (const k of ['AF_PROJECT_ROOT', 'AF_PLANS_DIR', 'AF_AUDIT_RETENTION_DAYS']) savedEnv[k] = process.env[k];
+  process.env.AF_PROJECT_ROOT = root;
+  process.env.AF_PLANS_DIR = path.join(root, '.claude', 'plans');
+  delete process.env.AF_AUDIT_RETENTION_DAYS; // exercise the 30-day default
+});
+
+afterEach(() => {
+  for (const [k, v] of Object.entries(savedEnv)) {
+    if (v === undefined) delete process.env[k]; else process.env[k] = v;
+  }
+  try { fs.rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ }
+});
+
+describe('sweepRetention — plan history + conflicts', () => {
+  it('prunes expired entries from history.jsonl and conflicts.jsonl', () => {
+    const history = writeJsonl(path.join(root, '.claude', 'plans', 'history.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, event: 'execution_completed', node: 'T-old' }),
+      JSON.stringify({ ts: NEW_TS, event: 'execution_completed', node: 'T-new' }),
+    ]);
+    const conflicts = writeJsonl(path.join(root, '.claude', 'plans', 'conflicts.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, conflict_id: 'C-old' }),
+      JSON.stringify({ ts: NEW_TS, conflict_id: 'C-new' }),
+    ]);
+
+    sweepRetention();
+
+    expect(readLines(history)).toEqual([JSON.stringify({ ts: NEW_TS, event: 'execution_completed', node: 'T-new' })]);
+    expect(readLines(conflicts)).toEqual([JSON.stringify({ ts: NEW_TS, conflict_id: 'C-new' })]);
+  });
+
+  it('removes history.jsonl entirely when every entry has expired', () => {
+    const history = writeJsonl(path.join(root, '.claude', 'plans', 'history.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, event: 'a' }),
+      JSON.stringify({ ts: OLD_TS, event: 'b' }),
+    ]);
+    sweepRetention();
+    expect(fs.existsSync(history)).toBe(false);
+  });
+
+  it('keeps everything when AF_AUDIT_RETENTION_DAYS=0', () => {
+    process.env.AF_AUDIT_RETENTION_DAYS = '0';
+    const history = writeJsonl(path.join(root, '.claude', 'plans', 'history.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, event: 'a' }),
+    ]);
+    sweepRetention();
+    expect(readLines(history)).toHaveLength(1);
+  });
+
+  it('honours a custom AF_AUDIT_RETENTION_DAYS window', () => {
+    process.env.AF_AUDIT_RETENTION_DAYS = '90';
+    const history = writeJsonl(path.join(root, '.claude', 'plans', 'history.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, event: 'a' }), // 60 days old — inside a 90-day window
+    ]);
+    sweepRetention();
+    expect(readLines(history)).toHaveLength(1);
+  });
+
+  it('is a silent no-op when no plan store exists', () => {
+    expect(() => sweepRetention()).not.toThrow();
+  });
+});
+
+describe('sweepRetention — co-located trace.jsonl', () => {
+  const taskTrace = () =>
+    path.join(root, '.claude', 'plans', 'features', 'FEAT-001', 'stories', 'STORY-01', 'tasks', 'TASK-1', 'trace.jsonl');
+
+  it('finds and prunes traces nested inside the feature tree', () => {
+    const trace = writeJsonl(taskTrace(), [
+      JSON.stringify({ ts: OLD_TS, event: 'tool_call' }),
+      JSON.stringify({ ts: NEW_TS, event: 'tool_call' }),
+    ]);
+
+    sweepRetention();
+
+    expect(readLines(trace)).toEqual([JSON.stringify({ ts: NEW_TS, event: 'tool_call' })]);
+  });
+
+  it('still prunes the legacy traces/ dir', () => {
+    const legacy = writeJsonl(path.join(root, '.claude', 'plans', 'traces', 'TASK-9.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, event: 'tool_call' }),
+    ]);
+    sweepRetention();
+    expect(fs.existsSync(legacy)).toBe(false);
+  });
+});
+
+describe('findCoLocatedTraces', () => {
+  it('returns [] for a missing root', () => {
+    expect(findCoLocatedTraces(path.join(root, 'nope'))).toEqual([]);
+  });
+
+  it('picks up only files named trace.jsonl', () => {
+    const dir = mk('features', 'FEAT-001', 'tasks', 'T1');
+    fs.writeFileSync(path.join(dir, 'trace.jsonl'), '');
+    fs.writeFileSync(path.join(dir, 'notes.jsonl'), '');
+    fs.writeFileSync(path.join(dir, '.trace.count'), '1');
+
+    const found = findCoLocatedTraces(path.join(root, 'features'));
+    expect(found.map(f => path.basename(f))).toEqual(['trace.jsonl']);
+    expect(path.isAbsolute(found[0])).toBe(true);
+  });
+
+  it('respects the depth limit', () => {
+    const deep = mk('features', 'a', 'b', 'c', 'd', 'e', 'f', 'g');
+    fs.writeFileSync(path.join(deep, 'trace.jsonl'), '');
+    expect(findCoLocatedTraces(path.join(root, 'features'), 2)).toEqual([]);
+    expect(findCoLocatedTraces(path.join(root, 'features'), 8)).toHaveLength(1);
+  });
+});
+
+describe('pruneStaleRunDirs', () => {
+  const cutoff = () => Date.now() - 30 * DAY;
+
+  it('removes run dirs older than the cutoff and keeps recent ones', () => {
+    const runs = mk('.claude', 'logs', 'runs');
+    const stale = path.join(runs, 'run-old');
+    const fresh = path.join(runs, 'run-new');
+    fs.mkdirSync(stale); fs.writeFileSync(path.join(stale, 'workflow-state.json'), '{}');
+    fs.mkdirSync(fresh); fs.writeFileSync(path.join(fresh, 'workflow-state.json'), '{}');
+    backdate(stale, 60);
+
+    pruneStaleRunDirs(runs, cutoff());
+
+    expect(fs.existsSync(stale)).toBe(false);
+    expect(fs.existsSync(fresh)).toBe(true);
+  });
+
+  it('never removes the run named by active-workflow.txt', () => {
+    const runs = mk('.claude', 'logs', 'runs');
+    const active = path.join(runs, 'run-active');
+    fs.mkdirSync(active);
+    fs.writeFileSync(path.join(runs, 'active-workflow.txt'), 'run-active\n');
+    backdate(active, 90);
+
+    pruneStaleRunDirs(runs, cutoff());
+
+    expect(fs.existsSync(active)).toBe(true);
+  });
+
+  it('leaves loose files alone', () => {
+    const runs = mk('.claude', 'logs', 'runs');
+    const pointer = path.join(runs, 'active-workflow.txt');
+    fs.writeFileSync(pointer, 'nothing');
+    backdate(pointer, 90);
+
+    pruneStaleRunDirs(runs, cutoff());
+
+    expect(fs.existsSync(pointer)).toBe(true);
+  });
+
+  it('is a silent no-op for a missing runs dir', () => {
+    expect(() => pruneStaleRunDirs(path.join(root, 'nope'), cutoff())).not.toThrow();
+  });
+
+  it('is reached by sweepRetention', () => {
+    const runs = mk('.claude', 'logs', 'runs');
+    const stale = path.join(runs, 'run-ancient');
+    fs.mkdirSync(stale);
+    backdate(stale, 90);
+
+    sweepRetention();
+
+    expect(fs.existsSync(stale)).toBe(false);
+  });
+});
+
+describe('pruneJsonlByTimestamp — streaming rewrite', () => {
+  it('prunes a multi-MB file without loading it whole', () => {
+    // ~4 MB of expired records + one survivor. The old implementation read the
+    // entire file into a string and split it; this asserts the result is still
+    // byte-exact after the chunked rewrite.
+    const file = path.join(root, 'big.jsonl');
+    const pad = 'x'.repeat(4000);
+    const lines = [];
+    for (let i = 0; i < 1000; i++) lines.push(JSON.stringify({ ts: OLD_TS, i, pad }));
+    const survivor = JSON.stringify({ ts: NEW_TS, i: 'keep', pad });
+    lines.push(survivor);
+    writeJsonl(file, lines);
+    expect(fs.statSync(file).size).toBeGreaterThan(3 * 1024 * 1024);
+
+    pruneJsonlByTimestamp(file, Date.now() - 30 * DAY);
+
+    expect(readLines(file)).toEqual([survivor]);
+  });
+
+  it('preserves malformed lines and records with no timestamp', () => {
+    const file = writeJsonl(path.join(root, 'mixed.jsonl'), [
+      'not json at all',
+      JSON.stringify({ no_ts: true }),
+      JSON.stringify({ ts: OLD_TS, drop: true }),
+    ]);
+
+    pruneJsonlByTimestamp(file, Date.now() - 30 * DAY);
+
+    expect(readLines(file)).toEqual(['not json at all', JSON.stringify({ no_ts: true })]);
+  });
+
+  it('handles records split across the chunk boundary intact', () => {
+    // Lines longer than the 64 KB read chunk exercise the carry buffer.
+    const long = 'y'.repeat(200 * 1024);
+    const survivor = JSON.stringify({ ts: NEW_TS, long });
+    const file = writeJsonl(path.join(root, 'long.jsonl'), [
+      JSON.stringify({ ts: OLD_TS, long }),
+      survivor,
+    ]);
+
+    pruneJsonlByTimestamp(file, Date.now() - 30 * DAY);
+
+    expect(readLines(file)).toEqual([survivor]);
+  });
+
+  it('leaves the file byte-identical when nothing expired, and drops no tmp file', () => {
+    const file = writeJsonl(path.join(root, 'fresh.jsonl'), [
+      JSON.stringify({ ts: NEW_TS, a: 1 }),
+      JSON.stringify({ ts: NEW_TS, a: 2 }),
+    ]);
+    const before = fs.readFileSync(file);
+
+    pruneJsonlByTimestamp(file, Date.now() - 30 * DAY);
+
+    expect(fs.readFileSync(file).equals(before)).toBe(true);
+    expect(fs.readdirSync(root).filter(f => f.includes('.tmp-'))).toEqual([]);
+  });
+});

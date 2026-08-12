@@ -8,12 +8,19 @@
  * selection, the recommendation mapping, and the advisory event shape.
  */
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
 const {
   collectRecentDoneTasks,
+  filterActuallyDone,
   foldLatestConflicts,
   findRescanPair,
   recommendationFor,
   buildRescanEvent,
+  latestCheckpointFile,
+  readTaskStatus,
 } = require('../../aura-frog/hooks/post-execute-conflict-rescan.cjs');
 
 const NOW = 1_000_000_000_000; // fixed clock; tests pass now explicitly (no Date.now)
@@ -69,6 +76,76 @@ describe('collectRecentDoneTasks', () => {
     ];
     // T2 collected, 'not json' skipped (continue), T1 still collected.
     expect([...collectRecentDoneTasks(lines, { now: NOW, windowMs: 60000 })].sort()).toEqual(['T1', 'T2']);
+  });
+});
+
+describe('filterActuallyDone', () => {
+  // execution_completed only means "a tool ran" — a task counts as a done
+  // blocker only when its node file's frontmatter status actually reads done.
+  it('keeps only tasks whose resolved status is done', () => {
+    const statuses = { T1: 'done', T2: 'active', T3: null };
+    const done = filterActuallyDone(new Set(['T1', 'T2', 'T3']), (id) => statuses[id]);
+    expect([...done]).toEqual(['T1']);
+  });
+
+  it('is empty when no candidate is done (mid-flight blocker)', () => {
+    expect(filterActuallyDone(new Set(['T1']), () => 'active').size).toBe(0);
+  });
+
+  it('is empty for an empty candidate set', () => {
+    expect(filterActuallyDone(new Set(), () => 'done').size).toBe(0);
+  });
+});
+
+describe('readTaskStatus / latestCheckpointFile (v3.7.3+ co-located layout)', () => {
+  let plansDir;
+  let taskDir;
+
+  beforeEach(() => {
+    plansDir = fs.mkdtempSync(path.join(os.tmpdir(), 'af-rescan-'));
+    taskDir = path.join(plansDir, 'features', 'FEAT-A_x', 'stories', 'STORY-0001_y', 'tasks', 'TASK-00001_z');
+    fs.mkdirSync(taskDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(taskDir, 'task.md'),
+      '---\nid: TASK-00001\ntier: 4\nstatus: done\n---\n\n# T\n',
+    );
+  });
+  afterEach(() => {
+    fs.rmSync(plansDir, { recursive: true, force: true });
+  });
+
+  it('readTaskStatus reads the frontmatter status from the task folder', () => {
+    expect(readTaskStatus(plansDir, 'TASK-00001')).toBe('done');
+    expect(readTaskStatus(plansDir, 'TASK-09999')).toBeNull();
+  });
+
+  it('finds the newest co-located checkpoint (timestamp-only filename)', () => {
+    const ckptDir = path.join(taskDir, 'checkpoints');
+    fs.mkdirSync(ckptDir);
+    fs.writeFileSync(path.join(ckptDir, '2026-08-01T10-00-00Z.json'), '{"git_sha":"old"}');
+    fs.writeFileSync(path.join(ckptDir, '2026-08-02T10-00-00Z.json'), '{"git_sha":"new"}');
+    expect(latestCheckpointFile(plansDir, 'TASK-00001'))
+      .toBe(path.join(ckptDir, '2026-08-02T10-00-00Z.json'));
+  });
+
+  it('falls back to the global {ID}_legacy dir when no co-located checkpoint exists', () => {
+    const legacyDir = path.join(plansDir, 'checkpoints', 'TASK-00001_legacy');
+    fs.mkdirSync(legacyDir, { recursive: true });
+    fs.writeFileSync(path.join(legacyDir, '2026-08-01T10-00-00Z.json'), '{}');
+    expect(latestCheckpointFile(plansDir, 'TASK-00001'))
+      .toBe(path.join(legacyDir, '2026-08-01T10-00-00Z.json'));
+  });
+
+  it('falls back to pre-v3.7.3 flat {ID}.{ISO}.json files last', () => {
+    const globalDir = path.join(plansDir, 'checkpoints');
+    fs.mkdirSync(globalDir, { recursive: true });
+    fs.writeFileSync(path.join(globalDir, 'TASK-00001.2026-08-01T10:00:00Z.json'), '{}');
+    expect(latestCheckpointFile(plansDir, 'TASK-00001'))
+      .toBe(path.join(globalDir, 'TASK-00001.2026-08-01T10:00:00Z.json'));
+  });
+
+  it('returns null when no checkpoint exists anywhere', () => {
+    expect(latestCheckpointFile(plansDir, 'TASK-00001')).toBeNull();
   });
 });
 

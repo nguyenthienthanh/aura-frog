@@ -133,15 +133,26 @@ function generateCompactContext(workflowState, sessionContext) {
     }
 
     // Modified files (from git)
+    const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
     try {
       const { execSync } = require('child_process');
-      const modified = execSync('git diff --name-only HEAD 2>/dev/null', { encoding: 'utf-8' }).trim();
+      // Only the first 20 names are rendered, but the WHOLE name list is
+      // buffered first — a big working tree can exceed the 1MB default.
+      const modified = execSync('git diff --name-only HEAD 2>/dev/null', {
+        encoding: 'utf-8',
+        timeout: TIMEOUT_DEFAULT_MS,
+        killSignal: 'SIGKILL',
+        maxBuffer: MAX_BUFFER_LARGE
+      }).trim();
       if (modified) {
         lines.push('## Modified Files (uncommitted)');
         modified.split('\n').slice(0, 20).forEach(f => lines.push(`- ${f}`));
         lines.push('');
       }
-    } catch { /* no git or no changes */ }
+    } catch (e) {
+      /* no git or no changes */
+      warnExecLimit('compact-handoff git diff', e);
+    }
 
     // Session context
     if (sessionContext) {

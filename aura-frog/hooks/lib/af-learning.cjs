@@ -32,6 +32,17 @@ const LOCAL_WORKFLOW_EVENTS_FILE = path.join(LEARNING_DIR, 'workflow-events.json
 const LEARNED_RULES_MD = path.join(LEARNING_DIR, 'learned-rules.md');
 const MAIN_INSTRUCTION_LINK = path.join(findProjectRoot(), '.claude', 'LEARNED_PATTERNS.md');
 
+// Retention caps for the local JSON stores. Same idiom across all three:
+// keep the last N, trimmed on every write.
+const MAX_LOCAL_PATTERNS = 500;
+const MAX_LOCAL_FEEDBACK = 500;
+const MAX_LOCAL_WORKFLOW_EVENTS = 1000;
+
+// updateLearnedRulesMD() renders every pattern and the recent feedback into one
+// string. With the caps above the render is bounded, but a 500-pattern render is
+// still a large file, so the per-category listing is bounded again here.
+const MAX_RENDERED_PATTERNS_PER_CATEGORY = 25;
+
 /**
  * Check if Supabase is configured
  * @returns {boolean}
@@ -168,7 +179,18 @@ function updateLearnedRulesMD() {
       content += `## ${category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, ' ')}\n\n`;
       content += `*${correctionCounts[category] || 0} corrections in this category*\n\n`;
 
-      categoryPatterns.forEach(p => {
+      // Highest-frequency first, bounded — the rendered file is read by humans
+      // and by the model, so an unbounded dump of every pattern is worse than
+      // the top ones.
+      const rendered = categoryPatterns
+        .slice()
+        .sort((a, b) => (b.frequency || 1) - (a.frequency || 1))
+        .slice(0, MAX_RENDERED_PATTERNS_PER_CATEGORY);
+      if (categoryPatterns.length > rendered.length) {
+        content += `*(showing top ${rendered.length} of ${categoryPatterns.length})*\n\n`;
+      }
+
+      rendered.forEach(p => {
         content += `### ${p.description || p.rule || 'Pattern'}\n\n`;
         if (p.evidence && p.evidence.length > 0) {
           content += `**Examples:**\n`;
@@ -315,7 +337,7 @@ async function recordFeedback(feedback) {
       const allFeedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
       allFeedback.push(data);
       // Keep only last 500 entries
-      const trimmed = allFeedback.slice(-500);
+      const trimmed = allFeedback.slice(-MAX_LOCAL_FEEDBACK);
       saveLocalFile(LOCAL_FEEDBACK_FILE, trimmed);
       // Update the MD file
       updateLearnedRulesMD();
@@ -445,7 +467,7 @@ async function recordWorkflowEvent(event) {
     const allEvents = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
     allEvents.push(eventData);
     // Keep only last 1000 events
-    const trimmed = allEvents.slice(-1000);
+    const trimmed = allEvents.slice(-MAX_LOCAL_WORKFLOW_EVENTS);
     saveLocalFile(LOCAL_WORKFLOW_EVENTS_FILE, trimmed);
   } catch (error) {
     console.error(`Learning: Failed to record local workflow event: ${error.message}`);
@@ -568,7 +590,16 @@ async function recordPattern(pattern) {
         allPatterns.push(patternData);
       }
 
-      saveLocalFile(LOCAL_PATTERNS_FILE, allPatterns);
+      // Cap, matching the sibling writers (feedback -500, workflow events
+      // -1000). This one had NO cap: every new category+description pair was
+      // appended forever, and updateLearnedRulesMD() below renders the ENTIRE
+      // list into one string on every single call.
+      //
+      // Trimmed from the front (oldest-appended first) rather than by frequency,
+      // to match the sibling idiom and to keep a just-recorded pattern alive —
+      // a new pattern always has frequency 1 and would otherwise be the first
+      // thing a frequency sort discards.
+      saveLocalFile(LOCAL_PATTERNS_FILE, allPatterns.slice(-MAX_LOCAL_PATTERNS));
       // Update the MD file
       updateLearnedRulesMD();
       return patternData;
@@ -763,6 +794,11 @@ module.exports = {
   LEARNED_RULES_MD,
   MAIN_INSTRUCTION_LINK,
   LOCAL_WORKFLOW_EVENTS_FILE,
+  LOCAL_PATTERNS_FILE,
+  MAX_LOCAL_PATTERNS,
+  MAX_LOCAL_FEEDBACK,
+  MAX_LOCAL_WORKFLOW_EVENTS,
+  MAX_RENDERED_PATTERNS_PER_CATEGORY,
   saveLocalFile,
   loadLocalFile
 };

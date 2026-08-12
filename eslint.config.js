@@ -24,6 +24,10 @@ module.exports = [
         setImmediate: 'readonly',
       },
     },
+    // All rules are 'warn' severity, so eslint alone always exits 0. The
+    // enforcement lives in package.json's lint script: --max-warnings=121
+    // (the baseline count as of 2026-08). Any new warning fails `npm run
+    // lint` / CI; lower the cap as warnings are burned down toward 0.
     rules: {
       'no-empty': ['warn', { allowEmptyCatch: false }],
       'consistent-return': 'warn',

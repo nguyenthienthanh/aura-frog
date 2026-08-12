@@ -27,7 +27,9 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { TIMEOUT_SLOW_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readJsonlTail } = require('./lib/jsonl-tail.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
@@ -39,6 +41,10 @@ const RESCAN_WINDOW_MS = 60 * 1000;
 // last), so the scan stops at the first out-of-window event. The exit_code gate
 // only became meaningful once post-execute-update-node read the real exit code
 // from stdin (STORY-0010) — before that every event carried a bogus 0.
+// NOTE: execution_completed means "a tool call finished while this task was
+// active", NOT "the task is done" — callers must confirm the node's frontmatter
+// status is actually `done` (see filterActuallyDone) before treating it as a
+// finished blocker.
 function collectRecentDoneTasks(historyLines, { now, windowMs }) {
   const done = new Set();
   for (let i = historyLines.length - 1; i >= 0; i--) {
@@ -49,6 +55,17 @@ function collectRecentDoneTasks(historyLines, { now, windowMs }) {
     if (evt.event === 'execution_completed' && evt.exit_code === 0 && evt.node) {
       done.add(evt.node);
     }
+  }
+  return done;
+}
+
+// Pure: keep only the task ids whose actual node status is `done`, per the
+// injected statusOf(taskId) resolver. Guards the §21.6 "blocker transitions to
+// done" precondition — a successful tool call alone is not a done transition.
+function filterActuallyDone(taskIds, statusOf) {
+  const done = new Set();
+  for (const id of taskIds) {
+    if (statusOf(id) === 'done') done.add(id);
   }
   return done;
 }
@@ -103,24 +120,93 @@ function buildRescanEvent({ conflictId, blocker, frozen, recommendation, ts }) {
   };
 }
 
+// I/O: locate a task's node folder (v3.7.3+ layout:
+// features/.../stories/.../tasks/{ID}_{slug}/task.md) by walking features/ and
+// matching the `id:` frontmatter. Same walk as tool-call-tracer.cjs.
+function resolveTaskFolder(plansDir, id) {
+  const featuresRoot = path.join(plansDir, 'features');
+  if (!fs.existsSync(featuresRoot)) return null;
+  const walk = (dir) => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return null; }
+    for (const ent of entries) {
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        const candidate = path.join(full, 'task.md');
+        if (fs.existsSync(candidate)) {
+          try {
+            const body = fs.readFileSync(candidate, 'utf8');
+            const m = body.match(/^id:\s*(.+?)\s*$/m);
+            if (m && m[1].trim().replace(/^["']|["']$/g, '') === id) return full;
+          } catch { /* skip */ }
+        }
+        const sub = walk(full);
+        if (sub) return sub;
+      }
+    }
+    return null;
+  };
+  return walk(featuresRoot);
+}
+
+// I/O: a task's frontmatter `status:` value, or null when unresolvable.
+function readTaskStatus(plansDir, id) {
+  const folder = resolveTaskFolder(plansDir, id);
+  if (!folder) return null;
+  try {
+    const body = fs.readFileSync(path.join(folder, 'task.md'), 'utf8');
+    const m = body.match(/^status:\s*(.+?)\s*$/m);
+    return m ? m[1].trim().replace(/^["']|["']$/g, '') : null;
+  } catch {
+    return null;
+  }
+}
+
+// I/O: latest checkpoint file for a task. v3.7.3+ _lib.sh save_checkpoint
+// co-locates checkpoints inside the node folder as
+// <node_folder>/checkpoints/<ISO-with-dashes>.json (timestamp-only filename).
+// Fallbacks: the global plans/checkpoints/{ID}_legacy/ dir (orphan nodes), then
+// the pre-v3.7.3 flat plans/checkpoints/{ID}.{ISO}.json files.
+function latestCheckpointFile(plansDir, blockerTask) {
+  const newestJson = (dir, filter) => {
+    let files;
+    try { files = fs.readdirSync(dir); } catch { return null; }
+    const matches = files.filter(filter).sort().reverse();
+    return matches.length > 0 ? path.join(dir, matches[0]) : null;
+  };
+
+  const folder = resolveTaskFolder(plansDir, blockerTask);
+  if (folder) {
+    const hit = newestJson(path.join(folder, 'checkpoints'), f => f.endsWith('.json'));
+    if (hit) return hit;
+  }
+  const globalDir = path.join(plansDir, 'checkpoints');
+  const legacyHit = newestJson(path.join(globalDir, `${blockerTask}_legacy`), f => f.endsWith('.json'));
+  if (legacyHit) return legacyHit;
+  return newestJson(globalDir, f => f.startsWith(`${blockerTask}.`) && f.endsWith('.json'));
+}
+
 // I/O: compatibility check — did the blocker's actual output (git diff since its
 // latest checkpoint) still touch the frozen sibling's planned files? Returns
 // true (compatible), false (still overlaps), or null (couldn't determine).
 function checkCompatibility(plansDir, blockerTask, plannedFiles) {
   try {
-    const checkpointsDir = path.join(plansDir, 'checkpoints');
-    if (!fs.existsSync(checkpointsDir)) return null;
-    const checkpoints = fs.readdirSync(checkpointsDir)
-      .filter(f => f.startsWith(`${blockerTask}.`))
-      .sort()
-      .reverse();
-    if (checkpoints.length === 0) return null;
-    const cp = JSON.parse(fs.readFileSync(path.join(checkpointsDir, checkpoints[0]), 'utf8'));
+    const checkpoint = latestCheckpointFile(plansDir, blockerTask);
+    if (!checkpoint) return null;
+    const cp = JSON.parse(fs.readFileSync(checkpoint, 'utf8'));
     if (!cp.git_sha) return null;
-    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, { encoding: 'utf8' }).trim();
+    // A stale checkpoint sha can span thousands of commits, so this diff is the
+    // largest git output any hook asks for — slow tier + large buffer.
+    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, {
+      encoding: 'utf8',
+      timeout: TIMEOUT_SLOW_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_LARGE
+    }).trim();
     const changed = diff.split('\n').filter(Boolean);
     return !changed.some(f => plannedFiles.includes(f));
-  } catch {
+  } catch (e) {
+    warnExecLimit('conflict-rescan git diff', e);
     return null;
   }
 }
@@ -128,16 +214,21 @@ function checkCompatibility(plansDir, blockerTask, plannedFiles) {
 function main() {
   if (!fs.existsSync(CONFLICTS_FILE) || !fs.existsSync(HISTORY_FILE)) return;
 
-  let historyLines = [];
-  try { historyLines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  // Bounded tails. History: collectRecentDoneTasks breaks at the first event
+  // older than RESCAN_WINDOW_MS, so it never looks past the tail. Conflicts:
+  // foldLatestConflicts wants the LATEST record per conflict_id, and in an
+  // append-only log the latest record is the last one — reading the tail keeps
+  // exactly the records a rescan can act on.
+  const historyLines = readJsonlTail(HISTORY_FILE);
 
-  const recentDoneTasks = collectRecentDoneTasks(historyLines, { now: Date.now(), windowMs: RESCAN_WINDOW_MS });
+  // Candidates are tasks with recent tool activity; a task only counts as a
+  // finished blocker once its node file's status actually reads `done`.
+  const recentCandidates = collectRecentDoneTasks(historyLines, { now: Date.now(), windowMs: RESCAN_WINDOW_MS });
+  if (recentCandidates.size === 0) return;
+  const recentDoneTasks = filterActuallyDone(recentCandidates, id => readTaskStatus(PLANS_DIR, id));
   if (recentDoneTasks.size === 0) return;
 
-  let conflictLines = [];
-  try { conflictLines = fs.readFileSync(CONFLICTS_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  const conflictLines = readJsonlTail(CONFLICTS_FILE);
 
   const recommendations = [];
   for (const [cid, conflict] of foldLatestConflicts(conflictLines)) {
@@ -177,6 +268,7 @@ if (require.main === module) {
   main();
 } else {
   module.exports = {
-    collectRecentDoneTasks, foldLatestConflicts, findRescanPair, recommendationFor, buildRescanEvent,
+    collectRecentDoneTasks, filterActuallyDone, foldLatestConflicts, findRescanPair,
+    recommendationFor, buildRescanEvent, latestCheckpointFile, readTaskStatus,
   };
 }

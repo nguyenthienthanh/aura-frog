@@ -2,6 +2,20 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/__tests__', '<rootDir>/aura-frog/hooks/lib/__tests__', '<rootDir>/aura-frog/scripts/__tests__'],
   testMatch: ['**/*.test.cjs'],
+
+  // Worker fan-out is the plugin's main RAM lever, and it scales with the
+  // machine: jest's default is cpu-1 full node processes, so the same suite
+  // costs 9 workers on a 10-core box and 15 on a 16-core one — which is why
+  // memory pressure showed up on some machines and not others.
+  //
+  // Most suites here spawn shells and hit the filesystem rather than burning
+  // CPU, so the default over-subscribes and the workers contend: measured on a
+  // 10-core M-series, 1150 tests take 44.3s at cpu-1 and 30.3s at 50%. Half the
+  // cores is both faster and bounded.
+  maxWorkers: '50%',
+  // Restart a worker that grows past this instead of letting a leak ride to the
+  // end of the run — bounds worst-case tree RSS to maxWorkers × limit.
+  workerIdleMemoryLimit: '512MB',
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: ['/node_modules/', '/__tests__/'],
   collectCoverageFrom: [

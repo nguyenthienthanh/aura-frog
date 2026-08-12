@@ -11,11 +11,6 @@ allowed-tools: NONE
 user-invocable: false
 ---
 
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
-
 # Agent Detector
 
 **Runs FIRST for every message.**
@@ -30,27 +25,15 @@ complexity[4]{level,criteria,approach}:
   Project,"Multi-feature / multi-session / weight ≥ 3 on bridge heuristic AND no active plan","/aura-frog:plan bootstrap then per-task /run anchored"
 ```
 
-**Project (v3.7.2+):** Emitted when `rules/workflow/run-plan-bridge.md` triggers sum to weight ≥ 3 AND `.claude/plans/active.json` is absent. `run-orchestrator` Step 0 owns the user prompt (`plan` / `deep` / `details`) and the scratch-file handoff. Otherwise Quick/Standard/Deep classification is unchanged.
-
 ## Model Selection
 
-**Prefer the session model — inherit it.** The model the user launched with is the signal of their intent and budget; use it for all substantive work (Standard / Deep / architecture / planning / build / review). Do NOT force-upgrade to a named model (e.g. Opus) for "complex" — if the user wanted more capability they'd run it, and naming a model means a newer/stronger one is ignored.
+Inherit the session model for all substantive work. Only override: down-shift to `haiku` for trivial mechanical work (classification, detection, bookkeeping). Never force-upgrade to a named model. See `rules/core/small-to-large-routing.md`.
 
-The only deliberate override is **down-shifting to `haiku`** for trivial mechanical work (classification, detection, state bookkeeping) where a wrong answer costs little. So: Quick/classification → `haiku`; everything else → **inherit (session model)**. See `rules/core/small-to-large-routing.md`.
+## Detection (priority order)
 
-## Detection (Priority Order)
+Task content > explicit tech (+60) > intent keywords (+50) > project context (+40) > file patterns (+20).
+Scoring: Primary ≥80 (leads), Secondary 50-79, Optional 30-49, Skip <30. **tester:** always secondary unless explicit test request.
 
-1. **Task content** (highest): Analyze task keywords — backend repo may have frontend tasks. Score ≥50 overrides repo detection.
-2. **Explicit tech** (+60): User mentions react-native/flutter/angular/vue/react/next/node/python/go/laravel → agent.
-3. **Intent** (+50): Action keywords: implement/fix/test/design/database/security/deploy → agent.
-4. **Project context** (+40): Package files/configs. Use cached detection when valid (<24h).
-5. **File patterns** (+20): Recent file naming: *.vue→frontend, *.go→architect, etc.
+Cache: `.claude/cache/agent-detection-cache.json` (reuse within workflow; invalidate on new workflow / phase 1 / user override).
 
-## Scoring
-
-Primary ≥80 (leads), Secondary 50-79 (supports), Optional 30-49, Skip <30.
-**tester:** Always secondary unless explicit test request.
-
-## Cache
-
-`.claude/cache/agent-detection-cache.json` — reuse within workflow (phase >1). Invalidate on new workflow, phase 1, or user override.
+**Detail (Project-level heuristic, signal weights, model rationale):** `skills/agent-detector/reference.md` — load on demand only.

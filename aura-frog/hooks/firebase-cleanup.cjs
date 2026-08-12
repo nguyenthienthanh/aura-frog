@@ -24,6 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { TIMEOUT_SLOW_MS, MAX_BUFFER_DEFAULT, warnExecLimit } = require('./lib/af-exec.cjs');
 
 // Firebase debug log path
 const FIREBASE_DEBUG_LOG = path.join(process.cwd(), 'firebase-debug.log');
@@ -40,15 +41,22 @@ function isFirebaseConfigured() {
 
   // Check if user is logged into Firebase
   try {
+    // `firebase login:list` reaches the network to validate the token. On a
+    // SessionStart hook that must not be allowed to hang the session, hence the
+    // slow-tier timeout + SIGKILL.
     const result = execSync('firebase login:list 2>/dev/null', {
       encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'ignore']
+      stdio: ['pipe', 'pipe', 'ignore'],
+      timeout: TIMEOUT_SLOW_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_DEFAULT
     });
     if (result && result.includes('@')) {
       return true;
     }
-  } catch {
+  } catch (e) {
     // Not logged in or firebase not installed
+    warnExecLimit('firebase login:list', e);
   }
 
   // Check environment variables

@@ -5,19 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/firebase-cleanup.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/playwright-reaper.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/workflow-edit-learn.cjs\" 2>&1"
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>session-start' '>firebase-cleanup' '>playwright-reaper' '>workflow-edit-learn' '>changelog-notify' '>session-start-restore-active'"
           },
           {
             "type": "command",
@@ -26,25 +14,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/update-check.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-notify.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/test-pattern-extractor.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-restore-active.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pending-confirm-timeout.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>update-check' '>test-pattern-extractor' '>pending-confirm-timeout'"
           }
         ]
       }
@@ -55,19 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scout-block.cjs\""
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-execute-load-plan-context.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "CLAUDE_HOOK_PHASE=pre node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-flight-validate.cjs\""
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" scout-block '>pre-execute-load-plan-context' '>tool-call-tracer+CLAUDE_HOOK_PHASE=pre' pre-flight-validate"
           },
           {
             "type": "command",
@@ -109,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if ! compgen -G '.claude/project-contexts/*/project-config.yaml' > /dev/null 2>&1; then echo '\ud83d\udca1 Reminder: Run project:init to create project context before generating code' >&2; fi"
+            "command": "if ! compgen -G '.claude/project-contexts/*/project-config.yaml' > /dev/null 2>&1; then echo '💡 Reminder: Run project:init to create project context before generating code' >&2; fi"
           },
           {
             "type": "command",
@@ -124,25 +82,6 @@
       }
     ],
     "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "async": true,
-            "command": "LOG_DIR=$(if [ -d .claude/logs/runs ]; then echo .claude/logs/runs; elif [ -d .claude/logs/workflows ]; then echo .claude/logs/workflows; else echo ''; fi); if [ -n \"$LOG_DIR\" ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> \"$LOG_DIR/commands.log\"; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"\ud83d\udcc4 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
-          }
-        ]
-      },
       {
         "matcher": "Write|Edit|Bash",
         "hooks": [
@@ -159,22 +98,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/lint-autofix.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/security-scan.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/design-conformance.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-test-runner.cjs\""
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>lint-autofix' security-scan design-conformance auto-test-runner"
           }
         ]
       },
@@ -184,17 +108,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/token-tracker.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-update-node.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "CLAUDE_HOOK_PHASE=post node \"${CLAUDE_PLUGIN_ROOT}/hooks/tool-call-tracer.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" token-tracker '>post-execute-update-node' '>tool-call-tracer+CLAUDE_HOOK_PHASE=post'"
           }
         ]
       },
@@ -224,17 +138,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/feature-done-trigger-archive.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reset-trigger.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/post-execute-conflict-rescan.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>feature-done-trigger-archive' '>session-reset-trigger' '>post-execute-conflict-rescan'"
           }
         ]
       },
@@ -254,41 +158,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/thinking-boost.cjs\""
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-reminder.cjs\""
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" thinking-boost prompt-reminder"
           },
           {
             "type": "command",
             "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scope-drift.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-logger.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/jira-auto-fetch.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bare-word-router.cjs\""
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/plan-escalation-check.cjs\""
+            "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>auto-learn' scope-drift prompt-logger '>jira-auto-fetch' bare-word-router plan-escalation-check"
           }
         ]
       }
@@ -331,16 +206,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs\" 2>&1"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>compact-handoff' '>rate-limit-check'"
           },
           {
             "type": "command",
             "async": true,
             "command": ". \"${CLAUDE_PLUGIN_ROOT}/scripts/envrc-guarded-source.sh\"; node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-metrics.cjs\" 2>&1"
-          },
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rate-limit-check.cjs\" 2>&1"
           },
           {
             "type": "command",

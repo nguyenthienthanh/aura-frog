@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 56 (9 auto-invoking + 47 reference)
+**Total Skills:** 60 (9 auto-invoking + 51 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -28,9 +28,9 @@ auto_invoke[9]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (47)
+## Reference Skills (51)
 
-Loaded on-demand when triggered.
+Loaded on-demand when triggered. (50 in the sections below + `run-orchestrator`, described in the note above.)
 
 ### Coverage — Deep Work (3)
 
@@ -68,15 +68,16 @@ bundle[1]{name,purpose}:
   framework-expert,Core patterns + lazy detection → loads individual experts on demand
 ```
 
-### Design & UI (2)
+### Design & UI (6)
 
 ```toon
-design[5]{name,purpose}:
+design[6]{name,purpose}:
   design-expert,Component design + design system selection + responsive layout + Figma Code Connect
   stitch-design,Google Stitch AI prompt generation
   frontend-aesthetics,Distinctive typography + dominant/accent color (house-style tuned)
   motion-design,Restrained reduced-motion-safe bundle-aware web motion
   design-tokens,OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
+  design-vision-loop,Screenshot + multimodal critique loop until UI matches design system
 ```
 
 ### Workflow & Infrastructure (9)
@@ -92,6 +93,21 @@ workflow[9]{name,purpose}:
   learning-analyzer,Analyze session feedback from Supabase
   prompt-evaluator,Evaluate prompt patterns and feature usage
   plan-orchestrator,Route 11 plan verbs to backing scripts (v3.7.2+)
+```
+
+### Planning & Safety (7)
+
+Hierarchical-planning and safety-gate companions (v3.7.0+):
+
+```toon
+planning[7]{name,purpose}:
+  plan-validator,Runs all 8 plan-tree invariants on demand (spec §6.7)
+  plan-archivist,Compress completed T2 branch into archive summary
+  conflict-detector,L1 file-overlap + L2 function-overlap between sibling T4 tasks
+  failure-classifier,Classify execution failures F1-F5 (deterministic; no LLM)
+  self-healing-orchestrator,Propose patches for F2/F3 failures — user approval required
+  preflight-validator,Tier 1 bash linters wrapper (scripts/preflight/run-all.sh)
+  mcp-security-auditor,Audit MCP usage from .aura/security/mcp-audit.jsonl
 ```
 
 ### Code Quality (5)

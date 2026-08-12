@@ -35,7 +35,7 @@ function safeExit(code = 0) {
 }
 
 // Pure: compose the minimal plan-context lines from a parsed active.json. The
-// order (mission → initiative → feature → story → task → phase → frozen → ready)
+// order (mission → initiative → feature → story → task → phase → frozen)
 // is the display order Claude reads.
 function composeContextLines(active) {
   const lines = [];
@@ -53,9 +53,8 @@ function composeContextLines(active) {
   if (active && Array.isArray(active.frozen) && active.frozen.length > 0) {
     lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura-frog:plan-conflicts`);
   }
-  if (active && Array.isArray(active.ready_queue) && active.ready_queue.length > 0) {
-    lines.push(`Ready: ${active.ready_queue.length} task(s) queued`);
-  }
+  // No "Ready: N queued" line: active.json's ready_queue is a vestigial field
+  // nothing maintains (next-task.sh rescans task files each call).
   return lines;
 }
 

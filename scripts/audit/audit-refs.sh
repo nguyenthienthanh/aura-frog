@@ -22,14 +22,23 @@ cd "$REPO_ROOT/aura-frog" || { echo "FATAL: aura-frog/ not found"; exit 1; }
 fail=0
 
 echo "▶ Orphan rules (rule with zero inbound references)…"
-while IFS= read -r rule; do
-  count=$(grep -r --include="*.md" "$rule" . \
+# Match PATH-SHAPED references (the repo's citation style is
+# 'rules/workflow/checkpoint-discipline.md' or without the extension), NOT
+# bare basenames: an unanchored substring grep let rules named after common
+# words ('verification', 'estimation', 'git-workflow') stay unauditable —
+# prose or same-named skill docs kept the count nonzero forever.
+while IFS= read -r rulepath; do
+  ref="${rulepath%.md}"
+  # Alive iff the rule's path appears (with or without .md), terminated by a
+  # non-name character or end-of-line so 'rules/core/naming' can't be
+  # satisfied by 'rules/core/naming-conventions.md'.
+  count=$(grep -rE --include="*.md" "${ref}(\.md)?([^A-Za-z0-9_-]|\$)" . \
             --exclude-dir=rules --exclude-dir=.git 2>/dev/null | wc -l | tr -d ' ')
   if [ "$count" = "0" ]; then
-    echo "  ORPHAN: $rule"
+    echo "  ORPHAN: $rulepath"
     fail=1
   fi
-done < <(find rules -name "*.md" ! -name "README.md" -exec basename {} .md \;)
+done < <(find rules -name "*.md" ! -name "README.md")
 
 echo "▶ Dead links (referenced path that does not exist)…"
 while IFS= read -r path; do

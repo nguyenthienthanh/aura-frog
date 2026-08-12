@@ -17,6 +17,7 @@ const path = require('path');
 
 const {
   resolveTaskFolder,
+  cachedTaskFolder,
   resolveTracePaths,
   taskSlugOf,
   nextEventId,
@@ -145,5 +146,48 @@ describe('tool-call-tracer — resolveTaskFolder / resolveTracePaths', () => {
     expect(traceFile).toBe(path.join(dir, 'traces', 'LEGACY-1.jsonl'));
     expect(counterFile).toBe(path.join(dir, 'traces', 'LEGACY-1.count'));
     expect(fs.existsSync(path.join(dir, 'traces'))).toBe(true);
+  });
+});
+
+describe('tool-call-tracer — cachedTaskFolder (walk cache)', () => {
+  const seedTask = (id) => {
+    const folder = path.join(dir, 'features', 'F', 'stories', 'S', 'tasks', `${id}_slug`);
+    fs.mkdirSync(folder, { recursive: true });
+    fs.writeFileSync(path.join(folder, 'task.md'), `---\nid: ${id}\n---\n`);
+    return folder;
+  };
+  const cacheFile = () => path.join(dir, '.trace-folder-cache.json');
+
+  it('writes the cache on first resolve and serves the hit without a walk', () => {
+    const folder = seedTask('TASK-9');
+    expect(cachedTaskFolder(dir, 'TASK-9')).toBe(folder);
+    expect(JSON.parse(fs.readFileSync(cacheFile(), 'utf8'))['TASK-9']).toBe(folder);
+    // Poison the tree: if the second call walked, it would find nothing.
+    fs.rmSync(path.join(dir, 'features'), { recursive: true, force: true });
+    fs.mkdirSync(folder, { recursive: true });
+    fs.writeFileSync(path.join(folder, 'task.md'), '---\nid: OTHER\n---\n');
+    expect(cachedTaskFolder(dir, 'TASK-9')).toBe(folder);
+  });
+
+  it('re-walks when the cached folder no longer holds a task.md', () => {
+    const folder = seedTask('TASK-9');
+    expect(cachedTaskFolder(dir, 'TASK-9')).toBe(folder);
+    fs.rmSync(folder, { recursive: true, force: true });
+    const moved = path.join(dir, 'features', 'F2', 'stories', 'S', 'tasks', 'TASK-9_slug');
+    fs.mkdirSync(moved, { recursive: true });
+    fs.writeFileSync(path.join(moved, 'task.md'), '---\nid: TASK-9\n---\n');
+    expect(cachedTaskFolder(dir, 'TASK-9')).toBe(moved);
+    expect(JSON.parse(fs.readFileSync(cacheFile(), 'utf8'))['TASK-9']).toBe(moved);
+  });
+
+  it('tolerates a corrupt cache file', () => {
+    const folder = seedTask('TASK-9');
+    fs.writeFileSync(cacheFile(), '{not json');
+    expect(cachedTaskFolder(dir, 'TASK-9')).toBe(folder);
+  });
+
+  it('returns null (and caches nothing) for an unknown task', () => {
+    seedTask('TASK-9');
+    expect(cachedTaskFolder(dir, 'TASK-NONE')).toBeNull();
   });
 });

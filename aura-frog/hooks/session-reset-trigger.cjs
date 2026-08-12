@@ -25,6 +25,7 @@
 const fs = require('fs');
 const path = require('path');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readJsonlTail } = require('./lib/jsonl-tail.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
@@ -61,9 +62,10 @@ function findPromptableSummarize(historyLines, now, windowMs) {
 function main() {
   if (!fs.existsSync(HISTORY_FILE)) return;
 
-  let lines = [];
-  try { lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  // Bounded tail: the scan below walks newest-first and stops at the first
+  // epic_summarized / session_reset, and only accepts events inside a 60s
+  // window — so anything beyond the trailing window is unreachable anyway.
+  const lines = readJsonlTail(HISTORY_FILE);
 
   const recentSummarize = findPromptableSummarize(lines, Date.now(), PROMPT_WINDOW_MS);
   if (!recentSummarize) return;

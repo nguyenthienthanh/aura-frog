@@ -44,7 +44,7 @@ ladder[5]{step,tool,when}:
 
 ### When a code-graph MCP is available (opt-in)
 
-If the **`codebase-memory`** MCP server is enabled (`.mcp.json`, disabled by default — the user installs the binary; the plugin never runs its installer), it is a *step-0* that beats grep for structural questions:
+If the **`codebase-memory`** MCP server is present, it is a *step-0* that beats grep for structural questions. It is **not bundled** — the user adds the entry to their own `.mcp.json` (snippet in `docs/operations/MCP_GUIDE.md § Optional Servers`) and installs the binary themselves; the plugin never runs its installer. Treat its tools as optional and fall back to `Read`/`Grep` when they are absent:
 
 - Prefer `search_graph` / `trace_path` / `get_architecture` over broad `Read`/`Grep` sweeps for "what calls this?", "where does X happen?", "what breaks if I change this?" — a graph query is ~100× cheaper than file-by-file exploration on large host projects.
 - **Fall back cleanly when it is NOT enabled** (the common case): use the Glob→Grep→Read ladder above. Never assume the server is present.

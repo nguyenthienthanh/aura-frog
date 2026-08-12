@@ -1,12 +1,19 @@
 name: Behavioral Evaluation
 
+# PARKED — manual trigger only. The tool this workflow is built on,
+# github.com/sjnims/cc-plugin-eval, now returns 404: the clone step fails with
+# "could not read Username for 'https://github.com'" (git prompting for
+# credentials, which is what a 404 looks like in CI), so the job cannot pass on
+# any PR. A check that can never go green is worse than no check — it trains
+# everyone to read red as normal.
+#
+# Kept rather than deleted because the intent is still wanted: behavioural
+# evaluation of auto-invoke skills. Restore the pull_request trigger below once
+# a reachable evaluator exists (upstream returning, a fork, or a replacement).
+# The `run` step was already continue-on-error for a separate reason — upstream
+# had dropped the --components/--filter flags in favour of a config.yaml we
+# never authored.
 on:
-  pull_request:
-    paths:
-      - 'aura-frog/skills/**'
-      - 'aura-frog/agents/**'
-      - 'aura-frog/commands/**'
-      - 'aura-frog/rules/**'
   workflow_dispatch:
 
 jobs:
