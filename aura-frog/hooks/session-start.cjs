@@ -530,8 +530,16 @@ function sweepRetention() {
     pruneJsonlByTimestamp(file, cutoff);
   }
 
-  // One directory per workflow, never pruned before.
-  pruneStaleRunDirs(path.join(findProjectRoot(), '.claude', 'logs', 'runs'), cutoff);
+  // One directory per workflow, never pruned before. Both roots: team-bridge's
+  // resolveWorkflowDir() falls back to the legacy .claude/logs/workflows, and a
+  // workflow that landed there kept everything under it forever — including the
+  // teams/phase-*/team-log.jsonl and per-agent logs, which are unrotated appends
+  // with no sweep of their own. Pruning the run directory covers them wherever
+  // the workflow lives, which a per-file target could not: AF_TEAM_LOG_DIR only
+  // exists inside a live team session, so at SessionStart there is nothing to read.
+  const logsRoot = path.join(findProjectRoot(), '.claude', 'logs');
+  pruneStaleRunDirs(path.join(logsRoot, 'runs'), cutoff);
+  pruneStaleRunDirs(path.join(logsRoot, 'workflows'), cutoff);
 }
 
 function listFiles(dir) {
