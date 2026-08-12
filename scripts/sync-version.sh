@@ -28,8 +28,23 @@ PLUGIN_DIR="$PROJECT_ROOT/aura-frog"
 # Single source of truth
 SOURCE_FILE="$PLUGIN_DIR/.claude-plugin/plugin.json"
 
-# Version pattern
-VERSION_PATTERN="[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+)?"
+# Version pattern (ERE, used with `sed -E` — portable across BSD and GNU sed).
+# Prerelease suffix allows dots/digits: 3.8.0-alpha.7 is this project's scheme
+# (same regex as aura-frog/scripts/release.sh).
+VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?'
+
+# Count of files actually modified — the script FAILS if this stays 0
+# (a silent no-op sync is how versions drift).
+CHANGED_COUNT=0
+
+# Portable in-place sed: BSD needs `sed -i ''`, GNU needs `sed -i` — instead
+# of feature-detecting, write to a temp file and move it into place.
+sed_inplace() {
+  local file=$1
+  shift
+  local tmp="$file.sedtmp"
+  sed -E "$@" "$file" > "$tmp" && mv "$tmp" "$file"
+}
 
 # All files that need version updates
 declare -a JSON_FILES=(
@@ -113,9 +128,9 @@ calculate_next_version() {
 # Validate version format
 validate_version() {
   local version=$1
-  if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+)?$ ]]; then
+  if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
     print_error "Invalid version format: $version"
-    print_info "Expected format: X.Y.Z or X.Y.Z-suffix (e.g., 1.0.0 or 1.0.0-beta)"
+    print_info "Expected format: X.Y.Z or X.Y.Z-suffix (e.g., 1.0.0, 1.0.0-beta, 3.8.0-alpha.7)"
     exit 1
   fi
 }
@@ -133,13 +148,14 @@ update_json_version() {
   cp "$file" "$file.bak"
 
   # Update all "version": "x.x.x" patterns in JSON
-  sed -i '' "s/\"version\": *\"[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?\"/\"version\": \"$new_version\"/g" "$file"
+  sed_inplace "$file" "s/\"version\": *\"$VERSION_PATTERN\"/\"version\": \"$new_version\"/g"
 
   if diff -q "$file" "$file.bak" > /dev/null; then
     print_warning "No changes: $(basename "$file")"
     rm "$file.bak"
   else
     print_success "Updated: $(basename "$file")"
+    CHANGED_COUNT=$((CHANGED_COUNT + 1))
     rm "$file.bak"
   fi
 }
@@ -157,24 +173,20 @@ update_md_version() {
   cp "$file" "$file.bak"
 
   # Update various version patterns in markdown
-  # **Version:** X.Y.Z
-  sed -i '' "s/\*\*Version:\*\* [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*Version:\*\* $new_version/g" "$file"
-  # Version: X.Y.Z (without bold)
-  sed -i '' "s/Version: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/Version: $new_version/g" "$file"
-  # **System:** Aura Frog vX.Y.Z
-  sed -i '' "s/\*\*System:\*\* Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*System:\*\* Aura Frog v$new_version/g" "$file"
-  # **Plugin:** Aura Frog vX.Y.Z
-  sed -i '' "s/\*\*Plugin:\*\* Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/\*\*Plugin:\*\* Aura Frog v$new_version/g" "$file"
-  # AURA FROG vX.Y.Z (banner)
-  sed -i '' "s/AURA FROG v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/AURA FROG v$new_version/g" "$file"
-  # Aura Frog vX.Y.Z (general reference)
-  sed -i '' "s/Aura Frog v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/Aura Frog v$new_version/g" "$file"
+  sed_inplace "$file" \
+    -e "s/\*\*Version:\*\* $VERSION_PATTERN/\*\*Version:\*\* $new_version/g" \
+    -e "s/Version: $VERSION_PATTERN/Version: $new_version/g" \
+    -e "s/\*\*System:\*\* Aura Frog v$VERSION_PATTERN/\*\*System:\*\* Aura Frog v$new_version/g" \
+    -e "s/\*\*Plugin:\*\* Aura Frog v$VERSION_PATTERN/\*\*Plugin:\*\* Aura Frog v$new_version/g" \
+    -e "s/AURA FROG v$VERSION_PATTERN/AURA FROG v$new_version/g" \
+    -e "s/Aura Frog v$VERSION_PATTERN/Aura Frog v$new_version/g"
 
   if diff -q "$file" "$file.bak" > /dev/null; then
     print_warning "No changes: $(basename "$file")"
     rm "$file.bak"
   else
     print_success "Updated: $(basename "$file")"
+    CHANGED_COUNT=$((CHANGED_COUNT + 1))
     rm "$file.bak"
   fi
 }
@@ -191,14 +203,16 @@ update_yaml_version() {
 
   cp "$file" "$file.bak"
 
-  sed -i '' "s/version: '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?'/version: '$new_version'/" "$file"
-  sed -i '' "s/# Version: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(-[a-z]*\)\?/# Version: $new_version/" "$file"
+  sed_inplace "$file" \
+    -e "s/version: '$VERSION_PATTERN'/version: '$new_version'/" \
+    -e "s/# Version: $VERSION_PATTERN/# Version: $new_version/"
 
   if diff -q "$file" "$file.bak" > /dev/null; then
     print_warning "No changes: $(basename "$file")"
     rm "$file.bak"
   else
     print_success "Updated: $(basename "$file")"
+    CHANGED_COUNT=$((CHANGED_COUNT + 1))
     rm "$file.bak"
   fi
 }
@@ -278,7 +292,14 @@ main() {
 
   echo ""
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  print_success "Version sync complete! $CURRENT_VERSION -> $NEW_VERSION"
+  if [ "$CHANGED_COUNT" -eq 0 ] && [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
+    # A bump that touched zero files means every sed pattern missed —
+    # exactly the silent-no-op failure mode this script used to have on
+    # macOS. Fail loudly instead of pretending it worked.
+    print_error "Version sync FAILED: no files were updated ($CURRENT_VERSION -> $NEW_VERSION)"
+    exit 1
+  fi
+  print_success "Version sync complete! $CURRENT_VERSION -> $NEW_VERSION ($CHANGED_COUNT file(s) updated)"
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
   echo ""

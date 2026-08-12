@@ -31,11 +31,19 @@ describe('next_counter — concurrency + missing-key (P0-4)', () => {
     // Launch N background subshells from a SINGLE bash so they race in parallel,
     // then `wait`. spawnSync alone would serialize the processes.
     const prog = `for i in $(seq 1 ${N}); do ( source "${LIB}"; next_counter "${plans}" TASK ) & done; wait`;
-    // Generous lock timeout so CPU starvation under a parallel jest run (many
-    // heavy suites at once) can't spuriously trip the spinlock budget — the
-    // property under test is atomicity (no dupes / no drops), not latency.
-    const p = spawnSync('bash', ['-c', prog],
-      { encoding: 'utf8', env: { ...process.env, AF_LOCK_TIMEOUT_SEC: '120' } });
+    // Bounded lock timeout + hard spawnSync kill: spawnSync is synchronous, so
+    // jest's per-test timeout CANNOT interrupt it (same hazard documented in
+    // __tests__/scripts/plans.test.cjs). Without these bounds, CPU contention
+    // during a full parallel run could block the worker for minutes (10 racing
+    // subshells x AF_LOCK_TIMEOUT_SEC). 30s per lock acquisition is still far
+    // above the sub-second happy path; the property under test is atomicity
+    // (no dupes / no drops), not latency.
+    const p = spawnSync('bash', ['-c', prog], {
+      encoding: 'utf8',
+      env: { ...process.env, AF_LOCK_TIMEOUT_SEC: '30' },
+      timeout: 30000,
+      killSignal: 'SIGKILL',
+    });
     const nums = (p.stdout || '')
       .split('\n').map(s => s.trim()).filter(Boolean)
       .map(Number).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
@@ -46,13 +54,15 @@ describe('next_counter — concurrency + missing-key (P0-4)', () => {
 
   it('returns non-zero when the counter key is missing', () => {
     const plans = mkPlans({ TASK: 5 });
-    const p = spawnSync('bash', ['-c', `source "${LIB}"; next_counter "${plans}" NOPE`], { encoding: 'utf8' });
+    const p = spawnSync('bash', ['-c', `source "${LIB}"; next_counter "${plans}" NOPE`],
+      { encoding: 'utf8', timeout: 20000, killSignal: 'SIGKILL' });
     try { fs.rmSync(plans, { recursive: true, force: true }); } catch {}
     expect(p.status).not.toBe(0);
   });
 
   it('exposes with_lock() as a reusable helper', () => {
-    const p = spawnSync('bash', ['-c', `source "${LIB}"; type with_lock >/dev/null 2>&1 && echo OK`], { encoding: 'utf8' });
+    const p = spawnSync('bash', ['-c', `source "${LIB}"; type with_lock >/dev/null 2>&1 && echo OK`],
+      { encoding: 'utf8', timeout: 20000, killSignal: 'SIGKILL' });
     expect((p.stdout || '').trim()).toBe('OK');
   });
 });

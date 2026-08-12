@@ -86,11 +86,21 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    # Fail fast instead of burning 6h of runner time: before this bound, the
+    # Node 20/22 jobs hung until GitHub's 6h default killed them on every run,
+    # so the coverage gate below never actually enforced anything.
+    timeout-minutes: 15
     strategy:
       matrix:
-        # Full matrix restored after root-cause fix in hooks/lib/safe-stdin.cjs
-        # (Node 20/22 Ubuntu hang was `fs.readFileSync(0)` blocking on
-        # non-pipe stdin — fixed with fstatSync gate + watchdog).
+        # Node 20/22 hang root cause (fixed 2026-08): safe-stdin.cjs
+        # whitelisted fd0 sockets in readStdinSafely(); a jest child-process
+        # worker's fd0 IS a socket the coordinator never closes (no EOF),
+        # so any suite calling readStdinSafely()/readPrompt() in-process
+        # blocked its worker forever. Sockets stay whitelisted (Node spawn
+        # pipes are socketpairs — the production path) but are now refused
+        # inside the jest runtime (JEST_WORKER_ID + in-process expect global).
+        # The earlier "fstatSync gate + watchdog" fix did NOT cover this —
+        # the watchdog only arms in the hook's main() process path.
         node-version: ['18', '20', '22']
     steps:
       - uses: actions/checkout@v4
@@ -126,6 +136,10 @@ jobs:
         run: npm install
 
       - name: Lint hooks
+        # `npm run lint` carries --max-warnings=123 (current baseline): all
+        # rules are 'warn' severity, so without a cap eslint always exits 0
+        # and this job could never fail. The cap is a ratchet — any NEW
+        # warning fails CI; lower the number as warnings are burned down.
         run: npm run lint
 
   stats:

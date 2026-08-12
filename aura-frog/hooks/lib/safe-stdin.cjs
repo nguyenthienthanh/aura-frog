@@ -26,10 +26,18 @@
  * THE FIX:
  * --------
  * Check `fs.fstatSync(0)` first. Only read fd 0 if it's a FIFO (pipe), a
- * regular file (input redirect), or a socket — all of which are guaranteed
- * to deliver EOF. Skip read entirely for character devices (TTYs) and
- * unknown types. Returns '' in the unsafe case; callers fall through to
- * their own fallback (typically `process.env.CLAUDE_USER_PROMPT`).
+ * regular file (input redirect), or a socket outside a jest worker. Sockets
+ * are on the list because Node's own child_process 'pipe' stdio is a unix
+ * socketpair on Unix (libuv), i.e. the normal path when a Node parent —
+ * Claude Code included — spawns a hook with piped stdin; EOF arrives when
+ * the parent closes its end. The exception: inside a jest child-process
+ * worker (JEST_WORKER_ID set AND the in-process `expect` global present)
+ * fd 0 is a socket the coordinator NEVER closes, so an in-process read
+ * blocks the worker forever — that was the root cause of the
+ * full-suite/CI hang. Skip read entirely for character
+ * devices (TTYs) and unknown types. Returns '' in the unsafe case; callers
+ * fall through to their own fallback (typically
+ * `process.env.CLAUDE_USER_PROMPT`).
  *
  * Usage:
  *   const { readStdinSafely, parseStdinJson } = require('./lib/safe-stdin');
@@ -54,11 +62,26 @@ function readStdinSafely() {
   let canRead = false;
   try {
     const stats = fs.fstatSync(0);
-    // FIFO = piped from parent process (the production path for hooks).
+    // FIFO = piped from parent (shell pipes, input redirection via shell).
     // File = stdin is redirected from a file (test fixtures, debugging).
-    // Socket = piped over a unix socket (some wrappers).
+    // Socket = Node-parent spawn pipes (libuv 'pipe' stdio is a unix
+    //   socketpair on Unix — the production path when Claude Code spawns a
+    //   hook). Safe ONLY outside a jest worker: a jest child-process
+    //   worker's fd 0 is a socket the coordinator never closes, so reading
+    //   it blocks forever (the historical Node 20/22 CI hang).
     // Anything else (TTY/character device, block device, unknown) → skip.
-    canRead = stats.isFIFO() || stats.isFile() || stats.isSocket();
+    //
+    // The jest guard needs BOTH signals: JEST_WORKER_ID alone is inherited
+    // by subprocesses the tests spawn (whose socket stdin IS closed and must
+    // stay readable), while the injected `expect` global only exists for
+    // code loaded in-process by the jest runtime — exactly the calls that
+    // would block the worker. (`expect`, not `jest`: the jest object is
+    // module-scoped, it is NOT on the environment's globalThis — verified
+    // empirically in a jest 29 child-process worker.)
+    const inJestRuntime = !!process.env.JEST_WORKER_ID &&
+                          typeof globalThis.expect === 'function';
+    canRead = stats.isFIFO() || stats.isFile() ||
+              (stats.isSocket() && !inJestRuntime);
   } catch {
     // fstatSync failed (fd not open?) — be conservative.
     canRead = false;
