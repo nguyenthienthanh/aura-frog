@@ -1,39 +1,80 @@
 #!/usr/bin/env node
 /**
- * Aura Frog — Playwright Orphan Reaper
+ * Aura Frog — Orphan Reaper (playwright + chrome-devtools + jest-worker)
  *
  * Fires: SessionStart
- * Purpose: Kill ORPHANED playwright processes left behind by ungraceful exits.
- *          The @playwright/mcp server launches a (headless) Chrome; when the
- *          server dies without calling browser_close (session crash / kill),
- *          that Chrome is reparented to launchd (ppid 1) and runs for days,
- *          silently loading the machine. This janitor reaps exactly those.
+ * Purpose: Kill ORPHANED heavyweight processes left behind by ungraceful exits.
+ *          Three known leak sources:
+ *            - @playwright/mcp launches a (headless) Chrome; if the server dies
+ *              without browser_close, that Chrome is reparented to launchd
+ *              (ppid 1) and runs for days, silently loading the machine.
+ *            - chrome-devtools-mcp launches a REAL Chrome the same way, and
+ *              leaks the same way (server + watchdog + browser).
+ *            - jest-worker children hold a full module graph (200-500MB each);
+ *              a killed test runner strands them on launchd.
+ *          This janitor reaps exactly those.
  *
  * Safety — a process is reaped ONLY when BOTH hold:
- *   1. its command is playwright-launched (the `playwright_chromiumdev_profile`
- *      temp user-data-dir, an ms-playwright browser, or a playwright-mcp server), AND
+ *   1. its command matches a REAP pattern — a playwright-launched process (the
+ *      `playwright_chromiumdev_profile` temp user-data-dir, an ms-playwright
+ *      browser, a playwright-mcp server), a chrome-devtools-mcp process (server,
+ *      telemetry watchdog, or a Chrome whose --user-data-dir is the mcp profile —
+ *      all carry the literal `chrome-devtools-mcp` in argv), or a jest-worker
+ *      child; AND
  *   2. it is orphaned (ppid === 1) — its launching session/server is dead, so no
  *      live session owns it.
- * A browser owned by a RUNNING session has its server as parent (ppid !== 1) and
- * is never touched. The user's normal Chrome uses the default profile (no
- * playwright_chromiumdev_profile in its argv) and is never matched.
+ *
+ * Why each guard is load-bearing (they are NOT redundant):
+ *   - ppid === 1 protects LIVE work. A browser owned by a running session has its
+ *     server as parent, and a RUNNING jest suite's workers have the jest runner as
+ *     parent (measured: workers at ppid 62389/68235 while `npm test` ran) — so a
+ *     running suite can never be reaped. Only a worker whose runner already died
+ *     gets reparented to 1, and that one is genuinely garbage.
+ *   - The PATTERN protects the user's own apps — and it, not ppid, is what saves
+ *     the user's ordinary Chrome: on macOS the top-level `Google Chrome` process
+ *     is itself ppid 1 (measured: pid 8964). It survives only because its argv is
+ *     the bare binary with the default profile and matches nothing here. Keep the
+ *     patterns anchored to mcp/playwright/jest-specific strings; never widen them
+ *     to a bare browser name.
  *
  * Disable: AF_PLAYWRIGHT_REAPER_DISABLED=true
  *
  * Exit codes:
  *   0 — always (best-effort janitor, never blocks a session start)
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 'use strict';
 
 const { execSync } = require('child_process');
 
+// `ps -A` on a busy machine can exceed the 1MB default maxBuffer, and a hung ps
+// would stall session start. Bound both.
+const PS_TIMEOUT_MS = 5000;
+const PS_MAX_BUFFER = 16 * 1024 * 1024;
+
 // Matches ONLY playwright-launched processes: the temp profile a playwright
 // Chrome runs under, the bundled ms-playwright browser path, or the MCP server.
 // Deliberately does NOT match a user's ordinary Chrome (default profile).
 const PLAYWRIGHT_PATTERN = /playwright_chromiumdev_profile|ms-playwright|playwright-mcp|@playwright\/mcp/i;
+
+// chrome-devtools-mcp: the npx wrapper, the server binary, its telemetry watchdog
+// (…/chrome-devtools-mcp/build/src/telemetry/watchdog/main.js) and the Chrome it
+// launches (--user-data-dir=…/chrome-devtools-mcp/…) all carry this literal.
+// A user's ordinary Chrome never does.
+const CHROME_DEVTOOLS_PATTERN = /chrome-devtools-mcp/i;
+
+// jest-worker children: `node …/jest-worker/build/workers/processChild.js`.
+// Anchored to the jest-worker package path / that exact worker entrypoint so an
+// unrelated `processChild.js` in someone's app is not swept up.
+const JEST_WORKER_PATTERN = /jest-worker[/\\]|[/\\]workers[/\\]processChild\.js/i;
+
+// The union actually used for reaping.
+const REAP_PATTERN = new RegExp(
+  [PLAYWRIGHT_PATTERN, CHROME_DEVTOOLS_PATTERN, JEST_WORKER_PATTERN].map(r => r.source).join('|'),
+  'i',
+);
 
 // Pure: parse `ps -Ao pid,ppid,command` output into {pid, ppid, command} records.
 // The header line and any non-matching lines are dropped.
@@ -46,17 +87,27 @@ function parsePsLines(output) {
   return recs;
 }
 
-// Pure: the pids safe to reap — orphaned (ppid === 1) AND playwright-launched,
-// excluding this process. Returns [] when nothing qualifies.
+// Pure: the pids safe to reap — orphaned (ppid === 1) AND matching a reap
+// pattern, excluding this process. Returns [] when nothing qualifies.
 function selectOrphans(procs, { selfPid } = {}) {
   return (procs || [])
-    .filter(p => p && p.ppid === 1 && p.pid !== selfPid && PLAYWRIGHT_PATTERN.test(p.command))
+    .filter(p => p && p.ppid === 1 && p.pid !== selfPid && REAP_PATTERN.test(p.command))
     .map(p => p.pid);
 }
 
 function listProcs() {
-  try { return parsePsLines(execSync('ps -Ao pid,ppid,command', { encoding: 'utf8' })); }
-  catch { return []; }
+  try {
+    return parsePsLines(execSync('ps -Ao pid,ppid,command', {
+      encoding: 'utf8',
+      timeout: PS_TIMEOUT_MS,
+      maxBuffer: PS_MAX_BUFFER,
+    }));
+  } catch (err) {
+    // Reaping nothing is the safe failure — but say so, otherwise a ps that
+    // times out or overflows the buffer looks identical to "no orphans found".
+    process.stderr.write(`[playwright-reaper] ps failed (${err && err.message}) — skipping reap\n`);
+    return [];
+  }
 }
 
 function reap(pids) {
@@ -76,7 +127,7 @@ function main() {
   const killed = reap(orphans);
   if (killed.length > 0) {
     process.stderr.write(
-      `[playwright-reaper] reaped ${killed.length} orphaned playwright process(es): ${killed.join(', ')}\n`,
+      `[playwright-reaper] reaped ${killed.length} orphaned process(es): ${killed.join(', ')}\n`,
     );
   }
 }
@@ -85,5 +136,12 @@ function main() {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { parsePsLines, selectOrphans, PLAYWRIGHT_PATTERN };
+  module.exports = {
+    parsePsLines,
+    selectOrphans,
+    PLAYWRIGHT_PATTERN,
+    CHROME_DEVTOOLS_PATTERN,
+    JEST_WORKER_PATTERN,
+    REAP_PATTERN,
+  };
 }

@@ -42,7 +42,7 @@ Active task (TASK-00200) — Phase 3 (GREEN)
 
 Conflicts: 0 open · 0 stale (>24h)
 Memory: permanent_memory.md 4 Epics · 2,840 tokens / 8,000 cap · 0 Tentative
-MCP: context7=enabled · postgres=disabled · 87 calls today · 0 blocked
+MCP: 6 servers enabled · 87 calls today · 0 blocked
 Pre-flight: 0 bypasses this session · last block: never
 ```
 

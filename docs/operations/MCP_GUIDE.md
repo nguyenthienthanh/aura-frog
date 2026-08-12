@@ -26,18 +26,71 @@ User Message → Claude → MCP Server → External Service
 
 ## MCP Servers
 
-All 8 MCP servers are configured in `.mcp.json` — 6 enabled by default, 2 opt-in (postgres + redis):
+All 6 bundled MCP servers are configured in `.mcp.json`, and all 6 are enabled:
 
 ```toon
-servers[8]{name,package,purpose,requires,enabled}:
-  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc),None,enabled
-  playwright,@playwright/mcp,Browser automation + E2E testing (v3.7.3+ default e2e runner),None,enabled
-  vitest,@djankies/vitest-mcp,Test execution + coverage,None,enabled
-  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login,enabled
-  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN,enabled
-  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN + SLACK_TEAM_ID,enabled
-  postgres,@modelcontextprotocol/server-postgres,Database queries (read-only by default),POSTGRES_CONNECTION_STRING,opt-in (disabled in .mcp.json)
-  redis,@modelcontextprotocol/server-redis,Cache + queue introspection,REDIS_URL,opt-in (disabled in .mcp.json)
+servers[6]{name,package,purpose,requires}:
+  context7,@upstash/context7-mcp,Library docs (MUI Tailwind React etc),None
+  playwright,@playwright/mcp,Browser automation + E2E testing (v3.7.3+ default e2e runner),None
+  vitest,@djankies/vitest-mcp,Test execution + coverage,None
+  firebase,firebase-tools,Firebase project management + Firestore + Auth,firebase login
+  figma,figma-developer-mcp,Design file fetching,FIGMA_API_TOKEN
+  slack,@modelcontextprotocol/server-slack,Team notifications,SLACK_BOT_TOKEN + SLACK_TEAM_ID
+```
+
+**Every entry in `.mcp.json` starts.** There is no "off" switch inside the file — Claude Code **ignores a `"disabled": true` field** and launches the server anyway. (Measured: `chrome-devtools` sat in `.mcp.json` marked `disabled: true` and still ran 6 live processes, one of them a real Chrome.) So the only way to keep a server off is to *not list it*. Anything you add here is a server you are choosing to run on every session.
+
+---
+
+## Optional Servers (Not Bundled)
+
+These are **not** in `.mcp.json` — they cost a session-start process (and in one case a Chrome) that most projects never use. To turn one on, paste its snippet into the `mcpServers` object of your project's own `.mcp.json` and set the env var it needs. To turn it back off, **delete the entry** — do not add `"disabled": true`, which does nothing.
+
+**postgres** — database queries, read-only by default. Needs `POSTGRES_CONNECTION_STRING`.
+
+```json
+"postgres": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-postgres@latest"],
+  "env": { "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}" }
+}
+```
+
+**redis** — cache + queue introspection. Needs `REDIS_URL`.
+
+```json
+"redis": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-redis@latest"],
+  "env": { "REDIS_URL": "${REDIS_URL}" }
+}
+```
+
+**chrome-devtools** — live page inspection / diagnostics (~5-6k tokens per session). This is *not* automation; that is `playwright`. It launches a **real, visible Chrome** and leaks it on an ungraceful exit, so add it only for a debugging stretch and remove it after.
+
+```json
+"chrome-devtools": {
+  "command": "npx",
+  "args": ["-y", "chrome-devtools-mcp@latest"]
+}
+```
+
+**codebase-memory** — code knowledge-graph (`search_graph` / `trace_path`). Requires you to install the `codebase-memory-mcp` binary yourself first; without it the server just fails to start.
+
+```json
+"codebase-memory": {
+  "command": "codebase-memory-mcp"
+}
+```
+
+**stitch** — Google Stitch AI UI generation (generate/edit screens + design-system tools). Needs `STITCH_API_KEY`.
+
+```json
+"stitch": {
+  "type": "http",
+  "url": "https://stitch.googleapis.com/mcp",
+  "headers": { "X-Goog-Api-Key": "${STITCH_API_KEY}" }
+}
 ```
 
 **Per-agent allowlist** — MCP Security Layer (Pillar 7) restricts which servers each agent can call. `architect` gets DB; `frontend` gets Figma + Playwright; `security` reads only. See `/aura-frog:mcp status` for the current allowlist, `/aura-frog:mcp audit` for the sanitized call log.

@@ -20,15 +20,13 @@
 mcp_status{servers_enabled,total_audited_today,blocked_today,sessions_limited}:
   6,142,3,1
 
-per_server[8]{server,enabled,calls_today,used_pct,rate_limit}:
+per_server[6]{server,enabled,calls_today,used_pct,rate_limit}:
   context7,true,87,29% of 200,30/min · 200/session
   playwright,true,12,—,30/min · 200/session
   vitest,true,18,—,30/min · 200/session
   firebase,true,5,—,30/min · 200/session
   figma,true,8,—,30/min · 200/session
   slack,true,4,—,30/min · 200/session
-  postgres,false,0,disabled,disabled by default
-  redis,false,0,disabled,disabled by default
 
 per_agent_allowlists[*]{agent,allowlist}:
   ...
@@ -67,8 +65,10 @@ Single-call connectivity test. Different per server:
 - `firebase` — `list_projects` (requires `firebase login`)
 - `figma` — `get_figma_data` for a known test URL (requires `FIGMA_API_TOKEN`)
 - `slack` — `auth.test` (requires `SLACK_BOT_TOKEN`)
-- `postgres` — `query "SELECT 1"` (requires `POSTGRES_CONNECTION_STRING` AND server enabled)
-- `redis` — `ping` (requires `REDIS_URL` AND server enabled)
+- `postgres` — `query "SELECT 1"` (requires `POSTGRES_CONNECTION_STRING`; not bundled — add it per `docs/operations/MCP_GUIDE.md § Optional Servers`)
+- `redis` — `ping` (requires `REDIS_URL`; not bundled — same)
+
+Only servers actually present in `.mcp.json` can be tested. Rows list every server the security layer knows a policy for, not every server that is running.
 
 Output shows: latency, success, sanitized output snippet (or error).
 

@@ -38,8 +38,11 @@ paths[2]{path,when,how}:
 
 ## Path A — Stitch MCP (automated)
 
-The `stitch` MCP is a **remote http server, opt-in (disabled by default)** in `.mcp.json`. Enable it and
-set `STITCH_API_KEY` (create a key in Stitch → Settings) to unlock direct generation. API-key auth is
+The `stitch` MCP is a **remote http server that is opt-in and NOT bundled** — it is absent from `.mcp.json`
+(a `"disabled": true` flag does nothing; Claude Code ignores it and starts the server anyway, so keeping a
+server off means leaving it out). Add the entry to your project's own `.mcp.json` — snippet in
+`docs/operations/MCP_GUIDE.md § Optional Servers` — and set `STITCH_API_KEY` (create a key in
+Stitch → Settings) to unlock direct generation. API-key auth is
 preferred over OAuth (OAuth tokens expire hourly and need manual refresh in the client).
 
 > ⚠️ **Verify on first connect.** The endpoint (`https://stitch.googleapis.com/mcp`), header name, and exact

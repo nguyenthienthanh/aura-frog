@@ -73,7 +73,7 @@ If you find drift between `docs/` and `aura-frog/`: file an issue tagged `doc-dr
 
 ## Operations
 
-- [MCP Guide](operations/MCP_GUIDE.md) — 6 bundled MCP servers, setup, and creating your own
+- [MCP Guide](operations/MCP_GUIDE.md) — 6 bundled MCP servers, opt-in snippets, and creating your own
 - [Troubleshooting](operations/TROUBLESHOOTING.md) — Common issues and fixes
 - [Security & Trust](operations/SECURITY_AND_TRUST.md) — Security model and trust policies
 - [Learning System](operations/LEARNING_SYSTEM.md) — Self-improving patterns (local + Supabase)
