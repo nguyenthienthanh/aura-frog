@@ -494,8 +494,9 @@ async function main() {
 }
 
 /**
- * Prune append-only JSONL stores (mcp-audit, plan traces, metrics sessions) to
- * keep them from growing unbounded. Filters in-place by parsing each line's
+ * Prune append-only JSONL stores (mcp-audit, plan history/conflicts, plan
+ * traces, metrics sessions) and stale workflow run dirs to keep them from
+ * growing unbounded. JSONL files are filtered in-place by parsing each line's
  * `ts` field (ISO-8601) and dropping entries older than the retention window.
  * Drops the entire file if every line is expired.
  *
@@ -514,13 +515,23 @@ function sweepRetention() {
     // separate from plans). Plan traces follow the v3.7.3 .claude/plans path,
     // with legacy .aura/plans honored via the resolver.
     path.join(findProjectRoot(), '.aura', 'security', 'mcp-audit.jsonl'),
+    // The two append-only plan logs. Six hooks append to these and nothing
+    // truncated them before; three Stop-registered hooks read their tails.
+    path.join(plansDir, 'history.jsonl'),
+    path.join(plansDir, 'conflicts.jsonl'),
     ...listFiles(path.join(plansDir, 'traces')),
+    // v3.7.3+ tool-call-tracer writes {taskFolder}/trace.jsonl, not the legacy
+    // traces/ dir — those co-located files escaped the sweep entirely.
+    ...findCoLocatedTraces(path.join(plansDir, 'features')),
     ...listFiles(path.join(findProjectRoot(), '.claude', 'metrics', 'sessions')),
   ];
 
   for (const file of targets) {
     pruneJsonlByTimestamp(file, cutoff);
   }
+
+  // One directory per workflow, never pruned before.
+  pruneStaleRunDirs(path.join(findProjectRoot(), '.claude', 'logs', 'runs'), cutoff);
 }
 
 function listFiles(dir) {
@@ -534,45 +545,146 @@ function listFiles(dir) {
   }
 }
 
+// Bounded recursive walk for co-located trace.jsonl files. The plan tree is
+// features/<FEAT>/stories/<STORY>/tasks/<TASK>/trace.jsonl — depth 6 covers it
+// with room to spare, and the file cap keeps a pathological tree from turning
+// the sweep itself into the hazard it is meant to fix.
+const TRACE_WALK_MAX_DEPTH = 6;
+const TRACE_WALK_MAX_FILES = 2000;
+function findCoLocatedTraces(rootDir, maxDepth = TRACE_WALK_MAX_DEPTH) {
+  const found = [];
+  try {
+    if (!fs.existsSync(rootDir)) return found;
+    const stack = [[rootDir, 0]];
+    while (stack.length > 0 && found.length < TRACE_WALK_MAX_FILES) {
+      const [dir, depth] = stack.pop();
+      let entries;
+      try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { continue; }
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (depth < maxDepth) stack.push([full, depth + 1]);
+        } else if (entry.name === 'trace.jsonl') {
+          found.push(full);
+          if (found.length >= TRACE_WALK_MAX_FILES) break;
+        }
+      }
+    }
+  } catch { /* best-effort */ }
+  return found;
+}
+
+// Remove whole workflow run directories older than the retention window. Only
+// directories are touched; the active-workflow.txt pointer (and whatever run it
+// names) is always preserved so a resumed session still finds its state.
+function pruneStaleRunDirs(runsDir, cutoffMs) {
+  try {
+    if (!fs.existsSync(runsDir)) return;
+    let activeId = null;
+    try {
+      activeId = fs.readFileSync(path.join(runsDir, 'active-workflow.txt'), 'utf8').trim() || null;
+    } catch { /* no pointer — nothing pinned */ }
+
+    for (const entry of fs.readdirSync(runsDir, { withFileTypes: true })) {
+      if (!entry.isDirectory() || entry.name === activeId) continue;
+      const full = path.join(runsDir, entry.name);
+      try {
+        if (fs.statSync(full).mtimeMs >= cutoffMs) continue;
+        fs.rmSync(full, { recursive: true, force: true });
+      } catch { /* skip this run dir */ }
+    }
+  } catch { /* best-effort; never block startup */ }
+}
+
+// Streaming prune: read in fixed-size chunks and write survivors straight to a
+// tmp file. Peak RSS is the chunk buffer, not 2x the file — which matters most
+// for exactly the case the size guard below lets through (a large, stale file).
+const PRUNE_CHUNK_BYTES = 64 * 1024;
+const PRUNE_FLUSH_BYTES = 64 * 1024;
+
 function pruneJsonlByTimestamp(file, cutoffMs) {
+  let inFd = null;
+  let outFd = null;
+  const tmp = `${file}.tmp-${process.pid}`;
   try {
     if (!fs.existsSync(file)) return;
     const stat = fs.statSync(file);
     // Cheap pre-check: if mtime is recent, nothing has aged out since last sweep.
     if (stat.mtimeMs > cutoffMs && stat.size < 1024 * 1024) return;
 
-    const lines = fs.readFileSync(file, 'utf8').split('\n');
-    const kept = [];
+    const { StringDecoder } = require('node:string_decoder');
+    const decoder = new StringDecoder('utf8');
+
+    inFd = fs.openSync(file, 'r');
+    outFd = fs.openSync(tmp, 'w');
+
     let dropped = 0;
-    for (const line of lines) {
-      if (!line.trim()) continue;
+    let keptCount = 0;
+    let pending = '';
+    let pendingBytes = 0;
+
+    const flush = () => {
+      if (!pending) return;
+      fs.writeSync(outFd, pending);
+      pending = '';
+      pendingBytes = 0;
+    };
+
+    const handle = (line) => {
+      if (!line.trim()) return;
       let ts;
+      let keep = true;
       try {
         const obj = JSON.parse(line);
         ts = obj.ts || obj.timestamp || obj.lastUpdated;
+        const ms = ts ? Date.parse(ts) : NaN;
+        keep = !(Number.isFinite(ms) && ms < cutoffMs);
       } catch {
         // Malformed line — keep it (don't silently destroy unparseable data).
-        kept.push(line);
-        continue;
+        keep = true;
       }
-      const ms = ts ? Date.parse(ts) : NaN;
-      if (Number.isFinite(ms) && ms < cutoffMs) {
-        dropped++;
-      } else {
-        kept.push(line);
-      }
-    }
-    if (dropped === 0) return;
+      if (!keep) { dropped++; return; }
+      keptCount++;
+      pending += line + '\n';
+      pendingBytes += line.length + 1;
+      if (pendingBytes >= PRUNE_FLUSH_BYTES) flush();
+    };
 
-    if (kept.length === 0) {
-      fs.unlinkSync(file);
-    } else {
-      // Atomic write — never half-replace a JSONL store.
-      const tmp = `${file}.tmp-${process.pid}`;
-      fs.writeFileSync(tmp, kept.join('\n') + '\n');
-      fs.renameSync(tmp, file);
+    const buf = Buffer.allocUnsafe(PRUNE_CHUNK_BYTES);
+    let carry = '';
+    let bytesRead;
+    while ((bytesRead = fs.readSync(inFd, buf, 0, PRUNE_CHUNK_BYTES, null)) > 0) {
+      carry += decoder.write(buf.subarray(0, bytesRead));
+      let nl;
+      while ((nl = carry.indexOf('\n')) !== -1) {
+        handle(carry.slice(0, nl));
+        carry = carry.slice(nl + 1);
+      }
     }
-  } catch { /* best-effort; never block startup */ }
+    carry += decoder.end();
+    if (carry) handle(carry);
+    flush();
+
+    fs.closeSync(inFd); inFd = null;
+    fs.closeSync(outFd); outFd = null;
+
+    if (dropped === 0) {
+      fs.unlinkSync(tmp); // nothing aged out — leave the original untouched
+      return;
+    }
+    if (keptCount === 0) {
+      fs.unlinkSync(tmp);
+      fs.unlinkSync(file);
+      return;
+    }
+    // Atomic swap — never half-replace a JSONL store.
+    fs.renameSync(tmp, file);
+  } catch {
+    // best-effort; never block startup
+    try { if (inFd !== null) fs.closeSync(inFd); } catch { /* ignore */ }
+    try { if (outFd !== null) fs.closeSync(outFd); } catch { /* ignore */ }
+    try { if (fs.existsSync(tmp)) fs.unlinkSync(tmp); } catch { /* ignore */ }
+  }
 }
 
 // Run as a hook; stay importable for tests. Requiring this file previously
@@ -584,6 +696,6 @@ if (require.main === module) {
 } else {
   module.exports = {
     cacheStaleReason, getValidCache, buildContextOutput, listFiles, pruneJsonlByTimestamp,
-    emitContextStalenessBanner,
+    emitContextStalenessBanner, sweepRetention, findCoLocatedTraces, pruneStaleRunDirs,
   };
 }

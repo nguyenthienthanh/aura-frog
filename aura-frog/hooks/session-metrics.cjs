@@ -46,13 +46,18 @@ const { findProjectRoot } = require('./lib/hook-runtime.cjs');
     }
   }
 
-  // Fallback: find most recent workflow
-  const dirs = fs.readdirSync(workflowsDir)
-    .filter(d => fs.statSync(path.join(workflowsDir, d)).isDirectory())
-    .map(d => ({
-      name: d,
-      mtime: fs.statSync(path.join(workflowsDir, d)).mtime
-    }))
+  // Fallback: find most recent workflow. withFileTypes gives isDirectory() for
+  // free, so this is one statSync per entry instead of two.
+  const dirs = fs.readdirSync(workflowsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => {
+      try {
+        return { name: d.name, mtime: fs.statSync(path.join(workflowsDir, d.name)).mtimeMs };
+      } catch {
+        return null; // raced away between readdir and stat
+      }
+    })
+    .filter(Boolean)
     .sort((a, b) => b.mtime - a.mtime);
 
   if (dirs.length > 0) {

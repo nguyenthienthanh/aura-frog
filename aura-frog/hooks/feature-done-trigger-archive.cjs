@@ -30,6 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readJsonlTail } = require('./lib/jsonl-tail.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
@@ -73,9 +74,11 @@ function main() {
   const featureId = active.active && active.active.feature;
   if (!featureId) return;
 
-  let lines = [];
-  try { lines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  // Bounded tail: shouldTriggerArchive walks newest-first and breaks on the
+  // first event mentioning this feature, so only the trailing window is ever
+  // consulted. A feature whose last transition scrolled out of the window is
+  // by definition not a *fresh* done — the case this hook exists to catch.
+  const lines = readJsonlTail(HISTORY_FILE);
 
   if (!shouldTriggerArchive(lines, featureId)) return;
 
