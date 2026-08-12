@@ -997,8 +997,13 @@ describe('hook-runtime: withBudget', () => {
   describe('slow path — fn exceeds budget', () => {
     it('rejects with HookBudgetTimeout when fn does not resolve within ms', async () => {
       const { withBudget, HookBudgetTimeout } = rt();
-      const slowFn = () => new Promise(resolve => setTimeout(resolve, 2000));
+      // Keep a handle on the work timer: withBudget abandons but cannot cancel
+      // the work fn (F8 note in hook-runtime.cjs), so an un-cleared 2s timer
+      // would keep the jest process alive after the run.
+      let workTimer;
+      const slowFn = () => new Promise(resolve => { workTimer = setTimeout(resolve, 2000); });
       await expect(withBudget(50, slowFn)).rejects.toBeInstanceOf(HookBudgetTimeout);
+      clearTimeout(workTimer);
     }, 5000);
 
     it('emits logger warn with budget_exceeded before rejecting', async () => {
@@ -1057,21 +1062,38 @@ const { withBudget } = require(${JSON.stringify(HOOK_RUNTIME)});
 
     it('does NOT propagate errors thrown by the work promise (silent catch)', async () => {
       const { withBudget, HookBudgetTimeout } = rt();
+      let workTimer;
       const throwingFn = () => new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('work error')), 2000);
+        workTimer = setTimeout(() => reject(new Error('work error')), 2000);
       });
       // Should reject with HookBudgetTimeout (timeout wins), not 'work error'
       const err = await withBudget(50, throwingFn).catch(e => e);
       expect(err).toBeInstanceOf(HookBudgetTimeout);
+      clearTimeout(workTimer); // don't leak the abandoned work timer
     }, 5000);
 
-    it('calls .finally(clearTimeout) — timer cleared even on rejection', async () => {
+    it('clears the budget timer when fn rejects within budget', async () => {
+      // Replaces a former assertion-free test whose premise ("jest open handle
+      // detector is the gate") was false twice over: detectOpenHandles is not
+      // enabled, and the budget timer is unref()'d so it could never trip the
+      // detector anyway. Assert the clearTimeout call directly instead.
       const { withBudget } = rt();
-      // This is proven implicitly by jest not warning about open handles
-      // after the test run with the slow-fn tests above.
-      const p = withBudget(50, () => new Promise(r => setTimeout(r, 2000)));
-      await p.catch(() => {}); // swallow rejection
-      // No assertion needed — jest open handle detector is the gate
+      const setSpy = jest.spyOn(global, 'setTimeout');
+      const clearSpy = jest.spyOn(global, 'clearTimeout');
+      try {
+        const err = await withBudget(5000, () => Promise.reject(new Error('boom'))).catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe('boom');
+        // Find the budget timer withBudget created (the 5000ms setTimeout)...
+        const idx = setSpy.mock.calls.findIndex(c => c[1] === 5000);
+        expect(idx).toBeGreaterThanOrEqual(0);
+        const budgetTimer = setSpy.mock.results[idx].value;
+        // ...and require that it was cleared on the rejection path.
+        expect(clearSpy.mock.calls.some(c => c[0] === budgetTimer)).toBe(true);
+      } finally {
+        setSpy.mockRestore();
+        clearSpy.mockRestore();
+      }
     }, 5000);
   });
 
@@ -1403,9 +1425,11 @@ describe('hook-runtime: in-process coverage smokes (TASK-00024)', () => {
     it('opts.label is used in the timeout warn meta when timeout fires', async () => {
       const { withBudget, HookBudgetTimeout } = rt();
       let caught;
+      let workTimer;
       try {
-        await withBudget(20, () => new Promise(r => setTimeout(r, 500)), { label: 'work' });
+        await withBudget(20, () => new Promise(r => { workTimer = setTimeout(r, 500); }), { label: 'work' });
       } catch (e) { caught = e; }
+      clearTimeout(workTimer); // don't leak the abandoned work timer
       expect(caught).toBeInstanceOf(HookBudgetTimeout);
       expect(caught.meta.label).toBe('work');
       expect(caught.meta.ms).toBe(20);

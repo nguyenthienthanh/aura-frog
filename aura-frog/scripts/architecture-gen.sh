@@ -95,10 +95,11 @@ detect_key_dependencies() {
         echo "|---------|---------|"
 
         # Map common packages to purposes
-        local deps=$(cat package.json | grep -oP '"[^"]+"\s*:\s*"[^"]+"' 2>/dev/null | head -30)
+        # Portable grep -E (grep -P is GNU-only; silently empty on macOS).
+        local deps=$(grep -oE '"[^"]+"[[:space:]]*:[[:space:]]*"[^"]+"' package.json 2>/dev/null | head -30)
 
         while IFS= read -r line; do
-            local pkg=$(echo "$line" | grep -oP '"([^"]+)"' | head -1 | tr -d '"')
+            local pkg=$(echo "$line" | grep -oE '"[^"]+"' | head -1 | tr -d '"')
             [ -z "$pkg" ] && continue
 
             local purpose=""
@@ -162,9 +163,10 @@ detect_key_dependencies() {
         echo "| Package | Purpose |"
         echo "|---------|---------|"
 
-        local deps=$(cat composer.json | grep -oP '"[^/]+/[^"]+"\s*:\s*"[^"]+"' 2>/dev/null | head -20)
+        # Portable grep -E (grep -P is GNU-only; silently empty on macOS).
+        local deps=$(grep -oE '"[^/]+/[^"]+"[[:space:]]*:[[:space:]]*"[^"]+"' composer.json 2>/dev/null | head -20)
         while IFS= read -r line; do
-            local pkg=$(echo "$line" | grep -oP '"([^"]+)"' | head -1 | tr -d '"')
+            local pkg=$(echo "$line" | grep -oE '"[^"]+"' | head -1 | tr -d '"')
             [ -z "$pkg" ] && continue
             local purpose=""
             case "$pkg" in
@@ -212,7 +214,7 @@ detect_key_dependencies() {
         echo "|---------|---------|"
         local deps_file="requirements.txt"
         [ -f "pyproject.toml" ] && deps_file="pyproject.toml"
-        grep -oP '^\w[\w-]+' "$deps_file" 2>/dev/null | head -15 | while read -r pkg; do
+        grep -oE '^[A-Za-z0-9_][A-Za-z0-9_-]+' "$deps_file" 2>/dev/null | head -15 | while read -r pkg; do
             local purpose=""
             case "$pkg" in
                 django) purpose="Web framework" ;;

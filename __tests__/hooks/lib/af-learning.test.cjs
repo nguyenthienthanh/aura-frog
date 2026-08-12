@@ -1,134 +1,50 @@
+'use strict';
 /**
- * Tests for af-learning.cjs
+ * Tests for the REAL aura-frog/hooks/lib/af-learning.cjs module.
  *
- * Tests: feature flags, local storage operations, data validation,
- *        workflow events, pattern recording, metrics tracking
+ * History: this suite previously asserted against functions copy-pasted into
+ * the test file ("Replicate pure functions from source"), so it passed no
+ * matter what the real module did. It now require()s the actual module and
+ * drives its local-storage behavior through a temp project root
+ * (AF_PROJECT_ROOT is honored by hook-runtime's findProjectRoot, which
+ * af-learning uses to compute LEARNING_DIR at require time).
  */
 
-const path = require('path');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 
-// ---------------------------------------------------------------------------
-// Mock fs module
-// ---------------------------------------------------------------------------
-const mockFs = {
-  _files: {},
-  _dirs: new Set(),
-  existsSync(p) { return this._dirs.has(p) || p in this._files; },
-  readFileSync(p) {
-    if (p in this._files) return this._files[p];
-    throw new Error('ENOENT');
-  },
-  writeFileSync(p, data) { this._files[p] = data; },
-  mkdirSync(p) { this._dirs.add(p); },
-  _reset() { this._files = {}; this._dirs = new Set(); }
-};
+// Point the module at a temp project root BEFORE requiring it —
+// LEARNING_DIR is computed at require time via findProjectRoot().
+const TMP_ROOT = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'af-learning-test-'));
+process.env.AF_PROJECT_ROOT = TMP_ROOT;
 
-jest.mock('fs', () => mockFs);
+const learning = require('../../../aura-frog/hooks/lib/af-learning.cjs');
 
-// ---------------------------------------------------------------------------
-// Replicate pure functions from source for isolated testing
-// (avoids side-effects of requiring the actual module which touches fs/env)
-// ---------------------------------------------------------------------------
+const LEARNING_DIR = path.join(TMP_ROOT, '.claude', 'learning');
+const WORKFLOW_EVENTS_FILE = path.join(LEARNING_DIR, 'workflow-events.json');
+const FEEDBACK_FILE = path.join(LEARNING_DIR, 'feedback.json');
 
-function isSupabaseConfigured() {
-  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY);
+function writeLearningFile(file, data) {
+  fs.mkdirSync(LEARNING_DIR, { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(data));
 }
 
-function isLearningEnabled() {
-  if (process.env.AF_LEARNING_DISABLED === 'true') return false;
-  return true;
-}
-
-function isLocalMode() {
-  if (isSupabaseConfigured()) return false;
-  return true;
-}
-
-function isFeedbackEnabled() {
-  return isLearningEnabled() && process.env.AF_FEEDBACK_COLLECTION !== 'false';
-}
-
-function isMetricsEnabled() {
-  return isLearningEnabled() && process.env.AF_METRICS_COLLECTION !== 'false';
-}
-
-const LEARNING_DIR = path.join(process.cwd(), '.claude', 'learning');
-const LOCAL_FEEDBACK_FILE = path.join(LEARNING_DIR, 'feedback.json');
-const LOCAL_PATTERNS_FILE = path.join(LEARNING_DIR, 'patterns.json');
-const LOCAL_METRICS_FILE = path.join(LEARNING_DIR, 'metrics.json');
-const LOCAL_WORKFLOW_EVENTS_FILE = path.join(LEARNING_DIR, 'workflow-events.json');
-
-function loadLocalFile(filePath) {
-  try {
-    if (mockFs.existsSync(filePath)) {
-      return JSON.parse(mockFs.readFileSync(filePath, 'utf-8'));
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function saveLocalFile(filePath, data) {
-  try {
-    if (!mockFs.existsSync(LEARNING_DIR)) {
-      mockFs.mkdirSync(LEARNING_DIR, { recursive: true });
-    }
-    mockFs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-  } catch { /* ignore */ }
-}
-
-function getWorkflowEvents(workflowId) {
-  const allEvents = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
-  return allEvents.filter(e => e.workflow_id === workflowId);
-}
-
-function getWorkflowEventStats(workflowId = null) {
-  let events = loadLocalFile(LOCAL_WORKFLOW_EVENTS_FILE);
-  if (workflowId) {
-    events = events.filter(e => e.workflow_id === workflowId);
-  }
-  const stats = {
-    total: events.length,
-    byType: {},
-    byPhase: {},
-    recentEvents: events.slice(-10)
-  };
-  events.forEach(e => {
-    stats.byType[e.event_type] = (stats.byType[e.event_type] || 0) + 1;
-    const phaseKey = `phase_${e.phase}`;
-    if (!stats.byPhase[phaseKey]) {
-      stats.byPhase[phaseKey] = { approved: 0, rejected: 0, modified: 0 };
-    }
-    if (e.event_type === 'APPROVED') stats.byPhase[phaseKey].approved++;
-    if (e.event_type === 'REJECTED') stats.byPhase[phaseKey].rejected++;
-    if (e.event_type === 'MODIFIED') stats.byPhase[phaseKey].modified++;
-  });
-  return stats;
-}
-
-function getRecentFeedback(limit = 20) {
-  const feedback = loadLocalFile(LOCAL_FEEDBACK_FILE);
-  return feedback.slice(-limit);
-}
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
-describe('af-learning', () => {
+describe('af-learning (real module)', () => {
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
-    mockFs._reset();
-    // Clear env vars
     delete process.env.SUPABASE_URL;
     delete process.env.SUPABASE_SECRET_KEY;
     delete process.env.AF_LEARNING_DISABLED;
     delete process.env.AF_FEEDBACK_COLLECTION;
     delete process.env.AF_METRICS_COLLECTION;
+    fs.rmSync(LEARNING_DIR, { recursive: true, force: true });
   });
 
   afterAll(() => {
     process.env = originalEnv;
+    fs.rmSync(TMP_ROOT, { recursive: true, force: true });
   });
 
   // =========================================================================
@@ -136,108 +52,96 @@ describe('af-learning', () => {
   // =========================================================================
   describe('isSupabaseConfigured', () => {
     it('returns false when neither var is set', () => {
-      expect(isSupabaseConfigured()).toBe(false);
+      expect(learning.isSupabaseConfigured()).toBe(false);
     });
 
     it('returns false when only URL is set', () => {
       process.env.SUPABASE_URL = 'https://example.supabase.co';
-      expect(isSupabaseConfigured()).toBe(false);
+      expect(learning.isSupabaseConfigured()).toBe(false);
     });
 
     it('returns false when only SECRET_KEY is set', () => {
       process.env.SUPABASE_SECRET_KEY = 'secret';
-      expect(isSupabaseConfigured()).toBe(false);
+      expect(learning.isSupabaseConfigured()).toBe(false);
     });
 
     it('returns true when both are set', () => {
       process.env.SUPABASE_URL = 'https://example.supabase.co';
       process.env.SUPABASE_SECRET_KEY = 'secret';
-      expect(isSupabaseConfigured()).toBe(true);
+      expect(learning.isSupabaseConfigured()).toBe(true);
     });
   });
 
   describe('isLearningEnabled', () => {
     it('returns true by default', () => {
-      expect(isLearningEnabled()).toBe(true);
+      expect(learning.isLearningEnabled()).toBe(true);
     });
 
     it('returns false when AF_LEARNING_DISABLED=true', () => {
       process.env.AF_LEARNING_DISABLED = 'true';
-      expect(isLearningEnabled()).toBe(false);
+      expect(learning.isLearningEnabled()).toBe(false);
     });
 
     it('returns true when AF_LEARNING_DISABLED is something else', () => {
       process.env.AF_LEARNING_DISABLED = 'false';
-      expect(isLearningEnabled()).toBe(true);
+      expect(learning.isLearningEnabled()).toBe(true);
     });
   });
 
   describe('isLocalMode', () => {
     it('returns true when Supabase not configured', () => {
-      expect(isLocalMode()).toBe(true);
+      expect(learning.isLocalMode()).toBe(true);
     });
 
     it('returns false when Supabase is configured', () => {
       process.env.SUPABASE_URL = 'https://example.supabase.co';
       process.env.SUPABASE_SECRET_KEY = 'secret';
-      expect(isLocalMode()).toBe(false);
+      expect(learning.isLocalMode()).toBe(false);
     });
   });
 
   describe('isFeedbackEnabled', () => {
     it('returns true by default (learning enabled + feedback not disabled)', () => {
-      expect(isFeedbackEnabled()).toBe(true);
+      expect(learning.isFeedbackEnabled()).toBe(true);
     });
 
     it('returns false when learning is disabled', () => {
       process.env.AF_LEARNING_DISABLED = 'true';
-      expect(isFeedbackEnabled()).toBe(false);
+      expect(learning.isFeedbackEnabled()).toBe(false);
     });
 
     it('returns false when AF_FEEDBACK_COLLECTION=false', () => {
       process.env.AF_FEEDBACK_COLLECTION = 'false';
-      expect(isFeedbackEnabled()).toBe(false);
+      expect(learning.isFeedbackEnabled()).toBe(false);
     });
   });
 
   describe('isMetricsEnabled', () => {
     it('returns true by default', () => {
-      expect(isMetricsEnabled()).toBe(true);
+      expect(learning.isMetricsEnabled()).toBe(true);
     });
 
     it('returns false when learning disabled', () => {
       process.env.AF_LEARNING_DISABLED = 'true';
-      expect(isMetricsEnabled()).toBe(false);
+      expect(learning.isMetricsEnabled()).toBe(false);
     });
 
     it('returns false when AF_METRICS_COLLECTION=false', () => {
       process.env.AF_METRICS_COLLECTION = 'false';
-      expect(isMetricsEnabled()).toBe(false);
+      expect(learning.isMetricsEnabled()).toBe(false);
     });
   });
 
   // =========================================================================
-  // Local storage paths
+  // Storage paths (exported constants)
   // =========================================================================
   describe('storage paths', () => {
-    it('LEARNING_DIR is under .claude/learning', () => {
-      expect(LEARNING_DIR).toContain(path.join('.claude', 'learning'));
+    it('LEARNING_DIR is under <projectRoot>/.claude/learning', () => {
+      expect(learning.LEARNING_DIR).toBe(LEARNING_DIR);
     });
 
-    it('feedback file is feedback.json', () => {
-      expect(LOCAL_FEEDBACK_FILE).toContain('feedback.json');
-    });
-
-    it('patterns file is patterns.json', () => {
-      expect(LOCAL_PATTERNS_FILE).toContain('patterns.json');
-    });
-
-    it('metrics file is metrics.json', () => {
-      expect(LOCAL_METRICS_FILE).toContain('metrics.json');
-    });
-
-    it('workflow events file is workflow-events.json', () => {
-      expect(LOCAL_WORKFLOW_EVENTS_FILE).toContain('workflow-events.json');
+    it('workflow events file is workflow-events.json under LEARNING_DIR', () => {
+      expect(learning.LOCAL_WORKFLOW_EVENTS_FILE).toBe(WORKFLOW_EVENTS_FILE);
     });
   });
 
@@ -246,31 +150,57 @@ describe('af-learning', () => {
   // =========================================================================
   describe('loadLocalFile', () => {
     it('returns empty array when file does not exist', () => {
-      expect(loadLocalFile('/nonexistent/file.json')).toEqual([]);
+      expect(learning.loadLocalFile(path.join(LEARNING_DIR, 'missing.json'))).toEqual([]);
     });
 
     it('returns parsed JSON when file exists', () => {
       const data = [{ id: 1 }, { id: 2 }];
-      mockFs._files['/test/data.json'] = JSON.stringify(data);
-      expect(loadLocalFile('/test/data.json')).toEqual(data);
+      writeLearningFile(path.join(LEARNING_DIR, 'data.json'), data);
+      expect(learning.loadLocalFile(path.join(LEARNING_DIR, 'data.json'))).toEqual(data);
     });
 
     it('returns empty array on malformed JSON', () => {
-      mockFs._files['/test/bad.json'] = 'not json{{{';
-      expect(loadLocalFile('/test/bad.json')).toEqual([]);
+      fs.mkdirSync(LEARNING_DIR, { recursive: true });
+      fs.writeFileSync(path.join(LEARNING_DIR, 'bad.json'), 'not json{{{');
+      expect(learning.loadLocalFile(path.join(LEARNING_DIR, 'bad.json'))).toEqual([]);
+    });
+
+    it('handles object JSON (not just arrays)', () => {
+      const obj = { key: 'value', nested: { a: 1 } };
+      writeLearningFile(path.join(LEARNING_DIR, 'obj.json'), obj);
+      expect(learning.loadLocalFile(path.join(LEARNING_DIR, 'obj.json'))).toEqual(obj);
     });
   });
 
   describe('saveLocalFile', () => {
-    it('writes JSON to file', () => {
+    it('writes pretty-printed JSON to the file (atomic tmp+rename)', () => {
+      const target = path.join(LEARNING_DIR, 'out.json');
       const data = [{ key: 'value' }];
-      saveLocalFile('/test/out.json', data);
-      expect(mockFs._files['/test/out.json']).toBe(JSON.stringify(data, null, 2));
+      learning.saveLocalFile(target, data);
+      expect(fs.readFileSync(target, 'utf-8')).toBe(JSON.stringify(data, null, 2));
+      // no leftover tmp file from the atomic write
+      expect(fs.readdirSync(LEARNING_DIR).filter(f => f.endsWith('.tmp'))).toEqual([]);
     });
 
-    it('creates learning directory if missing', () => {
-      saveLocalFile('/test/file.json', []);
-      expect(mockFs._dirs.has(LEARNING_DIR)).toBe(true);
+    it('creates the parent directory if missing', () => {
+      const target = path.join(LEARNING_DIR, 'deep', 'file.json');
+      learning.saveLocalFile(target, []);
+      expect(fs.existsSync(target)).toBe(true);
+    });
+
+    it('round-trips nested objects through loadLocalFile', () => {
+      const target = path.join(LEARNING_DIR, 'nested.json');
+      const data = { patterns: [{ type: 'a' }], meta: { count: 1 } };
+      learning.saveLocalFile(target, data);
+      const parsed = learning.loadLocalFile(target);
+      expect(parsed.patterns[0].type).toBe('a');
+      expect(parsed.meta.count).toBe(1);
+    });
+
+    it('handles empty array', () => {
+      const target = path.join(LEARNING_DIR, 'empty.json');
+      learning.saveLocalFile(target, []);
+      expect(learning.loadLocalFile(target)).toEqual([]);
     });
   });
 
@@ -279,18 +209,18 @@ describe('af-learning', () => {
   // =========================================================================
   describe('getWorkflowEvents', () => {
     it('returns empty array when no events stored', () => {
-      expect(getWorkflowEvents('wf-1')).toEqual([]);
+      expect(learning.getWorkflowEvents('wf-1')).toEqual([]);
     });
 
     it('filters events by workflow_id', () => {
       const events = [
         { workflow_id: 'wf-1', event_type: 'APPROVED', phase: 1 },
         { workflow_id: 'wf-2', event_type: 'REJECTED', phase: 2 },
-        { workflow_id: 'wf-1', event_type: 'MODIFIED', phase: 3 }
+        { workflow_id: 'wf-1', event_type: 'MODIFIED', phase: 3 },
       ];
-      mockFs._files[LOCAL_WORKFLOW_EVENTS_FILE] = JSON.stringify(events);
+      writeLearningFile(WORKFLOW_EVENTS_FILE, events);
 
-      const result = getWorkflowEvents('wf-1');
+      const result = learning.getWorkflowEvents('wf-1');
       expect(result).toHaveLength(2);
       expect(result.every(e => e.workflow_id === 'wf-1')).toBe(true);
     });
@@ -304,46 +234,44 @@ describe('af-learning', () => {
       { workflow_id: 'wf-1', event_type: 'APPROVED', phase: 1 },
       { workflow_id: 'wf-1', event_type: 'REJECTED', phase: 2 },
       { workflow_id: 'wf-1', event_type: 'APPROVED', phase: 3 },
-      { workflow_id: 'wf-2', event_type: 'MODIFIED', phase: 1 }
+      { workflow_id: 'wf-2', event_type: 'MODIFIED', phase: 1 },
     ];
 
     beforeEach(() => {
-      mockFs._files[LOCAL_WORKFLOW_EVENTS_FILE] = JSON.stringify(sampleEvents);
+      writeLearningFile(WORKFLOW_EVENTS_FILE, sampleEvents);
     });
 
     it('returns stats for all events when no workflowId given', () => {
-      const stats = getWorkflowEventStats();
-      expect(stats.total).toBe(4);
+      expect(learning.getWorkflowEventStats().total).toBe(4);
     });
 
     it('returns stats filtered by workflowId', () => {
-      const stats = getWorkflowEventStats('wf-1');
-      expect(stats.total).toBe(3);
+      expect(learning.getWorkflowEventStats('wf-1').total).toBe(3);
     });
 
     it('counts event types correctly', () => {
-      const stats = getWorkflowEventStats();
+      const stats = learning.getWorkflowEventStats();
       expect(stats.byType['APPROVED']).toBe(2);
       expect(stats.byType['REJECTED']).toBe(1);
       expect(stats.byType['MODIFIED']).toBe(1);
     });
 
     it('groups by phase correctly', () => {
-      const stats = getWorkflowEventStats('wf-1');
+      const stats = learning.getWorkflowEventStats('wf-1');
       expect(stats.byPhase['phase_1'].approved).toBe(1);
       expect(stats.byPhase['phase_2'].rejected).toBe(1);
       expect(stats.byPhase['phase_3'].approved).toBe(1);
     });
 
     it('includes recentEvents (max 10)', () => {
-      const stats = getWorkflowEventStats();
+      const stats = learning.getWorkflowEventStats();
       expect(stats.recentEvents.length).toBeLessThanOrEqual(10);
       expect(stats.recentEvents).toEqual(sampleEvents);
     });
 
     it('returns empty stats when no events file', () => {
-      mockFs._reset();
-      const stats = getWorkflowEventStats();
+      fs.rmSync(WORKFLOW_EVENTS_FILE, { force: true });
+      const stats = learning.getWorkflowEventStats();
       expect(stats.total).toBe(0);
       expect(stats.byType).toEqual({});
     });
@@ -354,14 +282,14 @@ describe('af-learning', () => {
   // =========================================================================
   describe('getRecentFeedback', () => {
     it('returns empty array when no feedback file', () => {
-      expect(getRecentFeedback()).toEqual([]);
+      expect(learning.getRecentFeedback()).toEqual([]);
     });
 
     it('returns last N feedback entries', () => {
       const feedback = Array.from({ length: 30 }, (_, i) => ({ id: i }));
-      mockFs._files[LOCAL_FEEDBACK_FILE] = JSON.stringify(feedback);
+      writeLearningFile(FEEDBACK_FILE, feedback);
 
-      const result = getRecentFeedback(5);
+      const result = learning.getRecentFeedback(5);
       expect(result).toHaveLength(5);
       expect(result[0].id).toBe(25);
       expect(result[4].id).toBe(29);
@@ -369,42 +297,13 @@ describe('af-learning', () => {
 
     it('defaults to 20 entries', () => {
       const feedback = Array.from({ length: 30 }, (_, i) => ({ id: i }));
-      mockFs._files[LOCAL_FEEDBACK_FILE] = JSON.stringify(feedback);
-
-      const result = getRecentFeedback();
-      expect(result).toHaveLength(20);
+      writeLearningFile(FEEDBACK_FILE, feedback);
+      expect(learning.getRecentFeedback()).toHaveLength(20);
     });
 
     it('returns all entries if fewer than limit', () => {
-      const feedback = [{ id: 1 }, { id: 2 }];
-      mockFs._files[LOCAL_FEEDBACK_FILE] = JSON.stringify(feedback);
-
-      const result = getRecentFeedback(20);
-      expect(result).toHaveLength(2);
-    });
-  });
-
-  // =========================================================================
-  // Data validation & edge cases
-  // =========================================================================
-  describe('data validation', () => {
-    it('loadLocalFile handles object JSON (not just arrays)', () => {
-      const obj = { key: 'value', nested: { a: 1 } };
-      mockFs._files['/test/obj.json'] = JSON.stringify(obj);
-      expect(loadLocalFile('/test/obj.json')).toEqual(obj);
-    });
-
-    it('saveLocalFile handles nested objects', () => {
-      const data = { patterns: [{ type: 'a' }], meta: { count: 1 } };
-      saveLocalFile('/test/nested.json', data);
-      const parsed = JSON.parse(mockFs._files['/test/nested.json']);
-      expect(parsed.patterns[0].type).toBe('a');
-      expect(parsed.meta.count).toBe(1);
-    });
-
-    it('saveLocalFile handles empty array', () => {
-      saveLocalFile('/test/empty.json', []);
-      expect(JSON.parse(mockFs._files['/test/empty.json'])).toEqual([]);
+      writeLearningFile(FEEDBACK_FILE, [{ id: 1 }, { id: 2 }]);
+      expect(learning.getRecentFeedback(20)).toHaveLength(2);
     });
   });
 });

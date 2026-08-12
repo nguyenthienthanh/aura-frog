@@ -201,15 +201,18 @@ get_exports() {
     local filepath="$1"
     local ext="${filepath##*.}"
 
+    # NOTE: portable sed -E only — the previous `grep -oP` (PCRE lookbehind)
+    # is GNU-only; macOS BSD grep exits 2 on -P, and the suppressed stderr in
+    # a non-final pipeline stage made the exports column silently empty.
     case "$ext" in
         ts|tsx|js|jsx)
-            grep -oP '(?<=export )(default |const |function |class |type |interface |enum )\K\w+' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
+            sed -nE 's/.*export (default |const |function |class |type |interface |enum )([A-Za-z0-9_]+).*/\2/p' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
             ;;
         py)
-            grep -oP '(?<=^def )\w+|(?<=^class )\w+' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
+            sed -nE 's/^(def|class) ([A-Za-z0-9_]+).*/\2/p' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
             ;;
         go)
-            grep -oP '(?<=^func )\w+|(?<=^type )\w+' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
+            sed -nE 's/^(func|type) ([A-Za-z0-9_]+).*/\2/p' "$filepath" 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//'
             ;;
         *)
             echo ""

@@ -47,24 +47,35 @@ ACTUAL_COMMANDS=$(find "$BASE_DIR/commands" -name '*.md' ! -name 'README.md' | w
 ACTUAL_HOOKS=$(find "$BASE_DIR/hooks" -maxdepth 1 -name '*.cjs' | wc -l | tr -d ' ')
 
 # -----------------------------------------------------------------------------
-# Extract expected counts from CLAUDE.md
-# Purpose line format: "11 agents + 50 skills + 88 commands"
+# Extract expected counts from CLAUDE.md's Resources TOON block — the declared
+# single source ("Component counts: see **Resources** below (single source)").
+# Format:  Agents (15),agents/
+#
+# HISTORY: this script used to parse counts out of the "**Purpose:**" line.
+# When that line dropped its inline numbers, extract_count silently returned
+# "?" and check_match treated "?" as a non-failing "??" status — so agents/
+# skills/commands were simply not validated anymore. A missing count marker
+# is now a HARD FAILURE, never a silent skip.
 # -----------------------------------------------------------------------------
 
-PURPOSE_LINE=$(grep -E '^\*\*Purpose:\*\*' "$CLAUDE_MD" 2>/dev/null || echo "")
-
 extract_count() {
-  local component="$1"
-  echo "$PURPOSE_LINE" | grep -oE "[0-9]+ ${component}" | grep -oE '[0-9]+' || echo "?"
+  local component="$1"   # capitalized TOON row label, e.g. "Agents"
+  grep -oE "${component} \(([0-9]+)\)" "$CLAUDE_MD" 2>/dev/null | head -1 | grep -oE '[0-9]+' || echo "MISSING"
 }
 
-EXPECTED_AGENTS=$(extract_count "agents")
-EXPECTED_SKILLS=$(extract_count "skills")
-EXPECTED_COMMANDS=$(extract_count "commands")
+EXPECTED_AGENTS=$(extract_count "Agents")
+EXPECTED_SKILLS=$(extract_count "Skills")
+EXPECTED_RULES=$(extract_count "Rules")
+EXPECTED_COMMANDS=$(extract_count "Commands")
+EXPECTED_HOOKS=$(extract_count "Hooks")
 
-# Rules and hooks may not be in purpose line; try plugin.json
-EXPECTED_RULES=$(grep -oE '[0-9]+ rules' "$PLUGIN_JSON" 2>/dev/null | grep -oE '[0-9]+' || echo "?")
-EXPECTED_HOOKS=$(grep -oE '[0-9]+ hooks' "$PLUGIN_JSON" 2>/dev/null | grep -oE '[0-9]+' || echo "?")
+# Cross-check: plugin.json's description also carries counts ("15 agents,
+# ... 60 skills, 24 commands, 50 hooks, 72 rules"). Any count present there
+# must agree with the actual file counts too.
+plugin_json_count() {
+  local word="$1"   # lowercase, e.g. "agents"
+  grep -oE "[0-9]+ ${word}" "$PLUGIN_JSON" 2>/dev/null | head -1 | grep -oE '[0-9]+' || echo ""
+}
 
 # -----------------------------------------------------------------------------
 # Compare and build table
@@ -75,8 +86,11 @@ check_match() {
   local actual="$2"
   local expected="$3"
 
-  if [ "$expected" = "?" ]; then
-    STATUS="${YELLOW}??${NC}"
+  if [ "$expected" = "MISSING" ]; then
+    # No count marker found where counts are supposed to live — that means
+    # the source moved (again) and this validator went blind. Fail loudly.
+    STATUS="${RED}NO MARKER${NC}"
+    MISMATCHES=$((MISMATCHES + 1))
   elif [ "$actual" -eq "$expected" ] 2>/dev/null; then
     STATUS="${GREEN}OK${NC}"
   else
@@ -102,6 +116,22 @@ check_match "Skills"   "$ACTUAL_SKILLS"   "$EXPECTED_SKILLS"
 check_match "Rules"    "$ACTUAL_RULES"    "$EXPECTED_RULES"
 check_match "Commands" "$ACTUAL_COMMANDS" "$EXPECTED_COMMANDS"
 check_match "Hooks"    "$ACTUAL_HOOKS"    "$EXPECTED_HOOKS"
+
+echo ""
+echo -e "  ${BOLD}plugin.json description cross-check:${NC}"
+for pair in "agents:$ACTUAL_AGENTS" "skills:$ACTUAL_SKILLS" "rules:$ACTUAL_RULES" "commands:$ACTUAL_COMMANDS" "hooks:$ACTUAL_HOOKS"; do
+  word="${pair%%:*}"
+  actual="${pair##*:}"
+  pj=$(plugin_json_count "$word")
+  if [ -z "$pj" ]; then
+    printf "  %-12s (not mentioned — skipped)\n" "$word"
+  elif [ "$pj" -eq "$actual" ] 2>/dev/null; then
+    printf "  %-12s %s    ${GREEN}OK${NC}\n" "$word" "$pj"
+  else
+    printf "  %-12s says %s, actual %s    ${RED}MISMATCH${NC}\n" "$word" "$pj" "$actual"
+    MISMATCHES=$((MISMATCHES + 1))
+  fi
+done
 
 echo ""
 
