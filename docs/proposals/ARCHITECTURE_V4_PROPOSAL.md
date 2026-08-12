@@ -1,3 +1,9 @@
+---
+last_aligned_with: v3.8.0-alpha.9
+status: current
+audience: contributor
+---
+
 # Architecture v4 Proposal — Aura Frog
 
 **Status:** DRAFT — awaiting maintainer approval. No code in this document has been applied.
