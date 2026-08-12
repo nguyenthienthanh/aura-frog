@@ -12,6 +12,8 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.10] - 2026-08-12 (Hook dispatch, RAM discipline, and 33 verified audit fixes)
+
 ### Performance
 
 - **Hook chains now run in one node process instead of one per script.** `hooks.json` registered 54 separate `node <script>.cjs` commands; a single Read tool call fired 5 of them on PreToolUse alone at ~536ms and ~45MB peak RSS each, almost all interpreter boot, and the multi-agent flows paid it 5–7× in parallel. `hooks/dispatch.cjs` reads fd 0 once and replays it to each hook, loads each with its `require.main` guard satisfied, and intercepts `process.exit` so one hook exiting doesn't kill the rest. 54 → 30 commands with all 48 scripts and 51 invocations kept in order; PreToolUse hot chain 359ms → 230ms (4 processes → 1), UserPromptSubmit 87ms → 56ms. `AF_DISPATCH_DISABLED=1` restores the old behaviour. Four bugs the tests caught during review: hooks wrap their body in `try { … } catch (e) { log(e); exit(0) }`, so that catch swallowed the unwind sentinel and reported success — `scout-block`'s exit 2 silently became 0, disarming every blocking hook; a sentinel thrown from a `setTimeout` surfaces as `uncaughtException`, not a rejection, and node aborted with code 1 (which Claude Code reads as "block"); a stray timer from a finished hook was credited to the running hook and cut it short (`AsyncLocalStorage` now attributes the exit to the hook that armed it); and waiting per hook cost `prompt-reminder` the full 5s timeout on every prompt, since only 44 of 50 hooks call `process.exit`.
