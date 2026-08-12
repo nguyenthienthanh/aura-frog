@@ -36,6 +36,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { readSessionState } = require('./lib/af-config-utils.cjs');
 const { readHookInputCompat, findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { acquireRunLock: acquireSharedLock } = require('./lib/af-run-lock.cjs');
 
 // Resolve the edited file from the PostToolUse stdin payload (tool_input),
 // falling back to the legacy CLAUDE_FILE_PATHS env var. The old code read only
@@ -133,34 +134,15 @@ function detectTestRunner(filePath) {
  * Single-flight guard. A burst of Write/Edit calls used to stack one full test
  * run per edit, each with its own worker fan-out. Returns a release function,
  * or null when a live run already holds the lock.
+ *
+ * Shares lib/af-run-lock.cjs with lint-autofix — same hazard (a PostToolUse
+ * hook launching an expensive child once per tool call), so same primitive.
+ * Stale window is twice the test budget: a run still inside its own timeout
+ * must not have its lock stolen.
  */
 function acquireRunLock() {
   const lockFile = path.join(findProjectRoot(), '.claude', 'cache', '.auto-test-runner.lock');
-  try {
-    fs.mkdirSync(path.dirname(lockFile), { recursive: true });
-    try {
-      fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' });
-    } catch {
-      // Held — unless the holder died or wedged past the timeout budget.
-      const stale = (() => {
-        try {
-          if (Date.now() - fs.statSync(lockFile).mtimeMs > TEST_TIMEOUT * 2) return true;
-          const pid = parseInt(fs.readFileSync(lockFile, 'utf-8'), 10);
-          if (!pid) return true;
-          process.kill(pid, 0); // throws ESRCH when the holder is gone
-          return false;
-        } catch {
-          return true;
-        }
-      })();
-      if (!stale) return null;
-      fs.writeFileSync(lockFile, String(process.pid));
-    }
-    return () => { try { fs.unlinkSync(lockFile); } catch { /* already gone */ } };
-  } catch {
-    // Cannot manage a lock (read-only fs?) — run unguarded rather than never.
-    return () => {};
-  }
+  return acquireSharedLock(lockFile, { staleMs: TEST_TIMEOUT * 2 });
 }
 
 /**
