@@ -66,7 +66,7 @@ For a project-scope task that touches 5+ features, `/run` will offer to escalate
 - [GET_STARTED.md](GET_STARTED.md) — Full setup walkthrough with first workflow
 - [FIRST_WORKFLOW_TUTORIAL.md](FIRST_WORKFLOW_TUTORIAL.md) — Guided hands-on tutorial
 - [All Commands](../../aura-frog/commands/README.md) — 24 commands (core 6 + `/aura-frog:*` planning suite)
-- [MCP Guide](../operations/MCP_GUIDE.md) — 8 MCP servers (6 enabled + postgres/redis opt-in)
+- [MCP Guide](../operations/MCP_GUIDE.md) — 6 bundled MCP servers (all enabled) + opt-in snippets
 - [Agent Selection Guide](../guides/AGENT_SELECTION_GUIDE.md) — How agents are auto-picked per task
 
 ---

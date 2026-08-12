@@ -91,7 +91,7 @@ cp .envrc.template .envrc
 aura-frog/                           # Repository root
 ├── aura-frog/                       # Main plugin directory
 │   ├── CLAUDE.md                    # Core AI instructions
-│   ├── .mcp.json                    # Bundled MCP servers config (8 servers — 6 enabled, postgres+redis opt-in)
+│   ├── .mcp.json                    # Bundled MCP servers config (6 servers, all enabled)
 │   ├── agents/                      # 15 specialized agents
 │   ├── commands/                    # 24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 │   ├── skills/                      # 60 skills (9 auto-invoke + 51 reference)

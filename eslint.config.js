@@ -25,7 +25,7 @@ module.exports = [
       },
     },
     // All rules are 'warn' severity, so eslint alone always exits 0. The
-    // enforcement lives in package.json's lint script: --max-warnings=123
+    // enforcement lives in package.json's lint script: --max-warnings=121
     // (the baseline count as of 2026-08). Any new warning fails `npm run
     // lint` / CI; lower the cap as warnings are burned down toward 0.
     rules: {

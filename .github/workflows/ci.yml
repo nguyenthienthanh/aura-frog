@@ -136,7 +136,7 @@ jobs:
         run: npm install
 
       - name: Lint hooks
-        # `npm run lint` carries --max-warnings=123 (current baseline): all
+        # `npm run lint` carries --max-warnings=121 (current baseline): all
         # rules are 'warn' severity, so without a cap eslint always exits 0
         # and this job could never fail. The cap is a ratchet — any NEW
         # warning fails CI; lower the number as warnings are burned down.

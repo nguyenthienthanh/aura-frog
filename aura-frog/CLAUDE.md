@@ -33,7 +33,7 @@ os_map[5]{concept,implementation}:
   Processes,15 agents (PID + state + budget)
   RAM,Context window (managed segments)
   Scheduler,5-phase TDD workflow
-  Drivers,11 MCP servers (auto-invoked; 6 enabled + 5 opt-in)
+  Drivers,6 MCP servers (auto-invoked; all enabled)
 ```
 
 ---
@@ -78,21 +78,18 @@ Owned end-to-end by `scripts/statusline.sh` — multi-line, 0 conversation token
 ## MCP Servers
 
 ```toon
-mcp[11]{name,purpose,requires,enabled}:
-  context7,Library docs,None,enabled
-  playwright,Browser automation + E2E (headless+isolated; browser is lazy — close it when done),None,enabled
-  vitest,Test execution + coverage,None,enabled
-  firebase,Firebase management,firebase login,enabled
-  figma,Design files,FIGMA_API_TOKEN,enabled
-  slack,Notifications,SLACK_BOT_TOKEN,enabled
-  postgres,Database queries (read-only default),POSTGRES_CONNECTION_STRING,disabled (opt-in)
-  redis,Cache + queue,REDIS_URL,disabled (opt-in)
-  chrome-devtools,Live inspection/diagnostics (~5-6k tok/session; NOT automation — that's playwright),None,disabled (opt-in)
-  codebase-memory,Code knowledge-graph (search_graph/trace_path; user installs binary),None,disabled (opt-in)
-  stitch,Google Stitch AI UI generation (generate/edit screens + design-system tools),STITCH_API_KEY,disabled (opt-in)
+mcp[6]{name,purpose,requires}:
+  context7,Library docs,None
+  playwright,Browser automation + E2E (headless+isolated; browser is lazy — close it when done),None
+  vitest,Test execution + coverage,None
+  firebase,Firebase management,firebase login
+  figma,Design files,FIGMA_API_TOKEN
+  slack,Notifications,SLACK_BOT_TOKEN
 ```
 
 Auto-invoked by context. Config: `.mcp.json`
+
+**Every entry in `.mcp.json` starts — there is no opt-in tier.** Claude Code ignores `"disabled": true` (measured: `chrome-devtools` was marked disabled and still ran 6 processes incl. a real Chrome), so a server is kept off by being **absent**, not flagged. postgres / redis / chrome-devtools / codebase-memory / stitch are therefore unbundled; copy-pasteable snippets to add one to a project's own `.mcp.json`: `docs/operations/MCP_GUIDE.md § Optional Servers`.
 
 **Browser hygiene:** the playwright Chrome launches lazily (first `browser_*` call) and does **not** close itself — always `browser_close` when a browser task finishes. The `playwright-reaper` SessionStart hook is the backstop: it kills only *orphaned* playwright processes (a headless Chrome whose MCP server died → `ppid 1`, running for days), never a live session's browser or your normal Chrome. Disable with `AF_PLAYWRIGHT_REAPER_DISABLED=true`.
 
@@ -280,7 +277,7 @@ resources[8]{name,location}:
   Rules (72),rules/{core|agent|workflow}/
   Skills (60),skills/
   Hooks (51),hooks/
-  MCP (11),.mcp.json (postgres/redis/chrome-devtools/codebase-memory/stitch disabled by default)
+  MCP (6),.mcp.json (all enabled; postgres/redis/chrome-devtools/codebase-memory/stitch unbundled — see docs/operations/MCP_GUIDE.md)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
 ```

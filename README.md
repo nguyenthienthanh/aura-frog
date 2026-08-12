@@ -313,7 +313,7 @@ Expected output:
   Skills:   60 available (9 auto-invoke, 51 on-demand)
   Rules:    72 loaded (22 core + 20 agent + 30 workflow)
   Hooks:    49 registered
-  MCP:      context7, playwright, vitest, firebase, figma, slack, postgres (disabled), redis (disabled)
+  MCP:      context7, playwright, vitest, firebase, figma, slack
 ```
 
 ### Initialize Your Project (Recommended — one time)
@@ -413,7 +413,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | **Rules** | 72 | 3-tier loading (22 core + 20 agent + 30 workflow) — only what's needed |
 | **Hooks** | 49 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
 | **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
-| **MCP Servers** | 10 | 6 enabled by default; postgres/redis/chrome-devtools/codebase-memory opt-in |
+| **MCP Servers** | 6 | All enabled — every `.mcp.json` entry starts, so opt-in servers are unbundled ([snippets](docs/operations/MCP_GUIDE.md#optional-servers-not-bundled)) |
 | **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |
 
 Full workflow target: **≤30K tokens** across all 5 phases.
@@ -688,7 +688,7 @@ aura-frog/
 ├── hooks/          50 lifecycle hooks (conditional execution)
 ├── scripts/        utility scripts (CI, plans, preflight, workflow, security, …)
 ├── docs/           AI reference docs (phases, TOON refs)
-└── .mcp.json       8 device drivers (6 enabled + postgres/redis opt-in)
+└── .mcp.json       6 device drivers (all enabled)
 ```
 
 ---

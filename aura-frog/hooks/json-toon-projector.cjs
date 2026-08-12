@@ -31,6 +31,8 @@
  * Configuration env vars:
  *   AF_JSON_TOON_DISABLED=true  → skip entirely (fallback for debugging)
  *   AF_JSON_TOON_MIN_BYTES=2000 → minimum file/payload size to project
+ *   AF_JSON_TOON_MAX_BYTES=1048576 → maximum size; above it the file is skipped
+ *                                    (projection would hold raw + parsed + TOON)
  *
  * Exit codes:
  *   0 — always (informational; never blocks)
@@ -49,6 +51,21 @@ if (process.env.AF_JSON_TOON_DISABLED === 'true') process.exit(0);
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
 const TOON_CONVERTER_PATH = path.join(PLUGIN_ROOT, 'scripts', 'json-to-toon.cjs');
 const MIN_BYTES = parseInt(process.env.AF_JSON_TOON_MIN_BYTES || '2000', 10);
+// Upper cap. Projecting means holding the raw string + the parsed object + the
+// TOON string at once — three copies. Above this, skipping is cheaper than any
+// context saving the projection could buy, and this hook runs on EVERY Read.
+const MAX_BYTES = parseInt(process.env.AF_JSON_TOON_MAX_BYTES || '1048576', 10);
+
+// Bounds for the .claude/logs scan (mcp__.* path). Without these the walk
+// recurses an unbounded tree on a hot path.
+const LOG_SCAN_MAX_DEPTH = 4;
+const LOG_SCAN_MAX_CANDIDATES = 50;
+const LOG_SCAN_WINDOW_MS = 60_000;
+// Directory-prune grace. A dir's mtime changes when entries are added/removed,
+// but NOT when an existing file is rewritten in place — so pruning strictly at
+// the 60s window would miss in-place appends. A full day of slack keeps the
+// prune limited to what it is actually for: stale archive/date directories.
+const LOG_SCAN_PRUNE_GRACE_MS = 24 * 60 * 60 * 1000;
 
 const SKIP_FILES = new Set([
   '.mcp.json',
@@ -135,7 +152,7 @@ function projectReadTool() {
 
   let stat;
   try { stat = fs.statSync(filePath); } catch { return null; }
-  if (stat.size < MIN_BYTES) return null;
+  if (stat.size < MIN_BYTES || stat.size > MAX_BYTES) return null;
 
   let raw;
   try { raw = fs.readFileSync(filePath, 'utf-8'); } catch { return null; }
@@ -154,34 +171,65 @@ function projectReadTool() {
   }
 }
 
+// Bounded scan for recent, projectable JSON under `root`.
+//
+// Runs on a hot path (every mcp__.* tool result), so every step is bounded:
+//   - depth-limited recursion (LOG_SCAN_MAX_DEPTH)
+//   - stops collecting at LOG_SCAN_MAX_CANDIDATES qualifying files
+//   - EXACTLY ONE statSync per file — it yields both mtime and size
+//   - stale directories are pruned by mtime before descending
+// Returns qualifying {p, m, s} records, newest first. Pure enough to test:
+// takes `now` and its bounds as arguments.
+function collectRecentJson(root, opts = {}) {
+  const now = opts.now != null ? opts.now : Date.now();
+  const windowMs = opts.windowMs != null ? opts.windowMs : LOG_SCAN_WINDOW_MS;
+  const minBytes = opts.minBytes != null ? opts.minBytes : MIN_BYTES;
+  const maxBytes = opts.maxBytes != null ? opts.maxBytes : MAX_BYTES;
+  const maxDepth = opts.maxDepth != null ? opts.maxDepth : LOG_SCAN_MAX_DEPTH;
+  const maxCandidates = opts.maxCandidates != null ? opts.maxCandidates : LOG_SCAN_MAX_CANDIDATES;
+  const pruneGraceMs = opts.pruneGraceMs != null ? opts.pruneGraceMs : LOG_SCAN_PRUNE_GRACE_MS;
+
+  const found = [];
+
+  function walk(dir, depth) {
+    if (depth > maxDepth || found.length >= maxCandidates) return;
+    let entries = [];
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entries) {
+      if (found.length >= maxCandidates) return;
+      const p = path.join(dir, e.name);
+
+      let stat;
+      try { stat = fs.statSync(p); } catch { continue; }  // ONE stat, reused below
+
+      if (e.isDirectory()) {
+        // Prune stale trees. A dir untouched for a day cannot hold a file
+        // modified in the last 60s (an in-place rewrite bumps the dir's own
+        // mtime on the filesystems we care about only sometimes — hence grace).
+        if ((now - stat.mtimeMs) > pruneGraceMs) continue;
+        walk(p, depth + 1);
+      } else if (e.isFile() && p.endsWith('.json')) {
+        if ((now - stat.mtimeMs) >= windowMs) continue;
+        if (stat.size < minBytes || stat.size > maxBytes) continue;
+        found.push({ p, m: stat.mtimeMs, s: stat.size });
+      }
+    }
+  }
+  walk(root, 0);
+
+  return found.sort((a, b) => b.m - a.m);
+}
+
 function projectMcpResult() {
   // MCP tool results are typically not directly file-backed. Best-effort:
   // peek at recent cache files (.claude/logs/**/*.json) modified within
   // the last 60 seconds. If any large + recent JSON cache exists, project it.
 
-const { findProjectRoot } = require('./lib/hook-runtime.cjs');
+  const { findProjectRoot } = require('./lib/hook-runtime.cjs');
   const logsDir = path.join(findProjectRoot(), '.claude', 'logs');
   if (!fs.existsSync(logsDir)) return null;
 
-  let candidates = [];
-  function walk(dir) {
-    let entries = [];
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
-    for (const e of entries) {
-      const p = path.join(dir, e.name);
-      if (e.isDirectory()) { walk(p); }
-      else if (e.isFile() && p.endsWith('.json')) candidates.push(p);
-    }
-  }
-  walk(logsDir);
-
-  const now = Date.now();
-  candidates = candidates
-    .map(p => { try { return { p, m: fs.statSync(p).mtimeMs, s: fs.statSync(p).size }; } catch { return null; } })
-    .filter(x => x && (now - x.m) < 60_000 && x.s >= MIN_BYTES)
-    .sort((a, b) => b.m - a.m)
-    .slice(0, 1);
-
+  const candidates = collectRecentJson(logsDir);
   if (candidates.length === 0) return null;
 
   const target = candidates[0];
@@ -230,5 +278,5 @@ function main() {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { getHookInput, getToolArgs };
+  module.exports = { getHookInput, getToolArgs, collectRecentJson, MIN_BYTES, MAX_BYTES };
 }
