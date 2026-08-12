@@ -65,11 +65,36 @@ function resolveTaskFolder(plansDir, id) {
   return walk(featuresRoot);
 }
 
+// The fs walk above visits the whole features/ tree, and this hook fires on
+// BOTH phases of every traced tool call — so the resolved folder is cached per
+// task and revalidated with a single existsSync. A moved/archived task folder
+// fails the check and triggers one fresh walk, which rewrites the cache.
+function cachedTaskFolder(plansDir, taskId) {
+  const cacheFile = path.join(plansDir, '.trace-folder-cache.json');
+  let cache = {};
+  try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')) || {}; }
+  catch { /* no cache yet or unreadable — rebuild below */ }
+
+  const hit = cache[taskId];
+  if (hit && fs.existsSync(path.join(hit, 'task.md'))) return hit;
+
+  const folder = resolveTaskFolder(plansDir, taskId);
+  if (folder) {
+    try {
+      // Keyed by task id only; stale entries for finished tasks are harmless
+      // (one existsSync miss) and the file stays a handful of entries.
+      cache[taskId] = folder;
+      fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    } catch { /* best-effort — next call just walks again */ }
+  }
+  return folder;
+}
+
 // Resolve where a task's trace + counter live: the v3.7.3+ co-located layout
 // (inside the task folder) if found, else the legacy top-level traces/ dir.
 // Pure except for the mkdir on the legacy path.
 function resolveTracePaths(plansDir, taskId) {
-  const taskFolder = resolveTaskFolder(plansDir, taskId);
+  const taskFolder = cachedTaskFolder(plansDir, taskId);
   if (taskFolder) {
     return {
       traceFile: path.join(taskFolder, 'trace.jsonl'),
@@ -201,6 +226,6 @@ if (require.main === module) {
   main();
 } else {
   module.exports = {
-    resolveTaskFolder, resolveTracePaths, taskSlugOf, nextEventId, hashFileBounded, hash, extractReadPath,
+    resolveTaskFolder, cachedTaskFolder, resolveTracePaths, taskSlugOf, nextEventId, hashFileBounded, hash, extractReadPath,
   };
 }

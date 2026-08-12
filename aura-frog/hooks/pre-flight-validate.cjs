@@ -57,6 +57,7 @@ function buildChildEnv(input, baseEnv) {
 const BYPASS_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass');
 const BYPASS_COUNT_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-bypass-count');
 const JQ_WARN_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-jq-missing');
+const JQ_OK_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight-jq-ok');
 
 // Every Tier-1 shell linter parses the tool payload JSON with `jq`. Without jq on
 // PATH, validate-tool-input.sh reads empty fields and FALSELY reports "missing
@@ -64,9 +65,43 @@ const JQ_WARN_FLAG = path.join(findProjectRoot(), '.claude', 'logs', '.preflight
 // session. Detect the missing dependency up front and skip pre-flight entirely
 // (same fail-open philosophy as the missing-run-all.sh guard above), warning once
 // so the user can install jq to re-enable the checks.
+//
+// This hook runs on the blocking PreToolUse path for every tool call, so the
+// probe result is cached: a positive probe stores the resolved jq path in
+// JQ_OK_FLAG and later calls only accessSync() it (microseconds, no subprocess).
+// A negative probe is never cached — installing jq mid-session re-enables the
+// checks on the next call. If the cached binary disappears, the accessSync
+// fails and the full probe runs again, so uninstalling jq cannot false-block.
+function findJqOnPath() {
+  for (const dir of (process.env.PATH || '').split(path.delimiter)) {
+    if (!dir) continue;
+    const candidate = path.join(dir, 'jq');
+    try {
+      fs.accessSync(candidate, fs.constants.X_OK);
+      return candidate;
+    } catch { /* not here — keep scanning */ }
+  }
+  return null;
+}
+
 function jqAvailable() {
   try {
-    return spawnSync('jq', ['--version'], { timeout: 2000 }).status === 0;
+    const cached = fs.readFileSync(JQ_OK_FLAG, 'utf-8').trim();
+    if (cached) {
+      fs.accessSync(cached, fs.constants.X_OK);
+      return true;
+    }
+  } catch { /* no cache or stale binary — fall through to the real probe */ }
+  try {
+    if (spawnSync('jq', ['--version'], { timeout: 2000 }).status !== 0) return false;
+    const jqPath = findJqOnPath();
+    if (jqPath) {
+      try {
+        fs.mkdirSync(path.dirname(JQ_OK_FLAG), { recursive: true });
+        fs.writeFileSync(JQ_OK_FLAG, jqPath + '\n');
+      } catch { /* best-effort cache — probe still succeeded */ }
+    }
+    return true;
   } catch {
     return false;
   }

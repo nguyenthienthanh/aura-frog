@@ -77,12 +77,32 @@ describe("exit semantics", () => {
     expect(run([h]).stderr).not.toContain("LEAKED");
   });
 
-  it("stops the chain at the first non-zero exit, as the sequential chain did", () => {
+  it("stops the chain at the first blocking exit 2", () => {
     const a = hook("blocker", `  process.exit(2);`);
     const b = hook("after", `  console.log('SHOULD-NOT-RUN');`);
     const { code, stdout } = run([a, b]);
     expect(code).toBe(2);
     expect(stdout).not.toContain("SHOULD-NOT-RUN");
+  });
+
+  it("keeps running after a warn-only exit 1 and reports 1 for the chain", () => {
+    // Claude Code's contract: only exit 2 blocks; exit 1 is a non-blocking
+    // warning. scope-drift/security-scan/design-conformance all exit 1 on
+    // ordinary findings — that must not cancel their sibling hooks.
+    const warn = hook("warner", `  console.error('WARNED');\n  process.exit(1);`);
+    const after = hook("after-warn", `  console.log('STILL-RAN');`);
+    const { code, stdout, stderr } = run([warn, after]);
+    expect(code).toBe(1);
+    expect(stdout).toContain("STILL-RAN");
+    expect(stderr).toContain("WARNED");
+  });
+
+  it("a later exit 2 still blocks even after an earlier warn", () => {
+    const warn = hook("warn-first", `  process.exit(1);`);
+    const block = hook("block-second", `  console.error('BLOCKED');\n  process.exit(2);`);
+    const { code, stderr } = run([warn, block]);
+    expect(code).toBe(2);
+    expect(stderr).toContain("BLOCKED");
   });
 
   it("runs the whole chain when every hook allows", () => {
@@ -243,6 +263,16 @@ describe("safety net", () => {
     expect(forked.code).toBe(2);
     expect(forked.stdout).not.toContain("SHOULD-NOT-RUN");
     expect(forked.code).toBe(run([a, b]).code);
+  });
+
+  it("AF_DISPATCH_DISABLED=1 matches warn-continue semantics too", () => {
+    const warn = hook("sn-warn", `  process.exit(1);`);
+    const after = hook("sn-after-warn", `  console.log('RAN-AFTER-WARN');`);
+    const forked = run([warn, after], { env: { AF_DISPATCH_DISABLED: "1" } });
+    expect(forked.code).toBe(1);
+    expect(forked.stdout).toContain("RAN-AFTER-WARN");
+    const inproc = run([warn, after]);
+    expect(forked.code).toBe(inproc.code);
   });
 
   it("exits 0 when handed no specs", () => {

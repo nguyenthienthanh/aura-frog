@@ -83,25 +83,6 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "async": true,
-            "command": "LOG_DIR=$(if [ -d .claude/logs/runs ]; then echo .claude/logs/runs; elif [ -d .claude/logs/workflows ]; then echo .claude/logs/workflows; else echo ''; fi); if [ -n \"$LOG_DIR\" ]; then echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Bash: $CLAUDE_TOOL_INPUT\" >> \"$LOG_DIR/commands.log\"; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -n \"$CLAUDE_FILE_PATHS\" ] && [ -f \"$CLAUDE_FILE_PATHS\" ]; then FILE_LINES=$(wc -l < \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 0); if [ \"$FILE_LINES\" -gt 500 ]; then echo \"📄 Large file ($FILE_LINES lines). Consider using response-analyzer skill for chunked reading.\" >&2; fi; fi"
-          }
-        ]
-      },
-      {
         "matcher": "Write|Edit|Bash",
         "hooks": [
           {

@@ -33,9 +33,18 @@
  * EXIT SEMANTICS
  * --------------
  * Claude Code treats exit 2 as "block the tool call" and shows stderr to the
- * model. We preserve that: the first script to exit non-zero wins, its stderr
- * is forwarded, and remaining scripts are skipped — same as the sequential
- * chain, where a blocking hook aborted the rest.
+ * model; any other non-zero exit is a non-blocking warning. We preserve both:
+ * the first script to exit 2 wins, its stderr is forwarded, and remaining
+ * scripts are skipped (the tool call is already dead). A warn-only exit (1)
+ * does NOT cancel the rest of the chain — before dispatch each hook was its
+ * own hooks.json entry and ran regardless of its siblings' codes; the first
+ * warn code becomes the chain's exit code once every hook has run.
+ *
+ * KNOWN LIMIT: exit codes are read after each hook's *synchronous* part. A
+ * hook that calls process.exit(2) from a timer or promise callback cannot
+ * block or fail the chain — the code lands after the chain result is latched.
+ * No shipped hook blocks asynchronously today; if one ever must, register it
+ * as its own hooks.json entry instead of a dispatch spec.
  *
  * WAITING FOR ASYNC WORK
  * ----------------------
@@ -190,10 +199,17 @@ function loadHook(file) {
 }
 
 function runInProcess(specs, progress) {
-  let firstFailure = null;
+  // Only exit 2 blocks (Claude Code's contract); it aborts the rest of the
+  // chain, matching the fact that the tool call is already dead. Any other
+  // non-zero exit is a warning: forward it as the chain's exit code, but keep
+  // running the remaining hooks — before dispatch, each hook was its own
+  // hooks.json entry and a warn-only exit(1) never cancelled its siblings
+  // (scope-drift, security-scan and design-conformance all exit 1 routinely).
+  let blocked = null;
+  let firstWarn = 0;
 
   for (const spec of specs) {
-    if (firstFailure) break;
+    if (blocked) break;
     if (!fs.existsSync(spec.file)) continue;
 
     const savedEnv = {};
@@ -237,14 +253,16 @@ function runInProcess(specs, progress) {
       else process.env[k] = v;
     }
 
-    if (state.code !== 0) firstFailure = { spec, code: state.code };
+    if (state.code === 2) blocked = { spec, code: state.code };
+    else if (state.code !== 0 && !firstWarn) firstWarn = state.code;
   }
 
-  return firstFailure ? firstFailure.code : 0;
+  return blocked ? blocked.code : firstWarn;
 }
 
 /** Original behaviour: one child process per script. Used as the safety net. */
 function runSpawned(specs, raw) {
+  let firstWarn = 0;
   for (const spec of specs) {
     if (!fs.existsSync(spec.file)) continue;
     const res = spawnSync(process.execPath, [spec.file], {
@@ -253,9 +271,12 @@ function runSpawned(specs, raw) {
       stdio: ["pipe", "inherit", spec.mergeStderr ? 1 : "inherit"],
       timeout: TIMEOUT_MS,
     });
-    if (res.status && res.status !== 0) return res.status;
+    // Same semantics as runInProcess: exit 2 blocks and aborts; any other
+    // non-zero is a warning that must not cancel the remaining hooks.
+    if (res.status === 2) return 2;
+    if (res.status && !firstWarn) firstWarn = res.status;
   }
-  return 0;
+  return firstWarn;
 }
 
 /**
