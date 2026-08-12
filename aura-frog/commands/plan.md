@@ -30,7 +30,7 @@ The 11 verbs and their backing scripts (see `skills/plan-orchestrator/SKILL.md` 
 |---|---|---|
 | `bootstrap` (default) | `new-plan.sh` | Initial T0/T1/T2 — same as no-arg form |
 | `expand <id>` | `expand-node.sh` | Decompose one tier down (T1→T2 / T2→T3 / T3→T4) |
-| `next` | `next-task.sh` | Pop next ready T4 from `ready_queue` |
+| `next` | `next-task.sh` | Dispatch next ready T4 (scans active story's task files) |
 | `status` | `render-plan-tree.sh` | Render the tree as ASCII |
 | `replan <id>` | `replan-node.sh` | Force replan + discard descendants |
 | `promote "<note>"` | `promote-node.sh` | Bubble T4 discovery up to T2/T1 |

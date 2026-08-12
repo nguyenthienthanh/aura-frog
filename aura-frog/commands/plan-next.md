@@ -16,7 +16,7 @@
 bash aura-frog/scripts/plans/next-task.sh [--plans-dir <path>] [--dry-run]
 ```
 
-The script pops `active.json#ready_queue` (refilling from active T3 if empty — collect T4 children with `status: planned` AND all `depends_on` in `{done, active}`), mutates the task to `status: active`, sets `active.task`, and appends `history.jsonl event=next`.
+The script scans the active T3's task files (collect T4 children with `status: planned` AND all `depends_on` in `{done, active}` — there is no ready_queue), picks the first, mutates it to `status: active` under the dispatch lock, sets `active.task`, and appends `history.jsonl {"verb":"next"}`.
 
 Then surface to the user: `Next ready: <TASK-ID> (<intent>). To execute: /aura-frog:run <one-line description> — auto-anchors via the Run ↔ Plan bridge.`
 

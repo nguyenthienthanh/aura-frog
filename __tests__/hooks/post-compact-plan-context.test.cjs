@@ -62,18 +62,18 @@ describe('pre-execute-load-plan-context — composeContextLines', () => {
     expect(composeContextLines({ active: { task: 'T' } })).toEqual(['Task: T']);
   });
 
-  it('summarises frozen and ready queues by count', () => {
+  it('summarises frozen nodes by count', () => {
     const lines = composeContextLines({
       active: {},
       frozen: ['a', 'b'],
-      ready_queue: ['x', 'y', 'z'],
     });
     expect(lines).toContain('Frozen: 2 node(s) — see /aura-frog:plan-conflicts');
-    expect(lines).toContain('Ready: 3 task(s) queued');
   });
 
-  it('ignores empty frozen/ready arrays', () => {
+  it('ignores an empty frozen array and the vestigial ready_queue field', () => {
     expect(composeContextLines({ active: {}, frozen: [], ready_queue: [] })).toEqual([]);
+    // ready_queue is unmaintained (next-task.sh rescans task files) — never rendered.
+    expect(composeContextLines({ active: {}, ready_queue: ['x', 'y'] })).toEqual([]);
   });
 
   it('is empty for an empty or malformed active object', () => {
