@@ -28,6 +28,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
+const { readJsonlTail } = require('./lib/jsonl-tail.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const HISTORY_FILE = path.join(PLANS_DIR, 'history.jsonl');
@@ -204,9 +205,12 @@ function checkCompatibility(plansDir, blockerTask, plannedFiles) {
 function main() {
   if (!fs.existsSync(CONFLICTS_FILE) || !fs.existsSync(HISTORY_FILE)) return;
 
-  let historyLines = [];
-  try { historyLines = fs.readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  // Bounded tails. History: collectRecentDoneTasks breaks at the first event
+  // older than RESCAN_WINDOW_MS, so it never looks past the tail. Conflicts:
+  // foldLatestConflicts wants the LATEST record per conflict_id, and in an
+  // append-only log the latest record is the last one — reading the tail keeps
+  // exactly the records a rescan can act on.
+  const historyLines = readJsonlTail(HISTORY_FILE);
 
   // Candidates are tasks with recent tool activity; a task only counts as a
   // finished blocker once its node file's status actually reads `done`.
@@ -215,9 +219,7 @@ function main() {
   const recentDoneTasks = filterActuallyDone(recentCandidates, id => readTaskStatus(PLANS_DIR, id));
   if (recentDoneTasks.size === 0) return;
 
-  let conflictLines = [];
-  try { conflictLines = fs.readFileSync(CONFLICTS_FILE, 'utf8').split('\n').filter(Boolean); }
-  catch { return; }
+  const conflictLines = readJsonlTail(CONFLICTS_FILE);
 
   const recommendations = [];
   for (const [cid, conflict] of foldLatestConflicts(conflictLines)) {
