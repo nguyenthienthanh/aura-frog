@@ -38,34 +38,29 @@ NOT checkpointed (cosmetic):
 
 ## Checkpoint format
 
-Path: `.claude/plans/checkpoints/{NODE_ID}.{R-ISO-8601}.json`
+Writer: `save_checkpoint` in `scripts/plans/_lib.sh` (v3.7.3+ co-located layout).
+
+Path: `<node_folder>/checkpoints/<ISO-8601-with-dashes>.json` — e.g.
+`features/FEAT-A_auth/stories/STORY-0007_login/tasks/TASK-00101_form/checkpoints/2026-04-29T14-30-00Z.json`.
+The filename is the timestamp only; the node identity lives inside the JSON.
+Fallback for nodes whose file path can't be resolved (rare — archived/orphan):
+`.claude/plans/checkpoints/{NODE_ID}_legacy/<ISO>.json`.
+(Pre-v3.7.3 checkpoints were flat: `.claude/plans/checkpoints/{NODE_ID}.{ISO}.json` — read-only legacy.)
 
 ```json
 {
-  "checkpoint_id": "TASK-00101.R-2026-04-29T14:30:00Z",
+  "schema_version": 1,
   "node_id": "TASK-00101",
-  "captured_at": "2026-04-29T14:30:00Z",
-  "captured_by": "master-planner",
-  "trigger": "status_transition",
-  "trigger_detail": "active → frozen (replan_budget_exhausted)",
+  "node_file": ".claude/plans/features/.../tasks/TASK-00101_form/task.md",
+  "saved_at": "2026-04-29T14:30:00Z",
   "git_sha": "abc123def",
-  "git_branch": "feat/hierarchical-planning",
-  "git_dirty": false,
-  "node_state_before": {
-    "frontmatter": { ... full YAML ... },
-    "body_sha256": "abc123...",
-    "body": "... full markdown body ..."
-  },
-  "siblings_state_before": [
-    { "node_id": "TASK-00102", "status": "planned", "revision": 1 }
-  ],
-  "parent_children_before": ["TASK-00101", "TASK-00102", "TASK-00103"]
+  "node_state_before_b64": "<base64 of the entire node file (frontmatter + body)>"
 }
 ```
 
-**git_sha tracking** (per spec §17.1): every checkpoint records the current `HEAD` sha and branch at capture time. This lets `/aura-frog:plan-undo` restore not just the plan tree but also any file mutations the master-planner triggered while the node was active.
+The node's pre-mutation state is one opaque base64 blob (`node_state_before_b64`) — there is no parsed frontmatter/body split, no sibling or parent snapshot, and no branch/dirty flags.
 
-If `git_dirty: true` (uncommitted changes present at capture), undo must warn the user before any `git reset --hard` — uncommitted work could be lost.
+**git_sha tracking** (per spec §17.1): every checkpoint records the current `HEAD` sha at capture time. This lets `/aura-frog:plan-undo` (and the conflict-rescan compatibility check) diff what actually changed while the node was active.
 
 ---
 
@@ -75,7 +70,7 @@ If `git_dirty: true` (uncommitted changes present at capture), undo must warn th
 retention[3]{rule,limit}:
   per_node,5,"keep last 5 checkpoints per node"
   age_cap,30 days,"checkpoints older than 30 days are pruned"
-  size_cap,50 MB,".claude/plans/checkpoints/ total"
+  size_cap,50 MB,"all checkpoints/ dirs under .claude/plans/ total"
 ```
 
 Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon) via the `plan-archivist` skill — checkpoint compression is part of branch archival; there is no standalone prune script.
@@ -84,16 +79,14 @@ Pruning runs in `/aura-frog:plan-archive` (lazy, not a daemon) via the `plan-arc
 
 ## Restore semantics
 
-`/aura-frog:plan-undo {NODE_ID}` (or `--active` for active node):
+`/aura-frog:plan-undo {NODE_ID}` (or defaulting to the deepest active node) — implemented by `scripts/plans/undo-decision.sh`:
 
-1. Find latest `.claude/plans/checkpoints/{NODE_ID}.*.json` (lexicographic max — ISO timestamps sort correctly)
-2. Refuse if file count == 0 → "no checkpoint exists; nothing to undo"
-3. Compute current `node_state_now` (frontmatter + body_sha256)
-4. If `node_state_now` matches `node_state_before` → no-op, report "already at checkpoint"
-5. Replace node file with `node_state_before.body + frontmatter`
-6. Restore parent's `children` if `parent_children_before` differs
-7. Append history.jsonl: `event: undo_restored`, with `restored_from: <checkpoint_id>`
-8. Do NOT delete the checkpoint (so `/aura-frog:plan-undo` is itself idempotent)
+1. Find latest `<node_folder>/checkpoints/*.json` (lexicographic max — ISO timestamps sort correctly); fall back to the legacy flat `.claude/plans/checkpoints/{NODE_ID}.*.json`
+2. Refuse if no checkpoint found → "no checkpoint for {NODE_ID}"
+3. Decode `node_state_before_b64` and atomically replace the file at `node_file`
+4. Rename the consumed checkpoint to `*.json.consumed` so repeated undo advances LIFO
+5. Validate the tree (`require_no_regression`); refuse on regression
+6. Append history.jsonl: `{"verb":"undo","target":...,"checkpoint_consumed":...}`
 
 ---
 

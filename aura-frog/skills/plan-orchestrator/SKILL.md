@@ -135,7 +135,7 @@ Every backing script that writes a node file must:
 |---|---|---|
 | `new-plan.sh` | bootstrap | Init `.claude/plans/` skeleton (existing, idempotent) |
 | `expand-node.sh` | expand | Decompose T2→T3 or T3→T4. Dispatches feature-architect or story-planner agent. |
-| `next-task.sh` | next | Pop next ready T4 from `ready_queue`; populate from active T3 if empty. |
+| `next-task.sh` | next | Dispatch next ready T4 — scans the active T3's task files each call (no ready_queue). |
 | `freeze-branch.sh` | freeze | Cascade-freeze descendants. Save checkpoint, refuse on done/archived. |
 | `thaw-branch.sh` | thaw | Reverse freeze. Validate blocker resolved + git-diff compatibility per §21.6. |
 | `archive-feature.sh` | archive | Compress completed T2 to summary + move originals to `archive/`. |
