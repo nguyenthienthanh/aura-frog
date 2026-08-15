@@ -8,7 +8,8 @@
 
 A plugin for **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** that treats it as an Operating System. **15 specialized agents**, **hierarchical planning** (Mission → Initiative → Feature → Story → Task), **forensic reasoning traces**, **conflict detection between parallel work**, **self-healing safety gates**, **per-agent MCP security**, smart flow selection, and multi-agent orchestration.
 
-[![Version](https://img.shields.io/badge/version-3.7.4-blue.svg)](docs/reference/CHANGELOG.md)
+[![npm](https://img.shields.io/npm/v/aura-frog/alpha?label=npm%40alpha)](https://www.npmjs.com/package/aura-frog)
+[![Version](https://img.shields.io/github/v/release/nguyenthienthanh/aura-frog?include_prereleases&label=release)](docs/reference/CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Portable](https://img.shields.io/badge/portable-~87%25_markdown-brightgreen)](docs/PORTABILITY.md)
@@ -315,6 +316,38 @@ Expected output:
   Hooks:    51 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
 ```
+
+### Also on npm
+
+[![npm](https://img.shields.io/npm/v/aura-frog/alpha?label=aura-frog%40alpha)](https://www.npmjs.com/package/aura-frog)
+
+The plugin payload is published to npm as [`aura-frog`](https://www.npmjs.com/package/aura-frog).
+**The marketplace above is still the way to install it** — npm is there for two other reasons.
+
+**Reference it from your own marketplace.** `npm` is a supported plugin source type, so a
+team marketplace can pull the payload from the registry instead of cloning this repository:
+
+```json
+{
+  "name": "aura-frog",
+  "source": {
+    "source": "npm",
+    "package": "aura-frog",
+    "version": "3.8.0-alpha.10"
+  }
+}
+```
+
+**Or vendor the files directly** — useful for skills-only mode on Codex / Gemini CLI /
+OpenCode, or for auditing what ships before you install anything:
+
+```bash
+npm pack aura-frog@alpha && tar -xzf aura-frog-*.tgz
+```
+
+> Published under the **`alpha`** dist-tag while 3.8.0 stabilises. Use `aura-frog@alpha`
+> rather than a bare `aura-frog` so you keep getting alpha builds once a stable release
+> takes over the `latest` tag.
 
 ### Initialize Your Project (Recommended — one time)
 
