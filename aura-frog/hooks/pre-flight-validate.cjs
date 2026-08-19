@@ -146,15 +146,27 @@ function bumpBypassCount() {
   }
 }
 
+// The hooks.json matcher is Bash|Read|Write|Edit|Glob|Grep, but run-all.sh's
+// dispatch — and validate-tool-input.sh's — only has cases for Bash, Read, Edit
+// and Write. For Glob and Grep the whole bash tree spawns, matches nothing, and
+// exits 0, on every search the model runs. Nothing in the matcher is wrong;
+// there is simply no check that applies to a read-only search, so answer that
+// before paying for the subprocesses.
+const NO_CHECKS_APPLY = new Set(['Glob', 'Grep']);
+
 function main() {
- if (consumeBypassFlag()) process.exit(0);
-
- if (!jqAvailable()) { warnJqMissingOnce(); process.exit(0); }
-
+ // Read the tool context FIRST. Deciding we have nothing to do has to happen
+ // before consumeBypassFlag(), which is single-use: a bypass the user granted
+ // for a risky Write was previously eaten by whatever Grep happened to run next.
  let input = {};
  try { input = readHookInputCompat(); } catch { /* env fallback below */ }
  const toolName = (input && input.tool_name) || process.env.CLAUDE_TOOL_NAME || '';
  if (!toolName) process.exit(0);
+ if (NO_CHECKS_APPLY.has(toolName)) process.exit(0);
+
+ if (consumeBypassFlag()) process.exit(0);
+
+ if (!jqAvailable()) { warnJqMissingOnce(); process.exit(0); }
 
  const result = spawnSync('bash', [RUN_ALL], {
   encoding: 'utf-8',
@@ -184,4 +196,4 @@ process.exit(0);
 
 if (require.main === module) main();
 
-module.exports = { buildChildEnv, jqAvailable };
+module.exports = { buildChildEnv, jqAvailable, NO_CHECKS_APPLY };
