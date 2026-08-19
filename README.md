@@ -311,7 +311,7 @@ Expected output:
 🐸 Aura Frog v3.7.3 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
-  Skills:   60 available (9 auto-invoke, 51 on-demand)
+  Skills:   59 available (9 auto-invoke, 50 on-demand)
   Rules:    72 loaded (22 core + 20 agent + 30 workflow)
   Hooks:    51 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
@@ -441,7 +441,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
-| **Skills** | 60 | 9 auto-invoke on context, 51 on-demand (incl. `design-vision-loop`) |
+| **Skills** | 59 | 9 auto-invoke on context, 50 on-demand (incl. `design-vision-loop`) |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
 | **Rules** | 72 | 3-tier loading (22 core + 20 agent + 30 workflow) — only what's needed |
 | **Hooks** | 51 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
@@ -629,7 +629,7 @@ Honest comparison with two popular plugins in the ecosystem (April 2026).
 | | **Aura Frog** | **wshobson/agents** | **Superpowers** |
 |---|---|---|---|
 | **Agents** | 15 curated | 184 across 78 plugins | ~20 |
-| **Skills** | 60 | 150 | Small focused set |
+| **Skills** | 59 | 150 | Small focused set |
 | **Commands** | 24 (14 user-facing + 10 legacy aliases) | 98 | ~10 |
 | **Workflow** | 5-phase TDD with 2 gates | No structured workflow | Phase-gated workflow |
 | **Agent routing** | Task-content Layer 0 override | Manual `/agent-name` | Similar to Aura Frog |
