@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 60 (9 auto-invoking + 51 reference)
+**Total Skills:** 59 (9 auto-invoking + 50 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -83,10 +83,9 @@ design[6]{name,purpose}:
 ### Workflow & Infrastructure (9)
 
 ```toon
-workflow[9]{name,purpose}:
+workflow[8]{name,purpose}:
   project-context-loader,Load project conventions and context
   session-continuation,Workflow state handoff and resume
-  phase1-lite,Ultra-compact Phase 1 requirements (500 token cap)
   lazy-agent-loader,Load agent definitions on-demand
   response-analyzer,Write large responses to temp files
   self-improve,Apply learned improvements to plugin
