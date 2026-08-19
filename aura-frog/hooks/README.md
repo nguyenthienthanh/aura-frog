@@ -350,6 +350,15 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 
 **Disable:** Set `AF_LINT_AUTOFIX=false` in environment
 
+**Environment handed to the linter:** the fixer is the working repo's own
+`node_modules/.bin` / `vendor/bin` binary — third-party code, run automatically
+on every Write and Edit. It is spawned with a minimised environment
+(`hooks/lib/af-child-env.cjs`): credential-shaped variables (`*SECRET*`,
+`*TOKEN*`, `*KEY*`, `*PASSWORD*`, `*CREDENTIAL*`, `PAT`) are stripped, while
+`PATH`, `HOME`, locale, `NODE_*` and the plugin's `AF_*` / `CLAUDE_*` wiring are
+kept. Set `AF_CHILD_ENV_UNFILTERED=true` to pass the environment through
+untouched, for a toolchain that genuinely needs a credential-named variable.
+
 **Script:** `hooks/lint-autofix.cjs`
 
 ---
