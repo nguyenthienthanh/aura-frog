@@ -59,16 +59,45 @@ describe('tdd-red-failure-tracker — buildDecisionEvent', () => {
   });
 });
 
-describe('tdd-red-failure-tracker — nextEventId', () => {
+describe('tdd-red-failure-tracker — shares the tracer store', () => {
+  const tracer = require('../../aura-frog/hooks/tool-call-tracer.cjs');
+
   let dir;
   beforeEach(() => { dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tdd-')); });
   afterEach(() => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ } });
 
-  it('numbers from the current line count + 1, digits-only task id', () => {
-    const tf = path.join(dir, 't.jsonl');
-    expect(tdd.nextEventId(tf, 'TASK-7')).toBe('TR-7-001'); // fresh
-    fs.writeFileSync(tf, '{}\n{}\n');
-    expect(tdd.nextEventId(tf, 'TASK-7')).toBe('TR-7-003'); // 2 lines -> next is 003
+  // This hook used to keep a private counter (line-count of its own file, with a
+  // digits-only id) and a private path (traces/{ID}.jsonl), so its decision
+  // events could never interleave correctly with the tracer's tool events.
+  it('re-exports the tracer resolver and counter, not private copies', () => {
+    expect(tdd.nextEventId).toBe(tracer.nextEventId);
+    expect(tdd.resolveTracePaths).toBe(tracer.resolveTracePaths);
+    expect(tdd.taskSlugOf).toBe(tracer.taskSlugOf);
+  });
+
+  it('numbers from the shared sibling counter file, in the tracer format', () => {
+    const counter = path.join(dir, '.trace.count');
+    expect(tdd.nextEventId(counter, tdd.taskSlugOf('TASK-00007'))).toBe('TR-TASK-00007-001');
+    expect(tdd.nextEventId(counter, tdd.taskSlugOf('TASK-00007'))).toBe('TR-TASK-00007-002');
+    // Persisted, so the next hook process continues the sequence rather than
+    // re-deriving it from a file it may not even be the only writer of.
+    expect(fs.readFileSync(counter, 'utf8')).toBe('2');
+  });
+
+  it('resolves the co-located task folder both hooks write to', () => {
+    const taskDir = path.join(dir, 'features', 'FEAT-A_x', 'stories', 'STORY-0001_y', 'tasks', 'TASK-00007_z');
+    fs.mkdirSync(taskDir, { recursive: true });
+    fs.writeFileSync(path.join(taskDir, 'task.md'), '---\nid: TASK-00007\n---\n');
+
+    const paths = tdd.resolveTracePaths(dir, 'TASK-00007');
+    expect(paths.traceFile).toBe(path.join(taskDir, 'trace.jsonl'));
+    expect(paths.counterFile).toBe(path.join(taskDir, '.trace.count'));
+  });
+
+  it('falls back to the legacy traces/ dir when there is no task folder', () => {
+    const paths = tdd.resolveTracePaths(dir, 'TASK-00007');
+    expect(paths.traceFile).toBe(path.join(dir, 'traces', 'TASK-00007.jsonl'));
+    expect(paths.counterFile).toBe(path.join(dir, 'traces', 'TASK-00007.count'));
   });
 });
 

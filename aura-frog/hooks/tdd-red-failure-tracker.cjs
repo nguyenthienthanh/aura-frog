@@ -25,10 +25,15 @@ const path = require('path');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
 const { readStdinSafely, parseStdinJson } = require('./lib/hook-runtime.cjs');
 const { readCommand, readExitCode } = require('./lib/tool-context.cjs');
+// One resolver, one counter, one on-disk layout. This hook used to hardcode the
+// pre-v3.7.3 traces/{ID}.jsonl path and count its own lines, so its decision
+// events landed in a different file from the tool_call/tool_result events the
+// tracer writes to {taskFolder}/trace.jsonl — and /aura-frog:trace only ever
+// saw one of the two. Borrow the tracer's resolver and counter instead.
+const { resolveTracePaths, taskSlugOf, nextEventId } = require('./tool-call-tracer.cjs');
 
 const PLANS_DIR = resolvePlansDir();
 const ACTIVE_FILE = path.join(PLANS_DIR, 'active.json');
-const TRACES_DIR = path.join(PLANS_DIR, 'traces');
 
 function safeExit(code = 0) { process.exit(code); }
 
@@ -37,14 +42,6 @@ const TEST_RUNNER = /\b(test|jest|vitest|pytest|cargo\s+test|go\s+test|rspec|php
 // Pure: does this command look like a test-runner invocation?
 function isTestRunner(cmd) {
   return TEST_RUNNER.test(cmd || '');
-}
-
-function nextEventId(traceFile, taskId) {
-  let n = 0;
-  if (fs.existsSync(traceFile)) {
-    n = fs.readFileSync(traceFile, 'utf8').split('\n').filter(Boolean).length;
-  }
-  return `TR-${taskId.replace(/[^0-9]/g, '')}-${String(n + 1).padStart(3, '0')}`;
 }
 
 // Pure: build the RED-phase decision event. In Phase 2 a failing test (exit != 0)
@@ -90,11 +87,13 @@ function main() {
   const exitCode = readExitCode(input) ?? (parseInt(process.env.CLAUDE_TOOL_EXIT_CODE || '0', 10) || 0);
   const ts = new Date().toISOString();
 
-  if (!fs.existsSync(TRACES_DIR)) fs.mkdirSync(TRACES_DIR, { recursive: true });
-  const traceFile = path.join(TRACES_DIR, `${taskId}.jsonl`);
+  // Co-located {taskFolder}/trace.jsonl when the task folder exists, legacy
+  // traces/{ID}.jsonl otherwise — resolveTracePaths makes that call (and the
+  // legacy mkdir) so both writers always agree on the destination.
+  const { traceFile, counterFile } = resolveTracePaths(PLANS_DIR, taskId);
 
   const event = buildDecisionEvent({
-    taskId, eventId: nextEventId(traceFile, taskId), exitCode, cmd, ts,
+    taskId, eventId: nextEventId(counterFile, taskSlugOf(taskId)), exitCode, cmd, ts,
   });
 
   try {
@@ -115,5 +114,7 @@ function main() {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { isTestRunner, nextEventId, buildDecisionEvent };
+  // nextEventId/resolveTracePaths are re-exported from tool-call-tracer so a
+  // caller (or a test) reaching for them here gets the one shared implementation.
+  module.exports = { isTestRunner, buildDecisionEvent, nextEventId, resolveTracePaths, taskSlugOf };
 }
