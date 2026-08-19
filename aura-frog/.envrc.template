@@ -21,6 +21,10 @@ export JIRA_BASE_URL="{{JIRA_BASE_URL}}"  # e.g., https://company.atlassian.net
 export JIRA_EMAIL="{{JIRA_EMAIL}}"
 export JIRA_API_TOKEN="{{JIRA_API_TOKEN}}"
 export JIRA_PROJECT_KEY="{{JIRA_PROJECT_KEY}}"  # Optional: default project
+# Outbound guard: jira-auto-fetch sends a basic-auth API token, so it only talks
+# to https hosts under *.atlassian.net. A self-hosted Jira must name itself here
+# (comma-separated; this REPLACES the default, it does not extend it).
+# export AF_JIRA_HOST_ALLOWLIST="jira.corp.example"
 
 # Confluence (uses JIRA credentials by default, or set separate)
 # export CONFLUENCE_BASE_URL="${JIRA_BASE_URL}/wiki"  # Auto-derived from JIRA_BASE_URL
@@ -72,6 +76,12 @@ export AURA_FROG_TOKEN_WARNING="150000"
 export SUPABASE_URL="{{SUPABASE_URL}}"  # e.g., https://your-project.supabase.co
 export SUPABASE_PUBLISHABLE_KEY="{{SUPABASE_PUBLISHABLE_KEY}}"  # Public key (safe for client)
 export SUPABASE_SECRET_KEY="{{SUPABASE_SECRET_KEY}}"  # Secret key (keep private!)
+# Outbound guard: the secret key goes out as apikey + Bearer, so requests are
+# sent only to https hosts under *.supabase.co. An http:// URL is refused
+# outright — the key is never put on the wire in cleartext. A proxied or
+# self-hosted deployment must name its host here (comma-separated; this REPLACES
+# the default, it does not extend it).
+# export AF_LEARNING_HOST_ALLOWLIST="db.corp.example"
 
 # Learning System Settings
 export AF_LEARNING_ENABLED="true"  # Enable/disable learning system

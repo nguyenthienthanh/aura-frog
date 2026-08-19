@@ -11,6 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { guardEndpoint } = require('./af-net-guard.cjs');
 
 /**
  * Get Supabase configuration from environment
@@ -33,10 +34,19 @@ function supabaseRequest(endpoint, config) {
       return;
     }
 
-    const url = new URL(`${config.url}/rest/v1/${endpoint}`);
+    // config.key goes out as apikey + Bearer, so the endpoint must clear the
+    // outbound guard first: https only, allowlisted host only. Previously an
+    // http:// SUPABASE_URL was accepted here and silently sent to :443 anyway,
+    // which made a misconfiguration look like a network failure.
+    const url = guardEndpoint(`${config.url}/rest/v1/${endpoint}`, 'supabase', 'af-memory-loader');
+    if (!url) {
+      resolve({ data: null, error: 'Supabase endpoint rejected by the outbound guard' });
+      return;
+    }
 
     const options = {
       hostname: url.hostname,
+      port: url.port || 443,
       path: url.pathname + url.search,
       method: 'GET',
       headers: {

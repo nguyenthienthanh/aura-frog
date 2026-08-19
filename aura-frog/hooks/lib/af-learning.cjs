@@ -17,7 +17,9 @@
  */
 
 const https = require('https');
-const http = require('http');
+// No `http` here on purpose: this module only ever sends credentialed requests,
+// and af-net-guard refuses any endpoint that is not https.
+const { guardEndpoint } = require('./af-net-guard.cjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -246,7 +248,12 @@ function updateLearnedRulesMD() {
  * @returns {Promise<object>}
  */
 async function supabaseRequest(table, method = 'POST', data = null, params = {}) {
-  const url = new URL(`${process.env.SUPABASE_URL}/rest/v1/${table}`);
+  // Every request below carries the Supabase service key in two headers. Refuse
+  // to build it at all unless the endpoint is https and on the allowlist — this
+  // used to fall back to plain `http` for an http:// SUPABASE_URL, which put the
+  // key on the wire in the clear.
+  const url = guardEndpoint(`${process.env.SUPABASE_URL}/rest/v1/${table}`, 'supabase', 'af-learning');
+  if (!url) throw new Error('Supabase endpoint rejected by the outbound guard');
 
   // Add query params
   Object.entries(params).forEach(([key, value]) => {
@@ -255,7 +262,7 @@ async function supabaseRequest(table, method = 'POST', data = null, params = {})
 
   const options = {
     hostname: url.hostname,
-    port: url.port || (url.protocol === 'https:' ? 443 : 80),
+    port: url.port || 443,
     path: url.pathname + url.search,
     method,
     headers: {
@@ -267,8 +274,7 @@ async function supabaseRequest(table, method = 'POST', data = null, params = {})
   };
 
   return new Promise((resolve, reject) => {
-    const protocol = url.protocol === 'https:' ? https : http;
-    const req = protocol.request(options, (res) => {
+    const req = https.request(options, (res) => {
       let body = '';
       res.on('data', chunk => body += chunk);
       res.on('end', () => {
@@ -611,8 +617,10 @@ async function recordPattern(pattern) {
 
   // Use Supabase
   try {
-    // Use RPC function to update frequency or create new
-    const url = new URL(`${process.env.SUPABASE_URL}/rest/v1/rpc/update_pattern_frequency`);
+    // Same guard as supabaseRequest: https + allowlisted host, or no request.
+    const url = guardEndpoint(
+      `${process.env.SUPABASE_URL}/rest/v1/rpc/update_pattern_frequency`, 'supabase', 'af-learning');
+    if (!url) return null;
 
     const data = {
       p_pattern_type: pattern.type,
