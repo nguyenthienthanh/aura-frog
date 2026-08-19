@@ -12,6 +12,33 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.11] - 2026-08-19 (Audit roadmap: P1 fixes, ENV hardening, plan-tree index)
+
+Remediation of the deep-research audit (PR #50). Baseline 79 suites / 1296 tests; after: 86 / 1529, CI green.
+
+### Security
+
+- **`.envrc` TOCTOU closed and the trust gate no longer fails silently.** The guarded loader hashed the file then re-read it to source; it now snapshots to a mode-600 temp, hashes and sources the same bytes, and refuses a group/world-writable `.envrc`. `AF_ENVRC_UNSAFE_AUTO_SOURCE` now warns on stderr when it disables the gate.
+- **Plugin credentials never leave over cleartext or to unlisted hosts.** Supabase/Jira requests refuse a non-`https` URL and check the host against an allowlist before sending `apikey`/`Bearer`. Spawned linters no longer inherit `SECRET`/`TOKEN`/`KEY`/`PASSWORD`/`PAT`/`CREDENTIAL` env.
+- **Command injection removed from conflict-rescan.** `git_sha` read from a checkpoint JSON is validated (`/^[0-9a-f]{7,40}$/`) and passed via `execFileSync` argv instead of an `execSync` shell string.
+- **The `rm -rf` and credential-path preflight blocks actually fire now** — real POSIX ERE (the old `\s` was a literal), and `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/Library/LaunchAgents` are blocked after canonicalization.
+
+### Fixed
+
+- **`post-compact` validated handoff state against the wrong schema**, so a healthy file triggered `exit 2` (a false block) after every compact. It now checks the schema its writer actually emits.
+- **One trace store.** `tdd-red-failure-tracker` and `/aura-frog:trace` now use `tool-call-tracer`'s co-located resolver and event-id counter instead of a resurrected legacy `traces/` dir, so forensic traces stop losing events.
+- **Abandoned session-state temp files** (`af-session-<ppid>.json`) are expired on read and swept at SessionStart.
+
+### Added
+
+- **`graph-index.json` — an opt-in adjacency cache for the plan tree.** `next-task`, `render` and `validate` read it when a project has opted in via `--rebuild`, falling back to the `find` + awk sweep (which self-heals a stale index) otherwise. Removes the vestigial `ready_queue`.
+
+### Changed
+
+- **One resolver for the MCP audit dir** (`.claude/security`, migrating from five hand-coded `.aura/security` spellings). Preflight skips the bash tree for Glob and Grep.
+- **Docs/counts:** stop claiming `autoInvoke` skills "fire on every message"; drop the dead flat-`planning` README; fold `phase1-lite` into `run-orchestrator`; drop `godot`/`svelte` from `framework-expert` (no such skills); skill count 60 → 59 across READMEs and `stats.json`.
+
+
 ## [3.8.0-alpha.10] - 2026-08-12 (Hook dispatch, RAM discipline, and 33 verified audit fixes)
 
 ### Performance

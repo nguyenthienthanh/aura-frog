@@ -308,7 +308,7 @@ You: "approve"
 Expected output:
 
 ```
-🐸 Aura Frog v3.7.3 — Ready
+🐸 Aura Frog v3.8.0-alpha.11 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   59 available (9 auto-invoke, 50 on-demand)
