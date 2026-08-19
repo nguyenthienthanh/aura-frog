@@ -1,7 +1,7 @@
 ---
 name: tree-of-thoughts
-description: "Branch, evaluate, prune, expand — structured search over solution space. Use for architecture with multi-step decisions, refactor planning, or complex debug hypothesis trees. Paper: Yao et al. 2023."
-when_to_use: "architecture decision with branching, refactor planning, debug hypothesis tree, reason: tot, deep complexity multi-step design"
+description: "Structured reasoning — branch/evaluate/prune/expand search over solution space (tree), or a single ordered chain when the path is linear. Use for architecture with multi-step decisions, refactor planning, complex debug hypothesis trees, or step-by-step structured thinking. Papers: Yao et al. 2023 (ToT), sequential/chain-of-thought reasoning."
+when_to_use: "architecture decision with branching, refactor planning, debug hypothesis tree, reason: tot, deep complexity multi-step design, sequential thinking, step by step reasoning, structured thinking, revise reasoning"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
 user-invocable: false
@@ -117,6 +117,58 @@ Root: "Login fails intermittently in production, works locally"
 Winning leaf: A1 (Redis pool exhausted)
 Verification: Check Redis CONFIG GET maxclients + monitor pool stats
 ```
+
+---
+
+## Linear mode (sequential thinking)
+
+Full tree search is not always worth its cost. When there is **one plausible path**
+and the work is *ordered analysis* rather than *choosing between genuinely different
+approaches*, drop the branch/prune machinery and run a single ordered chain of
+thoughts. This is the cheaper mode — reach for it first, escalate to the full tree
+only when real alternatives appear.
+
+**Use linear mode when:** the problem needs structured exploration before a solution,
+but the branches would be cosmetic (see Anti-Patterns) — e.g. tracing one bug's root
+cause, walking a performance investigation, or laying out a refactor whose sequence is
+clear. Triggers: *sequential thinking, step by step reasoning, structured thinking,
+revise reasoning.*
+
+**Use the full tree instead when:** there are 2+ genuinely different approaches to
+weigh, or debug hypotheses that fan out and need scoring/pruning.
+
+### Pattern
+
+```
+Thought 1/N: [Initial analysis — observations, assumptions]
+Thought 2/N: [Build on previous — deeper analysis, connections]
+Thought 3/N [REVISION of 1]: [Correct earlier assumptions — what was wrong, corrected view]
+Thought 4/N [BRANCH A]: [Alternative angle, if one genuinely appears — trade-offs]
+Thought 5/N [FINAL]: [Synthesize solution — recommended approach, key decisions]
+```
+
+A linear chain is still adjustable — a mid-chain `BRANCH` is the moment to consider
+whether you've actually crossed into tree territory.
+
+### Dynamic adjustment
+
+- **Expand** (complexity increases): add thoughts (N+1)
+- **Contract** (simpler than expected): skip to FINAL
+- **Branch** (multiple valid paths emerge): create BRANCH A/B/C — or promote to the full tree above
+
+### Rough sizing
+
+```toon
+use_cases[5]{scenario,thoughts}:
+  Architecture design,5-8
+  Bug root cause,3-5
+  Performance optimization,4-6
+  Security analysis,5-7
+  Refactoring strategy,4-6
+```
+
+Use linear mode for problems requiring exploration before solution. Not for
+straightforward tasks — those need neither mode.
 
 ---
 

@@ -61,10 +61,10 @@ cheapest tier (haiku)   →   session model (everything else)
 |---------------|:-----:|-----|
 | `agent-detector` | `haiku` | trivial classification |
 | `scanner` | `haiku` | trivial detection |
-| `session-continuation`, `git-workflow` | `haiku` | mechanical state / git plumbing |
+| `session-continuation`, `git` | `haiku` | mechanical state / git plumbing |
 | `security`, `tester`, `devops`, `strategist` | **inherit** | substantive work — match the session |
 | `architect`, `frontend`, `mobile`, `lead` | **inherit** | match the session |
-| `problem-solving`, `sequential-thinking` | **inherit** | reasoning — match the session |
+| `problem-solving`, `tree-of-thoughts` | **inherit** | reasoning — match the session |
 
 Resolution: per-agent / per-skill frontmatter `model:` field > session model. **Omit `model:` to inherit** — that is the default for any substantive work. Set `model: haiku` *only* as a deliberate cheap floor for trivial work.
 

@@ -1,26 +1,4 @@
----
-name: go-expert
-description: "Go gotchas and decision criteria. Covers error handling patterns, concurrency pitfalls, and interface design."
-autoInvoke: false
-priority: high
-triggers:
-  - "golang"
-  - "go"
-  - "gin"
-  - "echo"
-  - "fiber"
-paths:
-  - "**/*.go"
-  - "go.mod"
-  - "go.sum"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Go. Loaded on demand by the framework-expert bundle.
 
 # Go Expert — Gotchas & Decisions
 

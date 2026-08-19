@@ -1,26 +1,4 @@
----
-name: python-expert
-description: "Python gotchas and decision criteria. Covers async pitfalls, FastAPI/Django patterns, and type hint traps."
-autoInvoke: false
-priority: high
-triggers:
-  - "python"
-  - "django"
-  - "fastapi"
-  - "flask"
-paths:
-  - "**/*.py"
-  - "pyproject.toml"
-  - "requirements.txt"
-  - "setup.py"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Python. Loaded on demand by the framework-expert bundle.
 
 # Python Expert — Gotchas & Decisions
 

@@ -1,26 +1,4 @@
----
-name: angular-expert
-description: "Angular 17+ gotchas and decision criteria. Covers signals vs observables, standalone patterns, and common pitfalls Claude gets wrong."
-autoInvoke: false
-priority: high
-triggers:
-  - "angular"
-  - "ngrx"
-  - "rxjs"
-  - "angular.json"
-paths:
-  - "**/*.component.ts"
-  - "**/*.service.ts"
-  - "**/*.module.ts"
-  - "angular.json"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Angular. Loaded on demand by the framework-expert bundle.
 
 # Angular Expert — Gotchas & Decisions
 

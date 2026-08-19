@@ -58,7 +58,7 @@ Use for architectural decisions, system design, database modeling, and complex b
 **Skills:**
 - `skills/api-designer/SKILL.md` — REST/GraphQL design
 - `skills/migration-helper/SKILL.md` — Safe migrations
-- `skills/nodejs-expert/`, `skills/python-expert/`, `skills/laravel-expert/`, `skills/go-expert/` — Backend gotchas
+- `skills/framework-expert/refs/{nodejs,python,laravel,go}.md` — Backend gotchas (via the framework-expert bundle)
 
 ---
 

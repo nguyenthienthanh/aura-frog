@@ -313,11 +313,11 @@ Hook: 🔴 [CRITICAL] This file likely contains secrets. Verify it is NOT commit
 **Actions:**
 - ✅ Detect files over 500 lines
 - ✅ Warn about context consumption
-- ✅ Suggest response-analyzer skill for chunked reading
+- ✅ Suggest the large-response offloading technique for chunked reading
 
 **Example:**
 ```
-📄 Large file (1234 lines). Consider using response-analyzer skill for chunked reading.
+📄 Large file (1234 lines). Consider the write-to-file/summarize-in technique (rules/core/context-economy.md) for chunked reading.
 ```
 
 ---
@@ -734,7 +734,7 @@ Pre-compact: Workflow state saved for compact handoff
 - ✅ Detect user corrections (e.g., "no, that's wrong", "actually...")
 - ✅ Capture approval/rejection reasons at gates
 - ✅ Send feedback to Supabase for learning
-- ✅ Enable learning-analyzer skill
+- ✅ Feed the self-improve skill's Analyze loop
 
 **Script:** `hooks/feedback-capture.cjs`
 **Requires:** `AF_LEARNING_ENABLED=true`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`

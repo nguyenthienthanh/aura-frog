@@ -1,12 +1,21 @@
 ---
 name: self-improve
-description: "Apply learned improvements to the Aura Frog plugin. Updates rules, adjusts agent routing, modifies workflow configurations, and generates knowledge base entries."
+description: "Full learning loop for the Aura Frog plugin: analyze collected learning data from Supabase to identify success patterns, failure patterns, optimization opportunities, and agent performance trends, then apply learned improvements — update rules, adjust agent routing, modify workflow configurations, and generate knowledge base entries."
 autoInvoke: false
 priority: 30
 triggers:
+  - "/learn analyze"
   - "/learn apply"
+  - "/af learn analyze"
   - "self improve"
   - "apply improvements"
+  - "analyze learning data"
+  - "success patterns"
+  - "failure patterns"
+  - "agent performance trends"
+  - "optimization opportunities"
+  - "learning analysis"
+  - "pattern analysis"
 user-invocable: false
 ---
 
@@ -17,11 +26,82 @@ user-invocable: false
 
 # Self-Improve Skill
 
-Apply learned improvements: update rules, adjust agent routing, modify workflow configs, generate knowledge entries.
+Full learning loop: **Analyze** collected learning data (success/failure patterns, optimization opportunities, agent performance) → **Apply** learned improvements (update rules, adjust agent routing, modify workflow configs, generate knowledge entries).
 
 ---
 
-## Usage
+## Analyze
+
+Analyze learning data from Supabase: success/failure patterns, optimization opportunities, agent performance. Runs before Apply — its `v_improvement_suggestions` output feeds the Apply process below.
+
+### Analyze Usage
+
+```bash
+/af learn analyze                      # Full analysis
+/af learn analyze --period 30d         # Last 30 days
+/af learn analyze --focus agents       # Agent performance
+/af learn analyze --focus workflows    # Workflow patterns
+/af learn analyze --focus feedback     # User feedback
+```
+
+### Analyze Process
+
+#### 1. Query Supabase Views
+
+```toon
+views[5]{view,purpose}:
+  v_agent_success_rates,Agent performance by task type
+  v_common_patterns,Identified patterns
+  v_improvement_suggestions,Actionable suggestions
+  v_workflow_trends,Weekly workflow trends
+  v_feedback_summary,Feedback statistics
+```
+
+#### 2. AI Pattern Recognition
+
+Identify: Top 3 success patterns, top 3 failure patterns, top 3 optimization opportunities, agent recommendations.
+
+#### 3. Output Report
+
+```markdown
+## Learning Analysis Report
+Generated: {timestamp} | Period: {dates}
+
+### Success Patterns
+1. **Pattern:** {description} — Frequency: {N}, Confidence: {%}
+
+### Failure Patterns
+1. **Pattern:** {description} — Impact: {severity}, Suggested Fix: {fix}
+
+### Optimization Opportunities
+1. **Opportunity:** {description} — Savings: {tokens/time}
+
+### Agent Recommendations
+| Task Type | Agent | Success Rate | Confidence |
+
+### Suggested Rule Updates
+- [ ] {suggestion}
+```
+
+### Analyze Environment
+
+```bash
+AF_LEARNING_ENABLED=true
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key
+```
+
+### Analyze → Apply Handoff
+
+After analysis, improvements can be: reviewed (`/af learn review`), auto-applied (`/af learn apply --auto`, high confidence only), or saved as pending (`/af learn save`). The Apply section below consumes these suggestions.
+
+---
+
+## Apply
+
+Apply learned improvements: update rules, adjust agent routing, modify workflow configs, generate knowledge entries.
+
+### Apply Usage
 
 ```bash
 /af learn apply                    # Review and apply pending
@@ -37,7 +117,7 @@ Apply learned improvements: update rules, adjust agent routing, modify workflow 
 ```toon
 types[4]{type,target,example}:
   Rule updates,rules/*.md,Increase coverage threshold 80→85
-  Agent routing,agent-detector config,Default react-expert for .tsx
+  Agent routing,agent-detector config,Load framework-expert refs/react.md for .tsx
   Workflow adjustments,workflow config,Increase Phase 2 timeout
   Knowledge base,knowledge entries,TDD reduces bugs by 40% for APIs
 ```

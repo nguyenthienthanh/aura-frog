@@ -67,5 +67,5 @@ Dependency vulnerability scan. Auto-detects package manager. Reports affected pa
 
 ## Related
 
-- **Skills:** `code-reviewer`, `code-simplifier`, `performance-optimizer`, `perf-profiling`
+- **Skills:** `code-reviewer`, `code-simplifier`, `perf-profiling`
 - **Rules:** `rules/core/code-quality.md`, `rules/core/simplicity-over-complexity.md`

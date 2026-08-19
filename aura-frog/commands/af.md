@@ -87,4 +87,4 @@ Create a new reusable skill template.
 
 ## Related
 
-- **Skills:** `prompt-evaluator`, `learning-analyzer`, `self-improve`, `lazy-agent-loader`
+- **Skills:** `prompt-evaluator`, `self-improve` (Analyze→Apply learning loop)

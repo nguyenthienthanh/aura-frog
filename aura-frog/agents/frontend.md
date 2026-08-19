@@ -64,7 +64,7 @@ Use for all frontend implementation, UI components, design system work, and user
 - `skills/design-tokens/SKILL.md` — OKLCH single-hue token system (Tailwind v4 @theme / CSS vars)
 - `skills/design-vision-loop/SKILL.md` — **after building UI**, render → screenshot (viewports + dark) → critique vs design system → iterate
 - `skills/stitch-design/SKILL.md` — generate UI via Google Stitch (MCP or manual) → seed design system + screen targets
-- `skills/react-expert/`, `skills/vue-expert/`, `skills/angular-expert/`, `skills/nextjs-expert/` — Framework gotchas
+- `skills/framework-expert/refs/{react,vue,angular,nextjs}.md` — Framework gotchas (via the framework-expert bundle)
 
 **Figma sync discipline:** the installed `figma` MCP is `figma-developer-mcp` (Framelink), which exposes `get_figma_data` (layout + styles + text + component tree) and `download_figma_images` — **not** the Dev-Mode-MCP `get_variable_defs`/`get_code_connect_map`. So: pull structure with `get_figma_data`, extract its colors/typography/spacing, and feed those INTO the `design-tokens` system + `.claude/design/design-system.md` (one source of truth — never hand-copy hexes into components); use `download_figma_images` for assets. There is no Code Connect map on this server, so reuse existing project components by name-matching the Figma layer names against `src/components/` before generating net-new. See `skills/design-expert/SKILL.md`.
 

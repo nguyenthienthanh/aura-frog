@@ -1,6 +1,6 @@
 # Aura Frog Skills
 
-**Total Skills:** 59 (9 auto-invoking + 50 reference)
+**Total Skills:** 42 (9 auto-invoking + 33 reference)
 **Format:** [TOON](https://github.com/toon-format/toon) (Token-Optimized)
 
 ---
@@ -28,9 +28,9 @@ auto_invoke[9]{name,priority,trigger,tokens}:
 
 ---
 
-## Reference Skills (51)
+## Reference Skills (33)
 
-Loaded on-demand when triggered. (50 in the sections below + `run-orchestrator`, described in the note above.)
+Loaded on-demand when triggered. (32 in the sections below + `run-orchestrator`, described in the note above.)
 
 ### Coverage — Deep Work (3)
 
@@ -42,30 +42,17 @@ Added v3.7.0 to close gaps in hard debugging, monorepo handling, and performance
 | `monorepo` | pnpm/yarn/npm workspaces + Turborepo/Nx/Lerna — correct package scoping |
 | `perf-profiling` | Measure before optimize; Pareto-driven bottleneck targeting |
 
-### Framework Experts (11)
+### Framework Expertise (1)
 
-Gotchas & decision criteria only. Use Context7 for full docs.
-
-```toon
-experts[11]{name,focus}:
-  react-expert,Conditional rendering traps + state decisions + hooks pitfalls
-  react-native-expert,FlatList optimization + storage hierarchy + platform gotchas
-  vue-expert,Reactivity traps + Composition API pitfalls + Pinia patterns
-  angular-expert,Signals vs observables + standalone patterns + DI gotchas
-  nextjs-expert,Server/client boundary + caching strategy + data fetching
-  nodejs-expert,Async pitfalls + Express/NestJS patterns + ESM gotchas
-  python-expert,Async pitfalls + FastAPI/Django patterns + type hint traps
-  laravel-expert,N+1 prevention + Eloquent traps + migration safety
-  go-expert,Error handling + concurrency pitfalls + interface design
-  flutter-expert,Riverpod vs BLoC + widget optimization + platform gotchas
-  typescript-expert,Nullish traps + strict config + type guard patterns
-```
-
-### Framework Bundle (1)
+The 11 per-framework `*-expert` skills were folded into the `framework-expert`
+bundle as lazy-loaded reference files under `skills/framework-expert/refs/`
+(`react`, `react-native`, `vue`, `angular`, `nextjs`, `nodejs`, `python`,
+`laravel`, `go`, `flutter`, `typescript`). Gotchas & decision criteria only —
+use Context7 for full docs.
 
 ```toon
 bundle[1]{name,purpose}:
-  framework-expert,Core patterns + lazy detection → loads individual experts on demand
+  framework-expert,Core patterns + lazy detection → Read refs/<framework>.md on demand
 ```
 
 ### Design & UI (6)
@@ -80,16 +67,17 @@ design[6]{name,purpose}:
   design-vision-loop,Screenshot + multimodal critique loop until UI matches design system
 ```
 
-### Workflow & Infrastructure (9)
+### Workflow & Infrastructure (5)
+
+`lazy-agent-loader` and `response-analyzer` were folded into
+`rules/core/context-economy.md`; `learning-analyzer` was merged into
+`self-improve` (its Analyze→Apply loop).
 
 ```toon
-workflow[8]{name,purpose}:
+workflow[5]{name,purpose}:
   project-context-loader,Load project conventions and context
   session-continuation,Workflow state handoff and resume
-  lazy-agent-loader,Load agent definitions on-demand
-  response-analyzer,Write large responses to temp files
-  self-improve,Apply learned improvements to plugin
-  learning-analyzer,Analyze session feedback from Supabase
+  self-improve,Analyze learning data (Supabase) then apply learned improvements
   prompt-evaluator,Evaluate prompt patterns and feature usage
   plan-orchestrator,Route 11 plan verbs to backing scripts (v3.7.2+)
 ```
@@ -109,31 +97,35 @@ planning[7]{name,purpose}:
   mcp-security-auditor,Audit MCP usage from the resolved security dir (mcp-audit.jsonl)
 ```
 
-### Code Quality (5)
+### Code Quality (4)
+
+`performance-optimizer`'s layer-specific optimization playbook was folded into
+`perf-profiling` (see Coverage above).
 
 ```toon
-quality[5]{name,purpose}:
+quality[4]{name,purpose}:
   refactor-expert,Safe incremental refactoring
   api-designer,API design principles and conventions
-  performance-optimizer,Profiling and bottleneck resolution
   scalable-thinking,Design for scale while building simple
   migration-helper,Zero-downtime database/code migrations
 ```
 
-### Dev Tools (3)
+### Dev Tools (2)
+
+`git-workflow` and `git-worktree` were merged into a single `git` skill.
 
 ```toon
-tools[3]{name,purpose}:
-  git-workflow,Token-efficient git with security scanning
-  git-worktree,Auto-create worktrees for isolated changes
+tools[2]{name,purpose}:
+  git,Token-efficient commits (security scan + auto-split) + worktree isolation
   documentation,ADR and Runbook templates
 ```
 
-### Thinking (2)
+### Thinking (1)
+
+`sequential-thinking` was folded into `tree-of-thoughts` as its linear mode.
 
 ```toon
-thinking[2]{name,purpose}:
-  sequential-thinking,Structured analysis with revision and branching
+thinking[1]{name,purpose}:
   problem-solving,5 techniques for different problem types
 ```
 

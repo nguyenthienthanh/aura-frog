@@ -168,19 +168,21 @@ See: `workflow/project-linting-precedence.md`
 
 ## Framework-Specific Best Practices
 
-Framework-specific rules have been migrated to **Expert Skills** for on-demand loading:
+Framework-specific guidance lives in the **`framework-expert`** bundle, which
+lazy-loads a per-framework reference from `skills/framework-expert/refs/` on
+demand:
 
-| Skill | Triggers | Content |
-|-------|----------|---------|
-| `typescript-expert` | .ts, .tsx, type errors | Strict types, ESLint, nullish handling |
-| `react-expert` | React, JSX, hooks | Components, hooks, performance |
-| `react-native-expert` | RN, Expo, mobile | Lists, navigation, platform code |
-| `vue-expert` | Vue, Composition API | Script setup, Pinia, reactivity |
-| `nextjs-expert` | Next.js, App Router | Server Components, caching |
+| Reference | Triggers | Content |
+|-----------|----------|---------|
+| `refs/typescript.md` | .ts, .tsx, type errors | Strict types, ESLint, nullish handling |
+| `refs/react.md` | React, JSX, hooks | Components, hooks, performance |
+| `refs/react-native.md` | RN, Expo, mobile | Lists, navigation, platform code |
+| `refs/vue.md` | Vue, Composition API | Script setup, Pinia, reactivity |
+| `refs/nextjs.md` | Next.js, App Router | Server Components, caching |
 | *seo-expert* | *Available as addon* | *SEO module externalized* |
 | *ai-discovery-expert* | *Available as addon* | *AI discovery module externalized* |
 
-These skills auto-invoke when working with the respective framework.
+`framework-expert` detects the stack and reads the matching ref on demand.
 
 ---
 
