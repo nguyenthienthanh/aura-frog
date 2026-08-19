@@ -88,9 +88,14 @@ CANDIDATES=$(graph_index_ready "$PLANS_DIR" "$ACTIVE_STORY" || true)
 if [ -z "$CANDIDATES" ]; then
     # v3.7.3+: tasks live in folders — `tasks/{ID}_{slug}/task.md`. Pre-v3.7.3
     # layout was flat — `tasks/{ID}_{slug}.md`. Support both for transition.
-    TASK_CANDIDATES=$(find "$TASKS_DIR" -maxdepth 2 -name 'task.md' 2>/dev/null)
+    #
+    # Sorted: unsorted `find` returns directory order, so WHICH ready task got
+    # dispatched depended on the filesystem — two machines with the same tree
+    # could pick different tasks. The index path orders by id; this one now
+    # does too, so the fast and fallback paths dispatch the same task.
+    TASK_CANDIDATES=$(find "$TASKS_DIR" -maxdepth 2 -name 'task.md' 2>/dev/null | sort)
     TASK_CANDIDATES="${TASK_CANDIDATES}
-$(find "$TASKS_DIR" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null)"
+$(find "$TASKS_DIR" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null | sort)"
     for f in $TASK_CANDIDATES; do
         [ -f "$f" ] || continue
         tier=$(get_field "$f" "tier")

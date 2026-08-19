@@ -91,12 +91,18 @@ fi
 
 # T1 — Initiatives. v3.7.3+ layout: initiatives/{ID}_{slug}/initiative.md (folder).
 # Pre-v3.7.3 layout: initiatives/{ID}.md (flat). Support both.
+# `find` returns directory order, which is whatever the filesystem happens to
+# hand back — so the same tree rendered on two machines came out in two
+# different orders. Sort, so this path is deterministic and matches the
+# index renderer (which orders by id) node for node.
 init_files() {
     if [ -d "${PLANS_DIR}/initiatives" ]; then
-        # v3.7.3+ folder layout
-        find "${PLANS_DIR}/initiatives" -maxdepth 2 -name 'initiative.md' 2>/dev/null
-        # legacy flat layout
-        find "${PLANS_DIR}/initiatives" -maxdepth 1 -name '*.md' 2>/dev/null
+        {
+            # v3.7.3+ folder layout
+            find "${PLANS_DIR}/initiatives" -maxdepth 2 -name 'initiative.md' 2>/dev/null
+            # legacy flat layout
+            find "${PLANS_DIR}/initiatives" -maxdepth 1 -name '*.md' 2>/dev/null
+        } | sort
     fi
 }
 
@@ -127,11 +133,11 @@ for init in $(init_files); do
                     # T4 — Tasks. v3.7.3+: tasks/{ID}_{slug}/task.md. Pre-v3.7.3: tasks/{ID}_{slug}.md.
                     if [ -d "${story_dir}/tasks" ]; then
                         # New folder-per-task layout.
-                        for task in $(find "${story_dir}/tasks" -maxdepth 2 -name 'task.md' 2>/dev/null); do
+                        for task in $(find "${story_dir}/tasks" -maxdepth 2 -name 'task.md' 2>/dev/null | sort); do
                             print_node "$task" "│  │  │  └─ "
                         done
                         # Legacy flat layout.
-                        for task in $(find "${story_dir}/tasks" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null); do
+                        for task in $(find "${story_dir}/tasks" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null | sort); do
                             print_node "$task" "│  │  │  └─ "
                         done
                     fi

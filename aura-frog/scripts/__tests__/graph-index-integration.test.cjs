@@ -108,6 +108,18 @@ describe('next-task picks the same task with and without the index', () => {
         expect(r.stdout).toContain('TASK-00001');
     });
 
+    it('picks the lowest ready id, not whatever the filesystem lists first', () => {
+        // Written last, sorts first. Without an ordered scan, WHICH task gets
+        // dispatched depends on the filesystem — two machines with the same
+        // tree could pick different work.
+        node(`${STORY_DIR}/tasks/TASK-00000_setup`, 'task.md',
+            { id: 'TASK-00000', tier: 4, status: 'planned', parent: 'STORY-0001', intent: 'setup' });
+
+        expect(pick().stdout).toContain('TASK-00000');
+        run(NEXT_TASK, ['--plans-dir', plans, '--rebuild', '--dry-run']);
+        expect(pick().stdout).toContain('TASK-00000');
+    });
+
     it('dispatches TASK-00001 from the index', () => {
         run(NEXT_TASK, ['--plans-dir', plans, '--rebuild', '--dry-run']);
         const r = pick();
@@ -156,6 +168,10 @@ describe('render-plan-tree renders the same tree either way', () => {
     const ids = (out) => out.split('\n').map((l) => (l.match(/\b((?:MISSION|INIT|FEAT|STORY|TASK)[A-Z0-9-]*)/) || [])[1])
         .filter(Boolean);
 
+    // Both paths must be ID-ORDERED, not directory-ordered. Unsorted `find`
+    // returns whatever the filesystem hands back, so the same tree rendered on
+    // two machines came out in two different orders — this assertion caught
+    // exactly that on a CI runner whose readdir returned TASK-00002 first.
     it('scan and index produce the same nodes in the same order', () => {
         const scanned = run(RENDER, [plans]);
         expect(scanned.status).toBe(0);
@@ -167,6 +183,21 @@ describe('render-plan-tree renders the same tree either way', () => {
         expect(ids(indexed.stdout)).toEqual(ids(scanned.stdout));
         expect(ids(indexed.stdout)).toEqual(
             ['MISSION', 'INIT-001', 'FEAT-001', 'STORY-0001', 'TASK-00001', 'TASK-00002']);
+    });
+
+    it('orders siblings by id whichever way round they were created on disk', () => {
+        // Create a task that sorts FIRST but was written LAST, so directory
+        // order and id order disagree however the filesystem chooses to list.
+        node(`${STORY_DIR}/tasks/TASK-00000_setup`, 'task.md',
+            { id: 'TASK-00000', tier: 4, status: 'planned', parent: 'STORY-0001', intent: 'setup' });
+
+        const scanned = ids(run(RENDER, [plans]).stdout);
+        run(RENDER, [plans, '--rebuild']);
+        const indexed = ids(run(RENDER, [plans]).stdout);
+
+        const tasks = (list) => list.filter((id) => id.startsWith('TASK-'));
+        expect(tasks(scanned)).toEqual(['TASK-00000', 'TASK-00001', 'TASK-00002']);
+        expect(tasks(indexed)).toEqual(['TASK-00000', 'TASK-00001', 'TASK-00002']);
     });
 
     it('both paths print the legend', () => {
