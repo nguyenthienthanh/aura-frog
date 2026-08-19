@@ -122,7 +122,11 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 
 ## Auto-Invoke Skills
 
-Only skills with `autoInvoke: true` in frontmatter fire on every message.
+Skills with `autoInvoke: true` in frontmatter are *eligible* to fire without an
+explicit invocation — they are matched against each message and load when their
+trigger applies, which is not the same as loading on every message. The trigger
+column below is the real gate: `agent-detector` is the only one that genuinely
+runs every turn; the rest wait for the intent or the file they name.
 
 ⚠️ **Skills vs agents — different tools.** Everything in this section is a **skill** (file: `aura-frog/skills/<name>/SKILL.md`), invoke via the **Skill tool**. Do NOT call these names via the Agent tool's `subagent_type` — that errors with "Agent type 'aura-frog:<name>' not found". The 15 agents live in `aura-frog/agents/*.md` and are listed in the Process Table above.
 
