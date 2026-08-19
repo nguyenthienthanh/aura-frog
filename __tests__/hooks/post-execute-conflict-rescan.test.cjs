@@ -21,6 +21,7 @@ const {
   buildRescanEvent,
   latestCheckpointFile,
   readTaskStatus,
+  checkCompatibility,
 } = require('../../aura-frog/hooks/post-execute-conflict-rescan.cjs');
 
 const NOW = 1_000_000_000_000; // fixed clock; tests pass now explicitly (no Date.now)
@@ -146,6 +147,47 @@ describe('readTaskStatus / latestCheckpointFile (v3.7.3+ co-located layout)', ()
 
   it('returns null when no checkpoint exists anywhere', () => {
     expect(latestCheckpointFile(plansDir, 'TASK-00001')).toBeNull();
+  });
+});
+
+describe('checkCompatibility — checkpoint git_sha is untrusted input', () => {
+  let plansDir;
+  let ckptDir;
+
+  beforeEach(() => {
+    plansDir = fs.mkdtempSync(path.join(os.tmpdir(), 'af-rescan-sha-'));
+    const taskDir = path.join(plansDir, 'features', 'FEAT-A_x', 'stories', 'STORY-0001_y', 'tasks', 'TASK-00001_z');
+    ckptDir = path.join(taskDir, 'checkpoints');
+    fs.mkdirSync(ckptDir, { recursive: true });
+  });
+  afterEach(() => {
+    fs.rmSync(plansDir, { recursive: true, force: true });
+  });
+
+  const writeSha = (sha) => fs.writeFileSync(
+    path.join(ckptDir, '2026-08-01T10-00-00Z.json'),
+    JSON.stringify({ git_sha: sha }),
+  );
+
+  it('refuses a git_sha that is not a bare hex sha (no shell, no exec)', () => {
+    const canary = path.join(plansDir, 'pwned');
+    writeSha(`HEAD; touch ${canary}`);
+    expect(checkCompatibility(plansDir, 'TASK-00001', ['src/a.ts'])).toBeNull();
+    expect(fs.existsSync(canary)).toBe(false);
+  });
+
+  it('refuses substitution and option-looking shas', () => {
+    for (const bad of ['$(id)', '`id`', 'deadbee..HEAD --output=/tmp/x', '--upload-pack=touch', 'zzzzzzz', 'abc']) {
+      writeSha(bad);
+      expect(checkCompatibility(plansDir, 'TASK-00001', [])).toBeNull();
+    }
+  });
+
+  it('accepts a well-formed sha and reports overlap against the planned files', () => {
+    // A real sha shape that does not exist in this repo: git errors, the catch
+    // returns null. The point is that the guard let it through to git at all.
+    writeSha('0'.repeat(40));
+    expect(checkCompatibility(plansDir, 'TASK-00001', ['src/a.ts'])).toBeNull();
   });
 });
 

@@ -34,6 +34,35 @@ plans_dir() {
 }
 
 # ---------------------------------------------------------------------------
+# security_dir [explicit_path]
+#   Resolve the security dir (home of mcp-audit.jsonl). Shell mirror of
+#   hooks/lib/security-dir.cjs — the two MUST agree, since mcp-call-gate.cjs
+#   writes the log and dashboard.sh reads it.
+#     1. Explicit positional arg (caller passed it)
+#     2. $AF_SECURITY_DIR env var
+#     3. ".claude/security" if it exists
+#     4. ".aura/security" — the current default, and where every install has it
+#   Flipping (3) to be the default for fresh projects relocates a security audit
+#   trail, so it is a maintainer call, not a mechanical one. See the note in
+#   hooks/lib/security-dir.cjs.
+# ---------------------------------------------------------------------------
+security_dir() {
+    if [ -n "${1:-}" ]; then
+        echo "$1"
+        return 0
+    fi
+    if [ -n "${AF_SECURITY_DIR:-}" ]; then
+        echo "${AF_SECURITY_DIR}"
+        return 0
+    fi
+    if [ -d ".claude/security" ]; then
+        echo ".claude/security"
+        return 0
+    fi
+    echo ".aura/security"
+}
+
+# ---------------------------------------------------------------------------
 # slugify <text>
 #   Lower-case, ASCII-only, hyphen-separated. Used in feature/story/task
 #   folder names: ${ID}_${slug}/.
@@ -137,6 +166,90 @@ get_list() {
 # set_field <file> <field> <value>
 #   Update an existing frontmatter scalar in-place (atomic). Adds if missing.
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# graph_index_update <node_file>
+#   Refresh one node's entry in <plans_dir>/graph-index.json after a mutation.
+#
+#   The index is OPT-IN: it is only maintained once a project has run a
+#   --rebuild, so a project that never opted in pays a handful of `[ -f ]`
+#   tests here and nothing else — no node spawn, no behaviour change. That is
+#   also why the plans dir is discovered by walking UP for the index file
+#   rather than being passed in: set_field's callers only ever hand it a path.
+#
+#   Best-effort throughout. A mutation must never fail because a cache could
+#   not be updated, and a stale index is caught by the readers' staleness check.
+#   Disable: AF_GRAPH_INDEX_DISABLED=true
+# ---------------------------------------------------------------------------
+_AF_VAULT_INDEX_CJS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../hooks/lib" 2>/dev/null && pwd)/vault-index.cjs"
+
+graph_index_update() {
+    [ "${AF_GRAPH_INDEX_DISABLED:-}" = "true" ] && return 0
+    local file="$1"
+    [ -n "$file" ] && [ -f "$file" ] || return 0
+    case "$file" in *.md) ;; *) return 0 ;; esac
+
+    local dir depth=0
+    dir=$(cd "$(dirname "$file")" 2>/dev/null && pwd) || return 0
+    while [ -n "$dir" ] && [ "$dir" != "/" ] && [ "$depth" -lt 8 ]; do
+        if [ -f "${dir}/graph-index.json" ]; then
+            [ -f "$_AF_VAULT_INDEX_CJS" ] || return 0
+            command -v node >/dev/null 2>&1 || return 0
+            node "$_AF_VAULT_INDEX_CJS" --plans-dir "$dir" --update "$file" >/dev/null 2>&1 || true
+            return 0
+        fi
+        dir=$(dirname "$dir")
+        depth=$((depth + 1))
+    done
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# graph_index_rebuild <plans_dir>
+#   Full rescan → graph-index.json (atomic). This is how a project opts in, and
+#   how a stale index self-heals. Returns non-zero if it could not be written.
+# ---------------------------------------------------------------------------
+graph_index_rebuild() {
+    local plans="$1"
+    [ "${AF_GRAPH_INDEX_DISABLED:-}" = "true" ] && return 1
+    [ -f "$_AF_VAULT_INDEX_CJS" ] || return 1
+    command -v node >/dev/null 2>&1 || return 1
+    node "$_AF_VAULT_INDEX_CJS" --plans-dir "$plans" --rebuild >/dev/null 2>&1
+}
+
+# ---------------------------------------------------------------------------
+# graph_index_ready <plans_dir> <story_id>
+#   Print "ID<TAB>abs_path" for each dispatchable T4 under <story_id>, straight
+#   from the index. Returns non-zero when the index is absent or stale — the
+#   caller then runs its own scan, which is always correct, just slower.
+# ---------------------------------------------------------------------------
+graph_index_ready() {
+    local plans="$1"; local story="$2"
+    [ "${AF_GRAPH_INDEX_DISABLED:-}" = "true" ] && return 1
+    [ -f "${plans}/graph-index.json" ] || return 1
+    [ -f "$_AF_VAULT_INDEX_CJS" ] || return 1
+    command -v node >/dev/null 2>&1 || return 1
+    local out
+    out=$(node "$_AF_VAULT_INDEX_CJS" --plans-dir "$plans" --ready "$story" 2>/dev/null) || return 1
+    # Re-anchor the relative paths the index stores onto this plans dir.
+    printf '%s' "$out" | awk -F'\t' -v p="$plans" 'NF==2 && $1 != "" { print $1 "\t" p "/" $2 }'
+}
+
+# ---------------------------------------------------------------------------
+# graph_index_render <plans_dir>
+#   Print the ASCII tree straight from the index. Returns non-zero (printing
+#   nothing) when the index is absent, stale, empty or disabled, so the caller
+#   can fall back to its own filesystem walk.
+# ---------------------------------------------------------------------------
+graph_index_render() {
+    local plans="$1"
+    [ "${AF_GRAPH_INDEX_DISABLED:-}" = "true" ] && return 1
+    [ -f "${plans}/graph-index.json" ] || return 1
+    [ -f "$_AF_VAULT_INDEX_CJS" ] || return 1
+    command -v node >/dev/null 2>&1 || return 1
+    node "$_AF_VAULT_INDEX_CJS" --plans-dir "$plans" --render 2>/dev/null
+}
+
 set_field() {
     local file="$1"; local field="$2"; local value="$3"
     local tmp="${file}.tmp.$$"
@@ -157,6 +270,7 @@ set_field() {
         { print }
     ' "$file" > "$tmp"
     mv "$tmp" "$file"
+    graph_index_update "$file"
 }
 
 # ---------------------------------------------------------------------------

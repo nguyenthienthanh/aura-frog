@@ -46,3 +46,22 @@ describe('pre-flight-validate.jqAvailable (fail-open on missing jq)', () => {
     expect(typeof jqAvailable()).toBe('boolean');
   });
 });
+
+/**
+ * The hooks.json matcher is Bash|Read|Write|Edit|Glob|Grep, but neither
+ * run-all.sh nor validate-tool-input.sh has a case for Glob or Grep — the whole
+ * bash tree spawned, matched nothing, and exited 0 on every search.
+ */
+describe('pre-flight-validate — tools with no applicable check', () => {
+  const { NO_CHECKS_APPLY } = require('../../aura-frog/hooks/pre-flight-validate.cjs');
+
+  it('lists exactly the read-only search tools', () => {
+    expect([...NO_CHECKS_APPLY].sort()).toEqual(['Glob', 'Grep']);
+  });
+
+  it('does not list the tools run-all.sh actually dispatches on', () => {
+    for (const tool of ['Bash', 'Read', 'Write', 'Edit']) {
+      expect(NO_CHECKS_APPLY.has(tool)).toBe(false);
+    }
+  });
+});

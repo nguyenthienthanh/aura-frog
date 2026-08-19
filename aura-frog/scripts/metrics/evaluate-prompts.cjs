@@ -30,7 +30,7 @@ const AVAILABLE_SKILLS = [
   'agent-detector', 'bugfix-quick', 'code-reviewer', 'code-simplifier', 'test-writer',
   'plan-loader', 'reasoning-trace-recorder', 'extension-detector', 'permanent-memory-loader',
   // Orchestration & workflow
-  'run-orchestrator', 'session-continuation', 'phase1-lite', 'self-improve',
+  'run-orchestrator', 'session-continuation', 'self-improve',
   'lazy-agent-loader', 'project-context-loader', 'response-analyzer', 'learning-analyzer',
   // Reasoning techniques
   'self-consistency', 'tree-of-thoughts', 'chain-of-verification',

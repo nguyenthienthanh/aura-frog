@@ -265,6 +265,13 @@ function runSpawned(specs, raw) {
   let firstWarn = 0;
   for (const spec of specs) {
     if (!fs.existsSync(spec.file)) continue;
+    // NOT minimised through lib/af-child-env.cjs, unlike lint-autofix's linter
+    // spawn. The children here are this plugin's own hooks, several of which
+    // exist to use exactly the credentials that filter strips: jira-auto-fetch
+    // needs JIRA_API_TOKEN, the learning hooks need SUPABASE_SECRET_KEY.
+    // Stripping them would break those hooks on the spawn path only — and buy
+    // nothing, since runInProcess (the default) runs the same code in this very
+    // process with the full environment already.
     const res = spawnSync(process.execPath, [spec.file], {
       input: raw,
       env: { ...process.env, ...spec.env },

@@ -24,7 +24,7 @@ Referenced in plugin.json:
 
 ## Active Hooks (45 Total)
 
-> **v3.7.0 additions:** alpha.1: `pre-execute-load-plan-context.cjs`, `session-start-restore-active.cjs`. alpha.2: `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs`. alpha.3: `jira-auto-fetch.cjs`. alpha.4: `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs`, `json-toon-projector.cjs`. beta.1: `pre-flight-validate.cjs`. beta.2: `pre-dispatch-conflict-check.cjs`, `post-execute-conflict-rescan.cjs`, `pending-confirm-timeout.cjs`. **rc.1: `mcp-call-gate.cjs`** — PreToolUse on `mcp__.*` enforces per-agent allowlist + rate limits, writes sanitized audit to `.aura/security/mcp-audit.jsonl`.
+> **v3.7.0 additions:** alpha.1: `pre-execute-load-plan-context.cjs`, `session-start-restore-active.cjs`. alpha.2: `post-execute-update-node.cjs`, `tdd-red-failure-tracker.cjs`, `tool-call-tracer.cjs`. alpha.3: `jira-auto-fetch.cjs`. alpha.4: `feature-done-trigger-archive.cjs`, `session-reset-trigger.cjs`, `json-toon-projector.cjs`. beta.1: `pre-flight-validate.cjs`. beta.2: `pre-dispatch-conflict-check.cjs`, `post-execute-conflict-rescan.cjs`, `pending-confirm-timeout.cjs`. **rc.1: `mcp-call-gate.cjs`** — PreToolUse on `mcp__.*` enforces per-agent allowlist + rate limits, writes sanitized audit to `<security-dir>/mcp-audit.jsonl` (resolved by `hooks/lib/security-dir.cjs`).
 >
 > **v3.7.4 follow-up:** `task-track-model.cjs` (PreToolUse `Task`) + `task-clear-model.cjs` (PostToolUse `Task`) maintain `.aura-frog/runtime/model-stack.jsonl` so the statusline can show the per-step subagent model. Fail-open observability — see [docs/statusline-model-tracking.md](../docs/statusline-model-tracking.md).
 
@@ -349,6 +349,15 @@ Hook: 🔧 Auto-fixed: eslint, prettier
 ```
 
 **Disable:** Set `AF_LINT_AUTOFIX=false` in environment
+
+**Environment handed to the linter:** the fixer is the working repo's own
+`node_modules/.bin` / `vendor/bin` binary — third-party code, run automatically
+on every Write and Edit. It is spawned with a minimised environment
+(`hooks/lib/af-child-env.cjs`): credential-shaped variables (`*SECRET*`,
+`*TOKEN*`, `*KEY*`, `*PASSWORD*`, `*CREDENTIAL*`, `PAT`) are stripped, while
+`PATH`, `HOME`, locale, `NODE_*` and the plugin's `AF_*` / `CLAUDE_*` wiring are
+kept. Set `AF_CHILD_ENV_UNFILTERED=true` to pass the environment through
+untouched, for a toolchain that genuinely needs a credential-named variable.
 
 **Script:** `hooks/lint-autofix.cjs`
 

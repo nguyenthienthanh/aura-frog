@@ -25,6 +25,7 @@ const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const { findProjectRoot } = require('./lib/hook-runtime.cjs');
 const { acquireRunLock } = require('./lib/af-run-lock.cjs');
 const { TIMEOUT_QUICK_MS, warnExecLimit } = require('./lib/af-exec.cjs');
+const { filterChildEnv } = require('./lib/af-child-env.cjs');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -342,15 +343,20 @@ function runLinter(linter, filePath) {
     const cmd = resolved[0];
     const args = [...resolved.slice(1), filePath];
 
-    // Detect legacy .eslintrc.* config and set env var for eslint 9+
-    const env = { ...process.env };
+    // `cmd` here is the working repo's own node_modules/.bin or vendor/bin
+    // binary, run automatically on every Write and Edit — third-party code from
+    // whatever repository happens to be checked out. It has no use for the
+    // credentials .envrc exported into this process, so don't hand them over.
+    const extra = {};
     if (linter === 'eslint') {
       const legacyConfigs = ['.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', '.eslintrc.yml'];
       const hasLegacy = legacyConfigs.some(f => fs.existsSync(path.join(process.cwd(), f)));
       if (hasLegacy) {
-        env.ESLINT_USE_FLAT_CONFIG = 'false';
+        // Detect legacy .eslintrc.* config and set env var for eslint 9+
+        extra.ESLINT_USE_FLAT_CONFIG = 'false';
       }
     }
+    const env = filterChildEnv(process.env, extra);
 
     // Snapshot file mtime before running fixer
     const mtimeBefore = fs.statSync(filePath).mtimeMs;

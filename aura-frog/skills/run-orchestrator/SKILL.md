@@ -220,6 +220,40 @@ phases[5]{phase,name,builder,reviewer,gate}:
 
 **Builder != Reviewer.** Details: `rules/workflow/cross-review-workflow.md`
 
+### Phase 1 output budget — HARD CAP 500 tokens
+
+Phase 1 produces a requirements table, not an essay. The whole point of the
+approval gate is that a human reads the output; four paragraphs restating the
+task get skimmed, and the design decisions inside them get skimmed with them.
+
+```toon
+# Phase 1: Requirements
+# Task: {one-line description}
+
+scope[3-5]{item,type,priority}:
+  {feature},{new|change|fix},{must|should|nice}
+
+acceptance[3-5]{id,criteria}:
+  AC1,{testable criterion}
+
+tech_notes[1-3]{area,constraint}:
+  {area},{constraint or decision}
+
+risks[0-2]{risk,mitigation}:
+  {risk},{mitigation}
+
+# Phase 1 COMPLETE | Next: Phase 2 (Test RED) | Gate: APPROVAL
+```
+
+- TOON tables only — no prose paragraphs
+- MAX 5 rows per table, ONE line per row
+- No repetition, no explanations — data only
+- Over 500 tokens means it is wrong, not thorough
+
+(Absorbed from the former `phase1-lite` skill, which nothing loaded: it was
+`autoInvoke: false`, `user-invocable: false`, and triggered only on the literal
+phrase "phase 1 lite". The cap belongs where Phase 1 actually runs.)
+
 ### Mandatory transparency — announce who's doing what (v3.7.4+)
 
 At every phase transition AND every agent dispatch, surface the team to the user in the response message. Format:

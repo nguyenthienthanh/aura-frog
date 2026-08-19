@@ -9,28 +9,33 @@ const { composeContextLines } =
   require('../../aura-frog/hooks/pre-execute-load-plan-context.cjs');
 
 describe('post-compact — validateStateFile', () => {
-  it('flags a workflow-state file missing phase and agent', () => {
+  // The field names below are the ones the writers actually emit: the workflow
+  // state compact-handoff.cjs reads/synthesises carries current_phase +
+  // agents.primary, and saveHandoff() writes workflow + context.
+  it('flags a workflow-state file missing current_phase and agents.primary', () => {
     const w = validateStateFile('.claude/cache/workflow-state.json', {});
     expect(w).toEqual([
-      '.claude/cache/workflow-state.json: missing phase',
-      '.claude/cache/workflow-state.json: missing agent',
+      '.claude/cache/workflow-state.json: missing current_phase',
+      '.claude/cache/workflow-state.json: missing agents.primary',
     ]);
   });
 
   it('passes a complete workflow-state file', () => {
-    expect(validateStateFile('.claude/cache/workflow-state.json', { phase: '2', agent: 'frontend' }))
-      .toEqual([]);
+    expect(validateStateFile(
+      '.claude/cache/workflow-state.json',
+      { current_phase: 2, agents: { primary: 'frontend' } },
+    )).toEqual([]);
   });
 
-  it('flags a compact-handoff with neither summary nor decisions', () => {
+  it('flags a compact-handoff with neither workflow nor context', () => {
     const w = validateStateFile('.claude/cache/compact-handoff.json', {});
     expect(w).toHaveLength(1);
-    expect(w[0]).toContain('missing summary and decisions');
+    expect(w[0]).toContain('missing workflow and context');
   });
 
-  it('passes a compact-handoff that has either summary or decisions', () => {
-    expect(validateStateFile('compact-handoff.json', { summary: 'x' })).toEqual([]);
-    expect(validateStateFile('compact-handoff.json', { decisions: ['y'] })).toEqual([]);
+  it('passes a compact-handoff that has either workflow or context', () => {
+    expect(validateStateFile('compact-handoff.json', { workflow: { workflow_id: 'w1' } })).toEqual([]);
+    expect(validateStateFile('compact-handoff.json', { context: { project_name: 'p' } })).toEqual([]);
   });
 
   it('says nothing about an unrelated path', () => {
@@ -44,6 +49,58 @@ describe('post-compact — validateStateFile', () => {
 
   it('collectWarnings returns an array without throwing for missing files', () => {
     expect(Array.isArray(collectWarnings(['does/not/exist.json']))).toBe(true);
+  });
+});
+
+describe('post-compact — accepts what compact-handoff actually writes', () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+
+  let root;
+  let savedEnv;
+
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'af-postcompact-'));
+    savedEnv = { ...process.env };
+    // compact-handoff resolves its file paths at module load, so the root has to
+    // be in place before the fresh require below.
+    process.env.AF_PROJECT_ROOT = root;
+    process.env.AF_WORKFLOW_ID = 'wf-test-1';
+    process.env.AF_CURRENT_PHASE = '3';
+    process.env.AF_CURRENT_AGENT = 'frontend';
+    process.env.AF_TASK_DESCRIPTION = 'ship the thing';
+  });
+
+  afterEach(() => {
+    process.env = savedEnv;
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  it('collectWarnings is silent on a handoff written by saveHandoff()', () => {
+    let saveHandoff;
+    jest.isolateModules(() => {
+      ({ saveHandoff } = require('../../aura-frog/hooks/compact-handoff.cjs'));
+    });
+    expect(saveHandoff()).not.toBe(false);
+
+    const handoffFile = path.join(root, '.claude', 'cache', 'compact-handoff.json');
+    expect(fs.existsSync(handoffFile)).toBe(true);
+    // Absolute paths still match the `rel.includes(...)` dispatch in
+    // validateStateFile, so the real file goes through the real check.
+    expect(collectWarnings([handoffFile])).toEqual([]);
+  });
+
+  it('collectWarnings is silent on the paused workflow-state saveHandoff() writes', () => {
+    let saveHandoff;
+    jest.isolateModules(() => {
+      ({ saveHandoff } = require('../../aura-frog/hooks/compact-handoff.cjs'));
+    });
+    saveHandoff();
+
+    const stateFile = path.join(root, '.claude', 'logs', 'workflows', 'wf-test-1', 'workflow-state.json');
+    expect(fs.existsSync(stateFile)).toBe(true);
+    expect(collectWarnings([stateFile])).toEqual([]);
   });
 });
 

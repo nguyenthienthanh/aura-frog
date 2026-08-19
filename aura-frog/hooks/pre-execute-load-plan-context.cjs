@@ -53,7 +53,7 @@ function composeContextLines(active) {
   if (active && Array.isArray(active.frozen) && active.frozen.length > 0) {
     lines.push(`Frozen: ${active.frozen.length} node(s) — see /aura-frog:plan-conflicts`);
   }
-  // No "Ready: N queued" line: active.json's ready_queue is a vestigial field
+  // No "Ready: N queued" line: active.json's ready_queue was a vestigial field
   // nothing maintains (next-task.sh rescans task files each call).
   return lines;
 }

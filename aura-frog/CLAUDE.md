@@ -122,7 +122,11 @@ Agent selection handled by `skills/agent-detector/SKILL.md` (haiku, priority hig
 
 ## Auto-Invoke Skills
 
-Only skills with `autoInvoke: true` in frontmatter fire on every message.
+Skills with `autoInvoke: true` in frontmatter are *eligible* to fire without an
+explicit invocation — they are matched against each message and load when their
+trigger applies, which is not the same as loading on every message. The trigger
+column below is the real gate: `agent-detector` is the only one that genuinely
+runs every turn; the rest wait for the intent or the file they name.
 
 ⚠️ **Skills vs agents — different tools.** Everything in this section is a **skill** (file: `aura-frog/skills/<name>/SKILL.md`), invoke via the **Skill tool**. Do NOT call these names via the Agent tool's `subagent_type` — that errors with "Agent type 'aura-frog:<name>' not found". The 15 agents live in `aura-frog/agents/*.md` and are listed in the Process Table above.
 
@@ -141,7 +145,7 @@ skills[9]{name,trigger}:
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion. **Also a skill, not an agent.**
 
-51 reference skills loaded on-demand. Full list: `skills/README.md`
+50 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -275,7 +279,7 @@ resources[8]{name,location}:
   Agents (15),agents/
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
-  Skills (60),skills/
+  Skills (59),skills/
   Hooks (51),hooks/
   MCP (6),.mcp.json (all enabled; postgres/redis/chrome-devtools/codebase-memory/stitch unbundled — see docs/operations/MCP_GUIDE.md)
   AI References,docs/

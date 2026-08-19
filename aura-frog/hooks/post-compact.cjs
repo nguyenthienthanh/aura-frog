@@ -29,15 +29,22 @@ const STATE_PATHS = [
 
 // Pure: which required fields is a parsed state file missing? The check depends
 // on WHICH state file it is (matched by the `rel` path), so both are passed in.
+//
+// The field names here must track the actual writers, not a guessed schema:
+// compact-handoff.cjs saveHandoff() writes {version, saved_at, reason, workflow,
+// context, resume_hint}, and the workflow state it reads/synthesises carries
+// current_phase + agents.primary. The old checks looked for summary/decisions
+// and phase/agent — fields nothing writes — so every valid handoff tripped
+// exit(2) and told Claude its state was corrupt right after a compaction.
 function validateStateFile(rel, data) {
   const warnings = [];
   if (rel.includes('workflow-state')) {
-    if (!data.phase) warnings.push(`${rel}: missing phase`);
-    if (!data.agent) warnings.push(`${rel}: missing agent`);
+    if (!data.current_phase) warnings.push(`${rel}: missing current_phase`);
+    if (!data.agents?.primary) warnings.push(`${rel}: missing agents.primary`);
   }
   if (rel.includes('compact-handoff')) {
-    if (!data.summary && !data.decisions) {
-      warnings.push(`${rel}: missing summary and decisions — handoff may be empty`);
+    if (!data.workflow && !data.context) {
+      warnings.push(`${rel}: missing workflow and context — handoff may be empty`);
     }
   }
   return warnings;

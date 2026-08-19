@@ -26,7 +26,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const { TIMEOUT_SLOW_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
 const resolvePlansDir = require('./lib/plans-dir.cjs');
 const { readJsonlTail } = require('./lib/jsonl-tail.cjs');
@@ -195,9 +195,15 @@ function checkCompatibility(plansDir, blockerTask, plannedFiles) {
     if (!checkpoint) return null;
     const cp = JSON.parse(fs.readFileSync(checkpoint, 'utf8'));
     if (!cp.git_sha) return null;
+    // The checkpoint JSON is written by other hooks and lives on disk, so its
+    // git_sha is not trusted input: anything that reaches a shell here would run
+    // as the user. Shape-check it first (same guard as af-project-cache's
+    // getGitHead), then hand it to git as an argv element so no shell parses it.
+    if (!/^[0-9a-f]{7,40}$/i.test(cp.git_sha)) return null;
     // A stale checkpoint sha can span thousands of commits, so this diff is the
     // largest git output any hook asks for — slow tier + large buffer.
-    const diff = execSync(`git diff --name-only ${cp.git_sha}..HEAD 2>/dev/null`, {
+    const diff = execFileSync('git', ['diff', '--name-only', `${cp.git_sha}..HEAD`], {
+      stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf8',
       timeout: TIMEOUT_SLOW_MS,
       killSignal: 'SIGKILL',
@@ -270,5 +276,6 @@ if (require.main === module) {
   module.exports = {
     collectRecentDoneTasks, filterActuallyDone, foldLatestConflicts, findRescanPair,
     recommendationFor, buildRescanEvent, latestCheckpointFile, readTaskStatus,
+    checkCompatibility,
   };
 }

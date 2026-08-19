@@ -17,7 +17,9 @@
  *     The per-session counter resets on a rolling window boundary so a
  *     long-lived counter file cannot hard-block a fresh session forever.
  *   - Run `scripts/security/sanitize-mcp-input.sh` on input before audit append
- *   - Append sanitized entry to .aura/security/mcp-audit.jsonl
+ *   - Append sanitized entry to <security-dir>/mcp-audit.jsonl
+ *     (lib/security-dir.cjs: .claude/security if present, else .aura/security;
+ *      AF_SECURITY_DIR overrides)
  *
  * Configuration:
  *   AF_MCP_AUDIT_DISABLED=true        — skip audit (still enforce allowlist + rate limits)
@@ -38,13 +40,17 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { readHookInputCompat, findProjectRoot } = require('./lib/hook-runtime.cjs');
+const { resolveMcpAuditFile } = require('./lib/security-dir.cjs');
 
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
 const SANITIZER = path.join(PLUGIN_ROOT, 'scripts', 'security', 'sanitize-mcp-input.sh');
 const PLUGIN_JSON = path.join(PLUGIN_ROOT, '.claude-plugin', 'plugin.json');
 const AGENTS_DIR = path.join(PLUGIN_ROOT, 'agents');
 
-const AUDIT_FILE = path.join(findProjectRoot(), '.aura', 'security', 'mcp-audit.jsonl');
+// Resolved, not hardcoded: this hook is the sole WRITER of the audit log, and
+// the sweep, the dashboard and the auditor skill all have to agree with it on
+// where that log is. See lib/security-dir.cjs for the resolution order.
+const AUDIT_FILE = resolveMcpAuditFile(findProjectRoot());
 const COUNTER_FILE = path.join(findProjectRoot(), '.claude', 'logs', '.mcp-rate-counter.json');
 
 const DEFAULT_LIMITS = { max_calls_per_minute: 30, max_calls_per_session: 200 };

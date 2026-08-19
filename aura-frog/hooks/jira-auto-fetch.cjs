@@ -35,6 +35,7 @@ const fs = require('fs');
 const { readStdinSafely } = require('./lib/safe-stdin.cjs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { guardEndpoint } = require('./lib/af-net-guard.cjs');
 
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.join(__dirname, '..');
 const TOON_CONVERTER = path.join(PLUGIN_ROOT, 'scripts', 'json-to-toon.cjs');
@@ -112,10 +113,21 @@ function cacheFresh(ticketId) {
   }
 }
 
+const JIRA_FIELDS = 'summary,description,status,priority,assignee,reporter,labels,components,' +
+  'fixVersions,parent,subtasks,issuelinks,comment,issuetype,created,updated';
+
 function fetchTicket(ticketId) {
   const baseUrl = process.env.JIRA_BASE_URL.replace(/\/$/, '');
+  // JIRA_BASE_URL comes from the environment, and the request below carries a
+  // basic-auth API token — so a single edited .envrc line could ship that token
+  // to any host. Require https + an allowlisted host before building the call.
+  const endpoint = guardEndpoint(
+    `${baseUrl}/rest/api/3/issue/${ticketId}`, 'jira', 'jira-auto-fetch');
+  if (!endpoint) return null;
+  endpoint.searchParams.set('fields', JIRA_FIELDS);
+
   const auth = Buffer.from(`${process.env.JIRA_EMAIL}:${process.env.JIRA_API_TOKEN}`).toString('base64');
-  const url = `${baseUrl}/rest/api/3/issue/${ticketId}?fields=summary,description,status,priority,assignee,reporter,labels,components,fixVersions,parent,subtasks,issuelinks,comment,issuetype,created,updated`;
+  const url = endpoint.toString();
   try {
     const out = execFileSync('curl', [
       '-sf', '--max-time', '10',

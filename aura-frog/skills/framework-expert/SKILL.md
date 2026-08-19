@@ -1,6 +1,6 @@
 ---
 name: framework-expert
-description: "Unified framework expertise bundle. Lazy-loads relevant framework patterns (React, Vue, Angular, Next.js, Node.js, Python, Laravel, Go, Flutter, Godot) based on detected tech stack."
+description: "Unified framework expertise bundle. Lazy-loads relevant framework patterns (React, Vue, Angular, Next.js, Node.js, Python, Laravel, Go, Flutter, React Native, TypeScript) based on detected tech stack."
 autoInvoke: false
 priority: 50
 triggers:
@@ -30,13 +30,17 @@ Lazy-loads detected framework patterns. Use individual expert skills or Context7
 ## Detection
 
 ```toon
-bundles[5]{bundle,frameworks,detect_by}:
-  web-frontend,"react vue angular nextjs svelte","package.json deps"
+bundles[4]{bundle,frameworks,detect_by}:
+  web-frontend,"react vue angular nextjs","package.json deps"
   web-backend,"nodejs python laravel go","package.json/requirements.txt/composer.json/go.mod"
   mobile,"react-native flutter","app.json (expo) or pubspec.yaml"
-  game,godot,"project.godot or *.gd files"
   typescript,typescript,"tsconfig.json or .ts files"
 ```
+
+Every framework named above has a matching `<name>-expert` skill on disk. Svelte
+and Godot used to be listed here and had none, so detecting either sent the
+model looking for a skill that does not exist — reach for Context7 for those
+instead.
 
 ## Core Patterns (All Frameworks)
 

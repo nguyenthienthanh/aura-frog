@@ -1,6 +1,6 @@
 ---
 name: mcp-security-auditor
-description: "On-demand audit of MCP usage. Reads .aura/security/mcp-audit.jsonl, surfaces blocked calls, rate-limit hits, suspicious input patterns. Companion to mcp-call-gate hook (which produces the audit log)."
+description: "On-demand audit of MCP usage. Reads the MCP audit log (mcp-audit.jsonl) written by the mcp-call-gate hook, surfaces blocked calls, rate-limit hits, suspicious input patterns. Companion to mcp-call-gate hook (which produces the audit log)."
 when_to_use: "/aura-frog:mcp audit, security review, post-incident forensics on MCP calls"
 allowed-tools: Read, Glob, Grep, Bash
 effort: low
@@ -18,7 +18,10 @@ user-invocable: false
 
 ## Behavior
 
-1. Read `.aura/security/mcp-audit.jsonl` (append-only; produced by `hooks/mcp-call-gate.cjs`)
+1. Read `<security-dir>/mcp-audit.jsonl` (append-only; produced by `hooks/mcp-call-gate.cjs`).
+   Resolve `<security-dir>` the same way the writer does — see `hooks/lib/security-dir.cjs`:
+   `$AF_SECURITY_DIR`, else `.claude/security/` if it exists, else `.aura/security/`.
+   Do NOT hardcode one of them: read the first that exists, and report "no audit log yet" if neither does.
 2. Group entries by:
    - Agent → MCP server → method
    - Time bucket (last 1h / 24h / session)
@@ -69,7 +72,8 @@ blocked[3]{ts,agent,mcp,reason}:
 ## Tie-Ins
 
 - **Spec:** §9.10, §23 (MCP security)
-- **Hook:** `hooks/mcp-call-gate.cjs` — sole writer of `.aura/security/mcp-audit.jsonl`
+- **Hook:** `hooks/mcp-call-gate.cjs` — sole writer of `<security-dir>/mcp-audit.jsonl`
+- **Resolver:** `hooks/lib/security-dir.cjs` (shell mirror: `scripts/plans/_lib.sh#security_dir`) — where that log lives
 - **Script:** `scripts/security/sanitize-mcp-input.sh` — sanitization run by the gate before logging
 - **Rule:** `rules/agent/mcp-security-policy.md` — authoritative policy
 - **Rule:** `rules/agent/db-access-policy.md` — DB-specific subset (architect/tdd-engineer only, read-only default, destructive ops blocked)

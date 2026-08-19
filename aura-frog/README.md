@@ -206,7 +206,7 @@ When `failure-classifier` flags a task as F2 (local-logic) or F3 (local-design),
 
 ### 7 · MCP Security Layer  ✅
 
-Per-agent allowlist for MCP calls + audit log + rate limits + input sanitization. The `mcp-call-gate` hook authorises every MCP invocation against the agent's declared scope; blocked + rate-limited calls land in `.aura/security/mcp-audit.jsonl`. Post-incident forensics via `/aura-frog:mcp audit`. Tokens never leave the process. Disable audit-only with `AF_MCP_AUDIT_DISABLED=true`. Full threat model in [BENEFITS.md Part 9 §7](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [SECURITY_AND_TRUST.md](docs/operations/SECURITY_AND_TRUST.md).
+Per-agent allowlist for MCP calls + audit log + rate limits + input sanitization. The `mcp-call-gate` hook authorises every MCP invocation against the agent's declared scope; blocked + rate-limited calls land in `<security-dir>/mcp-audit.jsonl` (`.claude/security/` if present, else `.aura/security/`; override with `AF_SECURITY_DIR`). Post-incident forensics via `/aura-frog:mcp audit`. Tokens never leave the process. Disable audit-only with `AF_MCP_AUDIT_DISABLED=true`. Full threat model in [BENEFITS.md Part 9 §7](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [SECURITY_AND_TRUST.md](docs/operations/SECURITY_AND_TRUST.md).
 
 ### 8 · Phase-Role Binding  ✅
 
@@ -233,7 +233,7 @@ Disable any pillar individually via env var: `AF_SELF_HEAL_DISABLED`, `AF_MCP_AU
 
 ## Works Across AI Coding Tools
 
-Aura Frog's 72 rules, 60 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
+Aura Frog's 72 rules, 59 skills, and 15 agents are **~87% portable** (weighted average) because they're markdown conventions, not tool-specific code. Only the thin hook layer needs adapters.
 
 | Tool | Status | Coverage |
 |------|--------|:--------:|
@@ -311,7 +311,7 @@ Expected output:
 🐸 Aura Frog v3.7.3 — Ready
   Agents:   15 loaded (lead, architect, frontend, mobile, tester, security, devops, strategist, scanner,
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
-  Skills:   60 available (9 auto-invoke, 51 on-demand)
+  Skills:   59 available (9 auto-invoke, 50 on-demand)
   Rules:    72 loaded (22 core + 20 agent + 30 workflow)
   Hooks:    51 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
@@ -441,7 +441,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | Component | Count | Why it matters |
 |-----------|:-----:|----------------|
 | **Agents** | 15 | Right expert auto-selected per task (build + review + planning + safety roles) |
-| **Skills** | 60 | 9 auto-invoke on context, 51 on-demand (incl. `design-vision-loop`) |
+| **Skills** | 59 | 9 auto-invoke on context, 50 on-demand (incl. `design-vision-loop`) |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
 | **Rules** | 72 | 3-tier loading (22 core + 20 agent + 30 workflow) — only what's needed |
 | **Hooks** | 51 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
@@ -629,7 +629,7 @@ Honest comparison with two popular plugins in the ecosystem (April 2026).
 | | **Aura Frog** | **wshobson/agents** | **Superpowers** |
 |---|---|---|---|
 | **Agents** | 15 curated | 184 across 78 plugins | ~20 |
-| **Skills** | 60 | 150 | Small focused set |
+| **Skills** | 59 | 150 | Small focused set |
 | **Commands** | 24 (14 user-facing + 10 legacy aliases) | 98 | ~10 |
 | **Workflow** | 5-phase TDD with 2 gates | No structured workflow | Phase-gated workflow |
 | **Agent routing** | Task-content Layer 0 override | Manual `/agent-name` | Similar to Aura Frog |
@@ -662,7 +662,7 @@ What works well, what doesn't, what's tracked. v3.7.2 polishes the surface; the 
 |---|---|---|---|
 | 5 deferred env-var-dependent hooks still rely on undocumented `CLAUDE_TOOL_NAME` / `CLAUDE_FILE_PATHS` instead of the documented stdin-JSON contract. Only `mcp-call-gate` got the stdin fallback in v3.7.1. | medium | [#7](https://github.com/nguyenthienthanh/aura-frog/issues/7) | ~1d |
 | `hooks/lib/hook-runtime.cjs` doesn't exist yet — every hook re-implements stdin parsing + audit appending + atomic writes. Boilerplate × 43 files. | medium | [#6](https://github.com/nguyenthienthanh/aura-frog/issues/6) | ~2d |
-| `.claude/plans/.../trace.jsonl` files and `.aura/security/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
+| `.claude/plans/.../trace.jsonl` files and `<security-dir>/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
 | Hook performance budget not enforced. ~19 hooks fire on every Write/Edit; estimated 100-300ms p95 but unmeasured. | medium | [#9](https://github.com/nguyenthienthanh/aura-frog/issues/9) | ~1d for budget + benchmark |
 | Node 20/22 test matrix hangs on Ubuntu CI runners (Node 18 + macOS pass in ~22s). Temporarily reduced to Node 18 only for v3.7.2 release. | low | (no open issue yet — investigate in v3.7.3) | ~2-4h to bisect |
 | Pillar 4 Tier 2 OPA Rego policies, Pillar 5 L3+L4 LLM conflict detection, Pillar 6 auto-trigger on F2/F3 — all in the v3.7.0 roadmap, queued for v3.8+. | feature | — | varies |
@@ -685,7 +685,7 @@ Use this checklist:
 - ✅ MCP-heavy workflows (Figma + Firebase + Slack + DBs) → per-agent allowlists + audit log
 - ⚠️ Single-file edits / quick prototypes → workflow overhead may not pay off; use `/run task: …` to bypass
 - ⚠️ Haiku-only budget — some features (planning, conflict, design phases) prefer Sonnet/Opus
-- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 60 skills, 72 rules, 51 hooks)
+- ⚠️ Minimalist-plugin preference — Aura Frog is substantial (15 agents, 59 skills, 72 rules, 51 hooks)
 
 ---
 
@@ -697,7 +697,7 @@ Use this checklist:
 | **Getting Started** | [GET_STARTED.md](docs/getting-started/GET_STARTED.md) |
 | **First Workflow Tutorial** | [FIRST_WORKFLOW_TUTORIAL.md](docs/getting-started/FIRST_WORKFLOW_TUTORIAL.md) |
 | **All Commands (24)** | [commands/README.md](aura-frog/commands/README.md) |
-| **All Skills (60)** | [skills/README.md](aura-frog/skills/README.md) |
+| **All Skills (59)** | [skills/README.md](aura-frog/skills/README.md) |
 | **Agent Teams Guide** | [AGENT_TEAMS_GUIDE.md](docs/guides/AGENT_TEAMS_GUIDE.md) |
 | **MCP Setup** | [MCP_GUIDE.md](docs/operations/MCP_GUIDE.md) |
 | **Hooks & Lifecycle** | [hooks/README.md](aura-frog/hooks/README.md) |
@@ -715,7 +715,7 @@ TOON = Compression       Approval Gates = Interrupts    Handoffs = IPC
 
 aura-frog/
 ├── agents/         15 processes (auto-dispatched per task)
-├── skills/         60 skills (9 auto-invoke + 51 on-demand)
+├── skills/         59 skills (9 auto-invoke + 50 on-demand)
 ├── commands/       24 commands (core /run /check /design /project /af /help + /aura-frog:* hierarchical-planning suite)
 ├── rules/          72 rules (22 core + 20 agent + 30 workflow)
 ├── hooks/          50 lifecycle hooks (conditional execution)
