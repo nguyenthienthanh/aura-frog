@@ -303,3 +303,89 @@ describe('pruneJsonlByTimestamp — streaming rewrite', () => {
     expect(fs.readdirSync(root).filter(f => f.includes('.tmp-'))).toEqual([]);
   });
 });
+
+/**
+ * Session state files in the OS temp dir had no cleanup at all — nothing ever
+ * removed af-session-<id>.json. That is a correctness bug before a disk one:
+ * the id is process.ppid, which the OS recycles, so a file left by a session
+ * that ended last week gets read as live state by whatever new Claude Code
+ * process lands on that pid.
+ */
+describe('session-start — stale session state sweep', () => {
+  const {
+    sweepStaleSessionState,
+  } = require('../../aura-frog/hooks/session-start.cjs');
+  const {
+    SESSION_STATE_MAX_AGE_MS,
+    readSessionState,
+    writeSessionState,
+    getSessionTempPath,
+  } = require('../../aura-frog/hooks/lib/af-config-utils.cjs');
+
+  let tmp;
+  const NOW = Date.now();
+
+  const put = (name, ageMs) => {
+    const p = path.join(tmp, name);
+    fs.writeFileSync(p, JSON.stringify({ active_plan: 'FEAT-A' }));
+    const t = (NOW - ageMs) / 1000;
+    fs.utimesSync(p, t, t);
+    return p;
+  };
+
+  beforeEach(() => { tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'af-sessweep-')); });
+  afterEach(() => fs.rmSync(tmp, { recursive: true, force: true }));
+
+  it('removes session state older than the 24h window', () => {
+    put('af-session-12345.json', 3 * DAY);
+    expect(sweepStaleSessionState(NOW, tmp)).toBe(1);
+    expect(fs.readdirSync(tmp)).toEqual([]);
+  });
+
+  it('keeps state from a session that is still writing', () => {
+    put('af-session-12345.json', 60 * 1000);
+    expect(sweepStaleSessionState(NOW, tmp)).toBe(0);
+    expect(fs.readdirSync(tmp)).toEqual(['af-session-12345.json']);
+  });
+
+  it('also collects the .<rand> sidecars a crashed write leaves behind', () => {
+    put('af-session-12345.json.k3n9x', 3 * DAY);
+    expect(sweepStaleSessionState(NOW, tmp)).toBe(1);
+    expect(fs.readdirSync(tmp)).toEqual([]);
+  });
+
+  it('touches nothing else in the shared temp dir', () => {
+    put('some-other-tool.json', 90 * DAY);
+    put('session-12345.json', 90 * DAY);
+    expect(sweepStaleSessionState(NOW, tmp)).toBe(0);
+    expect(fs.readdirSync(tmp).sort()).toEqual(['session-12345.json', 'some-other-tool.json']);
+  });
+
+  it('is silent on a missing directory', () => {
+    expect(sweepStaleSessionState(NOW, path.join(tmp, 'nope'))).toBe(0);
+  });
+
+  it('readSessionState refuses a stale file even before the sweep reaches it', () => {
+    const saved = process.env.TMPDIR;
+    process.env.TMPDIR = tmp;
+    try {
+      expect(writeSessionState('99999', { active_plan: 'FEAT-A' })).toBe(true);
+      expect(readSessionState('99999')).toEqual({ active_plan: 'FEAT-A' });
+
+      // Age it past the window without touching anything else.
+      const p = getSessionTempPath('99999');
+      const t = (NOW - SESSION_STATE_MAX_AGE_MS - 60_000) / 1000;
+      fs.utimesSync(p, t, t);
+
+      expect(readSessionState('99999')).toBeNull();
+    } finally {
+      if (saved === undefined) delete process.env.TMPDIR;
+      else process.env.TMPDIR = saved;
+    }
+  });
+
+  it('readSessionState is still null-safe for a missing file and no id', () => {
+    expect(readSessionState('does-not-exist-12345')).toBeNull();
+    expect(readSessionState(null)).toBeNull();
+  });
+});

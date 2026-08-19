@@ -416,15 +416,31 @@ function resolveSessionId() {
 }
 
 /**
+ * How long a session state file stays trustworthy. The key is process.ppid,
+ * which the OS recycles: a stale af-session-<ppid>.json left in the temp dir by
+ * a session that ended days ago will be read as live state by whatever new
+ * Claude Code process lands on that pid. Anything this old is a collision, not
+ * a session — no real session runs for a day without a single state write, and
+ * writeSessionState refreshes the mtime on every one.
+ *
+ * session-start.cjs sweeps files past this age; readSessionState refuses them
+ * in the meantime, so a project that never starts a session cannot be poisoned
+ * by one that did.
+ */
+const SESSION_STATE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+/**
  * Read session state from temp file
  */
 function readSessionState(sessionId) {
   if (!sessionId) return null;
   const tempPath = getSessionTempPath(sessionId);
   try {
-    if (!fs.existsSync(tempPath)) return null;
+    const stat = fs.statSync(tempPath);
+    if (Date.now() - stat.mtimeMs > SESSION_STATE_MAX_AGE_MS) return null;
     return JSON.parse(fs.readFileSync(tempPath, 'utf8'));
   } catch (e) {
+    // ENOENT included: no file is the same answer as no usable state.
     return null;
   }
 }
@@ -594,6 +610,7 @@ module.exports = {
   getReportsPath,
 
   // Session state
+  SESSION_STATE_MAX_AGE_MS,
   getSessionTempPath,
   resolveSessionId,
   readSessionState,

@@ -542,6 +542,45 @@ function sweepRetention() {
   const logsRoot = path.join(findProjectRoot(), '.claude', 'logs');
   pruneStaleRunDirs(path.join(logsRoot, 'runs'), cutoff);
   pruneStaleRunDirs(path.join(logsRoot, 'workflows'), cutoff);
+
+  sweepStaleSessionState();
+}
+
+/**
+ * Delete abandoned af-session-<id>.json files from the OS temp dir.
+ *
+ * Nothing ever removed these. That is a correctness problem before it is a
+ * housekeeping one: the id is process.ppid, which the OS recycles, so a file
+ * left by a session that ended last week is read as live state by whatever new
+ * Claude Code process happens to land on that pid — restoring another session's
+ * active plan, phase and agent into an unrelated one.
+ *
+ * Uses its own 24h window rather than AF_AUDIT_RETENTION_DAYS: this is not
+ * retention of an audit trail the user may want to keep, it is scratch state
+ * that stops being true the moment its session ends. readSessionState applies
+ * the same cutoff, so a stale file is inert even before the sweep reaches it.
+ *
+ * The temp dir is shared between users on most systems. Files we cannot stat or
+ * unlink belong to someone else — skip them; that is not our failure to report.
+ */
+function sweepStaleSessionState(now = Date.now(), dir = os.tmpdir()) {
+  const { SESSION_STATE_MAX_AGE_MS } = require('./lib/af-config-utils.cjs');
+  const cutoff = now - SESSION_STATE_MAX_AGE_MS;
+  let removed = 0;
+  let entries;
+  try { entries = fs.readdirSync(dir); } catch { return 0; }
+  for (const name of entries) {
+    // Covers af-session-<id>.json and the .<rand> sidecars writeSessionState
+    // renames from — a crash between write and rename leaves those behind too.
+    if (!name.startsWith('af-session-')) continue;
+    const full = path.join(dir, name);
+    try {
+      if (fs.statSync(full).mtimeMs > cutoff) continue;
+      fs.unlinkSync(full);
+      removed++;
+    } catch { /* another user's file, or gone already — not ours to fix */ }
+  }
+  return removed;
 }
 
 function listFiles(dir) {
@@ -707,5 +746,6 @@ if (require.main === module) {
   module.exports = {
     cacheStaleReason, getValidCache, buildContextOutput, listFiles, pruneJsonlByTimestamp,
     emitContextStalenessBanner, sweepRetention, findCoLocatedTraces, pruneStaleRunDirs,
+    sweepStaleSessionState,
   };
 }
