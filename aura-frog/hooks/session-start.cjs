@@ -511,10 +511,12 @@ function sweepRetention() {
   const resolvePlansDir = require('./lib/plans-dir.cjs');
   const plansDir = resolvePlansDir();
   const targets = [
-    // MCP audit lives under .aura/security/ by design (security domain stays
-    // separate from plans). Plan traces follow the v3.7.3 .claude/plans path,
-    // with legacy .aura/plans honored via the resolver.
-    path.join(findProjectRoot(), '.aura', 'security', 'mcp-audit.jsonl'),
+    // MCP audit lives in its own security dir by design (security domain stays
+    // separate from plans), resolved through lib/security-dir.cjs so the sweep
+    // and mcp-call-gate — its only writer — cannot disagree about the location.
+    // Plan traces follow the v3.7.3 .claude/plans path, with legacy .aura/plans
+    // honored via the resolver.
+    require('./lib/security-dir.cjs').resolveMcpAuditFile(findProjectRoot()),
     // The two append-only plan logs. Six hooks append to these and nothing
     // truncated them before; three Stop-registered hooks read their tails.
     path.join(plansDir, 'history.jsonl'),

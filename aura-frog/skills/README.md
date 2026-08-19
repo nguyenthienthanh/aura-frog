@@ -107,7 +107,7 @@ planning[7]{name,purpose}:
   failure-classifier,Classify execution failures F1-F5 (deterministic; no LLM)
   self-healing-orchestrator,Propose patches for F2/F3 failures — user approval required
   preflight-validator,Tier 1 bash linters wrapper (scripts/preflight/run-all.sh)
-  mcp-security-auditor,Audit MCP usage from .aura/security/mcp-audit.jsonl
+  mcp-security-auditor,Audit MCP usage from the resolved security dir (mcp-audit.jsonl)
 ```
 
 ### Code Quality (5)

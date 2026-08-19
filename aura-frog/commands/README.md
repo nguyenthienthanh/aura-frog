@@ -78,7 +78,7 @@ rc1[3]{command,file,purpose}:
   /aura-frog:dashboard,dashboard.md,"--live / --json / --section — terse one-screen view of plan + conflicts + memory + MCP + preflight"
 ```
 
-`hooks/mcp-call-gate.cjs` auto-fires on every PreToolUse for `mcp__.*`. Enforces per-agent allowlist (frontmatter `mcp_servers:`), rate limits (soft 80% warn / hard 100% block), and writes sanitized audit to `.aura/security/mcp-audit.jsonl`. `scripts/security/sanitize-mcp-input.sh` strips Authorization headers + redacts tokens before logging.
+`hooks/mcp-call-gate.cjs` auto-fires on every PreToolUse for `mcp__.*`. Enforces per-agent allowlist (frontmatter `mcp_servers:`), rate limits (soft 80% warn / hard 100% block), and writes sanitized audit to `<security-dir>/mcp-audit.jsonl` (resolved by `hooks/lib/security-dir.cjs`). `scripts/security/sanitize-mcp-input.sh` strips Authorization headers + redacts tokens before logging.
 
 ---
 

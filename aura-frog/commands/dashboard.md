@@ -53,7 +53,7 @@ Pre-flight: 0 bypasses this session · last block: never
 3. Read latest run-state from `.claude/logs/runs/<latest>/run-state.json`
 4. Read open conflicts from `.claude/plans/conflicts.jsonl` (latest per conflict_id, filter resolution: null)
 5. Read `.claude/memory/permanent_memory.md` for size + Epic count
-6. Read `.aura/security/mcp-audit.jsonl` tail (last 24h) for MCP stats
+6. Read `<security-dir>/mcp-audit.jsonl` tail (last 24h) for MCP stats (see `hooks/lib/security-dir.cjs`)
 7. Read `.claude/logs/.preflight-bypass-count` for session bypass count
 8. Project all into TOON via `scripts/json-to-toon.cjs --schema generic` per section
 9. Render to stdout
@@ -88,4 +88,4 @@ Run only the named section. Useful for status-line integration or scripted check
 - **Skill:** `mcp-security-auditor` — for MCP section
 - **Skill:** `permanent-memory-loader` (via summary lines) — for Memory section
 - **Skill:** `plan-validator` — invariant check for the Plan-tree heading
-- **Files read** (read-only): `.claude/plans/active.json`, `conflicts.jsonl`, `history.jsonl`, `.claude/memory/permanent_memory.md`, `.aura/security/mcp-audit.jsonl`, `.claude/logs/runs/<latest>/run-state.json`, `.claude/logs/.preflight-bypass-count`
+- **Files read** (read-only): `.claude/plans/active.json`, `conflicts.jsonl`, `history.jsonl`, `.claude/memory/permanent_memory.md`, `<security-dir>/mcp-audit.jsonl`, `.claude/logs/runs/<latest>/run-state.json`, `.claude/logs/.preflight-bypass-count`

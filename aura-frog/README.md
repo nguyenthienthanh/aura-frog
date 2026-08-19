@@ -206,7 +206,7 @@ When `failure-classifier` flags a task as F2 (local-logic) or F3 (local-design),
 
 ### 7 · MCP Security Layer  ✅
 
-Per-agent allowlist for MCP calls + audit log + rate limits + input sanitization. The `mcp-call-gate` hook authorises every MCP invocation against the agent's declared scope; blocked + rate-limited calls land in `.aura/security/mcp-audit.jsonl`. Post-incident forensics via `/aura-frog:mcp audit`. Tokens never leave the process. Disable audit-only with `AF_MCP_AUDIT_DISABLED=true`. Full threat model in [BENEFITS.md Part 9 §7](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [SECURITY_AND_TRUST.md](docs/operations/SECURITY_AND_TRUST.md).
+Per-agent allowlist for MCP calls + audit log + rate limits + input sanitization. The `mcp-call-gate` hook authorises every MCP invocation against the agent's declared scope; blocked + rate-limited calls land in `<security-dir>/mcp-audit.jsonl` (`.claude/security/` if present, else `.aura/security/`; override with `AF_SECURITY_DIR`). Post-incident forensics via `/aura-frog:mcp audit`. Tokens never leave the process. Disable audit-only with `AF_MCP_AUDIT_DISABLED=true`. Full threat model in [BENEFITS.md Part 9 §7](docs/reference/BENEFITS.md#part-9--the-8-pillars-of-the-planning-first-llm-os-v370) and [SECURITY_AND_TRUST.md](docs/operations/SECURITY_AND_TRUST.md).
 
 ### 8 · Phase-Role Binding  ✅
 
@@ -662,7 +662,7 @@ What works well, what doesn't, what's tracked. v3.7.2 polishes the surface; the 
 |---|---|---|---|
 | 5 deferred env-var-dependent hooks still rely on undocumented `CLAUDE_TOOL_NAME` / `CLAUDE_FILE_PATHS` instead of the documented stdin-JSON contract. Only `mcp-call-gate` got the stdin fallback in v3.7.1. | medium | [#7](https://github.com/nguyenthienthanh/aura-frog/issues/7) | ~1d |
 | `hooks/lib/hook-runtime.cjs` doesn't exist yet — every hook re-implements stdin parsing + audit appending + atomic writes. Boilerplate × 43 files. | medium | [#6](https://github.com/nguyenthienthanh/aura-frog/issues/6) | ~2d |
-| `.claude/plans/.../trace.jsonl` files and `.aura/security/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
+| `.claude/plans/.../trace.jsonl` files and `<security-dir>/mcp-audit.jsonl` use append-only text. High-traffic logs would benefit from SQLite WAL but currently break "zero runtime dependencies." | low | [#8](https://github.com/nguyenthienthanh/aura-frog/issues/8) | open question (maintainer trade-off) |
 | Hook performance budget not enforced. ~19 hooks fire on every Write/Edit; estimated 100-300ms p95 but unmeasured. | medium | [#9](https://github.com/nguyenthienthanh/aura-frog/issues/9) | ~1d for budget + benchmark |
 | Node 20/22 test matrix hangs on Ubuntu CI runners (Node 18 + macOS pass in ~22s). Temporarily reduced to Node 18 only for v3.7.2 release. | low | (no open issue yet — investigate in v3.7.3) | ~2-4h to bisect |
 | Pillar 4 Tier 2 OPA Rego policies, Pillar 5 L3+L4 LLM conflict detection, Pillar 6 auto-trigger on F2/F3 — all in the v3.7.0 roadmap, queued for v3.8+. | feature | — | varies |

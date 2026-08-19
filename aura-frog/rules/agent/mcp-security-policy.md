@@ -78,7 +78,7 @@ Per-MCP per-session counters live in `.claude/logs/.mcp-rate-counter.json`. Coun
 
 ## Audit log (per spec §23.2)
 
-`.aura/security/mcp-audit.jsonl` (append-only). Schema:
+`<security-dir>/mcp-audit.jsonl` (append-only; `<security-dir>` resolves as `$AF_SECURITY_DIR`, else `.claude/security/` if it exists, else `.aura/security/` — see `hooks/lib/security-dir.cjs`). Schema:
 
 ```jsonl
 {"ts":"<ISO>","agent":"<id>","mcp":"<server>","method":"<method>","input":<sanitized>,"output_size_bytes":<N>,"latency_ms":<N>,"success":<bool>,"BLOCKED":<bool>,"reason":"<if blocked>"}

@@ -39,7 +39,16 @@ find_project_root() {
 PROJECT_ROOT=$(find_project_root)
 PLANS_DIR="${PROJECT_ROOT}/.claude/plans"
 MEMORY_DIR="${PROJECT_ROOT}/.claude/memory"
-SECURITY_DIR="${PROJECT_ROOT}/.aura/security"
+# Resolution order matches hooks/lib/security-dir.cjs and _lib.sh#security_dir —
+# this script only READS mcp-audit.jsonl, so it has to land wherever
+# mcp-call-gate.cjs decided to write it.
+if [ -n "${AF_SECURITY_DIR:-}" ]; then
+  SECURITY_DIR="${AF_SECURITY_DIR}"
+elif [ -d "${PROJECT_ROOT}/.claude/security" ]; then
+  SECURITY_DIR="${PROJECT_ROOT}/.claude/security"
+else
+  SECURITY_DIR="${PROJECT_ROOT}/.aura/security"
+fi
 LOGS_DIR="${PROJECT_ROOT}/.claude/logs"
 
 # ---------- helpers ----------

@@ -34,6 +34,35 @@ plans_dir() {
 }
 
 # ---------------------------------------------------------------------------
+# security_dir [explicit_path]
+#   Resolve the security dir (home of mcp-audit.jsonl). Shell mirror of
+#   hooks/lib/security-dir.cjs — the two MUST agree, since mcp-call-gate.cjs
+#   writes the log and dashboard.sh reads it.
+#     1. Explicit positional arg (caller passed it)
+#     2. $AF_SECURITY_DIR env var
+#     3. ".claude/security" if it exists
+#     4. ".aura/security" — the current default, and where every install has it
+#   Flipping (3) to be the default for fresh projects relocates a security audit
+#   trail, so it is a maintainer call, not a mechanical one. See the note in
+#   hooks/lib/security-dir.cjs.
+# ---------------------------------------------------------------------------
+security_dir() {
+    if [ -n "${1:-}" ]; then
+        echo "$1"
+        return 0
+    fi
+    if [ -n "${AF_SECURITY_DIR:-}" ]; then
+        echo "${AF_SECURITY_DIR}"
+        return 0
+    fi
+    if [ -d ".claude/security" ]; then
+        echo ".claude/security"
+        return 0
+    fi
+    echo ".aura/security"
+}
+
+# ---------------------------------------------------------------------------
 # slugify <text>
 #   Lower-case, ASCII-only, hyphen-separated. Used in feature/story/task
 #   folder names: ${ID}_${slug}/.

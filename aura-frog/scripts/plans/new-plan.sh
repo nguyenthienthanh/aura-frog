@@ -53,7 +53,17 @@ mkdir -p "${PLANS_DIR}/initiatives"
 mkdir -p "${PLANS_DIR}/features"
 mkdir -p "${PLANS_DIR}/archive"
 mkdir -p "${CLAUDE_DIR}/memory/archive"
-mkdir -p "${PROJECT_ROOT}/.aura/security"  # MCP audit lives under .aura/security/ still
+# MCP audit keeps its own directory, separate from plans. Resolution order
+# matches hooks/lib/security-dir.cjs and _lib.sh#security_dir; .aura/security is
+# still the default so an existing install's audit trail does not move.
+if [ -n "${AF_SECURITY_DIR:-}" ]; then
+    SECURITY_DIR="${AF_SECURITY_DIR}"
+elif [ -d "${PROJECT_ROOT}/.claude/security" ]; then
+    SECURITY_DIR="${PROJECT_ROOT}/.claude/security"
+else
+    SECURITY_DIR="${PROJECT_ROOT}/.aura/security"
+fi
+mkdir -p "${SECURITY_DIR}"
 
 NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
@@ -120,7 +130,7 @@ fi
 touch "${PLANS_DIR}/history.jsonl"
 touch "${PLANS_DIR}/conflicts.jsonl"
 touch "${PLANS_DIR}/conflict_cache.jsonl"
-touch "${PROJECT_ROOT}/.aura/security/mcp-audit.jsonl"
+touch "${SECURITY_DIR}/mcp-audit.jsonl"
 
 # INDEX.md — read-me-first for the plans directory.
 if [ ! -f "${PLANS_DIR}/INDEX.md" ]; then
