@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 # Validate plan tree integrity per spec §6.7 — enforces all 8 invariants.
 #
-# Usage: bash aura-frog/scripts/plans/validate-plan-tree.sh [.claude/plans/ path]
+# Usage: bash aura-frog/scripts/plans/validate-plan-tree.sh [.claude/plans/ path] [--rebuild]
+#
+# On graph-index.json: this script deliberately does NOT read it. It is the
+# validator — the one caller that must see the tree exactly as it is on disk. A
+# validator that trusts a cache can report a green tree that is actually broken,
+# which is worse than having no validator at all. Instead it PRODUCES the index:
+# it already parses every node, so with --rebuild it writes a fresh
+# graph-index.json once the invariants pass, and that is how a stale index the
+# other scripts keep rejecting gets healed. A failing tree never rebuilds the
+# index — indexing a tree we just declared invalid would hand the readers a fast
+# path through broken data.
 #
 # Exit codes:
 #   0 — all invariants pass
@@ -14,7 +24,16 @@ SCRIPT_DIR=$(dirname "$0")
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/_lib.sh"
 
-PLANS_DIR=$(plans_dir "${1:-}")
+REBUILD=0
+POSITIONAL=""
+for arg in "$@"; do
+    case "$arg" in
+        --rebuild) REBUILD=1 ;;
+        *) POSITIONAL="$arg" ;;
+    esac
+done
+
+PLANS_DIR=$(plans_dir "$POSITIONAL")
 
 if [ ! -d "${PLANS_DIR}" ]; then
     echo "✗ Plan tree not found at ${PLANS_DIR}"
@@ -278,8 +297,20 @@ done
 if [ "${VIOLATIONS}" -gt 0 ]; then
     echo ""
     echo "✗ ${VIOLATIONS} invariant violation(s) — plan tree is invalid"
+    if [ "$REBUILD" = "1" ]; then
+        echo "  graph-index.json NOT rebuilt — fix the tree first"
+    fi
     exit 1
 fi
 
 echo "✓ Plan tree valid (all 8 invariants pass)"
+
+if [ "$REBUILD" = "1" ]; then
+    if graph_index_rebuild "$PLANS_DIR"; then
+        echo "✓ graph-index.json rebuilt from the validated tree"
+    else
+        echo "⚠ could not rebuild graph-index.json (node missing, or index disabled)" >&2
+    fi
+fi
+
 exit 0

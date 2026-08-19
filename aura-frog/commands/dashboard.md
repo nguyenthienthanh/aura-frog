@@ -18,7 +18,7 @@
 ```toon
 sections[6]{name,what_it_shows}:
   plan,"T0-T4 tree summary: counts per tier, status histogram, deviation_score across active path"
-  active,"Active task + ancestors + ready_queue + frozen count + recent run-state.json"
+  active,"Active task + ancestors + frozen count + recent run-state.json"
   conflicts,"Open conflicts (unresolved CONFLICT-NNNNN), stale frozen (>24h), arbitration history tail"
   memory,"permanent_memory.md size + last Epic distillation timestamp + Tentative-section count"
   mcp,"per-server enable + 24h call count + blocked count + rate-limit status"

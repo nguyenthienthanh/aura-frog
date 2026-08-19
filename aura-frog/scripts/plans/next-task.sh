@@ -3,9 +3,11 @@
 #
 # Algorithm:
 #   1. Read active.json → active.story.
-#   2. Walk the story's tasks/ — collect T4 children with status=planned AND
-#      all depends_on satisfied (each dep status ∈ done|active). Pick first.
-#      (No ready_queue: candidates are rescanned from task files each call.)
+#   2. Collect T4 children with status=planned AND all depends_on satisfied
+#      (each dep status ∈ done|active). Pick first. Read from
+#      graph-index.json when the project has one and it is fresh; otherwise
+#      walk the story's tasks/ and parse frontmatter, which is always correct.
+#      (There is no ready_queue — candidates are derived per call either way.)
 #   3. Under the dispatch lock: re-check status=planned, save checkpoint, then
 #      mutate task: status=active, started_at=now, revision+=1.
 #   4. Update active.json: active.task=ID.
@@ -17,7 +19,11 @@
 # critical section and exits 2.
 #
 # Usage:
-#   next-task.sh [--plans-dir <path>] [--dry-run]
+#   next-task.sh [--plans-dir <path>] [--dry-run] [--rebuild]
+#
+# --rebuild regenerates graph-index.json from the tree before dispatching. Use
+# it to opt a project in, or to heal an index the staleness check keeps
+# rejecting. AF_GRAPH_INDEX_DISABLED=true turns the index off entirely.
 #
 # Exit codes:
 #   0 success — prints "TASK-NNNNN\t<file_path>"
@@ -34,16 +40,25 @@ source "${SCRIPT_DIR}/_lib.sh"
 
 PLANS_DIR=""  # resolved below via plans_dir
 DRY_RUN=0
+REBUILD=0
 while [ $# -gt 0 ]; do
     case "$1" in
         --plans-dir) PLANS_DIR="$2"; shift 2 ;;
         --plans-dir=*) PLANS_DIR="${1#--plans-dir=}"; shift ;;
         --dry-run) DRY_RUN=1; shift ;;
+        --rebuild) REBUILD=1; shift ;;
         *) echo "unknown arg: $1" >&2; exit 5 ;;
     esac
 done
 
 PLANS_DIR=$(plans_dir "$PLANS_DIR")
+
+if [ "$REBUILD" = "1" ]; then
+    graph_index_rebuild "$PLANS_DIR" || {
+        echo "could not rebuild graph index at ${PLANS_DIR}" >&2; exit 4;
+    }
+    echo "rebuilt ${PLANS_DIR}/graph-index.json" >&2
+fi
 
 [ -f "${PLANS_DIR}/active.json" ] || { echo "no active.json — run /aura-frog:plan first" >&2; exit 5; }
 
@@ -61,36 +76,46 @@ TASKS_DIR="${STORY_DIR}/tasks"
 [ -d "$TASKS_DIR" ] || { echo "story has no tasks/ — run /aura-frog:plan-expand ${ACTIVE_STORY}" >&2; exit 2; }
 
 # Collect candidates: T4, status=planned, all depends_on in {done, active}.
-# v3.7.3+: tasks live in folders — `tasks/{ID}_{slug}/task.md`. Pre-v3.7.3
-# layout was flat — `tasks/{ID}_{slug}.md`. Support both for transition.
-CANDIDATES=""
-TASK_CANDIDATES=$(find "$TASKS_DIR" -maxdepth 2 -name 'task.md' 2>/dev/null)
-TASK_CANDIDATES="${TASK_CANDIDATES}
-$(find "$TASKS_DIR" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null)"
-for f in $TASK_CANDIDATES; do
-    [ -f "$f" ] || continue
-    tier=$(get_field "$f" "tier")
-    [ "$tier" = "4" ] || continue
-    status=$(get_field "$f" "status")
-    [ "$status" = "planned" ] || continue
-    id=$(get_field "$f" "id")
-    [ -z "$id" ] && continue
+#
+# Fast path first: graph-index.json already holds tier/status/parent/depends_on
+# for every node, so the same rule can be evaluated without re-parsing the tree.
+# graph_index_ready returns non-zero when the index is missing, stale, or
+# disabled, and the find-scan below runs instead — the scan is always correct,
+# so the index can only ever cost time, never accuracy. `--rebuild` regenerates
+# it. Note the scan is the ONLY path on a project that has not opted in.
+CANDIDATES=$(graph_index_ready "$PLANS_DIR" "$ACTIVE_STORY" || true)
 
-    deps=$(get_list "$f" "depends_on" | tr -d ' "'"'"'' | grep -v '^$' || true)
-    ready=1
-    while IFS= read -r dep; do
-        [ -z "$dep" ] && continue
-        dep_file=$(resolve_file "$PLANS_DIR" "$dep" 2>/dev/null || true)
-        [ -z "$dep_file" ] && { ready=0; break; }
-        dep_status=$(get_field "$dep_file" "status")
-        case "$dep_status" in
-            done|active) ;;
-            *) ready=0; break ;;
-        esac
-    done <<< "$deps"
-    [ "$ready" = "1" ] && CANDIDATES="${CANDIDATES}${id}	${f}
+if [ -z "$CANDIDATES" ]; then
+    # v3.7.3+: tasks live in folders — `tasks/{ID}_{slug}/task.md`. Pre-v3.7.3
+    # layout was flat — `tasks/{ID}_{slug}.md`. Support both for transition.
+    TASK_CANDIDATES=$(find "$TASKS_DIR" -maxdepth 2 -name 'task.md' 2>/dev/null)
+    TASK_CANDIDATES="${TASK_CANDIDATES}
+$(find "$TASKS_DIR" -maxdepth 1 -name '*.md' -not -name 'task.md' 2>/dev/null)"
+    for f in $TASK_CANDIDATES; do
+        [ -f "$f" ] || continue
+        tier=$(get_field "$f" "tier")
+        [ "$tier" = "4" ] || continue
+        status=$(get_field "$f" "status")
+        [ "$status" = "planned" ] || continue
+        id=$(get_field "$f" "id")
+        [ -z "$id" ] && continue
+
+        deps=$(get_list "$f" "depends_on" | tr -d ' "'"'"'' | grep -v '^$' || true)
+        ready=1
+        while IFS= read -r dep; do
+            [ -z "$dep" ] && continue
+            dep_file=$(resolve_file "$PLANS_DIR" "$dep" 2>/dev/null || true)
+            [ -z "$dep_file" ] && { ready=0; break; }
+            dep_status=$(get_field "$dep_file" "status")
+            case "$dep_status" in
+                done|active) ;;
+                *) ready=0; break ;;
+            esac
+        done <<< "$deps"
+        [ "$ready" = "1" ] && CANDIDATES="${CANDIDATES}${id}	${f}
 "
-done
+    done
+fi
 
 if [ -z "$CANDIDATES" ]; then
     echo "no ready T4 under ${ACTIVE_STORY} — all tasks done or blocked by deps" >&2

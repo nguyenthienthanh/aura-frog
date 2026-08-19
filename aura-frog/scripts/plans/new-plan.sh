@@ -98,7 +98,6 @@ if [ ! -f "${PLANS_DIR}/active.json" ]; then
     "story": null,
     "task": null
   },
-  "ready_queue": [],
   "blocked": [],
   "frozen": [],
   "context_anchors": {}

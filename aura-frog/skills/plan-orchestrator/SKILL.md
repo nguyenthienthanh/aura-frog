@@ -135,7 +135,7 @@ Every backing script that writes a node file must:
 |---|---|---|
 | `new-plan.sh` | bootstrap | Init `.claude/plans/` skeleton (existing, idempotent) |
 | `expand-node.sh` | expand | Decompose T2→T3 or T3→T4. Dispatches feature-architect or story-planner agent. |
-| `next-task.sh` | next | Dispatch next ready T4 — scans the active T3's task files each call (no ready_queue). |
+| `next-task.sh` | next | Dispatch next ready T4 — reads `graph-index.json` when the project has a fresh one, else rescans the active T3's task files. `--rebuild` regenerates the index. |
 | `freeze-branch.sh` | freeze | Cascade-freeze descendants. Save checkpoint, refuse on done/archived. |
 | `thaw-branch.sh` | thaw | Reverse freeze. Validate blocker resolved + git-diff compatibility per §21.6. |
 | `archive-feature.sh` | archive | Compress completed T2 to summary + move originals to `archive/`. |
@@ -146,6 +146,27 @@ Every backing script that writes a node file must:
 | `resolve-node.sh` | (helper) | Resolve `<input>` to node ID. Exit 0/1/2. |
 
 Existing: `new-plan.sh`, `validate-plan-tree.sh`, `render-plan-tree.sh`. All others new in v3.7.2.
+
+### `graph-index.json` — the adjacency cache
+
+`<plans_dir>/graph-index.json` holds one record per node (`tier`, `status`,
+`parent`, `children`, `depends_on`, `path`, `intent`), so the questions asked on
+every dispatch and every render — who is my parent, which tasks under this story
+are ready — do not require re-walking the tree and re-parsing frontmatter out of
+every `.md`. Built and maintained by `hooks/lib/vault-index.cjs`.
+
+```toon
+graph_index[5]{aspect,behaviour}:
+  Opt-in,"Nothing creates it implicitly. `next-task.sh --rebuild`, `render-plan-tree.sh --rebuild` or `validate-plan-tree.sh --rebuild` writes it the first time."
+  Maintained,"`_lib.sh#set_field` patches the affected entry after each mutation — one file read, not a rescan. No-op when the index does not exist."
+  Self-healing,"Readers reject it when a node file is missing, newer than the index, or any directory changed since the build (which is how a newly created task is caught), and fall back to their own scan."
+  Authority,"The .md files are the source of truth. validate-plan-tree.sh never READS the index — it PRODUCES one, and only from a tree whose invariants passed."
+  Disable,AF_GRAPH_INDEX_DISABLED=true
+```
+
+The index can only ever cost time, never accuracy: every consumer keeps the
+filesystem scan as its fallback, and takes it whenever the index is absent,
+stale or disabled.
 
 ---
 
