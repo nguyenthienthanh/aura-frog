@@ -776,6 +776,51 @@ updateLearnedRulesMD()   // Regenerate the learned-rules.md file
 
 ---
 
+### 15. Reflection Queue Library (KG-2.3) — OPT-IN, default OFF
+
+**Location:** `hooks/lib/reflection-queue.cjs`
+
+A durable, crash-safe on-disk queue for post-session reflections. Wired
+additively into `learning-dispatch.cjs`: when the gate is ON, each PostToolUse
+dispatch appends a reflection payload; when OFF (the default) the enqueue call
+is a silent no-op and **nothing** changes.
+
+**Env gate:** `AF_REFLECTION_QUEUE` — default **OFF**. Unset / `""` / `0` /
+`false` / `off` / `no` ⇒ every export is a no-op and no file is written (zero
+behaviour change). Any other value turns it on.
+
+**Queue file:** `.claude/reflection/queue.jsonl` (append-only JSONL). One entry
+per line:
+
+```json
+{ "id": "<sha256 of payload>", "ts": <epoch seconds>, "kind": "reflection", "payload": { ... }, "status": "pending" }
+```
+
+`id` is a content hash of the payload, so re-enqueueing an equal payload is
+**idempotent** (dedupe on id, regardless of key order).
+
+**Durability & crash-recovery:**
+- `enqueue()` — one `fs.appendFileSync` of a single `\n`-terminated line (atomic
+  for small lines): a crash mid-write leaves the whole line or nothing.
+- `drain(handlerFn)` — runs the handler over each `pending` entry, marks handled
+  ones `done`, then rewrites the file via **temp-file + atomic rename** (never a
+  truncate-in-place). A crash before the rename leaves the original file intact.
+- Recovery — a `pending` entry left by a crash (or a handler that threw / returned
+  `false`) is simply re-seen and re-handled on the next drain. Idempotent by id.
+
+**Retention:** on every rewrite the processor keeps entries that are still
+`pending` **or** newer than `RETENTION_DAYS` (30), then caps the total to the
+most recent `MAX_ENTRIES` (500). Done + old entries are pruned.
+
+**API:** `enqueue(payload)`, `drain(handlerFn)`, `stats()` — all gated by the env
+var and **fail-closed** (never throw into the caller; warn once per process).
+
+**Self-test:** `node scripts/ci/validate-reflection-queue.cjs` (exits non-zero on
+failure) — exercises gate-off no-op → enqueue → dedupe → drain → crash-recovery →
+retention/cap → fail-closed.
+
+---
+
 ## Hook Types
 
 ### Type: "command"

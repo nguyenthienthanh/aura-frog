@@ -37,11 +37,40 @@ const { readStdinSafely, parseStdinJson, installWatchdog } = require('./lib/safe
  * module doesn't take down the dispatcher at load time. Each entry is a
  * `(input) => Promise|void` that self-filters by tool.
  */
+function reflectionQueueEnabled() {
+  const v = String(process.env.AF_REFLECTION_QUEUE || '').trim().toLowerCase();
+  return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+}
+
 function defaultRunners() {
-  return [
+  const runners = [
     { name: 'feedback-capture', run: (input) => require('./feedback-capture.cjs').run(input) },
     { name: 'smart-learn', run: (input) => require('./smart-learn.cjs').run(input) },
   ];
+  // KG-2.3: opt-in only. Off by default, so the default runner set is unchanged;
+  // appended (never inserted) when AF_REFLECTION_QUEUE is enabled.
+  if (reflectionQueueEnabled()) {
+    runners.push({ name: 'reflection-queue', run: (input) => enqueueReflection(input) });
+  }
+  return runners;
+}
+
+/**
+ * Additive KG-2.3 hook: when AF_REFLECTION_QUEUE is ON, append a reflection
+ * payload to the durable on-disk queue. When the gate is OFF (default), the
+ * enqueue() call is a silent no-op and NOTHING changes — existing dispatch
+ * behaviour is untouched either way. Fail-closed: reflection-queue never throws,
+ * and the dispatcher already isolates each runner in its own try/catch.
+ */
+function enqueueReflection(input) {
+  const { enqueue } = require('./lib/reflection-queue.cjs');
+  const src = input && typeof input === 'object' ? input : {};
+  enqueue({
+    tool: src.tool_name || null,
+    session_id: src.session_id || null,
+    cwd: src.cwd || null,
+    ts_iso: new Date().toISOString(),
+  });
 }
 
 /**
