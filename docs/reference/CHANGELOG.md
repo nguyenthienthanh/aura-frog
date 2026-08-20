@@ -10,11 +10,14 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [Unreleased] (Audit follow-ups: skill consolidation + KG-2)
+## [Unreleased]
+
+## [3.8.0-alpha.12] - 2026-08-20 (Audit follow-ups: skill consolidation, KG-2, custom statusline)
 
 Completes the two follow-up tracks the audit (PR #50) deliberately deferred as
-"needs a maintainer call". No behavior change by default — the two runtime
-features are opt-in and off.
+"needs a maintainer call", and brings the session-built custom statusline into
+the plugin. No behavior change by default — the new runtime features are opt-in
+and off. (PR #51.)
 
 ### Changed
 
@@ -40,6 +43,19 @@ features are opt-in and off.
 - **Async reflection queue** (KG-2.3). Crash-safe, idempotent
   `.claude/reflection/queue.jsonl` with retention. Gated behind
   `AF_REFLECTION_QUEUE` (default off → full no-op).
+
+### Added (statusline)
+
+- **Custom cost/usage statusline + `/af statusline`.** The renderer
+  (`scripts/statusline-render.py`) now ships with the plugin: 3 lines —
+  identity · 5h/7d limits with reset clock + context% · session $ / burn $/hr /
+  billing-cycle $. `/af statusline install|update|status`
+  (`scripts/statusline-install.sh`) installs or refreshes it into `~/.claude/`
+  (settings.json edits back up first). `docs/reference/STATUSLINE.md` documents
+  the layout + env toggles (`AF_BILLING_DAY`, `AF_PLAN_LABEL`, `AF_CTX_WINDOW`,
+  `AF_STATUSLINE_USAGE_DISABLED`, `NO_COLOR`) and fixes a dead CLAUDE.md link.
+  `settings.example.json` defaults new installs to it; the classic AF-context
+  statusline stays available via `--style af`.
 
 ## [3.8.0-alpha.11] - 2026-08-19 (Audit roadmap: P1 fixes, ENV hardening, plan-tree index)
 
