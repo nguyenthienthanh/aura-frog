@@ -1,7 +1,7 @@
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/statusline.sh 2>/dev/null || bash aura-frog/scripts/statusline.sh 2>/dev/null",
+    "command": "bash ~/.claude/plugins/marketplaces/aurafrog/aura-frog/scripts/statusline-cost.sh 2>/dev/null || bash aura-frog/scripts/statusline-cost.sh 2>/dev/null",
     "padding": 1,
     "refreshInterval": 30
   },
