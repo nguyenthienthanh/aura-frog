@@ -10,7 +10,36 @@ All notable changes to Aura Frog will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [Unreleased] (Audit follow-ups: skill consolidation + KG-2)
+
+Completes the two follow-up tracks the audit (PR #50) deliberately deferred as
+"needs a maintainer call". No behavior change by default — the two runtime
+features are opt-in and off.
+
+### Changed
+
+- **Skills consolidated 59 → 42** (audit CON-01). The 11 `*-expert` skills fold
+  into the `framework-expert` bundle as lazy `refs/<framework>.md`;
+  `performance-optimizer` → `perf-profiling`; `sequential-thinking` →
+  `tree-of-thoughts`; `learning-analyzer` → `self-improve` (Analyze→Apply);
+  `git-workflow` + `git-worktree` → `git`; `lazy-agent-loader` +
+  `response-analyzer` → `rules/core/context-economy.md`. Every capability is
+  preserved, just relocated; all cross-references, counts, and `stats.json`
+  reconciled.
+
+### Added (KG-2 — durable-format work, backward-compatible)
+
+- **`epic-summarizer` schema v2** (KG-2.1). New `<!-- af-memory:v2 … -->` marker +
+  typed, confidence-scored entries so `permanent-memory-loader` reads summary
+  lines cheaply. v1 sections still load; existing `permanent_memory.md` files are
+  never rewritten.
+- **Pattern nodes in the plan tree** (KG-2.2). New `node_type: pattern` leaf lets
+  the learning tier persist durable patterns; inert to T0–T4
+  scheduling/DAG/test-ref and handled surgically across all 8 plan invariants.
+  Gated behind `AF_KG_PROMOTE` (default off).
+- **Async reflection queue** (KG-2.3). Crash-safe, idempotent
+  `.claude/reflection/queue.jsonl` with retention. Gated behind
+  `AF_REFLECTION_QUEUE` (default off → full no-op).
 
 ## [3.8.0-alpha.11] - 2026-08-19 (Audit roadmap: P1 fixes, ENV hardening, plan-tree index)
 
