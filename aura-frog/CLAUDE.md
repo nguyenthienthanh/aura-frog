@@ -145,7 +145,7 @@ skills[9]{name,trigger}:
 
 **`run-orchestrator` is NOT auto-invoke** — it fires on `/run` command or intent-detected via description match (complex feature, multi-file work, `fasttrack:` prefix). Listed separately to avoid confusion. **Also a skill, not an agent.**
 
-50 reference skills loaded on-demand. Full list: `skills/README.md`
+33 reference skills loaded on-demand. Full list: `skills/README.md`
 
 ---
 
@@ -279,7 +279,7 @@ resources[8]{name,location}:
   Agents (15),agents/
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
-  Skills (59),skills/
+  Skills (42),skills/
   Hooks (51),hooks/
   MCP (6),.mcp.json (all enabled; postgres/redis/chrome-devtools/codebase-memory/stitch unbundled — see docs/operations/MCP_GUIDE.md)
   AI References,docs/

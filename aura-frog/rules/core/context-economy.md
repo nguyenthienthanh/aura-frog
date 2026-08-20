@@ -88,6 +88,54 @@ If the **`codebase-memory`** MCP server is present, it is a *step-0* that beats 
 
 ---
 
+## Lazy agent loading
+
+Agent definitions are heavy (~3K tokens each; the full set is ~48K). **Do not preload them.** Load an agent's summary from the index first; pull its full `agents/<id>.md` body only once that agent is actually activated. This is the "Locate before Read" ladder applied to agents — the index row is the cheap locate step, the full definition is the last-resort Read.
+
+```toon
+agent_load[3]{score,level,action}:
+  ">= 80",PRIMARY,"Load full definition (agents/<id>.md)"
+  50-79,SECONDARY,"Summary only from the agent index"
+  "< 50",OPTIONAL,"Don't load"
+```
+
+- Score candidate agents by keyword match against the agent index (the same 15-agent table `agent-detector` uses); load only PRIMARY.
+- **Cache loaded agents for the session** — track `loaded_agents[]: mobile,tester`; don't re-Read a definition already in context. Force reload only on explicit `reload agent <id>`.
+- Savings scale: initial load ~48K → ~1.2K (97%); a single activated agent ~2.7K (94%); each additional agent adds ~1.5K, not another 48K.
+
+`agent-detector` applies this automatically — score by index keywords, load PRIMARY agents only. When dispatching manually, follow the same discipline.
+
+---
+
+## Large-response offloading (write-to-file, summarize-in)
+
+When a tool or MCP call would return a large payload, **write the full result to a temp file and load only a summary into context.** The bulk lives on disk where you can re-query it with `grep`/`jq`; context holds just the distilled answer.
+
+```toon
+offload[5]{scenario,threshold,action}:
+  Command output,>100 lines,"Save to temp + summarize"
+  API / MCP response,>5KB,"Save JSON + extract key fields"
+  File-search results,>50 files,"Save list + show top 10"
+  Test output,>50 lines,"Save full + summarize pass/fail"
+  Build output,>100 lines,"Save full + show errors only"
+```
+
+Temp root: `/tmp/aura-frog/` (`responses/`, `summaries/`, `session/`). Patterns:
+
+```bash
+# Large command output — save full, load only the verdict lines
+npm test > /tmp/aura-frog/responses/test-$(date +%s).txt 2>&1
+grep -E "(PASS|FAIL|Tests:|Suites:)" /tmp/aura-frog/responses/test-*.txt | tail -10
+
+# Large API/MCP JSON — save full, load only queried fields
+curl url > /tmp/aura-frog/responses/api-$(date +%s).json
+jq '{total: .data | length, first_3: .data[:3] | map(.name)}' /tmp/aura-frog/responses/api-*.json
+```
+
+Savings are typically 87-96% (a 500-line test log ~2K → ~100 tokens). **Cleanup:** `find /tmp/aura-frog -mtime +1 -delete`. This is the tool-result counterpart to "Locate before Read": save the haystack to disk, pull only the needle into context.
+
+---
+
 ## What to do on `overloaded_error`
 
 The error is upstream-driven by total token volume. **Do not retry immediately with the same context.**
@@ -140,8 +188,8 @@ If you're approaching the hard limit and you have NOT yet started writing code, 
 - **Rule:** `rules/core/verification.md` — verify with the smallest evidence that supports the claim
 - **Skill:** `plan-loader` — already enforces ≤800 always-loaded tokens; this rule generalizes the principle to all tool calls
 - **Skill:** `permanent-memory-loader` — already auto-degrades when budget tight; same principle
-- **Skill:** `lazy-agent-loader` — load agent context only when activated, not preemptively
-- **Skill:** `response-analyzer` — for paginated reads of large files
+- **Section above:** [Lazy agent loading](#lazy-agent-loading) — load agent context only when activated, not preemptively (folded in from the former `lazy-agent-loader` skill)
+- **Section above:** [Large-response offloading](#large-response-offloading-write-to-file-summarize-in) — write big tool/MCP payloads to a temp file, load only a summary (folded in from the former `response-analyzer` skill)
 - **Skill:** `code-simplifier` (KISS) — same energy: do the smallest correct thing
 - **Agent tool:** `Explore` subagent — the right tool for "I need to understand a large area" without bloating main context
 - **Spec:** §26 (token budget) — defines always-loaded limits; this rule keeps tool-result accumulation under those limits

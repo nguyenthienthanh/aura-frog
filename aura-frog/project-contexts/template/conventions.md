@@ -373,7 +373,7 @@ module.exports = {
 - Built-in responsive design
 - Theme integration
 
-**Reference:** See `skills/react-native-expert/SKILL.md` for mobile patterns
+**Reference:** See `skills/framework-expert/refs/react-native.md` for mobile patterns
 
 ### For Web Projects: Standard CSS/Tailwind
 

@@ -1,24 +1,4 @@
----
-name: vue-expert
-description: "Vue 3 gotchas and decision criteria. Covers reactivity traps, Composition API pitfalls, and Pinia patterns."
-autoInvoke: false
-priority: high
-triggers:
-  - "vue"
-  - "composition api"
-  - "pinia"
-  - "nuxt"
-paths:
-  - "**/*.vue"
-  - "nuxt.config.*"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Vue. Loaded on demand by the framework-expert bundle.
 
 # Vue Expert — Gotchas & Decisions
 

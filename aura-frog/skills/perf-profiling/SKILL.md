@@ -1,7 +1,7 @@
 ---
 name: perf-profiling
-description: "Systematic performance profiling and optimization. Use when performance issues are reported or suspected. Measure first, optimize second. Applies Pareto principle — find the 20% of code causing 80% of slowness, fix that, not the rest."
-when_to_use: "slow, performance, profile, optimize speed, latency, memory leak, cpu usage, bottleneck, pareto, flamegraph, p95, p99, SLO"
+description: "Systematic performance profiling and optimization across frontend (Core Web Vitals, code splitting, lazy loading), backend (N+1 queries, async), and database (EXPLAIN ANALYZE, indexing) layers. Use when the user reports slow code, latency, memory leaks, needs to benchmark, or wants to speed up an application. Measure first, optimize second. Applies Pareto principle — find the 20% of code causing 80% of slowness, fix that, not the rest."
+when_to_use: "slow, slow code, performance, performance bottleneck, profile, benchmark, optimize speed, latency, memory leak, cpu usage, bottleneck, pareto, flamegraph, p95, p99, SLO, core web vitals, N+1 query, code splitting, lazy loading"
 allowed-tools: Read, Grep, Glob, Bash
 effort: high
 user-invocable: false
@@ -121,6 +121,72 @@ If profiling shows a flat distribution (no single bottleneck), OR if the target 
 - **Different runtime** — interpreted → compiled, single-threaded → parallel, CPU → GPU
 
 These are architectural calls. Use `self-consistency` for trade-off analysis, `tree-of-thoughts` for exploring design branches.
+
+---
+
+## Optimization Playbook by Layer
+
+Once profiling (above) has named the bottleneck, apply the fix for *its* layer. Still one change at a time, re-measure each. Don't apply these blind — they're the fix menu, not a checklist to run through.
+
+### Profiler → metric map
+
+| Layer | Tools | Metrics to watch |
+|-------|-------|------------------|
+| Frontend | Lighthouse, DevTools Performance | FCP, LCP, TTI, CLS |
+| Backend | APM, language profilers | Response time, throughput |
+| Database | `EXPLAIN ANALYZE`, slow query log | Query time, index usage |
+| Memory | Heap snapshots | Allocation rate, leaks |
+
+### Frontend
+
+**Core Web Vitals targets:** LCP < 2.5s · FID/INP < 100ms · CLS < 0.1.
+
+Quick wins once the profile points here:
+- `loading="lazy"` on below-the-fold images; serve WebP/AVIF.
+- Route/component code splitting: `lazy(() => import(...))` so first paint ships less JS.
+- `debounce`/`throttle` high-frequency handlers (scroll, resize, input).
+- `useMemo`/memoization for expensive re-computations; avoid re-render storms.
+- Cache headers on static assets; `preload` critical fonts.
+
+### Backend
+
+| Issue | Fix |
+|-------|-----|
+| N+1 queries | Eager loading, batching, dataloader |
+| Missing indexes | Add appropriate index (see Database) |
+| Unbounded queries | Pagination, `LIMIT` |
+| Sync blocking in hot path | Async / parallel processing |
+| No caching of hot data | Cache with a measured TTL (see Caching) |
+
+### Database
+
+`EXPLAIN ANALYZE` the slow query. **Seq Scan on a large table = bad; Index Scan = good.** Match the index type to the access pattern:
+
+| Query pattern | Index type |
+|---------------|------------|
+| Exact match | B-tree |
+| Range | B-tree |
+| Full-text | GIN / GiST |
+| JSON containment | GIN |
+
+### Caching (any layer)
+
+| Level | Typical TTL | Use case |
+|-------|-------------|----------|
+| Browser | Hours–Days | Static assets |
+| CDN | Minutes–Hours | API responses |
+| Application | Seconds–Minutes | Computed / hot data |
+
+Invalidation strategy: time-based, event-based, or version-based. Remember the anti-pattern above — cache only when measured benefit > memory + invalidation cost.
+
+### Memory leaks
+
+| Leak cause | Fix |
+|------------|-----|
+| Uncleaned event listeners | Clean up in `useEffect` return / `destroy` |
+| Retaining closures | Null out references when done |
+| Ever-growing collections | `WeakMap`, or clear periodically |
+| Dangling timers | `clearInterval` / `clearTimeout` |
 
 ---
 

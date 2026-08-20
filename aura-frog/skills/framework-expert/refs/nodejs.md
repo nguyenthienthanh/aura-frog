@@ -1,27 +1,4 @@
----
-name: nodejs-expert
-description: "Node.js gotchas and decision criteria. Covers async pitfalls, Express/NestJS patterns, and common mistakes."
-autoInvoke: false
-priority: high
-triggers:
-  - "nodejs"
-  - "express"
-  - "nestjs"
-  - "fastify"
-paths:
-  - "**/*.js"
-  - "**/*.ts"
-  - "package.json"
-  - "server.*"
-  - "app.*"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Node.js. Loaded on demand by the framework-expert bundle.
 
 # Node.js Expert — Gotchas & Decisions
 

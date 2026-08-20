@@ -69,7 +69,7 @@ export AURA_FROG_TOKEN_WARNING="150000"
 # ============================================
 # Supabase Learning System
 # ============================================
-# Used by: Learning hooks, skills/learning-analyzer, skills/self-improve
+# Used by: Learning hooks, skills/self-improve (Analyze→Apply loop)
 # Setup: https://supabase.com/dashboard → Project Settings → Data API
 # Schema: Run scripts/supabase/schema.sql in SQL Editor
 

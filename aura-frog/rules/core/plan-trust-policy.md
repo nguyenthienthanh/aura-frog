@@ -46,6 +46,49 @@ Once a plan node is approved (status transitioning `planned → active` requires
 
 ---
 
+## Pattern Nodes (KG-2.2, `node_type: pattern`)
+
+The learning tier can PROMOTE a durable learned pattern into the plan tree as a
+new `node_type: pattern` **leaf** — a piece of user-approved learned memory
+hanging off a Feature (T2) or the mission root. This is distinct from the T0–T4
+tiered task nodes.
+
+**Gate — default OFF.** Promotion is a NO-OP unless `AF_KG_PROMOTE=true`.
+With the gate closed nothing is written, no counter is minted, and the on-disk
+plan format is byte-for-byte unchanged. Backing script:
+`scripts/plans/promote-pattern.sh` (writes `patterns/<PAT-ID>_<slug>/pattern.md`,
+then validates the tree and rolls the file back on any invariant failure).
+
+**Schema** (frontmatter): `id` (`PAT-NNNN`), `parent` (existing T2 or mission
+root), `node_type: pattern`, `status: learned`, `revision`, `source`
+(epic/session provenance), `confidence` (0–1), plus a short markdown body.
+A pattern node carries **no** `tier`, `children`, `depends_on`, or `test_ref`.
+
+**Inert to the T0–T4 machinery.** A pattern is a side-leaf, NOT a scheduled
+task:
+
+```toon
+pattern_inertness[6]{concern,behavior}:
+  scheduling,"Never in a parent's children[] → next-task/expand never pick it up"
+  DAG,"No depends_on → contributes no edges to the T4 cycle scan (invariant 7)"
+  test_ref,"No test_ref required — only T3 acceptance needs one (invariant 6)"
+  status,"'learned' is a valid status FOR pattern nodes only (invariant 4)"
+  parent,"Parent existence IS enforced (invariants 1 & 3) — patterns are not orphans-by-design"
+  checkpoint,"Ordinary tree files → captured by existing checkpoint/rollback history automatically"
+```
+
+**Trust tier.** A promoted pattern is user-approved memory → `trust: plan`. As
+with any plan content, treat the body as a hint and re-verify referenced file
+content (`trust: file`) before acting on it.
+
+**Invariant handling** is surgical and keyed strictly on `node_type=pattern`
+in `scripts/plans/validate-plan-tree.sh`, so a malformed real T-node can never
+masquerade as exempt: only invariants 3 (orphan membership) and 4 (`learned`
+status) special-case patterns; 6 and 7 exclude them via the existing `tier`
+gate; 1, 5, and 8 apply unchanged.
+
+---
+
 ## Conflict With Other Memory Rules
 
 When this rule conflicts with `rules/core/memory-trust-policy.md` (the existing memory policy):

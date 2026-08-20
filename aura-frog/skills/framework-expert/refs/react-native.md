@@ -1,27 +1,4 @@
----
-name: react-native-expert
-description: "React Native gotchas and decision criteria. Covers FlatList optimization, storage hierarchy, and platform-specific pitfalls."
-autoInvoke: false
-priority: high
-triggers:
-  - "react-native"
-  - "expo"
-  - "mobile"
-  - "nativewind"
-paths:
-  - "**/*.tsx"
-  - "**/*.jsx"
-  - "app.json"
-  - "metro.config.*"
-  - "expo.json"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: React Native. Loaded on demand by the framework-expert bundle.
 
 # React Native Expert — Gotchas & Decisions
 

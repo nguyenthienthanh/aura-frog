@@ -25,7 +25,10 @@ user-invocable: false
 
 # Framework Expert (Bundle)
 
-Lazy-loads detected framework patterns. Use individual expert skills or Context7 for deep reference.
+Lazy-loads detected framework patterns. Per-framework depth (gotchas, decision
+criteria, code examples) lives in `refs/<framework>.md` — this bundle no longer
+delegates to separate `<name>-expert` skills; **Read the matching ref file on
+demand** once you detect the stack. Use Context7 for full library docs.
 
 ## Detection
 
@@ -37,10 +40,29 @@ bundles[4]{bundle,frameworks,detect_by}:
   typescript,typescript,"tsconfig.json or .ts files"
 ```
 
-Every framework named above has a matching `<name>-expert` skill on disk. Svelte
-and Godot used to be listed here and had none, so detecting either sent the
-model looking for a skill that does not exist — reach for Context7 for those
-instead.
+Svelte and Godot used to be listed here and had no reference of their own, so
+detecting either sent the model looking for depth that does not exist — reach
+for Context7 for those instead.
+
+## Framework References (Read on demand)
+
+Once a framework is detected, Read its ref file for the gotchas and decision
+tables:
+
+```toon
+refs[11]{framework,ref}:
+  React,refs/react.md
+  Vue,refs/vue.md
+  Angular,refs/angular.md
+  Next.js,refs/nextjs.md
+  Node.js,refs/nodejs.md
+  Python,refs/python.md
+  Laravel,refs/laravel.md
+  Go,refs/go.md
+  Flutter,refs/flutter.md
+  React Native,refs/react-native.md
+  TypeScript,refs/typescript.md
+```
 
 ## Core Patterns (All Frameworks)
 
@@ -56,4 +78,4 @@ core[8]{pattern,rule}:
   Security,Input validation + sanitization
 ```
 
-Load framework-specific patterns from individual expert skills on demand.
+Load framework-specific patterns from `refs/<framework>.md` on demand.

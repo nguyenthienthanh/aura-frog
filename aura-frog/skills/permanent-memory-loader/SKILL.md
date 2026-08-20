@@ -15,9 +15,26 @@ Auto-invoke complement to `epic-summarizer`. Read-only.
 ## Behavior (in order)
 
 1. **Detect:** if `.claude/memory/permanent_memory.md` does NOT exist → exit silently
-2. **Read** the file, extract each `## Epic: <ID> — <intent>` header + the first non-empty line of each subsection (decisions, gotchas, anti-patterns, patterns, conflicts)
-3. **Compose** a compact block: 1 line per Epic, 1 sub-line per subsection (≤120 chars each)
+2. **Read** the file. For each `## Epic: <ID> — <intent>` section, apply the **dual-read rule** (below) to load only its heading + one summary line — **never the full body / subsections.**
+3. **Compose** a compact block: 1 line per Epic (heading + its one summary line, ≤120 chars)
 4. **Stamp** `trust: file` per `rules/core/memory-trust-policy.md`
+
+## Dual-read rule (v2 fast-path + v1 fallback)
+
+Sections come in two shapes; both load, and the loader picks per section:
+
+- **v2 (fast-path):** if the section body's first line is an `<!-- af-memory:v2 epic=… confidence=… items=… -->` marker, load exactly **three lines** — the `## ` heading, that marker line, and the single one-line human summary immediately after it. Never read the prose subsections or typed entries.
+- **v1 (fallback, backward-compat):** if the section has **no** `af-memory:v2` marker, load the `## ` heading + the **first non-empty line** after it. Existing v1 files are never rewritten or migrated — they keep working unchanged.
+
+Exact lines loaded per section:
+
+```toon
+dualread[2]{shape,detect,lines_loaded}:
+  v2,"body starts with <!-- af-memory:v2 ... -->","## heading + marker line + next 1-line summary"
+  v1,"no af-memory:v2 marker","## heading + first non-empty line"
+```
+
+The marker's `confidence=`/`items=` fields are available cheaply for degradation decisions without touching the body.
 
 ## Token budget
 

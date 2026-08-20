@@ -111,6 +111,13 @@ id_exists() {
 
 # ------------------------------------------------------------------
 # INVARIANT 1: Every non-T0 node has existing parent
+#
+# Pattern nodes (node_type: pattern, a KG-promoted learned leaf) carry NO
+# `tier` field, so they never match the T0 skip below and are ENFORCED here:
+# a pattern must name an existing parent (a Feature/T2 or the mission root)
+# exactly like a real T-node. This is the single place a pattern's parent
+# linkage is checked, since INVARIANT 3 exempts patterns from the
+# children[]-membership orphan test (see there).
 # ------------------------------------------------------------------
 for f in "${ALL_NODES[@]}"; do
     id=$(get_field "$f" "id")
@@ -162,6 +169,14 @@ for f in "${ALL_NODES[@]}"; do
     tier=$(get_field "$f" "tier")
     [ -z "$id" ] && continue
     [ "$tier" = "0" ] && continue
+    # Pattern nodes (node_type: pattern) are inert side-leaves: they are
+    # DELIBERATELY not listed in any parent's children[], so the tiered
+    # scheduler (next-task, expand) never picks them up. Their parent linkage
+    # is still hard-enforced by INVARIANT 1 (they carry a required `parent`),
+    # so only the children[]-membership orphan test is exempted here — keyed
+    # STRICTLY on node_type=pattern so a genuinely orphaned T-node (which has a
+    # tier and no node_type) can never claim this exemption.
+    if [ "$(get_field "$f" "node_type")" = "pattern" ]; then continue; fi
     if ! grep -qx "$id" "$TMP_CLAIMED" 2>/dev/null; then
         # Verify via parent's children too
         parent=$(get_field "$f" "parent")
@@ -185,7 +200,15 @@ ALLOWED_STATUS="planned active done blocked discarded frozen archived"
 for f in "${ALL_NODES[@]}"; do
     status=$(get_field "$f" "status")
     [ -z "$status" ] && continue
-    if ! echo "${ALLOWED_STATUS}" | grep -wq "$status"; then
+    # Pattern nodes (node_type: pattern) additionally allow `learned` — the
+    # durable resting state of a KG-promoted pattern. The allowance is granted
+    # ONLY when node_type=pattern, so a real T-node can never use `learned` to
+    # slip past the status check.
+    allowed="$ALLOWED_STATUS"
+    if [ "$(get_field "$f" "node_type")" = "pattern" ]; then
+        allowed="$ALLOWED_STATUS learned"
+    fi
+    if ! echo "${allowed}" | grep -wq "$status"; then
         id=$(get_field "$f" "id")
         report 4 "node ${id} has invalid status '${status}'"
     fi
@@ -205,6 +228,11 @@ done
 
 # ------------------------------------------------------------------
 # INVARIANT 6: T3 acceptance test_ref exists when status >= active
+#
+# EXEMPT for pattern nodes: only T3 (tier==3) is checked. Pattern nodes carry
+# no `tier` (and no test_ref — a learned pattern is a note, not a testable
+# task), so they fall through the `tier == 3` guard untouched. No node_type
+# special-case is needed; the tier gate already excludes them.
 # ------------------------------------------------------------------
 for f in "${ALL_NODES[@]}"; do
     tier=$(get_field "$f" "tier")
@@ -231,6 +259,11 @@ done
 # INVARIANT 7: T4 depends_on forms a DAG (no cycles) — full DFS.
 # Collect every id→dep edge, then detect a cycle of ANY length (the old
 # check only caught self-loops and 2-cycles; A→B→C→A validated clean).
+#
+# EXEMPT for pattern nodes: only T4 (tier==4) contributes edges. Pattern nodes
+# carry no `tier` and no `depends_on` (a learned leaf has no dependencies), so
+# they add no edges and cannot appear in a cycle. The tier gate excludes them;
+# no node_type special-case is needed.
 # ------------------------------------------------------------------
 EDGES=""
 for f in "${ALL_NODES[@]}"; do

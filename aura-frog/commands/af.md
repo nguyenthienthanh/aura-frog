@@ -85,6 +85,22 @@ Create a new reusable skill template.
 
 ---
 
+## /af statusline
+
+Install / update / inspect the custom multi-line statusline (identity · 5h+7d limits with reset clock + context% · session $ / burn $/hr / billing-cycle $). Backed by `scripts/statusline-install.sh`; the canonical renderer lives in `scripts/statusline-render.py` and ships with the plugin.
+
+```toon
+statusline[3]{sub,action}:
+  "/af statusline install","Copy the statusline scripts to ~/.claude/ + wire settings.json. Flags: --billing-day N, --plan LABEL, --style cost|af"
+  "/af statusline update","Pull the latest renderer into ~/.claude/ (keeps your wiring + billing/plan)"
+  "/af statusline status","Show active statusline, resolved billing day + plan, cost-refresh + rate-limit cache health"
+```
+
+**Usage:** `/af statusline install --billing-day 9 --plan Max`, `/af statusline update`, `/af statusline status`
+**Details:** `docs/reference/STATUSLINE.md`. Env toggles: `AF_BILLING_DAY`, `AF_PLAN_LABEL`, `AF_CTX_WINDOW`, `AF_STATUSLINE_USAGE_DISABLED`, `NO_COLOR`.
+
+---
+
 ## Related
 
-- **Skills:** `prompt-evaluator`, `learning-analyzer`, `self-improve`, `lazy-agent-loader`
+- **Skills:** `prompt-evaluator`, `self-improve` (Analyze→Apply learning loop)

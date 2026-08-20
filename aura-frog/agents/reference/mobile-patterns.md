@@ -85,8 +85,8 @@ android_patterns[6]{element,pattern}:
 
 ```toon
 frameworks[2]{framework,key_tech,skill}:
-  React Native,"Expo, NativeWind, React Navigation",skills/react-native-expert/SKILL.md
-  Flutter,"Dart, BLoC/Riverpod, Material/Cupertino",skills/flutter-expert/SKILL.md
+  React Native,"Expo, NativeWind, React Navigation",skills/framework-expert/refs/react-native.md
+  Flutter,"Dart, BLoC/Riverpod, Material/Cupertino",skills/framework-expert/refs/flutter.md
 ```
 
 ---

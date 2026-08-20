@@ -1,25 +1,4 @@
----
-name: flutter-expert
-description: "Flutter/Dart gotchas and decision criteria. Covers Riverpod vs BLoC, widget optimization, and platform-specific pitfalls."
-autoInvoke: false
-priority: high
-triggers:
-  - "flutter"
-  - "dart"
-  - "widget"
-  - "bloc"
-  - "riverpod"
-paths:
-  - "**/*.dart"
-  - "pubspec.yaml"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: Flutter. Loaded on demand by the framework-expert bundle.
 
 # Flutter Expert — Gotchas & Decisions
 

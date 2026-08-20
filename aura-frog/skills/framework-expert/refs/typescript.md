@@ -1,26 +1,4 @@
----
-name: typescript-expert
-description: "TypeScript gotchas and decision criteria covering nullish coalescing pitfalls (|| vs ??), strict tsconfig settings (noUncheckedIndexedAccess, exactOptionalPropertyTypes), type guard patterns, discriminated unions, and as const vs enum. Use when writing TypeScript, configuring tsconfig, implementing type guards, or debugging null/undefined errors."
-autoInvoke: false
-priority: high
-triggers:
-  - "typescript"
-  - "type error"
-  - "tsconfig"
-  - "strict mode"
-paths:
-  - "**/*.ts"
-  - "**/*.tsx"
-  - "tsconfig.json"
-  - "tsconfig.*.json"
-allowed-tools: Read, Grep, Glob, Edit, Write
-user-invocable: false
----
-
-> **AI-consumed reference.** Optimized for Claude to read during execution.
-> Human-readable explanation: see [docs/architecture/HIERARCHICAL_PLANNING.md](../../../docs/architecture/HIERARCHICAL_PLANNING.md)
-> or [docs/getting-started/](../../../docs/getting-started/) depending on topic.
-
+> Framework reference: TypeScript. Loaded on demand by the framework-expert bundle.
 
 # TypeScript Expert — Gotchas & Decisions
 

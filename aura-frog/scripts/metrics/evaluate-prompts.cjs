@@ -31,23 +31,20 @@ const AVAILABLE_SKILLS = [
   'plan-loader', 'reasoning-trace-recorder', 'extension-detector', 'permanent-memory-loader',
   // Orchestration & workflow
   'run-orchestrator', 'session-continuation', 'self-improve',
-  'lazy-agent-loader', 'project-context-loader', 'response-analyzer', 'learning-analyzer',
+  'project-context-loader',
   // Reasoning techniques
   'self-consistency', 'tree-of-thoughts', 'chain-of-verification',
   // Code-writing
   'refactor-expert', 'api-designer', 'migration-helper', 'documentation',
-  'git-workflow', 'git-worktree',
+  'git',
   // Coverage skills
-  'deep-debugging', 'monorepo', 'perf-profiling', 'performance-optimizer',
+  'deep-debugging', 'monorepo', 'perf-profiling',
   // Thinking
-  'sequential-thinking', 'problem-solving', 'scalable-thinking', 'prompt-evaluator',
+  'problem-solving', 'scalable-thinking', 'prompt-evaluator',
   // Design & UI
   'design-expert', 'stitch-design',
-  // Framework experts
+  // Framework experts (individual *-expert skills folded into framework-expert/refs/)
   'framework-expert',
-  'react-expert', 'react-native-expert', 'vue-expert', 'angular-expert',
-  'nextjs-expert', 'nodejs-expert', 'python-expert', 'laravel-expert',
-  'go-expert', 'flutter-expert', 'typescript-expert',
   // Hierarchical planning + safety
   'plan-validator', 'plan-archivist', 'failure-classifier',
   'self-healing-orchestrator', 'conflict-detector', 'mcp-security-auditor',
