@@ -106,7 +106,8 @@ scaffold_phase() {
       scaffold_one 1 "REQUIREMENTS.md"          "requirements.md"
       scaffold_one 1 "TECH_SPEC.md"             "tech-spec-toon.md"
       scaffold_one 1 "TECH_SPEC_CONFLUENCE.md"  "confluence-page.md"
-      scaffold_one 1 "DESIGN_DECISIONS.md"      "lld.md"
+      scaffold_one 1 "DESIGN_DECISIONS.md"      "decision-record.md"
+      scaffold_one 1 "LLD.md"                   "lld.md"
       ;;
     2)
       scaffold_one 2 "TEST_PLAN.md"             "test-plan-toon.md"

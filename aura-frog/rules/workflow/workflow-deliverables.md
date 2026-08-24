@@ -26,10 +26,12 @@ Syntax: `files[3]{path,action,purpose}:` for tabular data. See [TOON format](htt
 ## Phase Deliverables
 
 ```toon
-deliverables[12]{phase,document,required,key_content}:
+deliverables[14]{phase,document,required,key_content}:
   1,REQUIREMENTS.md,YES,User stories + acceptance criteria + scope
   1,TECH_SPEC.md,YES,AI-readable: architecture + files + APIs + risks
   1,TECH_SPEC_CONFLUENCE.md,YES,Human-readable: full Confluence format
+  1,DESIGN_DECISIONS.md,YES,Decision records — tiered Y-statement/ADR/MADR/RFC
+  1,LLD.md,If design-heavy,Low-level design — data/API/errors/ops
   1,UI_BREAKDOWN.md,If UI,Components + props + accessibility
   2,TEST_PLAN.md,YES,Test scenarios + coverage targets
   2,Test files,YES,Failing tests (TDD RED)
@@ -52,6 +54,8 @@ deliverables[12]{phase,document,required,key_content}:
 ├── REQUIREMENTS.md
 ├── TECH_SPEC.md              # AI reads this
 ├── TECH_SPEC_CONFLUENCE.md   # Human-readable
+├── DESIGN_DECISIONS.md       # Decision records (tiered)
+├── LLD.md                    # Low-level design (if design-heavy)
 ├── UI_BREAKDOWN.md           # If UI
 ├── TEST_PLAN.md
 ├── CODE_REVIEW.md

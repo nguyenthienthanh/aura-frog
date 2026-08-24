@@ -1,128 +1,116 @@
-# Requirements Document Template
+# Requirements — [Tên tính năng]
 
-**Feature:** [Feature Name]  
-**Ticket:** [JIRA-TICKET]  
-**Date:** [Date]  
-**Author:** PM Operations Orchestrator
-
----
-
-## Overview
-
-Brief description of the feature.
+**Trạng thái:** ideation | discussion | published | committed | abandoned
+**Owner:** [ai chịu trách nhiệm] · **Ngày:** YYYY-MM-DD · **Ticket:** [JIRA-…]
+**Đọc bởi:** [ai đọc, để ra quyết định gì]
 
 ---
 
-## Functional Requirements
+## Vấn đề
 
-### FR-001: [Requirement Name]
-**Description:** User can...
-**Priority:** HIGH/MEDIUM/LOW
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
+Cái gì đang sai/thiếu hôm nay, đo bằng gì? **Chưa nói giải pháp.**
 
----
+## Non-goals
 
-## Non-Functional Requirements
+Cố tình KHÔNG làm: …
 
-### NFR-001: Performance
-- Response time < 200ms
-- Support 1000 concurrent users
+## Thành công trông như thế nào
 
-### NFR-002: Security
-- Input validation
-- API authentication
+Tiêu chí **đo được**, kèm cách đo. Không có số đo thật thì ghi `[UNVERIFIED] — sẽ đo bằng …`,
+đừng bịa ngưỡng.
 
 ---
 
-## User Stories
+## Yêu cầu
 
-### US-001: As a [user type]
-**I want to** [action]  
-**So that** [benefit]
+<!--
+Mỗi requirement mang bộ thuộc tính tối thiểu (INCOSE GtWR v4, A1–A49, tập đánh dấu `*`).
+Đây chính là móc truy vết requirement → thiết kế → test.
+-->
 
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
+### REQ-001 — [tên]
 
----
+> **Phát biểu:** [Chủ thể] **shall** [hành động] [điều kiện] [ràng buộc đo được].
 
-## Dependencies
-
-- API endpoints: [List]
-- Third-party services: [List]
-- Prerequisites: [List]
-
----
-
-## Assumptions
-
-- Assumption 1
-- Assumption 2
+| Thuộc tính | Giá trị |
+|---|---|
+| Rationale | *vì sao cần — thiếu ô này thì C1 Necessary không kiểm được* |
+| Trace to Parent | REQ-… hoặc nhu cầu gốc |
+| Trace to Source | ai/tài liệu nào yêu cầu |
+| Verification Method | test / phân tích / kiểm tra / demo |
+| Verification Success Criteria | **đúng cái gì xảy ra thì coi là đạt** |
+| Owner | |
+| Priority · Criticality · Risk | |
 
 ---
 
-## Constraints
+## Cổng chất lượng — GtWR v4 (INCOSE, guidance)
 
-- Constraint 1
-- Constraint 2
+Kiểm **từng** requirement (C1–C9):
+
+| | Đạt? |
+|---|---|
+| C1 Necessary — bỏ đi thì có mất gì không | ☐ |
+| C2 Appropriate — đúng mức trừu tượng | ☐ |
+| C3 Unambiguous — chỉ hiểu được một nghĩa | ☐ |
+| C4 Complete — không cần hỏi thêm để hiểu | ☐ |
+| C5 Singular — **một** nghĩa vụ duy nhất | ☐ |
+| C6 Feasible — làm được trong ràng buộc thật | ☐ |
+| C7 Verifiable — **có cách chứng minh đạt** | ☐ |
+| C8 Correct — mô tả đúng nhu cầu thật | ☐ |
+| C9 Conforming — theo đúng mẫu câu đã thống nhất | ☐ |
+
+Kiểm **cả tập** (C10–C15):
+
+| | Đạt? |
+|---|---|
+| C10 Complete — tập đủ, không thiếu mảng nào | ☐ |
+| C11 Consistent — không mâu thuẫn nhau | ☐ |
+| C12 Feasible — khả thi **khi gộp lại** | ☐ |
+| C13 Comprehensible — đọc cả tập vẫn hiểu | ☐ |
+| C14 Able to be validated — chứng minh được là đúng thứ cần | ☐ |
+| C15 Correct | ☐ |
+
+### Lint máy chạy được (tập con của R1–R42)
+
+- **R7** — cấm mơ hồ: *some, any, several, many, about, approximate*
+- **R8** — cấm câu thoát: *as appropriate, as required, to the extent practical, if practicable*
+- **R18–R23** — một `shall` một câu; cảnh báo `and`/`or` nối hai nghĩa vụ
+- **R32** — `all/every/none` phải kèm phạm vi xác định
+- **R33–R35** — số phải có đơn vị và dung sai
+- **R36–R40** — cùng một khái niệm dùng cùng một từ xuyên suốt
+
+> ⚠️ Chỉ ~10–12 trong 42 rule kiểm được bằng máy. INCOSE §1.8 nói rõ công cụ NLP/AI *"do not address
+> all the rules"* và việc thẩm định *"cannot be done without the project team doing the analysis
+> manually."* **Đừng quảng cáo "42 kiểm tra tự động".**
 
 ---
 
-## Risks
+## Truy vết
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Risk 1 | HIGH | MEDIUM | Mitigation plan |
+29148 §3.1.23 định nghĩa truy vết là *"the derivation path (upward) and allocation/flow-down path
+(downward)"*, dùng thuật ngữ parent/child. **Chuẩn KHÔNG dùng chữ "bidirectional"** — trích đúng chữ
+lên/xuống.
 
----
-
-## Success Criteria
-
-- [ ] All acceptance criteria met
-- [ ] 85%+ test coverage
-- [ ] Performance benchmarks met
-- [ ] Zero critical bugs
+| Requirement | Parent | Thiết kế | Test |
+|---|---|---|---|
+| REQ-001 | | | |
 
 ---
 
-## Initial Estimation
+## Giả định · Ràng buộc · Phụ thuộc
 
-### Story Points
-**Total:** [X] story points (Fibonacci scale: 1, 2, 3, 5, 8, 13, 21)
+Mỗi mục ghi rõ **sai thì hỏng cái gì**. Giả định không có hệ quả thì không đáng viết.
 
-**Complexity Assessment:** [Trivial / Simple / Moderate / Complex / Very Complex / Extensive]
+---
 
-**Breakdown:**
-- Phase 1 (Understand + Design): [2-4] points
-- Phase 2 (Test RED): [1-3] points
-- Phase 3 (Build GREEN): [2-8] points
-- Phase 4 (Refactor + Review): [1-3] points
-- Phase 5 (Finalize): [0.5-1] points
+### Nguồn
+**ISO/IEC/IEEE 29148:2018** — chuẩn normative đang hiệu lực (thay IEEE 830-1998 qua bản 2011; bản
+2011 cũng thay IEEE 1233 và 1362). Tách characteristics của requirement đơn lẻ (§5.2.5) khỏi
+characteristics của **tập** (§5.2.6), cộng language criteria (§5.2.7) và attributes (§5.2.8).
+*Nội dung clause trả phí — không trích tên như thể đã đọc từ chuẩn.*
+**INCOSE GtWR v4** (INCOSE-TP-2010-006-04, 2023) — **guidance của hội, không phải chuẩn**; miễn phí;
+là nguồn của C1–C15, R1–R42 và A1–A49 ở trên.
 
-### Time Estimate
-**Range:** [Y-Z] hours (~[W] days)
-
-**Breakdown:**
-- Optimistic: [Y] hours
-- Most Likely: [Y+X] hours
-- Pessimistic: [Z] hours
-
-### Confidence Level
-**Level:** [High / Medium / Low]
-
-**Reasoning:**
-- Requirements clarity: [High/Medium/Low]
-- Technical familiarity: [High/Medium/Low]
-- Dependencies: [None/Few/Many]
-- Unknowns: [None/Some/Many]
-
-### Effort Components
-- **Effort (40%):** [How much work? How many files?]
-- **Complexity (30%):** [How hard is the logic? Edge cases?]
-- **Uncertainty (20%):** [How many unknowns? Familiar tech?]
-- **Risk (10%):** [What can go wrong? How critical?]
-
-**📚 Reference:** Use Fibonacci scale (1, 2, 3, 5, 8, 13, 21) for estimation
-
+**Mức bằng chứng: [CONVENTION].** Không có nghiên cứu nào chứng minh requirement viết theo C1–C15 thì
+ít lỗi hơn.
