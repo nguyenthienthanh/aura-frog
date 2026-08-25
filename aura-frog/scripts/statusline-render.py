@@ -142,7 +142,45 @@ def limit_seg_compact(label, node):
         txt += dim(f"·{reset}")
     return txt
 
-# --- context % from transcript ---------------------------------------------
+# --- context % ---------------------------------------------------------------
+# NGUỒN SỰ THẬT: khối `context_window` mà Claude Code đưa vào stdin (>= v2.1.x).
+# Nó đã tính sẵn used_percentage theo ĐÚNG cửa sổ của model, và — điểm mấu chốt —
+# nó PHẢN ÁNH ĐÚNG SAU KHI COMPACT.
+#
+# Cách cũ (suy ra từ transcript) sai hai đường:
+#   1. Mẫu số đoán mò: 200k cho tới khi vượt 200k rồi mới nhảy sang 1M ⇒ trên Opus
+#      1M, 161k hiện 81% (161/200) thay vì 16% (161/1000), và khi vượt 200k thì %
+#      rơi vực 100% → 20%.
+#   2. Compact không reset: transcript của phiên bị compact KHÔNG ghi dấu
+#      isCompactSummary và khối `usage` cứ leo tiếp (đo được: 376k và tăng đều
+#      trong khi context thật đã về ~100k) ⇒ % đứng nguyên ở giá trị trước compact.
+# Chỉ lùi về suy-đoán-từ-transcript khi Claude Code cũ không gửi context_window.
+
+
+def context_from_stdin(cw):
+    """(pct, tokens) lấy thẳng từ stdin. None nếu payload không có/không hợp lệ."""
+    if not isinstance(cw, dict):
+        return None
+    toks = cw.get("total_input_tokens")
+    if not isinstance(toks, (int, float)) or toks <= 0:
+        return None
+    win = cw.get("context_window_size")
+    ovr = os.environ.get("AF_CTX_WINDOW")
+    if ovr:
+        try:
+            win = int(ovr)
+        except Exception:
+            pass
+    if isinstance(win, (int, float)) and win > 0:
+        return (min(100.0, toks / win * 100.0), int(toks))
+    # Không có size thì dùng % Claude Code đã tính (đừng tự bịa mẫu số).
+    pct = cw.get("used_percentage")
+    if isinstance(pct, (int, float)):
+        return (float(pct), int(toks))
+    return None
+
+
+# --- fallback: suy ra từ transcript (Claude Code cũ) -------------------------
 def ctx_window_for(toks, exceeds_200k):
     # Auto-pick the real window: Claude 5-era models run a 1M context and don't
     # compact at 200k, so a fixed 200k denominator pins big sessions at 100%.
@@ -276,7 +314,9 @@ def main():
     s7 = limit_seg_compact("7d", rl.get("seven_day"))
     if s5: segs.append(s5)
     if s7: segs.append(s7)
-    ctx = context_pct(transcript, exceeds)
+    ctx = context_from_stdin(g(d, "context_window", default=None))
+    if ctx is None:
+        ctx = context_pct(transcript, exceeds)
     if ctx is not None:
         cpct, ctoks = ctx
         ktxt = f"{ctoks/1000:.0f}k" if ctoks >= 1000 else str(ctoks)
