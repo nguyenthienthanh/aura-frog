@@ -166,7 +166,9 @@ individual[9]{id,characteristic}:
   C7,Verifiable
   C8,Correct
   C9,Conforming
+```
 
+```toon
 set[6]{id,characteristic}:
   C10,Complete
   C11,Consistent
@@ -222,7 +224,7 @@ applicable to the design subject."* Treat it as a **menu, not a checklist**:
 Interaction · State dynamics · Algorithm · Resources`
 
 ```toon
-folklore[9]{section,backing}:
+folklore[10]{section,backing}:
   Data model,"[CONVENTION] IEEE 1016 Information viewpoint 5.6 · NASA data structures · DoD DID"
   API contract / interfaces,"[CONVENTION] IEEE 1016 Interface 5.8 · ECSS 5.5 · DoD 4.3"
   Sequence diagram,"[CONVENTION] IEEE 1016 Interaction 5.10 · ECSS 4.2 dynamic architecture"
