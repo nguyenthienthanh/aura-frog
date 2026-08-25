@@ -12,6 +12,58 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.13] - 2026-08-25 (tech-writing skill + 4 template viết lại)
+
+### Added
+
+- **`tech-writing` skill** — viết requirements/PRD, tech spec, LLD, decision record
+  và phân tích kỹ thuật ở mức nghi thức khớp với quy mô task. Dựng trên 2 lượt
+  deep-research (214 agent, 49 nguồn sơ cấp). Bốn điểm đáng chú ý:
+  - **Phân tầng T0–T3, mặc định HẠ tầng**: Y-statement → ADR (Nygard) → MADR → RFC.
+    Thứ phân biệt là mức phân tích phương án, không phải độ dài.
+  - **Cấm tự chấm bản nháp trong chính context bản nháp.** Huang et al. (ICLR 2024):
+    GPT-4 GSM8K 95.5 → 91.5 → 89.0 và GPT-3.5 CommonSenseQA 75.8 → 38.1 sau khi tự
+    sửa; cải thiện trong nghiên cứu trước đến từ oracle label và biến mất khi bỏ nó.
+    Skill dùng chain-of-verification trả lời câu hỏi kiểm chứng ở context RIÊNG, và
+    ưu tiên verifier NGOÀI (chạy test, gọi API) hơn suy nghĩ nội tại.
+  - **Grounding trước khi viết**: trích nguyên văn → mọi claim về code phải có
+    `file_read` trước đó (`rules/core/grounding-discipline.md`) → claim không chống
+    lưng được thì XOÁ và đánh dấu lỗ hổng.
+  - **Nhãn mức bằng chứng** `[CODE]` / `[SOURCE]` / `[CONVENTION]` / `[UNVERIFIED]`,
+    và ghi rõ gần như toàn bộ nội dung là quy ước có nguồn, không phải hiệu quả đo được.
+- **`templates/decision-record.md`** — thang 4 bậc trong một file, kèm vòng đời trạng
+  thái của Oxide RFD (cố tình không có `draft`).
+
+### Changed
+
+- **Bốn template phase-1 viết lại.** Chúng vốn là khung rỗng: `lld.md` dán cứng ví dụ
+  `ShareModal.tsx`/Zustand của một dự án khác, `requirements.md` có NFR bịa số
+  (`< 200ms`, `1000 concurrent users`), `confluence-page.md` liệt kê
+  `FacebookCard`/`InstagramCard`.
+  - `lld.md` — nói THẲNG là không có chuẩn cho LLD (IEEE 1016-2009 để ranh giới
+    architecture/HLD/LLD ngoài phạm vi). Dùng 12 design viewpoint làm THỰC ĐƠN, cộng
+    tiêu chí dừng của ECSS: chi tiết tới mức đơn vị code/compile/test được, không hơn.
+    Idempotency/observability/migration đánh dấu `[UNVERIFIED]` — không chuẩn nào
+    chống lưng.
+  - `requirements.md` — bộ ba C/R/A của INCOSE GtWR v4: C1–C9 cá thể, C10–C15 tập hợp,
+    tập con ~10–12 rule lint được, A-attributes làm schema truy vết. Ghi rõ INCOSE §1.8
+    nói công cụ NLP/AI không phủ hết rule.
+  - `confluence-page.md` — bỏ ví dụ dán cứng, thêm mục Non-goals / Nhược điểm / Chế độ hỏng.
+- **`DESIGN_DECISIONS.md` sửa ánh xạ sai** — trước đây trỏ vào `lld.md` (LLD không phải
+  chỗ ghi quyết định), giờ trỏ `decision-record.md`; thêm `LLD.md` thành file riêng.
+  `rules/workflow/workflow-deliverables.md` 12 → 14 deliverables.
+- **`documentation` skill** thu hẹp về Runbook; ADR chuyển sang `tech-writing`.
+
+### Fixed
+
+- **`package.json` không được sync version.** File mà `npm publish` đọc version từ đó
+  KHÔNG nằm trong danh sách canonical của `release.sh` lẫn `sync-version.sh`, nên mỗi
+  lần phát hành phải nhớ sửa tay — quên là npm lệch khỏi `plugin.json`. Đã thêm vào
+  `release.sh prepare`.
+- **Link chết `skills/git-worktree/SKILL.md` trong README** — skill bị xoá có chủ ý ở
+  `03ddfe33` (consolidate 59→42) nhưng link bị bỏ lại, làm job "Check for broken
+  markdown links" đỏ trên chính `main`. Trỏ lại sang `skills/git`.
+
 ## [3.8.0-alpha.12] - 2026-08-20 (Audit follow-ups: skill consolidation, KG-2, custom statusline)
 
 Completes the two follow-up tracks the audit (PR #50) deliberately deferred as
