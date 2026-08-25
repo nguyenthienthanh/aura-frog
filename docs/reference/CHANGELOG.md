@@ -12,6 +12,26 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.14] - 2026-08-25 (Statusline context % — đọc từ stdin, đúng sau compact)
+
+### Fixed
+
+- **Statusline tính sai context %, và không reset sau compact.** Trên Opus (cửa sổ 1M)
+  statusline hiện `81%` ở 161k, `82%` ở 164k, rồi sau khi compact tụt về 100k mà % vẫn
+  đứng nguyên. Hai lỗi, cùng một nguyên nhân — `statusline-render.py` tự suy ra context
+  từ transcript thay vì đọc khối `context_window` Claude Code đã đưa sẵn vào stdin:
+  - **Mẫu số đoán mò**: dùng 200k cho tới khi vượt 200k mới nhảy sang 1M ⇒ `161k/200k
+    = 81%` thay vì `161k/1M = 16%`, phóng đại 5 lần; và khi vượt 200k thì % rơi vực
+    100% → 20% rồi leo lại.
+  - **Compact không reset**: transcript của phiên bị compact KHÔNG ghi
+    `isCompactSummary` và khối `usage` cứ leo tiếp (đo trên transcript thật: 376k và
+    tăng đều, không một cú tụt nào, trong khi context thật đã về ~100k).
+
+  Claude Code ≥ v2.1.x đưa sẵn `context_window{context_window_size, total_input_tokens,
+  used_percentage}` — đúng cửa sổ model VÀ đúng sau compact. Giờ ưu tiên nguồn này, chỉ
+  lùi về suy-từ-transcript với Claude Code cũ. `AF_CTX_WINDOW` vẫn ghi đè được.
+  Kèm 6 test RED/GREEN (`__tests__/scripts/statusline-context.test.cjs`).
+
 ## [3.8.0-alpha.13] - 2026-08-25 (tech-writing skill + 4 template viết lại)
 
 ### Added
