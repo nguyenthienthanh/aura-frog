@@ -279,7 +279,7 @@ resources[8]{name,location}:
   Agents (15),agents/
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
-  Skills (42),skills/
+  Skills (43),skills/
   Hooks (51),hooks/
   MCP (6),.mcp.json (all enabled; postgres/redis/chrome-devtools/codebase-memory/stitch unbundled — see docs/operations/MCP_GUIDE.md)
   AI References,docs/

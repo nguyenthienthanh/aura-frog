@@ -592,7 +592,7 @@ This overrides every agent/skill `model:` declaration. See [Per-Agent Model Over
 /run worktree: <task>    # Automatically creates isolated worktree + runs there
 ```
 
-Each worktree has its own state in `.claude/logs/runs/<id>/`. See [Git Worktree skill](aura-frog/skills/git-worktree/SKILL.md).
+Each worktree has its own state in `.claude/logs/runs/<id>/`. See the [git skill](aura-frog/skills/git/SKILL.md).
 
 For full multi-agent parallel work, enable Agent Teams:
 ```bash

@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: "Create Architecture Decision Records (ADRs) and Runbooks for operational documentation."
+description: "Create Runbooks for operational documentation. For ADRs, tech specs, requirements, LLD and technical analysis use the tech-writing skill instead."
 autoInvoke: false
 priority: medium
 triggers:
@@ -19,8 +19,10 @@ user-invocable: false
 
 ## When to Create
 
-- **ADR:** Technology choices, architectural changes, new patterns, deprecations
 - **Runbook:** Service deployment, common ops tasks, incident response
+- **ADR:** → use `skills/tech-writing` + `templates/decision-record.md`. That template carries the
+  full 4-tier ladder (Y-statement → Nygard ADR → MADR → RFC) and picks the tier by decision size.
+  The stripped ADR template below is kept only so existing links keep resolving.
 
 ## ADR Template
 
