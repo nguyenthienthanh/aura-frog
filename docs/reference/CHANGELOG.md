@@ -12,6 +12,40 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.15] - 2026-09-04 (Portability audit — EN templates, deliverables backstop, host-project context)
+
+### Fixed
+
+- **Run deliverable docs were often never created.** `run-orchestrator` Step 0.5 (scaffold
+  REQUIREMENTS.md, TECH_SPEC.md, … into `.claude/logs/runs/<id>/`) was instruction-only, buried
+  mid-file, and absent from the `/run` command protocol — real runs shipped with nothing but
+  `run-state.json`. New PostToolUse hook `run-deliverables-scaffold.cjs` now auto-scaffolds the
+  current phase's docs on every `run-state.json` write (idempotent, silent on re-run, skips
+  Quick/direct), and the scaffold step is spelled out in `commands/run.md` step 4.
+- **Default deliverable templates translated to English.** `requirements.md`, `lld.md`,
+  `decision-record.md`, `confluence-page.md` were majority-Vietnamese and scaffolded into every
+  user's Phase-1 deliverables — the plugin is publicly distributed, so defaults are now English
+  (structure, sources, and tone preserved 1:1).
+- **Host-project docs are now authoritative context.** `scanner` and `project-context-loader`
+  never read the host project's own `CLAUDE.md` / `README.md` — only the plugin's self-generated
+  cache. Both now read the project's `CLAUDE.md` (root or `.claude/`), `README.md`, and
+  `CONTRIBUTING.md` first; on conflict the project's docs win and the cache refreshes.
+- **Agent-roster hygiene.** Deleted orphaned `skills/agent-detector/task-based-agent-selection.md`
+  (517 lines referencing fictitious agents: `backend-laravel`, `web-nextjs`, "Dev agent");
+  `story-planner.md` no longer labels `run-orchestrator` an Agent (it's a skill) nor references a
+  nonexistent `tdd-engineer` (→ `tester`); `af-project-cache.cjs#detectAgentMapping` now emits the
+  canonical 15-agent roster instead of stale `web-*`/`backend-*` labels.
+- **Portability polish.** Hard `.claude/CLAUDE.md` paths accept a root `CLAUDE.md` too;
+  `frontend-aesthetics` house style is an overridable default (host project's design language
+  wins); `profile-hooks.sh` falls back timeout → gtimeout → none on macOS;
+  `context-economy.md` notes `Explore`/`general-purpose` are unprefixed Claude Code built-ins.
+
+### Added
+
+- **`scripts/audit/portability-audit.sh`** — 4-dimension portability gate (region/company/personal
+  tokens, undefined agent references, hardcoded paths, host-project context discipline). Exit 0/1,
+  CI-gate-ready; passes on this release.
+
 ## [3.8.0-alpha.14] - 2026-08-25 (Statusline context % — đọc từ stdin, đúng sau compact)
 
 ### Fixed
