@@ -70,7 +70,7 @@ Project-level files load AFTER plugin-level files, so they can shadow or extend 
 
 - **Detecting on a single user message** — that's reactive, not pattern-based; require 3+ occurrences for medium signals
 - **Inferring intent from one similar phrasing** — if the user said "don't do X" once, it's a correction, not a rule candidate
-- **Proposing skill/rule/command names without reading project context** — use Read on `.claude/CLAUDE.md` and recent files to ground the name
+- **Proposing skill/rule/command names without reading project context** — use Read on the project's `CLAUDE.md` (root or `.claude/CLAUDE.md`) and recent files to ground the name
 - **Surfacing a proposal mid-flow when the user is in active execution** — wait until a natural pause (between turns, not mid-tool-call)
 - **Re-proposing rejected ideas in the same session** — respect the no
 

@@ -161,7 +161,7 @@ Skills are still triggered three ways:
 2. **Explicit prompt mention** — "use the chain-of-verification skill on this report"
 3. **Internal invocation** — a `commands/` file or another skill calls into it (e.g., `/af prompts` → `prompt-evaluator` skill)
 
-If a skill needs slash exposure for the user → wrap it in a thin `commands/<name>.md` file that delegates here. See `.claude/CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".
+If a skill needs slash exposure for the user → wrap it in a thin `commands/<name>.md` file that delegates here. See the plugin `CLAUDE.md` "ARCHITECTURE RULE — Commands vs Skills Separation".
 
 ---
 

@@ -17,8 +17,8 @@
 
 ## Protocol — `propose <kind> <description>`
 
-1. **Verify project context.** Refuse if no `.claude/CLAUDE.md` exists ("not an Aura Frog project; run `/project init` first").
-2. **Read project context** — `.claude/CLAUDE.md`, recent prompts/turns, file tree. Ground the proposal in actual usage.
+1. **Verify project context.** Refuse if the project has neither a root `CLAUDE.md` nor `.claude/CLAUDE.md` ("not an Aura Frog project; run `/project init` first").
+2. **Read project context** — the project's `CLAUDE.md` (root or `.claude/CLAUDE.md`), `README.md`, recent prompts/turns, file tree. Ground the proposal in actual usage.
 3. **Draft a skeleton** with the right frontmatter for the kind:
    - `skill` → name, description, when_to_use, autoInvoke (default false), user-invocable: false, allowed-tools, effort
    - `rule` → priority (Critical/High/Medium), tier (core/agent/workflow), applies_to

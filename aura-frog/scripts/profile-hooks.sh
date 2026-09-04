@@ -29,7 +29,16 @@ for hook in "$HOOKS_DIR/"*.cjs; do
     start_ms=$(( 10#$(date +%s%3N 2>/dev/null || echo "$(date +%s)000") ))
 
     # Run hook with empty JSON input, capture output
-    output=$(echo '{}' | timeout 5 node "$hook" 2>&1 || true)
+    # macOS has no coreutils `timeout` by default; fall back to gtimeout (brew
+    # coreutils) or an unbounded run rather than erroring out.
+    if command -v timeout >/dev/null 2>&1; then
+      TIMEOUT_CMD="timeout 5"
+    elif command -v gtimeout >/dev/null 2>&1; then
+      TIMEOUT_CMD="gtimeout 5"
+    else
+      TIMEOUT_CMD=""
+    fi
+    output=$(echo '{}' | ${TIMEOUT_CMD} node "$hook" 2>&1 || true)
 
     end_ms=$(( 10#$(date +%s%3N 2>/dev/null || echo "$(date +%s)000") ))
 

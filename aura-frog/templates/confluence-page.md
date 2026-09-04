@@ -1,100 +1,103 @@
 # Confluence Page Template
 
-**Định dạng wiki-markup, dán thẳng vào Confluence.** Bản dành cho NGƯỜI đọc — bản AI đọc là
-`TECH_SPEC.md` (TOON). Hai bản phải nói cùng một sự thật; lệch nhau là bug.
+**Wiki-markup format, paste straight into Confluence.** This is the HUMAN-readable version — the
+AI-readable one is `TECH_SPEC.md` (TOON). The two must tell the same truth; divergence is a bug.
 
 <!--
-LUẬT ĐIỀN:
-- Xoá mọi mục không áp dụng. Mục trống tệ hơn mục thiếu.
-- Mỗi phát biểu về code phải trích `path/file.ts:120-134`. Không trích được ⇒ xoá.
-- Mỗi con số phải có nguồn. Không đo được ⇒ ghi [UNVERIFIED] + cách đo. KHÔNG bịa.
-- Tách rõ [ĐANG CÓ] và [ĐỀ XUẤT].
+FILL-IN RULES:
+- Delete every section that doesn't apply. An empty section is worse than a missing one.
+- Every claim about code must cite `path/file.ts:120-134`. Can't cite it ⇒ delete it.
+- Every number needs a source. Can't measure it ⇒ write [UNVERIFIED] + how it will be measured. DO NOT invent.
+- Keep [EXISTING] and [PROPOSED] clearly separated.
 -->
 
 ---
 
-h1. [Tên tính năng]
+h1. [Feature name]
 
-*Ticket:* [JIRA-…] | *Ngày:* [YYYY-MM-DD] | *Owner:* [tên] | *Trạng thái:* ideation / discussion / published / committed / abandoned
+*Ticket:* [JIRA-…] | *Date:* [YYYY-MM-DD] | *Owner:* [name] | *Status:* ideation / discussion / published / committed / abandoned
 
 {info}
-*Đọc bởi:* [ai đọc, để ra quyết định gì]
-*Trạng thái* theo vòng đời RFD của Oxide — _committed_ nghĩa là trang này mô tả hệ thống ĐANG CHẠY,
-không phải dự định. Không có trạng thái _draft_: ra sớm kèm nhãn đúng còn hơn giữ lại chờ hoàn hảo.
+*Read by:* [who reads this, to make what decision]
+*Status* follows Oxide's RFD lifecycle — _committed_ means this page describes the RUNNING system,
+not an intention. There is no _draft_ state: publish early with an honest label rather than hold
+back for perfection.
 {info}
 
 ----
 
-h2. Vấn đề
+h2. Problem
 
-Hôm nay đang sai/thiếu cái gì, đo bằng gì. *Chưa nói giải pháp.*
+What is wrong/missing today, measured how. *No solutions yet.*
 
 h2. Non-goals
 
-Cố tình KHÔNG làm: …
+Deliberately NOT doing: …
 
-h2. Quyết định
+h2. Decision
 
-Chúng tôi sẽ … *(thể chủ động, dứt khoát)*
+We will … *(active voice, decisive)*
 
-h3. Các phương án đã cân nhắc
+h3. Considered options
 
-|| Phương án || Ưu || Nhược || Vì sao chọn / loại ||
+|| Option || Pros || Cons || Why chosen / rejected ||
 | A | | | |
 | B | | | |
-| Không làm gì | | | |
+| Do nothing | | | |
 
 {warning}
-*Vì sao KHÔNG nên làm việc này?* — Bỏ trống mục này thì tài liệu mất uy tín. Nêu nhược điểm thật.
+*Why should we NOT do this?* — Leaving this empty costs the document its credibility. Name real
+drawbacks.
 {warning}
 
 ----
 
-h2. Thiết kế
+h2. Design
 
-Kiến trúc, thành phần, luồng dữ liệu. Sơ đồ *chỉ* được có nếu nó cho thấy thứ văn xuôi không diễn
-đạt nổi — sơ đồ chép lại đoạn văn bên trên thì xoá.
+Architecture, components, data flow. A diagram may *only* exist if it shows something prose cannot
+express — a diagram restating the paragraph above it gets deleted.
 
 h3. Interface / API
 
-Với mỗi interface: kiểu, khuôn dạng, đơn vị, miền giá trị, ràng buộc thời gian, xử lý lỗi.
-*Tiêu chí đủ:* người khác code được mà không phải hỏi thêm.
+For each interface: type, format, units, value range, timing constraints, error handling.
+*Sufficiency test:* someone else can code against it without asking follow-up questions.
 
-h3. Chế độ hỏng
+h3. Failure modes
 
-|| Hỏng thế nào || Phát hiện bằng gì || Phản ứng || Ai được báo ||
+|| How it fails || Detected by || Response || Who gets notified ||
 | | | | |
 
-Nhớ cả lỗi *âm thầm* — exit 0 nhưng không làm gì, payload rỗng — không chỉ exception.
+Remember *silent* failures — exit 0 doing nothing, empty payloads — not just exceptions.
 
 ----
 
-h2. Tiêu chí thành công
+h2. Success criteria
 
-Đo được, kèm cách đo. Chưa đo thì ghi `[UNVERIFIED] — sẽ đo bằng …`
+Measurable, with the measurement method. Not measured yet → `[UNVERIFIED] — will measure via …`
 
-h2. Kết quả kiểm thử
+h2. Test results
 
-|| Chỉ số || Giá trị || Nguồn ||
+|| Metric || Value || Source ||
 | | | |
 
 {note}
-Chỉ điền số ĐÃ CHẠY THẬT. Bảng test toàn ✅ mà không ai chạy là thứ làm tài liệu mất giá trị nhanh nhất.
+Only fill in numbers that ACTUALLY RAN. A test table full of ✅ nobody ran is the fastest way to
+make a document worthless.
 {note}
 
 ----
 
-h2. Rủi ro
+h2. Risks
 
-|| Rủi ro || Phơi nhiễm thật || Giảm thiểu ||
+|| Risk || Real exposure || Mitigation ||
 | | | |
 
-Mọi dòng đều MEDIUM/MEDIUM ⇒ xoá cả bảng, nó không nói gì.
+Every row reads MEDIUM/MEDIUM ⇒ delete the whole table, it says nothing.
 
-h2. Câu hỏi chưa ngã ngũ
+h2. Open questions
 
-Cái gì cố tình để ngỏ, chốt ở đâu, khi nào.
+What is deliberately left open, where and when it gets settled.
 
 ----
 
-_Tạo bởi [Aura Frog|https://github.com/nguyenthienthanh/aura-frog] · Cập nhật: [YYYY-MM-DD]_
+_Generated with [Aura Frog|https://github.com/nguyenthienthanh/aura-frog] · Updated: [YYYY-MM-DD]_
