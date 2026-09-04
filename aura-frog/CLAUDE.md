@@ -1,6 +1,6 @@
 # Aura Frog OS — Plugin for Claude Code
 
-**System:** Aura Frog v3.8.0-alpha.14 | **Format:** [TOON](https://github.com/toon-format/toon)
+**System:** Aura Frog v3.8.0-alpha.15 | **Format:** [TOON](https://github.com/toon-format/toon)
 **Purpose:** Planning-first LLM OS. Agents + skills + commands + 5-phase TDD + hierarchical planning (T0-T4) + memory tier + pre-flight + L1/L2 conflicts + freeze cascade + self-healing safety gates + MCP security tier + MCP servers. Component counts: see **Resources** below (single source).
 
 ---
@@ -280,7 +280,7 @@ resources[8]{name,location}:
   Commands (24),commands/
   Rules (72),rules/{core|agent|workflow}/
   Skills (43),skills/
-  Hooks (51),hooks/
+  Hooks (52),hooks/
   MCP (6),.mcp.json (all enabled; postgres/redis/chrome-devtools/codebase-memory/stitch unbundled — see docs/operations/MCP_GUIDE.md)
   AI References,docs/
   Human Docs,docs/README.md (repo root)
@@ -288,4 +288,4 @@ resources[8]{name,location}:
 
 ---
 
-**Version:** 3.8.0-alpha.14
+**Version:** 3.8.0-alpha.15
