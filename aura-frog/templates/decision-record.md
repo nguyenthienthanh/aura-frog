@@ -1,119 +1,122 @@
-# Decision Record — DR-NNN: [Tiêu đề ở thể khẳng định, vd "Dùng Postgres thay vì Mongo cho store đơn hàng"]
+# Decision Record — DR-NNN: [Title in assertive form, e.g. "Use Postgres over Mongo for the order store"]
 
 <!--
-THANG 4 BẬC — chọn bậc theo quy mô quyết định, ĐỪNG mặc định dùng bậc cao nhất.
-Thứ phân biệt các bậc là MỨC ĐỘ PHÂN TÍCH PHƯƠNG ÁN, không phải độ dài.
+4-TIER LADDER — pick the tier that matches the decision's size; do NOT default to the top tier.
+What separates the tiers is the DEPTH OF ALTERNATIVES ANALYSIS, not length.
 
-  Bậc 1 · Y-statement      1 câu.        Quyết định nhỏ, đảo ngược rẻ.
-  Bậc 2 · ADR (Nygard)     5 mục.        Có hệ quả lâu dài, nhưng phương án hiển nhiên.
-  Bậc 3 · MADR             + so sánh.    Có ≥2 phương án đáng cân nhắc thật.
-  Bậc 4 · RFC              2 tầng.       Ảnh hưởng nhiều nhóm / khó đảo ngược.
+  Tier 1 · Y-statement     1 sentence.   Small decision, cheap to reverse.
+  Tier 2 · ADR (Nygard)    5 sections.   Long-lived consequences, but the option is obvious.
+  Tier 3 · MADR            + comparison. There are ≥2 genuinely viable options.
+  Tier 4 · RFC             2 layers.     Affects multiple teams / hard to reverse.
 
-Xoá các bậc không dùng. Giữ khối `Trạng thái` ở mọi bậc.
+Delete the unused tiers. Keep the `Status` block at every tier.
 -->
 
-**Trạng thái:** ideation | discussion | published | committed | abandoned
-<!-- Lấy từ vòng đời RFD của Oxide. `committed` = tài liệu này mô tả hệ thống ĐANG CHẠY,
-     không còn là ý tưởng. Chuẩn mực (IETF RFC 3, 1969): "timely rather than polished" —
-     ra sớm kèm nhãn trạng thái đúng, đừng chờ hoàn hảo. -->
-**Ngày:** YYYY-MM-DD · **Owner:** [tên người chịu trách nhiệm cập nhật]
+**Status:** ideation | discussion | published | committed | abandoned
+<!-- From Oxide's RFD lifecycle. `committed` = this document describes the RUNNING system,
+     no longer an idea. The founding norm (IETF RFC 3, 1969): "timely rather than polished" —
+     publish early with an honest status label; don't wait for perfect. -->
+**Date:** YYYY-MM-DD · **Owner:** [name of the person who keeps this updated]
 
 ---
 
-## Bậc 1 — Y-statement (1 câu)
+## Tier 1 — Y-statement (1 sentence)
 
-Trong bối cảnh **[use case / user story]**,
-đối mặt **[mối lo / lực cản]**,
-chúng tôi chọn **[phương án]**
-để đạt **[thuộc tính chất lượng]**,
-chấp nhận **[điều đánh đổi]**.
+In the context of **[use case / user story]**,
+facing **[concern / constraint]**,
+we chose **[option]**
+to achieve **[quality attribute]**,
+accepting **[trade-off]**.
 
-> ⚠️ Ô "chấp nhận" bắt buộc phải điền, nhưng điền ≠ đã cân nhắc thật.
-> Nếu không nêu được một đánh đổi CỤ THỂ, quyết định này chưa chín — lên bậc 3.
-
----
-
-## Bậc 2 — ADR (Nygard, 5 mục)
-
-### Bối cảnh
-Lực cản đang giằng co nhau là gì? Mô tả tình thế, **chưa nói giải pháp**.
-
-### Quyết định
-Chúng tôi sẽ… *(thể chủ động, dứt khoát)*
-
-### Hệ quả
-Cái gì trở nên dễ hơn, cái gì khó hơn **sau** quyết định này — cả tốt lẫn xấu.
+> ⚠️ The "accepting" slot is mandatory, but filling it ≠ having actually weighed it.
+> If you cannot name a SPECIFIC trade-off, the decision isn't ripe — move up to Tier 3.
 
 ---
 
-## Bậc 3 — MADR (thêm phần so sánh phương án)
+## Tier 2 — ADR (Nygard, 5 sections)
 
-### Yếu tố dẫn dắt quyết định
-- [Yếu tố 1 — vd ràng buộc vận hành, chi phí, kỹ năng đội]
+### Context
+What forces are pulling against each other? Describe the situation, **no solutions yet**.
 
-### Các phương án đã cân nhắc
-1. **[Phương án A]**
-2. **[Phương án B]**
-3. **[Không làm gì]** ← luôn liệt kê, để lộ chi phí của việc đứng yên
+### Decision
+We will… *(active voice, decisive)*
 
-### Ưu / nhược từng phương án
-**[Phương án A]**
+### Consequences
+What becomes easier, what becomes harder **after** this decision — both good and bad.
+
+---
+
+## Tier 3 — MADR (adds options comparison)
+
+### Decision drivers
+- [Driver 1 — e.g. operational constraint, cost, team skills]
+
+### Considered options
+1. **[Option A]**
+2. **[Option B]**
+3. **[Do nothing]** ← always list it, to expose the cost of standing still
+
+### Pros / cons per option
+**[Option A]**
 - 👍 …
 - 👎 …
 
-### Kết quả
-Chọn **[phương án]**, vì [lý do bám vào yếu tố dẫn dắt ở trên].
+### Outcome
+Chose **[option]**, because [reason anchored to the drivers above].
 
-**Confirmation:** làm sao BIẾT quyết định này được tuân thủ trong thực tế?
-*(test, lint rule, review checklist, cảnh báo runtime — nêu cơ chế cụ thể, không nói "sẽ review kỹ")*
+**Confirmation:** how will we KNOW this decision is being followed in practice?
+*(test, lint rule, review checklist, runtime warning — name the concrete mechanism, not "we'll
+review carefully")*
 
-**Người quyết định:** … · **Đã hỏi ý:** … · **Đã thông báo:** …
-
----
-
-## Bậc 4 — RFC (tách 2 tầng, theo mẫu Rust RFC)
-
-### Tóm tắt
-Một đoạn.
-
-### Động cơ
-Đang giải quyết vấn đề gì? Kết quả mong đợi là gì?
-
-### Giải thích tầng hướng dẫn (guide-level)
-Trình bày như thể thứ này ĐÃ tồn tại và anh đang dạy một đồng nghiệp dùng nó.
-Giới thiệu khái niệm mới, giải thích chủ yếu **bằng ví dụ**, nêu luôn thông báo lỗi mẫu /
-cảnh báo deprecation / hướng dẫn migration nếu có.
-
-### Giải thích tầng tham chiếu (reference-level)
-Phần kỹ thuật. Chi tiết đủ để: rõ nó tương tác với các thành phần khác ra sao, rõ sẽ hiện
-thực thế nào, và **mổ xẻ các ca biên bằng ví dụ** — quay lại chính các ví dụ ở tầng trên.
-
-### Nhược điểm
-**Vì sao KHÔNG nên làm việc này?** *(Bỏ trống mục này = tài liệu mất uy tín.)*
-
-### Lý lẽ và các phương án khác
-Vì sao thiết kế này tốt nhất trong không gian các thiết kế khả dĩ? Đã cân nhắc những thiết kế
-nào khác và vì sao loại? **Tác động của việc KHÔNG làm gì cả là gì?**
-
-### Tiền lệ
-Ngôn ngữ / framework / hệ thống khác đã giải bài này ra sao? *(Được phép trả lời "không có" —
-nhưng phải nói rõ là đã tìm.)*
-
-### Câu hỏi chưa ngã ngũ
-Cái gì cố tình để ngỏ, sẽ chốt ở đâu và khi nào.
+**Decided by:** … · **Consulted:** … · **Informed:** …
 
 ---
 
-## Nguồn của mẫu này
+## Tier 4 — RFC (two layers, after the Rust RFC template)
 
-| Bậc | Nguồn | Ghi chú |
+### Summary
+One paragraph.
+
+### Motivation
+What problem is this solving? What is the expected outcome?
+
+### Guide-level explanation
+Present it as if the thing ALREADY exists and you are teaching a colleague to use it.
+Introduce new concepts, explain mostly **by example**, and include sample error messages /
+deprecation warnings / migration guidance where relevant.
+
+### Reference-level explanation
+The technical part. Detailed enough that: its interaction with other components is clear, the
+implementation approach is clear, and **corner cases are dissected by example** — returning to the
+very examples from the layer above.
+
+### Drawbacks
+**Why should we NOT do this?** *(Leaving this empty = the document loses credibility.)*
+
+### Rationale and alternatives
+Why is this design the best in the space of possible designs? Which other designs were considered
+and why were they rejected? **What is the impact of not doing this at all?**
+
+### Prior art
+How have other languages / frameworks / systems solved this? *("None found" is an acceptable
+answer — but say explicitly that you looked.)*
+
+### Unresolved questions
+What is deliberately left open, and where and when it will be settled.
+
+---
+
+## Sources of this template
+
+| Tier | Source | Notes |
 |---|---|---|
-| Y-statement | Olaf Zimmermann | 5 ô; trích trong paper MADR (CEUR-WS Vol-2072) |
-| ADR | Michael Nygard, 2011 | Thứ tự gốc: Title, Context, Decision, Status, Consequences. **Bản gốc KHÔNG có mục alternatives** |
-| MADR | github.com/adr/madr | Bản *minimal* vẫn giữ Considered Options. v3.0.0 đổi tên thành "Markdown Any Decision Records" |
-| RFC | rust-lang/rfcs `0000-template.md` | Drawbacks / Rationale-and-alternatives / Prior-art là quy ước xã hội, **không có máy nào chặn PR thiếu mục** |
-| Trạng thái | Oxide RFD 1 + IETF RFC 3 (1969) | 6 trạng thái, không có trạng thái "draft" |
+| Y-statement | Olaf Zimmermann | 5 slots; cited in the MADR paper (CEUR-WS Vol-2072) |
+| ADR | Michael Nygard, 2011 | Original order: Title, Context, Decision, Status, Consequences. **The original has NO alternatives section** |
+| MADR | github.com/adr/madr | Even the *minimal* variant keeps Considered Options. v3.0.0 renamed to "Markdown Any Decision Records" |
+| RFC | rust-lang/rfcs `0000-template.md` | Drawbacks / Rationale-and-alternatives / Prior-art are social conventions — **no machine blocks a PR missing them** |
+| Status | Oxide RFD 1 + IETF RFC 3 (1969) | 6 states, no "draft" state |
 
-> **Mức bằng chứng:** đây là **quy ước ngành có nguồn sơ cấp**, không phải kết quả nghiên cứu đối chứng.
-> Không có nghiên cứu nào chứng minh mẫu này cho ra quyết định tốt hơn.
-> Thứ tự lập luận (problem-first / decision-first / narrative) hiện **không có bằng chứng** theo chiều nào — tự chọn theo nhà.
+> **Evidence level:** this is **industry convention with primary sources**, not the result of a
+> controlled study. No research demonstrates this template produces better decisions.
+> Argument ordering (problem-first / decision-first / narrative) currently has **no evidence**
+> either way — pick a house style.

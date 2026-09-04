@@ -1,116 +1,118 @@
-# Requirements — [Tên tính năng]
+# Requirements — [Feature name]
 
-**Trạng thái:** ideation | discussion | published | committed | abandoned
-**Owner:** [ai chịu trách nhiệm] · **Ngày:** YYYY-MM-DD · **Ticket:** [JIRA-…]
-**Đọc bởi:** [ai đọc, để ra quyết định gì]
+**Status:** ideation | discussion | published | committed | abandoned
+**Owner:** [who is accountable] · **Date:** YYYY-MM-DD · **Ticket:** [JIRA-…]
+**Read by:** [who reads this, to make what decision]
 
 ---
 
-## Vấn đề
+## Problem
 
-Cái gì đang sai/thiếu hôm nay, đo bằng gì? **Chưa nói giải pháp.**
+What is wrong/missing today, measured how? **No solutions yet.**
 
 ## Non-goals
 
-Cố tình KHÔNG làm: …
+Deliberately NOT doing: …
 
-## Thành công trông như thế nào
+## What success looks like
 
-Tiêu chí **đo được**, kèm cách đo. Không có số đo thật thì ghi `[UNVERIFIED] — sẽ đo bằng …`,
-đừng bịa ngưỡng.
+**Measurable** criteria, with the measurement method. If no real number exists yet, write
+`[UNVERIFIED] — will measure via …`; do not invent thresholds.
 
 ---
 
-## Yêu cầu
+## Requirements
 
 <!--
-Mỗi requirement mang bộ thuộc tính tối thiểu (INCOSE GtWR v4, A1–A49, tập đánh dấu `*`).
-Đây chính là móc truy vết requirement → thiết kế → test.
+Each requirement carries the minimal attribute set (INCOSE GtWR v4, A1–A49, the `*`-marked subset).
+This is the trace hook: requirement → design → test.
 -->
 
-### REQ-001 — [tên]
+### REQ-001 — [name]
 
-> **Phát biểu:** [Chủ thể] **shall** [hành động] [điều kiện] [ràng buộc đo được].
+> **Statement:** [Subject] **shall** [action] [condition] [measurable constraint].
 
-| Thuộc tính | Giá trị |
+| Attribute | Value |
 |---|---|
-| Rationale | *vì sao cần — thiếu ô này thì C1 Necessary không kiểm được* |
-| Trace to Parent | REQ-… hoặc nhu cầu gốc |
-| Trace to Source | ai/tài liệu nào yêu cầu |
-| Verification Method | test / phân tích / kiểm tra / demo |
-| Verification Success Criteria | **đúng cái gì xảy ra thì coi là đạt** |
+| Rationale | *why this is needed — without this cell, C1 Necessary cannot be checked* |
+| Trace to Parent | REQ-… or the originating need |
+| Trace to Source | who/which document asked for it |
+| Verification Method | test / analysis / inspection / demo |
+| Verification Success Criteria | **exactly what happening counts as pass** |
 | Owner | |
 | Priority · Criticality · Risk | |
 
 ---
 
-## Cổng chất lượng — GtWR v4 (INCOSE, guidance)
+## Quality gate — GtWR v4 (INCOSE, guidance)
 
-Kiểm **từng** requirement (C1–C9):
+Check **each** requirement (C1–C9):
 
-| | Đạt? |
+| | Pass? |
 |---|---|
-| C1 Necessary — bỏ đi thì có mất gì không | ☐ |
-| C2 Appropriate — đúng mức trừu tượng | ☐ |
-| C3 Unambiguous — chỉ hiểu được một nghĩa | ☐ |
-| C4 Complete — không cần hỏi thêm để hiểu | ☐ |
-| C5 Singular — **một** nghĩa vụ duy nhất | ☐ |
-| C6 Feasible — làm được trong ràng buộc thật | ☐ |
-| C7 Verifiable — **có cách chứng minh đạt** | ☐ |
-| C8 Correct — mô tả đúng nhu cầu thật | ☐ |
-| C9 Conforming — theo đúng mẫu câu đã thống nhất | ☐ |
+| C1 Necessary — would anything be lost if removed | ☐ |
+| C2 Appropriate — right level of abstraction | ☐ |
+| C3 Unambiguous — only one possible reading | ☐ |
+| C4 Complete — no follow-up questions needed to understand it | ☐ |
+| C5 Singular — exactly **one** obligation | ☐ |
+| C6 Feasible — achievable within real constraints | ☐ |
+| C7 Verifiable — **there is a way to prove it is met** | ☐ |
+| C8 Correct — describes the actual need | ☐ |
+| C9 Conforming — follows the agreed sentence pattern | ☐ |
 
-Kiểm **cả tập** (C10–C15):
+Check the **whole set** (C10–C15):
 
-| | Đạt? |
+| | Pass? |
 |---|---|
-| C10 Complete — tập đủ, không thiếu mảng nào | ☐ |
-| C11 Consistent — không mâu thuẫn nhau | ☐ |
-| C12 Feasible — khả thi **khi gộp lại** | ☐ |
-| C13 Comprehensible — đọc cả tập vẫn hiểu | ☐ |
-| C14 Able to be validated — chứng minh được là đúng thứ cần | ☐ |
+| C10 Complete — set covers everything, no missing area | ☐ |
+| C11 Consistent — no internal contradictions | ☐ |
+| C12 Feasible — achievable **taken together** | ☐ |
+| C13 Comprehensible — the set still reads as a whole | ☐ |
+| C14 Able to be validated — provably the right thing | ☐ |
 | C15 Correct | ☐ |
 
-### Lint máy chạy được (tập con của R1–R42)
+### Machine-checkable lint (subset of R1–R42)
 
-- **R7** — cấm mơ hồ: *some, any, several, many, about, approximate*
-- **R8** — cấm câu thoát: *as appropriate, as required, to the extent practical, if practicable*
-- **R18–R23** — một `shall` một câu; cảnh báo `and`/`or` nối hai nghĩa vụ
-- **R32** — `all/every/none` phải kèm phạm vi xác định
-- **R33–R35** — số phải có đơn vị và dung sai
-- **R36–R40** — cùng một khái niệm dùng cùng một từ xuyên suốt
+- **R7** — ban vague terms: *some, any, several, many, about, approximate*
+- **R8** — ban escape clauses: *as appropriate, as required, to the extent practical, if practicable*
+- **R18–R23** — one `shall` per sentence; warn on `and`/`or` joining two obligations
+- **R32** — `all/every/none` must come with a defined scope
+- **R33–R35** — numbers must carry units and tolerance
+- **R36–R40** — one concept, one term, throughout
 
-> ⚠️ Chỉ ~10–12 trong 42 rule kiểm được bằng máy. INCOSE §1.8 nói rõ công cụ NLP/AI *"do not address
-> all the rules"* và việc thẩm định *"cannot be done without the project team doing the analysis
-> manually."* **Đừng quảng cáo "42 kiểm tra tự động".**
+> ⚠️ Only ~10–12 of the 42 rules are machine-checkable. INCOSE §1.8 says outright that NLP/AI tools
+> *"do not address all the rules"* and that validation *"cannot be done without the project team
+> doing the analysis manually."* **Do not advertise "42 automated checks".**
 
 ---
 
-## Truy vết
+## Traceability
 
-29148 §3.1.23 định nghĩa truy vết là *"the derivation path (upward) and allocation/flow-down path
-(downward)"*, dùng thuật ngữ parent/child. **Chuẩn KHÔNG dùng chữ "bidirectional"** — trích đúng chữ
-lên/xuống.
+29148 §3.1.23 defines traceability as *"the derivation path (upward) and allocation/flow-down path
+(downward)"*, using parent/child terminology. **The standard does NOT use the word "bidirectional"**
+— quote it as up/down, exactly.
 
-| Requirement | Parent | Thiết kế | Test |
+| Requirement | Parent | Design | Test |
 |---|---|---|---|
 | REQ-001 | | | |
 
 ---
 
-## Giả định · Ràng buộc · Phụ thuộc
+## Assumptions · Constraints · Dependencies
 
-Mỗi mục ghi rõ **sai thì hỏng cái gì**. Giả định không có hệ quả thì không đáng viết.
+For each item, state **what breaks if it is wrong**. An assumption with no consequence is not worth
+writing down.
 
 ---
 
-### Nguồn
-**ISO/IEC/IEEE 29148:2018** — chuẩn normative đang hiệu lực (thay IEEE 830-1998 qua bản 2011; bản
-2011 cũng thay IEEE 1233 và 1362). Tách characteristics của requirement đơn lẻ (§5.2.5) khỏi
-characteristics của **tập** (§5.2.6), cộng language criteria (§5.2.7) và attributes (§5.2.8).
-*Nội dung clause trả phí — không trích tên như thể đã đọc từ chuẩn.*
-**INCOSE GtWR v4** (INCOSE-TP-2010-006-04, 2023) — **guidance của hội, không phải chuẩn**; miễn phí;
-là nguồn của C1–C15, R1–R42 và A1–A49 ở trên.
+### Sources
+**ISO/IEC/IEEE 29148:2018** — the normative standard in force (superseded IEEE 830-1998 via the 2011
+edition; the 2011 edition also superseded IEEE 1233 and 1362). Separates characteristics of an
+individual requirement (§5.2.5) from characteristics of the **set** (§5.2.6), plus language criteria
+(§5.2.7) and attributes (§5.2.8). *Clause content is paywalled — don't cite clause names as if read
+from the standard.*
+**INCOSE GtWR v4** (INCOSE-TP-2010-006-04, 2023) — **society guidance, not a standard**; free; the
+source of C1–C15, R1–R42 and A1–A49 above.
 
-**Mức bằng chứng: [CONVENTION].** Không có nghiên cứu nào chứng minh requirement viết theo C1–C15 thì
-ít lỗi hơn.
+**Evidence level: [CONVENTION].** No study demonstrates that requirements written to C1–C15 have
+fewer defects.
