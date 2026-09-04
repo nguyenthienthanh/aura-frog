@@ -18,6 +18,7 @@ When the user types `/run <task>`, Claude MUST execute these steps in order. Do 
    - `/run project: <desc>` — force project mode; write `.claude/cache/pending-plan-bootstrap.json` and invoke `/aura-frog:plan` directly.
    - `AF_ESCALATION_DISABLED=true` — opts out per-session.
 4. **Create the run state file** at `.claude/logs/runs/<run-id>/run-state.json` per `skills/run-orchestrator/SKILL.md` Step 0b. **MANDATORY** — do not proceed without it. If escalation ran and the user picked `deep`, record `escalation_declined: true` in run-state.
+   - **Scaffold phase deliverables** (Step 0.5): `bash "${CLAUDE_PLUGIN_ROOT}/scripts/workflow/scaffold-phase-deliverables.sh" <run-id> 1` — the per-phase .md documents (REQUIREMENTS.md, TECH_SPEC.md, …) must exist on disk before phase work starts, and again on every phase advance. The `run-deliverables-scaffold` hook backstops this on every run-state.json write, but do not rely on it silently — fill the scaffolds in; files left as templates block the approval gate (`rules/workflow/workflow-deliverables.md`). Skip only for Quick/direct runs.
 5. **Apply the Run ↔ Plan bridge** (`rules/workflow/run-plan-bridge.md`):
    - `.claude/plans/active.json#active.task` set → auto-anchor; deliverables sync back to the plan tree on Phase 5.
    - Active feature without claimed task → suggest `/aura-frog:plan next`.

@@ -65,6 +65,16 @@ responsibilities[5]{area,description}:
 4. .claude/project-contexts/[project-name]/examples.md
 ```
 
+**Host-project documents (authoritative, read BEFORE the generated context above):**
+
+```
+1. .claude/CLAUDE.md and/or CLAUDE.md   — the project's own instructions; highest priority per rules/workflow/priority-hierarchy.md
+2. README.md (project root)             — stated purpose, setup, run commands, structure
+3. CONTRIBUTING.md (if present)         — contribution conventions
+```
+
+These are written by the project's humans — they override anything the scanner infers. Never let cached detection or generated conventions contradict them; on conflict, the host project's docs win and the cache is refreshed.
+
 ---
 
 ## Core Behavior Rules

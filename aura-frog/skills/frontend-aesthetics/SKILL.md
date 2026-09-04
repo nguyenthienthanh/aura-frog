@@ -9,7 +9,7 @@ user-invocable: false
 
 # Frontend Aesthetics
 
-Raise output from *consistent & correct* to *distinctive*. **House-style hard constraint (global CLAUDE.md "12-year-old friendly"): flat, clean, accessible, ONE restrained accent — NO neon, NO glow, NO gradient-mesh, NO sparkle.** "Distinctive" = tasteful type + cohesive tokens + dominant color + sharp accent, NOT flashy maximalism. Any output that adds glow/neon fails.
+Raise output from *consistent & correct* to *distinctive*. **Default style (overridable by the host project): flat, clean, accessible, ONE restrained accent — no neon, no glow, no gradient-mesh, no sparkle.** "Distinctive" = tasteful type + cohesive tokens + dominant color + sharp accent, NOT flashy maximalism. This default loses to the host project's own design language: if the project's `CLAUDE.md`, design system, or brand explicitly calls for neon/glow/gradients (gaming, nightlife, crypto, …), follow the project — the constraint is anti-slop, not anti-brand.
 
 > **Why this matters (Anthropic, *Improving frontend design through skills*):** generic "AI-look" UI is
 > distributional convergence — safe choices dominate training data, so sampling drifts to them. A taste

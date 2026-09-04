@@ -583,29 +583,30 @@ function detectAgentMapping(framework, patterns) {
     available: []
   };
 
-  // Framework to agent mapping
+  // Framework → canonical agent (must stay within the roster in agents/*.md —
+  // these labels surface in handoff/status output and must match dispatchable ids)
   const frameworkAgents = {
-    'nextjs': 'web-nextjs',
-    'react': 'web-reactjs',
-    'vue': 'web-vuejs',
-    'nuxt': 'web-vuejs',
-    'angular': 'web-angular',
-    'react-native': 'mobile-react-native',
-    'expo': 'mobile-react-native',
-    'flutter': 'mobile-flutter',
-    'laravel': 'backend-laravel',
-    'symfony': 'backend-laravel',
-    'express': 'backend-nodejs',
-    'nestjs': 'backend-nodejs',
-    'fastify': 'backend-nodejs',
-    'hono': 'backend-nodejs',
-    'django': 'backend-python',
-    'fastapi': 'backend-python',
-    'flask': 'backend-python',
-    'gin': 'backend-go',
-    'echo': 'backend-go',
-    'fiber': 'backend-go',
-    'godot': 'gamedev'
+    'nextjs': 'frontend',
+    'react': 'frontend',
+    'vue': 'frontend',
+    'nuxt': 'frontend',
+    'angular': 'frontend',
+    'react-native': 'mobile',
+    'expo': 'mobile',
+    'flutter': 'mobile',
+    'laravel': 'architect',
+    'symfony': 'architect',
+    'express': 'architect',
+    'nestjs': 'architect',
+    'fastify': 'architect',
+    'hono': 'architect',
+    'django': 'architect',
+    'fastapi': 'architect',
+    'flask': 'architect',
+    'gin': 'architect',
+    'echo': 'architect',
+    'fiber': 'architect',
+    'godot': 'frontend'
   };
 
   if (framework && frameworkAgents[framework]) {
@@ -613,26 +614,33 @@ function detectAgentMapping(framework, patterns) {
   }
 
   // Add secondary agents based on patterns
-  if (patterns.templates.length > 0) {
+  if (patterns.templates.length > 0 && agents.primary !== 'frontend') {
     agents.secondary.push('frontend');
   }
-  if (patterns.frontend.length > 0 && !agents.primary?.startsWith('web-')) {
+  if (patterns.frontend.length > 0 && agents.primary !== 'frontend') {
     agents.secondary.push('frontend');
   }
-  if (patterns.backend.length > 0 && !agents.primary?.startsWith('backend-')) {
-    // Determine backend agent from file patterns
-    if (patterns.backend.includes('.go')) agents.secondary.push('backend-go');
-    if (patterns.backend.includes('.py')) agents.secondary.push('backend-python');
-    if (patterns.backend.includes('.php')) agents.secondary.push('backend-laravel');
+  if (patterns.backend.length > 0 && agents.primary !== 'architect') {
+    agents.secondary.push('architect');
   }
 
-  // Always available agents
+  // Full canonical roster (agents/*.md)
   agents.available = [
+    'lead',
     'architect',
+    'frontend',
+    'mobile',
+    'strategist',
     'security',
     'tester',
-    'frontend',
-    'devops'
+    'devops',
+    'scanner',
+    'master-planner',
+    'feature-architect',
+    'story-planner',
+    'replanner',
+    'epic-summarizer',
+    'conflict-arbiter'
   ];
 
   // Dedupe secondary

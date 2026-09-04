@@ -86,6 +86,8 @@ If the **`codebase-memory`** MCP server is present, it is a *step-0* that beats 
 - **Codebase-wide refactors** → spawn `general-purpose` agent with a tight prompt; receive only the verdict + delta, not the intermediate noise
 - **Repeated reads of the same area** → if you'll touch this area >5 times, ask a subagent to summarize once
 
+> `Explore` and `general-purpose` are Claude Code **built-in** subagent types — they exist in every project and stay **unprefixed**. Only this plugin's own 15 agents need the `${PLUGIN_PREFIX}:` namespace (see `rules/core/agent-namespacing.md`).
+
 ---
 
 ## Lazy agent loading

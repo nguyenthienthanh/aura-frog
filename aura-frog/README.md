@@ -521,7 +521,7 @@ Verify with `/af status` — should show 0 orphan paths.
 - Rephrase task with domain-specific keywords: `"Add email template styling"` (frontend) vs `"Update email feature"` (ambiguous)
 - Override manually: `/run @frontend implement X` forces the frontend agent
 
-Full scoring logic: `skills/agent-detector/task-based-agent-selection.md`.
+Full scoring logic: `skills/agent-detector/reference.md`.
 </details>
 
 <details>

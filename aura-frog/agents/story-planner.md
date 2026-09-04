@@ -76,7 +76,7 @@ TDD Phase 1 (Understand + Design)
 - **Spec:** §8.4, §6.5 (Story schema), §6.6 (Task schema)
 - **Agent:** master-planner — dispatches story-planner on `/aura-frog:plan-expand STORY-*`
 - **Agent:** feature-architect — feeds T2 context via `parent` field
-- **Agent:** run-orchestrator — pairs with story-planner in Phase 1 of TDD
-- **Agent:** tdd-engineer — receives Tasks (in Milestone A, this is the existing `tester` agent)
+- **Skill:** run-orchestrator — pairs with story-planner in Phase 1 of TDD (a skill, invoked via the Skill tool — NOT an Agent-tool `subagent_type`)
+- **Agent:** tester — receives Tasks for TDD execution
 - **Skill:** chain-of-verification — verify each Task's acceptance criterion is testable
 - **Rule:** `rules/workflow/cross-review-workflow.md` — Phase 4 reviewer ≠ Phase 3 builder

@@ -138,7 +138,7 @@
           {
             "type": "command",
             "async": true,
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>feature-done-trigger-archive' '>session-reset-trigger' '>post-execute-conflict-rescan'"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.cjs\" '>feature-done-trigger-archive' '>session-reset-trigger' '>post-execute-conflict-rescan' '>run-deliverables-scaffold'"
           }
         ]
       },

@@ -33,6 +33,18 @@ Load project conventions and generate session context on demand.
 
 ## Loading Process
 
+### 0. Host-Project Documents First (authoritative)
+
+Before any cache or generated context, read the host project's own documentation — it is written by humans and overrides anything this skill infers:
+
+| File | Priority |
+|------|----------|
+| `CLAUDE.md` (root) and/or `.claude/CLAUDE.md` | Highest — project instructions (per `rules/workflow/priority-hierarchy.md`) |
+| `README.md` (root) | High — purpose, setup, run commands, structure |
+| `CONTRIBUTING.md` (if present) | Conventions for changes |
+
+Read them fully on first load of a session (they are usually short). On conflict between these and generated context below, **the host project's docs win** — refresh the cache instead of trusting it.
+
 ### 1. Check Cache
 If `.claude/session-context.toon` exists and is recent (< 1 hour), use it.
 
