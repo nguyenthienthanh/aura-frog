@@ -118,42 +118,31 @@ env_vars[16]{var,description}:
 
 ---
 
-### 0d. SessionStart - Compact Resume (NEW in 1.16.0)
-**When:** Once per session (after compact)
+### 0d. SessionStart - Compact Resume (rewritten in 3.8.0)
+**When:** Every SessionStart; acts on `source` = `compact` (handoff ≤6h old) or `startup`/`resume` (≤30min). Ignores `clear`.
 
 **Actions:**
-- ✅ Check for saved handoff state from previous session
-- ✅ Inject resume context if workflow was in progress
-- ✅ Display workflow status and resume instructions
-- ✅ Restore environment variables for continuity
+- ✅ Read `.claude/cache/compact-handoff.json`
+- ✅ Emit `hookSpecificOutput.additionalContext`: active run (`logs/runs/<id>/run-state.json`), plan anchor, last 3 user prompts, uncommitted files, and an instruction to re-read the run state and continue from the current phase
+- ✅ Delete the handoff after injecting (one-shot)
 
-**What It Restores:**
-- Workflow ID and current phase
-- Task description and agents
-- Project context (name, framework, branch)
-- Active plan reference
+No "type continue" step: after an auto-compact Claude continues the turn with the injected context. Disable with `AF_COMPACT_HANDOFF_DISABLED=true`.
 
-**Example Output:**
+**Example injected context:**
 ```
-═══════════════════════════════════════════════════════════
-🔄 SESSION RESUMED AFTER COMPACT
-═══════════════════════════════════════════════════════════
+# 🔄 Aura Frog — resumed after compact
 
-📋 **Workflow:** AUTH-123
-📝 **Task:** Implement user authentication with JWT
-📍 **Phase:** 2
-🤖 **Agent:** backend-nodejs
+## Active run: auth-0913
+- **Task:** Implement JWT login
+- **Where:** Standard · feature · phase 3
+- **Agent:** tester
+- **State file:** `.claude/logs/runs/auth-0913/run-state.json`
 
-📦 **Project:** my-api
-🛠️ **Framework:** nextjs
-🌿 **Branch:** feature/auth
+## Last user requests (oldest → newest)
+- approve
 
-───────────────────────────────────────────────────────────
-📥 **To fully resume workflow:**
-   /run resume AUTH-123
-
-💡 Context has been restored. Type "continue" to proceed.
-═══════════════════════════════════════════════════════════
+## How to continue
+Re-read `.claude/logs/runs/auth-0913/run-state.json` (and its deliverables) before acting, then continue the run from its current phase. Do not restart completed phases.
 ```
 
 **Script:** `hooks/compact-handoff.cjs --resume`
@@ -683,23 +672,12 @@ User: "Implement JWT authentication for the API"
 
 ---
 
-### 11. Stop - Compact Handoff Save (NEW in 1.16.0)
-**When:** Session stops (including before compact)
+### 11. Stop / PreCompact - Compact Handoff Save (rewritten in 3.8.0)
+**When:**
+- **PreCompact** (`--pre-compact`, trigger `manual` or `auto`) → always saves
+- **Stop** → saves when context usage ≥ `AF_HANDOFF_THRESHOLD` (default 70). Usage comes from `.claude/cache/context-usage.json`, written by `scripts/statusline.sh` (hooks never receive `used_percentage`). Without statusline data it saves only while a run is open.
 
-**Actions:**
-- ✅ Auto-save current workflow state
-- ✅ Capture session context (project, agent, phase)
-- ✅ Save to handoff file for resume after compact
-- ✅ Non-blocking - runs silently in background
-
-**Files Saved:**
-- `.claude/cache/compact-handoff.json` - Quick resume state
-- `.claude/logs/runs/[id]/run-state.json` - Full workflow state (if workflow active)
-
-**Example:**
-```
-💾 Workflow state saved for compact handoff
-```
+**Saves** `.claude/cache/compact-handoff.json`: newest open run from `.claude/logs/runs/*/run-state.json` (legacy `workflow-state.json` fallback), `plans/active.json` anchor, last 3 user prompts from `transcript_path`, `git diff --name-only HEAD`, context usage. Silent, non-blocking.
 
 **Script:** `hooks/compact-handoff.cjs`
 

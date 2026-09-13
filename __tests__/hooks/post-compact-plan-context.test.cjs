@@ -30,7 +30,9 @@ describe('post-compact — validateStateFile', () => {
   it('flags a compact-handoff with neither workflow nor context', () => {
     const w = validateStateFile('.claude/cache/compact-handoff.json', {});
     expect(w).toHaveLength(1);
-    expect(w[0]).toContain('missing workflow and context');
+    expect(w[0]).toContain('handoff may be empty');
+    // A run-state-only handoff (v2 schema) is valid on its own.
+    expect(validateStateFile('.claude/cache/compact-handoff.json', { run: { run_id: 'r1' } })).toEqual([]);
   });
 
   it('passes a compact-handoff that has either workflow or context', () => {

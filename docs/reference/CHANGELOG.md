@@ -12,6 +12,24 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.16] - 2026-09-13 (Compact handoff — save before autocompact, resume after)
+
+### Fixed
+
+- **Compact handoff saved nothing and resumed nothing.** `hooks/compact-handoff.cjs` read legacy
+  `.claude/logs/workflows` / `cache/workflow-state.json` state that `/run` no longer writes, and
+  only saved when `PROJECT_NAME` was visible to the hook. It now sources the newest open
+  `.claude/logs/runs/*/run-state.json` (legacy fallback kept), the `plans/active.json` anchor, the
+  last 3 user prompts from `transcript_path`, and uncommitted files.
+- **Handoff is saved before autocompact, not after.** PreCompact (manual + auto) always saves;
+  Stop saves once context usage ≥ `AF_HANDOFF_THRESHOLD` (default 70%). Hooks never receive
+  `used_percentage`, so `statusline.sh` now persists it to `.claude/cache/context-usage.json`.
+- **Resume is injected into context.** SessionStart reads `source` (skips `clear`), emits
+  `hookSpecificOutput.additionalContext` pointing Claude back at the run state and current phase,
+  then consumes the handoff. Opt-out: `AF_COMPACT_HANDOFF_DISABLED=true`.
+- `post-compact.cjs` accepts the v2 handoff schema; `session-continuation` skill no longer claims
+  a "every 5 min" auto-save that had no implementation.
+
 ## [3.8.0-alpha.15] - 2026-09-04 (Portability audit — EN templates, deliverables backstop, host-project context)
 
 ### Fixed

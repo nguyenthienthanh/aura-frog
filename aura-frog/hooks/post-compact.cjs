@@ -43,8 +43,8 @@ function validateStateFile(rel, data) {
     if (!data.agents?.primary) warnings.push(`${rel}: missing agents.primary`);
   }
   if (rel.includes('compact-handoff')) {
-    if (!data.workflow && !data.context) {
-      warnings.push(`${rel}: missing workflow and context — handoff may be empty`);
+    if (!data.run && !data.workflow && !data.plan && !data.context) {
+      warnings.push(`${rel}: missing run, workflow, plan and context — handoff may be empty`);
     }
   }
   return warnings;
