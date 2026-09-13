@@ -95,6 +95,13 @@ MODEL=$(parse_str "display_name")
 [ -z "$MODEL" ] && MODEL="unknown"
 
 CTX_PCT=$(parse_num "used_percentage")
+# Persist usage for hooks/compact-handoff.cjs — hooks never receive
+# used_percentage, so the Stop hook reads it here to save a handoff pre-compact.
+if [ -n "$CTX_PCT" ] && [ -d "$PROJECT_ROOT/.claude" ]; then
+    mkdir -p "$PROJECT_ROOT/.claude/cache" 2>/dev/null \
+        && printf '{"used_percentage":%s,"ts":%s}\n' "$CTX_PCT" "$(date +%s)" \
+            > "$PROJECT_ROOT/.claude/cache/context-usage.json" 2>/dev/null
+fi
 [ -z "$CTX_PCT" ] && CTX_PCT="0"
 CTX_INT=${CTX_PCT%.*}
 

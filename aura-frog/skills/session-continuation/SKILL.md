@@ -38,9 +38,15 @@ Token ≥75% → suggest handoff. User says handoff/save → execute. User says 
 2. Restore: project context, agents, phase rules, decisions
 3. Show summary → continue from saved phase
 
-## Auto-Save
+## Auto-Save / Auto-Resume (hooks — no action needed)
 
-Phase completion, every 5 min, token milestones (100K/150K/175K). Silent except warning thresholds.
+`hooks/compact-handoff.cjs` writes `.claude/cache/compact-handoff.json` (active run from `logs/runs/*/run-state.json`, plan anchor, last 3 user prompts, uncommitted files):
+
+- **PreCompact** (manual + auto) → always saves.
+- **Stop** → saves when context ≥ `AF_HANDOFF_THRESHOLD` (default 70%, read from the statusline's `.claude/cache/context-usage.json`); without statusline data, saves only while a run is open.
+- **SessionStart** (`source=compact`/`resume`/`startup`, not `clear`) → injects it as `additionalContext`, then deletes it.
+
+Keep `run-state.json` current (`current_phase`, `next_action`) — it is what the resume points Claude back to. Disable: `AF_COMPACT_HANDOFF_DISABLED=true`.
 
 ## TOON State Format (~160 tokens vs JSON ~600)
 

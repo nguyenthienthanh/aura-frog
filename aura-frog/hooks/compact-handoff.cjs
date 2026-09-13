@@ -2,86 +2,131 @@
 /**
  * Aura Frog - Compact Handoff Hook
  *
- * Fires: Stop (before compact) and SessionStart (after compact)
- * Purpose: Auto-save workflow state before compacting, auto-resume after
+ * Fires:
+ *   - PreCompact (--pre-compact)  → always save a handoff (trigger: manual|auto)
+ *   - Stop (no args, via dispatch) → save only when context usage ≥ threshold,
+ *                                    so a handoff exists before auto-compact
+ *   - SessionStart (--resume)      → inject the handoff as additionalContext
  *
- * Usage:
- *   - On Stop: Saves current workflow state to handoff file
- *   - On SessionStart (with --resume): Detects saved state and injects resume context
+ * State sources (newest schema first):
+ *   1. .claude/logs/runs/<id>/run-state.json  — what /run writes today
+ *   2. .claude/plans/active.json               — hierarchical plan anchor
+ *   3. .claude/cache/workflow-state.json + AF_WORKFLOW_ID env — legacy workflows
+ *
+ * Context usage comes from .claude/cache/context-usage.json, written by
+ * scripts/statusline.sh (the only surface Claude Code hands used_percentage to).
+ *
+ * Env:
+ *   AF_HANDOFF_THRESHOLD=70    Stop-save threshold (percent)
+ *   AF_COMPACT_HANDOFF_DISABLED=true
  *
  * Exit Codes:
- *   0 - Success (non-blocking)
- *
- * @version 1.0.0
+ *   0 - always (non-blocking)
  */
+
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
-
-// File paths
-
 const { findProjectRoot } = require('./lib/hook-runtime.cjs');
-const WORKFLOW_DIR = path.join(findProjectRoot(), '.claude', 'logs', 'workflows');
-const HANDOFF_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'compact-handoff.json');
-const WORKFLOW_STATE_FILE = path.join(findProjectRoot(), '.claude', 'cache', 'workflow-state.json');
-const CACHE_DIR = path.join(findProjectRoot(), '.claude', 'cache');
 
-/**
- * Ensure directory exists
- */
-function ensureDir(dirPath) {
-  try {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-  } catch { /* fs mkdir - non-blocking, will retry next time */ }
+const DEFAULT_THRESHOLD = 70;
+const USAGE_MAX_AGE_MS = 10 * 60 * 1000;
+// A Stop-save at 70% can precede the actual auto-compact by many turns.
+const COMPACT_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+const RESUME_MAX_AGE_MS = 30 * 60 * 1000;
+const OPEN_RUN_STATUSES = new Set(['in_progress', 'paused', 'active', 'blocked']);
+
+// Resolved per call (not at module load) so AF_PROJECT_ROOT can redirect tests.
+function getPaths(root = findProjectRoot()) {
+  const cache = path.join(root, '.claude', 'cache');
+  return {
+    root,
+    cache,
+    runsDir: path.join(root, '.claude', 'logs', 'runs'),
+    workflowsDir: path.join(root, '.claude', 'logs', 'workflows'),
+    handoff: path.join(cache, 'compact-handoff.json'),
+    workflowState: path.join(cache, 'workflow-state.json'),
+    contextUsage: path.join(cache, 'context-usage.json'),
+  };
 }
 
-/**
- * Get current workflow state
- */
-function getCurrentWorkflowState() {
+function readJson(file) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf-8')); } catch { return null; }
+}
+
+function readHookInput() {
   try {
-    // Check for workflow state in various locations
-    const locations = [
-      WORKFLOW_STATE_FILE,
-      path.join(WORKFLOW_DIR, 'current', 'workflow-state.json')
-    ];
+    const { readStdinSafely } = require('./lib/safe-stdin.cjs');
+    const raw = readStdinSafely();
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
 
-    for (const loc of locations) {
-      if (fs.existsSync(loc)) {
-        const state = JSON.parse(fs.readFileSync(loc, 'utf-8'));
-        if (state && state.workflow_id) {
-          return state;
-        }
-      }
+/** Newest open run (by mtime) under .claude/logs/runs, or null. */
+function findActiveRun(p = getPaths()) {
+  let best = null;
+  let entries;
+  try { entries = fs.readdirSync(p.runsDir, { withFileTypes: true }); } catch { return null; }
+  for (const e of entries) {
+    if (!e.isDirectory()) continue;
+    const file = path.join(p.runsDir, e.name, 'run-state.json');
+    let mtime;
+    try { mtime = fs.statSync(file).mtimeMs; } catch { continue; }
+    const state = readJson(file);
+    if (!state || !OPEN_RUN_STATUSES.has(state.status)) continue;
+    if (!best || mtime > best.mtime) {
+      best = { run_id: state.run_id || e.name, file: path.relative(p.root, file), mtime, state };
     }
+  }
+  if (!best) return null;
+  const s = best.state;
+  return {
+    run_id: best.run_id,
+    state_file: best.file,
+    task: s.task,
+    status: s.status,
+    complexity: s.complexity,
+    flow: s.flow,
+    current_phase: s.current_phase,
+    current_step: s.current_step || s.step,
+    active_agent: s.active_agent,
+    next_action: s.next_action || s.next_step,
+  };
+}
 
-    // Check environment variables for workflow info
-    if (process.env.AF_WORKFLOW_ID || process.env.AF_CURRENT_PHASE) {
-      return {
-        workflow_id: process.env.AF_WORKFLOW_ID || `session-${Date.now()}`,
-        current_phase: parseInt(process.env.AF_CURRENT_PHASE || '1', 10),
-        current_sub_phase: process.env.AF_CURRENT_SUBPHASE || null,
-        status: 'in_progress',
-        task: {
-          description: process.env.AF_TASK_DESCRIPTION || 'Workflow in progress'
-        },
-        agents: {
-          primary: process.env.AF_CURRENT_AGENT || 'general-purpose'
-        }
-      };
-    }
-
-    return null;
+function readActivePlan() {
+  try {
+    const resolvePlansDir = require('./lib/plans-dir.cjs');
+    const active = readJson(path.join(resolvePlansDir(), 'active.json'));
+    const a = active && active.active;
+    return a && (a.feature || a.initiative || a.mission) ? a : null;
   } catch {
     return null;
   }
 }
 
-/**
- * Get session context for handoff
- */
+/** Legacy workflow state (pre-/run). */
+function getLegacyWorkflowState(p = getPaths()) {
+  for (const loc of [p.workflowState, path.join(p.workflowsDir, 'current', 'workflow-state.json')]) {
+    const state = readJson(loc);
+    if (state && state.workflow_id) return state;
+  }
+  if (process.env.AF_WORKFLOW_ID || process.env.AF_CURRENT_PHASE) {
+    return {
+      workflow_id: process.env.AF_WORKFLOW_ID || `session-${Date.now()}`,
+      current_phase: parseInt(process.env.AF_CURRENT_PHASE || '1', 10),
+      current_sub_phase: process.env.AF_CURRENT_SUBPHASE || null,
+      status: 'in_progress',
+      task: { description: process.env.AF_TASK_DESCRIPTION || 'Workflow in progress' },
+      agents: { primary: process.env.AF_CURRENT_AGENT || 'general-purpose' },
+    };
+  }
+  return null;
+}
+
 function getSessionContext() {
   return {
     project_name: process.env.PROJECT_NAME || process.env.AF_PROJECT_NAME,
@@ -89,279 +134,261 @@ function getSessionContext() {
     framework: process.env.AF_FRAMEWORK,
     git_branch: process.env.AF_GIT_BRANCH,
     active_plan: process.env.AF_ACTIVE_PLAN,
-    suggested_plan: process.env.AF_SUGGESTED_PLAN,
     current_agent: process.env.AF_CURRENT_AGENT,
-    complexity: process.env.AF_COMPLEXITY
+    complexity: process.env.AF_COMPLEXITY,
   };
 }
 
-/**
- * Generate compact context summary for post-compact resume
- * Writes a markdown file with essential workflow state that Claude reads after compact
- */
-function generateCompactContext(workflowState, sessionContext) {
-  try {
-    const lines = ['# Compact Context Resume\n'];
-
-    // Workflow state
-    if (workflowState) {
-      lines.push(`## Workflow: ${workflowState.workflow_id}`);
-      lines.push(`- **Phase:** ${workflowState.current_phase}${workflowState.current_sub_phase || ''}`);
-      lines.push(`- **Status:** ${workflowState.status || 'in_progress'}`);
-      if (workflowState.task?.description) {
-        lines.push(`- **Task:** ${workflowState.task.description}`);
-      }
-      if (workflowState.agents?.primary) {
-        lines.push(`- **Agent:** ${workflowState.agents.primary}`);
-      }
-      lines.push('');
-    }
-
-    // Phase 1 decisions (if available)
-    if (workflowState?.workflow_id) {
-      const phase1Path = path.join(WORKFLOW_DIR, workflowState.workflow_id, 'deliverables', 'PHASE_1_REQUIREMENTS_ANALYSIS.md');
-      if (fs.existsSync(phase1Path)) {
-        try {
-          const phase1 = fs.readFileSync(phase1Path, 'utf-8');
-          // Extract just the key decisions (first 500 chars)
-          const summary = phase1.substring(0, 500).split('\n').slice(0, 15).join('\n');
-          lines.push('## Phase 1 Decisions (summary)');
-          lines.push(summary);
-          lines.push('...\n');
-        } catch { /* skip if unreadable */ }
-      }
-    }
-
-    // Modified files (from git)
-    const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_LARGE, warnExecLimit } = require('./lib/af-exec.cjs');
-    try {
-      const { execSync } = require('child_process');
-      // Only the first 20 names are rendered, but the WHOLE name list is
-      // buffered first — a big working tree can exceed the 1MB default.
-      const modified = execSync('git diff --name-only HEAD 2>/dev/null', {
-        encoding: 'utf-8',
-        timeout: TIMEOUT_DEFAULT_MS,
-        killSignal: 'SIGKILL',
-        maxBuffer: MAX_BUFFER_LARGE
-      }).trim();
-      if (modified) {
-        lines.push('## Modified Files (uncommitted)');
-        modified.split('\n').slice(0, 20).forEach(f => lines.push(`- ${f}`));
-        lines.push('');
-      }
-    } catch (e) {
-      /* no git or no changes */
-      warnExecLimit('compact-handoff git diff', e);
-    }
-
-    // Session context
-    if (sessionContext) {
-      lines.push('## Session Context');
-      if (sessionContext.project_name) lines.push(`- **Project:** ${sessionContext.project_name}`);
-      if (sessionContext.framework) lines.push(`- **Framework:** ${sessionContext.framework}`);
-      if (sessionContext.git_branch) lines.push(`- **Branch:** ${sessionContext.git_branch}`);
-      if (sessionContext.complexity) lines.push(`- **Complexity:** ${sessionContext.complexity}`);
-      lines.push('');
-    }
-
-    const contextFile = path.join(CACHE_DIR, 'compact-context.md');
-    fs.writeFileSync(contextFile, lines.join('\n'));
-    return true;
-  } catch {
-    return false;
-  }
+/** used_percentage from the statusline cache, or null when absent/stale. */
+function readContextUsage(p = getPaths(), nowMs = Date.now()) {
+  const data = readJson(p.contextUsage);
+  if (!data || typeof data.used_percentage !== 'number') return null;
+  if (data.ts && nowMs - data.ts * 1000 > USAGE_MAX_AGE_MS) return null;
+  return data.used_percentage;
 }
 
 /**
- * Save handoff state before compact
+ * Pure: should a Stop event save a handoff?
+ * Known usage → compare with threshold. Unknown usage (no statusline) → save
+ * only when there is open work worth resuming.
  */
-function saveHandoff() {
+function shouldSaveOnStop({ usage, threshold = DEFAULT_THRESHOLD, hasOpenWork }) {
+  if (typeof usage === 'number') return usage >= threshold;
+  return Boolean(hasOpenWork);
+}
+
+/** Last N real user prompts from a transcript JSONL (skips tool results + injected tags). */
+function recentUserPrompts(transcriptPath, n = 3, maxBytes = 512 * 1024) {
+  if (!transcriptPath) return [];
+  let text;
   try {
-    ensureDir(CACHE_DIR);
+    const fd = fs.openSync(transcriptPath, 'r');
+    try {
+      const size = fs.fstatSync(fd).size;
+      const len = Math.min(size, maxBytes);
+      const buf = Buffer.alloc(len);
+      fs.readSync(fd, buf, 0, len, size - len);
+      text = buf.toString('utf-8');
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch {
+    return [];
+  }
+  const prompts = [];
+  for (const line of text.split('\n')) {
+    let entry;
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (!entry || entry.type !== 'user' || entry.isMeta) continue;
+    let content = entry.message && entry.message.content;
+    if (Array.isArray(content)) {
+      content = content.filter((c) => c && c.type === 'text').map((c) => c.text).join('\n');
+    }
+    if (typeof content !== 'string') continue;
+    content = content.trim();
+    if (!content || content.startsWith('<')) continue;
+    prompts.push(content.length > 300 ? `${content.slice(0, 300)}…` : content);
+  }
+  return prompts.slice(-n);
+}
 
-    const workflowState = getCurrentWorkflowState();
-    const sessionContext = getSessionContext();
+function modifiedFiles(root) {
+  try {
+    const { execSync } = require('child_process');
+    const { TIMEOUT_DEFAULT_MS, MAX_BUFFER_LARGE } = require('./lib/af-exec.cjs');
+    const out = execSync('git diff --name-only HEAD 2>/dev/null', {
+      cwd: root,
+      encoding: 'utf-8',
+      timeout: TIMEOUT_DEFAULT_MS,
+      killSignal: 'SIGKILL',
+      maxBuffer: MAX_BUFFER_LARGE,
+    }).trim();
+    return out ? out.split('\n').slice(0, 20) : [];
+  } catch {
+    return [];
+  }
+}
 
-    // Only save if there's something to save
-    if (!workflowState && !sessionContext.project_name) {
+function buildHandoff({ p = getPaths(), input = {}, reason = 'compact' } = {}) {
+  const run = findActiveRun(p);
+  const workflow = run ? null : getLegacyWorkflowState(p);
+  const plan = readActivePlan();
+  const context = getSessionContext();
+  let resumeHint = null;
+  if (run) resumeHint = `/run resume ${run.run_id}`;
+  else if (workflow) resumeHint = `/run resume ${workflow.workflow_id}`;
+  return {
+    version: '2.0.0',
+    saved_at: new Date().toISOString(),
+    reason,
+    trigger: input.trigger || null,
+    context_usage: readContextUsage(p),
+    run,
+    workflow,
+    plan,
+    context,
+    modified_files: modifiedFiles(p.root),
+    recent_prompts: recentUserPrompts(input.transcript_path),
+    resume_hint: resumeHint,
+  };
+}
+
+/** Save a handoff. Returns false when there is nothing worth resuming. */
+function saveHandoff({ input = {}, reason = 'compact' } = {}) {
+  try {
+    const p = getPaths();
+    const handoff = buildHandoff({ p, input, reason });
+    if (!handoff.run && !handoff.workflow && !handoff.plan &&
+        !handoff.context.project_name && handoff.recent_prompts.length === 0) {
       return false;
     }
+    fs.mkdirSync(p.cache, { recursive: true });
+    fs.writeFileSync(p.handoff, JSON.stringify(handoff, null, 2));
 
-    // Generate compact context for post-compact resume
-    generateCompactContext(workflowState, sessionContext);
-
-    const handoff = {
-      version: '1.0.0',
-      saved_at: new Date().toISOString(),
-      reason: 'compact',
-      workflow: workflowState,
-      context: sessionContext,
-      resume_hint: workflowState
-        ? `/workflow resume ${workflowState.workflow_id}`
-        : null
-    };
-
-    fs.writeFileSync(HANDOFF_FILE, JSON.stringify(handoff, null, 2));
-
-    // Also save to workflow-specific location if workflow exists
-    if (workflowState && workflowState.workflow_id) {
-      const workflowDir = path.join(WORKFLOW_DIR, workflowState.workflow_id);
-      ensureDir(workflowDir);
-
-      // Update workflow state with paused status
-      const pausedState = {
-        ...workflowState,
+    // Legacy workflows: mark paused so /run resume shows the right status.
+    if (handoff.workflow && handoff.workflow.workflow_id) {
+      const dir = path.join(p.workflowsDir, handoff.workflow.workflow_id);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'workflow-state.json'), JSON.stringify({
+        ...handoff.workflow,
         status: 'paused',
-        paused_at: new Date().toISOString(),
-        paused_reason: 'compact'
-      };
-
-      fs.writeFileSync(
-        path.join(workflowDir, 'workflow-state.json'),
-        JSON.stringify(pausedState, null, 2)
-      );
+        paused_at: handoff.saved_at,
+        paused_reason: reason,
+      }, null, 2));
     }
-
-    console.log('💾 Workflow state saved for compact handoff');
-    return true;
+    return handoff;
   } catch (error) {
-    console.error(`Handoff save error: ${error.message}`);
+    process.stderr.write(`Handoff save error: ${error.message}\n`);
     return false;
   }
 }
 
-/**
- * Check for and load handoff state after compact
- */
-function loadHandoff() {
+/** Load the handoff if fresh enough for this SessionStart source; null otherwise. */
+function loadHandoff({ source = 'unknown', nowMs = Date.now() } = {}) {
   try {
-    if (!fs.existsSync(HANDOFF_FILE)) {
+    const p = getPaths();
+    if (source === 'clear' || !fs.existsSync(p.handoff)) return null;
+    const handoff = JSON.parse(fs.readFileSync(p.handoff, 'utf-8'));
+    const maxAge = source === 'compact' ? COMPACT_MAX_AGE_MS : RESUME_MAX_AGE_MS;
+    if (nowMs - new Date(handoff.saved_at).getTime() > maxAge) {
+      fs.unlinkSync(p.handoff);
       return null;
     }
-
-    const handoff = JSON.parse(fs.readFileSync(HANDOFF_FILE, 'utf-8'));
-
-    // Check if handoff is recent (within last 30 minutes)
-    const savedAt = new Date(handoff.saved_at);
-    const ageMs = Date.now() - savedAt.getTime();
-    const maxAgeMs = 30 * 60 * 1000; // 30 minutes
-
-    if (ageMs > maxAgeMs) {
-      // Old handoff, clean up
-      fs.unlinkSync(HANDOFF_FILE);
-      return null;
-    }
-
     return handoff;
   } catch {
     return null;
   }
 }
 
-/**
- * Generate resume context message
- */
-function generateResumeContext(handoff) {
-  let message = '\n';
-  message += '═══════════════════════════════════════════════════════════\n';
-  message += '🔄 SESSION RESUMED AFTER COMPACT\n';
-  message += '═══════════════════════════════════════════════════════════\n\n';
+/** Pure: render the resume context injected after compaction. */
+function generateResumeContext(handoff = {}) {
+  const lines = ['# 🔄 Aura Frog — resumed after compact', ''];
+
+  if (handoff.run) {
+    const r = handoff.run;
+    lines.push(`## Active run: ${r.run_id}`);
+    if (r.task) lines.push(`- **Task:** ${r.task}`);
+    const where = [r.complexity, r.flow, r.current_phase != null ? `phase ${r.current_phase}` : null, r.current_step]
+      .filter(Boolean).join(' · ');
+    if (where) lines.push(`- **Where:** ${where}`);
+    if (r.active_agent) lines.push(`- **Agent:** ${r.active_agent}`);
+    if (r.next_action) lines.push(`- **Next:** ${r.next_action}`);
+    lines.push(`- **State file:** \`${r.state_file}\``);
+    lines.push('');
+  }
 
   if (handoff.workflow) {
     const wf = handoff.workflow;
-    message += `📋 **Workflow:** ${wf.workflow_id}\n`;
-    message += `📝 **Task:** ${wf.task?.description || 'In progress'}\n`;
-    message += `📍 **Phase:** ${wf.current_phase}${wf.current_sub_phase || ''}\n`;
-    message += `🤖 **Agent:** ${wf.agents?.primary || 'general-purpose'}\n\n`;
+    lines.push(`## Workflow: ${wf.workflow_id}`);
+    lines.push(`- **Task:** ${(wf.task && wf.task.description) || 'In progress'}`);
+    lines.push(`- **Phase:** ${wf.current_phase}${wf.current_sub_phase || ''}`);
+    lines.push(`- **Agent:** ${(wf.agents && wf.agents.primary) || 'general-purpose'}`);
+    lines.push('');
   }
 
-  if (handoff.context) {
-    const ctx = handoff.context;
-    if (ctx.project_name) message += `📦 **Project:** ${ctx.project_name}\n`;
-    if (ctx.framework) message += `🛠️ **Framework:** ${ctx.framework}\n`;
-    if (ctx.git_branch) message += `🌿 **Branch:** ${ctx.git_branch}\n`;
-    if (ctx.active_plan) message += `📋 **Active Plan:** ${ctx.active_plan}\n`;
-    message += '\n';
+  if (handoff.plan) {
+    const a = handoff.plan;
+    const parts = [a.feature || a.initiative || a.mission, a.story, a.task].filter(Boolean);
+    lines.push(`## Plan anchor: ${parts.join(' → ')}`);
+    lines.push('');
   }
 
-  if (handoff.resume_hint) {
-    message += '───────────────────────────────────────────────────────────\n';
-    message += `📥 **To fully resume workflow:**\n`;
-    message += `   ${handoff.resume_hint}\n\n`;
+  const ctx = handoff.context || {};
+  const ctxLines = [
+    ctx.project_name && `- **Project:** ${ctx.project_name}`,
+    ctx.framework && `- **Framework:** ${ctx.framework}`,
+    (ctx.git_branch || ctx.branch) && `- **Branch:** ${ctx.git_branch || ctx.branch}`,
+  ].filter(Boolean);
+  if (ctxLines.length) lines.push('## Session', ...ctxLines, '');
+
+  if (handoff.recent_prompts && handoff.recent_prompts.length) {
+    lines.push('## Last user requests (oldest → newest)');
+    handoff.recent_prompts.forEach((q) => lines.push(`- ${q.replace(/\n+/g, ' ')}`));
+    lines.push('');
   }
 
-  message += '💡 Context has been restored. Type "continue" to proceed.\n';
-  message += '═══════════════════════════════════════════════════════════\n';
+  if (handoff.modified_files && handoff.modified_files.length) {
+    lines.push('## Uncommitted files');
+    handoff.modified_files.forEach((f) => lines.push(`- ${f}`));
+    lines.push('');
+  }
 
-  return message;
+  lines.push('## How to continue');
+  if (handoff.run) {
+    lines.push(`Re-read \`${handoff.run.state_file}\` (and its deliverables) before acting, then continue the run from its current phase. Do not restart completed phases.`);
+  } else if (handoff.resume_hint) {
+    lines.push(`Run \`${handoff.resume_hint}\` or re-read the workflow state, then continue.`);
+  } else {
+    lines.push('Continue the last user request above; verify file state before editing.');
+  }
+  return lines.join('\n');
 }
 
-/**
- * Inject resume context into session
- */
-function injectResumeContext(handoff) {
-  try {
-    // Write resume context to a file that session-start can read
-    const resumeContextFile = path.join(CACHE_DIR, 'resume-context.md');
-    const context = generateResumeContext(handoff);
-
-    // Append compact context if available
-    const compactContextFile = path.join(CACHE_DIR, 'compact-context.md');
-    let fullContext = context;
-    if (fs.existsSync(compactContextFile)) {
-      try {
-        fullContext += '\n' + fs.readFileSync(compactContextFile, 'utf-8');
-        fs.unlinkSync(compactContextFile); // Clean up after reading
-      } catch { /* skip if unreadable */ }
-    }
-
-    fs.writeFileSync(resumeContextFile, fullContext);
-
-    // Output to console for immediate display
-    console.log(context);
-
-    // Set environment variables for other hooks to use
-    if (handoff.workflow) {
-      console.log(`AF_WORKFLOW_ID=${handoff.workflow.workflow_id}`);
-      console.log(`AF_CURRENT_PHASE=${handoff.workflow.current_phase}`);
-      console.log(`AF_RESUME_FROM_COMPACT=true`);
-    }
-
-    // Clean up handoff file after successful resume
-    if (fs.existsSync(HANDOFF_FILE)) {
-      fs.unlinkSync(HANDOFF_FILE);
-    }
-
-    return true;
-  } catch (error) {
-    console.error(`Resume inject error: ${error.message}`);
-    return false;
-  }
-}
-
-/**
- * Main execution
- */
 function main() {
-  const args = process.argv.slice(2);
-  const mode = args[0] || 'save';
+  if (process.env.AF_COMPACT_HANDOFF_DISABLED === 'true') return;
+  const mode = process.argv[2] || 'stop';
+  const input = readHookInput();
 
   if (mode === '--resume' || mode === 'resume') {
-    // SessionStart mode - check for handoff and inject resume context
-    const handoff = loadHandoff();
-    if (handoff) {
-      injectResumeContext(handoff);
-    }
-  } else {
-    // Stop mode - save handoff state
-    saveHandoff();
+    const handoff = loadHandoff({ source: input.source });
+    if (!handoff) return;
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: generateResumeContext(handoff),
+      },
+    }));
+    try { fs.unlinkSync(getPaths().handoff); } catch { /* already gone */ }
+    return;
   }
 
-  process.exit(0);
+  if (mode === '--pre-compact') {
+    saveHandoff({ input, reason: `compact-${input.trigger || 'unknown'}` });
+    return;
+  }
+
+  // Stop: pre-emptive save before auto-compact.
+  const p = getPaths();
+  const usage = readContextUsage(p);
+  const threshold = Number(process.env.AF_HANDOFF_THRESHOLD) || DEFAULT_THRESHOLD;
+  if (shouldSaveOnStop({ usage, threshold, hasOpenWork: Boolean(findActiveRun(p)) })) {
+    saveHandoff({ input, reason: 'stop-threshold' });
+  }
 }
 
-module.exports = { saveHandoff, loadHandoff, generateResumeContext, generateCompactContext };
+module.exports = {
+  getPaths,
+  findActiveRun,
+  readContextUsage,
+  shouldSaveOnStop,
+  recentUserPrompts,
+  buildHandoff,
+  saveHandoff,
+  loadHandoff,
+  generateResumeContext,
+};
 
 if (require.main === module) {
   main();
+  process.exit(0);
 }
