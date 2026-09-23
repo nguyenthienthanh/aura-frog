@@ -12,6 +12,30 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.17] - 2026-09-23 (Per-session named handoffs that follow the project's plan)
+
+### Fixed
+
+- **Sessions in one project overwrote and stole each other's handoff.** There was a single
+  `.claude/cache/compact-handoff.json` per project, and any new session injected + deleted it.
+  Handoffs are now one per session: `.claude/handoffs/<name>.{json,md}`, named after the session
+  title (`/rename` → auto title → `session-<id8>`; a same-title clash gets `-<id8>`). SessionStart
+  injects only the handoff whose `session_id` matches; a new session gets just an index of names.
+  Resume by name: `/run resume <name>` (`compact-handoff.cjs --show <name>` / `--list`).
+- **Handoff ignored the project's plan.** The plan tree was resolved from cwd, not the project
+  root, and the project's own plan docs were never recorded. The handoff now carries the
+  `plans/active.json` anchor (from the project root) plus plan docs (`ROADMAP.md`, `*_PLAN.md`,
+  `docs/*plan*`…) and tells the resumed session to follow them.
+- **Non-code projects got run/plan logs.** Projects without `.git` or a manifest no longer get
+  `.claude/logs/workflows/` written by the hook, and `session-continuation` no longer asks for a
+  `run-state.json` there.
+- **Manual `handoff`** now runs `compact-handoff.cjs --save --note "…"`; the session id reaches it
+  via `AF_CLAUDE_SESSION_ID` / `AF_TRANSCRIPT_PATH`, exported to `CLAUDE_ENV_FILE` at SessionStart.
+- Handoff keeps `/command <args>` prompts (was dropping every `/run <task>`) and widens the
+  transcript scan until it finds the last 3 prompts (a 512KB tail missed them in long turns).
+- `post-compact.cjs` validates the compacting session's own handoff file. Handoffs >14 days are
+  pruned.
+
 ## [3.8.0-alpha.16] - 2026-09-13 (Compact handoff — save before autocompact, resume after)
 
 ### Fixed

@@ -1,17 +1,12 @@
 /**
  * Tests for aura-frog/hooks/compact-handoff.cjs
  *
- * Covers generateResumeContext (pure) and loadHandoff (read-only).
- *
- * saveHandoff and generateCompactContext are deliberately NOT called: CACHE_DIR /
- * HANDOFF_FILE are resolved from the real project root at module load and cannot
- * be redirected, so invoking either writes into the working repo's .claude/cache
- * (generateCompactContext also shells out to `git status`). Despite the name it
- * is not a pure builder — it writes compact-context.md and returns a boolean.
+ * Pure helpers are called in-process. Anything that writes runs the hook as a
+ * subprocess with AF_PROJECT_ROOT pointed at a tmp dir, so the working repo's
+ * .claude/ is never touched.
  */
 
 const {
-  loadHandoff,
   generateResumeContext,
 } = require('../../aura-frog/hooks/compact-handoff.cjs');
 
@@ -58,12 +53,40 @@ describe('compact-handoff', () => {
     });
   });
 
-  describe('loadHandoff', () => {
-    // Read-only: returns the stored handoff, or null when absent/stale.
-    it('returns null or an object without throwing', () => {
-      let out;
-      expect(() => { out = loadHandoff(); }).not.toThrow();
-      expect(out === null || typeof out === 'object').toBe(true);
+  describe('generateResumeContext — how to continue', () => {
+    it('without a run, points at the note/prompts instead of a workflow state', () => {
+      const out = generateResumeContext({ name: 'x', resume_hint: '/run resume x', note: 'do y' });
+      expect(out).not.toContain('workflow state');
+      expect(out).toContain('Continue from the handoff note');
+    });
+  });
+
+  describe('slugify', () => {
+    const { slugify } = require('../../aura-frog/hooks/compact-handoff.cjs');
+    it('strips Vietnamese diacritics and punctuation', () => {
+      expect(slugify('Làm Truyện')).toBe('lam-truyen');
+      expect(slugify('Đèn Ông Sao — Dán Dở!')).toBe('den-ong-sao-dan-do');
+      expect(slugify('   ')).toBe('');
+    });
+  });
+
+  describe('sessionTitle', () => {
+    const fs = require('fs');
+    const os = require('os');
+    const path = require('path');
+    const { sessionTitle } = require('../../aura-frog/hooks/compact-handoff.cjs');
+    it('prefers the latest custom-title, then ai-title, else null', () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'af-title-'));
+      const f = path.join(dir, 't.jsonl');
+      const w = (es) => fs.writeFileSync(f, es.map((e) => JSON.stringify(e)).join('\n'));
+      w([{ type: 'ai-title', aiTitle: 'Auto' }, { type: 'custom-title', customTitle: 'Old' }, { type: 'custom-title', customTitle: 'New' }]);
+      expect(sessionTitle(f)).toBe('New');
+      w([{ type: 'ai-title', aiTitle: 'Auto' }]);
+      expect(sessionTitle(f)).toBe('Auto');
+      w([{ type: 'user', message: { content: 'x' } }]);
+      expect(sessionTitle(f)).toBeNull();
+      expect(sessionTitle(path.join(dir, 'missing'))).toBeNull();
+      fs.rmSync(dir, { recursive: true, force: true });
     });
   });
 
@@ -117,7 +140,7 @@ describe('compact-handoff', () => {
       root = fs.mkdtempSync(path.join(os.tmpdir(), 'af-handoff-'));
       savedEnv = { ...process.env };
       process.env.AF_PROJECT_ROOT = root;
-      for (const k of ['AF_WORKFLOW_ID', 'AF_CURRENT_PHASE', 'PROJECT_NAME', 'AF_PROJECT_NAME']) delete process.env[k];
+      for (const k of ['AF_WORKFLOW_ID', 'AF_CURRENT_PHASE', 'PROJECT_NAME', 'AF_PROJECT_NAME', 'AF_CLAUDE_SESSION_ID', 'AF_TRANSCRIPT_PATH', 'CLAUDE_ENV_FILE']) delete process.env[k];
     });
 
     afterEach(() => {
@@ -149,30 +172,175 @@ describe('compact-handoff', () => {
       expect(recentUserPrompts(path.join(root, 'missing.jsonl'))).toEqual([]);
     });
 
-    it('PreCompact saves, SessionStart(compact) injects additionalContext and consumes the handoff', () => {
-      writeRun('fix-0913', 'in_progress');
-      const transcript = writeTranscript([{ type: 'user', message: { content: 'fix the resume' } }]);
+    it('recentUserPrompts widens the window when the last prompt is behind lots of tool output', () => {
+      const { recentUserPrompts } = require('../../aura-frog/hooks/compact-handoff.cjs');
+      const noise = { type: 'assistant', message: { content: [{ type: 'text', text: 'x'.repeat(1000) }] } };
+      const file = writeTranscript([
+        { type: 'user', message: { content: 'the real ask' } },
+        ...Array.from({ length: 50 }, () => noise),
+      ]);
+      expect(recentUserPrompts(file, 3, [1024])).toEqual([]);
+      expect(recentUserPrompts(file, 3, [1024, 1024 * 1024])).toEqual(['the real ask']);
+    });
 
-      expect(run(['--pre-compact'], { trigger: 'auto', transcript_path: transcript }).status).toBe(0);
-      const handoffFile = path.join(root, '.claude', 'cache', 'compact-handoff.json');
-      const saved = JSON.parse(fs.readFileSync(handoffFile, 'utf8'));
+    it('recentUserPrompts keeps slash-command prompts that carry args', () => {
+      const { recentUserPrompts } = require('../../aura-frog/hooks/compact-handoff.cjs');
+      const file = writeTranscript([
+        { type: 'user', message: { content: '<command-message>aura-frog:run</command-message>\n<command-name>/aura-frog:run</command-name>\n<command-args>fix handoff naming</command-args>' } },
+        { type: 'user', message: { content: '<command-name>/clear</command-name>\n<command-args></command-args>' } },
+      ]);
+      expect(recentUserPrompts(file)).toEqual(['/aura-frog:run fix handoff naming']);
+    });
+
+    const handoffsDir = () => path.join(root, '.claude', 'handoffs');
+    const readSaved = (name) => JSON.parse(fs.readFileSync(path.join(handoffsDir(), `${name}.json`), 'utf8'));
+
+    it('PreCompact saves a handoff named after the session, SessionStart(compact) of the same session injects + consumes it', () => {
+      writeRun('fix-0913', 'in_progress');
+      const transcript = writeTranscript([
+        { type: 'custom-title', customTitle: 'Làm Truyện', sessionId: 'sess-aaaa1111' },
+        { type: 'user', message: { content: 'fix the resume' } },
+      ]);
+
+      expect(run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-aaaa1111', transcript_path: transcript }).status).toBe(0);
+      const saved = readSaved('lam-truyen');
+      expect(saved.name).toBe('lam-truyen');
+      expect(saved.title).toBe('Làm Truyện');
+      expect(saved.session_id).toBe('sess-aaaa1111');
       expect(saved.run.run_id).toBe('fix-0913');
       expect(saved.reason).toBe('compact-auto');
       expect(saved.recent_prompts).toEqual(['fix the resume']);
+      expect(fs.existsSync(path.join(handoffsDir(), 'lam-truyen.md'))).toBe(true);
+      expect(fs.existsSync(path.join(root, '.claude', 'cache', 'compact-handoff.json'))).toBe(false);
 
-      const r = run(['--resume'], { source: 'compact' });
-      const out = JSON.parse(r.stdout);
-      expect(out.hookSpecificOutput.hookEventName).toBe('SessionStart');
-      expect(out.hookSpecificOutput.additionalContext).toContain('fix-0913');
-      expect(out.hookSpecificOutput.additionalContext).toContain('run-state.json');
-      expect(out.hookSpecificOutput.additionalContext).toContain('fix the resume');
-      expect(fs.existsSync(handoffFile)).toBe(false);
+      const r = run(['--resume'], { source: 'compact', session_id: 'sess-aaaa1111' });
+      const ctx = JSON.parse(r.stdout).hookSpecificOutput.additionalContext;
+      expect(ctx).toContain('fix-0913');
+      expect(ctx).toContain('run-state.json');
+      expect(ctx).toContain('fix the resume');
+      expect(ctx).toContain('Làm Truyện');
+      expect(fs.existsSync(path.join(handoffsDir(), 'lam-truyen.json'))).toBe(false);
+    });
+
+    it('falls back to ai-title, then to session-<id8>', () => {
+      const t1 = writeTranscript([{ type: 'ai-title', aiTitle: 'Websearch fallback fetch' }]);
+      run(['--pre-compact'], { trigger: 'manual', session_id: 'sess-bbbb2222', transcript_path: t1 });
+      expect(readSaved('websearch-fallback-fetch').session_id).toBe('sess-bbbb2222');
+
+      fs.writeFileSync(path.join(root, 'empty.jsonl'), JSON.stringify({ type: 'user', message: { content: 'hi' } }));
+      run(['--pre-compact'], { trigger: 'manual', session_id: 'cccc3333-dead-beef', transcript_path: path.join(root, 'empty.jsonl') });
+      expect(readSaved('session-cccc3333').session_id).toBe('cccc3333-dead-beef');
+    });
+
+    it('two sessions in the same project keep separate handoffs; each resumes its own', () => {
+      const ta = writeTranscript([{ type: 'custom-title', customTitle: 'Alpha' }, { type: 'user', message: { content: 'alpha work' } }]);
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-a', transcript_path: ta });
+      const tb = path.join(root, 'b.jsonl');
+      fs.writeFileSync(tb, [{ type: 'custom-title', customTitle: 'Beta' }, { type: 'user', message: { content: 'beta work' } }]
+        .map((e) => JSON.stringify(e)).join('\n'));
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-b', transcript_path: tb });
+
+      const ctx = JSON.parse(run(['--resume'], { source: 'compact', session_id: 'sess-b' }).stdout).hookSpecificOutput.additionalContext;
+      expect(ctx).toContain('beta work');
+      expect(ctx).not.toContain('alpha work');
+      expect(fs.existsSync(path.join(handoffsDir(), 'alpha.json'))).toBe(true);
+    });
+
+    it('same title from a different session does not overwrite: suffixes the short id', () => {
+      const t = writeTranscript([{ type: 'custom-title', customTitle: 'Alpha' }]);
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'aaaa0000-1', transcript_path: t });
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'bbbb0000-2', transcript_path: t });
+      expect(readSaved('alpha').session_id).toBe('aaaa0000-1');
+      expect(readSaved('alpha-bbbb0000').session_id).toBe('bbbb0000-2');
+    });
+
+    it('SessionStart(startup) of a NEW session lists named handoffs instead of injecting another session', () => {
+      const t = writeTranscript([{ type: 'custom-title', customTitle: 'Alpha' }, { type: 'user', message: { content: 'alpha secret work' } }]);
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-a', transcript_path: t });
+
+      const ctx = JSON.parse(run(['--resume'], { source: 'startup', session_id: 'sess-new' }).stdout).hookSpecificOutput.additionalContext;
+      expect(ctx).toContain('alpha');
+      expect(ctx).toContain('/run resume alpha');
+      expect(ctx).not.toContain('alpha secret work');
+      expect(fs.existsSync(path.join(handoffsDir(), 'alpha.json'))).toBe(true);
     });
 
     it('SessionStart(clear) does not inject', () => {
       writeRun('fix-0913', 'in_progress');
-      run(['--pre-compact'], { trigger: 'manual' });
-      expect(run(['--resume'], { source: 'clear' }).stdout).toBe('');
+      run(['--pre-compact'], { trigger: 'manual', session_id: 's1' });
+      expect(run(['--resume'], { source: 'clear', session_id: 's1' }).stdout).toBe('');
+    });
+
+    it('SessionStart exports the session id + transcript path to CLAUDE_ENV_FILE', () => {
+      const envFile = path.join(root, 'env.sh');
+      run(['--resume'], { source: 'startup', session_id: 'sess-env', transcript_path: '/x/t.jsonl' }, { CLAUDE_ENV_FILE: envFile });
+      const env = fs.readFileSync(envFile, 'utf8');
+      expect(env).toContain("AF_CLAUDE_SESSION_ID='sess-env'");
+      expect(env).toContain("AF_TRANSCRIPT_PATH='/x/t.jsonl'");
+    });
+
+    it('follows the project plan: plan tree resolved from the project root (not cwd) + plan docs', () => {
+      fs.mkdirSync(path.join(root, '.git'));
+      const plans = path.join(root, '.claude', 'plans');
+      fs.mkdirSync(plans, { recursive: true });
+      fs.writeFileSync(path.join(plans, 'active.json'), JSON.stringify({ active: { feature: 'FEAT-A', story: 'STORY-1', task: 'TASK-9' } }));
+      fs.writeFileSync(path.join(root, 'ROADMAP.md'), '# roadmap');
+      fs.mkdirSync(path.join(root, 'docs'));
+      fs.writeFileSync(path.join(root, 'docs', 'audio-plan.md'), '# plan');
+      fs.writeFileSync(path.join(root, 'README.md'), '# readme');
+      const sub = path.join(root, 'src', 'deep');
+      fs.mkdirSync(sub, { recursive: true });
+
+      spawnSync('node', [HOOK, '--pre-compact'], {
+        cwd: sub, encoding: 'utf8',
+        input: JSON.stringify({ trigger: 'auto', session_id: 'sess-plan0000' }),
+        env: { ...process.env, AF_PROJECT_ROOT: root },
+      });
+      const saved = readSaved('session-sess-pla');
+      expect(saved.plan).toEqual({ feature: 'FEAT-A', story: 'STORY-1', task: 'TASK-9' });
+      expect(saved.project.kind).toBe('code');
+      expect(saved.project.plan_docs).toEqual(expect.arrayContaining(['ROADMAP.md', path.join('docs', 'audio-plan.md')]));
+      expect(saved.project.plan_docs).not.toContain('README.md');
+
+      const ctx = JSON.parse(run(['--resume'], { source: 'compact', session_id: 'sess-plan0000' }).stdout).hookSpecificOutput.additionalContext;
+      expect(ctx).toContain('FEAT-A → STORY-1 → TASK-9');
+      expect(ctx).toContain('ROADMAP.md');
+      expect(ctx).toMatch(/project'?s plan/i);
+    });
+
+    it('non-code project: never creates run/plan logs', () => {
+      // no .git, no manifest
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-doc' }, { AF_WORKFLOW_ID: 'WF-1', AF_CURRENT_PHASE: '2' });
+      expect(fs.existsSync(path.join(root, '.claude', 'logs'))).toBe(false);
+      expect(fs.existsSync(path.join(root, '.claude', 'plans'))).toBe(false);
+      const saved = readSaved('session-sess-doc');
+      expect(saved.project.kind).toBe('non-code');
+      expect(saved.workflow).toBeNull();
+    });
+
+    it('code project keeps the legacy workflow pause marker', () => {
+      fs.writeFileSync(path.join(root, 'package.json'), '{}');
+      run(['--pre-compact'], { trigger: 'auto', session_id: 'sess-code' }, { AF_WORKFLOW_ID: 'WF-1', AF_CURRENT_PHASE: '2' });
+      expect(fs.existsSync(path.join(root, '.claude', 'logs', 'workflows', 'WF-1', 'workflow-state.json'))).toBe(true);
+    });
+
+    it('manual --save uses the exported session env, keeps a note, survives resume; --show prints it', () => {
+      const t = writeTranscript([{ type: 'custom-title', customTitle: 'Beta' }, { type: 'user', message: { content: 'beta work' } }]);
+      const env = { AF_CLAUDE_SESSION_ID: 'sess-b', AF_TRANSCRIPT_PATH: t };
+      const r = run(['--save', '--note', 'Next: wire the cron'], {}, env);
+      expect(r.status).toBe(0);
+      expect(r.stdout).toContain(path.join('.claude', 'handoffs', 'beta.md'));
+      const saved = readSaved('beta');
+      expect(saved.kind).toBe('manual');
+      expect(saved.note).toBe('Next: wire the cron');
+
+      const ctx = JSON.parse(run(['--resume'], { source: 'compact', session_id: 'sess-b' }).stdout).hookSpecificOutput.additionalContext;
+      expect(ctx).toContain('Next: wire the cron');
+      expect(fs.existsSync(path.join(handoffsDir(), 'beta.json'))).toBe(true);
+
+      const show = run(['--show', 'beta'], {});
+      expect(show.stdout).toContain('Next: wire the cron');
+      expect(run(['--show', 'Beta'], {}).stdout).toContain('Next: wire the cron');
     });
 
     it('Stop saves only when statusline usage crosses the threshold', () => {
@@ -180,22 +348,21 @@ describe('compact-handoff', () => {
       const cache = path.join(root, '.claude', 'cache');
       fs.mkdirSync(cache, { recursive: true });
       const usageFile = path.join(cache, 'context-usage.json');
-      const handoffFile = path.join(cache, 'compact-handoff.json');
       const now = Math.floor(Date.now() / 1000);
 
       fs.writeFileSync(usageFile, JSON.stringify({ used_percentage: 40, ts: now }));
-      run([], {});
-      expect(fs.existsSync(handoffFile)).toBe(false);
+      run([], { session_id: 'sess-stop0000' });
+      expect(fs.existsSync(path.join(handoffsDir(), 'session-sess-sto.json'))).toBe(false);
 
       fs.writeFileSync(usageFile, JSON.stringify({ used_percentage: 82, ts: now }));
-      run([], {});
-      expect(JSON.parse(fs.readFileSync(handoffFile, 'utf8')).reason).toBe('stop-threshold');
+      run([], { session_id: 'sess-stop0000' });
+      expect(readSaved('session-sess-sto').reason).toBe('stop-threshold');
     });
 
     it('AF_COMPACT_HANDOFF_DISABLED=true writes nothing', () => {
       writeRun('fix-0913', 'in_progress');
-      run(['--pre-compact'], { trigger: 'auto' }, { AF_COMPACT_HANDOFF_DISABLED: 'true' });
-      expect(fs.existsSync(path.join(root, '.claude', 'cache', 'compact-handoff.json'))).toBe(false);
+      run(['--pre-compact'], { trigger: 'auto', session_id: 's1' }, { AF_COMPACT_HANDOFF_DISABLED: 'true' });
+      expect(fs.existsSync(handoffsDir())).toBe(false);
     });
   });
 });

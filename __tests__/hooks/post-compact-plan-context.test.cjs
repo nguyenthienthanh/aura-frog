@@ -44,9 +44,11 @@ describe('post-compact — validateStateFile', () => {
     expect(validateStateFile('some/other.json', {})).toEqual([]);
   });
 
-  it('exposes the two state paths it checks', () => {
+  it('exposes the state paths it checks; handoffs are per session', () => {
     expect(STATE_PATHS).toContain('.claude/cache/workflow-state.json');
-    expect(STATE_PATHS).toContain('.claude/cache/compact-handoff.json');
+    expect(STATE_PATHS).not.toContain('.claude/cache/compact-handoff.json');
+    expect(validateStateFile('.claude/handoffs/lam-truyen.json', {})).toHaveLength(1);
+    expect(validateStateFile('.claude/handoffs/lam-truyen.json', { project: { kind: 'non-code' } })).toEqual([]);
   });
 
   it('collectWarnings returns an array without throwing for missing files', () => {
@@ -64,10 +66,14 @@ describe('post-compact — accepts what compact-handoff actually writes', () => 
 
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'af-postcompact-'));
+    // Legacy workflow state is only written for code projects.
+    fs.mkdirSync(path.join(root, '.git'));
     savedEnv = { ...process.env };
     // compact-handoff resolves its file paths at module load, so the root has to
     // be in place before the fresh require below.
     process.env.AF_PROJECT_ROOT = root;
+    delete process.env.AF_CLAUDE_SESSION_ID;
+    delete process.env.AF_TRANSCRIPT_PATH;
     process.env.AF_WORKFLOW_ID = 'wf-test-1';
     process.env.AF_CURRENT_PHASE = '3';
     process.env.AF_CURRENT_AGENT = 'frontend';
@@ -86,7 +92,7 @@ describe('post-compact — accepts what compact-handoff actually writes', () => 
     });
     expect(saveHandoff()).not.toBe(false);
 
-    const handoffFile = path.join(root, '.claude', 'cache', 'compact-handoff.json');
+    const handoffFile = path.join(root, '.claude', 'handoffs', 'session-unknown.json');
     expect(fs.existsSync(handoffFile)).toBe(true);
     // Absolute paths still match the `rel.includes(...)` dispatch in
     // validateStateFile, so the real file goes through the real check.

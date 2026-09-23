@@ -313,7 +313,7 @@ Expected output:
                        master-planner, feature-architect, story-planner, replanner, epic-summarizer, conflict-arbiter)
   Skills:   43 available (10 auto-invoke, 33 on-demand)
   Rules:    72 loaded (22 core + 20 agent + 30 workflow)
-  Hooks:    51 registered
+  Hooks:    52 registered
   MCP:      context7, playwright, vitest, firebase, figma, slack
 ```
 
@@ -444,7 +444,7 @@ Details: `rules/core/execution-rules.md`, `skills/agent-detector/SKILL.md`, `ski
 | **Skills** | 43 | 10 auto-invoke on context, 33 on-demand (incl. `design-vision-loop`) |
 | **Commands** | 24 | Core: `/run`, `/check`, `/design`, `/project`, `/af`, `/help` + `/aura-frog:*` hierarchical-planning suite (14 user-facing + 10 legacy `/aura-frog:plan-<verb>` alias stubs) |
 | **Rules** | 72 | 3-tier loading (22 core + 20 agent + 30 workflow) — only what's needed |
-| **Hooks** | 51 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
+| **Hooks** | 52 | Conditional — skip processing for non-code files (v3.7.2 adds `bare-word-router.cjs`) |
 | **Backing scripts** | 12 | Hierarchical-planning operations (v3.7.2): `new-plan`, `validate-plan-tree`, `render-plan-tree` + 9 new (`expand`, `next`, `freeze`, `thaw`, `archive`, `conflicts`, `replan`, `promote`, `undo`) + `resolve-node` + `_lib` |
 | **MCP Servers** | 6 | All enabled — every `.mcp.json` entry starts, so opt-in servers are unbundled ([snippets](docs/operations/MCP_GUIDE.md#optional-servers-not-bundled)) |
 | **Tests** | 317 | Coverage gate at 25% statements floor; +102 tests in v3.7.2 (38 plan scripts + 64 bare-word router) |

@@ -25,28 +25,34 @@ Manage workflow state across sessions.
 
 ## Triggers
 
-Token ≥75% → suggest handoff. User says handoff/save → execute. User says resume + ID → load.
+Token ≥75% → suggest handoff. User says handoff/save → execute. User says resume + name/ID → load.
 
-## Handoff Flow
+## Handoff = one file per session, named after the session
 
-1. Save to `.claude/logs/runs/[id]/run-state.json`: workflow_id, status, current_phase, agents, phases_completed (with deliverables), key decisions, token_usage
-2. Output: workflow ID, phase progress, deliverables, resume command
+`.claude/handoffs/<name>.{json,md}` — `<name>` = slug of the session title: `/rename` custom title → auto (ai) title → `session-<id8>`. Two sessions in one project never overwrite each other; a same-title clash gets `-<id8>`.
 
-## Resume Flow
+## Handoff Flow (user says `handoff`)
 
-1. Load state file → validate exists/valid
-2. Restore: project context, agents, phase rules, decisions
-3. Show summary → continue from saved phase
+1. Run `node "${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs" --save --note "<done · next steps · decisions · blockers>"`. The session id comes from `AF_CLAUDE_SESSION_ID` (exported at SessionStart). The note is the part only you know — make it specific.
+2. **Follow the project's plan.** The handoff records the plan tree anchor (`.claude/plans/active.json`, from the project root) and the project's own plan docs (`ROADMAP.md`, `*_PLAN.md`, `docs/*plan*`…). If one of those is the living plan, update it there — don't fork a second plan into the handoff.
+3. **Code project** with an open `/run`: also keep `run-state.json` current (`current_phase`, `next_action`).
+   **Non-code project** (no `.git`, no manifest): do **not** create `.claude/logs/runs/` or plan logs — the handoff file is the only state.
+4. Output the name + resume command the script prints: `/run resume <name>` (or `claude --resume "<title>"`).
+
+## Resume Flow (`/run resume <name>`)
+
+1. `node "${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs" --show <name>` (accepts name, title or session id; `--list` for all).
+2. Re-read the plan docs + run state it lists → verify file state → continue from the note / next action. Don't restart finished work.
 
 ## Auto-Save / Auto-Resume (hooks — no action needed)
 
-`hooks/compact-handoff.cjs` writes `.claude/cache/compact-handoff.json` (active run from `logs/runs/*/run-state.json`, plan anchor, last 3 user prompts, uncommitted files):
+`hooks/compact-handoff.cjs` saves the same per-session file automatically:
 
 - **PreCompact** (manual + auto) → always saves.
 - **Stop** → saves when context ≥ `AF_HANDOFF_THRESHOLD` (default 70%, read from the statusline's `.claude/cache/context-usage.json`); without statusline data, saves only while a run is open.
-- **SessionStart** (`source=compact`/`resume`/`startup`, not `clear`) → injects it as `additionalContext`, then deletes it.
+- **SessionStart** `compact`/`resume` of the **same session** → injects its handoff (auto snapshots are then deleted; manual ones stay). A **new** session only gets a list of named handoffs — never another session's context. `clear` → nothing.
 
-Keep `run-state.json` current (`current_phase`, `next_action`) — it is what the resume points Claude back to. Disable: `AF_COMPACT_HANDOFF_DISABLED=true`.
+Handoffs older than 14 days are pruned. Disable: `AF_COMPACT_HANDOFF_DISABLED=true`.
 
 ## TOON State Format (~160 tokens vs JSON ~600)
 

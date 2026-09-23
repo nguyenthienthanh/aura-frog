@@ -6,7 +6,20 @@
  *   - PreCompact (--pre-compact)  → always save a handoff (trigger: manual|auto)
  *   - Stop (no args, via dispatch) → save only when context usage ≥ threshold,
  *                                    so a handoff exists before auto-compact
- *   - SessionStart (--resume)      → inject the handoff as additionalContext
+ *   - SessionStart (--resume)      → same session: inject its handoff as
+ *                                    additionalContext. New session: list the
+ *                                    named handoffs only (never another
+ *                                    session's context).
+ *   - CLI (--save [--note <t>] [--name <n>], --show <name>, --list) → the
+ *     manual `handoff` / `/run resume <name>` path.
+ *
+ * One handoff per session, named after the session title (/rename custom-title
+ * → ai-title → session-<id8>): .claude/handoffs/<name>.{json,md}. Sessions in
+ * the same project no longer overwrite or steal each other's handoff.
+ *
+ * The handoff follows the project's own plan: the plan tree (resolved from the
+ * project root, not cwd) plus plan docs (ROADMAP.md, *_PLAN.md, docs/*plan*…).
+ * Non-code projects (no .git, no manifest) never get run/plan logs written.
  *
  * State sources (newest schema first):
  *   1. .claude/logs/runs/<id>/run-state.json  — what /run writes today
@@ -18,6 +31,8 @@
  *
  * Env:
  *   AF_HANDOFF_THRESHOLD=70    Stop-save threshold (percent)
+ *   AF_CLAUDE_SESSION_ID / AF_TRANSCRIPT_PATH — exported on SessionStart via
+ *     CLAUDE_ENV_FILE so the manual --save knows which session it is.
  *   AF_COMPACT_HANDOFF_DISABLED=true
  *
  * Exit Codes:
@@ -35,6 +50,13 @@ const USAGE_MAX_AGE_MS = 10 * 60 * 1000;
 // A Stop-save at 70% can precede the actual auto-compact by many turns.
 const COMPACT_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const RESUME_MAX_AGE_MS = 30 * 60 * 1000;
+// Named handoffs stay listable this long; older ones are pruned on save.
+const KEEP_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+const LIST_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const CODE_MARKERS = ['.git', 'package.json', 'pyproject.toml', 'requirements.txt', 'setup.py',
+  'go.mod', 'Cargo.toml', 'pom.xml', 'build.gradle', 'build.gradle.kts', 'composer.json',
+  'Gemfile', 'pubspec.yaml', 'Package.swift', 'mix.exs', 'deno.json', 'CMakeLists.txt', 'Makefile'];
+const PLAN_DOC_RE = /(plan|roadmap|handoff|backlog|todo)[^/]*\.(md|markdown|html|txt)$/i;
 const OPEN_RUN_STATUSES = new Set(['in_progress', 'paused', 'active', 'blocked']);
 
 // Resolved per call (not at module load) so AF_PROJECT_ROOT can redirect tests.
@@ -45,7 +67,7 @@ function getPaths(root = findProjectRoot()) {
     cache,
     runsDir: path.join(root, '.claude', 'logs', 'runs'),
     workflowsDir: path.join(root, '.claude', 'logs', 'workflows'),
-    handoff: path.join(cache, 'compact-handoff.json'),
+    handoffsDir: path.join(root, '.claude', 'handoffs'),
     workflowState: path.join(cache, 'workflow-state.json'),
     contextUsage: path.join(cache, 'context-usage.json'),
   };
@@ -97,15 +119,91 @@ function findActiveRun(p = getPaths()) {
   };
 }
 
-function readActivePlan() {
+function readActivePlan(root) {
   try {
     const resolvePlansDir = require('./lib/plans-dir.cjs');
-    const active = readJson(path.join(resolvePlansDir(), 'active.json'));
+    // Project root, not cwd: a session working in a subdirectory still follows
+    // the project's plan tree.
+    const active = readJson(path.join(resolvePlansDir(root), 'active.json'));
     const a = active && active.active;
     return a && (a.feature || a.initiative || a.mission) ? a : null;
   } catch {
     return null;
   }
+}
+
+/** Code project = has .git or a build/package manifest at the root. */
+function isCodeProject(root) {
+  return CODE_MARKERS.some((m) => fs.existsSync(path.join(root, m)));
+}
+
+/** The project's own plan docs (root + docs/), newest first, relative paths. */
+function findPlanDocs(root, limit = 6) {
+  const found = [];
+  for (const dir of ['', 'docs', path.join('docs', 'plans'), 'plans']) {
+    let entries;
+    try { entries = fs.readdirSync(path.join(root, dir), { withFileTypes: true }); } catch { continue; }
+    for (const e of entries) {
+      if (!e.isFile() || !PLAN_DOC_RE.test(e.name)) continue;
+      const rel = path.join(dir, e.name);
+      try { found.push({ rel, mtime: fs.statSync(path.join(root, rel)).mtimeMs }); } catch { /* raced */ }
+    }
+  }
+  return found.sort((a, b) => b.mtime - a.mtime).slice(0, limit).map((f) => f.rel);
+}
+
+/** Pure: filesystem-safe slug; strips Vietnamese diacritics (đ → d). */
+function slugify(text) {
+  return String(text || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+/**
+ * Session title from the transcript: latest /rename custom-title, else the
+ * latest ai-title, else null. Scans the raw text — title records are small
+ * and can sit anywhere in the file.
+ */
+function sessionTitle(transcriptPath) {
+  if (!transcriptPath) return null;
+  let text;
+  try { text = fs.readFileSync(transcriptPath, 'utf-8'); } catch { return null; }
+  let custom = null;
+  let ai = null;
+  for (const line of text.split('\n')) {
+    if (!line.includes('-title"')) continue;
+    let e;
+    try { e = JSON.parse(line); } catch { continue; }
+    if (e.type === 'custom-title' && e.customTitle) custom = e.customTitle;
+    else if (e.type === 'ai-title' && e.aiTitle) ai = e.aiTitle;
+  }
+  return custom || ai || null;
+}
+
+/** Existing handoffs, newest first. */
+function listHandoffs(p = getPaths()) {
+  let files;
+  try { files = fs.readdirSync(p.handoffsDir).filter((f) => f.endsWith('.json')); } catch { return []; }
+  return files
+    .map((f) => readJson(path.join(p.handoffsDir, f)))
+    .filter((h) => h && h.name && h.saved_at)
+    .sort((a, b) => new Date(b.saved_at) - new Date(a.saved_at));
+}
+
+/**
+ * Handoff name for a session: slug(title) or session-<id8>. When another
+ * session already owns that name, suffix this session's short id.
+ */
+function resolveHandoffName(p, sessionId, title) {
+  const shortId = String(sessionId || 'unknown').slice(0, 8);
+  const base = slugify(title) || `session-${slugify(shortId) || 'unknown'}`;
+  const owner = readJson(path.join(p.handoffsDir, `${base}.json`));
+  if (!owner || !owner.session_id || owner.session_id === sessionId) return base;
+  return `${base}-${slugify(shortId)}`;
 }
 
 /** Legacy workflow state (pre-/run). */
@@ -157,24 +255,8 @@ function shouldSaveOnStop({ usage, threshold = DEFAULT_THRESHOLD, hasOpenWork })
   return Boolean(hasOpenWork);
 }
 
-/** Last N real user prompts from a transcript JSONL (skips tool results + injected tags). */
-function recentUserPrompts(transcriptPath, n = 3, maxBytes = 512 * 1024) {
-  if (!transcriptPath) return [];
-  let text;
-  try {
-    const fd = fs.openSync(transcriptPath, 'r');
-    try {
-      const size = fs.fstatSync(fd).size;
-      const len = Math.min(size, maxBytes);
-      const buf = Buffer.alloc(len);
-      fs.readSync(fd, buf, 0, len, size - len);
-      text = buf.toString('utf-8');
-    } finally {
-      fs.closeSync(fd);
-    }
-  } catch {
-    return [];
-  }
+/** Real user prompts in a chunk of transcript JSONL (skips tool results + injected tags). */
+function parseUserPrompts(text) {
   const prompts = [];
   for (const line of text.split('\n')) {
     let entry;
@@ -186,10 +268,44 @@ function recentUserPrompts(transcriptPath, n = 3, maxBytes = 512 * 1024) {
     }
     if (typeof content !== 'string') continue;
     content = content.trim();
-    if (!content || content.startsWith('<')) continue;
+    if (content.startsWith('<')) {
+      // Slash commands arrive wrapped in tags; keep them when they carry args
+      // (`/run <task>` is often the most important request in the session).
+      const cmd = content.match(/<command-name>([^<]*)<\/command-name>/);
+      const args = content.match(/<command-args>([\s\S]*?)<\/command-args>/);
+      content = cmd && args && args[1].trim() ? `${cmd[1].trim()} ${args[1].trim()}` : '';
+    }
+    if (!content) continue;
     prompts.push(content.length > 300 ? `${content.slice(0, 300)}…` : content);
   }
-  return prompts.slice(-n);
+  return prompts;
+}
+
+/**
+ * Last N real user prompts from a transcript JSONL. Reads the tail and widens
+ * the window until N prompts are found: long agentic turns push the last
+ * prompt far back behind tool output.
+ */
+function recentUserPrompts(transcriptPath, n = 3, windows = [512 * 1024, 4 * 1024 * 1024, 16 * 1024 * 1024]) {
+  if (!transcriptPath) return [];
+  let fd;
+  try { fd = fs.openSync(transcriptPath, 'r'); } catch { return []; }
+  try {
+    const size = fs.fstatSync(fd).size;
+    let prompts = [];
+    for (const w of windows) {
+      const len = Math.min(size, w);
+      const buf = Buffer.alloc(len);
+      fs.readSync(fd, buf, 0, len, size - len);
+      prompts = parseUserPrompts(buf.toString('utf-8'));
+      if (prompts.length >= n || len === size) break;
+    }
+    return prompts.slice(-n);
+  } catch {
+    return [];
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function modifiedFiles(root) {
@@ -209,43 +325,75 @@ function modifiedFiles(root) {
   }
 }
 
-function buildHandoff({ p = getPaths(), input = {}, reason = 'compact' } = {}) {
+function buildHandoff({ p = getPaths(), input = {}, reason = 'compact', kind = 'auto', note = null } = {}) {
+  const codeProject = isCodeProject(p.root);
   const run = findActiveRun(p);
-  const workflow = run ? null : getLegacyWorkflowState(p);
-  const plan = readActivePlan();
+  // Legacy workflows are a code-run concept; env leftovers must not turn a
+  // docs/notes project into a "workflow".
+  const workflow = run || !codeProject ? null : getLegacyWorkflowState(p);
+  const plan = readActivePlan(p.root);
   const context = getSessionContext();
-  let resumeHint = null;
-  if (run) resumeHint = `/run resume ${run.run_id}`;
-  else if (workflow) resumeHint = `/run resume ${workflow.workflow_id}`;
+  const sessionId = input.session_id || process.env.AF_CLAUDE_SESSION_ID || null;
+  const transcript = input.transcript_path || process.env.AF_TRANSCRIPT_PATH || null;
+  const title = sessionTitle(transcript);
+  const name = resolveHandoffName(p, sessionId, title);
   return {
-    version: '2.0.0',
+    version: '3.0.0',
+    name,
+    title,
+    session_id: sessionId,
+    kind,
     saved_at: new Date().toISOString(),
     reason,
     trigger: input.trigger || null,
     context_usage: readContextUsage(p),
+    project: { kind: codeProject ? 'code' : 'non-code', plan_docs: findPlanDocs(p.root) },
     run,
     workflow,
     plan,
     context,
-    modified_files: modifiedFiles(p.root),
-    recent_prompts: recentUserPrompts(input.transcript_path),
-    resume_hint: resumeHint,
+    note,
+    modified_files: codeProject ? modifiedFiles(p.root) : [],
+    recent_prompts: recentUserPrompts(transcript),
+    resume_hint: `/run resume ${name}`,
   };
 }
 
+function pruneHandoffs(p, nowMs = Date.now()) {
+  for (const h of listHandoffs(p)) {
+    if (nowMs - new Date(h.saved_at).getTime() <= KEEP_MAX_AGE_MS) continue;
+    removeHandoff(p, h.name);
+  }
+}
+
+function removeHandoff(p, name) {
+  for (const ext of ['.json', '.md']) {
+    try { fs.unlinkSync(path.join(p.handoffsDir, name + ext)); } catch { /* already gone */ }
+  }
+}
+
 /** Save a handoff. Returns false when there is nothing worth resuming. */
-function saveHandoff({ input = {}, reason = 'compact' } = {}) {
+function saveHandoff({ input = {}, reason = 'compact', kind = 'auto', note = null } = {}) {
   try {
     const p = getPaths();
-    const handoff = buildHandoff({ p, input, reason });
-    if (!handoff.run && !handoff.workflow && !handoff.plan &&
-        !handoff.context.project_name && handoff.recent_prompts.length === 0) {
+    const handoff = buildHandoff({ p, input, reason, kind, note });
+    if (!handoff.run && !handoff.workflow && !handoff.plan && !handoff.note &&
+        !handoff.context.project_name && handoff.recent_prompts.length === 0 &&
+        !handoff.session_id) {
       return false;
     }
-    fs.mkdirSync(p.cache, { recursive: true });
-    fs.writeFileSync(p.handoff, JSON.stringify(handoff, null, 2));
+    fs.mkdirSync(p.handoffsDir, { recursive: true });
+    const prev = readJson(path.join(p.handoffsDir, `${handoff.name}.json`));
+    // An auto save must not erase the note of a manual handoff for this session.
+    if (prev && prev.kind === 'manual' && kind === 'auto') {
+      handoff.kind = 'manual';
+      handoff.note = prev.note;
+    }
+    fs.writeFileSync(path.join(p.handoffsDir, `${handoff.name}.json`), JSON.stringify(handoff, null, 2));
+    fs.writeFileSync(path.join(p.handoffsDir, `${handoff.name}.md`), generateResumeContext(handoff) + '\n');
+    pruneHandoffs(p);
 
-    // Legacy workflows: mark paused so /run resume shows the right status.
+    // Legacy workflows (code projects only): mark paused so /run resume shows the right status.
     if (handoff.workflow && handoff.workflow.workflow_id) {
       const dir = path.join(p.workflowsDir, handoff.workflow.workflow_id);
       fs.mkdirSync(dir, { recursive: true });
@@ -263,26 +411,52 @@ function saveHandoff({ input = {}, reason = 'compact' } = {}) {
   }
 }
 
-/** Load the handoff if fresh enough for this SessionStart source; null otherwise. */
-function loadHandoff({ source = 'unknown', nowMs = Date.now() } = {}) {
-  try {
-    const p = getPaths();
-    if (source === 'clear' || !fs.existsSync(p.handoff)) return null;
-    const handoff = JSON.parse(fs.readFileSync(p.handoff, 'utf-8'));
+/**
+ * The handoff belonging to this session (by session_id), if fresh enough for
+ * this SessionStart source; null otherwise. Never returns another session's.
+ */
+function loadHandoff({ source = 'unknown', sessionId = null, nowMs = Date.now(), p = getPaths() } = {}) {
+  if (source === 'clear' || !sessionId) return null;
+  const mine = listHandoffs(p).find((h) => h.session_id === sessionId);
+  if (!mine) return null;
+  if (mine.kind !== 'manual') {
     const maxAge = source === 'compact' ? COMPACT_MAX_AGE_MS : RESUME_MAX_AGE_MS;
-    if (nowMs - new Date(handoff.saved_at).getTime() > maxAge) {
-      fs.unlinkSync(p.handoff);
-      return null;
-    }
-    return handoff;
-  } catch {
-    return null;
+    if (nowMs - new Date(mine.saved_at).getTime() > maxAge) return null;
   }
+  return mine;
+}
+
+/** Find a handoff by name, slug of a title, or session id. */
+function findHandoff(query, p = getPaths()) {
+  if (!query) return null;
+  const all = listHandoffs(p);
+  const q = slugify(query);
+  return all.find((h) => h.name === query || h.name === q) ||
+    all.find((h) => h.session_id === query || slugify(h.title) === q) || null;
+}
+
+/** Pure: short index of named handoffs for a NEW session (no content leak). */
+function generateHandoffIndex(handoffs = []) {
+  if (!handoffs.length) return '';
+  const lines = ['# 🐸 Aura Frog — saved handoffs in this project', ''];
+  for (const h of handoffs) {
+    const what = (h.run && h.run.task) || h.note || '';
+    lines.push(`- **${h.name}**${h.title && slugify(h.title) !== h.name ? ` (${h.title})` : ''} · saved ${h.saved_at.slice(0, 16).replace('T', ' ')}` +
+      `${what ? ` · ${String(what).replace(/\n+/g, ' ').slice(0, 80)}` : ''} → \`/run resume ${h.name}\``);
+  }
+  lines.push('', 'These belong to other sessions. Only load one when the user asks to resume it.');
+  return lines.join('\n');
 }
 
 /** Pure: render the resume context injected after compaction. */
 function generateResumeContext(handoff = {}) {
-  const lines = ['# 🔄 Aura Frog — resumed after compact', ''];
+  const heading = handoff.title || handoff.name;
+  const lines = [`# 🔄 Aura Frog — resume${heading ? `: ${heading}` : ''}`, ''];
+  if (handoff.name) lines.push(`Handoff \`${handoff.name}\` · saved ${handoff.saved_at || '?'} · resume with \`/run resume ${handoff.name}\``, '');
+
+  if (handoff.note) {
+    lines.push('## Handoff note', handoff.note, '');
+  }
 
   if (handoff.run) {
     const r = handoff.run;
@@ -306,10 +480,15 @@ function generateResumeContext(handoff = {}) {
     lines.push('');
   }
 
-  if (handoff.plan) {
-    const a = handoff.plan;
-    const parts = [a.feature || a.initiative || a.mission, a.story, a.task].filter(Boolean);
-    lines.push(`## Plan anchor: ${parts.join(' → ')}`);
+  const planDocs = (handoff.project && handoff.project.plan_docs) || [];
+  if (handoff.plan || planDocs.length) {
+    lines.push("## Project's plan (source of truth — follow it)");
+    if (handoff.plan) {
+      const a = handoff.plan;
+      const parts = [a.feature || a.initiative || a.mission, a.story, a.task].filter(Boolean);
+      lines.push(`- **Plan anchor:** ${parts.join(' → ')}`);
+    }
+    planDocs.forEach((d) => lines.push(`- \`${d}\``));
     lines.push('');
   }
 
@@ -334,31 +513,97 @@ function generateResumeContext(handoff = {}) {
   }
 
   lines.push('## How to continue');
+  if (handoff.plan || planDocs.length) {
+    lines.push("Re-read the project's plan above first and continue from where it stands — do not invent a new plan.");
+  }
+  if (handoff.project && handoff.project.kind === 'non-code') {
+    lines.push('Non-code project: do not create run-state or plan logs; keep notes in the handoff (`--save --note`).');
+  }
   if (handoff.run) {
     lines.push(`Re-read \`${handoff.run.state_file}\` (and its deliverables) before acting, then continue the run from its current phase. Do not restart completed phases.`);
-  } else if (handoff.resume_hint) {
+  } else if (handoff.workflow && handoff.resume_hint) {
     lines.push(`Run \`${handoff.resume_hint}\` or re-read the workflow state, then continue.`);
+  } else if (handoff.note) {
+    lines.push('Continue from the handoff note above; verify file state before editing.');
   } else {
     lines.push('Continue the last user request above; verify file state before editing.');
   }
   return lines.join('\n');
 }
 
+function shq(v) {
+  return `'${String(v).replace(/'/g, `'\\''`)}'`;
+}
+
+/** Let later Bash calls (manual --save) know which session they belong to. */
+function exportSessionEnv(input) {
+  const envFile = process.env.CLAUDE_ENV_FILE;
+  if (!envFile || !input.session_id) return;
+  const lines = [`export AF_CLAUDE_SESSION_ID=${shq(input.session_id)}`];
+  if (input.transcript_path) lines.push(`export AF_TRANSCRIPT_PATH=${shq(input.transcript_path)}`);
+  try { fs.appendFileSync(envFile, lines.join('\n') + '\n'); } catch { /* best effort */ }
+}
+
+function argValue(argv, flag) {
+  const i = argv.indexOf(flag);
+  return i >= 0 && i + 1 < argv.length ? argv[i + 1] : null;
+}
+
 function main() {
   if (process.env.AF_COMPACT_HANDOFF_DISABLED === 'true') return;
-  const mode = process.argv[2] || 'stop';
+  const argv = process.argv.slice(2);
+  const mode = argv[0] || 'stop';
+
+  if (mode === '--save') {
+    const handoff = saveHandoff({ reason: 'manual', kind: 'manual', note: argValue(argv, '--note') });
+    if (!handoff) {
+      process.stdout.write('Nothing to hand off (no session id, run, plan or prompts).\n');
+      return;
+    }
+    process.stdout.write(`Handoff saved: ${path.join('.claude', 'handoffs', `${handoff.name}.md`)}\n` +
+      `Resume: /run resume ${handoff.name}${handoff.title ? ` (or: claude --resume "${handoff.title}")` : ''}\n`);
+    return;
+  }
+
+  if (mode === '--show') {
+    const h = findHandoff(argv[1]);
+    if (!h) {
+      const names = listHandoffs().map((x) => x.name);
+      process.stdout.write(`No handoff "${argv[1] || ''}". Available: ${names.join(', ') || '(none)'}\n`);
+      return;
+    }
+    process.stdout.write(generateResumeContext(h) + '\n');
+    return;
+  }
+
+  if (mode === '--list') {
+    process.stdout.write((generateHandoffIndex(listHandoffs()) || 'No handoffs.') + '\n');
+    return;
+  }
+
   const input = readHookInput();
 
   if (mode === '--resume' || mode === 'resume') {
-    const handoff = loadHandoff({ source: input.source });
-    if (!handoff) return;
+    exportSessionEnv(input);
+    const p = getPaths();
+    const handoff = loadHandoff({ source: input.source, sessionId: input.session_id, p });
+    let additionalContext = null;
+    if (handoff) {
+      additionalContext = generateResumeContext(handoff);
+      // Auto snapshots are consumed; manual handoffs stay until pruned.
+      if (handoff.kind !== 'manual') removeHandoff(p, handoff.name);
+    } else if (input.source !== 'clear' && input.source !== 'compact') {
+      const nowMs = Date.now();
+      const recent = listHandoffs(p)
+        .filter((h) => h.session_id !== input.session_id)
+        .filter((h) => nowMs - new Date(h.saved_at).getTime() <= LIST_MAX_AGE_MS)
+        .slice(0, 5);
+      additionalContext = generateHandoffIndex(recent) || null;
+    }
+    if (!additionalContext) return;
     process.stdout.write(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'SessionStart',
-        additionalContext: generateResumeContext(handoff),
-      },
+      hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext },
     }));
-    try { fs.unlinkSync(getPaths().handoff); } catch { /* already gone */ }
     return;
   }
 
@@ -379,6 +624,13 @@ function main() {
 module.exports = {
   getPaths,
   findActiveRun,
+  isCodeProject,
+  findPlanDocs,
+  slugify,
+  sessionTitle,
+  listHandoffs,
+  findHandoff,
+  generateHandoffIndex,
   readContextUsage,
   shouldSaveOnStop,
   recentUserPrompts,
