@@ -65,7 +65,7 @@ actions[8]{input,action}:
   approve,"Approve current gate → advance to next phase"
   reject <reason>,"Reject → brainstorm alternatives → redo"
   modify <changes>,"Adjust deliverables without restarting phase"
-  handoff,"Save state for next session"
+  handoff,"Save a handoff named after this session (.claude/handoffs/<session-name>.md)"
   status,"Show current run progress"
   progress,"Visual timeline + token usage"
   rollback,"Revert to last checkpoint"
@@ -98,7 +98,9 @@ Show active run: phase, progress %, deliverables, agents, time elapsed, token us
 
 ## /run resume <id-or-feature>
 
-Resume a saved run. Two forms (v3.7.3+):
+Resume a saved run or handoff. Three forms:
+
+- **`/run resume <session-name>`** (e.g., `/run resume lam-truyen`) — resume a named handoff. Handoffs are saved per session under `.claude/handoffs/<name>.{json,md}`, named after the session title (`/rename` → auto title → `session-<id8>`). Print it with `node "${CLAUDE_PLUGIN_ROOT}/hooks/compact-handoff.cjs" --show <name>`, re-read the project's plan docs it lists, then continue. Checked first; falls through to the forms below when no handoff matches.
 
 - **`/run resume <run-id>`** (e.g., `/run resume auth-260512`) — direct resume by run ID. Loads `.claude/logs/runs/<run-id>/run-state.json`, validates git state, restores context, continues from last phase.
 - **`/run resume <FEATURE_ID>`** (e.g., `/run resume FEAT-A`, `/run resume JIRA-1234`) — feature-anchored resume. Looks up the feature's `## Runs` table via `scripts/plans/link-run.sh list <FEATURE_ID>`, surfaces all linked runs with their status (in_progress / done / discarded), and prompts to pick one. If only one in-progress run exists, resumes it directly.

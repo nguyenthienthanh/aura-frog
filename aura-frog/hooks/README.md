@@ -119,18 +119,21 @@ env_vars[16]{var,description}:
 ---
 
 ### 0d. SessionStart - Compact Resume (rewritten in 3.8.0)
-**When:** Every SessionStart; acts on `source` = `compact` (handoff ≤6h old) or `startup`/`resume` (≤30min). Ignores `clear`.
+**When:** Every SessionStart. Ignores `clear`.
 
 **Actions:**
-- ✅ Read `.claude/cache/compact-handoff.json`
-- ✅ Emit `hookSpecificOutput.additionalContext`: active run (`logs/runs/<id>/run-state.json`), plan anchor, last 3 user prompts, uncommitted files, and an instruction to re-read the run state and continue from the current phase
-- ✅ Delete the handoff after injecting (one-shot)
+- ✅ Export `AF_CLAUDE_SESSION_ID` + `AF_TRANSCRIPT_PATH` to `CLAUDE_ENV_FILE` (used by the manual `--save`)
+- ✅ Same session (`session_id` match; `compact` ≤6h, `resume`/`startup` ≤30min, manual handoffs no limit): read `.claude/handoffs/<name>.json` and emit `hookSpecificOutput.additionalContext` — handoff note, active run (`logs/runs/<id>/run-state.json`), the project's plan (plan tree anchor + plan docs), last 3 user prompts, uncommitted files, and how to continue
+- ✅ Delete auto snapshots after injecting; manual handoffs stay
+- ✅ New session: inject only an index of named handoffs (`/run resume <name>`), never another session's content
 
 No "type continue" step: after an auto-compact Claude continues the turn with the injected context. Disable with `AF_COMPACT_HANDOFF_DISABLED=true`.
 
 **Example injected context:**
 ```
-# 🔄 Aura Frog — resumed after compact
+# 🔄 Aura Frog — resume: Auth work
+
+Handoff `auth-work` · saved 2026-09-13T10:00:00Z · resume with `/run resume auth-work`
 
 ## Active run: auth-0913
 - **Task:** Implement JWT login
@@ -677,7 +680,9 @@ User: "Implement JWT authentication for the API"
 - **PreCompact** (`--pre-compact`, trigger `manual` or `auto`) → always saves
 - **Stop** → saves when context usage ≥ `AF_HANDOFF_THRESHOLD` (default 70). Usage comes from `.claude/cache/context-usage.json`, written by `scripts/statusline.sh` (hooks never receive `used_percentage`). Without statusline data it saves only while a run is open.
 
-**Saves** `.claude/cache/compact-handoff.json`: newest open run from `.claude/logs/runs/*/run-state.json` (legacy `workflow-state.json` fallback), `plans/active.json` anchor, last 3 user prompts from `transcript_path`, `git diff --name-only HEAD`, context usage. Silent, non-blocking.
+**Saves** `.claude/handoffs/<name>.{json,md}`, one per session. `<name>` is the slug of the session title (`/rename` → ai title → `session-<id8>`); a same-title clash with another session gets `-<id8>`. Content: newest open run from `.claude/logs/runs/*/run-state.json` (legacy `workflow-state.json` fallback, code projects only), the project's plan (`plans/active.json` resolved from the project root + plan docs such as `ROADMAP.md`, `*_PLAN.md`, `docs/*plan*`), last 3 user prompts from `transcript_path`, `git diff --name-only HEAD`, context usage. Non-code projects (no `.git`, no manifest) never get run/plan logs. Pruned after 14 days. Silent, non-blocking.
+
+**CLI:** `--save [--note <text>]` (manual `handoff`), `--show <name>`, `--list`.
 
 **Script:** `hooks/compact-handoff.cjs`
 
