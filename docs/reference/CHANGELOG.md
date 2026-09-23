@@ -12,6 +12,8 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.17] - 2026-09-23 (Per-session named handoffs that follow the project's plan)
+
 ### Fixed
 
 - **Sessions in one project overwrote and stole each other's handoff.** There was a single
