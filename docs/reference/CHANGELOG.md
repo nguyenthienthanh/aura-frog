@@ -12,6 +12,21 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.18] - 2026-09-24 (Evidence-based code review: correctness + compatibility aspects, check review command)
+
+### Changed
+
+- **`code-reviewer` rebuilt on verified engineering standards** (Google eng-practices, OWASP
+  Top 10:2025, CWE Top 25, SemVer/Hyrum's law/AIP-180, Conventional Comments, SonarSource
+  cognitive complexity; sources in `skills/code-reviewer/references/standards.md`). 6 → 8 aspects:
+  adds **Correctness** (logic bugs) and **Compatibility** (no breaking change) as CRITICAL
+  priority; Simplicity now covers over-engineering and unnecessary comments. Every finding needs
+  `file:line` + a concrete failure scenario + a refute pass; severity is blocking / non-blocking /
+  nit by impact. Approval bar: the change improves code health, not perfection.
+- **Review is wired into every entry point:** TDD Phase 4 reviewers follow the skill and fill the
+  8-row `CODE_REVIEW.md`; new `/check review [path|PR]`; `/run review` also matches "audit".
+- `security` agent: OWASP Top 10 2021 → 2025.
+
 ## [3.8.0-alpha.17] - 2026-09-23 (Per-session named handoffs that follow the project's plan)
 
 ### Fixed

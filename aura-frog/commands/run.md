@@ -42,7 +42,7 @@ detection[8]{keywords,intent,flow}:
   "refactor/cleanup/restructure/improve code",refactor,"Analyze → plan → test → refactor → verify"
   "test/coverage/unit test/e2e/add tests",test,"Detect framework → analyze → write tests → verify coverage"
   "security/audit/vulnerability/scan/owasp",security,"Deps + SAST + secrets + OWASP Top 10 → report"
-  "review/check code/code review",review,"6-aspect review: security/arch/errors/tests/types/simplify"
+  "review/audit/check code/code review",review,"code-reviewer skill: 8 aspects, evidence + failure scenario per finding"
   "deploy/docker/cicd/kubernetes",deploy,"Platform detect → config → scripts → guide"
   "quality/lint/complexity/debt",quality,"Lint + format + type check + coverage + complexity → report"
 ```
