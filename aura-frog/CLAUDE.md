@@ -245,7 +245,7 @@ core_paths[22]{topic,path}:
 ```toon
 commands[13]{cmd,subs}:
   /run,"<task> (auto-detect intent) + context-aware: approve/reject/modify/handoff/status/progress/rollback/stop"
-  /check,"(all)/security/perf/complexity/debt/coverage/deps"
+  /check,"(all)/review/security/perf/complexity/debt/coverage/deps"
   /design,"api/db/doc"
   /project,"init/detect/status/list/switch/refresh/regen/env/sync"
   /af,"status/agents/metrics/learn/setup/update/mcp/prompts/skill"

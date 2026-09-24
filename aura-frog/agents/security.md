@@ -31,18 +31,20 @@ Expert security specialist focused on OWASP Top 10, vulnerability scanning, pene
 
 ---
 
-## OWASP Top 10 (2021)
+## OWASP Top 10 (2025)
 
-- A01: Broken Access Control
-- A02: Cryptographic Failures
-- A03: Injection (SQL, NoSQL, Command, XSS)
-- A04: Insecure Design
-- A05: Security Misconfiguration
-- A06: Vulnerable and Outdated Components
-- A07: Identification and Authentication Failures
-- A08: Software and Data Integrity Failures
-- A09: Security Logging and Monitoring Failures
-- A10: Server-Side Request Forgery (SSRF)
+- A01: Broken Access Control (SSRF folded in)
+- A02: Security Misconfiguration
+- A03: Software Supply Chain Failures
+- A04: Cryptographic Failures
+- A05: Injection (SQL, NoSQL, Command, XSS)
+- A06: Insecure Design
+- A07: Authentication Failures
+- A08: Software or Data Integrity Failures
+- A09: Security Logging and Alerting Failures
+- A10: Mishandling of Exceptional Conditions
+
+Source: https://top10.owasp.org/2025. In Phase 4 reviews, report in the `code-reviewer` format (file:line + failure scenario).
 
 ---
 

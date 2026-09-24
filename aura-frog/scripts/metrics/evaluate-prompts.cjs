@@ -115,7 +115,7 @@ const SUGGESTION_RULES = [
     id: 'no_code_review',
     check: (stats) => stats.reviewPercent < 3 && stats.implementCount > 5,
     title: 'Add code reviews to catch issues early',
-    detail: 'Almost no code review prompts detected. Use /simplify after changes or the code-reviewer skill for 6-aspect structured reviews.',
+    detail: 'Almost no code review prompts detected. Use /simplify after changes or /check review (code-reviewer skill) for evidence-based reviews.',
     priority: 'medium',
   },
   {

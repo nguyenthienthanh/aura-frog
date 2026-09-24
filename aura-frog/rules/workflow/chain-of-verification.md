@@ -87,4 +87,4 @@ Most hallucinations are "plausible-sounding facts the model wasn't actually chec
 - `rules/workflow/self-consistency.md` — SC picks an answer; CoVe checks its facts. Orthogonal.
 - `rules/workflow/tree-of-thoughts.md` — CoVe validates ToT's chosen leaf
 - `skills/chain-of-verification/SKILL.md` — concrete playbook
-- `skills/code-reviewer/SKILL.md` — applies CoVe to each of the 6 review aspects
+- `skills/code-reviewer/SKILL.md` — applies CoVe to factual claims in review output; per-finding evidence/scenario/refute check

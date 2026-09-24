@@ -9,9 +9,17 @@ Verify code quality, security, performance, and coverage. One command to audit e
 
 ## /check
 
-Run all quality checks: lint, format, type check, coverage, complexity. Produces scored report (0-100) with prioritized next steps.
+Run all quality checks: lint, format, type check, coverage, complexity. (Code review is separate: `/check review`.) Produces scored report (0-100) with prioritized next steps.
 
 **Usage:** `/check`, `/check src/components`
+
+---
+
+## /check review
+
+Evidence-based code review/audit of the current diff (default base `main`), a path, or a PR number, via `skills/code-reviewer/SKILL.md`: 8 aspects (security, correctness, compatibility, architecture, error handling, test gaps, type safety, simplicity). Each finding carries `file:line` + a concrete failure scenario; unproven findings are dropped. Ends with APPROVED / CHANGES REQUESTED.
+
+**Usage:** `/check review`, `/check review src/auth`, `/check review 123`
 
 ---
 

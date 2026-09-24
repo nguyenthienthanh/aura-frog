@@ -13,22 +13,24 @@ _One-paragraph verdict: approve / changes-required / block._
 ## Coverage by Aspect
 
 ```toon
-review[6]{aspect,verdict,blocker_count,notes}:
+review[8]{aspect,verdict,blocker_count,notes}:
   security,_,_,_
+  correctness,_,_,_
+  compatibility,_,_,_
   architecture,_,_,_
   error_handling,_,_,_
-  test_coverage,_,_,_
+  test_gaps,_,_,_
   type_safety,_,_,_
-  simplification,_,_,_
+  simplicity,_,_,_
 ```
 
 ## Findings
 
-### Blockers
-_Anything that must change before merge. Cite file:line._
+### Blocking
+_Must change before merge. Each: `file:line` — defect · Scenario · Fix (see `skills/code-reviewer`)._
 
-### Suggestions
-_Non-blocking improvements._
+### Non-blocking
+_Should fix; merge allowed. Nits prefixed `Nit:`._
 
 ### Praise
 _What's done well — calibrates reviewer signal._
@@ -39,6 +41,7 @@ _What's done well — calibrates reviewer signal._
 - [ ] Tests still pass (paste counts)
 - [ ] No new lint errors
 - [ ] No secret patterns introduced
+- [ ] No breaking change (or versioned + migration note)
 - [ ] Phase 3 builder did NOT also review this code
 
 ## Sign-off

@@ -321,7 +321,7 @@ execution[5]{phase,agent_id,main_thread_role}:
   1,architect,"dispatch + hold gate"
   2,tester,"verify tests fail as expected"
   3,"architect or frontend or mobile (per artifact)","dispatch + hold gate"
-  4,"security (primary) + tester","verify builder≠reviewer"
+  4,"security (primary) + tester","verify builder≠reviewer; reviewers follow skills/code-reviewer → CODE_REVIEW.md"
   5,inline (lead),"finalize — no fork needed"
 ```
 
@@ -403,6 +403,7 @@ Skills (playbooks):
 - `rules/workflow/smart-commenting.md` — WHY not WHAT
 
 **Phase 4 (Refactor + Review):**
+- `skills/code-reviewer/SKILL.md` — The review itself: 8 aspects, verified findings, blocking/non-blocking/nit
 - `rules/workflow/cross-review-workflow.md` — Builder ≠ Reviewer
 - `rules/workflow/post-implementation-linting.md` — Final lint gate
 

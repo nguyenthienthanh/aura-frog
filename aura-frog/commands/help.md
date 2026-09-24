@@ -16,7 +16,7 @@
 
 **Verify:**
 - /check — Run all quality checks
-- /check security / perf / complexity / debt / coverage / deps
+- /check review / security / perf / complexity / debt / coverage / deps
 
 **Design:**
 - /design api / db / doc — Design before coding
