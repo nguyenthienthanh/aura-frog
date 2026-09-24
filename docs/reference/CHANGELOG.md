@@ -12,6 +12,8 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.18] - 2026-09-24 (Evidence-based code review: correctness + compatibility aspects, check review command)
+
 ### Changed
 
 - **`code-reviewer` rebuilt on verified engineering standards** (Google eng-practices, OWASP
