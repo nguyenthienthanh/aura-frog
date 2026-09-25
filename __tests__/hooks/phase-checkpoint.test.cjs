@@ -9,14 +9,21 @@
  * contract rather than machine-specific values.
  */
 
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const {
   getWorkflowState,
   hasUncommittedChanges,
   getCacheFile,
   readCache,
+  isIndexLocked,
 } = require('../../aura-frog/hooks/phase-checkpoint.cjs');
+
+const HOOK_SRC = fs.readFileSync(
+  path.join(__dirname, '../../aura-frog/hooks/phase-checkpoint.cjs'), 'utf8');
 
 describe('phase-checkpoint', () => {
   it('does not export the repo-mutating helpers', () => {
@@ -64,6 +71,36 @@ describe('phase-checkpoint', () => {
       expect(() => { out = readCache(); }).not.toThrow();
       expect(typeof out).toBe('object');
       expect(out).not.toBeNull();
+    });
+  });
+
+  // A checkpoint racing a user/Claude commit is what leaves "index.lock: File
+  // exists" behind when several sessions share one repo.
+  describe('index lock contention', () => {
+    let repo;
+    beforeEach(() => {
+      repo = fs.mkdtempSync(path.join(os.tmpdir(), 'af-ckpt-'));
+      execFileSync('git', ['init', '-q', repo]);
+    });
+    afterEach(() => fs.rmSync(repo, { recursive: true, force: true }));
+
+    it('isIndexLocked is false for a clean repo', () => {
+      expect(isIndexLocked(repo)).toBe(false);
+    });
+
+    it('isIndexLocked is true while another git process holds index.lock', () => {
+      fs.writeFileSync(path.join(repo, '.git', 'index.lock'), '');
+      expect(isIndexLocked(repo)).toBe(true);
+    });
+
+    it('isIndexLocked is false outside a git repo', () => {
+      const plain = fs.mkdtempSync(path.join(os.tmpdir(), 'af-plain-'));
+      try { expect(isIndexLocked(plain)).toBe(false); }
+      finally { fs.rmSync(plain, { recursive: true, force: true }); }
+    });
+
+    it('status check does not take the index lock', () => {
+      expect(HOOK_SRC).toMatch(/git --no-optional-locks status --porcelain/);
     });
   });
 });

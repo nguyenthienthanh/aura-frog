@@ -7,6 +7,8 @@
  * - node_modules, __pycache__, .git, dist, build, vendor
  * - Custom patterns from .afignore
  *
+ * Disable: AF_SCOUT_BLOCK=false
+ *
  * Exit codes:
  * - 0: Command allowed
  * - 2: Command blocked
@@ -73,6 +75,32 @@ function isBlocked(targetPath, patterns) {
   });
 }
 
+// Commands that read or scan paths. Only these segments are checked, so
+// `cd repo && rm -f .git/index.lock` (stale-lock recovery) is not blocked.
+const ACCESS_COMMANDS = ['cd', 'ls', 'cat', 'head', 'tail', 'find', 'grep'];
+const SYSTEM_PREFIXES = ['/usr/', '/opt/', '/etc/', '/tmp/'];
+
+/**
+ * Return the blocked pattern a command reads from, or null.
+ * Checks the first line, split into `&&` / `||` / `;` / `|` segments; a segment
+ * counts only when its first word is an access command.
+ */
+function findBlockedInCommand(command, patterns) {
+  const firstLine = command.split('\n')[0];
+  for (const segment of firstLine.split(/&&|\|\||;|\|/)) {
+    const tokens = segment.trim().split(/\s+/);
+    if (!ACCESS_COMMANDS.includes(tokens[0])) continue;
+    for (const token of tokens.slice(1)) {
+      if (!token.includes('/') && !token.includes('\\')) continue;
+      if (SYSTEM_PREFIXES.some(p => token.startsWith(p))) continue;
+      const segments = token.replace(/\\/g, '/').toLowerCase().split('/');
+      const matched = patterns.find(p => segments.includes(p.toLowerCase()));
+      if (matched) return matched;
+    }
+  }
+  return null;
+}
+
 /**
  * Check if command is an allowed build command
  */
@@ -81,6 +109,8 @@ function isAllowedBuildCommand(command) {
 }
 
 function main() {
+  if (process.env.AF_SCOUT_BLOCK === 'false') process.exit(0);
+
   try {
     // Read hook input from stdin
     const input = readStdinSafely();
@@ -107,30 +137,11 @@ function main() {
 
     // Check command parameter (Bash tool)
     const command = toolInput.command || '';
-    if (command) {
-      if (isAllowedBuildCommand(command)) {
-        process.exit(0);
-      }
-      const firstLine = command.split('\n')[0];
-      const accessPatterns = ['cd ', 'ls ', 'cat ', 'head ', 'tail ', 'find ', 'grep '];
-      const isAccessCommand = accessPatterns.some(p => firstLine.includes(p));
-      if (isAccessCommand) {
-        const tokens = firstLine.split(/\s+/);
-        for (const token of tokens) {
-          if (token.includes('/') || token.includes('\\')) {
-            if (token.startsWith('/usr/') || token.startsWith('/opt/') || token.startsWith('/etc/') || token.startsWith('/tmp/')) {
-              continue;
-            }
-            if (isBlocked(token, allPatterns)) {
-              const matched = allPatterns.find(p => {
-                const segments = token.replace(/\\/g, '/').toLowerCase().split('/');
-                return segments.some(s => s === p.toLowerCase());
-              });
-              console.error(`⛔ Blocked: command accesses ${matched}`);
-              process.exit(2);
-            }
-          }
-        }
+    if (command && !isAllowedBuildCommand(command)) {
+      const matched = findBlockedInCommand(command, allPatterns);
+      if (matched) {
+        console.error(`⛔ Blocked: command accesses ${matched}`);
+        process.exit(2);
       }
     }
 
@@ -157,5 +168,6 @@ if (require.main === module) {
     isBlocked,
     isAllowedBuildCommand,
     loadCustomPatterns,
+    findBlockedInCommand,
   };
 }

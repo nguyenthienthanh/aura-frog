@@ -13,7 +13,16 @@ const {
   isBlocked,
   isAllowedBuildCommand,
   loadCustomPatterns,
+  findBlockedInCommand,
 } = require('../../aura-frog/hooks/scout-block.cjs');
+
+const { spawnSync } = require('child_process');
+const HOOK = path.join(__dirname, '../../aura-frog/hooks/scout-block.cjs');
+const runHook = (toolInput, env = {}) => spawnSync('node', [HOOK], {
+  input: JSON.stringify({ tool_input: toolInput }),
+  env: { ...process.env, ...env },
+  encoding: 'utf8',
+});
 
 describe('scout-block', () => {
   describe('isBlocked', () => {
@@ -191,6 +200,50 @@ describe('scout-block', () => {
     it('trims whitespace', () => {
       fs.writeFileSync(path.join(tmpDir, '.afignore'), '  dir1  \n  dir2  \n');
       expect(loadCustomPatterns(tmpDir)).toEqual(['dir1', 'dir2']);
+    });
+  });
+
+  describe('findBlockedInCommand', () => {
+    it('blocks an access command that reads a blocked dir', () => {
+      expect(findBlockedInCommand('cat node_modules/react/package.json', DEFAULT_BLOCKED)).toBe('node_modules');
+    });
+
+    it('blocks cd into .git', () => {
+      expect(findBlockedInCommand('cd /repo/.git && ls', DEFAULT_BLOCKED)).toBe('.git');
+    });
+
+    it('checks every segment of a chained command', () => {
+      expect(findBlockedInCommand('git status; cat dist/app.js', DEFAULT_BLOCKED)).toBe('dist');
+    });
+
+    // Stale-lock recovery: only the `cd` segment is an access command, and it
+    // does not touch a blocked dir. The rm segment must not be scanned.
+    it('allows removing a stale git lock after cd', () => {
+      expect(findBlockedInCommand('cd /repo && rm -f .git/index.lock', DEFAULT_BLOCKED)).toBeNull();
+    });
+
+    it('allows non-access commands that mention .git', () => {
+      expect(findBlockedInCommand('rm -f /repo/.git/index.lock', DEFAULT_BLOCKED)).toBeNull();
+    });
+
+    it('does not treat "tools"/"concat" as ls/cat', () => {
+      expect(findBlockedInCommand('echo tools /x/node_modules/y', DEFAULT_BLOCKED)).toBeNull();
+      expect(findBlockedInCommand('npx concat /x/dist/a.js', DEFAULT_BLOCKED)).toBeNull();
+    });
+
+    it('skips system paths', () => {
+      expect(findBlockedInCommand('ls /usr/local/lib/node_modules', DEFAULT_BLOCKED)).toBeNull();
+    });
+  });
+
+  describe('hook process', () => {
+    it('blocks with exit 2 by default', () => {
+      expect(runHook({ command: 'cat node_modules/x/package.json' }).status).toBe(2);
+    });
+
+    it('AF_SCOUT_BLOCK=false disables the hook', () => {
+      const r = runHook({ command: 'cat node_modules/x/package.json' }, { AF_SCOUT_BLOCK: 'false' });
+      expect(r.status).toBe(0);
     });
   });
 });

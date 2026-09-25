@@ -12,6 +12,23 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`phase-checkpoint` no longer fights other sessions for `index.lock`.** With several sessions
+  on one repo, the async checkpoint (`git add -A` + `git commit`, fired on every Write/Edit in
+  phases 2–4) could collide with a user/Claude commit and leave "index.lock: File exists". The
+  status check now uses `--no-optional-locks`; the hook skips (and retries on the next edit) while
+  another git process holds the lock; concurrent hook instances claim the phase atomically so only
+  one runs git.
+- **`scout-block` checks only the segments that read paths.** It now splits the command on
+  `&&` / `||` / `;` / `|` and checks a segment only when its first word is `cd`/`ls`/`cat`/`head`/
+  `tail`/`find`/`grep`. `cd repo && rm -f .git/index.lock` (stale-lock recovery) is no longer
+  blocked, and words like `tools` / `concat` no longer match `ls ` / `cat `.
+
+### Added
+
+- `AF_SCOUT_BLOCK=false` disables `scout-block`.
+
 ## [3.8.0-alpha.18] - 2026-09-24 (Evidence-based code review: correctness + compatibility aspects, check review command)
 
 ### Changed
