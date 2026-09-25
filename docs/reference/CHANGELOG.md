@@ -12,6 +12,8 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.19] - 2026-09-25 (Multi-session git: no more index.lock contention from hooks)
+
 ### Fixed
 
 - **`phase-checkpoint` no longer fights other sessions for `index.lock`.** With several sessions
