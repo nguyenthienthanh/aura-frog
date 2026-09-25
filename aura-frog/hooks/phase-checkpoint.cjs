@@ -27,10 +27,41 @@ function getWorkflowState() {
 
 function hasUncommittedChanges() {
   try {
-    const status = execSync('git status --porcelain', { encoding: 'utf8', timeout: 5000 });
+    // --no-optional-locks: a read-only status must not grab index.lock, or it
+    // collides with a commit running in another session on the same repo.
+    const status = execSync('git --no-optional-locks status --porcelain', { encoding: 'utf8', timeout: 5000 });
     return status.trim().length > 0;
   } catch { /* git not available - non-blocking */ }
   return false;
+}
+
+/**
+ * True when another git process holds the index lock. `--git-path` resolves the
+ * right file for worktrees too.
+ */
+function isIndexLocked(cwd = process.cwd()) {
+  try {
+    const lockPath = execSync('git rev-parse --git-path index.lock', {
+      cwd, encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return fs.existsSync(path.resolve(cwd, lockPath));
+  } catch { /* not a git repo - nothing to lock */ }
+  return false;
+}
+
+/**
+ * Atomically claim a checkpoint key so concurrent async hook instances (one per
+ * Write/Edit) don't both run `git add` + `git commit`. Returns false if another
+ * instance already claimed it.
+ */
+function claimCheckpoint(cacheKey) {
+  try {
+    const dir = path.dirname(getCacheFile());
+    fs.mkdirSync(dir, { recursive: true });
+    const claim = path.join(dir, `af-checkpoint-${cacheKey.replace(/[^\w.-]/g, '_')}.claim`);
+    fs.closeSync(fs.openSync(claim, 'wx'));
+    return true;
+  } catch { return false; }
 }
 
 function createCheckpoint(phase) {
@@ -102,7 +133,9 @@ function main() {
   const workflowId = state.workflowId || 'unknown';
   const cacheKey = `${workflowId}-phase-${currentPhase}`;
 
-  if (cache[cacheKey]) {
+  // Another session is mid-commit: skip without claiming, so the next
+  // Write/Edit retries instead of racing it for index.lock.
+  if (cache[cacheKey] || isIndexLocked() || !claimCheckpoint(cacheKey)) {
     process.exit(0);
     return;
   }
@@ -125,5 +158,5 @@ function main() {
 if (require.main === module) {
   main();
 } else {
-  module.exports = { getWorkflowState, hasUncommittedChanges, getCacheFile, readCache };
+  module.exports = { getWorkflowState, hasUncommittedChanges, getCacheFile, readCache, isIndexLocked };
 }

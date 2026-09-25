@@ -184,6 +184,11 @@ android/build
 ios/Pods
 ```
 
+**What is checked:** in Bash, only segments (split on `&&` / `||` / `;` / `|`) whose first word is
+`cd`, `ls`, `cat`, `head`, `tail`, `find` or `grep`. So `cd repo && rm -f .git/index.lock` is allowed.
+
+**Disable:** Set `AF_SCOUT_BLOCK=false` in environment
+
 ---
 
 ### 1b. PreToolUse - Commit Attribution (NEW in 2.0.0)
