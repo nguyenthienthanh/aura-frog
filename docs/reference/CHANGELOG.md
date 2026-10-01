@@ -12,6 +12,25 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.20] - 2026-10-01 (Startup context budget warning)
+
+### Added
+
+- **Startup context budget warning.** Claude Code loads every `CLAUDE.md` in the tree, every
+  `.claude/rules/**.md` without `paths:` frontmatter, and `~/.claude` instructions at session start,
+  and only warns past 150k chars. By then every session is already paying for it (measured on a
+  real project: 89 files = 492k chars). New `scripts/context-budget.cjs` measures the same set
+  (skips path-scoped rules, follows `@` imports); `session-start` now warns from 100k with the three
+  largest files and the fix. Threshold `AF_CONTEXT_BUDGET_WARN`, opt out
+  `AF_CONTEXT_BUDGET_DISABLED=true`.
+
+### Changed
+
+- **Project rules created via `extension-detector` / `/aura-frog:extend` are path-scoped by default.**
+  `extension-policy` now requires `paths:` frontmatter (always-loaded only with user confirmation),
+  a ~8k-char cap (logs and quick-refs go to `docs/`), and a one-line entry in the project's CLAUDE.md
+  rule index.
+
 ## [3.8.0-alpha.19] - 2026-09-25 (Multi-session git: no more index.lock contention from hooks)
 
 ### Fixed

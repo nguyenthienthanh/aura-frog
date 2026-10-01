@@ -92,6 +92,16 @@ forbidden_paths[1]{path,reason}:
 
 Project skills with `autoInvoke: true` MUST be name-collision-checked against plugin auto-invoke skills (would cause duplicate fires).
 
+### Project rules load EVERY session unless path-scoped (HARD)
+
+Claude Code loads every `.claude/rules/**/*.md` without `paths:` frontmatter at session start, and warns past **150k chars** total. A project that keeps adding rules hits that ceiling (measured: 86 unscoped rules + a 94k CLAUDE.md = 492k chars). So a new project rule:
+
+- **Declares `paths:` frontmatter** (globs of the code it governs) unless it is a project-wide guardrail that must apply to every task. Default to scoped; always-loaded is the exception the user confirms.
+- **Stays under ~8k chars.** Incident logs, patch histories and quick-refs go to `docs/`, and the rule keeps a short summary plus a pointer.
+- **Gets a one-line entry in the project's CLAUDE.md rule index** so it is still discoverable for chat-only work that touches no file.
+
+Check before and after: `node aura-frog/scripts/context-budget.cjs <project>`. Session start also warns once the total passes `AF_CONTEXT_BUDGET_WARN` (default 100k).
+
 ---
 
 ## Reference integrity follow-up
