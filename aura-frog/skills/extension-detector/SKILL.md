@@ -61,7 +61,7 @@ To prevent fatigue, max **1 proposal per turn**, max **3 proposals per session**
 | Kind | Path | Purpose |
 |---|---|---|
 | skill | `.claude/skills/<name>/SKILL.md` | AI-discoverable knowledge for repeated procedures |
-| rule | `.claude/rules/<tier>/<name>.md` | Always-loaded or per-agent guardrail |
+| rule | `.claude/rules/<tier>/<name>.md` | Guardrail; **declare `paths:` frontmatter** so it loads on demand, keep it under ~8k chars (see `rules/workflow/extension-policy.md` § path-scoped) |
 | command | `.claude/commands/<name>.md` | User-invocable slash command |
 
 Project-level files load AFTER plugin-level files, so they can shadow or extend plugin behavior without modifying the plugin.

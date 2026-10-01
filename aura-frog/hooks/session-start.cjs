@@ -179,6 +179,20 @@ function emitContextStalenessBanner() {
 }
 
 /**
+ * Warn when the instruction files Claude Code loads at startup (CLAUDE.md chain +
+ * unscoped .claude/rules + ~/.claude) approach its 150k-char limit. Fires below the
+ * limit so the fix (`paths:` frontmatter, move logs to docs/) lands before every
+ * session pays for it. Threshold: AF_CONTEXT_BUDGET_WARN (default 100000);
+ * disable with AF_CONTEXT_BUDGET_DISABLED=true. Never breaks session start.
+ */
+function emitContextBudgetWarning() {
+  try {
+    const msg = require('../scripts/context-budget.cjs').budgetWarning(findProjectRoot());
+    if (msg) console.log(msg);
+  } catch { /* non-blocking */ }
+}
+
+/**
  * Build context summary for output (compact, single line)
  */
 function buildContextOutput(config, detections, resolved, memoryResult) {
@@ -257,6 +271,7 @@ async function main() {
         }
       } catch {/* best-effort */}
       emitContextStalenessBanner();
+      emitContextBudgetWarning();
       process.exit(0);
     }
 
@@ -423,6 +438,7 @@ async function main() {
     } catch {/* best-effort; silent on failure */}
 
     emitContextStalenessBanner();
+    emitContextBudgetWarning();
 
     // Check if statusLine is configured — one-time hint
     const statusHintFile = path.join(findProjectRoot(), '.claude', 'cache', 'statusline-hint-shown');
