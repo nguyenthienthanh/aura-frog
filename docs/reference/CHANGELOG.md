@@ -12,6 +12,8 @@ All notable changes to Aura Frog will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0-alpha.20] - 2026-10-01 (Startup context budget warning)
+
 ### Added
 
 - **Startup context budget warning.** Claude Code loads every `CLAUDE.md` in the tree, every
